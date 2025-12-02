@@ -1,0 +1,422 @@
+// Common types and interfaces for the backend
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: ErrorResponse;
+}
+
+export interface ErrorResponse {
+  code: string;
+  message: string;
+  details?: Record<string, any>;
+  timestamp: string;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// Event-related types
+export interface BrandingConfig {
+  logo?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  bannerImage?: string;
+  customCss?: string;
+}
+
+export interface VenueConfig {
+  address: string;
+  city: string;
+  state?: string;
+  country: string;
+  postalCode?: string;
+  mapUrl?: string;
+  instructions?: string;
+}
+
+export interface VirtualConfig {
+  meetingUrl: string;
+  platform: string;
+  accessCode?: string;
+  instructions?: string;
+}
+
+export interface CreateEventDTO {
+  name: string;
+  description: string;
+  mode: 'OFFLINE' | 'ONLINE' | 'HYBRID';
+  startDate: Date | string;
+  endDate: Date | string;
+  capacity?: number;
+  registrationDeadline?: Date | string;
+  branding: BrandingConfig;
+  venue?: VenueConfig;
+  virtualLinks?: VirtualConfig;
+  templateId?: string;
+}
+
+export interface UpdateEventDTO {
+  name?: string;
+  description?: string;
+  mode?: 'OFFLINE' | 'ONLINE' | 'HYBRID';
+  startDate?: Date | string;
+  endDate?: Date | string;
+  capacity?: number;
+  registrationDeadline?: Date | string;
+  branding?: BrandingConfig;
+  venue?: VenueConfig;
+  virtualLinks?: VirtualConfig;
+  status?: 'DRAFT' | 'PUBLISHED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+  leaderboardEnabled?: boolean;
+}
+
+export interface EventResponse {
+  id: string;
+  name: string;
+  description: string;
+  mode: string;
+  startDate: Date;
+  endDate: Date;
+  capacity?: number;
+  registrationDeadline?: Date;
+  organizerId: string;
+  branding: BrandingConfig;
+  venue?: VenueConfig;
+  virtualLinks?: VirtualConfig;
+  status: string;
+  landingPageUrl: string;
+  leaderboardEnabled: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface LandingPageData {
+  event: EventResponse;
+  registrationOpen: boolean;
+  spotsRemaining?: number;
+  organizerInfo: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface EventAnalytics {
+  eventId: string;
+  registrationStats: {
+    total: number;
+    confirmed: number;
+    waitlisted: number;
+    cancelled: number;
+    overTime: Array<{ date: string; count: number }>;
+  };
+  attendanceStats?: {
+    totalCheckedIn: number;
+    checkInRate: number;
+    bySession?: Array<{ sessionId: string; count: number }>;
+  };
+  capacityUtilization?: number;
+}
+
+// Registration-related types
+export interface RegistrationDTO {
+  eventId: string;
+  userId: string;
+  formResponses: Record<string, any>;
+}
+
+export interface RegistrationResponse {
+  id: string;
+  eventId: string;
+  userId: string;
+  status: 'PENDING' | 'CONFIRMED' | 'WAITLISTED' | 'CANCELLED';
+  formResponses: Record<string, any>;
+  qrCode: string;
+  registeredAt: Date;
+  updatedAt: Date;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  registeredAt: Date;
+  position: number;
+}
+
+// Attendance-related types
+export interface QRCodeData {
+  code: string;
+  imageUrl: string;
+  registrationId: string;
+}
+
+export interface CheckInDTO {
+  qrCode: string;
+  sessionId?: string;
+  volunteerId?: string;
+}
+
+export interface AttendanceRecord {
+  id: string;
+  registrationId: string;
+  sessionId?: string | null;
+  checkInTime: Date;
+  checkInMethod: string;
+  volunteerId?: string | null;
+}
+
+export interface AttendanceReport {
+  eventId: string;
+  totalRegistrations: number;
+  attendedCount: number;
+  checkInRate: number;
+  attendanceRecords: Array<{
+    registrationId: string;
+    userId: string;
+    userName: string;
+    userEmail: string;
+    status: string;
+    attended: boolean;
+    checkInTime: Date | null;
+    checkInMethod: string | null;
+  }>;
+}
+
+// Judging-related types
+export interface RubricCriterion {
+  id: string;
+  name: string;
+  description: string;
+  weight: number; // 0-100
+  maxScore: number;
+}
+
+export interface CreateRubricDTO {
+  eventId: string;
+  criteria: Omit<RubricCriterion, 'id'>[];
+}
+
+export interface RubricResponse {
+  id: string;
+  eventId: string;
+  criteria: RubricCriterion[];
+  createdAt: Date;
+}
+
+export interface CreateSubmissionDTO {
+  eventId: string;
+  rubricId: string;
+  teamName: string;
+  description?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface SubmissionResponse {
+  id: string;
+  eventId: string;
+  rubricId: string;
+  teamName: string;
+  description?: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SubmitScoreDTO {
+  submissionId: string;
+  judgeId: string;
+  scores: Record<string, number>; // criterionId -> score
+}
+
+export interface ScoreResponse {
+  id: string;
+  submissionId: string;
+  judgeId: string;
+  rubricId: string;
+  scores: Record<string, number>;
+  submittedAt: Date;
+}
+
+export interface FinalScore {
+  submissionId: string;
+  teamName: string;
+  finalScore: number;
+  rank: number;
+  judgeScores: Array<{
+    judgeId: string;
+    judgeName: string;
+    scores: Record<string, number>;
+    totalScore: number;
+  }>;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  submissionId: string;
+  teamName: string;
+  finalScore: number;
+  metadata?: Record<string, any>;
+}
+
+export interface JudgeAssignment {
+  judgeId: string;
+  submissionIds: string[];
+}
+
+// Certificate-related types
+export interface CertificateMetadata {
+  eventName: string;
+  recipientName: string;
+  recipientEmail: string;
+  issueDate: Date;
+  position?: number;
+  score?: number;
+  role?: string;
+  customFields?: Record<string, any>;
+}
+
+export interface GenerateCertificateDTO {
+  recipientId: string;
+  eventId: string;
+  type: 'MERIT' | 'COMPLETION' | 'APPRECIATION';
+  metadata: CertificateMetadata;
+}
+
+export interface CertificateCriteria {
+  type: 'MERIT' | 'COMPLETION' | 'APPRECIATION';
+  conditions: {
+    minScore?: number;
+    maxRank?: number;
+    requiresAttendance?: boolean;
+    requiresRole?: string[];
+  };
+}
+
+export interface CertificateResponse {
+  id: string;
+  certificateId: string;
+  recipientId: string;
+  eventId: string;
+  type: 'MERIT' | 'COMPLETION' | 'APPRECIATION';
+  pdfUrl: string;
+  qrCodeUrl: string;
+  metadata: CertificateMetadata;
+  issuedAt: Date;
+  distributedAt?: Date;
+}
+
+export interface DistributionResult {
+  successful: number;
+  failed: number;
+  failures: Array<{
+    certificateId: string;
+    recipientEmail: string;
+    error: string;
+  }>;
+}
+
+export interface CertificateVerification {
+  valid: boolean;
+  certificate?: {
+    certificateId: string;
+    recipientName: string;
+    eventName: string;
+    type: 'MERIT' | 'COMPLETION' | 'APPRECIATION';
+    issuedAt: Date;
+  };
+  error?: string;
+}
+
+// Organization-related types
+export interface OrganizationBranding {
+  logoUrl: string;
+  bannerUrl: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+}
+
+export interface CreateOrganizationDTO {
+  name: string;
+  description: string;
+  category: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
+  branding: OrganizationBranding;
+  socialLinks?: Record<string, string>;
+}
+
+export interface UpdateOrganizationDTO {
+  name?: string;
+  description?: string;
+  category?: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
+  branding?: OrganizationBranding;
+  socialLinks?: Record<string, string>;
+}
+
+export interface OrganizationResponse {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  verificationStatus: string;
+  branding: OrganizationBranding;
+  socialLinks?: Record<string, string>;
+  pageUrl: string;
+  followerCount: number;
+  eventCount: number;
+  rejectionReason?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  latestEvents?: EventResponse[];
+}
+
+export interface OrganizationAnalytics {
+  totalEvents: number;
+  totalFollowers: number;
+  totalRegistrations: number;
+  followerGrowth: Record<string, number>;
+  eventPerformance: Array<{
+    eventId: string;
+    eventName: string;
+    registrationCount: number;
+  }>;
+  pageViews: number;
+}
+
+// Discovery-related types
+export interface SearchOrganizationsDTO {
+  query?: string;
+  category?: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
+  verifiedOnly?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface FollowResponse {
+  id: string;
+  userId: string;
+  organizationId: string;
+  followedAt: Date;
+}
+
+// Update EventResponse to include organization fields
+declare module './index' {
+  interface EventResponse {
+    organizationId?: string | null;
+    visibility?: string;
+    inviteLink?: string | null;
+    registrationCount?: number;
+  }
+}

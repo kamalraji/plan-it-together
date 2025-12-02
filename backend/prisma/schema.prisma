@@ -1,0 +1,306 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ORGANIZER
+  PARTICIPANT
+  JUDGE
+  VOLUNTEER
+  SPEAKER
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum EventMode {
+  OFFLINE
+  ONLINE
+  HYBRID
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+}
+
+enum CertificateType {
+  MERIT
+  COMPLETION
+  APPRECIATION
+}
+
+enum OrganizationCategory {
+  COLLEGE
+  COMPANY
+  INDUSTRY
+  NON_PROFIT
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum EventVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          UserRole
+  status        UserStatus @default(PENDING)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  organizedEvents    Event[]              @relation("OrganizerEvents")
+  registrations      Registration[]
+  scores             Score[]
+  certificates       Certificate[]
+  communications     CommunicationLog[]
+  organizationAdmins OrganizationAdmin[]
+  follows            Follow[]
+
+  @@index([email])
+}
+
+model Event {
+  id                   String          @id @default(uuid())
+  name                 String
+  description          String          @db.Text
+  mode                 EventMode
+  startDate            DateTime
+  endDate              DateTime
+  capacity             Int?
+  registrationDeadline DateTime?
+  organizerId          String
+  organizationId       String?
+  visibility           EventVisibility @default(PUBLIC)
+  branding             Json
+  venue                Json?
+  virtualLinks         Json?
+  status               EventStatus     @default(DRAFT)
+  landingPageUrl       String          @unique
+  inviteLink           String?         @unique
+  leaderboardEnabled   Boolean         @default(false)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  // Relations
+  organizer      User               @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  organization   Organization?      @relation(fields: [organizationId], references: [id])
+  registrations  Registration[]
+  rubric         Rubric?
+  certificates   Certificate[]
+  communications CommunicationLog[]
+
+  @@index([organizerId])
+  @@index([organizationId])
+  @@index([landingPageUrl])
+  @@index([visibility])
+}
+
+model Registration {
+  id            String             @id @default(uuid())
+  eventId       String
+  userId        String
+  status        RegistrationStatus @default(PENDING)
+  formResponses Json
+  qrCode        String             @unique
+  registeredAt  DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  // Relations
+  event      Event        @relation(fields: [eventId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+  attendance Attendance[]
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([qrCode])
+}
+
+model Attendance {
+  id             String   @id @default(uuid())
+  registrationId String
+  sessionId      String?
+  checkInTime    DateTime @default(now())
+  checkInMethod  String   // 'QR_SCAN' or 'MANUAL'
+  volunteerId    String?
+
+  // Relations
+  registration Registration @relation(fields: [registrationId], references: [id])
+
+  @@index([registrationId])
+}
+
+model Rubric {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  criteria  Json
+  createdAt DateTime @default(now())
+
+  // Relations
+  event       Event        @relation(fields: [eventId], references: [id])
+  scores      Score[]
+  submissions Submission[]
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  eventId     String
+  rubricId    String
+  teamName    String
+  description String?  @db.Text
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  rubric Rubric  @relation(fields: [rubricId], references: [id])
+  scores Score[]
+
+  @@index([eventId])
+  @@index([rubricId])
+}
+
+model Score {
+  id           String   @id @default(uuid())
+  submissionId String
+  judgeId      String
+  rubricId     String
+  scores       Json
+  submittedAt  DateTime @default(now())
+
+  // Relations
+  judge      User       @relation(fields: [judgeId], references: [id])
+  rubric     Rubric     @relation(fields: [rubricId], references: [id])
+  submission Submission @relation(fields: [submissionId], references: [id])
+
+  @@index([submissionId])
+  @@index([judgeId])
+  @@index([rubricId])
+}
+
+model Certificate {
+  id            String          @id @default(uuid())
+  certificateId String          @unique
+  recipientId   String
+  eventId       String
+  type          CertificateType
+  pdfUrl        String
+  qrCodeUrl     String
+  metadata      Json
+  issuedAt      DateTime        @default(now())
+  distributedAt DateTime?
+
+  // Relations
+  recipient User  @relation(fields: [recipientId], references: [id])
+  event     Event @relation(fields: [eventId], references: [id])
+
+  @@index([certificateId])
+  @@index([recipientId])
+  @@index([eventId])
+}
+
+model CommunicationLog {
+  id             String   @id @default(uuid())
+  eventId        String
+  senderId       String
+  recipientCount Int
+  subject        String
+  sentAt         DateTime @default(now())
+  status         String   // 'SENT', 'FAILED', 'PARTIAL'
+
+  // Relations
+  event  Event @relation(fields: [eventId], references: [id])
+  sender User  @relation(fields: [senderId], references: [id])
+
+  @@index([eventId])
+  @@index([senderId])
+}
+
+model Organization {
+  id                 String             @id @default(uuid())
+  name               String
+  description        String             @db.Text
+  category           OrganizationCategory
+  verificationStatus VerificationStatus @default(PENDING)
+  branding           Json
+  socialLinks        Json?
+  pageUrl            String             @unique
+  followerCount      Int                @default(0)
+  rejectionReason    String?            @db.Text
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  events  Event[]
+  admins  OrganizationAdmin[]
+  follows Follow[]
+
+  @@index([pageUrl])
+  @@index([category])
+  @@index([verificationStatus])
+}
+
+model OrganizationAdmin {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String
+  role           String   @default("ADMIN") // 'OWNER' or 'ADMIN'
+  addedAt        DateTime @default(now())
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Follow {
+  id             String   @id @default(uuid())
+  userId         String
+  organizationId String
+  followedAt     DateTime @default(now())
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+}
