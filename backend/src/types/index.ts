@@ -66,6 +66,8 @@ export interface CreateEventDTO {
   venue?: VenueConfig;
   virtualLinks?: VirtualConfig;
   templateId?: string;
+  organizationId?: string;
+  visibility?: 'PUBLIC' | 'PRIVATE' | 'UNLISTED';
 }
 
 export interface UpdateEventDTO {
@@ -81,6 +83,8 @@ export interface UpdateEventDTO {
   virtualLinks?: VirtualConfig;
   status?: 'DRAFT' | 'PUBLISHED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
   leaderboardEnabled?: boolean;
+  organizationId?: string;
+  visibility?: 'PUBLIC' | 'PRIVATE' | 'UNLISTED';
 }
 
 export interface EventResponse {
@@ -93,12 +97,16 @@ export interface EventResponse {
   capacity?: number;
   registrationDeadline?: Date;
   organizerId: string;
+  organizationId?: string | null;
+  visibility?: string;
+  inviteLink?: string | null;
   branding: BrandingConfig;
   venue?: VenueConfig;
   virtualLinks?: VirtualConfig;
   status: string;
   landingPageUrl: string;
   leaderboardEnabled: boolean;
+  registrationCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -110,6 +118,12 @@ export interface LandingPageData {
   organizerInfo: {
     name: string;
     email: string;
+  };
+  organizationInfo?: {
+    id: string;
+    name: string;
+    branding: OrganizationBranding;
+    verificationStatus: string;
   };
 }
 
@@ -386,13 +400,40 @@ export interface OrganizationAnalytics {
   totalEvents: number;
   totalFollowers: number;
   totalRegistrations: number;
+  totalAttendance: number;
   followerGrowth: Record<string, number>;
   eventPerformance: Array<{
     eventId: string;
     eventName: string;
     registrationCount: number;
+    attendanceCount: number;
+    attendanceRate: number;
   }>;
   pageViews: number;
+  followerDemographics: {
+    byRole: Record<string, number>;
+    byRegistrationDate: Record<string, number>;
+  };
+}
+
+export interface OrganizationAnalyticsReport {
+  organizationId: string;
+  organizationName: string;
+  generatedAt: Date;
+  analytics: OrganizationAnalytics;
+  summary: {
+    totalEvents: number;
+    totalFollowers: number;
+    totalRegistrations: number;
+    totalAttendance: number;
+    averageAttendanceRate: number;
+    followerGrowthRate: number;
+    mostPopularEvent: {
+      eventId: string;
+      eventName: string;
+      registrationCount: number;
+    } | null;
+  };
 }
 
 // Discovery-related types
@@ -411,12 +452,33 @@ export interface FollowResponse {
   followedAt: Date;
 }
 
-// Update EventResponse to include organization fields
-declare module './index' {
-  interface EventResponse {
-    organizationId?: string | null;
-    visibility?: string;
-    inviteLink?: string | null;
-    registrationCount?: number;
-  }
+// Organization Admin Management types
+export interface InviteAdminDTO {
+  email: string;
+  role?: 'OWNER' | 'ADMIN';
 }
+
+export interface AddAdminDTO {
+  userId: string;
+  role?: 'OWNER' | 'ADMIN';
+}
+
+export interface OrganizationAdminResponse {
+  id: string;
+  organizationId: string;
+  userId: string;
+  role: string;
+  addedAt: Date;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface AdminInvitationResult {
+  success: boolean;
+  message: string;
+}
+
+

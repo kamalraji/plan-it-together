@@ -8,7 +8,7 @@ The system emphasizes security, scalability, and user experience, with role-base
 
 **Official Pages Extension:** The platform now supports organization profiles, allowing colleges, companies, and industry associations to establish official presences. Organizations can host multiple events under their brand, manage visibility (public/private/unlisted), and build follower communities. This creates a trusted event discovery ecosystem where users can find events from verified organizations.
 
-**Official Pages Extension:** The platform now supports organization profiles, allowing colleges, companies, and industry associations to establish official presences. Organizations can host multiple events under their brand, manage visibility (public/private/unlisted), and build follower communities. This creates a trusted event discovery ecosystem where users can find events from verified organizations.
+**Event Marketplace Integration:** The platform includes an integrated B2B marketplace that seamlessly connects event organizers with verified service providers. The marketplace features comprehensive vendor management, service discovery, booking workflows, payment processing, and review systems, all integrated within the unified event management experience.
 
 ## Architecture
 
@@ -37,10 +37,14 @@ The application follows a client-server architecture with clear separation of co
 │  │  Attendance  │  │   Judging    │  │    Email     │      │
 │  │   Service    │  │   Service    │  │   Service    │      │
 │  └──────────────┘  └──────────────┘  └──────────────┘      │
-│  ┌──────────────┐  ┌──────────────┐                        │
-│  │Organization  │  │  Discovery   │                        │
-│  │   Service    │  │   Service    │                        │
-│  └──────────────┘  └──────────────┘                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │Organization  │  │  Discovery   │  │ Marketplace  │      │
+│  │   Service    │  │   Service    │  │   Service    │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   Vendor     │  │   Booking    │  │   Payment    │      │
+│  │   Service    │  │   Service    │  │   Service    │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
 └─────────────────────────────────────────────────────────────┘
                             │
 ┌─────────────────────────────────────────────────────────────┐
@@ -442,6 +446,215 @@ interface Follow {
 }
 ```
 
+### 10. Marketplace Service
+
+**Responsibilities:**
+- Service listing management and discovery
+- Vendor profile and verification management
+- Search and filtering for event services
+- Integration with event planning workflows
+
+**Key Interfaces:**
+
+```typescript
+interface MarketplaceService {
+  searchServices(query: SearchServicesDTO): Promise<ServiceListing[]>;
+  getServicesByCategory(category: ServiceCategory): Promise<ServiceListing[]>;
+  getVendorProfile(vendorId: string): Promise<VendorProfile>;
+  getFeaturedServices(eventType?: string, location?: string): Promise<ServiceListing[]>;
+  getServiceRecommendations(eventId: string): Promise<ServiceListing[]>;
+}
+
+interface SearchServicesDTO {
+  query?: string;
+  category?: ServiceCategory;
+  location?: string;
+  dateRange?: {
+    startDate: Date;
+    endDate: Date;
+  };
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  verifiedOnly?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+enum ServiceCategory {
+  VENUE = 'VENUE',
+  CATERING = 'CATERING',
+  PHOTOGRAPHY = 'PHOTOGRAPHY',
+  VIDEOGRAPHY = 'VIDEOGRAPHY',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  DECORATION = 'DECORATION',
+  AUDIO_VISUAL = 'AUDIO_VISUAL',
+  TRANSPORTATION = 'TRANSPORTATION',
+  SECURITY = 'SECURITY',
+  CLEANING = 'CLEANING',
+  EQUIPMENT_RENTAL = 'EQUIPMENT_RENTAL',
+  PRINTING = 'PRINTING',
+  MARKETING = 'MARKETING',
+  OTHER = 'OTHER'
+}
+```
+
+### 11. Vendor Service
+
+**Responsibilities:**
+- Vendor registration and profile management
+- Service listing creation and management
+- Vendor verification workflow
+- Portfolio and media management
+
+**Key Interfaces:**
+
+```typescript
+interface VendorService {
+  registerVendor(vendorData: CreateVendorDTO): Promise<VendorProfile>;
+  updateVendorProfile(vendorId: string, updates: UpdateVendorDTO): Promise<VendorProfile>;
+  createServiceListing(vendorId: string, serviceData: CreateServiceDTO): Promise<ServiceListing>;
+  updateServiceListing(listingId: string, updates: UpdateServiceDTO): Promise<ServiceListing>;
+  getVendorAnalytics(vendorId: string): Promise<VendorAnalytics>;
+  submitVerificationDocuments(vendorId: string, documents: VerificationDocuments): Promise<void>;
+}
+
+interface CreateVendorDTO {
+  businessName: string;
+  description: string;
+  contactInfo: ContactInfo;
+  serviceCategories: ServiceCategory[];
+  businessAddress: Address;
+  businessLicense?: string;
+  insuranceCertificate?: string;
+  portfolio: MediaFile[];
+}
+
+interface CreateServiceDTO {
+  title: string;
+  description: string;
+  category: ServiceCategory;
+  pricing: PricingModel;
+  availability: AvailabilityCalendar;
+  serviceArea: string[];
+  requirements?: string;
+  inclusions: string[];
+  exclusions?: string[];
+  media: MediaFile[];
+}
+
+interface PricingModel {
+  type: 'FIXED' | 'HOURLY' | 'PER_PERSON' | 'CUSTOM_QUOTE';
+  basePrice?: number;
+  currency: string;
+  minimumOrder?: number;
+  packageDeals?: PackageDeal[];
+}
+```
+
+### 12. Booking Service
+
+**Responsibilities:**
+- Booking request management
+- Service agreement generation
+- Timeline coordination with events
+- Communication between organizers and vendors
+
+**Key Interfaces:**
+
+```typescript
+interface BookingService {
+  createBookingRequest(bookingData: CreateBookingDTO): Promise<BookingRequest>;
+  updateBookingStatus(bookingId: string, status: BookingStatus): Promise<BookingRequest>;
+  generateServiceAgreement(bookingId: string): Promise<ServiceAgreement>;
+  getBookingsByEvent(eventId: string): Promise<BookingRequest[]>;
+  getBookingsByVendor(vendorId: string): Promise<BookingRequest[]>;
+  sendBookingMessage(bookingId: string, message: BookingMessage): Promise<void>;
+}
+
+interface CreateBookingDTO {
+  eventId: string;
+  serviceListingId: string;
+  organizerId: string;
+  serviceDate: Date;
+  requirements: string;
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  additionalNotes?: string;
+}
+
+enum BookingStatus {
+  PENDING = 'PENDING',
+  VENDOR_REVIEWING = 'VENDOR_REVIEWING',
+  QUOTE_SENT = 'QUOTE_SENT',
+  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED',
+  CONFIRMED = 'CONFIRMED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  DISPUTED = 'DISPUTED'
+}
+
+interface ServiceAgreement {
+  id: string;
+  bookingId: string;
+  terms: string;
+  deliverables: Deliverable[];
+  paymentSchedule: PaymentMilestone[];
+  cancellationPolicy: string;
+  signedAt?: Date;
+  organizerSignature?: string;
+  vendorSignature?: string;
+}
+```
+
+### 13. Payment Service
+
+**Responsibilities:**
+- Secure payment processing
+- Escrow management
+- Vendor payout automation
+- Invoice and receipt generation
+
+**Key Interfaces:**
+
+```typescript
+interface PaymentService {
+  processPayment(paymentData: ProcessPaymentDTO): Promise<PaymentResult>;
+  createEscrow(bookingId: string, amount: number): Promise<EscrowAccount>;
+  releaseFunds(escrowId: string, milestoneId: string): Promise<PaymentResult>;
+  generateInvoice(bookingId: string): Promise<Invoice>;
+  getPaymentHistory(userId: string, userType: 'ORGANIZER' | 'VENDOR'): Promise<PaymentRecord[]>;
+  processRefund(paymentId: string, amount: number, reason: string): Promise<RefundResult>;
+}
+
+interface ProcessPaymentDTO {
+  bookingId: string;
+  amount: number;
+  currency: string;
+  paymentMethod: PaymentMethod;
+  description: string;
+  milestoneId?: string;
+}
+
+interface PaymentMethod {
+  type: 'CREDIT_CARD' | 'BANK_TRANSFER' | 'DIGITAL_WALLET';
+  details: Record<string, any>;
+}
+
+interface EscrowAccount {
+  id: string;
+  bookingId: string;
+  totalAmount: number;
+  releasedAmount: number;
+  pendingAmount: number;
+  milestones: PaymentMilestone[];
+}
+```
+
 ## Data Models
 
 ### Core Entities
@@ -614,6 +827,201 @@ enum EventVisibility {
   PRIVATE = 'PRIVATE',
   UNLISTED = 'UNLISTED'
 }
+
+// Marketplace Entities
+interface VendorProfile {
+  id: string;
+  userId: string;
+  businessName: string;
+  description: string;
+  contactInfo: ContactInfo;
+  serviceCategories: ServiceCategory[];
+  businessAddress: Address;
+  verificationStatus: VerificationStatus;
+  verificationDocuments: VerificationDocuments;
+  rating: number;
+  reviewCount: number;
+  portfolio: MediaFile[];
+  businessHours: BusinessHours;
+  responseTime: number; // in hours
+  completionRate: number; // percentage
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ServiceListing {
+  id: string;
+  vendorId: string;
+  title: string;
+  description: string;
+  category: ServiceCategory;
+  pricing: PricingModel;
+  availability: AvailabilityCalendar;
+  serviceArea: string[];
+  requirements?: string;
+  inclusions: string[];
+  exclusions?: string[];
+  media: MediaFile[];
+  featured: boolean;
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  viewCount: number;
+  inquiryCount: number;
+  bookingCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface BookingRequest {
+  id: string;
+  eventId: string;
+  serviceListingId: string;
+  organizerId: string;
+  vendorId: string;
+  status: BookingStatus;
+  serviceDate: Date;
+  requirements: string;
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  quotedPrice?: number;
+  finalPrice?: number;
+  additionalNotes?: string;
+  messages: BookingMessage[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface BookingMessage {
+  id: string;
+  bookingId: string;
+  senderId: string;
+  senderType: 'ORGANIZER' | 'VENDOR';
+  message: string;
+  attachments?: MediaFile[];
+  sentAt: Date;
+}
+
+interface VendorReview {
+  id: string;
+  vendorId: string;
+  bookingId: string;
+  organizerId: string;
+  rating: number; // 1-5
+  title: string;
+  comment: string;
+  serviceQuality: number;
+  communication: number;
+  timeliness: number;
+  value: number;
+  wouldRecommend: boolean;
+  vendorResponse?: string;
+  vendorResponseAt?: Date;
+  verifiedPurchase: boolean;
+  helpful: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface PaymentRecord {
+  id: string;
+  bookingId: string;
+  payerId: string;
+  payeeId: string;
+  amount: number;
+  currency: string;
+  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  paymentMethod: PaymentMethod;
+  transactionId: string;
+  platformFee: number;
+  vendorPayout: number;
+  processedAt: Date;
+  createdAt: Date;
+}
+
+// Supporting Types
+interface ContactInfo {
+  email: string;
+  phone: string;
+  website?: string;
+  socialMedia?: Record<string, string>;
+}
+
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+interface MediaFile {
+  id: string;
+  url: string;
+  type: 'IMAGE' | 'VIDEO' | 'DOCUMENT';
+  caption?: string;
+  order: number;
+}
+
+interface AvailabilityCalendar {
+  timezone: string;
+  recurringAvailability: WeeklySchedule;
+  blockedDates: Date[];
+  customAvailability: CustomAvailabilitySlot[];
+}
+
+interface WeeklySchedule {
+  monday?: TimeSlot[];
+  tuesday?: TimeSlot[];
+  wednesday?: TimeSlot[];
+  thursday?: TimeSlot[];
+  friday?: TimeSlot[];
+  saturday?: TimeSlot[];
+  sunday?: TimeSlot[];
+}
+
+interface TimeSlot {
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+}
+
+interface CustomAvailabilitySlot {
+  date: Date;
+  available: boolean;
+  timeSlots?: TimeSlot[];
+}
+
+interface PackageDeal {
+  name: string;
+  description: string;
+  services: string[];
+  originalPrice: number;
+  packagePrice: number;
+  savings: number;
+}
+
+interface Deliverable {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: Date;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE';
+  completedAt?: Date;
+}
+
+interface PaymentMilestone {
+  id: string;
+  title: string;
+  description: string;
+  amount: number;
+  dueDate: Date;
+  status: 'PENDING' | 'PAID' | 'OVERDUE';
+  paidAt?: Date;
+}
 ```
 
 ### Database Relationships
@@ -634,6 +1042,16 @@ Organizations (1) ──── (N) OrganizationAdmins
 Users (1) ──── (N) OrganizationAdmins
 Organizations (1) ──── (N) Follows
 Users (1) ──── (N) Follows
+Users (1) ──── (1) VendorProfile [userId]
+VendorProfile (1) ──── (N) ServiceListings
+Events (1) ──── (N) BookingRequests
+ServiceListings (1) ──── (N) BookingRequests
+Users (1) ──── (N) BookingRequests [organizerId]
+VendorProfile (1) ──── (N) BookingRequests [vendorId]
+BookingRequests (1) ──── (N) BookingMessages
+BookingRequests (1) ──── (N) PaymentRecords
+VendorProfile (1) ──── (N) VendorReviews
+BookingRequests (1) ──── (1) VendorReviews
 ```
 
 
@@ -846,6 +1264,42 @@ After reviewing all testable acceptance criteria, the following properties have 
 ### Property 51: Private event invite link uniqueness
 *For any* private event, the generated invite link should be unique and grant access only to that specific event.
 **Validates: Requirements 24.1**
+
+### Property 52: Vendor profile data persistence
+*For any* vendor with business information, contact details, and service categories, storing and retrieving the vendor profile should preserve all data fields without loss or corruption.
+**Validates: Requirements 25.1, 25.3, 25.5**
+
+### Property 53: Service listing search accuracy
+*For any* service search query with filters (category, location, date range, budget), the results should contain only services matching all specified criteria.
+**Validates: Requirements 28.1, 28.2**
+
+### Property 54: Vendor verification state transitions
+*For any* vendor, verification status transitions should follow the valid flow: Pending → Verified or Pending → Rejected, with appropriate notifications and badge display.
+**Validates: Requirements 27.2, 27.3**
+
+### Property 55: Service pricing model validation
+*For any* service listing with pricing information, the pricing model should be consistent with the specified type (fixed, hourly, per-person, custom quote) and include all required fields.
+**Validates: Requirements 26.2**
+
+### Property 56: Booking request state transitions
+*For any* booking request, status transitions should follow valid business rules: Pending → Vendor Reviewing → Quote Sent → Quote Accepted → Confirmed → Completed, with proper authorization at each step.
+**Validates: Requirements 29.1, 29.2**
+
+### Property 57: Payment processing integrity
+*For any* payment transaction, the total amount should equal the sum of vendor payout and platform commission, with proper escrow management and milestone tracking.
+**Validates: Requirements 29.3, 29.4**
+
+### Property 58: Review authenticity validation
+*For any* vendor review, it should be linked to a verified booking completion and include all required rating components (service quality, communication, timeliness, value).
+**Validates: Requirements 30.1, 30.2**
+
+### Property 59: Vendor analytics accuracy
+*For any* vendor with service listings and bookings, calculated metrics (listing views, inquiry conversion rates, booking success ratios) should accurately reflect the underlying data.
+**Validates: Requirements 31.1, 31.2**
+
+### Property 60: Event-marketplace integration consistency
+*For any* event with marketplace bookings, vendor deliverables and timelines should be properly synchronized with the event project management system.
+**Validates: Requirements 32.2, 32.4**
 
 ## Error Handling
 
@@ -1142,6 +1596,16 @@ E2E tests will verify complete user workflows through the UI:
 - communication_logs
 - event_sessions
 - event_templates
+- organizations
+- organization_admins
+- follows
+- vendor_profiles
+- service_listings
+- booking_requests
+- booking_messages
+- vendor_reviews
+- payment_records
+- service_agreements
 
 **Key Indexes:**
 - users(email)
@@ -1149,3 +1613,9 @@ E2E tests will verify complete user workflows through the UI:
 - registrations(event_id, user_id)
 - certificates(certificate_id)
 - attendance(registration_id)
+- organizations(page_url)
+- vendor_profiles(user_id)
+- service_listings(vendor_id, category)
+- booking_requests(event_id, vendor_id)
+- vendor_reviews(vendor_id, booking_id)
+- payment_records(booking_id)

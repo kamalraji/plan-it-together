@@ -235,10 +235,18 @@ class CertificateService {
     criteria: CertificateCriteria[]
   ): Promise<void> {
     // Store criteria in event metadata
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { branding: true }
+    });
+
+    const currentBranding = event?.branding as any || {};
+    
     await prisma.event.update({
       where: { id: eventId },
       data: {
         branding: {
+          ...currentBranding,
           certificateCriteria: criteria
         }
       }
@@ -274,7 +282,7 @@ class CertificateService {
     const qrCodeUrl = `/storage/qr-codes/${certificateId}.png`;
 
     // Generate PDF
-    const pdfPath = await this.generateCertificatePDF(
+    await this.generateCertificatePDF(
       certificateId,
       data.type,
       data.metadata,

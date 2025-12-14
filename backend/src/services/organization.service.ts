@@ -5,7 +5,7 @@ import {
   OrganizationResponse,
   OrganizationAnalytics,
 } from '../types';
-import { randomBytes } from 'crypto';
+import { communicationService } from './communication.service';
 
 const prisma = new PrismaClient();
 
@@ -142,21 +142,143 @@ export class OrganizationService {
       },
     });
 
-    // TODO: Send notification to organization admins
+    // Send notification to organization admins
+    await this.notifyOrganizationAdmins(orgId, approved, reason);
 
     return this.mapOrganizationToResponse(updated);
   }
 
   /**
-   * Add an admin to an organization
+   * Invite a user to be an admin of an organization
    */
-  async addAdmin(orgId: string, userId: string, role: 'OWNER' | 'ADMIN' = 'ADMIN'): Promise<any> {
+  async inviteAdmin(
+    orgId: string,
+    inviterUserId: string,
+    inviteeEmail: string,
+    role: 'OWNER' | 'ADMIN' = 'ADMIN'
+  ): Promise<{ success: boolean; message: string }> {
     const organization = await prisma.organization.findUnique({
       where: { id: orgId },
     });
 
     if (!organization) {
       throw new Error('Organization not found');
+    }
+
+    // Check if inviter is an admin
+    const isInviterAdmin = await this.isOrganizationAdmin(orgId, inviterUserId);
+    if (!isInviterAdmin) {
+      throw new Error('You do not have permission to invite admins to this organization');
+    }
+
+    // Check if user exists
+    const inviteeUser = await prisma.user.findUnique({
+      where: { email: inviteeEmail },
+    });
+
+    if (!inviteeUser) {
+      throw new Error('User with this email does not exist');
+    }
+
+    // Check if user is already an admin
+    const existingAdmin = await prisma.organizationAdmin.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: orgId,
+          userId: inviteeUser.id,
+        },
+      },
+    });
+
+    if (existingAdmin) {
+      throw new Error('User is already an admin of this organization');
+    }
+
+    // Send invitation email
+    const inviterUser = await prisma.user.findUnique({
+      where: { id: inviterUserId },
+      select: { name: true, email: true },
+    });
+
+    const subject = `Invitation to join "${organization.name}" as an admin`;
+    const body = `Hello ${inviteeUser.name},
+
+${inviterUser?.name || 'Someone'} has invited you to become an admin of "${organization.name}" on Thittam1Hub.
+
+As an admin, you will be able to:
+- Manage organization profile and branding
+- Create and manage events under the organization
+- View organization analytics
+- Manage other team members
+
+To accept this invitation, please log in to your Thittam1Hub account and you will see the organization in your admin panel.
+
+Organization: ${organization.name}
+Role: ${role}
+
+Best regards,
+Thittam1Hub Team`;
+
+    try {
+      await communicationService.sendEmail({
+        to: [inviteeUser.email],
+        subject,
+        body,
+      });
+
+      // Automatically add the user as admin after sending invitation
+      await this.addAdmin(orgId, inviteeUser.id, role);
+
+      return {
+        success: true,
+        message: `Invitation sent to ${inviteeEmail} and admin access granted`,
+      };
+    } catch (error: any) {
+      console.error('Failed to send invitation email:', error);
+      // Still add the admin even if email fails
+      await this.addAdmin(orgId, inviteeUser.id, role);
+      
+      return {
+        success: true,
+        message: `Admin access granted to ${inviteeEmail} (email notification failed)`,
+      };
+    }
+  }
+
+  /**
+   * Add a user as an admin to an organization
+   */
+  async addAdmin(
+    orgId: string,
+    userId: string,
+    role: 'OWNER' | 'ADMIN' = 'ADMIN'
+  ): Promise<{
+    id: string;
+    organizationId: string;
+    userId: string;
+    role: string;
+    addedAt: Date;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }> {
+    const organization = await prisma.organization.findUnique({
+      where: { id: orgId },
+    });
+
+    if (!organization) {
+      throw new Error('Organization not found');
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
     }
 
     // Check if user is already an admin
@@ -290,59 +412,12 @@ export class OrganizationService {
   }
 
   /**
-   * Get organization analytics
+   * Get organization analytics (delegated to analytics service)
    */
   async getOrganizationAnalytics(orgId: string): Promise<OrganizationAnalytics> {
-    const organization = await prisma.organization.findUnique({
-      where: { id: orgId },
-      include: {
-        events: {
-          include: {
-            registrations: true,
-            _count: {
-              select: {
-                registrations: true,
-              },
-            },
-          },
-        },
-        follows: {
-          orderBy: {
-            followedAt: 'asc',
-          },
-        },
-      },
-    });
-
-    if (!organization) {
-      throw new Error('Organization not found');
-    }
-
-    // Calculate total registrations across all events
-    const totalRegistrations = organization.events.reduce(
-      (sum, event) => sum + event.registrations.length,
-      0
-    );
-
-    // Calculate follower growth (simplified - by month)
-    const followerGrowth = this.calculateFollowerGrowth(organization.follows);
-
-    // Calculate event performance
-    const eventPerformance = organization.events.map((event) => ({
-      eventId: event.id,
-      eventName: event.name,
-      registrationCount: event.registrations.length,
-      // Attendance rate would require attendance data
-    }));
-
-    return {
-      totalEvents: organization.events.length,
-      totalFollowers: organization.followerCount,
-      totalRegistrations,
-      followerGrowth,
-      eventPerformance,
-      pageViews: 0, // Would need to implement page view tracking
-    };
+    // Import here to avoid circular dependency
+    const { organizationAnalyticsService } = await import('./organization-analytics.service');
+    return organizationAnalyticsService.getOrganizationAnalytics(orgId);
   }
 
   /**
@@ -415,18 +490,80 @@ export class OrganizationService {
     return pageUrl;
   }
 
+
+
   /**
-   * Calculate follower growth over time
+   * Send notification to organization admins about verification status change
    */
-  private calculateFollowerGrowth(follows: any[]): Record<string, number> {
-    const growth: Record<string, number> = {};
+  private async notifyOrganizationAdmins(
+    orgId: string,
+    approved: boolean,
+    reason?: string
+  ): Promise<void> {
+    try {
+      // Get organization details
+      const organization = await prisma.organization.findUnique({
+        where: { id: orgId },
+        include: {
+          admins: {
+            include: {
+              user: {
+                select: {
+                  email: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-    follows.forEach((follow) => {
-      const monthKey = follow.followedAt.toISOString().substring(0, 7); // YYYY-MM
-      growth[monthKey] = (growth[monthKey] || 0) + 1;
-    });
+      if (!organization || !organization.admins.length) {
+        return;
+      }
 
-    return growth;
+      // Prepare email content
+      const subject = approved
+        ? `Organization "${organization.name}" has been verified`
+        : `Organization "${organization.name}" verification was rejected`;
+
+      const body = approved
+        ? `Hello,
+
+Your organization "${organization.name}" has been successfully verified and is now live on Thittam1Hub!
+
+You can now:
+- Publish events under your organization
+- Build your follower community
+- Access organization analytics
+
+Visit your organization page: ${organization.pageUrl}
+
+Best regards,
+Thittam1Hub Team`
+        : `Hello,
+
+Unfortunately, your organization "${organization.name}" verification was rejected.
+
+Reason: ${reason || 'No specific reason provided'}
+
+You can update your organization details and resubmit for verification.
+
+Best regards,
+Thittam1Hub Team`;
+
+      // Send email to all admins
+      const adminEmails = organization.admins.map((admin) => admin.user.email);
+      
+      await communicationService.sendEmail({
+        to: adminEmails,
+        subject,
+        body,
+      });
+    } catch (error) {
+      console.error('Failed to send verification notification:', error);
+      // Don't throw error to avoid breaking the verification process
+    }
   }
 
   /**

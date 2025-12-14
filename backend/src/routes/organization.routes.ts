@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { UserRole } from '@prisma/client';
 import { organizationService } from '../services/organization.service';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
@@ -128,7 +129,7 @@ router.put('/:id', authenticate, async (req: Request, res: Response) => {
 router.post(
   '/:id/verify',
   authenticate,
-  authorize(['SUPER_ADMIN']),
+  authorize(UserRole.SUPER_ADMIN),
   async (req: Request, res: Response) => {
     try {
       const { approved, reason } = req.body;
@@ -180,6 +181,65 @@ router.get('/:id/admins', authenticate, async (req: Request, res: Response) => {
 });
 
 /**
+ * Invite a user to be an admin of organization
+ * POST /api/organizations/:id/invite-admin
+ */
+router.post('/:id/invite-admin', authenticate, async (req: Request, res: Response) => {
+  try {
+    // Check if user is an admin of this organization
+    const isAdmin = await organizationService.isOrganizationAdmin(
+      req.params.id,
+      (req as any).user.id
+    );
+    
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You do not have permission to invite admins to this organization',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const { email, role } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Email is required',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const result = await organizationService.inviteAdmin(
+      req.params.id,
+      (req as any).user.id,
+      email,
+      role || 'ADMIN'
+    );
+    
+    res.status(201).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'INVITE_ADMIN_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
+/**
  * Add an admin to organization
  * POST /api/organizations/:id/admins
  */
@@ -203,7 +263,19 @@ router.post('/:id/admins', authenticate, async (req: Request, res: Response) => 
     }
     
     const { userId, role } = req.body;
-    const admin = await organizationService.addAdmin(req.params.id, userId, role);
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'User ID is required',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const admin = await organizationService.addAdmin(req.params.id, userId, role || 'ADMIN');
     
     res.status(201).json({
       success: true,

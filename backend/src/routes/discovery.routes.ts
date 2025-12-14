@@ -174,4 +174,41 @@ router.get('/:id/following-status', authenticate, async (req: Request, res: Resp
   }
 });
 
+/**
+ * Notify followers about a new event (Admin/Testing endpoint)
+ * POST /api/discovery/organizations/:id/notify-followers
+ */
+router.post('/:id/notify-followers', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.body;
+    
+    if (!eventId) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Event ID is required',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    await discoveryService.notifyFollowers(req.params.id, eventId);
+    
+    return res.json({
+      success: true,
+      data: { message: 'Followers notified successfully' },
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'NOTIFY_FOLLOWERS_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
 export default router;

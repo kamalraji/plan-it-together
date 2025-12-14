@@ -19,7 +19,7 @@ export class EventService {
    */
   async createEvent(
     organizerId: string,
-    eventData: CreateEventDTO & { organizationId?: string; visibility?: string }
+    eventData: CreateEventDTO
   ): Promise<EventResponse> {
     // Validate event mode requirements
     this.validateEventMode(eventData.mode, eventData.venue, eventData.virtualLinks);
@@ -58,7 +58,13 @@ export class EventService {
 
     // Notify followers if event is published and linked to organization
     if (event.organizationId && event.status === 'PUBLISHED') {
-      // TODO: Notify followers
+      try {
+        const { discoveryService } = await import('./discovery.service');
+        await discoveryService.notifyFollowers(event.organizationId, event.id);
+      } catch (error) {
+        console.error('Failed to notify followers:', error);
+        // Don't throw error to avoid breaking event creation
+      }
     }
 
     return this.mapEventToResponse(event);
@@ -111,6 +117,17 @@ export class EventService {
       data: updateData,
     });
 
+    // Notify followers if event status changed to PUBLISHED and linked to organization
+    if (updates.status === 'PUBLISHED' && event.organizationId) {
+      try {
+        const { discoveryService } = await import('./discovery.service');
+        await discoveryService.notifyFollowers(event.organizationId, event.id);
+      } catch (error) {
+        console.error('Failed to notify followers:', error);
+        // Don't throw error to avoid breaking event update
+      }
+    }
+
     return this.mapEventToResponse(event);
   }
 
@@ -157,6 +174,14 @@ export class EventService {
             email: true,
           },
         },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            branding: true,
+            verificationStatus: true,
+          },
+        },
         registrations: {
           where: {
             status: 'CONFIRMED',
@@ -173,7 +198,7 @@ export class EventService {
     const confirmedCount = event.registrations.length;
     const spotsRemaining = event.capacity ? event.capacity - confirmedCount : undefined;
 
-    return {
+    const landingPageData: LandingPageData = {
       event: this.mapEventToResponse(event),
       registrationOpen,
       spotsRemaining,
@@ -182,6 +207,18 @@ export class EventService {
         email: event.organizer.email,
       },
     };
+
+    // Include organization info if event is linked to an organization
+    if (event.organization) {
+      landingPageData.organizationInfo = {
+        id: event.organization.id,
+        name: event.organization.name,
+        branding: event.organization.branding as any,
+        verificationStatus: event.organization.verificationStatus,
+      };
+    }
+
+    return landingPageData;
   }
 
   /**
@@ -243,6 +280,60 @@ export class EventService {
     const events = await prisma.event.findMany({
       where: { organizerId },
       orderBy: { createdAt: 'desc' },
+      include: {
+        registrations: {
+          where: { status: 'CONFIRMED' },
+        },
+      },
+    });
+
+    return events.map((event) => this.mapEventToResponse(event));
+  }
+
+  /**
+   * Get events by organization
+   */
+  async getEventsByOrganization(
+    organizationId: string,
+    visibility?: 'PUBLIC' | 'PRIVATE' | 'UNLISTED',
+    userId?: string
+  ): Promise<EventResponse[]> {
+    const whereClause: any = { organizationId };
+
+    // Filter by visibility if specified
+    if (visibility) {
+      whereClause.visibility = visibility;
+    } else {
+      // Default to public events unless user is an organization admin
+      if (userId) {
+        const isAdmin = await prisma.organizationAdmin.findUnique({
+          where: {
+            organizationId_userId: {
+              organizationId,
+              userId,
+            },
+          },
+        });
+
+        if (!isAdmin) {
+          whereClause.visibility = 'PUBLIC';
+        }
+      } else {
+        whereClause.visibility = 'PUBLIC';
+      }
+    }
+
+    const events = await prisma.event.findMany({
+      where: whereClause,
+      orderBy: [
+        { startDate: 'asc' }, // Upcoming events first
+        { createdAt: 'desc' },
+      ],
+      include: {
+        registrations: {
+          where: { status: 'CONFIRMED' },
+        },
+      },
     });
 
     return events.map((event) => this.mapEventToResponse(event));
@@ -421,6 +512,61 @@ export class EventService {
   }
 
   /**
+   * Log access attempt to private event
+   */
+  async logAccessAttempt(
+    eventId: string,
+    userId?: string,
+    inviteLink?: string,
+    success: boolean = false
+  ): Promise<void> {
+    // For now, we'll just log to console
+    // In a production system, you'd want to store this in a database table
+    console.log(`Access attempt to event ${eventId}:`, {
+      userId,
+      inviteLink: inviteLink ? '***' : undefined,
+      success,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Get event by invite link
+   */
+  async getEventByInviteLink(inviteLink: string): Promise<EventResponse | null> {
+    const event = await prisma.event.findUnique({
+      where: { inviteLink },
+      include: {
+        registrations: {
+          where: { status: 'CONFIRMED' },
+        },
+      },
+    });
+
+    if (!event) {
+      return null;
+    }
+
+    return this.mapEventToResponse(event);
+  }
+
+  /**
+   * Check if user is organization member
+   */
+  async isOrganizationMember(organizationId: string, userId: string): Promise<boolean> {
+    const admin = await prisma.organizationAdmin.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId,
+          userId,
+        },
+      },
+    });
+
+    return !!admin;
+  }
+
+  /**
    * Map database event to response format
    */
   private mapEventToResponse(event: any): EventResponse {
@@ -443,6 +589,7 @@ export class EventService {
       landingPageUrl: event.landingPageUrl,
       inviteLink: event.inviteLink,
       leaderboardEnabled: event.leaderboardEnabled,
+      registrationCount: event.registrations ? event.registrations.length : undefined,
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
     };

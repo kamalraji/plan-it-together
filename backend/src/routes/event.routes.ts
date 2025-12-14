@@ -3,7 +3,6 @@ import { eventService } from '../services/event.service';
 import { authenticate } from '../middleware/auth.middleware';
 import { authorize } from '../middleware/rbac.middleware';
 import { CreateEventDTO, UpdateEventDTO, ApiResponse } from '../types';
-import * as analyticsService from '../services/analytics.service';
 
 const router = Router();
 
@@ -20,6 +19,26 @@ router.post(
       const organizerId = req.user!.userId;
       const eventData: CreateEventDTO = req.body;
 
+      // If organizationId is provided, verify user is an admin of that organization
+      if (eventData.organizationId) {
+        const isAdmin = await eventService.isOrganizationMember(
+          eventData.organizationId,
+          organizerId
+        );
+
+        if (!isAdmin) {
+          const response: ApiResponse = {
+            success: false,
+            error: {
+              code: 'UNAUTHORIZED_ORGANIZATION_ACCESS',
+              message: 'You are not authorized to create events for this organization',
+              timestamp: new Date().toISOString(),
+            },
+          };
+          return res.status(403).json(response);
+        }
+      }
+
       const event = await eventService.createEvent(organizerId, eventData);
 
       const response: ApiResponse = {
@@ -27,7 +46,7 @@ router.post(
         data: event,
       };
 
-      res.status(201).json(response);
+      return res.status(201).json(response);
     } catch (error: any) {
       const response: ApiResponse = {
         success: false,
@@ -37,7 +56,7 @@ router.post(
           timestamp: new Date().toISOString(),
         },
       };
-      res.status(400).json(response);
+      return res.status(400).json(response);
     }
   }
 );
@@ -108,11 +127,47 @@ router.put(
 
 /**
  * GET /api/events/:id/landing-page
- * Get landing page data for an event (Public)
+ * Get landing page data for an event (Public, but respects visibility)
  */
 router.get('/:id/landing-page', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { inviteLink } = req.query;
+    
+    // Get user ID if authenticated (optional)
+    let userId: string | undefined;
+    if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const jwt = await import('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        userId = decoded.userId;
+      } catch {
+        // Ignore auth errors
+      }
+    }
+
+    // First check if user has access to this event
+    const hasAccess = await eventService.validatePrivateEventAccess(
+      id,
+      userId,
+      inviteLink as string
+    );
+
+    if (!hasAccess) {
+      await eventService.logAccessAttempt(id, userId, inviteLink as string, false);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'ACCESS_DENIED',
+          message: 'Access denied to this event',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      return res.status(403).json(response);
+    }
+
     const landingPageData = await eventService.generateLandingPage(id);
 
     const response: ApiResponse = {
@@ -120,7 +175,7 @@ router.get('/:id/landing-page', async (req: Request, res: Response) => {
       data: landingPageData,
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error: any) {
     const response: ApiResponse = {
       success: false,
@@ -130,7 +185,7 @@ router.get('/:id/landing-page', async (req: Request, res: Response) => {
         timestamp: new Date().toISOString(),
       },
     };
-    res.status(404).json(response);
+    return res.status(404).json(response);
   }
 });
 
@@ -229,5 +284,184 @@ router.get(
     }
   }
 );
+
+/**
+ * GET /api/events/organization/:organizationId
+ * Get all events by organization (Public for public events, requires auth for private)
+ */
+router.get(
+  '/organization/:organizationId',
+  async (req: Request, res: Response) => {
+    try {
+      const { organizationId } = req.params;
+      const { visibility } = req.query;
+      
+      // Get user ID if authenticated (optional)
+      let userId: string | undefined;
+      if (req.headers.authorization) {
+        try {
+          // Try to authenticate but don't require it
+          const token = req.headers.authorization.split(' ')[1];
+          const jwt = await import('jsonwebtoken');
+          const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+          userId = decoded.userId;
+        } catch {
+          // Ignore auth errors for this endpoint
+        }
+      }
+
+      const events = await eventService.getEventsByOrganization(
+        organizationId,
+        visibility as any,
+        userId
+      );
+
+      const response: ApiResponse = {
+        success: true,
+        data: events,
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'EVENTS_FETCH_FAILED',
+          message: error.message || 'Failed to fetch organization events',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      res.status(400).json(response);
+    }
+  }
+);
+
+/**
+ * GET /api/events/invite/:inviteLink
+ * Access private event via invite link (Public)
+ */
+router.get('/invite/:inviteLink', async (req: Request, res: Response) => {
+  try {
+    const { inviteLink } = req.params;
+    
+    // Get user ID if authenticated (optional)
+    let userId: string | undefined;
+    if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const jwt = await import('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        userId = decoded.userId;
+      } catch {
+        // Ignore auth errors
+      }
+    }
+
+    const event = await eventService.getEventByInviteLink(inviteLink);
+
+    if (!event) {
+      await eventService.logAccessAttempt('unknown', userId, inviteLink, false);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_INVITE_LINK',
+          message: 'Invalid or expired invite link',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      return res.status(404).json(response);
+    }
+
+    // Validate access to the private event
+    const hasAccess = await eventService.validatePrivateEventAccess(
+      event.id,
+      userId,
+      inviteLink
+    );
+
+    if (!hasAccess) {
+      await eventService.logAccessAttempt(event.id, userId, inviteLink, false);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'ACCESS_DENIED',
+          message: 'Access denied to this private event',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      return res.status(403).json(response);
+    }
+
+    await eventService.logAccessAttempt(event.id, userId, inviteLink, true);
+
+    const response: ApiResponse = {
+      success: true,
+      data: event,
+    };
+
+    return res.json(response);
+  } catch (error: any) {
+    const response: ApiResponse = {
+      success: false,
+      error: {
+        code: 'INVITE_ACCESS_FAILED',
+        message: error.message || 'Failed to access event via invite link',
+        timestamp: new Date().toISOString(),
+      },
+    };
+    return res.status(400).json(response);
+  }
+});
+
+/**
+ * POST /api/events/:id/validate-access
+ * Validate access to a private event
+ */
+router.post('/:id/validate-access', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { inviteLink } = req.body;
+    
+    // Get user ID if authenticated (optional)
+    let userId: string | undefined;
+    if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const jwt = await import('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        userId = decoded.userId;
+      } catch {
+        // Ignore auth errors
+      }
+    }
+
+    const hasAccess = await eventService.validatePrivateEventAccess(
+      id,
+      userId,
+      inviteLink
+    );
+
+    await eventService.logAccessAttempt(id, userId, inviteLink, hasAccess);
+
+    const response: ApiResponse = {
+      success: true,
+      data: { hasAccess },
+    };
+
+    res.json(response);
+  } catch (error: any) {
+    const response: ApiResponse = {
+      success: false,
+      error: {
+        code: 'ACCESS_VALIDATION_FAILED',
+        message: error.message || 'Failed to validate event access',
+        timestamp: new Date().toISOString(),
+      },
+    };
+    res.status(400).json(response);
+  }
+});
 
 export default router;

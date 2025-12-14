@@ -1,4 +1,4 @@
-import { PrismaClient, OrganizationCategory, EventVisibility } from '@prisma/client';
+import { PrismaClient, EventVisibility } from '@prisma/client';
 import {
   SearchOrganizationsDTO,
   OrganizationResponse,
@@ -300,13 +300,92 @@ export class DiscoveryService {
       },
     });
 
-    if (!event) {
-      throw new Error('Event not found');
+    if (!event || !event.organization) {
+      throw new Error('Event or organization not found');
     }
 
-    // TODO: Send email notifications to all followers
-    // This would integrate with the communication service
-    console.log(`Notifying ${followers.length} followers about new event: ${event.name}`);
+    if (followers.length === 0) {
+      console.log('No followers to notify');
+      return;
+    }
+
+    // Import communication service dynamically to avoid circular dependency
+    const { communicationService } = await import('./communication.service');
+
+    // Prepare email content
+    const subject = `New event from ${event.organization.name}: ${event.name}`;
+    const body = `Hello {{userName}},
+
+${event.organization.name} has published a new event that you might be interested in!
+
+Event: ${event.name}
+Date: ${event.startDate.toLocaleDateString()}
+Mode: ${event.mode}
+
+${event.description}
+
+You can view more details and register for this event at: ${event.landingPageUrl}
+
+Best regards,
+Thittam1Hub Team
+
+---
+You are receiving this email because you follow ${event.organization.name}. You can unfollow them at any time from their organization page.`;
+
+    // Send notifications to all followers
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (const follower of followers) {
+      try {
+        const result = await communicationService.sendEmail({
+          to: [follower.user.email],
+          subject,
+          body: body.replace('{{userName}}', follower.user.name),
+        });
+
+        if (result.success) {
+          successCount++;
+        } else {
+          failureCount++;
+          console.error(`Failed to send notification to ${follower.user.email}:`, result.error);
+        }
+      } catch (error) {
+        failureCount++;
+        console.error(`Error sending notification to ${follower.user.email}:`, error);
+      }
+    }
+
+    // Log the notification delivery
+    console.log(`Follower notifications sent: ${successCount} successful, ${failureCount} failed out of ${followers.length} total followers`);
+
+    // Store notification delivery tracking (optional - could be added to database)
+    try {
+      await this.trackNotificationDelivery(orgId, eventId, followers.length, successCount, failureCount);
+    } catch (error) {
+      console.error('Failed to track notification delivery:', error);
+    }
+  }
+
+  /**
+   * Track notification delivery for analytics
+   */
+  private async trackNotificationDelivery(
+    orgId: string,
+    eventId: string,
+    totalFollowers: number,
+    successCount: number,
+    failureCount: number
+  ): Promise<void> {
+    // This could be stored in a separate notifications table for analytics
+    // For now, we'll just log it
+    console.log(`Notification tracking for org ${orgId}, event ${eventId}:`, {
+      totalFollowers,
+      successCount,
+      failureCount,
+      deliveryRate: totalFollowers > 0 ? (successCount / totalFollowers) * 100 : 0,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**
