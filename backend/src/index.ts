@@ -16,6 +16,7 @@ import marketplaceRoutes from './routes/marketplace.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
+import reviewRoutes from './routes/review.routes';
 
 dotenv.config();
 
@@ -143,6 +144,9 @@ app.use('/api/payments', paymentRoutes);
 
 // Service Agreement routes
 app.use('/api/service-agreements', serviceAgreementRoutes);
+
+// Review routes
+app.use('/api/reviews', reviewRoutes);
 
 // Start server
 app.listen(PORT, () => {
