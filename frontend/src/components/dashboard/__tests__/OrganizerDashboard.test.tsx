@@ -1,34 +1,45 @@
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { OrganizerDashboard } from '../OrganizerDashboard';
 import { AuthProvider } from '../../../hooks/useAuth';
 
 // Mock the API
-jest.mock('../../../lib/api', () => ({
-  __esModule: true,
+vi.mock('../../../lib/api', () => ({
   default: {
-    get: jest.fn().mockResolvedValue({ data: { events: [], totalEvents: 0, totalRegistrations: 0, activeEvents: 0, certificatesIssued: 0 } }),
+    get: vi.fn().mockResolvedValue({ 
+      data: { 
+        events: [], 
+        totalEvents: 0, 
+        totalRegistrations: 0, 
+        activeEvents: 0, 
+        certificatesIssued: 0 
+      } 
+    }),
   },
 }));
 
 // Mock useAuth hook
-jest.mock('../../../hooks/useAuth', () => ({
-  ...jest.requireActual('../../../hooks/useAuth'),
-  useAuth: () => ({
-    user: {
-      id: '1',
-      name: 'Test Organizer',
-      email: 'organizer@test.com',
-      role: 'ORGANIZER',
-      emailVerified: true,
-      profileCompleted: false,
-      bio: null,
-      organization: null,
-    },
-    logout: jest.fn(),
-  }),
-}));
+vi.mock('../../../hooks/useAuth', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: () => ({
+      user: {
+        id: '1',
+        name: 'Test Organizer',
+        email: 'organizer@test.com',
+        role: 'ORGANIZER',
+        emailVerified: true,
+        profileCompleted: false,
+        bio: null,
+        organization: null,
+      },
+      logout: vi.fn(),
+    }),
+  };
+});
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -49,7 +60,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
 describe('OrganizerDashboard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders organizer dashboard with header and navigation', () => {

@@ -1,15 +1,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { LoginForm } from '../LoginForm';
 import { AuthProvider } from '../../../hooks/useAuth';
 
 // Mock the API
-jest.mock('../../../lib/api', () => ({
-  __esModule: true,
+vi.mock('../../../lib/api', () => ({
   default: {
-    post: jest.fn(),
-    get: jest.fn(),
+    post: vi.fn(),
+    get: vi.fn(),
   },
 }));
 
@@ -34,7 +34,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
 describe('LoginForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders login form with email and password fields', () => {

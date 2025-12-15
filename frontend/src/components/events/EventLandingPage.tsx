@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import api from '../../lib/api';
-import { Event, EventMode, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
+import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 
 interface EventLandingPageProps {
@@ -26,6 +26,23 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     },
     enabled: !!eventId,
   });
+
+  // Check if event is private and redirect to access page (Requirements 24.2, 24.3)
+  useEffect(() => {
+    if (event && event.visibility === EventVisibility.PRIVATE) {
+      // Check if user has access via invite token in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const inviteToken = urlParams.get('invite');
+      
+      if (inviteToken) {
+        // Redirect to access page with invite token
+        navigate(`/events/${eventId}/access?invite=${inviteToken}`);
+      } else {
+        // Redirect to access page without token
+        navigate(`/events/${eventId}/access`);
+      }
+    }
+  }, [event, eventId, navigate]);
 
   // Registration mutation
   const registrationMutation = useMutation({
@@ -121,7 +138,22 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            {event.branding.logoUrl && (
+            {/* Organization or Event Branding (Requirements 19.2) */}
+            {event.organization?.branding?.logoUrl ? (
+              <div className="text-center mb-6">
+                <img
+                  src={event.organization.branding.logoUrl}
+                  alt={event.organization.name}
+                  className="h-16 w-auto mx-auto mb-2"
+                />
+                <p className="text-sm text-white text-opacity-90">
+                  Hosted by {event.organization.name}
+                  {event.organization.verificationStatus === 'VERIFIED' && (
+                    <span className="ml-1 text-blue-300">✓</span>
+                  )}
+                </p>
+              </div>
+            ) : event.branding.logoUrl && (
               <img
                 src={event.branding.logoUrl}
                 alt={`${event.name} logo`}

@@ -1,29 +1,33 @@
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { ParticipantDashboard } from '../ParticipantDashboard';
 
 // Mock the API
-jest.mock('../../../lib/api', () => ({
-  __esModule: true,
+vi.mock('../../../lib/api', () => ({
   default: {
-    get: jest.fn().mockResolvedValue({ data: { registrations: [], certificates: [] } }),
+    get: vi.fn().mockResolvedValue({ data: { registrations: [], certificates: [] } }),
   },
 }));
 
 // Mock useAuth hook
-jest.mock('../../../hooks/useAuth', () => ({
-  useAuth: () => ({
-    user: {
-      id: '1',
-      name: 'Test Participant',
-      email: 'participant@test.com',
-      role: 'PARTICIPANT',
-      emailVerified: true,
-    },
-    logout: jest.fn(),
-  }),
-}));
+vi.mock('../../../hooks/useAuth', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: () => ({
+      user: {
+        id: '1',
+        name: 'Test Participant',
+        email: 'participant@test.com',
+        role: 'PARTICIPANT',
+        emailVerified: true,
+      },
+      logout: vi.fn(),
+    }),
+  };
+});
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -44,7 +48,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 
 describe('ParticipantDashboard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders participant dashboard with header and navigation', () => {

@@ -14,7 +14,9 @@ import {
   TimelineItem,
   AgendaItem,
   PrizeInfo,
-  SponsorInfo
+  SponsorInfo,
+  EventVisibility,
+  Organization
 } from '../../types';
 
 interface EventFormProps {
@@ -27,6 +29,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   const queryClient = useQueryClient();
   const [selectedTemplate, setSelectedTemplate] = useState<EventTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'branding' | 'timeline' | 'details'>('basic');
+  const [inviteLink, setInviteLink] = useState<string | null>(event?.inviteLink || null);
 
   const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm<CreateEventDTO>({
     defaultValues: event ? {
@@ -37,6 +40,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
       endDate: event.endDate.slice(0, 16),
       capacity: event.capacity,
       registrationDeadline: event.registrationDeadline?.slice(0, 16),
+      organizationId: event.organizationId,
+      visibility: event.visibility,
       branding: event.branding,
       venue: event.venue,
       virtualLinks: event.virtualLinks,
@@ -45,6 +50,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
       sponsors: event.sponsors || []
     } : {
       mode: EventMode.OFFLINE,
+      visibility: EventVisibility.PUBLIC,
       branding: {},
       timeline: [],
       prizes: [],
@@ -68,6 +74,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   });
 
   const watchedMode = watch('mode');
+  const watchedVisibility = watch('visibility');
 
   // Fetch event templates (Requirements 4.1)
   const { data: templates } = useQuery({
@@ -75,6 +82,15 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     queryFn: async () => {
       const response = await api.get('/events/templates');
       return response.data.templates as EventTemplate[];
+    },
+  });
+
+  // Fetch user's organizations (Requirements 19.1)
+  const { data: organizations } = useQuery({
+    queryKey: ['user-organizations'],
+    queryFn: async () => {
+      const response = await api.get('/organizations/my-organizations');
+      return response.data.organizations as Organization[];
     },
   });
 
@@ -107,6 +123,19 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     }
     if (template.branding) {
       setValue('branding', { ...watch('branding'), ...template.branding });
+    }
+  };
+
+  // Generate invite link for private events (Requirements 24.1)
+  const generateInviteLink = async () => {
+    if (!event?.id) return;
+    
+    try {
+      const response = await api.post(`/events/${event.id}/generate-invite-link`);
+      const newInviteLink = response.data.inviteLink;
+      setInviteLink(newInviteLink);
+    } catch (error) {
+      console.error('Failed to generate invite link:', error);
     }
   };
 
@@ -217,6 +246,120 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                       <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
                     )}
                   </div>
+
+                  {/* Organization Selection (Requirements 19.1) */}
+                  {organizations && organizations.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Organization (Optional)
+                      </label>
+                      <select
+                        {...register('organizationId')}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select an organization</option>
+                        {organizations.map((org) => (
+                          <option key={org.id} value={org.id}>
+                            {org.name} {org.verificationStatus === 'VERIFIED' && '✓'}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Publishing under an organization will display their branding on your event page
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Event Visibility (Requirements 19.3, 19.4, 19.5) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Event Visibility *
+                    </label>
+                    <div className="space-y-3">
+                      {Object.values(EventVisibility).map((visibility) => (
+                        <label key={visibility} className="flex items-start">
+                          <input
+                            type="radio"
+                            value={visibility}
+                            {...register('visibility', { required: 'Event visibility is required' })}
+                            className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          />
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">
+                              {visibility === EventVisibility.PUBLIC && 'Public'}
+                              {visibility === EventVisibility.PRIVATE && 'Private'}
+                              {visibility === EventVisibility.UNLISTED && 'Unlisted'}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {visibility === EventVisibility.PUBLIC && 'Anyone can find and register for this event'}
+                              {visibility === EventVisibility.PRIVATE && 'Only people with invite links can access this event'}
+                              {visibility === EventVisibility.UNLISTED && 'Accessible via direct link but not searchable'}
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    {errors.visibility && (
+                      <p className="mt-1 text-sm text-red-600">{errors.visibility.message}</p>
+                    )}
+                  </div>
+
+                  {/* Private Event Invite Link (Requirements 24.1) */}
+                  {watchedVisibility === EventVisibility.PRIVATE && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-blue-900 mb-2">Private Event Access</h4>
+                      {isEditing && event ? (
+                        <div>
+                          {inviteLink ? (
+                            <div>
+                              <label className="block text-sm font-medium text-blue-800 mb-2">
+                                Invite Link
+                              </label>
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="text"
+                                  value={inviteLink}
+                                  readOnly
+                                  className="flex-1 px-3 py-2 bg-white border border-blue-300 rounded-md text-sm"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => navigator.clipboard.writeText(inviteLink)}
+                                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                                >
+                                  Copy
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={generateInviteLink}
+                                className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                              >
+                                Generate New Link
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-sm text-blue-800 mb-2">
+                                Generate an invite link to share with specific people
+                              </p>
+                              <button
+                                type="button"
+                                onClick={generateInviteLink}
+                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                              >
+                                Generate Invite Link
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-blue-800">
+                          An invite link will be generated after creating the event
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Event Mode Selection (Requirements 5.2, 5.3, 5.4) */}
                   <div>
@@ -469,15 +612,46 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                 </div>
               )}
 
-              {/* Branding Tab (Requirements 4.2) */}
+              {/* Branding Tab (Requirements 4.2, 19.2) */}
               {activeTab === 'branding' && (
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Event Branding</h3>
                     <p className="text-gray-600 mb-6">
                       Customize your event's visual appearance and branding elements.
+                      {watch('organizationId') && ' Organization branding will be automatically applied.'}
                     </p>
                   </div>
+
+                  {/* Organization Branding Preview (Requirements 19.2) */}
+                  {watch('organizationId') && organizations && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">Organization Branding</h4>
+                      {(() => {
+                        const selectedOrg = organizations.find(org => org.id === watch('organizationId'));
+                        if (selectedOrg) {
+                          return (
+                            <div className="flex items-center space-x-4">
+                              {selectedOrg.branding?.logoUrl && (
+                                <img
+                                  src={selectedOrg.branding.logoUrl}
+                                  alt={selectedOrg.name}
+                                  className="h-12 w-12 object-contain"
+                                />
+                              )}
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{selectedOrg.name}</p>
+                                <p className="text-sm text-gray-600">
+                                  This organization's branding will be displayed on your event page
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>

@@ -10,6 +10,9 @@ import { ParticipantDashboard } from './components/dashboard/ParticipantDashboar
 import { ProfileCompletion } from './components/profile/ProfileCompletion';
 import { EventForm } from './components/events/EventForm';
 import { EventLandingPage } from './components/events/EventLandingPage';
+import { PrivateEventAccess } from './components/events/PrivateEventAccess';
+import { CertificateVerification } from './components/certificates/CertificateVerification';
+import { OrganizationDirectory, FollowedOrganizations, OrganizationPage } from './components/organization';
 import { UserRole } from './types';
 import api from './lib/api';
 
@@ -58,6 +61,36 @@ function App() {
             <Route 
               path="/events/:eventId" 
               element={<EventLandingPage />} 
+            />
+            <Route 
+              path="/events/:eventId/access" 
+              element={<PrivateEventAccess />} 
+            />
+            {/* Organization routes */}
+            <Route 
+              path="/organizations" 
+              element={<OrganizationDirectory />} 
+            />
+            <Route 
+              path="/organizations/followed" 
+              element={
+                <ProtectedRoute>
+                  <FollowedOrganizations />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/organizations/:organizationId" 
+              element={<OrganizationPage />} 
+            />
+            {/* Public certificate verification routes */}
+            <Route 
+              path="/verify-certificate/:certificateId" 
+              element={<CertificateVerification />} 
+            />
+            <Route 
+              path="/verify-certificate" 
+              element={<CertificateVerification />} 
             />
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
