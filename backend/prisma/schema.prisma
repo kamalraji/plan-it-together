@@ -71,6 +71,55 @@ enum EventVisibility {
   UNLISTED
 }
 
+enum ServiceCategory {
+  VENUE
+  CATERING
+  PHOTOGRAPHY
+  VIDEOGRAPHY
+  ENTERTAINMENT
+  DECORATION
+  AUDIO_VISUAL
+  TRANSPORTATION
+  SECURITY
+  CLEANING
+  EQUIPMENT_RENTAL
+  PRINTING
+  MARKETING
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING
+  VENDOR_REVIEWING
+  QUOTE_SENT
+  QUOTE_ACCEPTED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum PricingType {
+  FIXED
+  HOURLY
+  PER_PERSON
+  CUSTOM_QUOTE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  BANK_TRANSFER
+  DIGITAL_WALLET
+}
+
 model User {
   id            String   @id @default(uuid())
   email         String   @unique
@@ -90,6 +139,11 @@ model User {
   communications     CommunicationLog[]
   organizationAdmins OrganizationAdmin[]
   follows            Follow[]
+  vendorProfile      VendorProfile?
+  bookingRequests    BookingRequest[]     @relation("OrganizerBookings")
+  vendorReviews      VendorReview[]
+  paymentsSent       PaymentRecord[]      @relation("PaymentPayer")
+  paymentsReceived   PaymentRecord[]      @relation("PaymentPayee")
 
   @@index([email])
 }
@@ -123,6 +177,7 @@ model Event {
   rubric         Rubric?
   certificates   Certificate[]
   communications CommunicationLog[]
+  bookingRequests BookingRequest[]
 
   @@index([organizerId])
   @@index([organizationId])
@@ -303,4 +358,194 @@ model Follow {
   @@unique([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
+}
+
+model VendorProfile {
+  id                    String             @id @default(uuid())
+  userId                String             @unique
+  businessName          String
+  description           String             @db.Text
+  contactInfo           Json               // email, phone, website, socialMedia
+  serviceCategories     ServiceCategory[]
+  businessAddress       Json               // street, city, state, country, postalCode, coordinates
+  verificationStatus    VerificationStatus @default(PENDING)
+  verificationDocuments Json?              // businessLicense, insuranceCertificate, etc.
+  rating                Float              @default(0)
+  reviewCount           Int                @default(0)
+  portfolio             Json               // array of MediaFile objects
+  businessHours         Json?              // weekly schedule
+  responseTime          Int                @default(24) // in hours
+  completionRate        Float              @default(100) // percentage
+  rejectionReason       String?            @db.Text
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceListings ServiceListing[]
+  bookingRequests BookingRequest[] @relation("VendorBookings")
+  reviews         VendorReview[]   @relation("VendorReviews")
+
+  @@index([userId])
+  @@index([verificationStatus])
+  @@index([serviceCategories])
+}
+
+model ServiceListing {
+  id              String          @id @default(uuid())
+  vendorId        String
+  title           String
+  description     String          @db.Text
+  category        ServiceCategory
+  pricing         Json            // PricingModel object
+  availability    Json            // AvailabilityCalendar object
+  serviceArea     String[]        // array of location strings
+  requirements    String?         @db.Text
+  inclusions      String[]        // array of included services
+  exclusions      String[]        // array of excluded services
+  media           Json            // array of MediaFile objects
+  featured        Boolean         @default(false)
+  status          String          @default("ACTIVE") // 'ACTIVE', 'INACTIVE', 'SUSPENDED'
+  viewCount       Int             @default(0)
+  inquiryCount    Int             @default(0)
+  bookingCount    Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  vendor          VendorProfile    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  bookingRequests BookingRequest[]
+
+  @@index([vendorId])
+  @@index([category])
+  @@index([status])
+  @@index([featured])
+}
+
+model BookingRequest {
+  id              String        @id @default(uuid())
+  eventId         String
+  serviceListingId String
+  organizerId     String
+  vendorId        String
+  status          BookingStatus @default(PENDING)
+  serviceDate     DateTime
+  requirements    String        @db.Text
+  budgetRange     Json?         // {min: number, max: number}
+  quotedPrice     Float?
+  finalPrice      Float?
+  additionalNotes String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  event           Event            @relation(fields: [eventId], references: [id])
+  serviceListing  ServiceListing   @relation(fields: [serviceListingId], references: [id])
+  organizer       User             @relation("OrganizerBookings", fields: [organizerId], references: [id])
+  vendor          VendorProfile    @relation("VendorBookings", fields: [vendorId], references: [id])
+  messages        BookingMessage[]
+  paymentRecords  PaymentRecord[]
+  review          VendorReview?
+  serviceAgreement ServiceAgreement?
+
+  @@index([eventId])
+  @@index([serviceListingId])
+  @@index([organizerId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model BookingMessage {
+  id         String   @id @default(uuid())
+  bookingId  String
+  senderId   String
+  senderType String   // 'ORGANIZER' or 'VENDOR'
+  message    String   @db.Text
+  attachments Json?   // array of MediaFile objects
+  sentAt     DateTime @default(now())
+
+  // Relations
+  booking BookingRequest @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([sentAt])
+}
+
+model VendorReview {
+  id                String   @id @default(uuid())
+  vendorId          String
+  bookingId         String   @unique
+  organizerId       String
+  rating            Int      // 1-5
+  title             String
+  comment           String   @db.Text
+  serviceQuality    Int      // 1-5
+  communication     Int      // 1-5
+  timeliness        Int      // 1-5
+  value             Int      // 1-5
+  wouldRecommend    Boolean
+  vendorResponse    String?  @db.Text
+  vendorResponseAt  DateTime?
+  verifiedPurchase  Boolean  @default(true)
+  helpful           Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  vendor    VendorProfile  @relation("VendorReviews", fields: [vendorId], references: [id])
+  booking   BookingRequest @relation(fields: [bookingId], references: [id])
+  organizer User           @relation(fields: [organizerId], references: [id])
+
+  @@index([vendorId])
+  @@index([bookingId])
+  @@index([organizerId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+model PaymentRecord {
+  id            String            @id @default(uuid())
+  bookingId     String
+  payerId       String
+  payeeId       String
+  amount        Float
+  currency      String            @default("USD")
+  status        PaymentStatus     @default(PENDING)
+  paymentMethod Json              // PaymentMethod object
+  transactionId String?
+  platformFee   Float
+  vendorPayout  Float
+  processedAt   DateTime?
+  createdAt     DateTime          @default(now())
+
+  // Relations
+  booking BookingRequest @relation(fields: [bookingId], references: [id])
+  payer   User           @relation("PaymentPayer", fields: [payerId], references: [id])
+  payee   User           @relation("PaymentPayee", fields: [payeeId], references: [id])
+
+  @@index([bookingId])
+  @@index([payerId])
+  @@index([payeeId])
+  @@index([status])
+  @@index([processedAt])
+}
+
+model ServiceAgreement {
+  id                  String   @id @default(uuid())
+  bookingId           String   @unique
+  terms               String   @db.Text
+  deliverables        Json     // array of Deliverable objects
+  paymentSchedule     Json     // array of PaymentMilestone objects
+  cancellationPolicy  String   @db.Text
+  signedAt            DateTime?
+  organizerSignature  String?
+  vendorSignature     String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  booking BookingRequest @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+  @@index([signedAt])
 }

@@ -13,15 +13,32 @@ import { EventLandingPage } from './components/events/EventLandingPage';
 import { PrivateEventAccess } from './components/events/PrivateEventAccess';
 import { CertificateVerification } from './components/certificates/CertificateVerification';
 import { OrganizationDirectory, FollowedOrganizations, OrganizationPage } from './components/organization';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ApiHealthCheck } from './components/common/ApiHealthCheck';
 import { UserRole } from './types';
 import api from './lib/api';
+import { validateEnvironment, ENV_CONFIG } from './lib/config';
+
+// Validate environment variables on app startup
+try {
+  validateEnvironment();
+} catch (error) {
+  console.error('Environment validation failed:', error);
+}
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-gray-50">
-          <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="min-h-screen bg-gray-50">
+            {/* API Health Check Indicator */}
+            {ENV_CONFIG.isDevelopment && (
+              <div className="fixed top-4 right-4 z-50">
+                <ApiHealthCheck showIndicator={true} />
+              </div>
+            )}
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
@@ -94,10 +111,11 @@ function App() {
             />
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </AuthProvider>
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -481,4 +481,410 @@ export interface AdminInvitationResult {
   message: string;
 }
 
+// Marketplace-related types
+export interface ContactInfo {
+  email: string;
+  phone: string;
+  website?: string;
+  socialMedia?: Record<string, string>;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+export interface MediaFile {
+  id: string;
+  url: string;
+  type: 'IMAGE' | 'VIDEO' | 'DOCUMENT';
+  caption?: string;
+  order: number;
+}
+
+export interface TimeSlot {
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+}
+
+export interface WeeklySchedule {
+  monday?: TimeSlot[];
+  tuesday?: TimeSlot[];
+  wednesday?: TimeSlot[];
+  thursday?: TimeSlot[];
+  friday?: TimeSlot[];
+  saturday?: TimeSlot[];
+  sunday?: TimeSlot[];
+}
+
+export interface CustomAvailabilitySlot {
+  date: Date;
+  available: boolean;
+  timeSlots?: TimeSlot[];
+}
+
+export interface AvailabilityCalendar {
+  timezone: string;
+  recurringAvailability: WeeklySchedule;
+  blockedDates: Date[];
+  customAvailability: CustomAvailabilitySlot[];
+}
+
+export interface PackageDeal {
+  name: string;
+  description: string;
+  services: string[];
+  originalPrice: number;
+  packagePrice: number;
+  savings: number;
+}
+
+export interface PricingModel {
+  type: 'FIXED' | 'HOURLY' | 'PER_PERSON' | 'CUSTOM_QUOTE';
+  basePrice?: number;
+  currency: string;
+  minimumOrder?: number;
+  packageDeals?: PackageDeal[];
+}
+
+export interface VerificationDocuments {
+  businessLicense?: string;
+  insuranceCertificate?: string;
+  taxDocuments?: string[];
+  identityVerification?: string;
+  portfolioSamples?: string[];
+}
+
+// Vendor Profile types
+export interface CreateVendorDTO {
+  businessName: string;
+  description: string;
+  contactInfo: ContactInfo;
+  serviceCategories: string[]; // ServiceCategory enum values
+  businessAddress: Address;
+  businessLicense?: string;
+  insuranceCertificate?: string;
+  portfolio: MediaFile[];
+  businessHours?: WeeklySchedule;
+}
+
+export interface UpdateVendorDTO {
+  businessName?: string;
+  description?: string;
+  contactInfo?: ContactInfo;
+  serviceCategories?: string[];
+  businessAddress?: Address;
+  portfolio?: MediaFile[];
+  businessHours?: WeeklySchedule;
+}
+
+export interface VerificationBadge {
+  isVerified: boolean;
+  badgeText: string;
+  badgeColor: string;
+  description: string;
+}
+
+export interface VendorProfileResponse {
+  id: string;
+  userId: string;
+  businessName: string;
+  description: string;
+  contactInfo: ContactInfo;
+  serviceCategories: string[];
+  businessAddress: Address;
+  verificationStatus: string;
+  verificationDocuments?: VerificationDocuments;
+  rating: number;
+  reviewCount: number;
+  portfolio: MediaFile[];
+  businessHours?: WeeklySchedule;
+  responseTime: number;
+  completionRate: number;
+  rejectionReason?: string;
+  verificationBadge?: VerificationBadge;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Service Listing types
+export interface CreateServiceDTO {
+  title: string;
+  description: string;
+  category: string; // ServiceCategory enum value
+  pricing: PricingModel;
+  availability: AvailabilityCalendar;
+  serviceArea: string[];
+  requirements?: string;
+  inclusions: string[];
+  exclusions?: string[];
+  media: MediaFile[];
+}
+
+export interface UpdateServiceDTO {
+  title?: string;
+  description?: string;
+  category?: string;
+  pricing?: PricingModel;
+  availability?: AvailabilityCalendar;
+  serviceArea?: string[];
+  requirements?: string;
+  inclusions?: string[];
+  exclusions?: string[];
+  media?: MediaFile[];
+  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+}
+
+export interface ServiceListingResponse {
+  id: string;
+  vendorId: string;
+  title: string;
+  description: string;
+  category: string;
+  pricing: PricingModel;
+  availability: AvailabilityCalendar;
+  serviceArea: string[];
+  requirements?: string;
+  inclusions: string[];
+  exclusions: string[];
+  media: MediaFile[];
+  featured: boolean;
+  status: string;
+  viewCount: number;
+  inquiryCount: number;
+  bookingCount: number;
+  vendor?: VendorProfileResponse;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Search and Discovery types
+export interface SearchServicesDTO {
+  query?: string;
+  category?: string;
+  location?: string;
+  dateRange?: {
+    startDate: Date;
+    endDate: Date;
+  };
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  verifiedOnly?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SearchServicesResponse {
+  services: ServiceListingResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  filters: {
+    categories: Array<{ category: string; count: number }>;
+    priceRanges: Array<{ range: string; count: number }>;
+    locations: Array<{ location: string; count: number }>;
+  };
+}
+
+// Booking types
+export interface CreateBookingDTO {
+  eventId: string;
+  serviceListingId: string;
+  serviceDate: Date;
+  requirements: string;
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  additionalNotes?: string;
+}
+
+export interface UpdateBookingDTO {
+  status?: string; // BookingStatus enum value
+  quotedPrice?: number;
+  finalPrice?: number;
+  additionalNotes?: string;
+}
+
+export interface BookingRequestResponse {
+  id: string;
+  eventId: string;
+  serviceListingId: string;
+  organizerId: string;
+  vendorId: string;
+  status: string;
+  serviceDate: Date;
+  requirements: string;
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  quotedPrice?: number;
+  finalPrice?: number;
+  additionalNotes?: string;
+  event?: EventResponse;
+  serviceListing?: ServiceListingResponse;
+  organizer?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  vendor?: VendorProfileResponse;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BookingMessageDTO {
+  message: string;
+  attachments?: MediaFile[];
+}
+
+export interface BookingMessageResponse {
+  id: string;
+  bookingId: string;
+  senderId: string;
+  senderType: 'ORGANIZER' | 'VENDOR';
+  message: string;
+  attachments?: MediaFile[];
+  sentAt: Date;
+}
+
+// Vendor Analytics types
+export interface VendorAnalytics {
+  vendorId: string;
+  listingViews: number;
+  inquiryCount: number;
+  bookingCount: number;
+  conversionRate: number;
+  averageRating: number;
+  totalReviews: number;
+  revenue: number;
+  performanceMetrics: {
+    responseTime: number;
+    completionRate: number;
+    repeatCustomerRate: number;
+  };
+  trendData: {
+    viewsOverTime: Array<{ date: string; views: number }>;
+    bookingsOverTime: Array<{ date: string; bookings: number }>;
+    revenueOverTime: Array<{ date: string; revenue: number }>;
+  };
+  topServices: Array<{
+    serviceId: string;
+    serviceName: string;
+    bookingCount: number;
+    revenue: number;
+  }>;
+}
+
+// Review types
+export interface CreateReviewDTO {
+  rating: number; // 1-5
+  title: string;
+  comment: string;
+  serviceQuality: number;
+  communication: number;
+  timeliness: number;
+  value: number;
+  wouldRecommend: boolean;
+}
+
+export interface VendorReviewResponse {
+  id: string;
+  vendorId: string;
+  bookingId: string;
+  organizerId: string;
+  rating: number;
+  title: string;
+  comment: string;
+  serviceQuality: number;
+  communication: number;
+  timeliness: number;
+  value: number;
+  wouldRecommend: boolean;
+  vendorResponse?: string;
+  vendorResponseAt?: Date;
+  verifiedPurchase: boolean;
+  helpful: number;
+  organizer?: {
+    id: string;
+    name: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Service Agreement types
+export interface Deliverable {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: Date;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE';
+  completedAt?: Date;
+}
+
+export interface PaymentMilestone {
+  id: string;
+  title: string;
+  description: string;
+  amount: number;
+  dueDate: Date;
+  status: 'PENDING' | 'PAID' | 'OVERDUE';
+  paidAt?: Date;
+}
+
+export interface ServiceAgreementTemplate {
+  id: string;
+  name: string;
+  category: string;
+  terms: string;
+  deliverableTemplates: Omit<Deliverable, 'id' | 'status' | 'completedAt'>[];
+  paymentScheduleTemplate: Omit<PaymentMilestone, 'id' | 'status' | 'paidAt'>[];
+  cancellationPolicy: string;
+}
+
+export interface CreateServiceAgreementDTO {
+  bookingId: string;
+  templateId?: string;
+  customTerms?: string;
+  deliverables: Omit<Deliverable, 'id' | 'status' | 'completedAt'>[];
+  paymentSchedule: Omit<PaymentMilestone, 'id' | 'status' | 'paidAt'>[];
+  cancellationPolicy?: string;
+}
+
+export interface ServiceAgreementResponse {
+  id: string;
+  bookingId: string;
+  terms: string;
+  deliverables: Deliverable[];
+  paymentSchedule: PaymentMilestone[];
+  cancellationPolicy: string;
+  signedAt?: Date;
+  organizerSignature?: string;
+  vendorSignature?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DigitalSignatureDTO {
+  agreementId: string;
+  signatureType: 'ORGANIZER' | 'VENDOR';
+  signature: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
 

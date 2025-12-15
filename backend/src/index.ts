@@ -11,6 +11,11 @@ import judgingRoutes from './routes/judging.routes';
 import certificateRoutes from './routes/certificate.routes';
 import organizationRoutes from './routes/organization.routes';
 import discoveryRoutes from './routes/discovery.routes';
+import vendorRoutes from './routes/vendor.routes';
+import marketplaceRoutes from './routes/marketplace.routes';
+import bookingRoutes from './routes/booking.routes';
+import paymentRoutes from './routes/payment.routes';
+import serviceAgreementRoutes from './routes/service-agreement.routes';
 
 dotenv.config();
 
@@ -29,8 +34,64 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/storage', express.static('storage'));
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (_req, res) => {
+  try {
+    // Basic health check
+    const health = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      version: process.env.npm_package_version || '1.0.0',
+      memory: process.memoryUsage(),
+    };
+
+    res.json(health);
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: 'Health check failed',
+    });
+  }
+});
+
+// API health check endpoint
+app.get('/api/health', async (_req, res) => {
+  try {
+    // More detailed health check including database connectivity
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$disconnect();
+
+    const health = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      version: process.env.npm_package_version || '1.0.0',
+      services: {
+        database: 'ok',
+        api: 'ok',
+      },
+      memory: process.memoryUsage(),
+    };
+
+    res.json(health);
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: 'error',
+        api: 'ok',
+      },
+      error: 'Database connection failed',
+    });
+  }
 });
 
 // API routes
@@ -67,6 +128,21 @@ app.use('/api/organizations', organizationRoutes);
 
 // Discovery routes
 app.use('/api/discovery', discoveryRoutes);
+
+// Vendor routes
+app.use('/api/vendors', vendorRoutes);
+
+// Marketplace routes
+app.use('/api/marketplace', marketplaceRoutes);
+
+// Booking routes
+app.use('/api/bookings', bookingRoutes);
+
+// Payment routes
+app.use('/api/payments', paymentRoutes);
+
+// Service Agreement routes
+app.use('/api/service-agreements', serviceAgreementRoutes);
 
 // Start server
 app.listen(PORT, () => {

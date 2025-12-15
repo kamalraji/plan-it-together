@@ -55,7 +55,8 @@ describe('RubricManagement', () => {
     
     // Fill in criterion details
     const nameInput = screen.getByPlaceholderText('e.g., Innovation');
-    const weightInput = screen.getByLabelText('Weight (%) *');
+    const weightInputs = screen.getAllByRole('spinbutton');
+    const weightInput = weightInputs[0]; // First number input should be weight
     const descriptionInput = screen.getByPlaceholderText('Describe what judges should evaluate for this criterion...');
     
     fireEvent.change(nameInput, { target: { value: 'Innovation' } });
