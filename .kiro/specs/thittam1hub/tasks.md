@@ -1258,8 +1258,14 @@
   - Test review response functionality
   - _Requirements: 30.1, 30.2, 30.4_
 
-- [ ] 35. Implement vendor analytics and performance tracking
-- [ ] 35.1 Create vendor analytics service
+- [x] 35. Implement vendor analytics and performance tracking
+
+
+
+
+- [x] 35.1 Create vendor analytics service
+
+
   - Calculate listing performance metrics
   - Track inquiry and conversion rates
   - Generate performance insights and recommendations
@@ -1268,6 +1274,8 @@
 - [ ]* 35.2 Write property test for vendor analytics accuracy
   - **Property 59: Vendor analytics accuracy**
   - **Validates: Requirements 31.1, 31.2**
+
+
 
 - [ ] 35.3 Build vendor dashboard
   - Create performance metrics display
@@ -1281,8 +1289,13 @@
   - Test recommendation algorithms
   - _Requirements: 31.1, 31.2, 31.3_
 
-- [ ] 36. Implement marketplace-event integration
-- [ ] 36.1 Create event-marketplace integration service
+- [x] 36. Implement marketplace-event integration
+
+
+
+
+- [x] 36.1 Create event-marketplace integration service
+
   - Build service recommendation engine for events
   - Implement vendor timeline synchronization
   - Create integrated communication tools
@@ -1292,7 +1305,9 @@
   - **Property 60: Event-marketplace integration consistency**
   - **Validates: Requirements 32.2, 32.4**
 
-- [ ] 36.3 Implement marketplace integration in event workflow
+
+- [x] 36.3 Implement marketplace integration in event workflow
+
   - Add marketplace access from event dashboard
   - Integrate vendor bookings with event timeline
   - Create unified vendor coordination interface
@@ -1304,7 +1319,11 @@
   - Test integrated communication features
   - _Requirements: 32.1, 32.2, 32.3_
 
-- [ ] 37. Checkpoint - Ensure all marketplace tests pass
+- [-] 37. Checkpoint - Ensure all marketplace tests pass
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 38. Build frontend - Marketplace vendor interface

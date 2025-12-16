@@ -567,6 +567,256 @@ export class EventService {
   }
 
   /**
+   * Get marketplace integration data for an event
+   */
+  async getEventMarketplaceData(eventId: string, organizerId: string): Promise<any> {
+    // Verify event ownership
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    if (event.organizerId !== organizerId) {
+      throw new Error('You can only access marketplace data for your own events');
+    }
+
+    // Get marketplace integration service
+    const { eventMarketplaceIntegrationService } = await import('./event-marketplace-integration.service');
+
+    // Get recommendations and dashboard data
+    const [recommendations, dashboard] = await Promise.all([
+      eventMarketplaceIntegrationService.getServiceRecommendationsForEvent(eventId, organizerId, {
+        limit: 5,
+        verifiedOnly: true,
+      }),
+      eventMarketplaceIntegrationService.getEventMarketplaceDashboard(eventId, organizerId),
+    ]);
+
+    return {
+      event: this.mapEventToResponse(event),
+      recommendations,
+      dashboard,
+      marketplaceEnabled: true,
+    };
+  }
+
+  /**
+   * Add marketplace access shortcut to event dashboard
+   */
+  async getEventDashboardWithMarketplace(eventId: string, organizerId: string): Promise<any> {
+    const event = await this.getEvent(eventId);
+    
+    if (event.organizerId !== organizerId) {
+      throw new Error('You can only access dashboard for your own events');
+    }
+
+    // Get basic event analytics
+    const analytics = await this.getEventAnalytics(eventId);
+
+    // Get marketplace quick stats
+    const bookingStats = await prisma.bookingRequest.aggregate({
+      where: { eventId },
+      _count: {
+        id: true,
+      },
+    });
+
+    const confirmedBookings = await prisma.bookingRequest.count({
+      where: {
+        eventId,
+        status: 'CONFIRMED',
+      },
+    });
+
+    const totalSpent = await prisma.bookingRequest.aggregate({
+      where: {
+        eventId,
+        finalPrice: { not: null },
+      },
+      _sum: {
+        finalPrice: true,
+      },
+    });
+
+    return {
+      event,
+      analytics,
+      marketplace: {
+        totalBookings: bookingStats._count.id,
+        confirmedBookings,
+        totalSpent: totalSpent._sum.finalPrice || 0,
+        quickActions: [
+          {
+            label: 'Browse Services',
+            action: 'marketplace_browse',
+            url: `/api/event-marketplace-integration/${eventId}/recommendations`,
+          },
+          {
+            label: 'View Vendor Timeline',
+            action: 'vendor_timeline',
+            url: `/api/event-marketplace-integration/${eventId}/coordination`,
+          },
+          {
+            label: 'Communicate with Vendors',
+            action: 'vendor_communication',
+            url: `/api/event-marketplace-integration/${eventId}/communicate`,
+          },
+        ],
+      },
+    };
+  }
+
+  /**
+   * Integrate vendor bookings with event timeline
+   */
+  async integrateVendorBookingsWithTimeline(eventId: string, organizerId: string): Promise<any> {
+    // Verify event ownership
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    if (event.organizerId !== organizerId) {
+      throw new Error('You can only integrate bookings for your own events');
+    }
+
+    // Get all confirmed bookings for the event
+    const bookings = await prisma.bookingRequest.findMany({
+      where: {
+        eventId,
+        status: 'CONFIRMED',
+      },
+      include: {
+        serviceListing: {
+          include: {
+            vendor: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        serviceAgreement: {
+          select: {
+            deliverables: true,
+          },
+        },
+      },
+    });
+
+    // Create timeline integration
+    const timelineIntegration = {
+      eventId,
+      totalVendors: bookings.length,
+      upcomingServices: bookings
+        .filter(b => new Date(b.serviceDate) > new Date())
+        .sort((a, b) => new Date(a.serviceDate).getTime() - new Date(b.serviceDate).getTime())
+        .slice(0, 5)
+        .map(booking => ({
+          bookingId: booking.id,
+          vendorName: booking.serviceListing.vendor.businessName,
+          serviceName: booking.serviceListing.title,
+          serviceDate: booking.serviceDate,
+          category: booking.serviceListing.category,
+          status: booking.status,
+        })),
+      upcomingDeadlines: bookings
+        .flatMap(booking => {
+          if (!booking.serviceAgreement?.deliverables) return [];
+          const deliverables = booking.serviceAgreement.deliverables as any[];
+          return deliverables
+            .filter(d => d.status !== 'COMPLETED' && new Date(d.dueDate) > new Date())
+            .map(d => ({
+              bookingId: booking.id,
+              vendorName: booking.serviceListing.vendor.businessName,
+              deliverableTitle: d.title,
+              dueDate: d.dueDate,
+              status: d.status,
+            }));
+        })
+        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+        .slice(0, 10),
+      vendorContacts: bookings.map(booking => ({
+        bookingId: booking.id,
+        vendorId: booking.vendorId,
+        vendorName: booking.serviceListing.vendor.businessName,
+        contactEmail: (booking.serviceListing.vendor.contactInfo as any)?.email || '',
+        contactPhone: (booking.serviceListing.vendor.contactInfo as any)?.phone || '',
+        serviceCategory: booking.serviceListing.category,
+        lastCommunication: null, // Will be populated by communication service
+      })),
+    };
+
+    return timelineIntegration;
+  }
+
+  /**
+   * Create unified vendor coordination interface
+   */
+  async createVendorCoordinationInterface(eventId: string, organizerId: string): Promise<any> {
+    // Verify event ownership
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    if (event.organizerId !== organizerId) {
+      throw new Error('You can only create coordination interface for your own events');
+    }
+
+    // Get vendor coordination data from integration service
+    const { eventMarketplaceIntegrationService } = await import('./event-marketplace-integration.service');
+    const coordinationData = await eventMarketplaceIntegrationService.getVendorCoordinationData(eventId, organizerId);
+
+    // Enhance with event-specific data
+    const enhancedCoordination = {
+      ...coordinationData,
+      event: {
+        id: event.id,
+        name: event.name,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        mode: event.mode,
+        venue: event.venue,
+      },
+      coordinationTools: {
+        bulkCommunication: {
+          enabled: true,
+          url: `/api/event-marketplace-integration/${eventId}/communicate`,
+          types: ['VENDOR_BROADCAST', 'CATEGORY_SPECIFIC', 'TIMELINE_UPDATE'],
+        },
+        timelineSync: {
+          enabled: true,
+          url: `/api/event-marketplace-integration/${eventId}/sync-timelines`,
+          lastSync: null, // Will be populated from timeline items
+        },
+        vendorDirectory: {
+          enabled: true,
+          totalVendors: coordinationData.vendors?.length || 0,
+          categories: [...new Set(coordinationData.vendors?.map((v: any) => v.booking.serviceListing.category) || [])],
+        },
+      },
+    };
+
+    return enhancedCoordination;
+  }
+
+  /**
    * Map database event to response format
    */
   private mapEventToResponse(event: any): EventResponse {

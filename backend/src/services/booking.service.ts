@@ -607,10 +607,9 @@ export class BookingService {
     booking.messages.forEach((message) => {
       timeline.push({
         type: 'message',
+        status: 'SENT',
         timestamp: message.sentAt,
-        description: `Message from ${message.senderType.toLowerCase()}`,
-        message: message.message,
-        senderType: message.senderType,
+        description: `Message from ${message.senderType.toLowerCase()}: ${message.message}`,
       });
     });
 

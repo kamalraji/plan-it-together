@@ -411,79 +411,44 @@ export class VendorService {
   }
 
   /**
-   * Get vendor analytics
+   * Get vendor analytics (delegated to analytics service)
    */
   async getVendorAnalytics(vendorId: string): Promise<VendorAnalytics> {
-    const vendor = await prisma.vendorProfile.findUnique({
-      where: { id: vendorId },
-      include: {
-        serviceListings: true,
-        bookingRequests: {
-          include: {
-            paymentRecords: true,
-          },
-        },
-        reviews: true,
-      },
-    });
+    // Import here to avoid circular dependency
+    const { vendorAnalyticsService } = await import('./vendor-analytics.service');
+    return vendorAnalyticsService.getEnhancedVendorAnalytics(vendorId);
+  }
 
-    if (!vendor) {
-      throw new Error('Vendor profile not found');
-    }
+  /**
+   * Get vendor performance metrics
+   */
+  async getVendorPerformanceMetrics(vendorId: string) {
+    const { vendorAnalyticsService } = await import('./vendor-analytics.service');
+    return vendorAnalyticsService.calculateVendorPerformanceMetrics(vendorId);
+  }
 
-    // Calculate metrics
-    const totalViews = vendor.serviceListings.reduce(
-      (sum, service) => sum + service.viewCount,
-      0
-    );
-    const totalInquiries = vendor.serviceListings.reduce(
-      (sum, service) => sum + service.inquiryCount,
-      0
-    );
-    const totalBookings = vendor.bookingRequests.length;
-    const conversionRate = totalInquiries > 0 ? (totalBookings / totalInquiries) * 100 : 0;
+  /**
+   * Get vendor insights and recommendations
+   */
+  async getVendorInsights(vendorId: string) {
+    const { vendorAnalyticsService } = await import('./vendor-analytics.service');
+    return vendorAnalyticsService.generateVendorInsights(vendorId);
+  }
 
-    const totalRevenue = vendor.bookingRequests
-      .filter((booking) => booking.status === 'COMPLETED')
-      .reduce((sum, booking) => {
-        const completedPayments = booking.paymentRecords.filter(
-          (payment) => payment.status === 'COMPLETED'
-        );
-        return sum + completedPayments.reduce((paySum, payment) => paySum + payment.vendorPayout, 0);
-      }, 0);
+  /**
+   * Get vendor trend data
+   */
+  async getVendorTrendData(vendorId: string, months?: number) {
+    const { vendorAnalyticsService } = await import('./vendor-analytics.service');
+    return vendorAnalyticsService.generateVendorTrendData(vendorId, months);
+  }
 
-    // Get top services
-    const topServices = vendor.serviceListings
-      .sort((a, b) => b.bookingCount - a.bookingCount)
-      .slice(0, 5)
-      .map((service) => ({
-        serviceId: service.id,
-        serviceName: service.title,
-        bookingCount: service.bookingCount,
-        revenue: 0, // TODO: Calculate per-service revenue
-      }));
-
-    return {
-      vendorId,
-      listingViews: totalViews,
-      inquiryCount: totalInquiries,
-      bookingCount: totalBookings,
-      conversionRate,
-      averageRating: vendor.rating,
-      totalReviews: vendor.reviewCount,
-      revenue: totalRevenue,
-      performanceMetrics: {
-        responseTime: vendor.responseTime,
-        completionRate: vendor.completionRate,
-        repeatCustomerRate: 0, // TODO: Calculate repeat customer rate
-      },
-      trendData: {
-        viewsOverTime: [], // TODO: Implement trend data
-        bookingsOverTime: [],
-        revenueOverTime: [],
-      },
-      topServices,
-    };
+  /**
+   * Get market intelligence
+   */
+  async getMarketIntelligence() {
+    const { vendorAnalyticsService } = await import('./vendor-analytics.service');
+    return vendorAnalyticsService.getMarketIntelligence();
   }
 
   /**

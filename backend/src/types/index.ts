@@ -887,4 +887,51 @@ export interface DigitalSignatureDTO {
   userAgent?: string;
 }
 
+// Event-Marketplace Integration types
+export interface ServiceRecommendationDTO {
+  preferredCategories?: string[]; // ServiceCategory enum values
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  verifiedOnly?: boolean;
+  limit?: number;
+}
+
+export interface VendorTimelineSyncDTO {
+  sendReminders?: boolean;
+  includeDeliverables?: boolean;
+  includeServiceDates?: boolean;
+}
+
+export interface IntegratedCommunicationDTO {
+  type: 'VENDOR_BROADCAST' | 'CATEGORY_SPECIFIC' | 'INDIVIDUAL_VENDOR' | 'TIMELINE_UPDATE';
+  message: string;
+  attachments?: MediaFile[];
+  targetCategories?: string[]; // For CATEGORY_SPECIFIC type
+  targetBookingId?: string; // For INDIVIDUAL_VENDOR type
+}
+
+export interface EventMarketplaceIntegrationResponse {
+  success: boolean;
+  message: string;
+  data: any;
+}
+
+export interface EventTimelineItem {
+  id: string;
+  eventId: string;
+  bookingId?: string;
+  deliverableId?: string;
+  serviceDate?: Date;
+  title: string;
+  description: string;
+  dueDate: Date;
+  status: string;
+  vendorId?: string;
+  category: 'VENDOR_DELIVERABLE' | 'VENDOR_SERVICE' | 'EVENT_MILESTONE';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 

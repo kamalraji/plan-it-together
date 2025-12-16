@@ -17,6 +17,7 @@ import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
+import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
 
 dotenv.config();
 
@@ -147,6 +148,9 @@ app.use('/api/service-agreements', serviceAgreementRoutes);
 
 // Review routes
 app.use('/api/reviews', reviewRoutes);
+
+// Event-Marketplace Integration routes
+app.use('/api/event-marketplace-integration', eventMarketplaceIntegrationRoutes);
 
 // Start server
 app.listen(PORT, () => {

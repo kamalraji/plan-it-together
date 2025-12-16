@@ -464,4 +464,144 @@ router.post('/:id/validate-access', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * GET /api/events/:id/marketplace
+ * Get marketplace integration data for an event (Organizer only)
+ */
+router.get(
+  '/:id/marketplace',
+  authenticate,
+  authorize(['ORGANIZER', 'SUPER_ADMIN']),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const organizerId = req.user!.userId;
+
+      const marketplaceData = await eventService.getEventMarketplaceData(id, organizerId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: marketplaceData,
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'MARKETPLACE_DATA_FETCH_FAILED',
+          message: error.message || 'Failed to fetch marketplace data',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      res.status(400).json(response);
+    }
+  }
+);
+
+/**
+ * GET /api/events/:id/dashboard-with-marketplace
+ * Get event dashboard with marketplace integration (Organizer only)
+ */
+router.get(
+  '/:id/dashboard-with-marketplace',
+  authenticate,
+  authorize(['ORGANIZER', 'SUPER_ADMIN']),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const organizerId = req.user!.userId;
+
+      const dashboard = await eventService.getEventDashboardWithMarketplace(id, organizerId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: dashboard,
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'DASHBOARD_FETCH_FAILED',
+          message: error.message || 'Failed to fetch event dashboard',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      res.status(400).json(response);
+    }
+  }
+);
+
+/**
+ * GET /api/events/:id/vendor-timeline
+ * Get vendor bookings integrated with event timeline (Organizer only)
+ */
+router.get(
+  '/:id/vendor-timeline',
+  authenticate,
+  authorize(['ORGANIZER', 'SUPER_ADMIN']),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const organizerId = req.user!.userId;
+
+      const timelineIntegration = await eventService.integrateVendorBookingsWithTimeline(id, organizerId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: timelineIntegration,
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'TIMELINE_INTEGRATION_FAILED',
+          message: error.message || 'Failed to integrate vendor timeline',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      res.status(400).json(response);
+    }
+  }
+);
+
+/**
+ * GET /api/events/:id/vendor-coordination
+ * Get unified vendor coordination interface (Organizer only)
+ */
+router.get(
+  '/:id/vendor-coordination',
+  authenticate,
+  authorize(['ORGANIZER', 'SUPER_ADMIN']),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const organizerId = req.user!.userId;
+
+      const coordinationInterface = await eventService.createVendorCoordinationInterface(id, organizerId);
+
+      const response: ApiResponse = {
+        success: true,
+        data: coordinationInterface,
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'COORDINATION_INTERFACE_FAILED',
+          message: error.message || 'Failed to create vendor coordination interface',
+          timestamp: new Date().toISOString(),
+        },
+      };
+      res.status(400).json(response);
+    }
+  }
+);
+
 export default router;

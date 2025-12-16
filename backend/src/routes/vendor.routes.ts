@@ -458,6 +458,142 @@ router.get('/:id/analytics', authenticate, async (req: Request, res: Response) =
 });
 
 /**
+ * Get vendor performance metrics
+ * GET /api/vendors/:id/performance
+ */
+router.get('/:id/performance', authenticate, async (req: Request, res: Response) => {
+  try {
+    const existingVendor = await vendorService.getVendorProfile(req.params.id);
+    
+    if (existingVendor.userId !== (req as any).user.id) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You can only view performance metrics for your own vendor profile',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const metrics = await vendorService.getVendorPerformanceMetrics(req.params.id);
+    
+    res.json({
+      success: true,
+      data: metrics,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VENDOR_PERFORMANCE_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
+/**
+ * Get vendor insights and recommendations
+ * GET /api/vendors/:id/insights
+ */
+router.get('/:id/insights', authenticate, async (req: Request, res: Response) => {
+  try {
+    const existingVendor = await vendorService.getVendorProfile(req.params.id);
+    
+    if (existingVendor.userId !== (req as any).user.id) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You can only view insights for your own vendor profile',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const insights = await vendorService.getVendorInsights(req.params.id);
+    
+    res.json({
+      success: true,
+      data: insights,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VENDOR_INSIGHTS_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
+/**
+ * Get vendor trend data
+ * GET /api/vendors/:id/trends
+ */
+router.get('/:id/trends', authenticate, async (req: Request, res: Response) => {
+  try {
+    const existingVendor = await vendorService.getVendorProfile(req.params.id);
+    
+    if (existingVendor.userId !== (req as any).user.id) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You can only view trends for your own vendor profile',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+    
+    const months = req.query.months ? parseInt(req.query.months as string) : undefined;
+    const trends = await vendorService.getVendorTrendData(req.params.id, months);
+    
+    res.json({
+      success: true,
+      data: trends,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VENDOR_TRENDS_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
+/**
+ * Get market intelligence
+ * GET /api/vendors/market/intelligence
+ */
+router.get('/market/intelligence', authenticate, async (req: Request, res: Response) => {
+  try {
+    const intelligence = await vendorService.getMarketIntelligence();
+    
+    res.json({
+      success: true,
+      data: intelligence,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'MARKET_INTELLIGENCE_ERROR',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
+
+/**
  * Get verified vendors count by category
  * GET /api/vendors/verification/categories
  */
