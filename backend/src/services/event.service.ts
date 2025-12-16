@@ -56,6 +56,15 @@ export class EventService {
       },
     });
 
+    // Automatically provision workspace for the event
+    try {
+      const { workspaceLifecycleService } = await import('./workspace-lifecycle.service');
+      await workspaceLifecycleService.onEventCreated(event.id, organizerId);
+    } catch (error) {
+      console.error('Failed to auto-provision workspace:', error);
+      // Don't throw error to avoid breaking event creation
+    }
+
     // Notify followers if event is published and linked to organization
     if (event.organizationId && event.status === 'PUBLISHED') {
       try {
@@ -112,10 +121,30 @@ export class EventService {
       updateData.leaderboardEnabled = updates.leaderboardEnabled;
     }
 
+    // Get the current event to compare status changes
+    const currentEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
     const event = await prisma.event.update({
       where: { id: eventId },
       data: updateData,
     });
+
+    // Handle workspace lifecycle changes if status changed
+    if (updates.status && currentEvent && currentEvent.status !== updates.status) {
+      try {
+        const { workspaceLifecycleService } = await import('./workspace-lifecycle.service');
+        await workspaceLifecycleService.onEventStatusChanged(
+          eventId,
+          updates.status as any,
+          currentEvent.status as any
+        );
+      } catch (error) {
+        console.error('Failed to handle workspace lifecycle change:', error);
+        // Don't throw error to avoid breaking event update
+      }
+    }
 
     // Notify followers if event status changed to PUBLISHED and linked to organization
     if (updates.status === 'PUBLISHED' && event.organizationId) {

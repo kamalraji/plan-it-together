@@ -935,3 +935,247 @@ export interface EventTimelineItem {
 }
 
 
+// Workspace-related types
+export interface WorkspaceSettings {
+  autoInviteOrganizer: boolean;
+  defaultChannels: string[];
+  taskCategories: string[];
+  retentionPeriodDays: number;
+  allowExternalMembers: boolean;
+}
+
+export interface CreateWorkspaceDTO {
+  eventId: string;
+  name?: string;
+  description?: string;
+  settings?: WorkspaceSettings;
+  templateId?: string;
+}
+
+export interface UpdateWorkspaceDTO {
+  name?: string;
+  description?: string;
+  settings?: WorkspaceSettings;
+}
+
+export interface WorkspaceResponse {
+  id: string;
+  eventId: string;
+  name: string;
+  description?: string;
+  status: string;
+  settings?: WorkspaceSettings;
+  templateId?: string;
+  event?: {
+    id: string;
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    status: string;
+  };
+  teamMembers: Array<{
+    id: string;
+    userId: string;
+    role: string;
+    status: string;
+    joinedAt: Date;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+  taskSummary?: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    overdue: number;
+  };
+  channels: Array<{
+    id: string;
+    name: string;
+    type: string;
+    description?: string;
+    isPrivate: boolean;
+  }>;
+  createdAt: Date;
+  updatedAt: Date;
+  dissolvedAt?: Date;
+}
+
+// Team Management types
+export interface TeamInvitationDTO {
+  email: string;
+  name?: string;
+  role: 'WORKSPACE_OWNER' | 'TEAM_LEAD' | 'EVENT_COORDINATOR' | 'VOLUNTEER_MANAGER' | 'TECHNICAL_SPECIALIST' | 'MARKETING_LEAD' | 'GENERAL_VOLUNTEER';
+}
+
+export interface BulkInvitationDTO {
+  invitations: TeamInvitationDTO[];
+}
+
+export interface InvitationResponse {
+  id: string;
+  workspaceId: string;
+  email: string;
+  role: string;
+  status: string;
+  invitationToken: string;
+  workspace: {
+    id: string;
+    name: string;
+    event?: {
+      id: string;
+      name: string;
+      startDate: Date;
+      endDate: Date;
+    };
+  };
+  invitedAt: Date;
+}
+
+export interface TeamMemberResponse {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  role: string;
+  permissions: string[];
+  status: string;
+  joinedAt: Date;
+  leftAt?: Date;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  invitedBy?: {
+    id: string;
+    name: string;
+  };
+}
+
+// Task Management types
+export interface CreateTaskDTO {
+  title: string;
+  description: string;
+  assigneeId?: string;
+  category: 'SETUP' | 'MARKETING' | 'LOGISTICS' | 'TECHNICAL' | 'REGISTRATION' | 'POST_EVENT';
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  dueDate?: Date | string;
+  dependencies?: string[];
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateTaskDTO {
+  title?: string;
+  description?: string;
+  assigneeId?: string;
+  category?: 'SETUP' | 'MARKETING' | 'LOGISTICS' | 'TECHNICAL' | 'REGISTRATION' | 'POST_EVENT';
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'REVIEW_REQUIRED' | 'COMPLETED' | 'BLOCKED';
+  progress?: number;
+  dueDate?: Date | string;
+  dependencies?: string[];
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface TaskAssignmentDTO {
+  assigneeId: string;
+}
+
+export interface TaskProgressDTO {
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'REVIEW_REQUIRED' | 'COMPLETED' | 'BLOCKED';
+  progress: number;
+}
+
+export interface TaskResponse {
+  id: string;
+  workspaceId: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  status: string;
+  progress: number;
+  dueDate?: Date;
+  dependencies: string[];
+  tags: string[];
+  metadata?: Record<string, any>;
+  assignee?: {
+    id: string;
+    userId: string;
+    role: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  } | null;
+  creator: {
+    id: string;
+    userId: string;
+    role: string;
+    user: {
+      id: string;
+      name: string;
+    };
+  };
+  workspace?: {
+    id: string;
+    name: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+}
+
+// Communication types
+export interface CreateChannelDTO {
+  name: string;
+  type: 'GENERAL' | 'TASK_SPECIFIC' | 'ROLE_BASED' | 'ANNOUNCEMENT';
+  description?: string;
+  members?: string[];
+  isPrivate?: boolean;
+}
+
+export interface ChannelResponse {
+  id: string;
+  workspaceId: string;
+  name: string;
+  type: string;
+  description?: string;
+  members: string[];
+  isPrivate: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SendMessageDTO {
+  content: string;
+  attachments?: MediaFile[];
+}
+
+export interface MessageResponse {
+  id: string;
+  channelId: string;
+  senderId: string;
+  content: string;
+  attachments: MediaFile[];
+  sentAt: Date;
+  editedAt?: Date;
+}
+
+export interface BroadcastMessageDTO {
+  content: string;
+  attachments?: MediaFile[];
+  targetType: 'ALL_MEMBERS' | 'ROLE_SPECIFIC';
+  targetRoles?: string[];
+}
+
+export interface ChannelMessageHistory {
+  channelId: string;
+  messages: MessageResponse[];
+  hasMore: boolean;
+}

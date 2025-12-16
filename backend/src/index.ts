@@ -18,6 +18,7 @@ import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
 import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
+import workspaceLifecycleRoutes from './routes/workspace-lifecycle.routes';
 
 dotenv.config();
 
@@ -152,9 +153,21 @@ app.use('/api/reviews', reviewRoutes);
 // Event-Marketplace Integration routes
 app.use('/api/event-marketplace-integration', eventMarketplaceIntegrationRoutes);
 
+// Workspace Lifecycle routes
+app.use('/api/workspace-lifecycle', workspaceLifecycleRoutes);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Start workspace dissolution scheduler
+  try {
+    const { workspaceSchedulerService } = require('./services/workspace-scheduler.service');
+    workspaceSchedulerService.start();
+    console.log('Workspace dissolution scheduler started');
+  } catch (error) {
+    console.error('Failed to start workspace dissolution scheduler:', error);
+  }
 });
 
 export default app;

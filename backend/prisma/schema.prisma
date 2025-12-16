@@ -119,6 +119,12 @@ enum ChannelType {
   ANNOUNCEMENT
 }
 
+enum MemberStatus {
+  INVITED
+  ACTIVE
+  INACTIVE
+}
+
 enum ServiceCategory {
   VENUE
   CATERING
@@ -192,6 +198,8 @@ model User {
   vendorReviews      VendorReview[]
   paymentsSent       PaymentRecord[]      @relation("PaymentPayer")
   paymentsReceived   PaymentRecord[]      @relation("PaymentPayee")
+  teamMemberships    TeamMember[]
+  invitedTeamMembers TeamMember[]         @relation("TeamMemberInviter")
 
   @@index([email])
 }
@@ -242,6 +250,7 @@ model Workspace {
   description String?         @db.Text
   status      WorkspaceStatus @default(PROVISIONING)
   settings    Json?           // WorkspaceSettings object
+  templateId  String?         // Reference to workspace template used
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   dissolvedAt DateTime?
@@ -254,6 +263,7 @@ model Workspace {
 
   @@index([eventId])
   @@index([status])
+  @@index([templateId])
 }
 
 model TeamMember {
@@ -265,7 +275,7 @@ model TeamMember {
   joinedAt    DateTime      @default(now())
   leftAt      DateTime?
   invitedBy   String
-  status      String        @default("ACTIVE") // 'INVITED', 'ACTIVE', 'INACTIVE'
+  status      MemberStatus  @default(ACTIVE)
 
   // Relations
   workspace     Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -328,6 +338,26 @@ model WorkspaceChannel {
 
   @@index([workspaceId])
   @@index([type])
+}
+
+model Registration {
+  id         String             @id @default(uuid())
+  eventId    String
+  userId     String
+  status     RegistrationStatus @default(PENDING)
+  metadata   Json?              // Additional registration data
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  // Relations
+  event      Event        @relation(fields: [eventId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+  attendance Attendance[]
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
 }
 
 model Attendance {
