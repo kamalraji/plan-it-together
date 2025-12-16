@@ -19,6 +19,10 @@ import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
 import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
 import workspaceLifecycleRoutes from './routes/workspace-lifecycle.routes';
+import workspaceRoutes from './routes/workspace.routes';
+import teamRoutes from './routes/team.routes';
+import taskRoutes from './routes/task.routes';
+import workspaceCommunicationRoutes from './routes/workspace-communication.routes';
 
 dotenv.config();
 
@@ -155,6 +159,18 @@ app.use('/api/event-marketplace-integration', eventMarketplaceIntegrationRoutes)
 
 // Workspace Lifecycle routes
 app.use('/api/workspace-lifecycle', workspaceLifecycleRoutes);
+
+// Workspace routes
+app.use('/api/workspace', workspaceRoutes);
+
+// Team Management routes
+app.use('/api/team', teamRoutes);
+
+// Task Management routes
+app.use('/api/task', taskRoutes);
+
+// Workspace Communication routes
+app.use('/api/workspace-communication', workspaceCommunicationRoutes);
 
 // Start server
 app.listen(PORT, () => {
