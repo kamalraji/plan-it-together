@@ -9,6 +9,8 @@ import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { WorkspaceHealthMetrics } from './WorkspaceHealthMetrics';
 import { TeamManagement } from './TeamManagement';
 import { WorkspaceCommunication } from './WorkspaceCommunication';
+import { WorkspaceAnalyticsDashboard } from './WorkspaceAnalyticsDashboard';
+import { WorkspaceReportExport } from './WorkspaceReportExport';
 import { EventMarketplaceIntegration } from '../marketplace';
 import api from '../../lib/api';
 
@@ -20,7 +22,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = propWorkspaceId || paramWorkspaceId;
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'marketplace'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'reports' | 'marketplace'>('overview');
 
   // Fetch workspace data
   const { data: workspace, isLoading, error } = useQuery({
@@ -147,10 +149,11 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         )}
 
         {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics & Reports</h2>
-            <p className="text-gray-600">Analytics interface will be implemented in a separate task.</p>
-          </div>
+          <WorkspaceAnalyticsDashboard workspace={workspace} />
+        )}
+
+        {activeTab === 'reports' && (
+          <WorkspaceReportExport workspace={workspace} />
         )}
       </div>
     </div>
