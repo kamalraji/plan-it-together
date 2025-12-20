@@ -13,6 +13,7 @@ import { EventLandingPage } from './components/events/EventLandingPage';
 import { PrivateEventAccess } from './components/events/PrivateEventAccess';
 import { CertificateVerification } from './components/certificates/CertificateVerification';
 import { OrganizationDirectory, FollowedOrganizations, OrganizationPage } from './components/organization';
+import { WorkspaceDashboard } from './components/workspace/WorkspaceDashboard';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ApiHealthCheck } from './components/common/ApiHealthCheck';
 import { UserRole } from './types';
@@ -99,6 +100,15 @@ function App() {
             <Route 
               path="/organizations/:organizationId" 
               element={<OrganizationPage />} 
+            />
+            {/* Workspace routes */}
+            <Route 
+              path="/workspaces/:workspaceId" 
+              element={
+                <ProtectedRoute requireEmailVerification>
+                  <WorkspaceDashboard />
+                </ProtectedRoute>
+              } 
             />
             {/* Public certificate verification routes */}
             <Route 

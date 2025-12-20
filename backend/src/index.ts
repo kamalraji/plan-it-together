@@ -18,6 +18,7 @@ import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
 import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
+import workspaceApiRoutes from './routes/workspace-api.routes';
 import workspaceLifecycleRoutes from './routes/workspace-lifecycle.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import teamRoutes from './routes/team.routes';
@@ -159,6 +160,9 @@ app.use('/api/reviews', reviewRoutes);
 
 // Event-Marketplace Integration routes
 app.use('/api/event-marketplace-integration', eventMarketplaceIntegrationRoutes);
+
+// Workspace API routes (consolidated)
+app.use('/api/workspace-api', workspaceApiRoutes);
 
 // Workspace Lifecycle routes
 app.use('/api/workspace-lifecycle', workspaceLifecycleRoutes);

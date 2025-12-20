@@ -570,3 +570,152 @@ export interface OrganizationAnalytics {
     byLocation: Record<string, number>;
   };
 }
+
+// Workspace-related types
+export interface WorkspaceSettings {
+  autoInviteOrganizer: boolean;
+  defaultChannels: string[];
+  taskCategories: string[];
+  retentionPeriodDays: number;
+  allowExternalMembers: boolean;
+}
+
+export enum WorkspaceStatus {
+  PROVISIONING = 'PROVISIONING',
+  ACTIVE = 'ACTIVE',
+  WINDING_DOWN = 'WINDING_DOWN',
+  DISSOLVED = 'DISSOLVED'
+}
+
+export enum WorkspaceRole {
+  WORKSPACE_OWNER = 'WORKSPACE_OWNER',
+  TEAM_LEAD = 'TEAM_LEAD',
+  EVENT_COORDINATOR = 'EVENT_COORDINATOR',
+  VOLUNTEER_MANAGER = 'VOLUNTEER_MANAGER',
+  TECHNICAL_SPECIALIST = 'TECHNICAL_SPECIALIST',
+  MARKETING_LEAD = 'MARKETING_LEAD',
+  GENERAL_VOLUNTEER = 'GENERAL_VOLUNTEER'
+}
+
+export enum TaskStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REVIEW_REQUIRED = 'REVIEW_REQUIRED',
+  COMPLETED = 'COMPLETED',
+  BLOCKED = 'BLOCKED'
+}
+
+export enum TaskPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
+
+export enum TaskCategory {
+  SETUP = 'SETUP',
+  MARKETING = 'MARKETING',
+  LOGISTICS = 'LOGISTICS',
+  TECHNICAL = 'TECHNICAL',
+  REGISTRATION = 'REGISTRATION',
+  POST_EVENT = 'POST_EVENT'
+}
+
+export interface Workspace {
+  id: string;
+  eventId: string;
+  name: string;
+  description?: string;
+  status: WorkspaceStatus;
+  settings?: WorkspaceSettings;
+  templateId?: string;
+  event?: {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+  };
+  teamMembers: TeamMember[];
+  taskSummary?: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    overdue: number;
+  };
+  channels: WorkspaceChannel[];
+  createdAt: string;
+  updatedAt: string;
+  dissolvedAt?: string;
+}
+
+export interface TeamMember {
+  id: string;
+  userId: string;
+  role: WorkspaceRole;
+  status: string;
+  joinedAt: string;
+  leftAt?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  invitedBy?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface WorkspaceTask {
+  id: string;
+  workspaceId: string;
+  title: string;
+  description: string;
+  category: TaskCategory;
+  priority: TaskPriority;
+  status: TaskStatus;
+  progress: number;
+  dueDate?: string;
+  dependencies: string[];
+  tags: string[];
+  metadata?: Record<string, any>;
+  assignee?: {
+    id: string;
+    userId: string;
+    role: WorkspaceRole;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  } | null;
+  creator: {
+    id: string;
+    userId: string;
+    role: WorkspaceRole;
+    user: {
+      id: string;
+      name: string;
+    };
+  };
+  workspace?: {
+    id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+
+export interface WorkspaceChannel {
+  id: string;
+  workspaceId: string;
+  name: string;
+  type: string;
+  description?: string;
+  members: string[];
+  isPrivate: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
