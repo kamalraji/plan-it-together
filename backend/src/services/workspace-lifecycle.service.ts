@@ -458,7 +458,7 @@ export class WorkspaceLifecycleService {
     details: Record<string, any>
   ): Promise<void> {
     try {
-      await prisma.workspaceAuditLog.create({
+      await (prisma as any).workspaceAuditLog.create({
         data: {
           workspaceId,
           userId,

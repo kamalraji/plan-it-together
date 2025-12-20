@@ -8,6 +8,7 @@ import { TeamMemberRoster } from './TeamMemberRoster';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { WorkspaceHealthMetrics } from './WorkspaceHealthMetrics';
 import { TeamManagement } from './TeamManagement';
+import { EventMarketplaceIntegration } from '../marketplace';
 import api from '../../lib/api';
 
 interface WorkspaceDashboardProps {
@@ -18,7 +19,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = propWorkspaceId || paramWorkspaceId;
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'marketplace'>('overview');
 
   // Fetch workspace data
   const { data: workspace, isLoading, error } = useQuery({
@@ -127,6 +128,13 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Task Management</h2>
             <p className="text-gray-600">Task management interface will be implemented in a separate task.</p>
           </div>
+        )}
+
+        {activeTab === 'marketplace' && workspace.event && (
+          <EventMarketplaceIntegration 
+            eventId={workspace.event.id} 
+            eventName={workspace.event.name}
+          />
         )}
 
         {activeTab === 'team' && (

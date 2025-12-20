@@ -943,3 +943,13 @@ model SecurityIncident {
   @@index([detectedAt])
   @@map("security_incidents")
 }
+
+model MarketplaceConfig {
+  id        String   @id @default("default")
+  config    Json     // MarketplaceConfig object
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("marketplace_config")
+}

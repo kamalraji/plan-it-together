@@ -14,6 +14,8 @@ import { PrivateEventAccess } from './components/events/PrivateEventAccess';
 import { CertificateVerification } from './components/certificates/CertificateVerification';
 import { OrganizationDirectory, FollowedOrganizations, OrganizationPage } from './components/organization';
 import { WorkspaceDashboard } from './components/workspace/WorkspaceDashboard';
+import VendorDashboard from './components/vendor/VendorDashboard';
+import VendorRegistration from './components/vendor/VendorRegistration';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ApiHealthCheck } from './components/common/ApiHealthCheck';
 import { UserRole } from './types';
@@ -100,6 +102,23 @@ function App() {
             <Route 
               path="/organizations/:organizationId" 
               element={<OrganizationPage />} 
+            />
+            {/* Vendor routes */}
+            <Route 
+              path="/vendor/register" 
+              element={
+                <ProtectedRoute requireEmailVerification>
+                  <VendorRegistrationWrapper />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/dashboard" 
+              element={
+                <ProtectedRoute requireEmailVerification>
+                  <VendorDashboardWrapper />
+                </ProtectedRoute>
+              } 
             />
             {/* Workspace routes */}
             <Route 
@@ -218,6 +237,34 @@ function EventEditWrapper() {
   }
 
   return <EventForm event={event} isEditing={true} />;
+}
+
+function VendorRegistrationWrapper() {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <VendorRegistration 
+      userId={user.id} 
+      onRegistrationComplete={() => {
+        // Redirect to vendor dashboard after successful registration
+        window.location.href = '/vendor/dashboard';
+      }}
+    />
+  );
+}
+
+function VendorDashboardWrapper() {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <VendorDashboard userId={user.id} />;
 }
 
 export default App;

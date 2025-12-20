@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import VendorAnalyticsDashboard from './VendorAnalyticsDashboard';
+import ServiceListingManagement from './ServiceListingManagement';
+import VendorBookingManagement from './VendorBookingManagement';
+import VendorRegistration from './VendorRegistration';
 
 interface VendorProfile {
   id: string;
@@ -298,14 +301,10 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
         <VendorAnalyticsDashboard vendorId={vendorProfile.id} />
       )}
       {activeSection === 'services' && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Services management coming soon...</p>
-        </div>
+        <ServiceListingManagement vendorId={vendorProfile.id} />
       )}
       {activeSection === 'bookings' && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Bookings management coming soon...</p>
-        </div>
+        <VendorBookingManagement vendorId={vendorProfile.id} />
       )}
     </div>
   );

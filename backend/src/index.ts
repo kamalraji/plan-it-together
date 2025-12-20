@@ -13,6 +13,7 @@ import organizationRoutes from './routes/organization.routes';
 import discoveryRoutes from './routes/discovery.routes';
 import vendorRoutes from './routes/vendor.routes';
 import marketplaceRoutes from './routes/marketplace.routes';
+import marketplaceConfigRoutes from './routes/marketplace-config.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
@@ -145,6 +146,9 @@ app.use('/api/vendors', vendorRoutes);
 
 // Marketplace routes
 app.use('/api/marketplace', marketplaceRoutes);
+
+// Marketplace Configuration routes
+app.use('/api/marketplace', marketplaceConfigRoutes);
 
 // Booking routes
 app.use('/api/bookings', bookingRoutes);

@@ -136,7 +136,7 @@ export class WorkspaceCommunicationService {
     }
 
     // Create message in database
-    const message = await prisma.workspaceMessage.create({
+    const message = await (prisma as any).workspaceMessage.create({
       data: {
         channelId,
         senderId,
@@ -234,7 +234,7 @@ export class WorkspaceCommunicationService {
       whereClause.sentAt = { lt: before };
     }
 
-    const messages = await prisma.workspaceMessage.findMany({
+    const messages = await (prisma as any).workspaceMessage.findMany({
       where: whereClause,
       orderBy: { sentAt: 'desc' },
       take: limit,
@@ -360,7 +360,7 @@ export class WorkspaceCommunicationService {
       whereClause.channelId = channelId;
     }
 
-    const messages = await prisma.workspaceMessage.findMany({
+    const messages = await (prisma as any).workspaceMessage.findMany({
       where: whereClause,
       orderBy: { sentAt: 'desc' },
       take: 100, // Limit search results

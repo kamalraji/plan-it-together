@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
+import { useVendorStatus } from '../../hooks/useVendorStatus';
+import { MarketplaceOrganizerInterface } from '../marketplace';
 
 interface Event {
   id: string;
@@ -17,7 +19,8 @@ interface Event {
 
 export function OrganizerDashboard() {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'events' | 'analytics' | 'profile'>('events');
+  const { isVendor, isLoading: vendorLoading } = useVendorStatus(user?.id || '');
+  const [activeTab, setActiveTab] = useState<'events' | 'analytics' | 'marketplace' | 'profile'>('events');
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
 
   // Check if profile completion is needed (Requirements 2.4, 2.5)
@@ -60,6 +63,14 @@ export function OrganizerDashboard() {
               <p className="text-gray-600">Welcome back, {user?.name}</p>
             </div>
             <div className="flex items-center space-x-4">
+              {!vendorLoading && (
+                <Link
+                  to={isVendor ? "/vendor/dashboard" : "/vendor/register"}
+                  className="text-indigo-600 hover:text-indigo-700 transition-colors font-medium"
+                >
+                  {isVendor ? "Vendor Dashboard" : "Become a Vendor"}
+                </Link>
+              )}
               <Link
                 to="/events/create"
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
@@ -84,6 +95,7 @@ export function OrganizerDashboard() {
             {[
               { key: 'events', label: 'My Events' },
               { key: 'analytics', label: 'Analytics' },
+              { key: 'marketplace', label: 'Marketplace' },
               { key: 'profile', label: 'Profile' },
             ].map((tab) => (
               <button
@@ -261,6 +273,10 @@ export function OrganizerDashboard() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === 'marketplace' && (
+          <MarketplaceOrganizerInterface />
         )}
 
         {activeTab === 'profile' && (

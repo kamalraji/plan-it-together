@@ -57,16 +57,16 @@ export class AnalyticsService {
   async calculateRegistrationsOverTime(eventId: string): Promise<RegistrationOverTime[]> {
     const registrations = await prisma.registration.findMany({
       where: { eventId },
-      orderBy: { registeredAt: 'asc' },
+      orderBy: { createdAt: 'asc' },
       select: {
-        registeredAt: true,
+        createdAt: true,
       },
     });
 
     // Group by date
     const dateMap = new Map<string, number>();
     registrations.forEach((reg) => {
-      const date = new Date(reg.registeredAt).toISOString().split('T')[0];
+      const date = new Date(reg.createdAt).toISOString().split('T')[0];
       dateMap.set(date, (dateMap.get(date) || 0) + 1);
     });
 

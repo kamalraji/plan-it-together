@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { paymentService } from '../services/payment.service';
 import { authenticate } from '../middleware/auth.middleware';
 import { ApiResponse } from '../types';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 /**
  * Process payment for a booking
@@ -343,40 +345,311 @@ router.post('/payout/setup', authenticate, async (req, res) => {
  */
 router.post('/webhook', async (req, res) => {
   try {
-    // Handle Stripe webhook events
     const sig = req.headers['stripe-signature'] as string;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     
     if (!sig) {
       return res.status(400).json({ error: 'Missing stripe signature' });
     }
 
-    // In production, verify the webhook signature
-    // const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    let event;
 
-    const event = req.body;
+    // Verify webhook signature if secret is configured
+    if (webhookSecret) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      } catch (err: any) {
+        console.error('Webhook signature verification failed:', err.message);
+        return res.status(400).json({ error: 'Invalid signature' });
+      }
+    } else {
+      console.warn('Webhook secret not configured - skipping signature verification');
+      event = req.body;
+    }
 
+    // Handle different event types
     switch (event.type) {
       case 'payment_intent.succeeded':
-        // Handle successful payment
-        console.log('Payment succeeded:', event.data.object.id);
+        await handlePaymentSucceeded(event.data.object);
         break;
+      
       case 'payment_intent.payment_failed':
-        // Handle failed payment
-        console.log('Payment failed:', event.data.object.id);
+        await handlePaymentFailed(event.data.object);
         break;
+      
+      case 'payment_intent.requires_action':
+        await handlePaymentRequiresAction(event.data.object);
+        break;
+      
       case 'transfer.created':
-        // Handle vendor payout
-        console.log('Transfer created:', event.data.object.id);
+        await handleTransferCreated(event.data.object);
         break;
+      
+      case 'transfer.failed':
+        await handleTransferFailed(event.data.object);
+        break;
+      
+      case 'account.updated':
+        await handleAccountUpdated(event.data.object);
+        break;
+      
+      case 'payout.created':
+        await handlePayoutCreated(event.data.object);
+        break;
+      
+      case 'payout.failed':
+        await handlePayoutFailed(event.data.object);
+        break;
+      
       default:
-        console.log('Unhandled event type:', event.type);
+        console.log('Unhandled webhook event type:', event.type);
     }
 
     res.json({ received: true });
   } catch (error: any) {
-    console.error('Webhook error:', error);
-    res.status(400).json({ error: error.message });
+    console.error('Webhook processing error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
   }
 });
+
+/**
+ * Handle successful payment
+ */
+async function handlePaymentSucceeded(paymentIntent: any) {
+  try {
+    const bookingId = paymentIntent.metadata?.bookingId;
+    if (!bookingId) {
+      console.warn('Payment succeeded but no booking ID in metadata:', paymentIntent.id);
+      return;
+    }
+
+    // Update payment record
+    await prisma.paymentRecord.updateMany({
+      where: {
+        bookingId,
+        transactionId: paymentIntent.id,
+      },
+      data: {
+        status: 'COMPLETED',
+        processedAt: new Date(),
+      },
+    });
+
+    // Update booking status
+    await prisma.bookingRequest.update({
+      where: { id: bookingId },
+      data: { status: 'CONFIRMED' },
+    });
+
+    // Trigger automated payout if enabled
+    if (process.env.AUTO_PAYOUT_ENABLED === 'true') {
+      const payment = await prisma.paymentRecord.findFirst({
+        where: {
+          bookingId,
+          transactionId: paymentIntent.id,
+        },
+      });
+      
+      if (payment) {
+        await paymentService.processVendorPayout(payment.id);
+      }
+    }
+
+    console.log('Payment succeeded and processed:', paymentIntent.id);
+  } catch (error) {
+    console.error('Error handling payment success:', error);
+  }
+}
+
+/**
+ * Handle failed payment
+ */
+async function handlePaymentFailed(paymentIntent: any) {
+  try {
+    const bookingId = paymentIntent.metadata?.bookingId;
+    if (!bookingId) {
+      console.warn('Payment failed but no booking ID in metadata:', paymentIntent.id);
+      return;
+    }
+
+    // Update payment record
+    await prisma.paymentRecord.updateMany({
+      where: {
+        bookingId,
+        transactionId: paymentIntent.id,
+      },
+      data: {
+        status: 'FAILED',
+      },
+    });
+
+    // Optionally update booking status back to previous state
+    await prisma.bookingRequest.update({
+      where: { id: bookingId },
+      data: { status: 'QUOTE_SENT' }, // Revert to previous state
+    });
+
+    console.log('Payment failed and processed:', paymentIntent.id);
+  } catch (error) {
+    console.error('Error handling payment failure:', error);
+  }
+}
+
+/**
+ * Handle payment requiring action
+ */
+async function handlePaymentRequiresAction(paymentIntent: any) {
+  try {
+    const bookingId = paymentIntent.metadata?.bookingId;
+    if (!bookingId) {
+      return;
+    }
+
+    // Update payment record to indicate action required
+    await prisma.paymentRecord.updateMany({
+      where: {
+        bookingId,
+        transactionId: paymentIntent.id,
+      },
+      data: {
+        status: 'PENDING',
+        // Store action details in payment method
+        paymentMethod: {
+          ...paymentIntent.metadata,
+          requiresAction: true,
+          clientSecret: paymentIntent.client_secret,
+        },
+      },
+    });
+
+    console.log('Payment requires action:', paymentIntent.id);
+  } catch (error) {
+    console.error('Error handling payment action required:', error);
+  }
+}
+
+/**
+ * Handle transfer created (vendor payout)
+ */
+async function handleTransferCreated(transfer: any) {
+  try {
+    const paymentId = transfer.metadata?.paymentId;
+    if (!paymentId) {
+      return;
+    }
+
+    // Update payment record with transfer information
+    await prisma.paymentRecord.update({
+      where: { id: paymentId },
+      data: {
+        paymentMethod: {
+          ...transfer.metadata,
+          transferId: transfer.id,
+          transferStatus: 'created',
+          transferredAt: new Date(),
+        },
+      },
+    });
+
+    console.log('Transfer created:', transfer.id);
+  } catch (error) {
+    console.error('Error handling transfer created:', error);
+  }
+}
+
+/**
+ * Handle transfer failed
+ */
+async function handleTransferFailed(transfer: any) {
+  try {
+    const paymentId = transfer.metadata?.paymentId;
+    if (!paymentId) {
+      return;
+    }
+
+    // Update payment record with failure information
+    await prisma.paymentRecord.update({
+      where: { id: paymentId },
+      data: {
+        paymentMethod: {
+          ...transfer.metadata,
+          transferId: transfer.id,
+          transferStatus: 'failed',
+          transferFailureReason: transfer.failure_message,
+        },
+      },
+    });
+
+    console.log('Transfer failed:', transfer.id, transfer.failure_message);
+  } catch (error) {
+    console.error('Error handling transfer failure:', error);
+  }
+}
+
+/**
+ * Handle Stripe Connect account updates
+ */
+async function handleAccountUpdated(account: any) {
+  try {
+    // Find vendor with this Stripe account
+    const vendor = await prisma.vendorProfile.findFirst({
+      where: {
+        verificationDocuments: {
+          path: ['stripeAccountId'],
+          equals: account.id,
+        },
+      },
+    });
+
+    if (!vendor) {
+      return;
+    }
+
+    // Update vendor verification status based on account status
+    const verificationDocs = vendor.verificationDocuments as any;
+    verificationDocs.stripeAccountStatus = account.charges_enabled ? 'active' : 'pending';
+    verificationDocs.stripeAccountDetails = {
+      chargesEnabled: account.charges_enabled,
+      payoutsEnabled: account.payouts_enabled,
+      detailsSubmitted: account.details_submitted,
+    };
+
+    await prisma.vendorProfile.update({
+      where: { id: vendor.id },
+      data: {
+        verificationDocuments: verificationDocs,
+      },
+    });
+
+    console.log('Account updated:', account.id);
+  } catch (error) {
+    console.error('Error handling account update:', error);
+  }
+}
+
+/**
+ * Handle payout created
+ */
+async function handlePayoutCreated(payout: any) {
+  try {
+    console.log('Payout created:', payout.id, 'Amount:', payout.amount);
+    // Log payout for audit purposes
+  } catch (error) {
+    console.error('Error handling payout created:', error);
+  }
+}
+
+/**
+ * Handle payout failed
+ */
+async function handlePayoutFailed(payout: any) {
+  try {
+    console.log('Payout failed:', payout.id, 'Reason:', payout.failure_message);
+    // Handle payout failure - might need to retry or notify vendor
+  } catch (error) {
+    console.error('Error handling payout failure:', error);
+  }
+}
 
 export default router;

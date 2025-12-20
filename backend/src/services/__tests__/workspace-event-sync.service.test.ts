@@ -35,6 +35,14 @@ jest.mock('@prisma/client', () => ({
     HIGH: 'HIGH',
     URGENT: 'URGENT',
   },
+  TaskCategory: {
+    SETUP: 'SETUP',
+    MARKETING: 'MARKETING',
+    LOGISTICS: 'LOGISTICS',
+    TECHNICAL: 'TECHNICAL',
+    REGISTRATION: 'REGISTRATION',
+    POST_EVENT: 'POST_EVENT',
+  },
   EventStatus: {
     DRAFT: 'DRAFT',
     PUBLISHED: 'PUBLISHED',

@@ -5,8 +5,8 @@ import { Breadcrumb } from '../common/Breadcrumb';
 interface WorkspaceNavigationProps {
   workspace: Workspace;
   userWorkspaces: Workspace[];
-  activeTab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics';
-  onTabChange: (tab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics') => void;
+  activeTab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'marketplace';
+  onTabChange: (tab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'marketplace') => void;
   onWorkspaceSwitch: (workspaceId: string) => void;
 }
 
@@ -35,6 +35,15 @@ export function WorkspaceNavigation({
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      )
+    },
+    {
+      id: 'marketplace' as const,
+      name: 'Marketplace',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       )
     },

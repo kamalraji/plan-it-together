@@ -143,7 +143,7 @@ router.get('/permissions', auditWorkspaceAction('list_permissions'), async (_req
  * GET /api/workspace-api/roles
  * Get available workspace roles
  */
-router.get('/roles', auditWorkspaceAction('list_roles'), async (req: Request, res: Response) => {
+router.get('/roles', auditWorkspaceAction('list_roles'), async (_req: Request, res: Response) => {
   try {
     const roles = {
       WORKSPACE_OWNER: {
@@ -269,7 +269,7 @@ router.get('/stats', auditWorkspaceAction('view_api_stats'), async (req: Request
     });
   } catch (error) {
     console.error('Error getting workspace API stats:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: {
         code: 'GET_API_STATS_ERROR',
