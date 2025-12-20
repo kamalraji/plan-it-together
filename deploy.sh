@@ -69,6 +69,26 @@ deploy_production() {
     echo "🗄️ Running production database migrations..."
     docker-compose -f docker-compose.prod.yml exec backend npm run prisma:migrate
     
+    # Initialize workspace configuration
+    echo "⚙️ Initializing workspace configuration..."
+    docker-compose -f docker-compose.prod.yml exec backend node -e "
+        const { workspaceConfig } = require('./dist/config/workspace.config.js');
+        const validation = workspaceConfig.validateConfiguration();
+        if (!validation.valid) {
+            console.error('Workspace configuration validation failed:', validation.errors);
+            process.exit(1);
+        }
+        console.log('Workspace configuration validated successfully');
+    "
+    
+    # Start workspace scheduler
+    echo "📅 Starting workspace dissolution scheduler..."
+    docker-compose -f docker-compose.prod.yml exec backend node -e "
+        const { workspaceSchedulerService } = require('./dist/services/workspace-scheduler.service.js');
+        workspaceSchedulerService.start();
+        console.log('Workspace scheduler started');
+    "
+    
     echo "✅ Production deployment completed!"
     echo "🌐 Application: http://localhost"
     echo "🔧 API: http://localhost:3000"
@@ -112,6 +132,14 @@ health_check() {
         echo "✅ Backend is healthy"
     else
         echo "❌ Backend health check failed"
+        return 1
+    fi
+    
+    # Check workspace configuration
+    if curl -f http://localhost:3000/api/workspace-config/health > /dev/null 2>&1; then
+        echo "✅ Workspace configuration is healthy"
+    else
+        echo "❌ Workspace configuration health check failed"
         return 1
     fi
     

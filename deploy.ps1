@@ -79,6 +79,28 @@ function Deploy-Production {
     docker-compose -f docker-compose.prod.yml exec backend npm run prisma:migrate
     if ($LASTEXITCODE -ne 0) { throw "Failed to run production migrations" }
     
+    # Initialize workspace configuration
+    Write-Host "⚙️ Initializing workspace configuration..." -ForegroundColor Yellow
+    docker-compose -f docker-compose.prod.yml exec backend node -e "
+        const { workspaceConfig } = require('./dist/config/workspace.config.js');
+        const validation = workspaceConfig.validateConfiguration();
+        if (!validation.valid) {
+            console.error('Workspace configuration validation failed:', validation.errors);
+            process.exit(1);
+        }
+        console.log('Workspace configuration validated successfully');
+    "
+    if ($LASTEXITCODE -ne 0) { throw "Failed to initialize workspace configuration" }
+    
+    # Start workspace scheduler
+    Write-Host "📅 Starting workspace dissolution scheduler..." -ForegroundColor Yellow
+    docker-compose -f docker-compose.prod.yml exec backend node -e "
+        const { workspaceSchedulerService } = require('./dist/services/workspace-scheduler.service.js');
+        workspaceSchedulerService.start();
+        console.log('Workspace scheduler started');
+    "
+    if ($LASTEXITCODE -ne 0) { throw "Failed to start workspace scheduler" }
+    
     Write-Host "✅ Production deployment completed!" -ForegroundColor Green
     Write-Host "🌐 Application: http://localhost" -ForegroundColor Cyan
     Write-Host "🔧 API: http://localhost:3000" -ForegroundColor Cyan
@@ -140,6 +162,21 @@ function Test-Health {
     }
     catch {
         Write-Host "❌ Backend health check failed: $_" -ForegroundColor Red
+        $healthCheckFailed = $true
+    }
+    
+    # Check workspace configuration
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:3000/api/workspace-config/health" -TimeoutSec 5 -UseBasicParsing
+        if ($response.StatusCode -eq 200) {
+            Write-Host "✅ Workspace configuration is healthy" -ForegroundColor Green
+        } else {
+            Write-Host "❌ Workspace configuration health check failed" -ForegroundColor Red
+            $healthCheckFailed = $true
+        }
+    }
+    catch {
+        Write-Host "❌ Workspace configuration health check failed: $_" -ForegroundColor Red
         $healthCheckFailed = $true
     }
     

@@ -28,6 +28,7 @@ import workspaceCommunicationRoutes from './routes/workspace-communication.route
 import workspaceTemplateRoutes from './routes/workspace-templates';
 import workspaceMarketplaceIntegrationRoutes from './routes/workspace-marketplace-integration.routes';
 import workspaceSecurityRoutes from './routes/workspace-security.routes';
+import workspaceConfigRoutes from './routes/workspace-config.routes';
 
 dotenv.config();
 
@@ -191,6 +192,9 @@ app.use('/api/workspace-marketplace-integration', workspaceMarketplaceIntegratio
 
 // Workspace Security routes
 app.use('/api/workspace-security', workspaceSecurityRoutes);
+
+// Workspace Configuration routes
+app.use('/api/workspace-config', workspaceConfigRoutes);
 
 // Start server
 app.listen(PORT, () => {
