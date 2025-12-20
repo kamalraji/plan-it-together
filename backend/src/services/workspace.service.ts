@@ -90,6 +90,14 @@ export class WorkspaceService {
    * Get workspace by ID
    */
   async getWorkspace(workspaceId: string, userId: string): Promise<WorkspaceResponse> {
+    // Log access attempt for security audit
+    const { workspaceSecurityService } = await import('./workspace-security.service');
+    await workspaceSecurityService.logAccessAttempt(workspaceId, userId, {
+      resource: 'WORKSPACE',
+      resourceId: workspaceId,
+      accessType: 'READ',
+      success: true,
+    });
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       include: {
@@ -428,52 +436,57 @@ export class WorkspaceService {
   }
 
   /**
-   * Get workspace analytics
+   * Get comprehensive workspace analytics
+   * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
    */
   async getWorkspaceAnalytics(workspaceId: string, userId: string): Promise<any> {
-    // Verify user has access to workspace
-    const teamMember = await prisma.teamMember.findFirst({
-      where: {
-        workspaceId,
-        userId,
-      },
-    });
+    // Import analytics service dynamically to avoid circular dependencies
+    const { workspaceAnalyticsService } = await import('./workspace-analytics.service');
+    return workspaceAnalyticsService.getWorkspaceAnalytics(workspaceId, userId);
+  }
 
-    if (!teamMember) {
-      throw new Error('Access denied: User is not a member of this workspace');
-    }
+  /**
+   * Get workspace progress indicators for event integration
+   * Requirements: 9.5
+   */
+  async getWorkspaceProgressIndicators(workspaceId: string, userId: string): Promise<any> {
+    // Import event sync service dynamically to avoid circular dependencies
+    const { workspaceEventSyncService } = await import('./workspace-event-sync.service');
+    return workspaceEventSyncService.getWorkspaceProgressIndicators(workspaceId, userId);
+  }
 
-    // Get task statistics
-    const taskStats = await prisma.workspaceTask.groupBy({
-      by: ['status'],
-      where: { workspaceId },
-      _count: { id: true },
-    });
+  /**
+   * Synchronize workspace with event milestones
+   * Requirements: 9.1, 9.2
+   */
+  async synchronizeWithEvent(workspaceId: string, userId: string, config?: any): Promise<void> {
+    // Import event sync service dynamically to avoid circular dependencies
+    const { workspaceEventSyncService } = await import('./workspace-event-sync.service');
+    return workspaceEventSyncService.synchronizeWithEventMilestones(workspaceId, userId, config);
+  }
 
-    // Get team member count
-    const teamMemberCount = await prisma.teamMember.count({
-      where: { workspaceId, status: 'ACTIVE' },
-    });
+  /**
+   * Get template recommendations for workspace
+   * Requirements: 11.2
+   */
+  async getTemplateRecommendations(eventId: string, userId: string): Promise<any[]> {
+    // Import template service dynamically to avoid circular dependencies
+    const { workspaceTemplateService } = await import('./workspace-template.service');
+    return workspaceTemplateService.getTemplateRecommendations(eventId, userId);
+  }
 
-    // Get overdue tasks
-    const overdueTasks = await prisma.workspaceTask.count({
-      where: {
-        workspaceId,
-        dueDate: { lt: new Date() },
-        status: { notIn: ['COMPLETED'] },
-      },
-    });
-
-    return {
-      workspaceId,
-      teamMemberCount,
-      taskStats: taskStats.reduce((acc, stat) => {
-        acc[stat.status] = stat._count.id;
-        return acc;
-      }, {} as Record<string, number>),
-      overdueTasks,
-      generatedAt: new Date(),
-    };
+  /**
+   * Create template from successful workspace
+   * Requirements: 11.1
+   */
+  async createTemplateFromWorkspace(
+    workspaceId: string,
+    userId: string,
+    templateData: any
+  ): Promise<any> {
+    // Import template service dynamically to avoid circular dependencies
+    const { workspaceTemplateService } = await import('./workspace-template.service');
+    return workspaceTemplateService.createTemplateFromWorkspace(workspaceId, userId, templateData);
   }
 
   /**

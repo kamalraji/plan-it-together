@@ -117,12 +117,28 @@ enum ChannelType {
   TASK_SPECIFIC
   ROLE_BASED
   ANNOUNCEMENT
+  VENDOR_SPECIFIC
 }
 
 enum MemberStatus {
   INVITED
   ACTIVE
   INACTIVE
+}
+
+enum TemplateCategory {
+  CONFERENCE
+  WORKSHOP
+  HACKATHON
+  NETWORKING
+  COMPETITION
+  GENERAL
+}
+
+enum TemplateComplexity {
+  SIMPLE
+  MODERATE
+  COMPLEX
 }
 
 enum ServiceCategory {
@@ -200,6 +216,11 @@ model User {
   paymentsReceived   PaymentRecord[]      @relation("PaymentPayee")
   teamMemberships    TeamMember[]
   invitedTeamMembers TeamMember[]         @relation("TeamMemberInviter")
+  workspaceMessages  WorkspaceMessage[]   @relation("WorkspaceMessageSender")
+  templateShares     TemplateOrganizationShare[]
+  workspaceIntegrations WorkspaceMarketplaceIntegration[]
+  auditLogs          WorkspaceAuditLog[]
+  securityIncidents  SecurityIncident[]
 
   @@index([email])
 }
@@ -236,6 +257,7 @@ model Event {
   bookingRequests BookingRequest[]
   timelineItems  EventTimelineItem[]
   workspace      Workspace?
+  templateUsages TemplateUsage[]
 
   @@index([organizerId])
   @@index([organizationId])
@@ -256,10 +278,15 @@ model Workspace {
   dissolvedAt DateTime?
 
   // Relations
-  event        Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  template     WorkspaceTemplate? @relation("WorkspaceTemplate", fields: [templateId], references: [id])
   teamMembers  TeamMember[]
   tasks        WorkspaceTask[]
   channels     WorkspaceChannel[]
+  templateUsage TemplateUsage[]
+  marketplaceIntegrations WorkspaceMarketplaceIntegration[]
+  auditLogs    WorkspaceAuditLog[]
+  securityIncidents SecurityIncident[]
 
   @@index([eventId])
   @@index([status])
@@ -276,6 +303,8 @@ model TeamMember {
   leftAt      DateTime?
   invitedBy   String
   status      MemberStatus  @default(ACTIVE)
+  memberType  String?       // 'VOLUNTEER', 'HIRED_PROFESSIONAL'
+  accessLevel String?       // 'STANDARD', 'PROFESSIONAL', 'LIMITED'
 
   // Relations
   workspace     Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -283,6 +312,7 @@ model TeamMember {
   inviter       User            @relation("TeamMemberInviter", fields: [invitedBy], references: [id])
   assignedTasks WorkspaceTask[] @relation("TaskAssignee")
   createdTasks  WorkspaceTask[] @relation("TaskCreator")
+  marketplaceIntegration WorkspaceMarketplaceIntegration?
 
   @@unique([workspaceId, userId])
   @@index([workspaceId])
@@ -308,6 +338,10 @@ model WorkspaceTask {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   completedAt  DateTime?
+  allowExternalComments Boolean @default(false)
+  externalCollaborators String[] @default([])
+  availableForExternalAssignment Boolean @default(false)
+  externalAssignmentBookingId String?
 
   // Relations
   workspace Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -330,14 +364,37 @@ model WorkspaceChannel {
   description String?     @db.Text
   members     String[]    @default([]) // Array of user IDs
   isPrivate   Boolean     @default(false)
+  memberTypes String[]    @default([]) // Array of member types ('VOLUNTEER', 'HIRED_PROFESSIONAL')
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
   // Relations
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  messages  WorkspaceMessage[]
 
   @@index([workspaceId])
   @@index([type])
+}
+
+model WorkspaceMessage {
+  id          String      @id @default(uuid())
+  channelId   String
+  senderId    String
+  content     String      @db.Text
+  attachments Json?       // Array of MediaFile objects
+  isPriority  Boolean     @default(false)
+  sentAt      DateTime    @default(now())
+  editedAt    DateTime?
+  deletedAt   DateTime?
+
+  // Relations
+  channel WorkspaceChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender  User             @relation("WorkspaceMessageSender", fields: [senderId], references: [id])
+
+  @@index([channelId])
+  @@index([senderId])
+  @@index([sentAt])
+  @@index([isPriority])
 }
 
 model Registration {
@@ -479,6 +536,7 @@ model Organization {
   events  Event[]
   admins  OrganizationAdmin[]
   follows Follow[]
+  templateShares TemplateOrganizationShare[]
 
   @@index([pageUrl])
   @@index([category])
@@ -542,6 +600,7 @@ model VendorProfile {
   bookingRequests BookingRequest[] @relation("VendorBookings")
   reviews         VendorReview[]   @relation("VendorReviews")
   timelineItems   EventTimelineItem[]
+  workspaceIntegrations WorkspaceMarketplaceIntegration[]
 
   @@index([userId])
   @@index([verificationStatus])
@@ -605,6 +664,7 @@ model BookingRequest {
   review          VendorReview?
   serviceAgreement ServiceAgreement?
   timelineItems   EventTimelineItem[]
+  workspaceIntegration WorkspaceMarketplaceIntegration?
 
   @@index([eventId])
   @@index([serviceListingId])
@@ -735,4 +795,151 @@ model EventTimelineItem {
   @@index([vendorId])
   @@index([dueDate])
   @@index([status])
+}
+
+model WorkspaceTemplate {
+  id              String             @id @default(uuid())
+  name            String
+  description     String             @db.Text
+  category        TemplateCategory
+  eventSizeMin    Int
+  eventSizeMax    Int
+  complexity      TemplateComplexity
+  structure       Json               // WorkspaceTemplateStructure object
+  metadata        Json               // Template metadata (createdBy, organizationId, isPublic, etc.)
+  effectiveness   Json               // Template effectiveness metrics
+  usageCount      Int                @default(0)
+  averageRating   Float              @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  // Relations
+  workspaces      Workspace[]        @relation("WorkspaceTemplate")
+  usageMetrics    TemplateUsage[]
+  organizationShares TemplateOrganizationShare[]
+
+  @@index([category])
+  @@index([complexity])
+  @@index([eventSizeMin, eventSizeMax])
+  @@index([usageCount])
+  @@index([averageRating])
+}
+
+model TemplateUsage {
+  id                String            @id @default(uuid())
+  templateId        String
+  workspaceId       String
+  eventId           String
+  usedAt            DateTime          @default(now())
+  customizations    Json?             // Applied customizations
+  completionRate    Float?            // Task completion rate for this usage
+  teamSatisfaction  Float?            // Team satisfaction score
+  eventSuccess      Boolean?          // Whether event was successful
+  feedback          String?           @db.Text
+  
+  // Relations
+  template          WorkspaceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  event             Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, workspaceId])
+  @@index([templateId])
+  @@index([workspaceId])
+  @@index([eventId])
+  @@index([usedAt])
+}
+
+model TemplateOrganizationShare {
+  id             String            @id @default(uuid())
+  templateId     String
+  organizationId String
+  sharedBy       String
+  sharedAt       DateTime          @default(now())
+  permissions    Json              // Sharing permissions (view, use, modify)
+
+  // Relations
+  template       WorkspaceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sharer         User              @relation(fields: [sharedBy], references: [id])
+
+  @@unique([templateId, organizationId])
+  @@index([templateId])
+  @@index([organizationId])
+  @@index([sharedBy])
+}
+
+model WorkspaceMarketplaceIntegration {
+  id                  String   @id @default(uuid())
+  workspaceId         String
+  bookingId           String   @unique
+  vendorId            String
+  teamMemberId        String?  @unique
+  integrationType     String   // 'HIRED_SPECIALIST', 'CONSULTANT', 'CONTRACTOR'
+  accessLevel         String   // 'FULL', 'LIMITED', 'TASK_SPECIFIC'
+  integrationStatus   String   // 'PENDING_ACCEPTANCE', 'ACTIVE', 'COMPLETED', 'CANCELLED'
+  integratedBy        String
+  integratedAt        DateTime @default(now())
+  completedAt         DateTime?
+  
+  // Relations
+  workspace           Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  booking             BookingRequest @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  vendor              VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  teamMember          TeamMember?   @relation(fields: [teamMemberId], references: [id], onDelete: SetNull)
+  integrator          User          @relation(fields: [integratedBy], references: [id])
+  
+  @@unique([workspaceId, bookingId])
+  @@map("workspace_marketplace_integrations")
+}
+model WorkspaceAuditLog {
+  id          String   @id @default(uuid())
+  workspaceId String
+  userId      String
+  action      String   // Action performed (e.g., 'CREATE_TASK', 'UPDATE_MEMBER', 'ACCESS_DATA')
+  resource    String   // Resource affected (e.g., 'TASK', 'TEAM_MEMBER', 'PARTICIPANT_DATA')
+  resourceId  String?  // ID of the specific resource
+  details     Json?    // Additional details about the action
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime @default(now())
+  
+  // Relations
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id])
+  
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([action])
+  @@map("workspace_audit_logs")
+}
+
+model SecurityIncident {
+  id            String   @id @default(uuid())
+  workspaceId   String
+  userId        String?
+  incidentType  String   // 'DATA_BREACH', 'UNAUTHORIZED_ACCESS', 'MALICIOUS_ACTIVITY', 'POLICY_VIOLATION'
+  severity      String   // 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
+  description   String   @db.Text
+  details       Json?    // Additional incident details
+  status        String   // 'DETECTED', 'RESPONDING', 'RESOLVED', 'CLOSED'
+  ipAddress     String?
+  userAgent     String?
+  detectedAt    DateTime @default(now())
+  detectedBy    String?
+  respondedAt   DateTime?
+  resolvedAt    DateTime?
+  responseActions String[] @default([])
+  
+  // Relations
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user          User?     @relation(fields: [userId], references: [id])
+  
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([incidentType])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+  @@map("security_incidents")
 }

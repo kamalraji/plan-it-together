@@ -23,6 +23,9 @@ import workspaceRoutes from './routes/workspace.routes';
 import teamRoutes from './routes/team.routes';
 import taskRoutes from './routes/task.routes';
 import workspaceCommunicationRoutes from './routes/workspace-communication.routes';
+import workspaceTemplateRoutes from './routes/workspace-templates';
+import workspaceMarketplaceIntegrationRoutes from './routes/workspace-marketplace-integration.routes';
+import workspaceSecurityRoutes from './routes/workspace-security.routes';
 
 dotenv.config();
 
@@ -171,6 +174,15 @@ app.use('/api/task', taskRoutes);
 
 // Workspace Communication routes
 app.use('/api/workspace-communication', workspaceCommunicationRoutes);
+
+// Workspace Template routes
+app.use('/api/workspace-templates', workspaceTemplateRoutes);
+
+// Workspace Marketplace Integration routes
+app.use('/api/workspace-marketplace-integration', workspaceMarketplaceIntegrationRoutes);
+
+// Workspace Security routes
+app.use('/api/workspace-security', workspaceSecurityRoutes);
 
 // Start server
 app.listen(PORT, () => {

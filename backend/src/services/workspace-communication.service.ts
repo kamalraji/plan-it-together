@@ -1,18 +1,19 @@
-import { PrismaClient, ChannelType } from '@prisma/client';
+import { PrismaClient, ChannelType, WorkspaceRole } from '@prisma/client';
 import { 
   CreateChannelDTO, 
   ChannelResponse, 
   SendMessageDTO, 
   MessageResponse, 
   BroadcastMessageDTO,
-  ChannelMessageHistory 
+  ChannelMessageHistory,
+  MediaFile
 } from '../types';
 
 const prisma = new PrismaClient();
 
 export class WorkspaceCommunicationService {
   /**
-   * Create a new communication channel
+   * Create a new communication channel organized by topic/function
    */
   async createChannel(
     workspaceId: string,
@@ -34,13 +35,23 @@ export class WorkspaceCommunicationService {
       throw new Error('Channel with this name already exists');
     }
 
+    // Auto-populate members for role-based channels
+    let channelMembers = channelData.members || [];
+    if (channelData.type === ChannelType.ROLE_BASED && channelData.name.includes('-team')) {
+      const roleFromName = this.extractRoleFromChannelName(channelData.name);
+      if (roleFromName) {
+        const roleMembers = await this.getRoleMemberIds(workspaceId, roleFromName);
+        channelMembers = [...new Set([...channelMembers, ...roleMembers])];
+      }
+    }
+
     const channel = await prisma.workspaceChannel.create({
       data: {
         workspaceId,
         name: channelData.name.toLowerCase(),
         type: channelData.type,
         description: channelData.description,
-        members: channelData.members || [],
+        members: channelMembers,
         isPrivate: channelData.isPrivate || false,
       },
     });
@@ -101,12 +112,12 @@ export class WorkspaceCommunicationService {
   }
 
   /**
-   * Send message to channel
+   * Send message to channel with priority messaging support
    */
   async sendMessage(
     channelId: string,
     senderId: string,
-    messageData: SendMessageDTO
+    messageData: SendMessageDTO & { isPriority?: boolean }
   ): Promise<MessageResponse> {
     const channel = await prisma.workspaceChannel.findUnique({
       where: { id: channelId },
@@ -124,67 +135,73 @@ export class WorkspaceCommunicationService {
       throw new Error('Access denied: User is not a member of this private channel');
     }
 
-    // For now, we'll store messages in a simple format
-    // In a full implementation, you'd have a separate Message table
-    const message: MessageResponse = {
-      id: this.generateMessageId(),
-      channelId,
-      senderId,
-      content: messageData.content,
-      attachments: messageData.attachments || [],
-      sentAt: new Date(),
-      editedAt: undefined,
+    // Create message in database
+    const message = await prisma.workspaceMessage.create({
+      data: {
+        channelId,
+        senderId,
+        content: messageData.content,
+        attachments: (messageData.attachments || []) as any,
+        isPriority: messageData.isPriority || false,
+      },
+    });
+
+    const messageResponse: MessageResponse = {
+      id: message.id,
+      channelId: message.channelId,
+      senderId: message.senderId,
+      content: message.content,
+      attachments: (message.attachments as any as MediaFile[]) || [],
+      sentAt: message.sentAt,
+      editedAt: message.editedAt || undefined,
     };
 
-    // Store message (in a real implementation, this would be in a messages table)
-    await this.storeMessage(message);
+    // Send notifications to channel members with priority handling
+    await this.notifyChannelMembers(channel, messageResponse, senderId, messageData.isPriority);
 
-    // Send notifications to channel members
-    await this.notifyChannelMembers(channel, message, senderId);
-
-    return message;
+    return messageResponse;
   }
 
   /**
-   * Send broadcast message to workspace
+   * Send broadcast message to all team members or specific role groups
    */
   async sendBroadcastMessage(
     workspaceId: string,
     senderId: string,
-    broadcastData: BroadcastMessageDTO
+    broadcastData: BroadcastMessageDTO & { isPriority?: boolean }
   ): Promise<MessageResponse[]> {
     // Verify sender has permission to send broadcasts
     await this.verifyChannelPermission(workspaceId, senderId, 'SEND_BROADCASTS');
 
     const results: MessageResponse[] = [];
 
-    // Get target recipients based on broadcast type
-    await this.getBroadcastRecipients(workspaceId, broadcastData);
-
-    // Send message to appropriate channels or create direct messages
     if (broadcastData.targetType === 'ALL_MEMBERS') {
       // Send to general announcement channel
       const announcementChannel = await this.getOrCreateAnnouncementChannel(workspaceId);
       const message = await this.sendMessage(announcementChannel.id, senderId, {
         content: broadcastData.content,
         attachments: broadcastData.attachments,
+        isPriority: broadcastData.isPriority,
       });
       results.push(message);
-    } else if (broadcastData.targetType === 'ROLE_SPECIFIC') {
-      // Send to role-based channel or create one
-      const roleChannel = await this.getOrCreateRoleChannel(workspaceId, broadcastData.targetRoles![0]);
-      const message = await this.sendMessage(roleChannel.id, senderId, {
-        content: broadcastData.content,
-        attachments: broadcastData.attachments,
-      });
-      results.push(message);
+    } else if (broadcastData.targetType === 'ROLE_SPECIFIC' && broadcastData.targetRoles) {
+      // Send to each specified role's channel
+      for (const role of broadcastData.targetRoles) {
+        const roleChannel = await this.getOrCreateRoleChannel(workspaceId, role);
+        const message = await this.sendMessage(roleChannel.id, senderId, {
+          content: broadcastData.content,
+          attachments: broadcastData.attachments,
+          isPriority: broadcastData.isPriority,
+        });
+        results.push(message);
+      }
     }
 
     return results;
   }
 
   /**
-   * Get message history for channel
+   * Get message history and search capabilities within workspace context
    */
   async getChannelMessages(
     channelId: string,
@@ -207,13 +224,44 @@ export class WorkspaceCommunicationService {
       throw new Error('Access denied: User is not a member of this private channel');
     }
 
-    // In a real implementation, this would query a messages table
-    // For now, return mock data structure
-    const messages = await this.getStoredMessages(channelId, limit, before);
+    // Query messages from database
+    const whereClause: any = {
+      channelId,
+      deletedAt: null,
+    };
+
+    if (before) {
+      whereClause.sentAt = { lt: before };
+    }
+
+    const messages = await prisma.workspaceMessage.findMany({
+      where: whereClause,
+      orderBy: { sentAt: 'desc' },
+      take: limit,
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    const messageResponses: MessageResponse[] = messages.map((msg: any) => ({
+      id: msg.id,
+      channelId: msg.channelId,
+      senderId: msg.senderId,
+      content: msg.content,
+      attachments: (msg.attachments as any as MediaFile[]) || [],
+      sentAt: msg.sentAt,
+      editedAt: msg.editedAt || undefined,
+    }));
 
     return {
       channelId,
-      messages,
+      messages: messageResponses.reverse(), // Return in chronological order
       hasMore: messages.length === limit,
     };
   }
@@ -279,20 +327,70 @@ export class WorkspaceCommunicationService {
   }
 
   /**
-   * Search messages in workspace
+   * Search messages in workspace with full-text search capabilities
    */
   async searchMessages(
     workspaceId: string,
     userId: string,
-    _query: string,
-    _channelId?: string
+    query: string,
+    channelId?: string
   ): Promise<MessageResponse[]> {
     // Verify user has access to workspace
     await this.verifyWorkspaceAccess(workspaceId, userId);
 
-    // In a real implementation, this would search a messages table with full-text search
-    // For now, return empty array as placeholder
-    return [];
+    // Get user's accessible channels
+    const accessibleChannels = await this.getUserAccessibleChannels(workspaceId, userId);
+    const channelIds = accessibleChannels.map(ch => ch.id);
+
+    // Build search query
+    const whereClause: any = {
+      channel: {
+        workspaceId,
+        id: { in: channelIds },
+      },
+      deletedAt: null,
+      content: {
+        contains: query,
+        mode: 'insensitive',
+      },
+    };
+
+    // Filter by specific channel if provided
+    if (channelId && channelIds.includes(channelId)) {
+      whereClause.channelId = channelId;
+    }
+
+    const messages = await prisma.workspaceMessage.findMany({
+      where: whereClause,
+      orderBy: { sentAt: 'desc' },
+      take: 100, // Limit search results
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        channel: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+      },
+    });
+
+    return messages.map((msg: any) => ({
+      id: msg.id,
+      channelId: msg.channelId,
+      senderId: msg.senderId,
+      content: msg.content,
+      attachments: (msg.attachments as any as MediaFile[]) || [],
+      sentAt: msg.sentAt,
+      editedAt: msg.editedAt || undefined,
+    }));
   }
 
   /**
@@ -338,25 +436,57 @@ export class WorkspaceCommunicationService {
     }
   }
 
+
+
   /**
-   * Get broadcast recipients based on criteria
+   * Get user's accessible channels in workspace
    */
-  private async getBroadcastRecipients(
-    workspaceId: string,
-    broadcastData: BroadcastMessageDTO
-  ): Promise<string[]> {
-    let whereClause: any = { workspaceId, status: 'ACTIVE' };
+  private async getUserAccessibleChannels(workspaceId: string, userId: string): Promise<any[]> {
+    return await prisma.workspaceChannel.findMany({
+      where: {
+        workspaceId,
+        OR: [
+          { isPrivate: false },
+          { 
+            isPrivate: true,
+            members: {
+              has: userId,
+            },
+          },
+        ],
+      },
+    });
+  }
 
-    if (broadcastData.targetType === 'ROLE_SPECIFIC' && broadcastData.targetRoles) {
-      whereClause.role = { in: broadcastData.targetRoles };
-    }
+  /**
+   * Extract role from channel name (e.g., "marketing-team" -> "MARKETING_LEAD")
+   */
+  private extractRoleFromChannelName(channelName: string): WorkspaceRole | null {
+    const roleMap: Record<string, WorkspaceRole> = {
+      'marketing-team': WorkspaceRole.MARKETING_LEAD,
+      'technical-team': WorkspaceRole.TECHNICAL_SPECIALIST,
+      'volunteer-team': WorkspaceRole.VOLUNTEER_MANAGER,
+      'coordinator-team': WorkspaceRole.EVENT_COORDINATOR,
+      'lead-team': WorkspaceRole.TEAM_LEAD,
+    };
 
-    const teamMembers = await prisma.teamMember.findMany({
-      where: whereClause,
+    return roleMap[channelName] || null;
+  }
+
+  /**
+   * Get member IDs for a specific role
+   */
+  private async getRoleMemberIds(workspaceId: string, role: WorkspaceRole): Promise<string[]> {
+    const members = await prisma.teamMember.findMany({
+      where: {
+        workspaceId,
+        role,
+        status: 'ACTIVE',
+      },
       select: { userId: true },
     });
 
-    return teamMembers.map(member => member.userId);
+    return members.map(member => member.userId);
   }
 
   /**
@@ -387,7 +517,7 @@ export class WorkspaceCommunicationService {
   }
 
   /**
-   * Get or create role-based channel
+   * Get or create role-based channel with automatic member population
    */
   private async getOrCreateRoleChannel(workspaceId: string, role: string): Promise<ChannelResponse> {
     const channelName = `${role.toLowerCase().replace('_', '-')}-team`;
@@ -400,6 +530,9 @@ export class WorkspaceCommunicationService {
     });
 
     if (!channel) {
+      // Get members with this role
+      const roleMembers = await this.getRoleMemberIds(workspaceId, role as WorkspaceRole);
+      
       channel = await prisma.workspaceChannel.create({
         data: {
           workspaceId,
@@ -407,6 +540,7 @@ export class WorkspaceCommunicationService {
           type: ChannelType.ROLE_BASED,
           description: `Communication channel for ${role} team members`,
           isPrivate: true,
+          members: roleMembers,
         },
       });
     }
@@ -415,42 +549,225 @@ export class WorkspaceCommunicationService {
   }
 
   /**
-   * Generate unique message ID
+   * Create task-specific communication channel
    */
-  private generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  async createTaskChannel(
+    workspaceId: string,
+    taskId: string,
+    taskTitle: string,
+    _creatorId: string
+  ): Promise<ChannelResponse> {
+    const channelName = `task-${taskId.slice(-8)}`;
+    
+    const channel = await prisma.workspaceChannel.create({
+      data: {
+        workspaceId,
+        name: channelName,
+        type: ChannelType.TASK_SPECIFIC,
+        description: `Discussion channel for task: ${taskTitle}`,
+        isPrivate: false,
+        members: [],
+      },
+    });
+
+    return this.mapChannelToResponse(channel);
   }
 
   /**
-   * Store message (placeholder implementation)
+   * Initialize default workspace channels
    */
-  private async storeMessage(message: MessageResponse): Promise<void> {
-    // In a real implementation, this would store in a messages table
-    console.log(`Storing message: ${message.content}`);
+  async initializeDefaultChannels(workspaceId: string): Promise<ChannelResponse[]> {
+    const defaultChannels = [
+      {
+        name: 'general',
+        type: ChannelType.GENERAL,
+        description: 'General workspace discussions',
+        isPrivate: false,
+      },
+      {
+        name: 'announcements',
+        type: ChannelType.ANNOUNCEMENT,
+        description: 'Important announcements and updates',
+        isPrivate: false,
+      },
+    ];
+
+    const createdChannels: ChannelResponse[] = [];
+
+    for (const channelData of defaultChannels) {
+      const existingChannel = await prisma.workspaceChannel.findFirst({
+        where: {
+          workspaceId,
+          name: channelData.name,
+        },
+      });
+
+      if (!existingChannel) {
+        const channel = await prisma.workspaceChannel.create({
+          data: {
+            workspaceId,
+            ...channelData,
+          },
+        });
+        createdChannels.push(this.mapChannelToResponse(channel));
+      }
+    }
+
+    return createdChannels;
   }
 
   /**
-   * Get stored messages (placeholder implementation)
+   * Send task-related message with automatic task integration
    */
-  private async getStoredMessages(
-    _channelId: string,
-    _limit: number,
-    _before?: Date
-  ): Promise<MessageResponse[]> {
-    // In a real implementation, this would query a messages table
-    return [];
+  async sendTaskMessage(
+    taskId: string,
+    senderId: string,
+    messageData: SendMessageDTO & { taskUpdate?: boolean }
+  ): Promise<MessageResponse> {
+    // Get task details
+    const task = await prisma.workspaceTask.findUnique({
+      where: { id: taskId },
+      include: {
+        workspace: true,
+        assignee: {
+          include: { user: true },
+        },
+        creator: {
+          include: { user: true },
+        },
+      },
+    });
+
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    // Get or create task-specific channel
+    const channelName = `task-${taskId.slice(-8)}`;
+    let channel = await prisma.workspaceChannel.findFirst({
+      where: {
+        workspaceId: task.workspaceId,
+        name: channelName,
+      },
+    });
+
+    if (!channel) {
+      const newChannel = await this.createTaskChannel(
+        task.workspaceId,
+        taskId,
+        task.title,
+        senderId
+      );
+      
+      // Get the actual channel record for further operations
+      channel = await prisma.workspaceChannel.findUnique({
+        where: { id: newChannel.id },
+      });
+      
+      if (!channel) {
+        throw new Error('Failed to create task channel');
+      }
+    }
+
+    // Add task participants to channel if not already members
+    const taskParticipants = [task.creatorId, task.assigneeId].filter((id): id is string => id !== null);
+    const updatedMembers = [...new Set([...channel.members, ...taskParticipants])];
+    
+    if (updatedMembers.length > channel.members.length) {
+      await prisma.workspaceChannel.update({
+        where: { id: channel.id },
+        data: { members: updatedMembers },
+      });
+    }
+
+    // Send message with task context
+    const enhancedContent = messageData.taskUpdate 
+      ? `**Task Update**: ${messageData.content}`
+      : messageData.content;
+
+    return await this.sendMessage(channel.id, senderId, {
+      ...messageData,
+      content: enhancedContent,
+    });
   }
 
   /**
-   * Notify channel members of new message
+   * Get task-related messages
+   */
+  async getTaskMessages(
+    taskId: string,
+    userId: string,
+    limit: number = 50
+  ): Promise<ChannelMessageHistory> {
+    const task = await prisma.workspaceTask.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    // Verify user has access to workspace
+    await this.verifyWorkspaceAccess(task.workspaceId, userId);
+
+    const channelName = `task-${taskId.slice(-8)}`;
+    const channel = await prisma.workspaceChannel.findFirst({
+      where: {
+        workspaceId: task.workspaceId,
+        name: channelName,
+      },
+    });
+
+    if (!channel) {
+      return {
+        channelId: '',
+        messages: [],
+        hasMore: false,
+      };
+    }
+
+    return await this.getChannelMessages(channel.id, userId, limit);
+  }
+
+  /**
+   * Notify channel members of new message with priority handling
    */
   private async notifyChannelMembers(
     channel: any,
     message: MessageResponse,
-    _senderId: string
+    senderId: string,
+    isPriority: boolean = false
   ): Promise<void> {
-    // In a real implementation, this would send push notifications, emails, etc.
-    console.log(`New message in channel ${channel.name}: ${message.content}`);
+    // Get all channel members (excluding sender)
+    let notificationTargets: string[] = [];
+
+    if (channel.isPrivate) {
+      notificationTargets = channel.members.filter((memberId: string) => memberId !== senderId);
+    } else {
+      // For public channels, notify all workspace members
+      const workspaceMembers = await prisma.teamMember.findMany({
+        where: {
+          workspaceId: channel.workspaceId,
+          status: 'ACTIVE',
+        },
+        select: { userId: true },
+      });
+      notificationTargets = workspaceMembers
+        .map(member => member.userId)
+        .filter(userId => userId !== senderId);
+    }
+
+    // In a real implementation, this would integrate with notification service
+    // For now, we'll log the notification details
+    const notificationType = isPriority ? 'PRIORITY_MESSAGE' : 'CHANNEL_MESSAGE';
+    console.log(`${notificationType} in channel ${channel.name}: ${message.content}`);
+    console.log(`Notifying ${notificationTargets.length} members:`, notificationTargets);
+
+    // TODO: Integrate with actual notification service
+    // - Send push notifications for mobile users
+    // - Send email notifications based on user preferences
+    // - Send immediate notifications for priority messages
+    // - Queue regular notifications for batch processing
   }
 
   /**
