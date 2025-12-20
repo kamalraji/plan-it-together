@@ -1,4 +1,5 @@
 export { WorkspaceDashboard } from './WorkspaceDashboard';
+export { ResponsiveWorkspaceDashboard } from './ResponsiveWorkspaceDashboard';
 export { WorkspaceHeader } from './WorkspaceHeader';
 export { WorkspaceNavigation } from './WorkspaceNavigation';
 export { WorkspaceCommunication } from './WorkspaceCommunication';
@@ -17,3 +18,6 @@ export { TaskManagementInterface } from './TaskManagementInterface';
 export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
 export { TaskDetailView } from './TaskDetailView';
+
+// Mobile Components
+export * from './mobile';
