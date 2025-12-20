@@ -199,6 +199,31 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * Rate template based on usage experience
+ * POST /api/workspace-templates/:templateId/rate
+ */
+router.post('/:templateId/rate', async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const userId = req.user.id;
+    const ratingData = req.body;
+
+    await workspaceTemplateService.rateTemplate(templateId, userId, ratingData);
+
+    res.json({
+      success: true,
+      message: 'Template rating submitted successfully',
+    });
+  } catch (error) {
+    console.error('Error rating template:', error);
+    res.status(400).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to submit rating',
+    });
+  }
+});
+
+/**
  * Get template by ID
  * GET /api/workspace-templates/:templateId
  */

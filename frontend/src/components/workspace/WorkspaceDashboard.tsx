@@ -11,6 +11,7 @@ import { TeamManagement } from './TeamManagement';
 import { WorkspaceCommunication } from './WorkspaceCommunication';
 import { WorkspaceAnalyticsDashboard } from './WorkspaceAnalyticsDashboard';
 import { WorkspaceReportExport } from './WorkspaceReportExport';
+import { WorkspaceTemplateManagement } from './WorkspaceTemplateManagement';
 import { EventMarketplaceIntegration } from '../marketplace';
 import api from '../../lib/api';
 
@@ -22,7 +23,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = propWorkspaceId || paramWorkspaceId;
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'reports' | 'marketplace'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'reports' | 'marketplace' | 'templates'>('overview');
 
   // Fetch workspace data
   const { data: workspace, isLoading, error } = useQuery({
@@ -154,6 +155,21 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
         {activeTab === 'reports' && (
           <WorkspaceReportExport workspace={workspace} />
+        )}
+
+        {activeTab === 'templates' && (
+          <WorkspaceTemplateManagement
+            workspaceId={workspace.id}
+            mode="library"
+            onTemplateApplied={(template) => {
+              console.log('Template applied:', template);
+              // Optionally refresh workspace data
+            }}
+            onTemplateCreated={(template) => {
+              console.log('Template created:', template);
+              // Optionally show success message
+            }}
+          />
         )}
       </div>
     </div>

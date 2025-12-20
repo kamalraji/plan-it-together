@@ -221,6 +221,7 @@ model User {
   workspaceIntegrations WorkspaceMarketplaceIntegration[]
   auditLogs          WorkspaceAuditLog[]
   securityIncidents  SecurityIncident[]
+  templateRatings    TemplateRating[]
 
   @@index([email])
 }
@@ -287,6 +288,7 @@ model Workspace {
   marketplaceIntegrations WorkspaceMarketplaceIntegration[]
   auditLogs    WorkspaceAuditLog[]
   securityIncidents SecurityIncident[]
+  templateRatings TemplateRating[]
 
   @@index([eventId])
   @@index([status])
@@ -817,6 +819,7 @@ model WorkspaceTemplate {
   workspaces      Workspace[]        @relation("WorkspaceTemplate")
   usageMetrics    TemplateUsage[]
   organizationShares TemplateOrganizationShare[]
+  ratings         TemplateRating[]
 
   @@index([category])
   @@index([complexity])
@@ -866,6 +869,33 @@ model TemplateOrganizationShare {
   @@index([templateId])
   @@index([organizationId])
   @@index([sharedBy])
+}
+
+model TemplateRating {
+  id               String            @id @default(uuid())
+  templateId       String
+  userId           String
+  workspaceId      String
+  rating           Int               // 1-5 overall rating
+  feedback         String?           @db.Text
+  completionRate   Int?              // 0-100 percentage
+  teamSatisfaction Int?              // 1-5 rating
+  eventSuccess     Boolean?
+  wouldRecommend   Boolean?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  // Relations
+  template         WorkspaceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id])
+  workspace        Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, userId, workspaceId])
+  @@index([templateId])
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([rating])
+  @@index([createdAt])
 }
 
 model WorkspaceMarketplaceIntegration {

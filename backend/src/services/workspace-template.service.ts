@@ -290,7 +290,7 @@ export class WorkspaceTemplateService {
    */
   async trackTemplateEffectiveness(templateId: string): Promise<TemplateEffectivenessMetrics> {
     // Get all template usage records
-    const templateUsages = await (prisma as any).templateUsage.findMany({
+    const templateUsages = await prisma.templateUsage.findMany({
       where: { templateId },
       include: {
         workspace: {
@@ -388,7 +388,7 @@ export class WorkspaceTemplateService {
     }
 
     // Verify template exists
-    const template = await (prisma as any).workspaceTemplate.findUnique({
+    const template = await prisma.workspaceTemplate.findUnique({
       where: { id: templateId },
     });
 
@@ -397,7 +397,7 @@ export class WorkspaceTemplateService {
     }
 
     // Create organization share record
-    await (prisma as any).templateOrganizationShare.upsert({
+    await prisma.templateOrganizationShare.upsert({
       where: {
         templateId_organizationId: {
           templateId,
@@ -421,6 +421,123 @@ export class WorkspaceTemplateService {
           view: true,
           use: true,
           modify: false,
+        },
+      },
+    });
+  }
+
+  /**
+   * Rate template based on usage experience
+   * Requirements: 11.4
+   */
+  async rateTemplate(
+    templateId: string,
+    userId: string,
+    ratingData: {
+      workspaceId: string;
+      rating: number;
+      feedback?: string;
+      completionRate?: number;
+      teamSatisfaction?: number;
+      eventSuccess?: boolean;
+      wouldRecommend?: boolean;
+    }
+  ): Promise<void> {
+    // Verify user has access to the workspace
+    await this.verifyWorkspacePermission(ratingData.workspaceId, userId, 'VIEW_WORKSPACE');
+
+    // Verify template exists
+    const template = await this.getTemplate(templateId);
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    // Check if user has already rated this template for this workspace
+    const existingRating = await prisma.templateRating.findFirst({
+      where: {
+        templateId,
+        userId,
+        workspaceId: ratingData.workspaceId,
+      },
+    });
+
+    if (existingRating) {
+      // Update existing rating
+      await prisma.templateRating.update({
+        where: { id: existingRating.id },
+        data: {
+          rating: ratingData.rating,
+          feedback: ratingData.feedback,
+          completionRate: ratingData.completionRate,
+          teamSatisfaction: ratingData.teamSatisfaction,
+          eventSuccess: ratingData.eventSuccess,
+          wouldRecommend: ratingData.wouldRecommend,
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      // Create new rating
+      await prisma.templateRating.create({
+        data: {
+          templateId,
+          userId,
+          workspaceId: ratingData.workspaceId,
+          rating: ratingData.rating,
+          feedback: ratingData.feedback,
+          completionRate: ratingData.completionRate,
+          teamSatisfaction: ratingData.teamSatisfaction,
+          eventSuccess: ratingData.eventSuccess,
+          wouldRecommend: ratingData.wouldRecommend,
+        },
+      });
+    }
+
+    // Update template's average rating and effectiveness metrics
+    await this.updateTemplateMetrics(templateId);
+  }
+
+  /**
+   * Update template metrics based on ratings
+   */
+  private async updateTemplateMetrics(templateId: string): Promise<void> {
+    // Get all ratings for this template
+    const ratings = await prisma.templateRating.findMany({
+      where: { templateId },
+    });
+
+    if (ratings.length === 0) return;
+
+    // Calculate averages
+    const avgRating = ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / ratings.length;
+    const avgCompletionRate = ratings
+      .filter((r: any) => r.completionRate !== null)
+      .reduce((sum: number, r: any) => sum + r.completionRate, 0) / 
+      ratings.filter((r: any) => r.completionRate !== null).length || 0;
+    const avgTeamSatisfaction = ratings
+      .filter((r: any) => r.teamSatisfaction !== null)
+      .reduce((sum: number, r: any) => sum + r.teamSatisfaction, 0) / 
+      ratings.filter((r: any) => r.teamSatisfaction !== null).length || 0;
+    const successRate = ratings
+      .filter((r: any) => r.eventSuccess !== null)
+      .reduce((sum: number, r: any) => sum + (r.eventSuccess ? 1 : 0), 0) / 
+      ratings.filter((r: any) => r.eventSuccess !== null).length * 100 || 0;
+    const recommendationRate = ratings
+      .filter((r: any) => r.wouldRecommend !== null)
+      .reduce((sum: number, r: any) => sum + (r.wouldRecommend ? 1 : 0), 0) / 
+      ratings.filter((r: any) => r.wouldRecommend !== null).length * 100 || 0;
+
+    // Update template
+    await prisma.workspaceTemplate.update({
+      where: { id: templateId },
+      data: {
+        averageRating: Math.round(avgRating * 10) / 10, // Round to 1 decimal place
+        effectiveness: {
+          completionRate: Math.round(avgCompletionRate),
+          teamSatisfaction: Math.round(avgTeamSatisfaction * 10) / 10,
+          successRate: Math.round(successRate),
+          recommendationRate: Math.round(recommendationRate),
+          totalRatings: ratings.length,
+          lastUpdated: new Date().toISOString(),
         },
       },
     });
@@ -944,7 +1061,7 @@ export class WorkspaceTemplateService {
 
   // Database operations
   private async saveTemplate(template: Omit<WorkspaceTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<WorkspaceTemplate> {
-    const savedTemplate = await (prisma as any).workspaceTemplate.create({
+    const savedTemplate = await prisma.workspaceTemplate.create({
       data: {
         name: template.name,
         description: template.description,
@@ -970,7 +1087,7 @@ export class WorkspaceTemplateService {
         max: savedTemplate.eventSizeMax,
       },
       complexity: savedTemplate.complexity as any,
-      structure: savedTemplate.structure as WorkspaceTemplateStructure,
+      structure: savedTemplate.structure as unknown as WorkspaceTemplateStructure,
       metadata: savedTemplate.metadata as any,
       effectiveness: savedTemplate.effectiveness as any,
       createdAt: savedTemplate.createdAt,
@@ -979,7 +1096,7 @@ export class WorkspaceTemplateService {
   }
 
   private async getTemplate(templateId: string): Promise<WorkspaceTemplate | null> {
-    const template = await (prisma as any).workspaceTemplate.findUnique({
+    const template = await prisma.workspaceTemplate.findUnique({
       where: { id: templateId },
     });
 
@@ -997,7 +1114,7 @@ export class WorkspaceTemplateService {
         max: template.eventSizeMax,
       },
       complexity: template.complexity as any,
-      structure: template.structure as WorkspaceTemplateStructure,
+      structure: template.structure as unknown as WorkspaceTemplateStructure,
       metadata: template.metadata as any,
       effectiveness: template.effectiveness as any,
       createdAt: template.createdAt,
@@ -1007,7 +1124,7 @@ export class WorkspaceTemplateService {
 
   private async getAvailableTemplates(userId: string, organizationId?: string): Promise<WorkspaceTemplate[]> {
     // Get public templates and organization-specific templates
-    const templates = await (prisma as any).workspaceTemplate.findMany({
+    const templates = await prisma.workspaceTemplate.findMany({
       where: {
         OR: [
           // Public templates
@@ -1060,7 +1177,7 @@ export class WorkspaceTemplateService {
 
   private async trackTemplateUsage(templateId: string, workspaceId?: string, eventId?: string): Promise<void> {
     // Increment usage counter
-    await (prisma as any).workspaceTemplate.update({
+    await prisma.workspaceTemplate.update({
       where: { id: templateId },
       data: {
         usageCount: {
@@ -1071,7 +1188,7 @@ export class WorkspaceTemplateService {
 
     // Create usage record if workspace and event are provided
     if (workspaceId && eventId) {
-      await (prisma as any).templateUsage.create({
+      await prisma.templateUsage.create({
         data: {
           templateId,
           workspaceId,
@@ -1082,7 +1199,7 @@ export class WorkspaceTemplateService {
   }
 
   private async getTemplatesByOrganization(organizationId: string): Promise<WorkspaceTemplate[]> {
-    const templates = await (prisma as any).workspaceTemplate.findMany({
+    const templates = await prisma.workspaceTemplate.findMany({
       where: {
         organizationShares: {
           some: {
