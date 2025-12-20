@@ -8,6 +8,7 @@ import { TeamMemberRoster } from './TeamMemberRoster';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { WorkspaceHealthMetrics } from './WorkspaceHealthMetrics';
 import { TeamManagement } from './TeamManagement';
+import { WorkspaceCommunication } from './WorkspaceCommunication';
 import { EventMarketplaceIntegration } from '../marketplace';
 import api from '../../lib/api';
 
@@ -142,10 +143,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         )}
 
         {activeTab === 'communication' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication</h2>
-            <p className="text-gray-600">Communication interface will be implemented in a separate task.</p>
-          </div>
+          <WorkspaceCommunication workspaceId={workspace.id} />
         )}
 
         {activeTab === 'analytics' && (

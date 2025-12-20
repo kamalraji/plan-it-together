@@ -154,7 +154,7 @@ export function TaskSummaryCards({ workspace, onViewTasks }: TaskSummaryCardsPro
               </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

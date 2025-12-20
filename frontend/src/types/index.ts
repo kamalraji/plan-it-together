@@ -572,6 +572,13 @@ export interface OrganizationAnalytics {
 }
 
 // Workspace-related types
+export interface MediaFile {
+  filename: string;
+  size: number;
+  type: string;
+  url: string;
+}
+
 export interface WorkspaceSettings {
   autoInviteOrganizer: boolean;
   defaultChannels: string[];
@@ -718,4 +725,40 @@ export interface WorkspaceChannel {
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateChannelDTO {
+  name: string;
+  type: 'GENERAL' | 'TASK_SPECIFIC' | 'ROLE_BASED' | 'ANNOUNCEMENT';
+  description?: string;
+  members?: string[];
+  isPrivate?: boolean;
+}
+
+export interface SendMessageDTO {
+  content: string;
+  attachments?: MediaFile[];
+}
+
+export interface MessageResponse {
+  id: string;
+  channelId: string;
+  senderId: string;
+  content: string;
+  attachments: MediaFile[];
+  sentAt: string;
+  editedAt?: string;
+}
+
+export interface BroadcastMessageDTO {
+  content: string;
+  attachments?: MediaFile[];
+  targetType: 'ALL_MEMBERS' | 'ROLE_SPECIFIC';
+  targetRoles?: string[];
+}
+
+export interface ChannelMessageHistory {
+  channelId: string;
+  messages: MessageResponse[];
+  hasMore: boolean;
 }
