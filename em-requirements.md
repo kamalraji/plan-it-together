@@ -85,11 +85,13 @@ The Event Marketplace is a comprehensive B2B platform integrated within Thittam1
 4. WHEN a booking is confirmed, THE Thittam1Hub SHALL update vendor availability and send confirmation to both parties
 5. THE Thittam1Hub SHALL support booking modifications, cancellations, and rescheduling with appropriate policies
 
-### Requirement 6: Payment Processing and Escrow
+### Requirement 6: Payment Processing and Escrow (Future Implementation)
 
 **User Story:** As an organizer, I want secure payment processing for marketplace services, so that transactions are protected and transparent.
 
-#### Acceptance Criteria
+**Note:** This requirement is planned for future implementation and is not part of the current development phase.
+
+#### Acceptance Criteria (Future Implementation)
 
 1. WHEN an organizer makes a payment, THE Thittam1Hub SHALL process payment securely and hold funds in escrow until service completion
 2. WHEN a service is completed satisfactorily, THE Thittam1Hub SHALL release payment to the vendor minus platform commission
@@ -121,11 +123,13 @@ The Event Marketplace is a comprehensive B2B platform integrated within Thittam1
 4. WHEN a vendor's performance changes significantly, THE Thittam1Hub SHALL send alerts and recommendations
 5. THE Thittam1Hub SHALL generate periodic performance reports for vendors with actionable insights
 
-### Requirement 9: Commission and Fee Management
+### Requirement 9: Commission and Fee Management (Future Implementation)
 
 **User Story:** As a platform administrator, I want to manage marketplace commissions and fees, so that the platform generates sustainable revenue.
 
-#### Acceptance Criteria
+**Note:** This requirement is planned for future implementation and is not part of the current development phase.
+
+#### Acceptance Criteria (Future Implementation)
 
 1. WHEN a booking is completed, THE Thittam1Hub SHALL calculate and deduct the appropriate commission based on service category and vendor tier
 2. WHEN vendors reach certain volume thresholds, THE Thittam1Hub SHALL apply tiered commission rates automatically

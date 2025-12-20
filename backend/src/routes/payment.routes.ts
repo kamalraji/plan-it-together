@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import { paymentService } from '../services/payment.service';
 import { authenticate } from '../middleware/auth.middleware';
+import { requireFeature } from '../config/features';
 import { ApiResponse } from '../types';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+// Apply feature flag middleware to all payment routes
+router.use(requireFeature('PAYMENT_PROCESSING'));
 
 /**
  * Process payment for a booking

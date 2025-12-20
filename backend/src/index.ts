@@ -16,6 +16,7 @@ import marketplaceRoutes from './routes/marketplace.routes';
 import marketplaceConfigRoutes from './routes/marketplace-config.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
+import featuresRoutes from './routes/features.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
 import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
@@ -154,7 +155,10 @@ app.use('/api/marketplace', marketplaceConfigRoutes);
 // Booking routes
 app.use('/api/bookings', bookingRoutes);
 
-// Payment routes
+// Features routes
+app.use('/api/features', featuresRoutes);
+
+// Payment routes (Feature flagged - Future Implementation)
 app.use('/api/payments', paymentRoutes);
 
 // Service Agreement routes

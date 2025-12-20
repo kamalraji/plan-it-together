@@ -126,6 +126,45 @@ See `backend/.env.example` for required environment variables.
 ### Frontend (.env)
 See `frontend/.env.example` for required environment variables.
 
+## Payment System
+
+**Current Status: Direct Payment Mode**
+
+The marketplace currently operates in **direct payment mode**, where organizers and vendors arrange payments outside the platform. Integrated payment processing is planned for future implementation.
+
+### How It Works
+
+1. **Organizer** creates booking after accepting vendor quote
+2. **Organizer** contacts vendor directly to arrange payment
+3. **Payment** is made using organizer and vendor's preferred method
+4. **Vendor** confirms payment received in the platform
+5. **Service** proceeds as normal
+
+### Supported Payment Methods
+
+Since payments are handled directly between parties, any payment method can be used:
+- Bank transfers
+- Credit cards (directly with vendor)
+- PayPal, Venmo, etc.
+- Cash (for local services)
+- Checks
+- Any other mutually agreed method
+
+### Benefits of Direct Payment
+
+- ✅ **Flexibility** - Use any payment method
+- ✅ **No platform fees** - No additional charges
+- ✅ **Vendor control** - Vendors manage their own payment processing
+- ✅ **Familiar process** - Similar to traditional business transactions
+
+### Future: Integrated Payments
+
+Integrated payment processing with escrow, automated payouts, and platform fees is planned for future implementation. This will be enabled via feature flags when ready.
+
+For more details, see:
+- `backend/PAYMENT_SYSTEM_STATUS.md` - Technical implementation details
+- `PAYMENT_WORKFLOW_GUIDE.md` - User workflow guide
+
 ## Testing
 
 ### Backend Tests
