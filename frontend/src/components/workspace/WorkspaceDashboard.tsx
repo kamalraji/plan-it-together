@@ -7,6 +7,7 @@ import { TaskSummaryCards } from './TaskSummaryCards';
 import { TeamMemberRoster } from './TeamMemberRoster';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
 import { WorkspaceHealthMetrics } from './WorkspaceHealthMetrics';
+import { TeamManagement } from './TeamManagement';
 import api from '../../lib/api';
 
 interface WorkspaceDashboardProps {
@@ -129,10 +130,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         )}
 
         {activeTab === 'team' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Team Management</h2>
-            <p className="text-gray-600">Team management interface will be implemented in a separate task.</p>
-          </div>
+          <TeamManagement workspace={workspace} />
         )}
 
         {activeTab === 'communication' && (

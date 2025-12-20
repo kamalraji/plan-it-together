@@ -188,6 +188,12 @@ export function OrganizerDashboard() {
                       >
                         Edit
                       </Link>
+                      <Link
+                        to={`/workspaces/${event.id}`}
+                        className="text-green-600 hover:text-green-800 text-sm font-medium"
+                      >
+                        Workspace
+                      </Link>
                     </div>
                   </div>
                 ))}

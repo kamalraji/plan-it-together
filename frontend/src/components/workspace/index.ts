@@ -4,3 +4,6 @@ export { WorkspaceNavigation } from './WorkspaceNavigation';
 export { TaskSummaryCards } from './TaskSummaryCards';
 export { TeamMemberRoster } from './TeamMemberRoster';
 export { WorkspaceHealthMetrics } from './WorkspaceHealthMetrics';
+export { TeamManagement } from './TeamManagement';
+export { TeamInvitation } from './TeamInvitation';
+export { TeamRosterManagement } from './TeamRosterManagement';

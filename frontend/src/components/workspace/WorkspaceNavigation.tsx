@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Workspace, WorkspaceStatus } from '../../types';
+import { Breadcrumb } from '../common/Breadcrumb';
 
 interface WorkspaceNavigationProps {
   workspace: Workspace;
@@ -86,15 +87,15 @@ export function WorkspaceNavigation({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Breadcrumb Navigation */}
-          <nav className="flex items-center space-x-4 py-4">
-            <a href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
-              Dashboard
-            </a>
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            <span className="text-sm font-medium text-gray-900">Workspace</span>
-          </nav>
+          <div className="py-4">
+            <Breadcrumb
+              items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: workspace.event?.name || 'Event', href: workspace.event ? `/events/${workspace.event.id}` : undefined },
+                { label: 'Workspace', current: true }
+              ]}
+            />
+          </div>
 
           {/* Workspace Switcher */}
           {userWorkspaces.length > 1 && (
