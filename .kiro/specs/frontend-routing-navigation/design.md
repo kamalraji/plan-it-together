@@ -2,40 +2,66 @@
 
 ## Overview
 
-The Frontend Routing and Navigation system transforms Thittam1Hub's React frontend from a single-component application into a comprehensive multi-page application with proper URL routing, navigation menus, and page layouts. The system leverages the existing React Router DOM v6.21.0 dependency and builds upon the extensive component library already present in the codebase.
+The Frontend Routing and Navigation system transforms Thittam1Hub's React frontend from a single-component application into a comprehensive multi-page application with AWS-style interface patterns, proper URL routing, navigation menus, and page layouts. The system leverages the existing React Router DOM v6.21.0 dependency and builds upon the extensive component library already present in the codebase.
 
-The design implements a hierarchical routing structure that supports role-based access control, responsive navigation, and seamless integration with existing authentication and state management systems. The architecture prioritizes user experience through consistent navigation patterns, proper loading states, and mobile-responsive design.
+The design implements AWS Console-inspired interface patterns including:
+- **Service-based navigation** with expandable service categories
+- **Breadcrumb navigation** with service context
+- **Console-style layouts** with consistent header, sidebar, and content areas
+- **Service dashboards** with widget-based layouts and customizable panels
+- **Resource management interfaces** with table views, filters, and bulk actions
+- **Multi-region/organization context switching**
+- **Search-first navigation** with global search and service-specific search
+
+The architecture prioritizes enterprise-grade user experience through AWS-proven navigation patterns, consistent visual hierarchy, and scalable interface design suitable for complex business applications.
 
 ## Architecture
 
 ### Routing Architecture
 
-The system uses React Router DOM with a browser-based routing strategy, implementing a hierarchical route structure:
+The system uses React Router DOM with a browser-based routing strategy, implementing an AWS Console-inspired hierarchical route structure:
 
 ```
 /
 ├── /login
 ├── /register  
 ├── /forgot-password
-├── /dashboard (role-based redirect)
-│   ├── /organizer
-│   ├── /participant  
-│   └── /vendor
-├── /events
-│   ├── /create
-│   ├── /:eventId
-│   └── /:eventId/edit
-├── /workspaces
-│   └── /:workspaceId
-├── /marketplace
-├── /organizations
-├── /profile
-├── /analytics
-├── /help
-└── /admin (admin only)
+├── /console (main console interface)
+│   ├── /dashboard (role-based service dashboard)
+│   ├── /events (Event Management Service)
+│   │   ├── /create
+│   │   ├── /:eventId
+│   │   ├── /:eventId/edit
+│   │   ├── /templates
+│   │   └── /analytics
+│   ├── /workspaces (Workspace Management Service)
+│   │   ├── /:workspaceId
+│   │   ├── /:workspaceId/tasks
+│   │   ├── /:workspaceId/team
+│   │   └── /:workspaceId/communication
+│   ├── /marketplace (Marketplace Service)
+│   │   ├── /services
+│   │   ├── /bookings
+│   │   └── /vendors
+│   ├── /organizations (Organization Management Service)
+│   │   ├── /members
+│   │   ├── /settings
+│   │   └── /analytics
+│   ├── /profile (Account Management)
+│   │   ├── /security
+│   │   ├── /preferences
+│   │   └── /activity
+│   ├── /analytics (Global Analytics Service)
+│   ├── /notifications (Notification Center)
+│   └── /support (Help & Support)
+├── /admin (Administrative Console - admin only)
+│   ├── /users
+│   ├── /system
+│   └── /monitoring
+└── /search (Global Search Interface)
 ```
 
-### Component Hierarchy
+### AWS-Style Component Hierarchy
 
 ```
 App
@@ -44,12 +70,14 @@ App
 ├── QueryClient Provider
 └── Routes
     ├── PublicRoute (login, register)
-    ├── ProtectedRoute
-    │   ├── Layout
-    │   │   ├── Navigation
-    │   │   ├── Breadcrumbs
-    │   │   └── PageContent
-    │   └── RoleBasedRoute
+    ├── ConsoleRoute (main console interface)
+    │   ├── ConsoleLayout
+    │   │   ├── ConsoleHeader (with service switcher, search, user menu)
+    │   │   ├── ServiceNavigation (expandable service categories)
+    │   │   ├── BreadcrumbBar (service context breadcrumbs)
+    │   │   ├── PageHeader (with actions, filters, view controls)
+    │   │   └── PageContent (with consistent spacing and layout)
+    │   └── ServiceRoute (individual service interfaces)
     └── NotFoundPage
 ```
 
@@ -62,162 +90,227 @@ The routing system integrates with existing state management:
 
 ## Components and Interfaces
 
-### Core Routing Components
+### AWS-Style Console Components
 
-#### AppRouter Component
+#### ConsoleLayout Component
 ```typescript
-interface AppRouterProps {
-  children?: React.ReactNode;
-}
-
-interface RouteConfig {
-  path: string;
-  element: React.ComponentType;
-  protected: boolean;
-  roles?: UserRole[];
-  children?: RouteConfig[];
-}
-```
-
-The main router component that configures all application routes and handles route-level concerns like authentication and authorization.
-
-#### ProtectedRoute Component
-```typescript
-interface ProtectedRouteProps {
+interface ConsoleLayoutProps {
   children: React.ReactNode;
-  requiredRoles?: UserRole[];
-  redirectTo?: string;
-}
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  isLoading: boolean;
-}
-```
-
-Wraps protected routes and handles authentication checks, role-based access control, and redirects for unauthorized access.
-
-#### Layout Component
-```typescript
-interface LayoutProps {
-  children: React.ReactNode;
-  showSidebar?: boolean;
+  currentService?: string;
+  showServiceNavigation?: boolean;
   showBreadcrumbs?: boolean;
 }
 
-interface NavigationItem {
-  label: string;
-  path: string;
-  icon?: React.ComponentType;
-  roles?: UserRole[];
-  children?: NavigationItem[];
+interface ConsoleContext {
+  currentService: string;
+  currentRegion?: string; // for multi-organization context
+  user: User;
+  preferences: UserPreferences;
 }
 ```
 
-Provides consistent page layout with navigation, header, and content areas. Adapts based on user role and screen size.
+The main console layout component that provides AWS-style interface structure with consistent header, navigation, and content areas.
 
-### Navigation Components
-
-#### MainNavigation Component
+#### ConsoleHeader Component
 ```typescript
-interface MainNavigationProps {
+interface ConsoleHeaderProps {
   user: User;
+  currentService?: string;
+  onServiceChange: (service: string) => void;
+  onSearch: (query: string) => void;
   onLogout: () => void;
+}
+
+interface ServiceSwitcher {
+  services: ServiceDefinition[];
+  currentService: string;
+  recentServices: string[];
+  favoriteServices: string[];
+}
+```
+
+AWS Console-style header with service switcher, global search, notifications, and user menu.
+
+#### ServiceNavigation Component
+```typescript
+interface ServiceNavigationProps {
+  currentService: string;
+  user: User;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }
 
-interface NavigationState {
-  activeRoute: string;
-  expandedMenus: string[];
-  isMobileMenuOpen: boolean;
-}
-```
-
-Renders the primary navigation menu with role-based menu items, active state management, and mobile responsiveness.
-
-#### Breadcrumb Component
-```typescript
-interface BreadcrumbProps {
-  items: BreadcrumbItem[];
-  separator?: React.ReactNode;
-}
-
-interface BreadcrumbItem {
+interface ServiceCategory {
+  id: string;
   label: string;
-  path?: string;
-  isActive?: boolean;
+  icon: React.ComponentType;
+  items: ServiceNavigationItem[];
+  roles?: UserRole[];
+  expanded?: boolean;
+}
+
+interface ServiceNavigationItem {
+  id: string;
+  label: string;
+  path: string;
+  icon?: React.ComponentType;
+  badge?: BadgeConfig;
+  roles?: UserRole[];
+  description?: string;
 }
 ```
 
-Displays hierarchical navigation context with automatic breadcrumb generation based on current route.
+AWS-style service navigation with expandable categories, role-based filtering, and visual hierarchy.
 
-### Page Components
-
-#### DashboardPage Component
+#### PageHeader Component
 ```typescript
-interface DashboardPageProps {
+interface PageHeaderProps {
+  title: string;
+  subtitle?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  actions?: PageAction[];
+  tabs?: TabConfig[];
+  filters?: FilterConfig[];
+  viewControls?: ViewControlConfig[];
+}
+
+interface PageAction {
+  label: string;
+  action: () => void;
+  icon?: string;
+  variant: 'primary' | 'secondary' | 'danger';
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+interface ViewControlConfig {
+  type: 'table' | 'cards' | 'list';
+  active: boolean;
+  onChange: (type: string) => void;
+}
+```
+
+Consistent page header with title, actions, tabs, and view controls following AWS patterns.
+
+### AWS-Style Page Components
+
+#### ServiceDashboard Component
+```typescript
+interface ServiceDashboardProps {
+  service: string;
   userRole: UserRole;
+  widgets: DashboardWidget[];
+  layout: DashboardLayout;
 }
 
-interface DashboardConfig {
-  component: React.ComponentType;
-  widgets: WidgetConfig[];
-  layout: LayoutType;
+interface DashboardWidget {
+  id: string;
+  type: 'metric' | 'chart' | 'table' | 'list' | 'status';
+  title: string;
+  size: 'small' | 'medium' | 'large';
+  data: any;
+  refreshInterval?: number;
+}
+
+interface DashboardLayout {
+  columns: number;
+  rows: DashboardRow[];
+  customizable: boolean;
 }
 ```
 
-Renders role-appropriate dashboard by composing existing dashboard components (OrganizerDashboard, ParticipantDashboard, VendorDashboard).
+AWS-style service dashboard with customizable widgets, metrics, and quick actions.
 
-#### EventPages Components
+#### ResourceListPage Component
 ```typescript
-interface EventListPageProps {
-  filters?: EventFilters;
-  pagination?: PaginationConfig;
+interface ResourceListPageProps {
+  resourceType: string;
+  columns: TableColumn[];
+  filters: FilterDefinition[];
+  actions: BulkAction[];
+  searchable: boolean;
+  exportable: boolean;
 }
 
-interface EventDetailPageProps {
-  eventId: string;
-  tab?: string;
+interface TableColumn {
+  key: string;
+  label: string;
+  sortable: boolean;
+  filterable: boolean;
+  width?: string;
+  render?: (value: any, record: any) => React.ReactNode;
 }
 
-interface EventFormPageProps {
-  eventId?: string; // undefined for create, string for edit
-  mode: 'create' | 'edit';
+interface BulkAction {
+  label: string;
+  action: (selectedItems: any[]) => void;
+  icon?: string;
+  confirmationRequired?: boolean;
+  roles?: UserRole[];
 }
 ```
 
-Composes existing event components (EventForm, EventLandingPage) into full page layouts with proper routing and state management.
+AWS-style resource list interface with table view, filtering, sorting, and bulk actions.
 
-#### WorkspacePage Component
+#### ResourceDetailPage Component
 ```typescript
-interface WorkspacePageProps {
-  workspaceId: string;
-  activeView?: WorkspaceView;
+interface ResourceDetailPageProps {
+  resourceId: string;
+  resourceType: string;
+  tabs: DetailTab[];
+  actions: ResourceAction[];
 }
 
-interface WorkspaceView {
-  type: 'dashboard' | 'tasks' | 'team' | 'communication';
-  subView?: string;
+interface DetailTab {
+  id: string;
+  label: string;
+  component: React.ComponentType<any>;
+  badge?: string | number;
+  roles?: UserRole[];
+}
+
+interface ResourceAction {
+  label: string;
+  action: () => void;
+  icon?: string;
+  variant: 'primary' | 'secondary' | 'danger';
+  confirmationRequired?: boolean;
 }
 ```
 
-Integrates existing workspace components into a unified workspace interface with sub-navigation and context management.
+AWS-style resource detail interface with tabbed content, actions, and contextual information.
 
 ## Data Models
 
-### Route Configuration Model
+### AWS-Style Service Configuration Model
 ```typescript
-interface RouteDefinition {
+interface ServiceDefinition {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  icon: string;
+  category: ServiceCategory;
+  routes: ServiceRoute[];
+  permissions: ServicePermission[];
+  dashboard: ServiceDashboardConfig;
+}
+
+interface ServiceCategory {
+  id: string;
+  name: string;
+  displayName: string;
+  icon: string;
+  order: number;
+}
+
+interface ServiceRoute {
   path: string;
   component: React.ComponentType<any>;
-  exact?: boolean;
-  protected: boolean;
-  roles?: UserRole[];
   title: string;
   breadcrumb?: string | ((params: any) => string);
-  children?: RouteDefinition[];
+  permissions?: string[];
+  children?: ServiceRoute[];
 }
 
 enum UserRole {
@@ -228,58 +321,68 @@ enum UserRole {
 }
 ```
 
-### Navigation Configuration Model
+### Console Navigation Model
 ```typescript
-interface NavigationConfig {
-  items: NavigationItem[];
-  branding: BrandingConfig;
-  responsive: ResponsiveConfig;
+interface ConsoleNavigationConfig {
+  services: ServiceDefinition[];
+  categories: ServiceCategory[];
+  userPreferences: NavigationPreferences;
+  branding: ConsoleBrandingConfig;
 }
 
-interface NavigationItem {
-  id: string;
-  label: string;
-  path?: string;
-  icon?: string;
-  roles: UserRole[];
-  children?: NavigationItem[];
-  external?: boolean;
-  badge?: BadgeConfig;
+interface NavigationPreferences {
+  collapsedCategories: string[];
+  favoriteServices: string[];
+  recentServices: string[];
+  defaultLandingService?: string;
 }
 
-interface BrandingConfig {
+interface ConsoleBrandingConfig {
   logo: string;
   title: string;
-  subtitle?: string;
+  favicon: string;
+  theme: 'light' | 'dark' | 'auto';
+  colors: ThemeColors;
 }
 
-interface ResponsiveConfig {
-  breakpoints: {
-    mobile: number;
-    tablet: number;
-    desktop: number;
-  };
-  collapsedWidth: number;
-  expandedWidth: number;
+interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
 }
 ```
 
-### Page Metadata Model
+### Resource Management Model
 ```typescript
-interface PageMetadata {
-  title: string;
-  description?: string;
-  keywords?: string[];
-  breadcrumbs: BreadcrumbItem[];
-  actions?: PageAction[];
+interface ResourceDefinition {
+  type: string;
+  displayName: string;
+  pluralName: string;
+  icon: string;
+  listView: ResourceListConfig;
+  detailView: ResourceDetailConfig;
+  actions: ResourceActionConfig[];
 }
 
-interface PageAction {
+interface ResourceListConfig {
+  columns: ResourceColumn[];
+  filters: ResourceFilter[];
+  sorting: SortingConfig;
+  pagination: PaginationConfig;
+  bulkActions: BulkActionConfig[];
+}
+
+interface ResourceColumn {
+  key: string;
   label: string;
-  action: () => void;
-  icon?: string;
-  variant: 'primary' | 'secondary' | 'danger';
-  roles?: UserRole[];
+  type: 'text' | 'number' | 'date' | 'status' | 'actions';
+  sortable: boolean;
+  filterable: boolean;
+  width?: string;
+  align?: 'left' | 'center' | 'right';
 }
 ```
 

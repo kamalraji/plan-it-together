@@ -2,14 +2,22 @@
 
 ## Overview
 
-This implementation plan transforms the existing React frontend from a single-component application into a comprehensive multi-page application with proper URL routing, navigation menus, and page layouts. The plan builds incrementally, starting with core routing infrastructure, then adding authentication protection, navigation components, and finally integrating all existing components into proper page layouts.
+This implementation plan transforms the existing React frontend from a single-component application into a comprehensive AWS Console-style multi-service application with proper URL routing, service-based navigation menus, and enterprise-grade page layouts. The plan builds incrementally, starting with core console infrastructure, then adding service navigation, AWS-style page components, and finally integrating all existing components into proper service interfaces.
+
+The implementation follows AWS Console design patterns including:
+- **Service-oriented architecture** with clear service boundaries
+- **Consistent console layout** with header, service navigation, and content areas  
+- **Resource management interfaces** with table views, filters, and bulk actions
+- **Dashboard-style service landing pages** with customizable widgets
+- **Enterprise-grade visual hierarchy** and information architecture
 
 ## Tasks
 
-- [-] 1. Set up core routing infrastructure
-  - Create AppRouter component with React Router configuration
-  - Implement basic route definitions and error boundaries
-  - Set up 404 NotFound page component
+- [x] 1. Set up AWS Console-style core infrastructure
+  - Create AppRouter component with React Router configuration for console-style routing
+  - Implement ConsoleLayout component with header, service navigation, and content areas
+  - Set up 404 NotFound page component with service navigation options
+  - Create basic service route definitions and error boundaries
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
 - [ ]* 1.1 Write property test for router initialization and navigation
@@ -24,93 +32,103 @@ This implementation plan transforms the existing React frontend from a single-co
   - **Property 3: Nested routing support**
   - **Validates: Requirements 1.5**
 
-- [ ] 2. Implement authentication-based route protection
-  - Create ProtectedRoute component with authentication checks
-  - Implement role-based access control for different user types
-  - Add redirect logic for unauthenticated and unauthorized access
-  - Integrate with existing useAuth hook
-  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
-
-- [ ]* 2.1 Write property test for unauthenticated access protection
-  - **Property 4: Unauthenticated access protection**
-  - **Validates: Requirements 2.1**
-
-- [ ]* 2.2 Write property test for role-based access control
-  - **Property 5: Role-based access control**
-  - **Validates: Requirements 2.2, 2.5**
-
-- [ ]* 2.3 Write property test for authentication state management
-  - **Property 6: Authentication state management**
-  - **Validates: Requirements 2.3, 2.4**
-
-- [ ] 3. Create main navigation and layout components
-  - Implement Layout component with header, sidebar, and content areas
-  - Create MainNavigation component with role-based menu items
-  - Add Breadcrumb component for hierarchical navigation
-  - Implement responsive navigation with mobile support
+- [ ] 2. Create AWS Console-style header and global navigation
+  - Implement ConsoleHeader component with service switcher, global search, and user menu
+  - Create ServiceSwitcher component with service categories and quick access
+  - Add GlobalSearch component with cross-service search capabilities
+  - Implement NotificationCenter component for organized notification feeds
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ]* 3.1 Write property test for persistent navigation display
-  - **Property 7: Persistent navigation display**
-  - **Validates: Requirements 3.1, 3.3**
+- [ ]* 2.1 Write property test for console header functionality
+  - **Property 7: Console header persistence and functionality**
+  - **Validates: Requirements 3.1, 3.2, 3.3**
 
-- [ ]* 3.2 Write property test for navigation interaction feedback
-  - **Property 8: Navigation interaction feedback**
-  - **Validates: Requirements 3.2**
+- [ ]* 2.2 Write property test for service switching behavior
+  - **Property 8: Service switcher and context management**
+  - **Validates: Requirements 3.2, 3.5**
 
-- [ ]* 3.3 Write property test for responsive navigation behavior
-  - **Property 9: Responsive navigation behavior**
-  - **Validates: Requirements 3.4, 3.5**
+- [ ]* 2.3 Write property test for global search functionality
+  - **Property 9: Global search across services**
+  - **Validates: Requirements 3.3**
 
-- [ ] 4. Implement dashboard routing and pages
-  - Create DashboardPage component that routes to role-specific dashboards
-  - Integrate existing OrganizerDashboard and ParticipantDashboard components
-  - Add dashboard customization and widget management
-  - Implement dashboard routing logic based on user roles
-  - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+- [x] 3. Implement service-based navigation system
+  - Create ServiceNavigation component with expandable service categories
+  - Implement service category organization and role-based filtering
+  - Add service favorites, recent services, and navigation preferences
+  - Create responsive service navigation with mobile support
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ]* 4.1 Write unit tests for role-specific dashboard routing
-  - Test organizer, participant, vendor, and admin dashboard routing
-  - **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
+- [ ]* 3.1 Write property test for service navigation display
+  - **Property 10: Service navigation role-based display**
+  - **Validates: Requirements 2.1, 2.3**
 
-- [ ]* 4.2 Write property test for dashboard customization persistence
-  - **Property 10: Dashboard customization persistence**
-  - **Validates: Requirements 4.5**
+- [ ]* 3.2 Write property test for service navigation interactions
+  - **Property 11: Service navigation interaction feedback**
+  - **Validates: Requirements 2.2**
 
-- [ ] 5. Create event management page structure
-  - Implement EventListPage with filtering and search
-  - Create EventDetailPage integrating existing EventLandingPage
-  - Build EventFormPage for create/edit using existing EventForm
-  - Add event navigation and breadcrumbs
+- [ ]* 3.3 Write property test for responsive service navigation
+  - **Property 12: Responsive service navigation behavior**
+  - **Validates: Requirements 2.4, 2.5**
+
+- [ ] 4. Create AWS-style page components and layouts
+  - Implement PageHeader component with breadcrumbs, actions, tabs, and view controls
+  - Create ResourceListPage component with table views, filters, and bulk actions
+  - Build ResourceDetailPage component with tabbed content and resource actions
+  - Add ServiceDashboard component with customizable widgets and metrics
+  - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
+
+- [ ]* 4.1 Write unit tests for AWS-style page components
+  - Test PageHeader, ResourceListPage, ResourceDetailPage, and ServiceDashboard rendering
+  - Test component interactions and state management
+
+- [ ] 5. Implement authentication-based route protection for console
+  - Create ConsoleRoute component with authentication checks for console access
+  - Implement role-based service access control within the console
+  - Add redirect logic for unauthenticated users to login with return URL
+  - Integrate with existing useAuth hook for console authentication
+  - _Requirements: Authentication and authorization for console access_
+
+- [ ]* 5.1 Write property test for console authentication protection
+  - **Property 4: Console authentication and authorization**
+  - **Validates: Console access control requirements**
+
+- [ ] 6. Create Event Management Service interface
+  - Implement EventService dashboard with AWS-style service landing page
+  - Create EventListPage using ResourceListPage with event-specific columns and filters
+  - Build EventDetailPage using ResourceDetailPage with event management tabs
+  - Add EventFormPage with AWS-style form layout and validation
+  - Integrate existing EventForm and EventLandingPage components
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ]* 5.1 Write unit tests for event page components
-  - Test event list, detail, and form page rendering
-  - Test event navigation and routing
+- [ ]* 6.1 Write unit tests for Event Management Service
+  - Test event service dashboard, list, detail, and form pages
+  - Test integration with existing event components
 
-- [ ] 6. Implement workspace navigation integration
-  - Create WorkspacePage component integrating existing workspace components
-  - Add workspace-specific navigation and context management
-  - Implement workspace switching and breadcrumb navigation
-  - Integrate task management, team, and communication features
+- [ ] 7. Create Workspace Management Service interface
+  - Implement WorkspaceService dashboard with workspace analytics and quick actions
+  - Create WorkspaceListPage with workspace filtering and management
+  - Build WorkspaceDetailPage with tabs for tasks, team, and communication
+  - Integrate existing workspace components into service interface
+  - Add workspace context switching and breadcrumb navigation
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ]* 6.1 Write unit tests for workspace navigation
-  - Test workspace page rendering and navigation
-  - Test workspace context switching
+- [ ]* 7.1 Write unit tests for Workspace Management Service
+  - Test workspace service interface and component integration
+  - Test workspace context switching and navigation
 
-- [ ] 7. Build profile and account management pages
-  - Create ProfilePage integrating existing profile components
-  - Implement account settings and security pages
-  - Add profile completion workflows and guided setup
-  - Create account activity and session management pages
-  - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+- [x] 8. Create Marketplace Service interface
+  - Implement MarketplaceService dashboard with vendor and booking analytics
+  - Create ServiceListPage for marketplace service discovery with AWS-style filtering
+  - Build VendorDashboardPage using service dashboard patterns
+  - Add booking management interface with resource list and detail views
+  - Integrate existing marketplace components into service structure
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ]* 7.1 Write unit tests for profile pages
-  - Test profile page rendering and form integration
-  - Test account settings and security features
+- [ ]* 8.1 Write unit tests for Marketplace Service
+  - Test marketplace service interface and vendor management
+  - Test service discovery and booking workflows
 
-- [ ] 8. Checkpoint - Ensure core routing and navigation works
+- [ ] 8.2 Checkpoint - Ensure core console and services work
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Implement organization management interface
@@ -124,36 +142,36 @@ This implementation plan transforms the existing React frontend from a single-co
   - Test organization management page rendering
   - Test member management and analytics integration
 
-- [ ] 10. Create marketplace and vendor pages
+- [ ] 9.2 Create marketplace and vendor pages
   - Implement MarketplacePage integrating existing marketplace components
   - Create VendorDashboardPage using existing vendor components
   - Add service discovery, booking, and vendor coordination pages
   - Integrate marketplace with event management workflow
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ]* 10.1 Write unit tests for marketplace pages
+- [ ]* 9.3 Write unit tests for marketplace pages
   - Test marketplace page rendering and vendor integration
   - Test service discovery and booking workflows
 
-- [ ] 11. Implement search and discovery pages
+- [ ] 9.4 Implement search and discovery pages
   - Create SearchPage with unified search across all content types
   - Add search result filtering and categorization
   - Implement search suggestions and auto-completion
   - Create search history and saved searches functionality
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ]* 11.1 Write unit tests for search functionality
+- [ ]* 9.5 Write unit tests for search functionality
   - Test search page rendering and result display
   - Test search filtering and suggestions
 
-- [ ] 12. Add notification and communication pages
+- [ ] 9.6 Add notification and communication pages
   - Create NotificationPage with organized notification feeds
   - Implement communication preferences and settings
   - Add message history and communication logs
   - Create message composition with rich text editing
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ]* 12.1 Write unit tests for communication pages
+- [ ]* 9.7 Write unit tests for communication pages
   - Test notification page rendering and management
   - Test communication preferences and messaging
 

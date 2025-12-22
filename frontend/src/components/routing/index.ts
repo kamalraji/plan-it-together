@@ -1,3 +1,14 @@
 export { AppRouter } from './AppRouter';
 export { NotFoundPage } from './NotFoundPage';
 export { ErrorBoundary } from './ErrorBoundary';
+export { ConsoleLayout } from './ConsoleLayout';
+export { ConsoleHeader } from './ConsoleHeader';
+export { ServiceNavigation } from './ServiceNavigation';
+export { ServiceSwitcher } from './ServiceSwitcher';
+export { GlobalSearch } from './GlobalSearch';
+export { NotificationCenter } from './NotificationCenter';
+export { BreadcrumbBar } from './BreadcrumbBar';
+export { PageHeader } from './PageHeader';
+export { ResourceListPage } from './ResourceListPage';
+export { ResourceDetailPage, OverviewTab, SettingsTab, ActivityTab } from './ResourceDetailPage';
+export { ServiceDashboard } from './ServiceDashboard';

@@ -1,15 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { NotFoundPage } from '../NotFoundPage';
 import { AuthProvider } from '../../../hooks/useAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock the API module
-jest.mock('../../../lib/api', () => ({
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
+vi.mock('../../../lib/api', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  }
 }));
 
 const queryClient = new QueryClient({

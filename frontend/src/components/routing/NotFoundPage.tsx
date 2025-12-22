@@ -11,7 +11,7 @@ export const NotFoundPage: React.FC = () => {
   };
 
   const getHomeLink = () => {
-    return isAuthenticated ? '/dashboard' : '/login';
+    return isAuthenticated ? '/console' : '/login';
   };
 
   return (
@@ -83,7 +83,7 @@ export const NotFoundPage: React.FC = () => {
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 />
               </svg>
-              {isAuthenticated ? 'Go to Dashboard' : 'Go to Login'}
+              {isAuthenticated ? 'Go to Console' : 'Go to Login'}
             </Link>
           </div>
 
@@ -94,23 +94,23 @@ export const NotFoundPage: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row sm:justify-center space-y-2 sm:space-y-0 sm:space-x-6">
               <Link
-                to="/help"
+                to="/console/support"
                 className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
               >
                 Help Center
               </Link>
               <Link
-                to="/contact"
+                to="/console/support"
                 className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
               >
                 Contact Support
               </Link>
               {isAuthenticated && (
                 <Link
-                  to="/dashboard"
+                  to="/console"
                   className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
                 >
-                  Dashboard
+                  Console Dashboard
                 </Link>
               )}
             </div>

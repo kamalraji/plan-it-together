@@ -3,6 +3,8 @@
  * Checks which features are enabled on the backend
  */
 
+import React from 'react';
+
 export interface FeatureFlags {
   PAYMENT_PROCESSING?: boolean;
   ESCROW_MANAGEMENT?: boolean;
@@ -25,7 +27,7 @@ export async function fetchEnabledFeatures(): Promise<FeatureFlags> {
   
   // Return cached features if still valid
   if (cachedFeatures && (now - lastFetch) < CACHE_DURATION) {
-    return cachedFeatures;
+    return cachedFeatures as FeatureFlags;
   }
   
   try {
@@ -122,6 +124,3 @@ export function PaymentUnavailableMessage() {
     </div>
   );
 }
-
-// Note: React import would be needed if using React hooks
-// import React from 'react';

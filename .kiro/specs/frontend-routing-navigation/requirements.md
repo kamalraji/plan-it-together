@@ -2,65 +2,73 @@
 
 ## Introduction
 
-The Frontend Routing and Navigation system provides the foundational page structure and navigation framework for Thittam1Hub's React frontend application. This system transforms the existing component-based architecture into a navigable multi-page application with proper URL routing, navigation menus, and page layouts. The system enables users to access different functional areas of the application through intuitive navigation while maintaining proper authentication, authorization, and user experience patterns.
+The Frontend Routing and Navigation system provides the foundational AWS Console-style interface structure and navigation framework for Thittam1Hub's React frontend application. This system transforms the existing component-based architecture into a navigable multi-service console application with proper URL routing, service-based navigation menus, and enterprise-grade page layouts. The system enables users to access different functional areas of the application through AWS-proven navigation patterns while maintaining proper authentication, authorization, and user experience standards.
 
-Currently, the frontend has comprehensive components organized by feature area but lacks the routing infrastructure to present them as navigable pages. This system will implement React Router-based navigation, create page layouts that compose existing components, and establish consistent navigation patterns across the entire application.
+Currently, the frontend has comprehensive components organized by feature area but lacks the console-style routing infrastructure to present them as navigable services. This system will implement React Router-based navigation with AWS Console interface patterns, create service-oriented page layouts that compose existing components, and establish consistent enterprise navigation patterns across the entire application.
+
+The interface will follow AWS Console design principles including:
+- **Service-based navigation** with expandable service categories
+- **Consistent page headers** with breadcrumbs, actions, and view controls
+- **Resource management interfaces** with table views, filters, and bulk actions
+- **Dashboard-style service landing pages** with customizable widgets
+- **Global search and service switching** capabilities
+- **Enterprise-grade visual hierarchy** and information architecture
 
 ## Glossary
 
-- **Page Route**: A URL path that corresponds to a specific page or view in the application
-- **Navigation Menu**: A persistent UI element that provides links to major application sections
-- **Page Layout**: A template structure that defines how components are arranged on a page
-- **Route Guard**: A protection mechanism that controls access to specific routes based on authentication and authorization
-- **Breadcrumb Navigation**: A secondary navigation system showing the user's current location within the application hierarchy
-- **Nested Routing**: A routing pattern where child routes are rendered within parent route components
-- **Route Parameters**: Dynamic segments in URLs that pass data to page components
-- **Navigation State**: The current active route and navigation context maintained by the routing system
-- **Page Component**: A top-level component that represents a complete page view and composes feature components
-- **Route Configuration**: The mapping between URL paths and their corresponding page components
-- **Navigation Guard**: Authentication and authorization checks that determine route accessibility
-- **Responsive Navigation**: Navigation elements that adapt to different screen sizes and device types
-- **Route Transition**: The process of navigating between different pages with appropriate loading and animation states
-- **Deep Linking**: The ability to navigate directly to specific application states via URL
-- **Navigation History**: The browser's navigation stack that enables back/forward functionality
+- **Console Layout**: An AWS Console-style interface structure with consistent header, service navigation, and content areas
+- **Service Navigation**: A hierarchical navigation system organized by service categories (Events, Workspaces, Marketplace, etc.)
+- **Service Dashboard**: A landing page for each service with widgets, quick actions, and service-specific navigation
+- **Resource List View**: A table-based interface for managing collections of resources (events, workspaces, users, etc.)
+- **Resource Detail View**: A detailed interface for viewing and managing individual resources with tabbed content
+- **Console Header**: A persistent header with service switcher, global search, notifications, and user menu
+- **Page Header**: A consistent page-level header with breadcrumbs, page actions, tabs, and view controls
+- **Service Category**: A grouping of related services in the navigation (e.g., "Event Management", "Collaboration Tools")
+- **Global Search**: A search interface that works across all services and resource types
+- **Service Switcher**: A dropdown interface for quickly switching between different services
+- **Widget Dashboard**: A customizable dashboard interface with draggable widgets and metrics
+- **Bulk Actions**: Operations that can be performed on multiple selected resources simultaneously
+- **View Controls**: Interface elements that allow switching between different view modes (table, cards, list)
+- **Filter Bar**: A horizontal interface for applying filters and search criteria to resource lists
+- **Context Switching**: The ability to switch between different organizational or workspace contexts
 
 ## Requirements
 
-### Requirement 1: Core Routing Infrastructure
+### Requirement 1: AWS Console-Style Core Infrastructure
 
-**User Story:** As a developer, I want a robust routing system implemented with React Router, so that the application can support multiple pages with proper URL navigation and browser history.
-
-#### Acceptance Criteria
-
-1. WHEN the application loads, THE Routing_System SHALL initialize React Router with browser history support and proper error boundaries
-2. WHEN users navigate to different URLs, THE Routing_System SHALL render the appropriate page components without full page reloads
-3. WHEN invalid routes are accessed, THE Routing_System SHALL display a user-friendly 404 error page with navigation options
-4. WHEN route changes occur, THE Routing_System SHALL update the browser URL and maintain proper navigation history
-5. THE Routing_System SHALL support nested routing for complex page hierarchies and sub-navigation patterns
-
-### Requirement 2: Authentication-Based Route Protection
-
-**User Story:** As a user, I want pages to be properly protected based on my authentication status, so that I can only access features I'm authorized to use.
+**User Story:** As a developer, I want a robust AWS Console-style routing system implemented with React Router, so that the application can support multiple services with proper URL navigation, service switching, and enterprise-grade interface patterns.
 
 #### Acceptance Criteria
 
-1. WHEN unauthenticated users access protected routes, THE Route_Guard SHALL redirect them to the login page with return URL preservation
-2. WHEN authenticated users access routes, THE Route_Guard SHALL verify their permissions and grant access to authorized pages
-3. WHEN users log out, THE Route_Guard SHALL clear authentication state and redirect to public pages
-4. WHEN authentication expires, THE Route_Guard SHALL detect the expiration and prompt for re-authentication
-5. THE Route_Guard SHALL support role-based access control for different user types (organizers, participants, vendors, admins)
+1. WHEN the application loads, THE Console_System SHALL initialize React Router with browser history support and display the main console interface with service navigation
+2. WHEN users navigate to different service URLs, THE Console_System SHALL render the appropriate service interfaces without full page reloads while maintaining console layout
+3. WHEN invalid routes are accessed, THE Console_System SHALL display a user-friendly 404 error page with service navigation options and suggested alternatives
+4. WHEN route changes occur within services, THE Console_System SHALL update the browser URL, breadcrumbs, and maintain proper navigation history
+5. THE Console_System SHALL support nested routing for service hierarchies and resource detail views with consistent URL patterns
 
-### Requirement 3: Main Navigation Menu System
+### Requirement 2: Service-Based Navigation System
 
-**User Story:** As a user, I want a consistent navigation menu that allows me to easily access different sections of the application, so that I can efficiently move between features.
+**User Story:** As a user, I want AWS Console-style service navigation that allows me to easily switch between different services and access service-specific features, so that I can efficiently manage different aspects of my work.
 
 #### Acceptance Criteria
 
-1. WHEN users view any page, THE Navigation_Menu SHALL display persistent navigation links to major application sections
-2. WHEN users click navigation items, THE Navigation_Menu SHALL highlight the active section and provide visual feedback
-3. WHEN users have different roles, THE Navigation_Menu SHALL show role-appropriate menu items and hide unauthorized sections
-4. WHEN the screen size changes, THE Navigation_Menu SHALL adapt to mobile layouts with collapsible menu functionality
-5. THE Navigation_Menu SHALL support nested menu items for complex feature hierarchies with proper hover and focus states
+1. WHEN users view the console, THE Service_Navigation SHALL display expandable service categories with role-appropriate services and clear visual hierarchy
+2. WHEN users click service navigation items, THE Service_Navigation SHALL highlight the active service, update the console context, and provide visual feedback
+3. WHEN users have different roles, THE Service_Navigation SHALL show role-appropriate services and hide unauthorized service categories
+4. WHEN the screen size changes, THE Service_Navigation SHALL adapt to mobile layouts with collapsible service navigation and touch-friendly interactions
+5. THE Service_Navigation SHALL support service favorites, recent services, and search functionality for quick service discovery
+
+### Requirement 3: Console Header and Global Navigation
+
+**User Story:** As a user, I want a consistent AWS Console-style header with service switching, global search, and user management, so that I can efficiently navigate the entire application and access global features.
+
+#### Acceptance Criteria
+
+1. WHEN users view any console page, THE Console_Header SHALL display persistent service switcher, global search, notifications, and user menu
+2. WHEN users interact with the service switcher, THE Console_Header SHALL provide quick access to all available services with search and favorites
+3. WHEN users perform global searches, THE Console_Header SHALL provide real-time search results across all services and resource types
+4. WHEN users access notifications, THE Console_Header SHALL display organized notification feeds with proper categorization and actions
+5. THE Console_Header SHALL support context switching between organizations or workspaces with clear visual indicators
 
 ### Requirement 4: Dashboard and Landing Pages
 
