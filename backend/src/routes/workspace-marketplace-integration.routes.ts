@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { workspaceMarketplaceIntegrationService } from '../services/workspace-marketplace-integration.service';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -8,7 +8,7 @@ const router = Router();
  * Get team member service recommendations for a workspace
  * GET /api/workspace-marketplace-integration/:workspaceId/recommendations
  */
-router.get('/:workspaceId/recommendations', authMiddleware, async (req, res) => {
+router.get('/:workspaceId/recommendations', authenticate, async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user!.id;
@@ -48,7 +48,7 @@ router.get('/:workspaceId/recommendations', authMiddleware, async (req, res) => 
  * Integrate hired specialist into workspace
  * POST /api/workspace-marketplace-integration/:workspaceId/integrate-specialist
  */
-router.post('/:workspaceId/integrate-specialist', authMiddleware, async (req, res) => {
+router.post('/:workspaceId/integrate-specialist', authenticate, async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user!.id;
@@ -90,7 +90,7 @@ router.post('/:workspaceId/integrate-specialist', authMiddleware, async (req, re
  * Set up integrated communication for external team members
  * POST /api/workspace-marketplace-integration/:workspaceId/setup-communication
  */
-router.post('/:workspaceId/setup-communication', authMiddleware, async (req, res) => {
+router.post('/:workspaceId/setup-communication', authenticate, async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user!.id;
@@ -116,7 +116,7 @@ router.post('/:workspaceId/setup-communication', authMiddleware, async (req, res
  * Manage mixed team access levels
  * POST /api/workspace-marketplace-integration/:workspaceId/manage-mixed-team
  */
-router.post('/:workspaceId/manage-mixed-team', authMiddleware, async (req, res) => {
+router.post('/:workspaceId/manage-mixed-team', authenticate, async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user!.id;
@@ -142,7 +142,7 @@ router.post('/:workspaceId/manage-mixed-team', authMiddleware, async (req, res) 
  * Set up service separation with collaboration
  * POST /api/workspace-marketplace-integration/:workspaceId/setup-separation
  */
-router.post('/:workspaceId/setup-separation', authMiddleware, async (req, res) => {
+router.post('/:workspaceId/setup-separation', authenticate, async (req, res) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user!.id;
