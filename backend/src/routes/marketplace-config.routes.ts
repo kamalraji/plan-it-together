@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { marketplaceConfigService } from '../services/marketplace-config.service';
 import { authenticate } from '../middleware/auth.middleware';
-import { requireRole } from '../middleware/rbac.middleware';
+import { authorize } from '../middleware/rbac.middleware';
 import { ApiResponse } from '../types';
 
 const router = Router();
@@ -10,7 +10,7 @@ const router = Router();
  * Get marketplace configuration
  * GET /api/marketplace/config
  */
-router.get('/config', authenticate, requireRole(['SUPER_ADMIN']), async (req, res) => {
+router.get('/config', authenticate, authorize(['SUPER_ADMIN']), async (req, res) => {
   try {
     const config = await marketplaceConfigService.getConfig();
 
@@ -35,7 +35,7 @@ router.get('/config', authenticate, requireRole(['SUPER_ADMIN']), async (req, re
  * Update marketplace configuration
  * PUT /api/marketplace/config
  */
-router.put('/config', authenticate, requireRole(['SUPER_ADMIN']), async (req, res) => {
+router.put('/config', authenticate, authorize(['SUPER_ADMIN']), async (req, res) => {
   try {
     const updates = req.body;
 
@@ -157,7 +157,7 @@ router.get('/config/verification/:vendorId/:category/check', authenticate, async
  * Validate payment configuration
  * GET /api/marketplace/config/validate
  */
-router.get('/config/validate', authenticate, requireRole(['SUPER_ADMIN']), async (req, res) => {
+router.get('/config/validate', authenticate, authorize(['SUPER_ADMIN']), async (req, res) => {
   try {
     const validation = await marketplaceConfigService.validatePaymentConfig();
 

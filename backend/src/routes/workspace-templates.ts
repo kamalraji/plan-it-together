@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { workspaceTemplateService } from '../services/workspace-template.service';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
 // Apply authentication middleware to all routes
-router.use(authenticateToken);
+router.use(authenticate);
 
 /**
  * Create template from workspace

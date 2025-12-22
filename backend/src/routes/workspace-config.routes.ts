@@ -5,8 +5,8 @@
 
 import { Router, Request, Response } from 'express';
 import { workspaceConfig } from '../config/workspace.config';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { rbacMiddleware } from '../middleware/rbac.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import { authorize } from '../middleware/rbac.middleware';
 
 const router = Router();
 
@@ -62,8 +62,8 @@ router.get('/health', async (req: Request, res: Response) => {
  * Get full workspace configuration (admin only)
  */
 router.get('/admin', 
-  authMiddleware,
-  rbacMiddleware(['admin']),
+  authenticate,
+  authorize(['SUPER_ADMIN']),
   async (req: Request, res: Response) => {
     try {
       const config = workspaceConfig.getConfig();

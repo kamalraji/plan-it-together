@@ -58,10 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return response.data.user;
     },
     enabled: !!user,
-    onSuccess: (data) => {
-      setUser(data);
-    },
   });
+
+  // Update user when userData changes
+  React.useEffect(() => {
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userData]);
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {

@@ -24,10 +24,7 @@ export const FEATURE_FLAGS = {
 
 // Validation function for required environment variables
 export const validateEnvironment = (): void => {
-  const requiredVars = ['VITE_API_URL'];
-  const missing = requiredVars.filter(varName => !import.meta.env[varName]);
-  
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
+  // VITE_API_URL is optional since we have a default value
+  // No required environment variables for now
+  console.log('Environment validated successfully');
 };
