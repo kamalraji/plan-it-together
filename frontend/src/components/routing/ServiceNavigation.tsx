@@ -131,6 +131,29 @@ const serviceCategories: ServiceCategory[] = [
     ],
   },
   {
+    id: 'communication',
+    label: 'Communication',
+    icon: '💬',
+    items: [
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        path: '/console/notifications',
+        icon: '🔔',
+        description: 'Manage your notifications',
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+      },
+      {
+        id: 'communications',
+        label: 'Communications',
+        path: '/console/communications',
+        icon: '💬',
+        description: 'Messages and communication preferences',
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+      },
+    ],
+  },
+  {
     id: 'account',
     label: 'Account',
     icon: '👤',

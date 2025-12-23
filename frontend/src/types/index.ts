@@ -762,3 +762,35 @@ export interface ChannelMessageHistory {
   messages: MessageResponse[];
   hasMore: boolean;
 }
+
+// Dashboard and Widget Types
+export interface DashboardWidget {
+  id: string;
+  type: 'metric' | 'chart' | 'table' | 'list' | 'status' | 'quickAction';
+  title: string;
+  size: 'small' | 'medium' | 'large' | 'full';
+  data: any;
+  refreshInterval?: number;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface DashboardLayout {
+  columns: number;
+  rows: DashboardRow[];
+  customizable: boolean;
+}
+
+export interface DashboardRow {
+  id: string;
+  widgets: string[];
+  height?: string;
+}
+
+export interface QuickAction {
+  label: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  action: () => void;
+  variant?: 'primary' | 'secondary';
+}

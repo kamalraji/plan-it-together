@@ -6,36 +6,44 @@ import { UserRole } from '../../types';
 import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
+import { SearchPage } from './SearchPage';
 import { EventService, MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
+import { HelpPage } from '../help';
+import { NotificationPage } from './NotificationPage';
+import { CommunicationPage } from './CommunicationPage';
+import { LoginForm } from '../auth/LoginForm';
+import { RegisterForm } from '../auth/RegisterForm';
 
-// Create a query client instance
+// Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+    },
+    mutations: {
+      retry: 1,
     },
   },
 });
 
-// Placeholder components for now - these will be implemented in later tasks
-const LoginPage = () => (
+// Forgot Password placeholder - will be implemented in later tasks
+const ForgotPasswordPage = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="max-w-md w-full space-y-8">
       <div className="text-center">
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Login Page</h2>
-        <p className="mt-2 text-sm text-gray-600">Login functionality will be implemented in later tasks</p>
-      </div>
-    </div>
-  </div>
-);
-
-const RegisterPage = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="max-w-md w-full space-y-8">
-      <div className="text-center">
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Register Page</h2>
-        <p className="mt-2 text-sm text-gray-600">Registration functionality will be implemented in later tasks</p>
+        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Reset Password</h2>
+        <p className="mt-2 text-sm text-gray-600">Password reset functionality will be implemented in later tasks</p>
+        <div className="mt-4">
+          <a 
+            href="/login" 
+            className="font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Back to Login
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -101,15 +109,6 @@ const WorkspaceService = () => (
   </div>
 );
 
-const OrganizationServicePlaceholder = () => (
-  <div className="px-4 sm:px-6 lg:px-8">
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Organization Management</h1>
-      <p className="text-gray-600">Organization management functionality will be implemented in later tasks</p>
-    </div>
-  </div>
-);
-
 const AnalyticsService = () => (
   <div className="px-4 sm:px-6 lg:px-8">
     <div className="max-w-7xl mx-auto">
@@ -128,14 +127,23 @@ const ProfileService = () => (
   </div>
 );
 
-const SupportService = () => (
-  <div className="px-4 sm:px-6 lg:px-8">
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Help & Support</h1>
-      <p className="text-gray-600">Help and support functionality will be implemented in later tasks</p>
-    </div>
-  </div>
-);
+const SupportService = () => {
+  // Get current context from URL or other means
+  const currentContext = window.location.pathname.includes('/events') ? 'events' :
+                         window.location.pathname.includes('/workspaces') ? 'workspaces' :
+                         window.location.pathname.includes('/marketplace') ? 'marketplace' :
+                         undefined;
+
+  return <HelpPage currentContext={currentContext} />;
+};
+
+const NotificationService = () => {
+  return <NotificationPage />;
+};
+
+const CommunicationService = () => {
+  return <CommunicationPage />;
+};
 
 export const AppRouter: React.FC = () => {
   return (
@@ -146,9 +154,10 @@ export const AppRouter: React.FC = () => {
             {/* Root redirect to console */}
             <Route path="/" element={<Navigate to="/console" replace />} />
             
-            {/* Public routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* Public authentication routes */}
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             
             {/* Console routes - all protected with enhanced console authentication */}
             <Route
@@ -217,6 +226,30 @@ export const AppRouter: React.FC = () => {
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <SupportService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="notifications/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <NotificationService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="communications/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <CommunicationService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="search" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SearchPage />
                   </ConsoleRoute>
                 } 
               />

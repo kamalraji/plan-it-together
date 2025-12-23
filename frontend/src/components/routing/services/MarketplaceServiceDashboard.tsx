@@ -61,23 +61,29 @@ export const MarketplaceServiceDashboard: React.FC = () => {
     ],
     quickActions: [
       {
+        title: 'Comprehensive Marketplace',
+        description: 'Access the full marketplace interface with all features',
+        href: '/console/marketplace/marketplace',
+        icon: '🏪',
+        primary: true,
+      },
+      {
         title: 'Discover Services',
         description: 'Browse marketplace services for your events',
         href: '/console/marketplace/services',
         icon: '🔍',
-        primary: true,
+      },
+      {
+        title: 'Vendor Dashboard',
+        description: 'Comprehensive vendor management and analytics',
+        href: '/console/marketplace/vendor',
+        icon: '🏪',
       },
       {
         title: 'Manage Bookings',
         description: 'View and manage your service bookings',
         href: '/console/marketplace/bookings',
         icon: '📋',
-      },
-      {
-        title: 'Vendor Dashboard',
-        description: 'Manage your vendor profile and services',
-        href: '/console/marketplace/vendors',
-        icon: '🏪',
       },
       {
         title: 'Analytics & Reports',

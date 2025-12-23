@@ -16,6 +16,8 @@ export { MarketplaceServiceDashboard } from './MarketplaceServiceDashboard';
 export { MarketplaceListPage } from './MarketplaceListPage';
 export { VendorDashboardPage } from './VendorDashboardPage';
 export { BookingListPage } from './BookingListPage';
+export { MarketplacePage } from './MarketplacePage';
+export { VendorPage } from './VendorPage';
 
 // Organization Management Service
 export { OrganizationService } from './OrganizationService';

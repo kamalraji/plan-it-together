@@ -6,7 +6,9 @@ import './index.css';
 function App() {
   return (
     <ErrorBoundary>
-      <AppRouter />
+      <div className="App">
+        <AppRouter />
+      </div>
     </ErrorBoundary>
   );
 }
