@@ -101,6 +101,16 @@ export const EventServiceDashboard: React.FC = () => {
           actions={pageActions}
         />
 
+        {/* Welcome Message */}
+        {user && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-blue-800">
+              Welcome back, <span className="font-semibold">{user.name}</span>! 
+              Ready to manage your events?
+            </p>
+          </div>
+        )}
+
         {/* Service Overview Metrics */}
         <div className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">

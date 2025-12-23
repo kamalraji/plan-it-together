@@ -19,7 +19,7 @@ export interface NotificationAction {
 
 class NotificationService {
   private registration: ServiceWorkerRegistration | null = null;
-  private vapidPublicKey = process.env.REACT_APP_VAPID_PUBLIC_KEY || '';
+  private vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
 
   async initialize(): Promise<boolean> {
     try {
@@ -82,7 +82,7 @@ class NotificationService {
         // Create new subscription
         subscription = await this.registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+          applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey) as BufferSource
         });
       }
 
@@ -129,7 +129,7 @@ class NotificationService {
           badge: payload.badge || '/badge-72x72.png',
           tag: payload.tag || 'workspace-notification',
           data: payload.data,
-          actions: payload.actions,
+          // actions: payload.actions, // Commented out as actions is not supported in all browsers
           requireInteraction: payload.requireInteraction || false
         });
       } else {

@@ -110,9 +110,9 @@ export function MobileTaskManagement({
 
   const getAssigneeName = (task: WorkspaceTask) => {
     if (task.assignee) {
-      return task.assignee.name;
+      return task.assignee.user.name;
     }
-    const member = teamMembers?.find(m => m.id === task.assigneeId);
+    const member = teamMembers?.find(m => m.id === task.assignee?.id);
     return member?.user.name || 'Unassigned';
   };
 

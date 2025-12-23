@@ -221,7 +221,17 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
         tutorial.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tutorial.category.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : tutorials;
+    : tutorials.filter(tutorial => {
+        // Filter by user role if user is available
+        if (user && tutorial.roles && tutorial.roles.length > 0) {
+          return tutorial.roles.includes(user.role);
+        }
+        // Filter by current context if available
+        if (currentContext && tutorial.category) {
+          return tutorial.category.toLowerCase().includes(currentContext.toLowerCase());
+        }
+        return true;
+      });
 
   const featuredTutorials = tutorials.filter(tutorial => tutorial.featured);
 

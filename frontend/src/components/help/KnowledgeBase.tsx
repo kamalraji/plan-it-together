@@ -278,6 +278,24 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Search Input */}
+      {!searchQuery && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder={`Search knowledge base${currentContext ? ` for ${currentContext}` : ''}...`}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          {user && (
+            <p className="mt-2 text-sm text-gray-500">
+              Showing content relevant to {user.role.toLowerCase()} role
+            </p>
+          )}
+        </div>
+      )}
       {/* Featured Articles */}
       {!searchQuery && featuredArticles.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">

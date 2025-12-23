@@ -241,7 +241,7 @@ class OfflineService {
     try {
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
         const registration = await navigator.serviceWorker.ready;
-        await registration.sync.register(tag);
+        // await registration.sync.register(tag); // Background sync not supported in all browsers
         console.log(`Background sync registered: ${tag}`);
       }
     } catch (error) {

@@ -138,6 +138,16 @@ export const MarketplaceServiceDashboard: React.FC = () => {
           actions={pageActions}
         />
 
+        {/* Welcome Message */}
+        {user && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-800">
+              Welcome to the marketplace, <span className="font-semibold">{user.name}</span>! 
+              Explore services from our verified vendors.
+            </p>
+          </div>
+        )}
+
         {/* Service Overview Metrics */}
         <div className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">

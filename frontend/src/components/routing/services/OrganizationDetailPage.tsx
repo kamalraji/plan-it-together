@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceDetailPage } from '../ResourceDetailPage';
-import { OrganizationPage } from '../../organization/OrganizationPage';
+import OrganizationPage from '../../organization/OrganizationPage';
 import { useAuth } from '../../../hooks/useAuth';
 
 /**

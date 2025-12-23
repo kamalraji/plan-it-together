@@ -73,7 +73,7 @@ export const WorkspaceListPage: React.FC = () => {
       label: 'Workspace Name',
       sortable: true,
       filterable: true,
-      render: (value: string, workspace: Workspace) => (
+      render: (_value: string, workspace: Workspace) => (
         <div>
           <div className="text-sm font-medium text-gray-900">{workspace.name}</div>
           {workspace.description && (
@@ -100,7 +100,7 @@ export const WorkspaceListPage: React.FC = () => {
       label: 'Associated Event',
       sortable: true,
       filterable: false,
-      render: (value: any, workspace: Workspace) => (
+      render: (_value: any, workspace: Workspace) => (
         <div className="text-sm text-gray-900">
           {workspace.event ? (
             <Link 
@@ -155,7 +155,7 @@ export const WorkspaceListPage: React.FC = () => {
       label: 'Actions',
       sortable: false,
       filterable: false,
-      render: (value: any, workspace: Workspace) => (
+      render: (_value: any, workspace: Workspace) => (
         <div className="flex items-center space-x-2">
           <Link
             to={`/console/workspaces/${workspace.id}`}
@@ -180,23 +180,6 @@ export const WorkspaceListPage: React.FC = () => {
           </button>
         </div>
       ),
-    },
-  ];
-
-  const filters = [
-    {
-      key: 'status',
-      label: 'Status',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'All Statuses' },
-        { value: WorkspaceStatus.ACTIVE, label: 'Active' },
-        { value: WorkspaceStatus.PROVISIONING, label: 'Provisioning' },
-        { value: WorkspaceStatus.WINDING_DOWN, label: 'Winding Down' },
-        { value: WorkspaceStatus.DISSOLVED, label: 'Dissolved' },
-      ],
-      value: statusFilter,
-      onChange: (value: string) => setStatusFilter(value as WorkspaceStatus | 'all'),
     },
   ];
 

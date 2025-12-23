@@ -13,7 +13,7 @@ import {
   PaperClipIcon,
   FaceSmileIcon
 } from '@heroicons/react/24/outline';
-import { WorkspaceChannel, Message, TeamMember } from '../../../types';
+import { WorkspaceChannel, MessageResponse, TeamMember } from '../../../types';
 import api from '../../../lib/api';
 
 interface MobileCommunicationProps {
@@ -46,7 +46,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
     queryFn: async () => {
       if (!selectedChannel) return [];
       const response = await api.get(`/channels/${selectedChannel.id}/messages`);
-      return response.data.messages as Message[];
+      return response.data.messages as MessageResponse[];
     },
     enabled: !!selectedChannel,
   });
@@ -343,7 +343,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
           messages.map((message, index) => {
             const isConsecutive = index > 0 && 
               messages[index - 1].senderId === message.senderId &&
-              new Date(message.createdAt).getTime() - new Date(messages[index - 1].createdAt).getTime() < 300000; // 5 minutes
+              new Date(message.sentAt).getTime() - new Date(messages[index - 1].sentAt).getTime() < 300000; // 5 minutes
 
             return (
               <div key={message.id} className={`flex space-x-3 ${isConsecutive ? 'mt-1' : 'mt-4'}`}>
@@ -362,7 +362,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                         {getMemberName(message.senderId)}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {formatMessageTime(message.createdAt)}
+                        {formatMessageTime(message.sentAt)}
                       </span>
                     </div>
                   )}

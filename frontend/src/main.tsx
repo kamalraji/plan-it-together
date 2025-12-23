@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+// React import removed as it's not needed in React 18+
+import { createRoot } from 'react-dom/client';
 import App from './App';
 
 console.log('🚀 Starting Thittam1Hub frontend...');
@@ -12,7 +12,7 @@ try {
     throw new Error('Root element not found');
   }
 
-  const root = ReactDOM.createRoot(rootElement);
+  const root = createRoot(rootElement);
   console.log('React root created');
 
   root.render(<App />);

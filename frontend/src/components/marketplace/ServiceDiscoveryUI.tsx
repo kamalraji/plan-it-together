@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
 
@@ -72,6 +72,27 @@ interface ServiceDiscoveryUIProps {
   eventId?: string;
 }
 
+// Utility function for formatting prices
+const formatPrice = (pricing: PricingModel) => {
+  if (pricing.type === 'CUSTOM_QUOTE') {
+    return 'Custom Quote';
+  }
+  
+  const price = pricing.basePrice || 0;
+  const currency = pricing.currency || 'USD';
+  
+  switch (pricing.type) {
+    case 'FIXED':
+      return `${currency} ${price.toLocaleString()}`;
+    case 'HOURLY':
+      return `${currency} ${price.toLocaleString()}/hour`;
+    case 'PER_PERSON':
+      return `${currency} ${price.toLocaleString()}/person`;
+    default:
+      return 'Contact for pricing';
+  }
+};
+
 const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
   const [filters, setFilters] = useState<SearchFilters>({
     verifiedOnly: true,
@@ -80,7 +101,7 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
   const [selectedService, setSelectedService] = useState<ServiceListing | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
-  const { data: services, isLoading, refetch } = useQuery({
+  const { data: services, isLoading } = useQuery({
     queryKey: ['marketplace-services', filters],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -105,26 +126,6 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
   const handleBookService = (service: ServiceListing) => {
     setSelectedService(service);
     setShowBookingModal(true);
-  };
-
-  const formatPrice = (pricing: PricingModel) => {
-    if (pricing.type === 'CUSTOM_QUOTE') {
-      return 'Custom Quote';
-    }
-    
-    const price = pricing.basePrice || 0;
-    const currency = pricing.currency || 'USD';
-    
-    switch (pricing.type) {
-      case 'FIXED':
-        return `${currency} ${price.toLocaleString()}`;
-      case 'HOURLY':
-        return `${currency} ${price.toLocaleString()}/hour`;
-      case 'PER_PERSON':
-        return `${currency} ${price.toLocaleString()}/person`;
-      default:
-        return 'Contact for pricing';
-    }
   };
 
   return (

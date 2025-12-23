@@ -37,7 +37,7 @@ export async function fetchEnabledFeatures(): Promise<FeatureFlags> {
     if (data.success) {
       cachedFeatures = data.data.features || {};
       lastFetch = now;
-      return cachedFeatures;
+      return cachedFeatures || getDefaultFeatures();
     }
   } catch (error) {
     console.warn('Failed to fetch feature flags:', error);

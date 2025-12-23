@@ -260,6 +260,21 @@ export const HelpPage: React.FC<HelpPageProps> = ({ currentContext }) => {
                 user={user}
               />
             )}
+            
+            {/* Quick Feedback Section */}
+            <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600 mb-2">Was this helpful?</p>
+              <div className="flex space-x-2">
+                <button className="flex items-center px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200">
+                  <ThumbsUp className="w-4 h-4 mr-1" />
+                  Yes
+                </button>
+                <button className="flex items-center px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
+                  <ThumbsDown className="w-4 h-4 mr-1" />
+                  No
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

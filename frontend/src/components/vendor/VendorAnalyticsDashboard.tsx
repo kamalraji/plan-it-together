@@ -340,6 +340,40 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Service Distribution Chart */}
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Service Distribution</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={[
+                { name: 'Photography', value: 35, color: '#3B82F6' },
+                { name: 'Catering', value: 25, color: '#10B981' },
+                { name: 'Venue', value: 20, color: '#F59E0B' },
+                { name: 'Music', value: 15, color: '#EF4444' },
+                { name: 'Other', value: 5, color: '#8B5CF6' }
+              ]}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              dataKey="value"
+            >
+              {[
+                { name: 'Photography', value: 35, color: '#3B82F6' },
+                { name: 'Catering', value: 25, color: '#10B981' },
+                { name: 'Venue', value: 20, color: '#F59E0B' },
+                { name: 'Music', value: 15, color: '#EF4444' },
+                { name: 'Other', value: 5, color: '#8B5CF6' }
+              ].map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 

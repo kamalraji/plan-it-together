@@ -23,6 +23,8 @@ interface SupportTicket {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   category: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  userId?: string;
+  userEmail?: string;
   createdAt: string;
   updatedAt: string;
   attachments?: File[];
@@ -45,8 +47,8 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 }) => {
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [ticketForm, setTicketForm] = useState({
-    subject: '',
-    description: '',
+    subject: searchQuery ? `Issue with: ${searchQuery}` : '',
+    description: currentContext ? `Issue occurred in: ${currentContext}\n\n` : '',
     priority: 'medium' as const,
     category: 'general',
     attachments: [] as File[]
@@ -156,6 +158,8 @@ export const SupportContact: React.FC<SupportContactProps> = ({
       const newTicket: SupportTicket = {
         id: `TICK-${String(Math.random()).slice(2, 8)}`,
         ...ticketForm,
+        userId: user?.id || 'anonymous',
+        userEmail: user?.email || 'unknown@example.com',
         status: 'open',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
