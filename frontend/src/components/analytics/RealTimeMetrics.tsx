@@ -42,6 +42,7 @@ interface MetricCard {
   trend?: number[];
 }
 
+export default RealTimeMetrics;
 export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
   scope,
   eventId,
@@ -67,7 +68,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
     const connectWebSocket = () => {
       try {
         let wsUrl = `ws://localhost:3001/ws/analytics`;
-        
+
         if (scope === 'event' && eventId) {
           wsUrl += `?eventId=${eventId}`;
         } else if (scope === 'organization' && organizationId) {
@@ -116,7 +117,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
       intervalRef.current = setInterval(async () => {
         try {
           let endpoint = '/api/analytics/realtime';
-          
+
           if (scope === 'event' && eventId) {
             endpoint = `/api/events/${eventId}/analytics/realtime`;
           } else if (scope === 'organization' && organizationId) {
@@ -249,12 +250,10 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h2 className="text-lg font-medium text-gray-900">Real-time Metrics</h2>
-            <div className={`flex items-center space-x-2 ${
-              isConnected ? 'text-green-600' : 'text-red-600'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                isConnected ? 'bg-green-500' : 'bg-red-500'
-              } ${isConnected ? 'animate-pulse' : ''}`} />
+            <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-600' : 'text-red-600'
+              }`}>
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'
+                } ${isConnected ? 'animate-pulse' : ''}`} />
               <span className="text-sm font-medium">
                 {isConnected ? 'Connected' : 'Disconnected'}
               </span>
@@ -285,11 +284,10 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
             {/* Pause/Resume Button */}
             <button
               onClick={handlePauseToggle}
-              className={`inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium ${
-                isPaused
+              className={`inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium ${isPaused
                   ? 'text-green-700 bg-green-50 hover:bg-green-100'
                   : 'text-gray-700 bg-white hover:bg-gray-50'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
             >
               {isPaused ? (
                 <>
@@ -324,11 +322,10 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
                   {metric.value}
                 </p>
                 {metric.change && (
-                  <p className={`text-sm ${
-                    metric.changeType === 'increase' ? 'text-green-600' :
-                    metric.changeType === 'decrease' ? 'text-red-600' :
-                    'text-gray-600'
-                  }`}>
+                  <p className={`text-sm ${metric.changeType === 'increase' ? 'text-green-600' :
+                      metric.changeType === 'decrease' ? 'text-red-600' :
+                        'text-gray-600'
+                    }`}>
                     {metric.change}
                   </p>
                 )}

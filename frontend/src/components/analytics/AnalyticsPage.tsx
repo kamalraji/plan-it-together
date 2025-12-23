@@ -35,7 +35,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
   useEffect(() => {
     fetchAnalyticsData();
-    
+
     // Set up auto-refresh for real-time data
     if (refreshInterval) {
       const interval = setInterval(fetchAnalyticsData, refreshInterval * 1000);
@@ -47,10 +47,10 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const fetchAnalyticsData = async (): Promise<void> => {
     try {
       setLoading(true);
-      
+
       let endpoint = '/api/analytics';
       const params = new URLSearchParams();
-      
+
       if (scope === 'event' && eventId) {
         endpoint = `/api/events/${eventId}/analytics`;
       } else if (scope === 'organization' && organizationId) {
@@ -86,7 +86,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const handleExportReport = async (format: 'CSV' | 'PDF', options: any): Promise<void> => {
     try {
       let endpoint = '/api/analytics/export';
-      
+
       if (scope === 'event' && eventId) {
         endpoint = `/api/events/${eventId}/analytics/export`;
       } else if (scope === 'organization' && organizationId) {
@@ -125,18 +125,18 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
   // Role-based access control for analytics features
   const canViewAdvancedAnalytics = () => {
-    return user?.role === UserRole.SUPER_ADMIN || 
-           user?.role === UserRole.ORGANIZER;
+    return user?.role === UserRole.SUPER_ADMIN ||
+      user?.role === UserRole.ORGANIZER;
   };
 
   const canExportReports = () => {
-    return user?.role === UserRole.SUPER_ADMIN || 
-           user?.role === UserRole.ORGANIZER;
+    return user?.role === UserRole.SUPER_ADMIN ||
+      user?.role === UserRole.ORGANIZER;
   };
 
   const canCustomizeDashboard = () => {
-    return user?.role === UserRole.SUPER_ADMIN || 
-           user?.role === UserRole.ORGANIZER;
+    return user?.role === UserRole.SUPER_ADMIN ||
+      user?.role === UserRole.ORGANIZER;
   };
 
   // Generate dashboard widgets based on scope and user role
@@ -282,13 +282,13 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     loading?: boolean;
     icon?: React.ComponentType<{ className?: string }>;
   }> = [
-    {
-      label: 'Refresh',
-      action: fetchAnalyticsData,
-      variant: 'secondary' as const,
-      loading,
-    },
-  ];
+      {
+        label: 'Refresh',
+        action: fetchAnalyticsData,
+        variant: 'secondary' as const,
+        loading,
+      },
+    ];
 
   if (canExportReports()) {
     pageActions.unshift({

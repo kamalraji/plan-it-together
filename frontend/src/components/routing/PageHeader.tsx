@@ -7,7 +7,7 @@ interface BreadcrumbItem {
   current?: boolean;
 }
 
-interface PageAction {
+export interface PageAction {
   label: string;
   action: () => void;
   icon?: React.ComponentType<{ className?: string }>;
@@ -16,7 +16,7 @@ interface PageAction {
   loading?: boolean;
 }
 
-interface TabConfig {
+export interface TabConfig {
   id: string;
   label: string;
   current: boolean;
@@ -25,7 +25,7 @@ interface TabConfig {
   onClick?: () => void;
 }
 
-interface FilterConfig {
+export interface FilterConfig {
   id: string;
   label: string;
   type: 'select' | 'search' | 'date' | 'toggle';
@@ -34,13 +34,13 @@ interface FilterConfig {
   onChange: (value: any) => void;
 }
 
-interface ViewControlConfig {
+export interface ViewControlConfig {
   type: 'table' | 'cards' | 'list';
   active: boolean;
   onChange: (type: string) => void;
 }
 
-interface PageHeaderProps {
+export interface PageHeaderProps {
   title: string;
   subtitle?: string;
   breadcrumbs?: BreadcrumbItem[];
@@ -63,7 +63,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   const getButtonClasses = (variant: string, disabled?: boolean, loading?: boolean) => {
     const baseClasses = 'inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
-    
+
     if (disabled || loading) {
       return `${baseClasses} opacity-50 cursor-not-allowed bg-gray-100 border-gray-300 text-gray-500`;
     }
@@ -101,9 +101,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                       </a>
                     ) : (
                       <span
-                        className={`text-sm font-medium ${
-                          item.current ? 'text-gray-900' : 'text-gray-500'
-                        }`}
+                        className={`text-sm font-medium ${item.current ? 'text-gray-900' : 'text-gray-500'
+                          }`}
                       >
                         {item.label}
                       </span>
@@ -126,7 +125,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
               )}
             </div>
-            
+
             {/* Actions */}
             {actions && actions.length > 0 && (
               <div className="flex space-x-3">
@@ -165,19 +164,17 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 <button
                   key={tab.id}
                   onClick={tab.onClick}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    tab.current
+                  className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${tab.current
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   {tab.label}
                   {tab.badge && (
-                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      tab.current
+                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tab.current
                         ? 'bg-indigo-100 text-indigo-600'
                         : 'bg-gray-100 text-gray-600'
-                    }`}>
+                      }`}>
                       {tab.badge}
                     </span>
                   )}
@@ -223,14 +220,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                     {filter.type === 'toggle' && (
                       <button
                         onClick={() => filter.onChange(!filter.value)}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                          filter.value ? 'bg-indigo-600' : 'bg-gray-200'
-                        }`}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-gray-200'
+                          }`}
                       >
                         <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                            filter.value ? 'translate-x-5' : 'translate-x-0'
-                          }`}
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filter.value ? 'translate-x-5' : 'translate-x-0'
+                            }`}
                         />
                       </button>
                     )}
@@ -246,11 +241,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                   <button
                     key={control.type}
                     onClick={() => control.onChange(control.type)}
-                    className={`px-3 py-1 text-sm font-medium rounded ${
-                      control.active
+                    className={`px-3 py-1 text-sm font-medium rounded ${control.active
                         ? 'bg-white text-gray-900 shadow-sm'
                         : 'text-gray-500 hover:text-gray-700'
-                    }`}
+                      }`}
                   >
                     {control.type.charAt(0).toUpperCase() + control.type.slice(1)}
                   </button>

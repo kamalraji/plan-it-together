@@ -6,9 +6,11 @@ import './index.css';
 function App() {
   return (
     <ErrorBoundary>
-      <div className="App">
-        <AppRouter />
-      </div>
+      <React.Fragment>
+        <div className="App">
+          <AppRouter />
+        </div>
+      </React.Fragment>
     </ErrorBoundary>
   );
 }

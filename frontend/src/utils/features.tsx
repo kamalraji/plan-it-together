@@ -24,16 +24,16 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
  */
 export async function fetchEnabledFeatures(): Promise<FeatureFlags> {
   const now = Date.now();
-  
+
   // Return cached features if still valid
   if (cachedFeatures && (now - lastFetch) < CACHE_DURATION) {
     return cachedFeatures as FeatureFlags;
   }
-  
+
   try {
     const response = await fetch('/api/features');
     const data = await response.json();
-    
+
     if (data.success) {
       cachedFeatures = data.data.features || {};
       lastFetch = now;
@@ -42,7 +42,7 @@ export async function fetchEnabledFeatures(): Promise<FeatureFlags> {
   } catch (error) {
     console.warn('Failed to fetch feature flags:', error);
   }
-  
+
   // Return empty object if fetch fails
   return {};
 }
@@ -68,13 +68,13 @@ export async function getEnabledFeatures(): Promise<FeatureFlags> {
 export function useFeatures() {
   const [features, setFeatures] = React.useState<FeatureFlags>({});
   const [loading, setLoading] = React.useState(true);
-  
+
   React.useEffect(() => {
     fetchEnabledFeatures()
       .then(setFeatures)
       .finally(() => setLoading(false));
   }, []);
-  
+
   return { features, loading, isEnabled: (feature: keyof FeatureFlags) => features[feature] === true };
 }
 
@@ -89,12 +89,16 @@ interface FeatureGateProps {
 
 export function FeatureGate({ feature, children, fallback = null }: FeatureGateProps) {
   const { features, loading } = useFeatures();
-  
+
   if (loading) {
     return null; // or loading spinner
   }
-  
+
   return features[feature] ? <>{children}</> : <>{fallback}</>;
+}
+
+function getDefaultFeatures(): FeatureFlags {
+  return {};
 }
 
 /**
@@ -115,7 +119,7 @@ export function PaymentUnavailableMessage() {
           </h3>
           <div className="mt-2 text-sm text-blue-700">
             <p>
-              Integrated payment processing is planned for future implementation. 
+              Integrated payment processing is planned for future implementation.
               For now, please arrange payment directly with the vendor using your preferred method.
             </p>
           </div>

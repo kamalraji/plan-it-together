@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Workspace, WorkspaceStatus } from '../../types';
@@ -78,6 +78,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Workspace Not Found</h2>
           <p className="text-gray-600 mb-4">The workspace you're looking for doesn't exist or you don't have access to it.</p>
+          <p className="text-gray-500 mb-4 text-sm">Status: {WorkspaceStatus.DISSOLVED}</p>
           <button
             onClick={() => navigate('/dashboard')}
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
@@ -114,11 +115,11 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           <div className="space-y-8">
             {/* Task Summary */}
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />
-            
+
             {/* Team Overview and Health Metrics */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <TeamMemberRoster 
-                workspace={workspace} 
+              <TeamMemberRoster
+                workspace={workspace}
                 showActions={false}
                 maxMembers={6}
               />
@@ -135,8 +136,8 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         )}
 
         {activeTab === 'marketplace' && workspace.event && (
-          <EventMarketplaceIntegration 
-            eventId={workspace.event.id} 
+          <EventMarketplaceIntegration
+            eventId={workspace.event.id}
             eventName={workspace.event.name}
           />
         )}

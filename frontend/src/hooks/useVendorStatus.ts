@@ -31,6 +31,6 @@ export function useVendorStatus(userId: string) {
     vendorProfile,
     isVendor: !!vendorProfile,
     isLoading,
-    error: error && error.response?.status !== 404 ? error : null,
+    error: error && (error as any).response?.status !== 404 ? error : null,
   };
 }

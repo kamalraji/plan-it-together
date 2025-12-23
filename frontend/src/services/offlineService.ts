@@ -29,11 +29,11 @@ class OfflineService {
       }
 
       this.db = await this.openDatabase();
-      
+
       // Register background sync if supported
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
         const registration = await navigator.serviceWorker.ready;
-        console.log('Background sync supported');
+        console.log('Background sync supported', registration);
       }
 
       return true;
@@ -226,11 +226,11 @@ class OfflineService {
       if (cursor) {
         const entry = cursor.value;
         const now = Date.now();
-        
+
         if (now - entry.timestamp > entry.ttl) {
           cursor.delete();
         }
-        
+
         cursor.continue();
       }
     };
@@ -242,7 +242,7 @@ class OfflineService {
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
         const registration = await navigator.serviceWorker.ready;
         // await registration.sync.register(tag); // Background sync not supported in all browsers
-        console.log(`Background sync registered: ${tag}`);
+        console.log(`Background sync registered: ${tag}`, registration);
       }
     } catch (error) {
       console.error('Failed to register background sync:', error);
@@ -252,7 +252,7 @@ class OfflineService {
   // Sync Methods (called by service worker)
   async syncTaskUpdates(): Promise<void> {
     const pendingUpdates = await this.getPendingTaskUpdates();
-    
+
     for (const update of pendingUpdates) {
       try {
         const response = await fetch(`/api/workspaces/${update.workspaceId}/tasks/${update.taskId}`, {
@@ -274,7 +274,7 @@ class OfflineService {
 
   async syncMessages(): Promise<void> {
     const pendingMessages = await this.getPendingMessages();
-    
+
     for (const message of pendingMessages) {
       try {
         const response = await fetch(`/api/channels/${message.channelId}/messages`, {
@@ -329,7 +329,7 @@ class OfflineService {
     if (!this.db) return;
 
     const transaction = this.db.transaction(['taskUpdates', 'messages', 'cachedData'], 'readwrite');
-    
+
     await Promise.all([
       transaction.objectStore('taskUpdates').clear(),
       transaction.objectStore('messages').clear(),
