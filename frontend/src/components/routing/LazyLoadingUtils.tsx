@@ -259,7 +259,7 @@ export const createRouteBundle = (_routes: string[]) => {
   const preloadBundle = (routePath: string) => {
     if (!bundleMap.has(routePath)) {
       // This would be replaced with actual dynamic imports in real implementation
-      const importPromise = import(/* webpackChunkName: "[request]" */ `../pages/${routePath}.tsx`);
+      const importPromise = import(/* webpackChunkName: "[request]" */ `@/pages/${routePath}.tsx`);
       bundleMap.set(routePath, importPromise);
     }
     return bundleMap.get(routePath);
