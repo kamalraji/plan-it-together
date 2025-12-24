@@ -90,7 +90,7 @@ export const preloadRoutes = (routes: string[]) => {
 
   routes.forEach(route => {
     // This would be replaced with actual route imports in implementation
-    import(/* webpackChunkName: "[request]" */ `../pages/${route}`)
+    import(/* webpackChunkName: "[request]" */ `@/pages/${route}.tsx`)
       .catch(error => {
         console.warn(`Failed to preload route ${route}:`, error);
       });
