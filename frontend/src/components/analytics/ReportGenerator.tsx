@@ -4,7 +4,6 @@ import {
   CalendarIcon,
   ChartBarIcon,
   TableCellsIcon,
-  PhotoIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
 import { ExportFormat, DateRangeFilter } from '../../types';
@@ -38,9 +37,9 @@ interface ReportTemplate {
 
 export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
   scope,
-  eventId,
-  organizationId,
-  workspaceId,
+  eventId: _eventId,
+  organizationId: _organizationId,
+  workspaceId: _workspaceId,
   onExport,
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('comprehensive');

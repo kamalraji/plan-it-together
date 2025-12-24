@@ -97,14 +97,12 @@ export const MarketplaceServiceDashboard: React.FC = () => {
   const pageActions = [
     {
       label: 'Browse Services',
-      action: () => window.location.href = '/console/marketplace/services',
-      icon: 'search',
+      action: () => { window.location.href = '/console/marketplace/services'; },
       variant: 'primary' as const,
     },
     {
       label: 'Manage Bookings',
-      action: () => window.location.href = '/console/marketplace/bookings',
-      icon: 'calendar',
+      action: () => { window.location.href = '/console/marketplace/bookings'; },
       variant: 'secondary' as const,
     },
   ];

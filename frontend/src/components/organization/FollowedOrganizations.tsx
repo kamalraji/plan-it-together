@@ -1,13 +1,10 @@
-import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { 
   HeartIcon,
   CalendarIcon,
-  BuildingOfficeIcon,
   CheckBadgeIcon,
   UsersIcon,
-  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import api from '../../lib/api';
@@ -152,14 +149,6 @@ function FollowedOrganizationCard({
   onUnfollow, 
   isUnfollowing 
 }: FollowedOrganizationCardProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
   const isEventUpcoming = (startDate: string) => {
     return new Date(startDate) > new Date();
   };

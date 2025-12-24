@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
-import { AttendanceReport, Registration } from '../../types';
+import { AttendanceReport } from '../../types';
 
 interface AttendanceListProps {
   eventId: string;
@@ -22,7 +22,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
   const [showManualCheckIn, setShowManualCheckIn] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<string>('');
   
-  const queryClient = useQueryClient();
+  useQueryClient();
 
   // Fetch attendance report
   const { data: attendanceReport, isLoading, refetch } = useQuery<AttendanceReport>({
@@ -253,7 +253,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
               {manualCheckInMutation.isError && (
                 <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
                   <p className="text-sm text-red-800">
-                    {manualCheckInMutation.error?.response?.data?.error?.message || 'Check-in failed'}
+                    {(manualCheckInMutation.error as any)?.response?.data?.error?.message || 'Check-in failed'}
                   </p>
                 </div>
               )}

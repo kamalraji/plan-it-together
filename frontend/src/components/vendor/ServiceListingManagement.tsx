@@ -199,37 +199,61 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
     }));
   };
 
-  const handleNestedInputChange = (parent: string, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent as keyof CreateServiceDTO],
-        [field]: value,
-      },
-    }));
+  const handleNestedInputChange = (parent: keyof CreateServiceDTO, field: string, value: any) => {
+    setFormData(prev => {
+      const parentValue = prev[parent];
+      if (typeof parentValue === 'object' && parentValue !== null && !Array.isArray(parentValue)) {
+        return {
+          ...prev,
+          [parent]: {
+            ...parentValue,
+            [field]: value,
+          },
+        };
+      }
+      return prev;
+    });
   };
 
-  const handleArrayInputChange = (field: string, index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field as keyof CreateServiceDTO].map((item: string, i: number) => 
-        i === index ? value : item
-      ),
-    }));
+  const handleArrayInputChange = (field: keyof CreateServiceDTO, index: number, value: string) => {
+    setFormData(prev => {
+      const arr = prev[field];
+      if (Array.isArray(arr)) {
+        return {
+          ...prev,
+          [field]: arr.map((item: any, i: number) => 
+            i === index ? value : item
+          ),
+        };
+      }
+      return prev;
+    });
   };
 
-  const addArrayItem = (field: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: [...prev[field as keyof CreateServiceDTO], ''],
-    }));
+  const addArrayItem = (field: keyof CreateServiceDTO) => {
+    setFormData(prev => {
+      const arr = prev[field];
+      if (Array.isArray(arr)) {
+        return {
+          ...prev,
+          [field]: [...arr, ''],
+        };
+      }
+      return prev;
+    });
   };
 
-  const removeArrayItem = (field: string, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field as keyof CreateServiceDTO].filter((_: any, i: number) => i !== index),
-    }));
+  const removeArrayItem = (field: keyof CreateServiceDTO, index: number) => {
+    setFormData(prev => {
+      const arr = prev[field];
+      if (Array.isArray(arr)) {
+        return {
+          ...prev,
+          [field]: arr.filter((_: any, i: number) => i !== index),
+        };
+      }
+      return prev;
+    });
   };
 
   const handleFileUpload = async (files: FileList): Promise<MediaFile[]> => {

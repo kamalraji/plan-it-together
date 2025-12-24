@@ -43,7 +43,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ currentContext }) => {
   const [activeSection, setActiveSection] = useState('knowledge-base');
   const [searchQuery, setSearchQuery] = useState('');
   const [contextualHelp, setContextualHelp] = useState<ContextualHelpItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   const helpSections: HelpSection[] = [
     {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Workspace, WorkspaceRole } from '../../types';
 
 interface TeamMemberRosterProps {
@@ -54,7 +53,7 @@ export function TeamMemberRoster({
       .slice(0, 2);
   };
 
-  const getStatusIndicator = (member: any) => {
+  const getStatusIndicator = () => {
     // For now, assume all members are active
     // This could be enhanced with actual status tracking
     return (
@@ -98,7 +97,7 @@ export function TeamMemberRoster({
                     </span>
                   </div>
                   <div className="absolute -bottom-1 -right-1">
-                    {getStatusIndicator(member)}
+                    {getStatusIndicator()}
                   </div>
                 </div>
 

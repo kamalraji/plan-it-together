@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Bars3Icon,
   XMarkIcon,

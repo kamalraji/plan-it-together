@@ -14,7 +14,7 @@ import { useAuth } from '../../../hooks/useAuth';
  */
 export const OrganizationAnalyticsPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
-  const { user } = useAuth();
+  useAuth();
   const [organization, setOrganization] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -88,20 +88,17 @@ export const OrganizationAnalyticsPage: React.FC = () => {
   const pageActions = [
     {
       label: 'View Organization',
-      action: () => window.location.href = `/console/organizations/${organizationId}`,
-      icon: 'eye',
+      action: () => { window.location.href = `/console/organizations/${organizationId}`; },
       variant: 'secondary' as const,
     },
     {
       label: 'Manage Members',
-      action: () => window.location.href = `/console/organizations/${organizationId}/members`,
-      icon: 'users',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/members`; },
       variant: 'secondary' as const,
     },
     {
       label: 'Organization Settings',
-      action: () => window.location.href = `/console/organizations/${organizationId}/settings`,
-      icon: 'cog',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/settings`; },
       variant: 'secondary' as const,
     },
   ];

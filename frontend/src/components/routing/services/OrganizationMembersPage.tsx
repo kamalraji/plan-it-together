@@ -94,14 +94,12 @@ export const OrganizationMembersPage: React.FC = () => {
   const pageActions = [
     {
       label: 'View Organization',
-      action: () => window.location.href = `/console/organizations/${organizationId}`,
-      icon: 'eye',
+      action: () => { window.location.href = `/console/organizations/${organizationId}`; },
       variant: 'secondary' as const,
     },
     {
       label: 'Organization Settings',
-      action: () => window.location.href = `/console/organizations/${organizationId}/settings`,
-      icon: 'cog',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/settings`; },
       variant: 'secondary' as const,
     },
   ];

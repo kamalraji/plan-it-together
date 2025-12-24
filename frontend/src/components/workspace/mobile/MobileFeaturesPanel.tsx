@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   MapPinIcon,
   PhotoIcon,
   MicrophoneIcon,
-  ClockIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon
@@ -25,8 +24,6 @@ interface MobileFeaturesPanelProps {
 }
 
 export function MobileFeaturesPanel({ 
-  workspaceId, 
-  taskId, 
   onLocationUpdate, 
   onPhotoCapture, 
   onVoiceRecording 
@@ -36,7 +33,7 @@ export function MobileFeaturesPanel({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [recordingInterval, setRecordingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [recordingInterval, setRecordingInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {

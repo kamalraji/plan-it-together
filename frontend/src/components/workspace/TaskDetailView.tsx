@@ -49,11 +49,9 @@ interface TaskDetailViewProps {
 
 export function TaskDetailView({
   task,
-  teamMembers,
   comments = [],
   files = [],
   activities = [],
-  onTaskUpdate,
   onStatusChange,
   onProgressUpdate,
   onCommentAdd,
@@ -62,7 +60,6 @@ export function TaskDetailView({
   onFileUpload,
   onFileDelete,
   onClose,
-  isLoading = false
 }: TaskDetailViewProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'files' | 'activity'>('details');
   const [newComment, setNewComment] = useState('');

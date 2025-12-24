@@ -15,7 +15,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
   const [hasSearched, setHasSearched] = useState(false);
 
   // Search messages
-  const { data: results, isLoading, refetch } = useQuery({
+  const { isLoading, refetch } = useQuery({
     queryKey: ['search-messages', workspaceId, searchQuery, selectedChannelId],
     queryFn: async () => {
       if (!searchQuery.trim()) return [];

@@ -24,21 +24,6 @@ interface MediaFile {
   order: number;
 }
 
-interface WeeklySchedule {
-  monday?: TimeSlot[];
-  tuesday?: TimeSlot[];
-  wednesday?: TimeSlot[];
-  thursday?: TimeSlot[];
-  friday?: TimeSlot[];
-  saturday?: TimeSlot[];
-  sunday?: TimeSlot[];
-}
-
-interface TimeSlot {
-  startTime: string;
-  endTime: string;
-}
-
 enum ServiceCategory {
   VENUE = 'VENUE',
   CATERING = 'CATERING',
@@ -73,7 +58,6 @@ interface VendorRegistrationProps {
 }
 
 const VendorRegistration: React.FC<VendorRegistrationProps> = ({ 
-  userId, 
   onRegistrationComplete 
 }) => {
   const navigate = useNavigate();
@@ -135,14 +119,20 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
     }));
   };
 
-  const handleNestedInputChange = (parent: string, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent as keyof CreateVendorDTO],
-        [field]: value,
-      },
-    }));
+  const handleNestedInputChange = (parent: keyof CreateVendorDTO, field: string, value: any) => {
+    setFormData(prev => {
+      const parentValue = prev[parent];
+      if (typeof parentValue === 'object' && parentValue !== null && !Array.isArray(parentValue)) {
+        return {
+          ...prev,
+          [parent]: {
+            ...(parentValue as object),
+            [field]: value,
+          },
+        };
+      }
+      return prev;
+    });
   };
 
   const handleServiceCategoryToggle = (category: ServiceCategory) => {
@@ -154,7 +144,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
     }));
   };
 
-  const handleFileUpload = async (file: File, type: 'document' | 'portfolio'): Promise<string> => {
+  const handleFileUpload = async (file: File, _type: 'document' | 'portfolio'): Promise<string> => {
     // In a real implementation, this would upload to a file storage service
     // For now, we'll simulate the upload
     return new Promise((resolve) => {

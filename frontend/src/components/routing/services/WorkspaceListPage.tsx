@@ -340,11 +340,11 @@ export const WorkspaceListPage: React.FC = () => {
                       </td>
                       {columns.slice(0, -1).map((column) => (
                         <td key={column.key} className="px-6 py-4 whitespace-nowrap">
-                          {column.render ? column.render(workspace[column.key as keyof Workspace], workspace) : workspace[column.key as keyof Workspace]}
+                          {column.render ? column.render(workspace[column.key as keyof Workspace] as any, workspace) : String(workspace[column.key as keyof Workspace] || '')}
                         </td>
                       ))}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {columns[columns.length - 1].render && columns[columns.length - 1].render(null, workspace)}
+                        {columns[columns.length - 1].render && columns[columns.length - 1].render(undefined as any, workspace)}
                       </td>
                     </tr>
                   ))

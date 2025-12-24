@@ -1,5 +1,4 @@
-import React, { Suspense, useState, useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import React, { useState } from 'react';
 import { 
   PageLoading, 
   LoadingOverlay, 
@@ -15,7 +14,6 @@ import {
   ProgressiveLoader 
 } from './LazyLoadingUtils';
 import { 
-  usePerformanceMonitor, 
   usePagination, 
   useDebouncedSearch, 
   VirtualizedList,
@@ -132,8 +130,6 @@ export const OptimizedDataTable: React.FC<{
     totalPages,
     currentItems,
     goToPage,
-    hasNextPage,
-    hasPrevPage
   } = usePagination(filteredData, itemsPerPage);
 
   const renderRow = (item: any, index: number) => (

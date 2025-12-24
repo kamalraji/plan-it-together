@@ -1,4 +1,3 @@
-import React from 'react';
 import { WorkspaceTask, TeamMember } from '../../types';
 import { TaskForm, TaskFormData } from './TaskForm';
 

@@ -20,8 +20,8 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
   const [isNavigationCollapsed, setIsNavigationCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Get current service from URL
-  const currentService = 'dashboard'; // This will be dynamic based on route
+  // Get current service from URL (for future use)
+  // const currentService = 'dashboard';
 
   const handleServiceChange = (service: string) => {
     // This will be handled by React Router navigation

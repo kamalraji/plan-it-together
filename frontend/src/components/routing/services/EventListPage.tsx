@@ -5,7 +5,6 @@ import { Event, EventStatus, EventMode } from '../../../types';
 import {
   PlusIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,

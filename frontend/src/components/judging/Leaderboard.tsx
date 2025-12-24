@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Leaderboard as LeaderboardType, LeaderboardEntry } from '../../types';
+import { Leaderboard as LeaderboardType } from '../../types';
 import api from '../../lib/api';
 
 interface LeaderboardProps {
@@ -197,7 +197,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 
       {/* Leaderboard Entries */}
       <div className="divide-y divide-gray-200">
-        {leaderboard.entries.map((entry, index) => (
+        {leaderboard.entries.map((entry) => (
           <div
             key={entry.id}
             className={`px-6 py-4 hover:bg-gray-50 transition-colors ${

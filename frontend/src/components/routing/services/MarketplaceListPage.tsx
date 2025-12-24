@@ -17,14 +17,12 @@ export const MarketplaceListPage: React.FC = () => {
   const pageActions = [
     {
       label: 'Manage Bookings',
-      action: () => window.location.href = '/console/marketplace/bookings',
-      icon: 'calendar',
+      action: () => { window.location.href = '/console/marketplace/bookings'; },
       variant: 'primary' as const,
     },
     {
       label: 'Vendor Dashboard',
-      action: () => window.location.href = '/console/marketplace/vendors',
-      icon: 'store',
+      action: () => { window.location.href = '/console/marketplace/vendors'; },
       variant: 'secondary' as const,
     },
   ];

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:dev": "vite build --mode development",
     "build:prod": "NODE_ENV=production npm run build",
     "preview": "vite preview",
     "test": "vitest --run",
@@ -19,8 +20,10 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.3.3",
+    "@supabase/supabase-js": "^2.89.0",
     "@tanstack/react-query": "^5.14.2",
     "axios": "^1.6.2",
+    "lovable-tagger": "^1.1.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.68.0",
@@ -31,7 +34,6 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
-    "@types/node": "^25.0.3",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.15.0",

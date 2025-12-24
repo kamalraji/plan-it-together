@@ -5,7 +5,6 @@ import {
   ChevronUpIcon,
   ChevronDownIcon,
   EllipsisHorizontalIcon,
-  CheckIcon,
 } from '@heroicons/react/24/outline';
 
 interface TableColumn {
@@ -64,7 +63,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   filters = [],
   bulkActions = [],
   searchable = true,
-  exportable = false,
+  exportable: _exportable = false,
   loading = false,
   onRefresh,
   onCreateNew,
@@ -230,9 +229,9 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   });
 
   const viewControls = [
-    { type: 'table' as const, active: viewType === 'table', onChange: setViewType },
-    { type: 'cards' as const, active: viewType === 'cards', onChange: setViewType },
-    { type: 'list' as const, active: viewType === 'list', onChange: setViewType },
+    { type: 'table' as const, active: viewType === 'table', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
+    { type: 'cards' as const, active: viewType === 'cards', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
+    { type: 'list' as const, active: viewType === 'list', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
   ];
 
   return (

@@ -21,7 +21,7 @@ export function OrganizerDashboard() {
   const { user, logout } = useAuth();
   const { isVendor, isLoading: vendorLoading } = useVendorStatus(user?.id || '');
   const [activeTab, setActiveTab] = useState<'events' | 'analytics' | 'marketplace' | 'profile'>('events');
-  const [showProfilePrompt, setShowProfilePrompt] = useState(false);
+  const [, setShowProfilePrompt] = useState(false);
 
   // Check if profile completion is needed (Requirements 2.4, 2.5)
   const isProfileIncomplete = !user?.profileCompleted || 

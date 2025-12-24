@@ -41,7 +41,7 @@ interface FeedbackForm {
 
 export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
   searchQuery = '',
-  currentContext,
+  currentContext: _currentContext,
   user
 }) => {
   const [activeTab, setActiveTab] = useState<'submit' | 'browse'>('submit');

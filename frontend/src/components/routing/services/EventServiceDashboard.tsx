@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
-import { ServiceDashboard } from '../ServiceDashboard';
 
 /**
  * EventServiceDashboard provides the AWS-style service landing page for Event Management.
@@ -79,14 +78,12 @@ export const EventServiceDashboard: React.FC = () => {
   const pageActions = [
     {
       label: 'Create Event',
-      action: () => window.location.href = '/console/events/create',
-      icon: 'plus',
+      action: () => { window.location.href = '/console/events/create'; },
       variant: 'primary' as const,
     },
     {
       label: 'Import Events',
       action: () => console.log('Import events'),
-      icon: 'upload',
       variant: 'secondary' as const,
     },
   ];

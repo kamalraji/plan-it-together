@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { CheckInData, AttendanceRecord } from '../../types';
 
@@ -22,7 +22,7 @@ interface ScanResult {
 }
 
 export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
-  eventId,
+  eventId: _eventId,
   sessionId,
   onScanSuccess,
   onScanError,

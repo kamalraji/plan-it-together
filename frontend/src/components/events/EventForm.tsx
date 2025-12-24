@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -8,13 +8,6 @@ import {
   EventMode, 
   EventTemplate, 
   CreateEventDTO, 
-  BrandingConfig, 
-  VenueConfig, 
-  VirtualConfig,
-  TimelineItem,
-  AgendaItem,
-  PrizeInfo,
-  SponsorInfo,
   EventVisibility,
   Organization
 } from '../../types';
@@ -462,7 +455,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           <input
                             type="text"
                             {...register('venue.name', { 
-                              required: watchedMode !== EventMode.ONLINE ? 'Venue name is required' : false 
+                              required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Venue name is required' : false 
                             })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="Enter venue name"
@@ -476,7 +469,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           <input
                             type="text"
                             {...register('venue.address', { 
-                              required: watchedMode !== EventMode.ONLINE ? 'Address is required' : false 
+                              required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Address is required' : false 
                             })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="Street address"
@@ -491,7 +484,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             <input
                               type="text"
                               {...register('venue.city', { 
-                                required: watchedMode !== EventMode.ONLINE ? 'City is required' : false 
+                                required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'City is required' : false 
                               })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             />
@@ -503,7 +496,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             <input
                               type="text"
                               {...register('venue.state', { 
-                                required: watchedMode !== EventMode.ONLINE ? 'State is required' : false 
+                                required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'State is required' : false 
                               })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             />
@@ -515,7 +508,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             <input
                               type="text"
                               {...register('venue.country', { 
-                                required: watchedMode !== EventMode.ONLINE ? 'Country is required' : false 
+                                required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Country is required' : false 
                               })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             />
@@ -547,7 +540,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           <input
                             type="url"
                             {...register('virtualLinks.meetingUrl', { 
-                              required: watchedMode !== EventMode.OFFLINE ? 'Meeting URL is required' : false 
+                              required: watchedMode === EventMode.ONLINE || watchedMode === EventMode.HYBRID ? 'Meeting URL is required' : false 
                             })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="https://zoom.us/j/..."

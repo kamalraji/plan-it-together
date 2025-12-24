@@ -15,7 +15,7 @@ import api from '../../../lib/api';
  * - Service-specific widgets and analytics
  */
 export const WorkspaceServiceDashboard: React.FC = () => {
-  const { user } = useAuth();
+  useAuth();
 
   // Fetch user's workspaces
   const { data: workspaces, isLoading } = useQuery({

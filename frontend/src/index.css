@@ -99,6 +99,8 @@ code {
     background-color: rgba(0, 0, 0, 0.75);
   }
 }
+
+.will-change-transform {
   will-change: transform;
 }
 

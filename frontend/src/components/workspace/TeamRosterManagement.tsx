@@ -11,7 +11,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
-import { TeamMember, Workspace, WorkspaceRole } from '../../types';
+import { TeamMember, WorkspaceRole } from '../../types';
 
 interface TeamRosterManagementProps {
   teamMembers: TeamMember[];

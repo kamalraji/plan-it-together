@@ -85,7 +85,7 @@ export const OrganizationDetailPage: React.FC = () => {
       component: () => (
         <OrganizationPage 
           organizationId={organizationId!} 
-          currentUser={user} 
+          currentUser={user ?? undefined} 
         />
       ),
     },
@@ -143,22 +143,19 @@ export const OrganizationDetailPage: React.FC = () => {
   const actions = [
     {
       label: 'Manage Members',
-      action: () => window.location.href = `/console/organizations/${organizationId}/members`,
-      icon: 'users',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/members`; },
       variant: 'primary' as const,
       roles: ['OWNER', 'ADMIN'],
     },
     {
       label: 'View Analytics',
-      action: () => window.location.href = `/console/organizations/${organizationId}/analytics`,
-      icon: 'chart',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/analytics`; },
       variant: 'secondary' as const,
       roles: ['OWNER', 'ADMIN'],
     },
     {
       label: 'Organization Settings',
-      action: () => window.location.href = `/console/organizations/${organizationId}/settings`,
-      icon: 'cog',
+      action: () => { window.location.href = `/console/organizations/${organizationId}/settings`; },
       variant: 'secondary' as const,
       roles: ['OWNER', 'ADMIN'],
     },
@@ -189,6 +186,7 @@ export const OrganizationDetailPage: React.FC = () => {
         />
 
         <ResourceDetailPage
+          title={organization.name}
           resourceId={organizationId!}
           resourceType="organization"
           tabs={filteredTabs}

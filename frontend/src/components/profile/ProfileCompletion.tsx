@@ -48,7 +48,7 @@ export function ProfileCompletion() {
       });
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Update the auth context with the new user data
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
       navigate('/dashboard');

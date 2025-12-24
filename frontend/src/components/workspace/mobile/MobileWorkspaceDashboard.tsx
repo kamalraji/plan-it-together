@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Bars3Icon,
-  XMarkIcon,
   PlusIcon,
   UserPlusIcon,
-  BellIcon,
   ChatBubbleLeftRightIcon,
-  ChartBarIcon,
-  Cog6ToothIcon
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
-import { Workspace, WorkspaceStatus } from '../../../types';
+import { Workspace } from '../../../types';
 import { MobileTaskSummary } from './MobileTaskSummary';
 import { MobileTeamOverview } from './MobileTeamOverview';
 import { MobileWorkspaceHeader } from './MobileWorkspaceHeader';

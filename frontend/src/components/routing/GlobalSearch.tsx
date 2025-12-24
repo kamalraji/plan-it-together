@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
   ClockIcon,
-  XMarkIcon,
   CommandLineIcon,
 } from '@heroicons/react/24/outline';
 
@@ -362,7 +361,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                         <span>{category.displayName}</span>
                       </h3>
                       <div className="space-y-1">
-                        {category.results.map((result, index) => {
+                        {category.results.map((result) => {
                           const globalIndex = results.indexOf(result);
                           return (
                             <button

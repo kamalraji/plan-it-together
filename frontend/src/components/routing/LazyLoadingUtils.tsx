@@ -253,7 +253,7 @@ export const NetworkAwareLoading: React.FC<{
 };
 
 // Route-based code splitting utilities
-export const createRouteBundle = (routes: string[]) => {
+export const createRouteBundle = (_routes: string[]) => {
   const bundleMap = new Map<string, Promise<any>>();
 
   const preloadBundle = (routePath: string) => {

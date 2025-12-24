@@ -13,7 +13,6 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
   eventId, 
   eventName 
 }) => {
-  const [activeTab, setActiveTab] = useState<'integrated' | 'discover' | 'bookings' | 'reviews'>('integrated');
 
   // If we have an eventId, show the integrated event-specific interface by default
   const defaultTab = eventId ? 'integrated' : 'discover';

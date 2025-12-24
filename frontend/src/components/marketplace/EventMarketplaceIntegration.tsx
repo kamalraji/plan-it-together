@@ -230,7 +230,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         {activeTab === 'shortlist' && (
           <VendorShortlist
             eventId={eventId}
-            onRequestQuote={handleRequestQuote}
+            onRequestQuote={(service) => handleRequestQuote({ ...service, vendorId: service.vendor.id })}
           />
         )}
 

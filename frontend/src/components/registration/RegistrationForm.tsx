@@ -66,7 +66,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       const response = await api.post('/registrations', data);
       return response.data.data;
     },
-    onSuccess: (registration: Registration) => {
+    onSuccess: () => {
       if (onSuccess) {
         onSuccess();
       } else {
@@ -351,7 +351,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               </svg>
               <div className="ml-3">
                 <p className="text-sm text-red-800">
-                  {registrationMutation.error?.response?.data?.error?.message || 'Registration failed. Please try again.'}
+                  {(registrationMutation.error as any)?.response?.data?.error?.message || 'Registration failed. Please try again.'}
                 </p>
               </div>
             </div>

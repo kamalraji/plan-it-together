@@ -42,7 +42,6 @@ interface MetricCard {
   trend?: number[];
 }
 
-export default RealTimeMetrics;
 export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
   scope,
   eventId,
@@ -114,7 +113,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
 
     // Fallback to polling if WebSocket is not available
     const startPolling = () => {
-      intervalRef.current = setInterval(async () => {
+      intervalRef.current = window.setInterval(async () => {
         try {
           let endpoint = '/api/analytics/realtime';
 

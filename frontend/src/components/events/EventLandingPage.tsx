@@ -13,7 +13,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const { eventId: paramEventId } = useParams<{ eventId: string }>();
   const eventId = propEventId || paramEventId;
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
