@@ -1,0 +1,593 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AuthProvider } from '../../hooks/useAuth';
+import { UserRole } from '../../types';
+import { ConsoleRoute } from './ConsoleRoute';
+import { ConsoleLayout } from './ConsoleLayout';
+import { NotFoundPage } from './NotFoundPage';
+import { SearchPage } from './SearchPage';
+import { EventService, MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
+import { HelpPage } from '../help';
+import { NotificationPage } from './NotificationPage';
+import { CommunicationPage } from './CommunicationPage';
+import { LoginForm } from '../auth/LoginForm';
+import { RegisterForm } from '../auth/RegisterForm';
+import { DashboardDataLab } from '../enhanced/DashboardDataLab';
+
+// Create a query client instance with optimized settings for the console application
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+// Enhanced Forgot Password page without doodle illustrations
+const ForgotPasswordPage = () => {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-mint/10">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
+            Reset Password
+          </h2>
+          <p className="text-gray-600 mb-8">
+            Don't worry! Password reset functionality will be implemented in later tasks.
+          </p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-soft">
+            <div className="flex items-center justify-center space-x-4 mb-6">
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-900">Coming Soon!</h3>
+                <p className="text-sm text-gray-600">We're working on this feature.</p>
+              </div>
+            </div>
+            <Link 
+              to="/login" 
+              className="inline-flex items-center justify-center w-full py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle transition-all duration-200 hover:scale-105"
+            >
+              Back to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Types for unified dashboard metrics
+interface DashboardMetrics {
+  activeEvents: number;
+  draftEvents: number;
+  completedEvents: number;
+  totalRegistrations: number;
+  activeWorkspaces: number;
+  teamMembers: number;
+  availableServices: number;
+  activeBookings: number;
+  totalRevenue: number;
+}
+
+// Console Dashboard using real backend metrics
+const ConsoleDashboard = () => {
+  const { data: metrics, isLoading, error } = useQuery<DashboardMetrics>({
+    queryKey: ['dashboard-metrics'],
+    queryFn: async () => {
+      // Ensure we have an authenticated user so RLS-scoped metrics work correctly
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!userData?.user) {
+        throw new Error('User not authenticated');
+      }
+
+      const [
+        activeEventsRes,
+        draftEventsRes,
+        completedEventsRes,
+        registrationsRes,
+        activeWorkspacesRes,
+        servicesRes,
+        activeBookingsRes,
+        revenueRes,
+      ] = await Promise.all([
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['PUBLISHED', 'ONGOING']),
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'DRAFT'),
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'COMPLETED'),
+        supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('workspaces')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'ACTIVE'),
+        supabase
+          .from('services')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true),
+        supabase
+          .from('bookings')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['PENDING', 'CONFIRMED']),
+        supabase
+          .from('bookings')
+          .select('amount')
+          .eq('status', 'COMPLETED'),
+      ]);
+
+      if (activeEventsRes.error) throw activeEventsRes.error;
+      if (draftEventsRes.error) throw draftEventsRes.error;
+      if (completedEventsRes.error) throw completedEventsRes.error;
+      if (registrationsRes.error) throw registrationsRes.error;
+      if (activeWorkspacesRes.error) throw activeWorkspacesRes.error;
+      if (servicesRes.error) throw servicesRes.error;
+      if (activeBookingsRes.error) throw activeBookingsRes.error;
+      if (revenueRes.error) throw revenueRes.error;
+
+      const totalRevenue = (revenueRes.data ?? []).reduce(
+        (sum: number, row: { amount: number | null }) => sum + Number(row.amount ?? 0),
+        0,
+      );
+
+      return {
+        activeEvents: activeEventsRes.count ?? 0,
+        draftEvents: draftEventsRes.count ?? 0,
+        completedEvents: completedEventsRes.count ?? 0,
+        totalRegistrations: registrationsRes.count ?? 0,
+        activeWorkspaces: activeWorkspacesRes.count ?? 0,
+        teamMembers: 0, // Team metrics will be wired to dedicated tables later
+        availableServices: servicesRes.count ?? 0,
+        activeBookings: activeBookingsRes.count ?? 0,
+        totalRevenue,
+      } satisfies DashboardMetrics;
+    },
+  });
+
+  useEffect(() => {
+    document.title = 'Dashboard | Thittam1Hub';
+
+    const description =
+      'Unified dashboard for events, workspaces, marketplace activity, and registrations in Thittam1Hub.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.origin + '/dashboard');
+  }, []);
+
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-cream to-lavender/20 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12 text-center py-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
+            Your Thittam1Hub Dashboard
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Live overview of your events, participants, and marketplace activity in one place.
+          </p>
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-coral" />
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-8 max-w-2xl mx-auto rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            Unable to load live metrics right now. Data cards below may be empty.
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Events Card */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-gray-900">Event Management</h3>
+              </div>
+            </div>
+            <p className="text-gray-600 mb-6">Create, publish, and track your events and participants.</p>
+            <div className="space-y-2 text-sm text-gray-500 mb-6">
+              <div className="flex justify-between">
+                <span>Active Events</span>
+                <span className="font-semibold text-coral">{metrics?.activeEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Draft Events</span>
+                <span className="font-semibold text-teal">{metrics?.draftEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Completed Events</span>
+                <span className="font-semibold text-sunny">{metrics?.completedEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Registrations</span>
+                <span className="font-semibold text-gray-900">{metrics?.totalRegistrations ?? 0}</span>
+              </div>
+            </div>
+            <button className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              Go to Events
+            </button>
+          </div>
+
+          {/* Workspaces Card */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-gray-900">Workspaces</h3>
+              </div>
+            </div>
+            <p className="text-gray-600 mb-6">Collaborate with your team on event prep and execution.</p>
+            <div className="space-y-2 text-sm text-gray-500 mb-6">
+              <div className="flex justify-between">
+                <span>Active Workspaces</span>
+                <span className="font-semibold text-teal">{metrics?.activeWorkspaces ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Team Members</span>
+                <span className="font-semibold text-coral">{metrics?.teamMembers ?? 0}</span>
+              </div>
+            </div>
+            <button className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              Go to Workspaces
+            </button>
+          </div>
+
+          {/* Marketplace Card */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-gray-900">Marketplace</h3>
+              </div>
+            </div>
+            <p className="text-gray-600 mb-6">Discover and book verified vendors for your events.</p>
+            <div className="space-y-2 text-sm text-gray-500 mb-6">
+              <div className="flex justify-between">
+                <span>Available Services</span>
+                <span className="font-semibold text-sunny">{metrics?.availableServices ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Active Bookings</span>
+                <span className="font-semibold text-coral">{metrics?.activeBookings ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Revenue</span>
+                <span className="font-semibold text-gray-900">
+                  {metrics ? `$${metrics.totalRevenue.toLocaleString()}` : '$0'}
+                </span>
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/marketplace'}
+              className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
+            >
+              Go to Marketplace
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-16 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Quick Actions</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button className="bg-white/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+              Create Event
+            </button>
+            <button className="bg-white/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+              Join Workspace
+            </button>
+            <button 
+              onClick={() => window.location.href = '/marketplace'}
+              className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
+              Browse Services
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const WorkspaceService = () => {
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal/5 to-mint/10 min-h-screen">
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal to-mint bg-clip-text text-transparent mb-4">
+            Workspace Service
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Collaborate, create, and achieve amazing things together.
+          </p>
+        </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 shadow-soft">
+          <div className="flex items-center space-x-4 mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Coming Soon!</h2>
+              <p className="text-gray-600">Workspace functionality will be implemented in later tasks.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="text-center p-4 bg-teal/5 rounded-xl">
+              <h3 className="font-semibold text-teal mb-2">Team Collaboration</h3>
+              <p className="text-sm text-gray-600">Work together seamlessly.</p>
+            </div>
+            <div className="text-center p-4 bg-mint/5 rounded-xl">
+              <h3 className="font-semibold text-teal mb-2">Project Management</h3>
+              <p className="text-sm text-gray-600">Organize your projects.</p>
+            </div>
+            <div className="text-center p-4 bg-teal/5 rounded-xl">
+              <h3 className="font-semibold text-teal mb-2">Real-time Updates</h3>
+              <p className="text-sm text-gray-600">Stay in sync with your team.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AnalyticsService = () => {
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-sunny/5 to-coral/10 min-h-screen">
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-sunny to-coral bg-clip-text text-transparent mb-4">
+            Analytics Service
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover insights and track your success with analytics.
+          </p>
+        </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-soft">
+          <div className="flex items-center space-x-4 mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Powerful Analytics Coming Soon!</h2>
+              <p className="text-gray-600">Analytics functionality will be implemented in later tasks.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="text-center p-4 bg-sunny/5 rounded-xl">
+              <h3 className="font-semibold text-sunny mb-2">Event Metrics</h3>
+              <p className="text-sm text-gray-600">Track event performance.</p>
+            </div>
+            <div className="text-center p-4 bg-coral/5 rounded-xl">
+              <h3 className="font-semibold text-coral mb-2">User Insights</h3>
+              <p className="text-sm text-gray-600">Understand your audience.</p>
+            </div>
+            <div className="text-center p-4 bg-sunny/5 rounded-xl">
+              <h3 className="font-semibold text-sunny mb-2">Revenue Reports</h3>
+              <p className="text-sm text-gray-600">Monitor your earnings.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProfileService = () => {
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender/5 to-cream/20 min-h-screen">
+      <div className="max-w-7xl mx-auto py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-coral to-lavender bg-clip-text text-transparent mb-4">
+            Profile Management
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Customize your profile and showcase your achievements.
+          </p>
+        </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-soft">
+          <div className="flex items-center space-x-4 mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Your Profile Awaits!</h2>
+              <p className="text-gray-600">Profile management functionality will be implemented in later tasks.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="text-center p-4 bg-coral/5 rounded-xl">
+              <h3 className="font-semibold text-coral mb-2">Personal Info</h3>
+              <p className="text-sm text-gray-600">Update your details.</p>
+            </div>
+            <div className="text-center p-4 bg-lavender/5 rounded-xl">
+              <h3 className="font-semibold text-lavender mb-2">Achievements</h3>
+              <p className="text-sm text-gray-600">Show off your badges.</p>
+            </div>
+            <div className="text-center p-4 bg-coral/5 rounded-xl">
+              <h3 className="font-semibold text-coral mb-2">Preferences</h3>
+              <p className="text-sm text-gray-600">Customize your experience.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SupportService = () => {
+  // Get current context from URL or other means
+  const currentContext = window.location.pathname.includes('/events') ? 'events' :
+                         window.location.pathname.includes('/workspaces') ? 'workspaces' :
+                         window.location.pathname.includes('/marketplace') ? 'marketplace' :
+                         undefined;
+
+  return <HelpPage currentContext={currentContext} />;
+};
+
+const NotificationService = () => {
+  return <NotificationPage />;
+};
+
+const CommunicationService = () => {
+  return <CommunicationPage />;
+};
+
+export const AppRouter: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Root redirect to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            
+            {/* Public authentication routes */}
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            
+            {/* Dashboard routes - all protected with enhanced authentication */}
+            <Route
+              path="/dashboard"
+              element={
+                <ConsoleRoute>
+                  <ConsoleLayout />
+                </ConsoleRoute>
+              }
+            >
+              {/* Dashboard home - default route */}
+              <Route index element={<ConsoleDashboard />} />
+              <Route path="home" element={<ConsoleDashboard />} />
+              
+              {/* Service routes with role-based access control */}
+              <Route 
+                path="events/*" 
+                element={
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                    <EventService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="workspaces/*" 
+                element={
+                  <ConsoleRoute>
+                    <WorkspaceService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="marketplace/*" 
+                element={
+                  <ConsoleRoute>
+                    <MarketplaceService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="organizations/*" 
+                element={
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                    <OrganizationServiceComponent />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="analytics/*" 
+                element={
+                  <ConsoleRoute>
+                    <AnalyticsService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="profile/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <ProfileService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="support/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SupportService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="notifications/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <NotificationService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="communications/*" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <CommunicationService />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="search" 
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SearchPage />
+                  </ConsoleRoute>
+                } 
+              />
+              <Route 
+                path="data-lab" 
+                element={
+                  <ConsoleRoute>
+                    <DashboardDataLab />
+                  </ConsoleRoute>
+                }
+              />
+            </Route>
+
+            {/* Standalone Marketplace - public marketplace for browsing services */}
+            <Route 
+              path="/marketplace/*" 
+              element={
+                <ConsoleRoute>
+                  <MarketplaceService />
+                </ConsoleRoute>
+              } 
+            />
+
+            {/* Legacy console redirect */}
+            <Route path="/console/*" element={<Navigate to="/dashboard" replace />} />
+            
+            {/* 404 Not Found - must be last */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default AppRouter;
