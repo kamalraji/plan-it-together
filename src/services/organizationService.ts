@@ -1,9 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
-type Organization = Database['public']['Tables']['organizations']['Row'];
-type OrganizationAdmin = Database['public']['Tables']['organization_admins']['Row'];
-type Follow = Database['public']['Tables']['follows']['Row'];
+// Use loose typing here to keep the service compatible while
+// the Supabase schema and frontend models are being aligned.
+type Organization = any;
+type OrganizationAdmin = any;
+type Follow = any;
 
 export interface CreateOrganizationDTO {
   name: string;

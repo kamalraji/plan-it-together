@@ -83,13 +83,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     },
   });
 
-  // Fetch user's organizations from Lovable Cloud (Requirements 19.1)
+  // Fetch user's organizations from Supabase (mapped to Organization type)
   const { data: organizations } = useQuery({
     queryKey: ['user-organizations'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('organizations')
-        .select('id, name, category, verification_status')
+        .from('Organization')
+        .select('id, name, category, verificationStatus')
         .order('name');
 
       if (error) {
@@ -102,7 +102,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         name: org.name,
         description: '',
         category: org.category,
-        verificationStatus: org.verification_status,
+        verificationStatus: org.verificationStatus,
         branding: {},
         socialLinks: {},
         pageUrl: '',
@@ -126,31 +126,31 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     return `${base}-${randomSuffix}`;
   };
 
-  // Create/Update event mutation using Lovable Cloud
+  // Create/Update event mutation using Supabase Event table
   const eventMutation = useMutation({
     mutationFn: async (data: CreateEventDTO) => {
       if (!user) {
         throw new Error('You must be logged in to manage events.');
       }
 
-      const payload: TablesInsert<'events'> | TablesUpdate<'events'> = {
+      const payload: TablesInsert<'Event'> | TablesUpdate<'Event'> = {
         name: data.name,
         description: data.description,
-        mode: data.mode,
-        start_date: data.startDate,
-        end_date: data.endDate,
-        capacity: data.capacity,
-        registration_deadline: data.registrationDeadline,
-        organization_id: data.organizationId || null,
-        visibility: data.visibility,
+        mode: data.mode as any,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        capacity: data.capacity ?? null,
+        registrationDeadline: data.registrationDeadline ?? null,
+        organizationId: data.organizationId || null,
+        visibility: data.visibility as any,
         branding: (data.branding || {}) as any,
         venue: (data.venue || null) as any,
-        virtual_links: (data.virtualLinks || null) as any,
+        virtualLinks: (data.virtualLinks || null) as any,
       };
 
       if (isEditing && event) {
         const { data: updated, error } = await supabase
-          .from('events')
+          .from('Event')
           .update(payload)
           .eq('id', event.id)
           .select('*')
@@ -159,14 +159,14 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         if (error) throw error;
         return updated;
       } else {
-        const insertPayload: TablesInsert<'events'> = {
-          ...(payload as TablesInsert<'events'>),
-          organizer_id: user.id,
-          landing_page_url: generateLandingPageSlug(data.name),
+        const insertPayload: TablesInsert<'Event'> = {
+          ...(payload as TablesInsert<'Event'>),
+          organizerId: user.id,
+          landingPageUrl: generateLandingPageSlug(data.name),
         };
 
         const { data: created, error } = await supabase
-          .from('events')
+          .from('Event')
           .insert(insertPayload)
           .select('*')
           .single();
@@ -175,7 +175,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         return created;
       }
     },
-    onSuccess: (newEvent) => {
+    onSuccess: (newEvent: any) => {
       queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
       navigate(`/events/${newEvent.id}`);
     },
@@ -203,14 +203,14 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     try {
       const token = Math.random().toString(36).substring(2, 10);
       const { data: updated, error } = await supabase
-        .from('events')
-        .update({ invite_link: token })
+        .from('Event')
+        .update({ inviteLink: token })
         .eq('id', event.id)
-        .select('invite_link')
+        .select('inviteLink')
         .single();
 
       if (error) throw error;
-      setInviteLink(updated.invite_link);
+      setInviteLink(updated.inviteLink);
     } catch (error) {
       console.error('Failed to generate invite link:', error);
     }

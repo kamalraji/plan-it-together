@@ -17,12 +17,12 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
-  // Fetch event details directly from Lovable Cloud
+  // Fetch event details directly from Supabase
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('events')
+        .from('Event')
         .select('*')
         .eq('id', eventId as string)
         .single();
@@ -35,26 +35,26 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         name: data.name,
         description: data.description || '',
         mode: data.mode as EventMode,
-        startDate: data.start_date || '',
-        endDate: data.end_date || '',
+        startDate: data.startDate || '',
+        endDate: data.endDate || '',
         capacity: data.capacity ?? undefined,
-        registrationDeadline: data.registration_deadline || undefined,
-        organizerId: data.organizer_id,
-        organizationId: data.organization_id || undefined,
+        registrationDeadline: data.registrationDeadline || undefined,
+        organizerId: data.organizerId,
+        organizationId: data.organizationId || undefined,
         visibility: data.visibility as EventVisibility,
-        inviteLink: data.invite_link || undefined,
+        inviteLink: data.inviteLink || undefined,
         branding: (data.branding as any) || {},
         venue: (data.venue as any) || undefined,
-        virtualLinks: (data.virtual_links as any) || undefined,
+        virtualLinks: (data.virtualLinks as any) || undefined,
         status: data.status as any,
-        landingPageUrl: data.landing_page_url || '',
+        landingPageUrl: data.landingPageUrl || '',
         timeline: [],
         agenda: [],
         prizes: [],
         sponsors: [],
         organization: undefined,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
       };
 
       return mappedEvent;
@@ -79,16 +79,16 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     }
   }, [event, eventId, navigate]);
 
-  // Registration mutation - store registrations in Lovable Cloud
+  // Registration mutation - store registrations in Supabase
   const registrationMutation = useMutation({
     mutationFn: async () => {
       if (!eventId || !user) {
         throw new Error('You must be logged in to register for an event.');
       }
 
-      const { error } = await supabase.from('registrations').insert({
-        event_id: eventId,
-        user_id: user.id,
+      const { error } = await supabase.from('Registration').insert({
+        eventId: eventId as string,
+        userId: user.id,
         status: 'PENDING',
       });
 
