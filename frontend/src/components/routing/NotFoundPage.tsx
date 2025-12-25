@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getCharacter } from '../doodles';
 
 export const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const FloatingCloud = getCharacter('floating-cloud');
+  const WavingPerson = getCharacter('waving-person');
 
   const handleGoBack = () => {
     navigate(-1);
@@ -15,40 +18,36 @@ export const NotFoundPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-cream to-lavender/20 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-lg">
         <div className="text-center">
-          {/* 404 Icon */}
-          <div className="mx-auto h-24 w-24 text-gray-400 mb-6">
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              className="w-full h-full"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.291-1.007-5.691-2.709M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          {/* Doodle Character */}
+          <div className="flex justify-center mb-8">
+            {FloatingCloud && (
+              <FloatingCloud 
+                size="xl" 
+                animation="float" 
+                className="animate-float" 
               />
-            </svg>
+            )}
           </div>
 
           {/* Error Message */}
-          <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
+            404
+          </h1>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Page Not Found
+            Oops! Page Not Found
           </h2>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Sorry, we couldn't find the page you're looking for. The page might have been moved, deleted, or you might have entered the wrong URL.
+            Looks like this page decided to take a little adventure! Don't worry, we'll help you find your way back.
           </p>
 
           {/* Action Buttons */}
-          <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+          <div className="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center mb-8">
             <button
               onClick={handleGoBack}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-coral/20 rounded-xl shadow-soft text-base font-medium text-coral bg-white/80 backdrop-blur-sm hover:bg-coral hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-all duration-200 hover:scale-105"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -68,7 +67,7 @@ export const NotFoundPage: React.FC = () => {
 
             <Link
               to={getHomeLink()}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl shadow-soft text-base font-medium text-white bg-gradient-to-r from-teal to-teal-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal transition-all duration-200 hover:scale-105"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -87,30 +86,41 @@ export const NotFoundPage: React.FC = () => {
             </Link>
           </div>
 
-          {/* Help Links */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-500 mb-4">
-              Need help? Try these options:
-            </p>
+          {/* Friendly Helper */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-6 shadow-soft">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              {WavingPerson && (
+                <WavingPerson 
+                  size="md" 
+                  color="sunny" 
+                  animation="wave" 
+                />
+              )}
+              <div className="text-left">
+                <h3 className="font-semibold text-gray-900">Need a hand?</h3>
+                <p className="text-sm text-gray-600">We're here to help you find what you're looking for!</p>
+              </div>
+            </div>
+            
             <div className="flex flex-col sm:flex-row sm:justify-center space-y-2 sm:space-y-0 sm:space-x-6">
               <Link
                 to="/console/support"
-                className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
+                className="text-sm text-teal hover:text-teal-light transition-colors font-medium"
               >
-                Help Center
+                📚 Help Center
               </Link>
               <Link
                 to="/console/support"
-                className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
+                className="text-sm text-teal hover:text-teal-light transition-colors font-medium"
               >
-                Contact Support
+                💬 Contact Support
               </Link>
               {isAuthenticated && (
                 <Link
                   to="/console"
-                  className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
+                  className="text-sm text-teal hover:text-teal-light transition-colors font-medium"
                 >
-                  Console Dashboard
+                  🏠 Console Dashboard
                 </Link>
               )}
             </div>

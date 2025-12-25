@@ -14,18 +14,60 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting */
+    /* Linting - maintaining strict settings for quality */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
 
-    /* Path aliases */
+    /* Enhanced type checking for design system */
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Path aliases for merged component structure */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/components/ui/*": ["./src/components/ui/*"],
+      "@/components/doodles/*": ["./src/components/doodles/*"],
+      "@/components/doodles/original/*": ["./src/components/doodles/original/*"],
+      "@/components/doodles/ligne-claire/*": ["./src/components/doodles/ligne-claire/*"],
+      "@/components/doodles/hand-drawn/*": ["./src/components/doodles/hand-drawn/*"],
+      "@/components/enhanced/*": ["./src/components/enhanced/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/lib/design-system/*": ["./src/lib/design-system/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/integrations/*": ["./src/integrations/*"],
+      "@/services/*": ["./src/services/*"]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": [
+    "src", 
+    "vite.config.ts",
+    "tailwind.config.js",
+    "eslint.config.js",
+    "postcss.config.js"
+  ],
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "build",
+    "doodle-hub-delight",
+    "frontend-backup*",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }

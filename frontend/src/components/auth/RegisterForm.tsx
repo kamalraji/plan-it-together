@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
+import { getCharacter } from '../doodles';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,6 +27,9 @@ export function RegisterForm() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const HappyStar = getCharacter('happy-star');
+  const RocketDoodle = getCharacter('rocket-doodle');
+  const Confetti = getCharacter('confetti');
   
   // Get event code from URL if present
   const eventCodeFromUrl = searchParams.get('eventCode');
@@ -67,146 +71,181 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sunny/5 to-teal/10 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
+        {/* Welcome Section with Doodle */}
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            {HappyStar && (
+              <HappyStar 
+                size="xl" 
+                animation="float" 
+                className="animate-float" 
+              />
+            )}
+          </div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
+            Join the Adventure!
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
+          <p className="text-gray-600 mb-2">
+            Create your account and start exploring amazing events
+          </p>
+          <p className="text-sm text-gray-500">
+            Already have an account?{' '}
             <Link
               to="/login"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
+              className="font-medium text-teal hover:text-teal-light transition-colors"
             >
-              sign in to your existing account
+              Sign in here
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                {...register('name')}
-                type="text"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Enter your full name"
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-              )}
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                autoComplete="email"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Enter your email address"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Account Type
-              </label>
-              <select
-                {...register('role')}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value={UserRole.PARTICIPANT}>Participant</option>
-                <option value={UserRole.ORGANIZER}>Organizer</option>
-              </select>
-              {errors.role && (
-                <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
-              )}
-            </div>
-
-            {selectedRole === UserRole.PARTICIPANT && (
-              <div>
-                <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700">
-                  Event Code (Optional)
-                </label>
-                <input
-                  {...register('eventCode')}
-                  type="text"
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="Enter event code if you have one"
-                />
-                {errors.eventCode && (
-                  <p className="mt-1 text-sm text-red-600">{errors.eventCode.message}</p>
-                )}
+        {/* Registration Form */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-doodle">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {error && (
+              <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-coral">⚠️</span>
+                  <div className="text-sm text-coral font-medium">{error}</div>
+                </div>
               </div>
             )}
+            
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  {...register('name')}
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Enter your full name"
+                />
+                {errors.name && (
+                  <p className="mt-2 text-sm text-coral">{errors.name.message}</p>
+                )}
+              </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                {...register('password')}
-                type="password"
-                autoComplete="new-password"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Create a password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  {...register('email')}
+                  type="email"
+                  autoComplete="email"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Enter your email address"
+                />
+                {errors.email && (
+                  <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                  Account Type
+                </label>
+                <select
+                  {...register('role')}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                >
+                  <option value={UserRole.PARTICIPANT}>🎉 Participant</option>
+                  <option value={UserRole.ORGANIZER}>🎯 Organizer</option>
+                </select>
+                {errors.role && (
+                  <p className="mt-2 text-sm text-coral">{errors.role.message}</p>
+                )}
+              </div>
+
+              {selectedRole === UserRole.PARTICIPANT && (
+                <div>
+                  <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700 mb-2">
+                    Event Code (Optional)
+                  </label>
+                  <input
+                    {...register('eventCode')}
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    placeholder="Enter event code if you have one"
+                  />
+                  {errors.eventCode && (
+                    <p className="mt-2 text-sm text-coral">{errors.eventCode.message}</p>
+                  )}
+                </div>
               )}
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <input
+                  {...register('password')}
+                  type="password"
+                  autoComplete="new-password"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Create a secure password"
+                />
+                {errors.password && (
+                  <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  {...register('confirmPassword')}
+                  type="password"
+                  autoComplete="new-password"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Confirm your password"
+                />
+                {errors.confirmPassword && (
+                  <p className="mt-2 text-sm text-coral">{errors.confirmPassword.message}</p>
+                )}
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                {...register('confirmPassword')}
-                type="password"
-                autoComplete="new-password"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Confirm your password"
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-sunny to-teal hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
             >
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Creating account...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {RocketDoodle && (
+                    <RocketDoodle size="sm" color="white" />
+                  )}
+                  <span>Create account</span>
+                </div>
+              )}
             </button>
-          </div>
 
-          {selectedRole === UserRole.ORGANIZER && (
-            <div className="rounded-md bg-blue-50 p-4">
-              <div className="text-sm text-blue-700">
-                <strong>Note:</strong> Organizer accounts require approval from a Super-Admin. 
-                You'll receive an email once your account is approved.
+            {selectedRole === UserRole.ORGANIZER && (
+              <div className="rounded-xl bg-teal/10 border border-teal/20 p-4">
+                <div className="flex items-start space-x-3">
+                  {Confetti && (
+                    <Confetti size="sm" color="teal" />
+                  )}
+                  <div className="text-sm text-teal">
+                    <strong>Organizer Account:</strong> Your account will need approval from a Super-Admin. 
+                    You'll receive an email once your account is approved and ready to go!
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </form>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );
