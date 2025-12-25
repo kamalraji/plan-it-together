@@ -13,29 +13,9 @@ const workspaceSchema = z.object({
     .max(120, 'Name must be at most 120 characters'),
 });
 
-const serviceSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'Name is required')
-    .max(160, 'Name must be at most 160 characters'),
-  category: z
-    .string()
-    .trim()
-    .min(1, 'Category is required')
-    .max(80, 'Category must be at most 80 characters'),
-  basePrice: z
-    .number({ invalid_type_error: 'Base price must be a number' })
-    .nonnegative('Base price cannot be negative'),
-});
+// Note: service and booking helpers are currently disabled while
+// the marketplace schema is aligned with Supabase.
 
-const bookingSchema = z.object({
-  serviceId: z.string().uuid('Select a valid service'),
-  amount: z
-    .number({ invalid_type_error: 'Amount must be a number' })
-    .nonnegative('Amount cannot be negative'),
-  status: z.enum(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']),
-});
 
 export const DashboardDataLab: React.FC = () => {
   const { user } = useAuth();
@@ -52,9 +32,9 @@ export const DashboardDataLab: React.FC = () => {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('events')
-        .select('id, name, status')
-        .eq('organizer_id', user!.id);
+        .from('Event')
+        .select('id, name, status, organizerId')
+        .eq('organizerId', user!.id);
       if (error) throw error;
       return data ?? [];
     },
@@ -65,39 +45,18 @@ export const DashboardDataLab: React.FC = () => {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('workspaces')
-        .select('id, name, status, created_at, event_id')
-        .order('created_at', { ascending: false });
+        .from('Workspace')
+        .select('id, name, status, createdAt, eventId')
+        .order('createdAt', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
 
-  const { data: services } = useQuery({
-    queryKey: ['services'],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, category, base_price, is_active, created_at')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const { data: bookings } = useQuery({
-    queryKey: ['bookings'],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('id, service_id, amount, status, created_at')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  // NOTE: Services & bookings are currently handled via the legacy backend.
+  // For now, keep these arrays empty to avoid schema mismatch with Supabase.
+  const services: any[] = [];
+  const bookings: any[] = [];
 
   const resetFeedback = () => {
     setFormError(null);
@@ -123,10 +82,10 @@ export const DashboardDataLab: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase.from('workspaces').insert({
-        event_id: parseResult.data.eventId,
+      const { error } = await supabase.from('Workspace').insert({
+        eventId: parseResult.data.eventId,
         name: parseResult.data.name,
-        organizer_id: user.id,
+        status: 'ACTIVE',
       });
       if (error) throw error;
       setFormSuccess('Workspace created');
@@ -141,7 +100,7 @@ export const DashboardDataLab: React.FC = () => {
   const handleDeleteWorkspace = async (id: string) => {
     resetFeedback();
     try {
-      const { error } = await supabase.from('workspaces').delete().eq('id', id);
+      const { error } = await supabase.from('Workspace').delete().eq('id', id);
       if (error) throw error;
       setFormSuccess('Workspace deleted');
       await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
@@ -151,104 +110,28 @@ export const DashboardDataLab: React.FC = () => {
     }
   };
 
+  // Service and booking helpers are temporarily disabled until
+  // the marketplace schema is fully aligned with Supabase.
   const handleCreateService = async (e: React.FormEvent) => {
     e.preventDefault();
     resetFeedback();
-    if (!user) {
-      setFormError('You must be logged in to create services.');
-      return;
-    }
-
-    const basePrice = Number(serviceForm.basePrice);
-    const parseResult = serviceSchema.safeParse({
-      name: serviceForm.name,
-      category: serviceForm.category,
-      basePrice: Number.isNaN(basePrice) ? NaN : basePrice,
-    });
-
-    if (!parseResult.success) {
-      setFormError(parseResult.error.issues[0]?.message ?? 'Invalid service data');
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from('services').insert({
-        organizer_id: user.id,
-        name: parseResult.data.name,
-        category: parseResult.data.category,
-        base_price: parseResult.data.basePrice,
-      });
-      if (error) throw error;
-      setFormSuccess('Service created');
-      setServiceForm({ name: '', category: '', basePrice: '' });
-      await queryClient.invalidateQueries({ queryKey: ['services'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-metrics'] });
-    } catch (err: any) {
-      setFormError(err.message ?? 'Failed to create service');
-    }
+    setFormError('Service creation via Data Lab is temporarily disabled.');
   };
 
-  const handleDeleteService = async (id: string) => {
+  const handleDeleteService = async (_id: string) => {
     resetFeedback();
-    try {
-      const { error } = await supabase.from('services').delete().eq('id', id);
-      if (error) throw error;
-      setFormSuccess('Service deleted');
-      await queryClient.invalidateQueries({ queryKey: ['services'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-metrics'] });
-    } catch (err: any) {
-      setFormError(err.message ?? 'Failed to delete service');
-    }
+    setFormError('Service deletion via Data Lab is temporarily disabled.');
   };
 
   const handleCreateBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     resetFeedback();
-    if (!user) {
-      setFormError('You must be logged in to create bookings.');
-      return;
-    }
-
-    const amount = Number(bookingForm.amount);
-    const parseResult = bookingSchema.safeParse({
-      serviceId: bookingForm.serviceId,
-      amount: Number.isNaN(amount) ? NaN : amount,
-      status: bookingForm.status as any,
-    });
-
-    if (!parseResult.success) {
-      setFormError(parseResult.error.issues[0]?.message ?? 'Invalid booking data');
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from('bookings').insert({
-        service_id: parseResult.data.serviceId,
-        organizer_id: user.id,
-        amount: parseResult.data.amount,
-        status: parseResult.data.status,
-      });
-      if (error) throw error;
-      setFormSuccess('Booking created');
-      setBookingForm({ serviceId: '', amount: '', status: 'CONFIRMED' });
-      await queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-metrics'] });
-    } catch (err: any) {
-      setFormError(err.message ?? 'Failed to create booking');
-    }
+    setFormError('Booking creation via Data Lab is temporarily disabled.');
   };
 
-  const handleDeleteBooking = async (id: string) => {
+  const handleDeleteBooking = async (_id: string) => {
     resetFeedback();
-    try {
-      const { error } = await supabase.from('bookings').delete().eq('id', id);
-      if (error) throw error;
-      setFormSuccess('Booking deleted');
-      await queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-metrics'] });
-    } catch (err: any) {
-      setFormError(err.message ?? 'Failed to delete booking');
-    }
+    setFormError('Booking deletion via Data Lab is temporarily disabled.');
   };
 
   return (
