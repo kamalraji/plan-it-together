@@ -13,7 +13,7 @@ import {
   EventVisibility,
   Organization
 } from '../../types';
-import { TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
+
 
 interface EventFormProps {
   event?: Event;
@@ -133,7 +133,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         throw new Error('You must be logged in to manage events.');
       }
 
-      const payload: TablesInsert<'Event'> | TablesUpdate<'Event'> = {
+      const payload = {
         name: data.name,
         description: data.description,
         mode: data.mode as any,
@@ -146,7 +146,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         branding: (data.branding || {}) as any,
         venue: (data.venue || null) as any,
         virtualLinks: (data.virtualLinks || null) as any,
-      };
+      } as any;
 
       if (isEditing && event) {
         const { data: updated, error } = await supabase
@@ -159,11 +159,11 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         if (error) throw error;
         return updated;
       } else {
-        const insertPayload: TablesInsert<'Event'> = {
-          ...(payload as TablesInsert<'Event'>),
+        const insertPayload = {
+          ...(payload as any),
           organizerId: user.id,
           landingPageUrl: generateLandingPageSlug(data.name),
-        };
+        } as any;
 
         const { data: created, error } = await supabase
           .from('Event')
