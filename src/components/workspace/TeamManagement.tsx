@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  UserPlusIcon, 
-  UserGroupIcon, 
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon
+  UserPlusIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, TeamMember, WorkspaceRole } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
+import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
 import api from '../../lib/api';
 
 interface TeamManagementProps {
@@ -126,64 +124,12 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   }) || [];
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircleIcon className="w-3 h-3 mr-1" />
-            Active
-          </span>
-        );
-      case 'PENDING':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <ClockIcon className="w-3 h-3 mr-1" />
-            Pending
-          </span>
-        );
-      case 'INACTIVE':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            <XCircleIcon className="w-3 h-3 mr-1" />
-            Inactive
-          </span>
-        );
-      default:
-        return null;
-    }
+    return <WorkspaceStatusBadge status={status} />;
   };
 
   const getRoleBadge = (role: WorkspaceRole) => {
-    const roleClasses: Record<WorkspaceRole, string> = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-primary/10 text-primary',
-      [WorkspaceRole.TEAM_LEAD]: 'bg-secondary/10 text-secondary-foreground',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-accent/10 text-accent-foreground',
-      [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-muted text-foreground',
-      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'bg-primary/10 text-primary-foreground',
-      [WorkspaceRole.MARKETING_LEAD]: 'bg-accent text-accent-foreground',
-      [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-muted text-foreground',
-    };
-
-    const roleLabels: Record<WorkspaceRole, string> = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
-      [WorkspaceRole.TEAM_LEAD]: 'Team Lead',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
-      [WorkspaceRole.VOLUNTEER_MANAGER]: 'Vol. Manager',
-      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'Tech Specialist',
-      [WorkspaceRole.MARKETING_LEAD]: 'Marketing Lead',
-      [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
-    };
-
-    const roleClassName = roleClasses[role] ?? 'bg-muted text-foreground';
-    const roleLabel = roleLabels[role] ?? 'Member';
-
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClassName}`}>
-        {roleLabel}
-      </span>
-    );
+    return <WorkspaceRoleBadge role={role} />;
   };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
