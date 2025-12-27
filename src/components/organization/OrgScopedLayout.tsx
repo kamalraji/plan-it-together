@@ -71,7 +71,7 @@ export const OrgScopedLayout: React.FC = () => {
 
   return (
     <OrganizationProvider value={{ organization }}>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         {/* Global console header fixed at the top */}
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
