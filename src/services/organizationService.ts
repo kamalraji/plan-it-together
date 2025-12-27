@@ -123,6 +123,50 @@ class OrganizationService {
   }
 
   /**
+   * Get organization membership rows for the current user
+   */
+  async getMyOrganizationMemberships(): Promise<any[]> {
+    const { data: session } = await supabase.auth.getSession();
+    const user = session?.session?.user;
+
+    if (!user) {
+      throw new Error('Not authenticated');
+    }
+
+    const { data, error } = await supabase
+      .from('organization_memberships')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+
+  /**
+   * Get organizations where the current user is an ACTIVE member
+   */
+  async getMyMemberOrganizations(): Promise<Organization[]> {
+    const { data: session } = await supabase.auth.getSession();
+    const user = session?.session?.user;
+
+    if (!user) {
+      throw new Error('Not authenticated');
+    }
+
+    const { data, error } = await supabase
+      .from('organization_memberships')
+      .select('organizations(*)')
+      .eq('user_id', user.id)
+      .eq('status', 'ACTIVE');
+
+    if (error) throw new Error(error.message);
+
+    return (data || [])
+      .map((row: any) => row.organizations)
+      .filter(Boolean);
+  }
+
+  /**
    * Search organizations with filters
    */
   async searchOrganizations(params: SearchOrganizationsParams): Promise<Organization[]> {
@@ -183,6 +227,7 @@ class OrganizationService {
 
   /**
    * Add an admin to an organization
+   * (legacy admin model, kept for backwards compatibility)
    */
   async addAdmin(
     organizationId: string,
@@ -246,6 +291,82 @@ class OrganizationService {
       .single();
 
     return !error && !!data;
+  }
+
+  /**
+   * Request to join an organization as ORGANIZER (PENDING)
+   */
+  async requestJoinOrganization(organizationId: string): Promise<any> {
+    const { data: session } = await supabase.auth.getSession();
+    const user = session?.session?.user;
+
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('organization_memberships')
+      .insert({
+        organization_id: organizationId,
+        user_id: user.id,
+        role: 'ORGANIZER',
+        status: 'PENDING',
+      })
+      .select('*')
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  /**
+   * Get memberships for an organization (all statuses)
+   */
+  async getOrganizationMemberships(
+    organizationId: string,
+    status?: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED',
+  ): Promise<any[]> {
+    let query = supabase
+      .from('organization_memberships')
+      .select('*')
+      .eq('organization_id', organizationId);
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+
+  /**
+   * Update membership status / role (for org admins)
+   */
+  async updateMembershipStatus(
+    membershipId: string,
+    updates: { status?: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED'; role?: string },
+  ): Promise<any> {
+    const { data: session } = await supabase.auth.getSession();
+    const user = session?.session?.user;
+
+    if (!user) throw new Error('Not authenticated');
+
+    const payload: any = {
+      ...updates,
+    };
+
+    if (updates.status === 'ACTIVE' || updates.status === 'REJECTED') {
+      payload.approved_by = user.id;
+    }
+
+    const { data, error } = await supabase
+      .from('organization_memberships')
+      .update(payload)
+      .eq('id', membershipId)
+      .select('*')
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
   }
 
   /**
