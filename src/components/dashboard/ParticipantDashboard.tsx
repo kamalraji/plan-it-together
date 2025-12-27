@@ -186,7 +186,7 @@ export function ParticipantDashboard() {
       return start >= now;
     }) ?? [];
 
-  // Simple search and pagination for registrations (UI wiring added below)
+  // Simple search and pagination for registrations
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -206,17 +206,6 @@ export function ParticipantDashboard() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage,
   );
-
-  // Mark pagination state as used for now; UI handlers are wired below
-  useEffect(() => {
-    void searchTerm;
-    void setSearchTerm;
-    void page;
-    void setPage;
-    void rowsPerPage;
-    void setRowsPerPage;
-    void paginatedRegistrations;
-  }, [searchTerm, page, rowsPerPage, paginatedRegistrations]);
 
   if (isLoading) {
     return (
@@ -406,165 +395,190 @@ export function ParticipantDashboard() {
       </div>
 
 
-       {/* Content */}
-       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-         {activeTab === 'events' && (
-           <div className="space-y-8 sm:space-y-10">
-             <div>
-               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-                 <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Registered Events</h2>
-                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                   <span>
-                     {registrations?.length || 0} event
-                     {(registrations?.length || 0) !== 1 ? 's' : ''} registered
-                   </span>
-                   <button
-                     onClick={() => navigate('/dashboard/participant-events')}
-                     className="text-primary hover:text-primary/80 font-medium"
-                   >
-                     Browse all events
-                   </button>
-                 </div>
-               </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-16">
+        {activeTab === 'events' && (
+          <div className="space-y-6 sm:space-y-8">
+            <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-5">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-accent/60 px-3 py-1 text-[11px] sm:text-xs font-medium text-accent-foreground mb-2">
+                    <span className="inline-flex h-1.5 w-1.5 rounded-full bg-accent-foreground" />
+                    Primary participant dashboard
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground">My Registered Events</h2>
+                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-xl">
+                    Access a comprehensive listing of all events you have registered for and participated in.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:items-end gap-2 text-xs sm:text-sm">
+                  <p className="text-muted-foreground">
+                    <span className="font-semibold text-foreground">{filteredRegistrations.length}</span>{' '}
+                    event{filteredRegistrations.length !== 1 ? 's' : ''} shown
+                  </p>
+                  <button
+                    onClick={() => navigate('/dashboard/participant-events')}
+                    className="inline-flex items-center rounded-full bg-primary px-4 py-1.5 text-xs sm:text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    Browse all events
+                  </button>
+                </div>
+              </div>
 
-             {registrations && registrations.length > 0 ? (
-               <div className="space-y-4 sm:space-y-6">
-                 {registrations.map((registration) => (
-                   <div
-                     key={registration.id}
-                     className="bg-white rounded-lg shadow overflow-hidden"
-                   >
-                   {/* Event Header */}
-                   <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
-                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                       <div>
-                         <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                           {registration.event.name}
-                         </h3>
-                         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                           {new Date(
-                             registration.event.startDate,
-                           ).toLocaleDateString()}{' '}
-                           -{' '}
-                           {new Date(
-                             registration.event.endDate,
-                           ).toLocaleDateString()}
-                         </p>
-                       </div>
-                       <div className="flex items-center gap-2">
-                         <span
-                           className={`inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
-                                 registration.status === 'CONFIRMED'
-                                   ? 'bg-emerald-100 text-emerald-800'
-                                   : registration.status === 'WAITLISTED'
-                                   ? 'bg-amber-100 text-amber-800'
-                                   : 'bg-muted text-muted-foreground'
-                               }`}
-                             >
-                               {registration.status}
-                             </span>
-                           {registration.attendance && (
-                             <span className="inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-sky-100 text-sky-800">
-                               Checked In
-                             </span>
-                           )}
-                         </div>
-                       </div>
-                     </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Search events</label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setPage(1);
+                    }}
+                    placeholder="Search by event name or description"
+                    className="w-full rounded-full border border-input bg-background px-3 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+                  />
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm">
+                  <span className="text-muted-foreground">Rows per page</span>
+                  <select
+                    value={rowsPerPage}
+                    onChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setPage(1);
+                    }}
+                    className="rounded-full border border-input bg-background px-2 py-1 text-xs sm:text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/60"
+                  >
+                    {[5, 10, 25].map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-                     <div className="p-4 sm:p-6">
-                       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 sm:gap-6">
-                         <div className="flex-1">
-                           <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">
-                             {registration.event.description}
-                           </p>
- 
-                           {/* Event Details Grid */}
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
-                             <div className="space-y-2">
-                               <div className="flex justify-between">
-                                 <span className="text-muted-foreground">Start Time:</span>
-                                 <span className="text-foreground">
-                                   {new Date(
-                                     registration.event.startDate,
-                                   ).toLocaleString()}
-                                 </span>
-                               </div>
-                               <div className="flex justify-between">
-                                 <span className="text-muted-foreground">End Time:</span>
-                                 <span className="text-foreground">
-                                   {new Date(
-                                     registration.event.endDate,
-                                   ).toLocaleString()}
-                                 </span>
-                               </div>
-                               <div className="flex justify-between">
-                                 <span className="text-muted-foreground">Event Mode:</span>
-                                 <span className="text-foreground capitalize">
-                                   {registration.event.mode.toLowerCase()}
-                                 </span>
-                               </div>
-                             </div>
-                             <div className="space-y-2">
-                               <div className="flex justify-between">
-                                 <span className="text-muted-foreground">Registered:</span>
-                                 <span className="text-foreground">
-                                   {new Date(
-                                     registration.registeredAt,
-                                   ).toLocaleDateString()}
-                                 </span>
-                               </div>
-                               {registration.attendance && (
-                                 <div className="flex justify-between">
-                                   <span className="text-muted-foreground">Checked In:</span>
-                                   <span className="text-foreground">
-                                     {new Date(
-                                       registration.attendance.checkInTime,
-                                     ).toLocaleString()}
-                                   </span>
-                                 </div>
-                               )}
-                             </div>
-                           </div>
+              {paginatedRegistrations.length > 0 ? (
+                <div className="space-y-4 sm:space-y-5">
+                  {paginatedRegistrations.map((registration) => (
+                    <div
+                      key={registration.id}
+                      className="rounded-2xl border border-border/60 bg-card shadow-xs overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-muted/40 border-b border-border/60">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                              {registration.event.name}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                              {new Date(registration.event.startDate).toLocaleDateString()} -{' '}
+                              {new Date(registration.event.endDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
+                                registration.status === 'CONFIRMED'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : registration.status === 'WAITLISTED'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-muted text-muted-foreground'
+                              }`}
+                            >
+                              {registration.status}
+                            </span>
+                            {registration.attendance && (
+                              <span className="inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-accent text-accent-foreground">
+                                Checked in
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
 
-                            {/* Location/Virtual Links */}
-                             {registration.event.venue && (
-                               <div className="mt-4 p-3 bg-muted rounded-lg">
-                                 <div className="flex items-start">
-                                   <svg
-                                     className="h-5 w-5 text-muted-foreground mt-0.5 mr-2"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke="currentColor"
-                                   >
-                                     <path
-                                       strokeLinecap="round"
-                                       strokeLinejoin="round"
-                                       strokeWidth={2}
-                                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 111.314 0z"
-                                     />
-                                     <path
-                                       strokeLinecap="round"
-                                       strokeLinejoin="round"
-                                       strokeWidth={2}
-                                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                     />
-                                   </svg>
-                                   <div>
-                                     <p className="text-sm font-medium text-foreground">Venue</p>
-                                     <p className="text-sm text-muted-foreground">
-                                       {registration.event.venue.address}
-                                     </p>
-                                   </div>
-                                 </div>
-                               </div>
-                             )}
+                      <div className="p-4 sm:p-6">
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 sm:gap-6">
+                          <div className="flex-1">
+                            <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">
+                              {registration.event.description}
+                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Start time</span>
+                                  <span className="text-foreground">
+                                    {new Date(registration.event.startDate).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">End time</span>
+                                  <span className="text-foreground">
+                                    {new Date(registration.event.endDate).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Event mode</span>
+                                  <span className="text-foreground capitalize">
+                                    {registration.event.mode.toLowerCase()}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Registered</span>
+                                  <span className="text-foreground">
+                                    {new Date(registration.registeredAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                {registration.attendance && (
+                                  <div className="flex justify-between">
+                                    <span className="text-muted-foreground">Checked in</span>
+                                    <span className="text-foreground">
+                                      {new Date(registration.attendance.checkInTime).toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {registration.event.venue && (
+                              <div className="mt-4 p-3 rounded-lg bg-muted/60">
+                                <div className="flex items-start gap-2">
+                                  <svg
+                                    className="h-5 w-5 text-muted-foreground mt-0.5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 111.314 0z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                  </svg>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Venue</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {registration.event.venue.address}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
                             {registration.event.virtualLinks && (
-                              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                                <div className="flex items-start">
+                              <div className="mt-4 p-3 rounded-lg bg-accent/40">
+                                <div className="flex items-start gap-2">
                                   <svg
-                                    className="h-5 w-5 text-blue-400 mt-0.5 mr-2"
+                                    className="h-5 w-5 text-accent-foreground mt-0.5"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -577,16 +591,14 @@ export function ParticipantDashboard() {
                                     />
                                   </svg>
                                   <div>
-                                    <p className="text-sm font-medium text-gray-900">
-                                      Virtual Meeting
-                                    </p>
+                                    <p className="text-sm font-medium text-foreground">Virtual meeting</p>
                                     <a
                                       href={registration.event.virtualLinks.meetingUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-sm text-blue-600 hover:text-blue-800 underline"
+                                      className="text-sm text-primary hover:text-primary/80 underline"
                                     >
-                                      Join Meeting
+                                      Join meeting
                                     </a>
                                   </div>
                                 </div>
@@ -596,28 +608,27 @@ export function ParticipantDashboard() {
                             <div className="mt-4">
                               <Link
                                 to={`/events/${registration.event.id}`}
-                                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                className="text-sm font-medium text-primary hover:text-primary/80"
                               >
-                                View Event Page
+                                View event page
                               </Link>
                             </div>
                           </div>
 
-                          {/* QR Code Section */}
                           {registration.status === 'CONFIRMED' && (
-                            <div className="md:ml-6 text-center bg-gray-50 p-4 rounded-lg">
-                              <h4 className="text-sm font-medium text-gray-900 mb-3">
-                                Check-in QR Code
+                            <div className="md:ml-6 text-center bg-muted/40 p-4 rounded-xl">
+                              <h4 className="text-sm font-medium text-foreground mb-3">
+                                Check-in QR code
                               </h4>
-                              <div className="bg-white p-2 rounded border">
+                              <div className="bg-background p-2 rounded border border-border/60 inline-block">
                                 <img
                                   src={generateQRCode(registration.qrCode)}
-                                  alt="QR Code for check-in"
+                                  alt="QR code for check-in"
                                   className="w-24 h-24"
                                 />
                               </div>
-                              <p className="text-xs text-gray-500 mt-2 mb-3">
-                                Show this at the event for check-in
+                              <p className="text-xs text-muted-foreground mt-2 mb-3">
+                                Show this at the event for check-in.
                               </p>
                               <div className="space-y-2">
                                 <button
@@ -629,7 +640,7 @@ export function ParticipantDashboard() {
                                     link.href = generateQRCode(registration.qrCode);
                                     link.click();
                                   }}
-                                  className="w-full text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition-colors"
+                                  className="w-full text-xs rounded-full bg-primary text-primary-foreground px-3 py-1 hover:bg-primary/90 transition-colors"
                                 >
                                   Download QR
                                 </button>
@@ -643,7 +654,7 @@ export function ParticipantDashboard() {
                                       });
                                     }
                                   }}
-                                  className="w-full text-xs bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+                                  className="w-full text-xs rounded-full bg-secondary text-secondary-foreground px-3 py-1 hover:bg-secondary/90 transition-colors"
                                 >
                                   Share QR
                                 </button>
@@ -651,10 +662,9 @@ export function ParticipantDashboard() {
                             </div>
                           )}
 
-                          {/* Waitlist Status */}
                           {registration.status === 'WAITLISTED' && (
-                            <div className="md:ml-6 text-center bg-yellow-50 p-4 rounded-lg">
-                              <div className="text-yellow-600 mb-2">
+                            <div className="md:ml-6 text-center bg-accent/40 p-4 rounded-xl">
+                              <div className="text-accent-foreground mb-2">
                                 <svg
                                   className="h-8 w-8 mx-auto"
                                   fill="none"
@@ -669,11 +679,11 @@ export function ParticipantDashboard() {
                                   />
                                 </svg>
                               </div>
-                              <h4 className="text-sm font-medium text-yellow-800 mb-1">
-                                On Waitlist
+                              <h4 className="text-sm font-medium text-foreground mb-1">
+                                On waitlist
                               </h4>
-                              <p className="text-xs text-yellow-700">
-                                You'll be notified if a spot becomes available
+                              <p className="text-xs text-muted-foreground">
+                                You'll be notified if a spot becomes available.
                               </p>
                             </div>
                           )}
@@ -683,8 +693,8 @@ export function ParticipantDashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+                <div className="text-center py-10 sm:py-12 rounded-2xl border border-dashed border-border/70 bg-background">
+                  <div className="mx-auto h-12 w-12 text-muted-foreground mb-4">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         strokeLinecap="round"
@@ -694,37 +704,56 @@ export function ParticipantDashboard() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No Events Registered
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    No events registered yet
                   </h3>
-                  <p className="text-gray-600 mb-4">
-                    You haven't registered for any events yet. Browse available events to
-                    get started.
+                  <p className="text-sm text-muted-foreground mb-4">
+                    You haven't registered for any events yet. Browse available events to get started.
                   </p>
                   <button
                     onClick={() => navigate('/events')}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                    className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
-                    Browse Events
+                    Browse events
                   </button>
                 </div>
               )}
-            </div>
 
-            {/* Compact event discovery so participants can browse upcoming events */}
-            <section className="bg-white rounded-lg shadow p-6">
+              <div className="mt-6 border-t border-border/60 pt-4 flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
+                <div>
+                  Page <span className="font-medium text-foreground">{currentPage}</span> of{' '}
+                  <span className="font-medium text-foreground">{totalPages}</span>
+                </div>
+                <div className="inline-flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-full border border-input bg-background px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted/60 transition-colors"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="rounded-full border border-input bg-background px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted/60 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Discover Upcoming Events
-                  </h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">Discover upcoming events</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Browse a few upcoming events you might be interested in.
                   </p>
                 </div>
                 <button
                   onClick={() => navigate('/events')}
-                  className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80"
                 >
                   View all
                 </button>
@@ -734,23 +763,21 @@ export function ParticipantDashboard() {
                 {upcomingRegistrations.slice(0, 3).map((registration) => (
                   <div
                     key={registration.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    className="rounded-xl border border-border/60 bg-background p-4 hover:shadow-md transition-shadow"
                   >
-                    <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                    <h4 className="text-sm font-semibold text-foreground mb-1">
                       {registration.event.name}
                     </h4>
-                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
                       {registration.event.description}
                     </p>
-                    <p className="text-xs text-gray-500 mb-3">
-                      {new Date(
-                        registration.event.startDate,
-                      ).toLocaleDateString()}{' '}
-                      • {registration.event.mode.toLowerCase()}
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {new Date(registration.event.startDate).toLocaleDateString()} •{' '}
+                      {registration.event.mode.toLowerCase()}
                     </p>
                     <Link
                       to={`/events/${registration.event.id}`}
-                      className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                      className="text-xs font-medium text-primary hover:text-primary/80"
                     >
                       View event
                     </Link>
@@ -758,9 +785,8 @@ export function ParticipantDashboard() {
                 ))}
 
                 {upcomingRegistrations.length === 0 && (
-                  <div className="col-span-full text-sm text-gray-500">
-                    You don't have any upcoming events yet. Browse events to discover
-                    what's coming up.
+                  <div className="col-span-full text-sm text-muted-foreground">
+                    You don't have any upcoming events yet. Browse events to discover what's coming up.
                   </div>
                 )}
               </div>
@@ -769,210 +795,202 @@ export function ParticipantDashboard() {
         )}
 
         {activeTab === 'certificates' && (
-           <div className="space-y-6 sm:space-y-8">
-             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
-               <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Certificates</h2>
-               <Link
-                 to="/verify-certificate"
-                 className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
-               >
-                 Public certificate verification
-               </Link>
-             </div>
- 
-             {certificates && certificates.length > 0 ? (
-               <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
-                 {certificates.map((certificate) => (
-                   <div
-                     key={certificate.id}
-                     className="bg-card rounded-lg shadow p-4 flex flex-col justify-between"
-                   >
-                     <div>
-                       <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
-                         {certificate.event.name}
-                       </h3>
-                       <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Certificate ID</p>
-                       <p className="text-[11px] sm:text-xs font-mono text-foreground break-all mb-2.5 sm:mb-3">
-                         {certificate.code}
-                       </p>
-                     </div>
-                     <p className="text-[11px] sm:text-xs text-muted-foreground mt-auto">
-                       Issued on {new Date(certificate.issuedAt).toLocaleDateString()}
-                     </p>
-                   </div>
-                 ))}
-               </div>
-             ) : (
-               <div className="text-center py-10 sm:py-12 bg-card rounded-lg shadow">
-                 <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
-                   No Certificates Yet
-                 </h3>
-                 <p className="text-sm text-muted-foreground mb-3 sm:mb-4">
-                   Certificates from completed events will appear here.
-                 </p>
-                 <p className="text-xs sm:text-sm text-muted-foreground">
-                   If you think you're missing a certificate, please contact the event organizer.
-                 </p>
-               </div>
-             )}
-           </div>
-         )}
-
-        {activeTab === 'profile' && (
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Profile Settings</h2>
+          <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground">My Certificates</h2>
+                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                  Certificates from completed events will appear here once issued by organizers.
+                </p>
+              </div>
               <Link
-                to="/complete-profile"
-                className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
+                to="/verify-certificate"
+                className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
               >
-                Edit Profile
+                Public certificate verification
               </Link>
             </div>
- 
-            <div className="space-y-6 sm:space-y-8">
-              <div className="bg-card rounded-lg shadow p-4 sm:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-3 sm:space-y-4">
+
+            {certificates && certificates.length > 0 ? (
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {certificates.map((certificate) => (
+                  <div
+                    key={certificate.id}
+                    className="bg-background rounded-xl border border-border/60 p-4 flex flex-col justify-between shadow-xs"
+                  >
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Name
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">
-                        {user?.name || 'Not provided'}
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
+                        {certificate.event.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Certificate ID</p>
+                      <p className="text-[11px] sm:text-xs font-mono text-foreground break-all mb-2.5 sm:mb-3">
+                        {certificate.code}
                       </p>
                     </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Email
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">{user?.email}</p>
+                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-auto">
+                      Issued on {new Date(certificate.issuedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 sm:py-12 rounded-2xl border border-dashed border-border/70 bg-background">
+                <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
+                  No certificates yet
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3 sm:mb-4">
+                  Certificates from completed events will appear here.
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  If you think you're missing a certificate, please contact the event organizer.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {activeTab === 'profile' && (
+          <div className="space-y-6 sm:space-y-8">
+            <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Profile settings</h2>
+                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                    Keep your personal details up to date so organizers and teammates can recognize you.
+                  </p>
+                </div>
+                <Link
+                  to="/complete-profile"
+                  className="rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Edit profile
+                </Link>
+              </div>
+
+              <div className="space-y-6 sm:space-y-8">
+                <div className="bg-background rounded-xl border border-border/60 p-4 sm:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="mt-1 text-sm text-foreground">{user?.name || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="mt-1 text-sm text-foreground">{user?.email}</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Role</label>
+                        <p className="mt-1 text-sm text-foreground">{user?.role}</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Organization</label>
+                        <p className="mt-1 text-sm text-foreground">{user?.organization || 'Not provided'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Role
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">{user?.role}</p>
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Organization
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">
-                        {user?.organization || 'Not provided'}
-                      </p>
+
+                    <div className="space-y-3 sm:space-y-4">
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="mt-1 text-sm text-foreground">{user?.phone || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Website</label>
+                        <p className="mt-1 text-sm text-foreground">
+                          {user?.website ? (
+                            <a
+                              href={user.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80"
+                            >
+                              {user.website}
+                            </a>
+                          ) : (
+                            'Not provided'
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Email status</label>
+                        <p className="mt-1 text-sm text-foreground">
+                          <span
+                            className={`inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
+                              user?.emailVerified
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {user?.emailVerified ? 'Verified' : 'Pending verification'}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
- 
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Phone
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">
-                        {user?.phone || 'Not provided'}
-                      </p>
+
+                  {user?.bio && (
+                    <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Bio</label>
+                      <p className="mt-1 text-sm text-foreground">{user.bio}</p>
                     </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Website
+                  )}
+
+                  {user?.socialLinks && Object.keys(user.socialLinks).length > 0 && (
+                    <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
+                        Social links
                       </label>
-                      <p className="mt-1 text-sm text-foreground">
-                        {user?.website ? (
+                      <div className="flex flex-wrap gap-3 text-sm">
+                        {user.socialLinks.linkedin && (
                           <a
-                            href={user.website}
+                            href={user.socialLinks.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary hover:text-primary/80"
                           >
-                            {user.website}
+                            LinkedIn
                           </a>
-                        ) : (
-                          'Not provided'
                         )}
-                      </p>
+                        {user.socialLinks.twitter && (
+                          <a
+                            href={user.socialLinks.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80"
+                          >
+                            Twitter
+                          </a>
+                        )}
+                        {user.socialLinks.github && (
+                          <a
+                            href={user.socialLinks.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80"
+                          >
+                            GitHub
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
-                        Email Status
-                      </label>
-                      <p className="mt-1 text-sm text-foreground">
-                        <span
-                          className={`inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
-                            user?.emailVerified
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {user?.emailVerified ? 'Verified' : 'Pending Verification'}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
- 
-                {user?.bio && (
-                  <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
-                    <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Bio</label>
-                    <p className="mt-1 text-sm text-foreground">{user.bio}</p>
-                  </div>
-                )}
- 
-                {user?.socialLinks && Object.keys(user.socialLinks).length > 0 && (
-                  <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
-                    <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
-                      Social Links
-                    </label>
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      {user.socialLinks.linkedin && (
-                        <a
-                          href={user.socialLinks.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80"
-                        >
-                          LinkedIn
-                        </a>
-                      )}
-                      {user.socialLinks.twitter && (
-                        <a
-                          href={user.socialLinks.twitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80"
-                        >
-                          Twitter
-                        </a>
-                      )}
-                      {user.socialLinks.github && (
-                        <a
-                          href={user.socialLinks.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80"
-                        >
-                          GitHub
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
- 
-              <section>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1.5 sm:mb-2">
-                  Followed Organizations
-                </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                  Stay up to date with announcements and events from organizations you
-                  follow.
-                </p>
-                <FollowedOrganizations />
-              </section>
-            </div>
+            </section>
+
+            <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1.5 sm:mb-2">
+                Followed organizations
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
+                Stay up to date with announcements and events from organizations you follow.
+              </p>
+              <FollowedOrganizations />
+            </section>
           </div>
         )}
       </main>
+
     </div>
   );
 }
