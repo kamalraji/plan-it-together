@@ -5,6 +5,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
 import api from '../../../lib/api';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 /**
  * WorkspaceServiceDashboard provides the AWS-style service landing page for Workspace Management.
@@ -16,69 +17,106 @@ import api from '../../../lib/api';
  */
 export const WorkspaceServiceDashboard: React.FC = () => {
   useAuth();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-  // Fetch user's workspaces
+  const currentPath = location.pathname;
+  const orgSlugCandidate = currentPath.split('/')[1];
+  const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+  const eventId = searchParams.get('eventId');
+
+  // Fetch user's workspaces (scoped by org/event via query params when available)
   const { data: workspaces, isLoading } = useQuery({
-    queryKey: ['user-workspaces'],
+    queryKey: ['user-workspaces', orgSlugCandidate, eventId],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces');
+      const response = await api.get('/workspaces/my-workspaces', {
+        params: {
+          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
+          eventId: eventId || undefined,
+        },
+      });
       return response.data.workspaces as Workspace[];
     },
   });
 
-  // Calculate dashboard metrics
+  // Calculate dashboard metrics, optionally scoped by event
   const dashboardData = React.useMemo(() => {
     if (!workspaces) return null;
 
-    const activeWorkspaces = workspaces.filter(w => w.status === WorkspaceStatus.ACTIVE);
-    const provisioningWorkspaces = workspaces.filter(w => w.status === WorkspaceStatus.PROVISIONING);
-    const windingDownWorkspaces = workspaces.filter(w => w.status === WorkspaceStatus.WINDING_DOWN);
-    
-    // Calculate total tasks and team members across all workspaces
-    const totalTasks = workspaces.reduce((sum, w) => sum + (w.taskSummary?.total || 0), 0);
-    const totalTeamMembers = workspaces.reduce((sum, w) => sum + (w.teamMembers?.length || 0), 0);
+    const scopedWorkspaces = eventId
+      ? workspaces.filter((w) => w.eventId === eventId)
+      : workspaces;
+
+    if (!scopedWorkspaces.length) {
+      return {
+        metrics: {
+          totalWorkspaces: 0,
+          activeWorkspaces: 0,
+          provisioningWorkspaces: 0,
+          windingDownWorkspaces: 0,
+          totalTasks: 0,
+          totalTeamMembers: 0,
+        },
+        recentWorkspaces: [],
+        quickActions: [],
+      };
+    }
+
+    const activeWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.ACTIVE);
+    const provisioningWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.PROVISIONING);
+    const windingDownWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.WINDING_DOWN);
+
+    const totalTasks = scopedWorkspaces.reduce((sum, w) => sum + (w.taskSummary?.total || 0), 0);
+    const totalTeamMembers = scopedWorkspaces.reduce((sum, w) => sum + (w.teamMembers?.length || 0), 0);
+
+    const baseWorkspacePath = isOrgContext && orgSlugCandidate
+      ? `/${orgSlugCandidate}/workspaces`
+      : '/dashboard/workspaces';
 
     return {
       metrics: {
-        totalWorkspaces: workspaces.length,
+        totalWorkspaces: scopedWorkspaces.length,
         activeWorkspaces: activeWorkspaces.length,
         provisioningWorkspaces: provisioningWorkspaces.length,
         windingDownWorkspaces: windingDownWorkspaces.length,
         totalTasks,
         totalTeamMembers,
       },
-      recentWorkspaces: workspaces
+      recentWorkspaces: scopedWorkspaces
+        .slice()
         .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
         .slice(0, 5),
       quickActions: [
         {
           title: 'Create New Workspace',
           description: 'Start a new collaborative workspace',
-          href: '/console/workspaces/create',
+          href: `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`,
           icon: '🏗️',
           primary: true,
         },
         {
           title: 'Browse Templates',
           description: 'Use pre-built workspace templates',
-          href: '/console/workspaces/templates',
+          href: `${baseWorkspacePath}/templates`,
           icon: '📋',
         },
         {
           title: 'View All Workspaces',
           description: 'Manage your existing workspaces',
-          href: '/console/workspaces/list',
+          href: `${baseWorkspacePath}/list${eventId ? `?eventId=${eventId}` : ''}`,
           icon: '📊',
         },
         {
           title: 'Team Analytics',
           description: 'View team performance metrics',
-          href: '/console/analytics/workspaces',
+          href: isOrgContext && orgSlugCandidate
+            ? `/${orgSlugCandidate}/analytics?scope=workspaces${eventId ? `&eventId=${eventId}` : ''}`
+            : '/dashboard/analytics?scope=workspaces',
           icon: '📈',
         },
       ],
     };
-  }, [workspaces]);
+  }, [workspaces, eventId, isOrgContext, orgSlugCandidate]);
 
   const pageActions = [
     {
@@ -132,7 +170,13 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         {/* Page Header */}
         <PageHeader
           title="Workspace Management"
-          subtitle="Create, manage, and collaborate in event workspaces"
+          subtitle={
+            eventId
+              ? 'Workspaces for this event and organization'
+              : isOrgContext
+                ? 'Workspaces for this organization'
+                : 'Create, manage, and collaborate in event workspaces'
+          }
           actions={pageActions}
         />
 

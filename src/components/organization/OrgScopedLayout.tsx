@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
-import { EventService } from '@/components/routing/services';
+import { EventService, WorkspaceService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
@@ -83,6 +83,7 @@ export const OrgScopedLayout: React.FC = () => {
               <Routes>
                 <Route path="dashboard" element={<OrganizerDashboard />} />
                 <Route path="eventmanagement/*" element={<EventService />} />
+                <Route path="workspaces/*" element={<WorkspaceService />} />
                 <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
                 <Route path="team" element={<OrganizationTeamManagement />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />
