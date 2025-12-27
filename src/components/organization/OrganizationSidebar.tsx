@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/components/ui/sidebar';
 import { LayoutDashboard, CalendarDays, LineChart, Users } from 'lucide-react';
 
@@ -24,13 +23,12 @@ const orgItems = [
 export const OrganizationSidebar: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const location = useLocation();
-  const { state } = useSidebar();
 
   const base = `/${orgSlug ?? ''}`.replace(/\/$/, '');
   const currentPath = location.pathname;
 
   return (
-    <Sidebar collapsible="icon" className={state === 'collapsed' ? 'w-14' : 'w-60'}>
+    <Sidebar collapsible="offcanvas">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Organization</SidebarGroupLabel>
@@ -50,7 +48,7 @@ export const OrganizationSidebar: React.FC = () => {
                         activeClassName="text-primary font-semibold"
                       >
                         <item.icon className="h-4 w-4" />
-                        {state === 'expanded' && <span>{item.title}</span>}
+                        <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
