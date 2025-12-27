@@ -12,7 +12,7 @@ export const LoadingSpinner: React.FC<{
   };
 
   return (
-    <div className={`animate-spin rounded-full border-b-2 border-indigo-600 ${sizeClasses[size]} ${className}`} />
+    <div className={`animate-spin rounded-full border-b-2 border-primary ${sizeClasses[size]} ${className}`} />
   );
 };
 
@@ -23,7 +23,7 @@ export const PageLoading: React.FC<{
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
       <LoadingSpinner size="lg" />
-      <p className="text-gray-600 text-sm">{message}</p>
+      <p className="text-muted-foreground text-sm">{message}</p>
     </div>
   );
 };
@@ -31,18 +31,18 @@ export const PageLoading: React.FC<{
 // Skeleton loading components for different content types
 export const SkeletonCard: React.FC = () => {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+    <div className="bg-card rounded-lg border border-border p-6 animate-pulse">
       <div className="flex items-center space-x-3 mb-4">
-        <div className="w-8 h-8 bg-gray-200 rounded"></div>
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
+        <div className="w-8 h-8 bg-muted rounded" />
+        <div className="h-4 bg-muted rounded w-32" />
       </div>
       <div className="space-y-2">
-        <div className="h-3 bg-gray-200 rounded w-full"></div>
-        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-3 bg-muted rounded w-full" />
+        <div className="h-3 bg-muted rounded w-3/4" />
       </div>
       <div className="mt-4 space-y-1">
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+        <div className="h-3 bg-muted rounded w-1/2" />
+        <div className="h-3 bg-muted rounded w-1/3" />
       </div>
     </div>
   );
@@ -53,23 +53,23 @@ export const SkeletonTable: React.FC<{
   columns?: number;
 }> = ({ rows = 5, columns = 4 }) => {
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden animate-pulse">
+    <div className="bg-card shadow rounded-lg overflow-hidden animate-pulse">
       {/* Table header */}
-      <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+      <div className="bg-muted/40 px-6 py-3 border-b border-border">
         <div className="flex space-x-4">
           {Array.from({ length: columns }).map((_, i) => (
-            <div key={i} className="h-4 bg-gray-200 rounded flex-1"></div>
+            <div key={i} className="h-4 bg-muted rounded flex-1" />
           ))}
         </div>
       </div>
       
       {/* Table rows */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div key={rowIndex} className="px-6 py-4">
             <div className="flex space-x-4">
               {Array.from({ length: columns }).map((_, colIndex) => (
-                <div key={colIndex} className="h-4 bg-gray-200 rounded flex-1"></div>
+                <div key={colIndex} className="h-4 bg-muted rounded flex-1" />
               ))}
             </div>
           </div>
@@ -85,14 +85,14 @@ export const SkeletonList: React.FC<{
   return (
     <div className="space-y-4">
       {Array.from({ length: items }).map((_, index) => (
-        <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+        <div key={index} className="bg-card rounded-lg border border-border p-4 animate-pulse">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+            <div className="w-12 h-12 bg-muted rounded-full" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-3/4" />
+              <div className="h-3 bg-muted rounded w-1/2" />
             </div>
-            <div className="w-20 h-8 bg-gray-200 rounded"></div>
+            <div className="w-20 h-8 bg-muted rounded" />
           </div>
         </div>
       ))}
@@ -105,8 +105,8 @@ export const SkeletonDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Header skeleton */}
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-96"></div>
+      <div className="h-8 bg-muted rounded w-64 mb-2" />
+      <div className="h-4 bg-muted rounded w-96" />
       </div>
 
       {/* Dashboard cards skeleton */}
@@ -130,14 +130,14 @@ export const ProgressBar: React.FC<{
   return (
     <div className={`w-full ${className}`}>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-sm text-gray-600">Loading...</span>
+        <span className="text-sm text-muted-foreground">Loading...</span>
         {showPercentage && (
-          <span className="text-sm text-gray-600">{Math.round(clampedProgress)}%</span>
+          <span className="text-sm text-muted-foreground">{Math.round(clampedProgress)}%</span>
         )}
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-muted/40 rounded-full h-2">
         <div
-          className="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-out"
+          className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${clampedProgress}%` }}
         />
       </div>
@@ -172,7 +172,7 @@ export const InlineLoading: React.FC<{
   message?: string;
 }> = ({ message = 'Loading...' }) => {
   return (
-    <div className="flex items-center space-x-2 text-gray-600">
+    <div className="flex items-center space-x-2 text-muted-foreground">
       <LoadingSpinner size="sm" />
       <span className="text-sm">{message}</span>
     </div>
@@ -187,13 +187,13 @@ export const SkeletonForm: React.FC<{
     <div className="space-y-6 animate-pulse">
       {Array.from({ length: fields }).map((_, index) => (
         <div key={index} className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-24"></div>
-          <div className="h-10 bg-gray-200 rounded w-full"></div>
+          <div className="h-4 bg-muted rounded w-24" />
+          <div className="h-10 bg-muted rounded w-full" />
         </div>
       ))}
       <div className="flex space-x-3 pt-4">
-        <div className="h-10 bg-gray-200 rounded w-24"></div>
-        <div className="h-10 bg-gray-200 rounded w-20"></div>
+        <div className="h-10 bg-muted rounded w-24" />
+        <div className="h-10 bg-muted rounded w-20" />
       </div>
     </div>
   );
@@ -201,21 +201,21 @@ export const SkeletonForm: React.FC<{
 
 export const SkeletonChart: React.FC = () => {
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 animate-pulse">
-      <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+    <div className="bg-card p-6 rounded-lg border border-border animate-pulse">
+      <div className="h-6 bg-muted rounded w-48 mb-4" />
       <div className="space-y-3">
         <div className="flex items-end space-x-2 h-32">
           {Array.from({ length: 7 }).map((_, i) => (
             <div
               key={i}
-              className="bg-gray-200 rounded-t flex-1"
+              className="bg-muted rounded-t flex-1"
               style={{ height: `${Math.random() * 80 + 20}%` }}
-            ></div>
+            />
           ))}
         </div>
         <div className="flex justify-between">
           {Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className="h-3 bg-gray-200 rounded w-8"></div>
+            <div key={i} className="h-3 bg-muted rounded w-8" />
           ))}
         </div>
       </div>
@@ -225,22 +225,22 @@ export const SkeletonChart: React.FC = () => {
 
 export const SkeletonProfile: React.FC = () => {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+    <div className="bg-card rounded-lg border border-border p-6 animate-pulse">
       <div className="flex items-center space-x-4 mb-6">
-        <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+        <div className="w-16 h-16 bg-muted rounded-full" />
         <div className="space-y-2">
-          <div className="h-5 bg-gray-200 rounded w-32"></div>
-          <div className="h-4 bg-gray-200 rounded w-24"></div>
+          <div className="h-5 bg-muted rounded w-32" />
+          <div className="h-4 bg-muted rounded w-24" />
         </div>
       </div>
       <div className="space-y-4">
         <div className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-20"></div>
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
+          <div className="h-4 bg-muted rounded w-20" />
+          <div className="h-4 bg-muted rounded w-full" />
         </div>
         <div className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-16"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-muted rounded w-16" />
+          <div className="h-4 bg-muted rounded w-3/4" />
         </div>
       </div>
     </div>
