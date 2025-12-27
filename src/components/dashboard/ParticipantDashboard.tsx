@@ -64,6 +64,25 @@ export function ParticipantDashboard() {
     if (typeof window === 'undefined') return true;
     return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
   });
+  const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
+
+  useEffect(() => {
+    const checkOrganizerSignup = async () => {
+      if (!user) return;
+      try {
+        const { data } = await supabase.auth.getUser();
+        const desiredRole = data.user?.user_metadata?.desiredRole;
+        const isOrganizerSignup = desiredRole === 'ORGANIZER';
+        if (isOrganizerSignup && user.role === 'PARTICIPANT') {
+          setShowOrganizerBanner(true);
+        }
+      } catch (error) {
+        console.warn('Failed to read auth metadata for organizer banner', error);
+      }
+    };
+
+    void checkOrganizerSignup();
+  }, [user]);
 
   const { data: registrations, isLoading } = useQuery<Registration[]>({
     queryKey: ['participant-registrations'],
@@ -214,6 +233,31 @@ export function ParticipantDashboard() {
            </div>
          </div>
        </header>
+
+      {/* Organizer onboarding banner for new organizer signups */}
+      {showOrganizerBanner && (
+        <div className="bg-accent/80 text-accent-foreground border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
+            <span>
+              You signed up as an organizer. To unlock organizer tools, first create your organization.
+            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/onboarding/organization')}
+                className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
+              >
+                Set up organization
+              </button>
+              <button
+                onClick={() => setShowOrganizerBanner(false)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Profile completion banner */}
       {isProfileIncomplete && showProfileBanner && (
