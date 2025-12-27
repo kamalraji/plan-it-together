@@ -154,17 +154,17 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   };
 
   const getRoleBadge = (role: WorkspaceRole) => {
-    const roleColors = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
-      [WorkspaceRole.TEAM_LEAD]: 'bg-blue-100 text-blue-800',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
-      [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-green-100 text-green-800',
-      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'bg-orange-100 text-orange-800',
-      [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
-      [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-gray-100 text-gray-800',
-    } as const;
+    const roleClasses: Record<WorkspaceRole, string> = {
+      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-primary/10 text-primary',
+      [WorkspaceRole.TEAM_LEAD]: 'bg-secondary/10 text-secondary-foreground',
+      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-accent/10 text-accent-foreground',
+      [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-muted text-foreground',
+      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'bg-primary/10 text-primary-foreground',
+      [WorkspaceRole.MARKETING_LEAD]: 'bg-accent text-accent-foreground',
+      [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-muted text-foreground',
+    };
 
-    const roleLabels = {
+    const roleLabels: Record<WorkspaceRole, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
       [WorkspaceRole.TEAM_LEAD]: 'Team Lead',
       [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
@@ -172,10 +172,10 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
       [WorkspaceRole.TECHNICAL_SPECIALIST]: 'Tech Specialist',
       [WorkspaceRole.MARKETING_LEAD]: 'Marketing Lead',
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
-    } as const;
+    };
 
-    const roleClassName = roleColors[role] || 'bg-gray-100 text-gray-800';
-    const roleLabel = roleLabels[role] || 'Member';
+    const roleClassName = roleClasses[role] ?? 'bg-muted text-foreground';
+    const roleLabel = roleLabels[role] ?? 'Member';
 
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClassName}`}>
