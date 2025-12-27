@@ -244,9 +244,9 @@ export function ParticipantDashboard() {
 
       {/* Hero with floating profile card */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/90 via-accent/80 to-secondary/80 shadow-xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/90 via-accent/80 to-secondary/80 shadow-xl min-h-[180px] sm:min-h-[220px]">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_hsl(var(--card))/0.2,_transparent_60%),_radial-gradient(circle_at_bottom,_hsl(var(--primary-foreground))/0.15,_transparent_55%)]" />
-          <div className="relative px-6 sm:px-10 py-8 sm:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="relative px-6 sm:px-10 py-7 sm:py-9 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-xs sm:text-sm text-primary-foreground/80 mb-1">/ Participant view</p>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-primary-foreground">
@@ -265,8 +265,8 @@ export function ParticipantDashboard() {
           </div>
 
           {/* Floating profile card */}
-          <div className="pointer-events-none absolute -bottom-10 left-4 sm:left-10">
-            <div className="pointer-events-auto rounded-2xl border border-border/60 bg-card/95 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 shadow-2xl min-w-[220px] sm:min-w-[260px]">
+          <div className="pointer-events-none absolute -bottom-9 sm:-bottom-10 left-4 sm:left-10 right-4 sm:right-auto">
+            <div className="pointer-events-auto rounded-2xl border border-border/60 bg-card/95 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 shadow-2xl max-w-sm sm:min-w-[260px]">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                 Signed in as
               </p>
@@ -339,21 +339,21 @@ export function ParticipantDashboard() {
 
       {/* QR Pass Modal */}
       {canShowQrPass && qrCoreRegistration && qrRegistration && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
           <div className="max-w-md w-full mx-4">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Event Pass</h2>
+            <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+                <h2 className="text-base sm:text-lg font-semibold text-foreground">Event Pass</h2>
                 <button
                   onClick={() => setQrRegistration(null)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-muted-foreground hover:text-foreground text-lg leading-none"
                   aria-label="Close event pass"
                 >
                   ✕
                 </button>
               </div>
-              <div className="p-4 space-y-3">
-                <p className="text-sm text-gray-600">
+              <div className="p-4 sm:p-5 space-y-3">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   This QR code is your personal check-in ID. It works for any event where you have a confirmed registration.
                 </p>
                 <QRCodeDisplay
@@ -366,10 +366,45 @@ export function ParticipantDashboard() {
         </div>
       )}
 
+      {/* Summary metrics */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Upcoming events</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {upcomingRegistrations.length}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">Next {upcomingRegistrations.length === 1 ? 'event' : 'events'}</span>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Past events</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {(registrations?.length ?? 0) - upcomingRegistrations.length}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">Completed experiences</span>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Certificates</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {certificates?.length ?? 0}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">Earned so far</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-12">
         <div className="bg-card border border-border/60 rounded-2xl px-2 sm:px-3 py-2 shadow-sm overflow-x-auto">
-          <nav className="flex gap-2 sm:gap-3">
+          <nav className="flex gap-2 sm:gap-3 min-w-max">
             {[
               { key: 'events', label: 'My Events' },
               { key: 'certificates', label: 'Certificates' },
@@ -394,8 +429,7 @@ export function ParticipantDashboard() {
         </div>
       </div>
 
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-14 sm:pt-16">
         {activeTab === 'events' && (
           <div className="space-y-6 sm:space-y-8">
             <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6">
