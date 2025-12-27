@@ -94,8 +94,60 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get current service from URL (dashboard is at /dashboard/...)
-  const currentService = location.pathname.split('/')[2] || 'dashboard';
+  const currentPath = location.pathname;
+  const orgSlugCandidate = currentPath.split('/')[1];
+  const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+
+  const getServicePath = (serviceId: string): string => {
+    if (isOrgContext && orgSlugCandidate) {
+      switch (serviceId) {
+        case 'dashboard':
+          return `/${orgSlugCandidate}/dashboard`;
+        case 'events':
+          return `/${orgSlugCandidate}/eventmanagement`;
+        case 'workspaces':
+          return `/${orgSlugCandidate}/workspaces`;
+        case 'marketplace':
+          return `/${orgSlugCandidate}/marketplace`;
+        case 'organizations':
+          return `/dashboard/organizations`;
+        case 'analytics':
+          return `/${orgSlugCandidate}/analytics`;
+        default:
+          return `/${orgSlugCandidate}/dashboard`;
+      }
+    }
+
+    switch (serviceId) {
+      case 'dashboard':
+        return '/dashboard';
+      case 'events':
+        return '/dashboard/eventmanagement';
+      case 'workspaces':
+        return '/dashboard/workspaces';
+      case 'marketplace':
+        return '/marketplace';
+      case 'organizations':
+        return '/dashboard/organizations';
+      case 'analytics':
+        return '/dashboard/analytics';
+      default:
+        return '/dashboard';
+    }
+  };
+
+  const currentService: string = (() => {
+    for (const service of services) {
+      const pathForService = getServicePath(service.id);
+      if (
+        currentPath === pathForService ||
+        currentPath.startsWith(pathForService + '/')
+      ) {
+        return service.id;
+      }
+    }
+    return 'dashboard';
+  })();
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -117,9 +169,9 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const handleServiceSelect = (serviceId: string) => {
     setIsServiceSwitcherOpen(false);
     onServiceChange(serviceId);
-    navigate(`/dashboard/${serviceId}`);
+    const target = getServicePath(serviceId);
+    navigate(target);
   };
-
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 h-16">
       <div className="flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
