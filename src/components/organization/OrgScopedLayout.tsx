@@ -5,7 +5,6 @@ import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganizati
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
 import { EventService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
-import { OrganizationSwitcher } from './OrganizationSwitcher';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
@@ -80,11 +79,6 @@ export const OrgScopedLayout: React.FC = () => {
           <OrganizationSidebar />
 
           <SidebarInset>
-            {/* Organization switcher bar inside the org-scoped console */}
-            <div className="border-b bg-card px-4 py-3 flex items-center gap-3">
-              <OrganizationSwitcher />
-            </div>
-
             <div className="px-4 py-6">
               <Routes>
                 <Route path="dashboard" element={<OrganizerDashboard />} />
