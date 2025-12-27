@@ -14,6 +14,8 @@ import {
 import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
 import api from '../../../lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import { UserRole } from '@/types';
 
 /**
  * WorkspaceListPage provides AWS-style resource list interface for workspaces.
@@ -24,6 +26,7 @@ import api from '../../../lib/api';
  * - Quick actions for common workspace operations
  */
 export const WorkspaceListPage: React.FC = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -39,6 +42,9 @@ export const WorkspaceListPage: React.FC = () => {
   const baseWorkspacePath = isOrgContext && orgSlugCandidate
     ? `/${orgSlugCandidate}/workspaces`
     : '/dashboard/workspaces';
+
+  const canManageWorkspaces =
+    !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
 
   // Fetch workspaces
   const { data: workspaces, isLoading, error } = useQuery({
@@ -175,66 +181,75 @@ export const WorkspaceListPage: React.FC = () => {
       render: (_value: any, workspace: Workspace) => (
         <div className="flex items-center space-x-2">
           <Link
-            to={`/dashboard/workspaces/${workspace.id}`}
+            to={`${baseWorkspacePath}/${workspace.id}`}
             className="text-blue-600 hover:text-blue-500 p-1"
             title="View workspace"
           >
             <EyeIcon className="w-4 h-4" />
           </Link>
-          <Link
-            to={`/dashboard/workspaces/${workspace.id}/edit`}
-            className="text-gray-600 hover:text-gray-500 p-1"
-            title="Edit workspace"
-          >
-            <PencilIcon className="w-4 h-4" />
-          </Link>
-          <button
-            onClick={() => handleDeleteWorkspace(workspace.id)}
-            className="text-red-600 hover:text-red-500 p-1"
-            title="Delete workspace"
-          >
-            <TrashIcon className="w-4 h-4" />
-          </button>
+          {canManageWorkspaces && (
+            <>
+              <Link
+                to={`${baseWorkspacePath}/${workspace.id}/edit`}
+                className="text-gray-600 hover:text-gray-500 p-1"
+                title="Edit workspace"
+              >
+                <PencilIcon className="w-4 h-4" />
+              </Link>
+              <button
+                onClick={() => handleDeleteWorkspace(workspace.id)}
+                className="text-red-600 hover:text-red-500 p-1"
+                title="Delete workspace"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       ),
     },
   ];
 
-  const bulkActions = [
-    {
-      label: 'Archive Selected',
-      action: (selectedItems: Workspace[]) => {
-        console.log('Archive workspaces:', selectedItems);
-        // Implement bulk archive logic
-      },
-      icon: 'archive',
-      confirmationRequired: true,
-    },
-    {
-      label: 'Delete Selected',
-      action: (selectedItems: Workspace[]) => {
-        console.log('Delete workspaces:', selectedItems);
-        // Implement bulk delete logic
-      },
-      icon: 'trash',
-      confirmationRequired: true,
-    },
-  ];
+  const bulkActions = canManageWorkspaces
+    ? [
+        {
+          label: 'Archive Selected',
+          action: (selectedItems: Workspace[]) => {
+            console.log('Archive workspaces:', selectedItems);
+            // Implement bulk archive logic
+          },
+          icon: 'archive',
+          confirmationRequired: true,
+        },
+        {
+          label: 'Delete Selected',
+          action: (selectedItems: Workspace[]) => {
+            console.log('Delete workspaces:', selectedItems);
+            // Implement bulk delete logic
+          },
+          icon: 'trash',
+          confirmationRequired: true,
+        },
+      ]
+    : [];
 
-  const pageActions = [
-    {
-      label: 'Create Workspace',
-      action: () => {
-        window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-      },
-      variant: 'primary' as const,
-    },
-    {
-      label: 'Import Workspace',
-      action: () => console.log('Import workspace'),
-      variant: 'secondary' as const,
-    },
-  ];
+  const pageActions = canManageWorkspaces
+    ? [
+        {
+          label: 'Create Workspace',
+          action: () => {
+            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
+          },
+          variant: 'primary' as const,
+        },
+        {
+          label: 'Import Workspace',
+          action: () => console.log('Import workspace'),
+          variant: 'secondary' as const,
+        },
+      ]
+    : [];
+
 
   const handleDeleteWorkspace = (workspaceId: string) => {
     if (window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
@@ -421,7 +436,7 @@ export const WorkspaceListPage: React.FC = () => {
                 : 'Get started by creating your first workspace for event collaboration.'
               }
             </p>
-            {(!searchTerm && statusFilter === 'all') && (
+            {canManageWorkspaces && !searchTerm && statusFilter === 'all' && (
               <Link
                 to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"

@@ -6,6 +6,8 @@ import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
 import api from '../../../lib/api';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import { UserRole } from '@/types';
+
 
 /**
  * WorkspaceServiceDashboard provides the AWS-style service landing page for Workspace Management.
@@ -16,7 +18,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
  * - Service-specific widgets and analytics
  */
 export const WorkspaceServiceDashboard: React.FC = () => {
-  useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
  
@@ -118,20 +120,26 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     };
   }, [workspaces, eventId, isOrgContext, orgSlugCandidate, baseWorkspacePath]);
 
-  const pageActions = [
-    {
-      label: 'Create Workspace',
-      action: () => {
-        window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-      },
-      variant: 'primary' as const,
-    },
-    {
-      label: 'Import Workspace',
-      action: () => console.log('Import workspace'),
-      variant: 'secondary' as const,
-    },
-  ];
+  const canManageWorkspaces =
+    !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
+
+  const pageActions = canManageWorkspaces
+    ? [
+        {
+          label: 'Create Workspace',
+          action: () => {
+            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
+          },
+          variant: 'primary' as const,
+        },
+        {
+          label: 'Import Workspace',
+          action: () => console.log('Import workspace'),
+          variant: 'secondary' as const,
+        },
+      ]
+    : [];
+
 
   const getStatusColor = (status: WorkspaceStatus) => {
     switch (status) {
