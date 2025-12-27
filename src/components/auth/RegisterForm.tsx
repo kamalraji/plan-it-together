@@ -6,6 +6,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { motion } from 'framer-motion';
+import { AuthLayout } from './AuthLayout';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -80,16 +81,8 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Gradient backdrop with blurred color shapes */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
-        <div className="absolute -top-32 -right-20 h-72 w-72 rounded-full bg-gradient-to-br from-teal/40 via-sunny/40 to-coral/30 blur-3xl opacity-70" />
-        <div className="absolute -bottom-40 -left-24 h-80 w-80 rounded-full bg-gradient-to-tr from-coral/40 via-sunny/35 to-teal/35 blur-3xl opacity-65" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
-      </div>
-
-      <div className="relative max-w-md w-full space-y-8">
+    <AuthLayout>
+      <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
             Join the Adventure!
@@ -281,6 +274,6 @@ export function RegisterForm() {
           </form>
         </motion.div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

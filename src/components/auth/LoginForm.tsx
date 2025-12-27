@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
-
+import { AuthLayout } from './AuthLayout';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -86,21 +86,8 @@ export function LoginForm() {
     }
   };
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Gradient backdrop with blurred color glows */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
-        <div className="absolute -top-32 -left-24 h-72 w-72 rounded-full bg-gradient-to-br from-teal/40 via-sunny/35 to-coral/35 blur-3xl opacity-70" />
-        <div className="absolute -bottom-40 -right-32 h-80 w-80 rounded-full bg-gradient-to-tr from-teal/35 via-coral/40 to-sunny/35 blur-3xl opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
-      </div>
-
-      <motion.div
-        className="relative max-w-md w-full space-y-10"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
-      >
+    <AuthLayout>
+      <div className="space-y-10">
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-4xl font-semibold sm:font-bold tracking-tight text-foreground">
             Welcome back
@@ -220,7 +207,7 @@ export function LoginForm() {
             </motion.button>
           </form>
         </motion.div>
-      </motion.div>
-    </div>
+      </div>
+    </AuthLayout>
   );
 }
