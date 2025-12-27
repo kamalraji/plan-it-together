@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
@@ -19,6 +19,14 @@ interface Event {
   capacity?: number;
 }
 
+interface WorkspaceSummary {
+  id: string;
+  name: string;
+  status: string;
+  updatedAt: string;
+  event?: { id: string; name: string } | null;
+}
+ 
 export function OrganizerDashboard() {
   const { user, logout } = useAuth();
   const organization = useCurrentOrganization();
@@ -40,7 +48,17 @@ export function OrganizerDashboard() {
       return response.data.events as Event[];
     },
   });
-
+ 
+  const { data: workspaces } = useQuery({
+    queryKey: ['organizer-workspaces', organization.id],
+    queryFn: async () => {
+      const response = await api.get('/workspaces/my-workspaces', {
+        params: { orgSlug: organization.slug },
+      });
+      return response.data.workspaces as WorkspaceSummary[];
+    },
+  });
+ 
   const { data: analytics } = useQuery({
     queryKey: ['organizer-analytics', organization.id],
     queryFn: async () => {
@@ -51,6 +69,22 @@ export function OrganizerDashboard() {
     },
   });
 
+  const topWorkspaces = useMemo(() => {
+    if (!workspaces) return [];
+    return [...workspaces]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 3);
+  }, [workspaces]);
+ 
+  const upcomingMilestones = useMemo(() => {
+    if (!events) return [];
+    const now = new Date();
+    return [...events]
+      .filter((event) => new Date(event.startDate) > now)
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .slice(0, 3);
+  }, [events]);
+ 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -123,50 +157,123 @@ export function OrganizerDashboard() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Onboarding Checklist */}
-        <div className="mb-6">
-          <OrganizerOnboardingChecklist />
-        </div>
-
-        {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
-        {isProfileIncomplete && (
-          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">
-                  Complete Your Profile
-                </h3>
-                <div className="mt-2 text-sm text-yellow-700">
-                  <p>
-                    Complete your organizer profile to unlock all dashboard features and improve your event management experience.
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <div className="-mx-2 -my-1.5 flex">
-                    <Link
-                      to="/complete-profile"
-                      className="bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
-                    >
-                      Complete Profile
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setShowProfilePrompt(false)}
-                      className="ml-3 bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+         {/* Onboarding Checklist */}
+         <div className="mb-6">
+           <OrganizerOnboardingChecklist />
+         </div>
+ 
+         {/* Organizer overview widgets */}
+         <div className="mb-8 grid gap-6 lg:grid-cols-3">
+           <div className="bg-white rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-gray-900 mb-3">Top Workspaces</h2>
+             {topWorkspaces.length > 0 ? (
+               <ul className="space-y-3 text-sm text-gray-700">
+                 {topWorkspaces.map((ws) => (
+                   <li key={ws.id} className="flex items-center justify-between">
+                     <div>
+                       <div className="font-medium text-gray-900">{ws.name}</div>
+                       {ws.event && (
+                         <div className="text-xs text-gray-500">Event: {ws.event.name}</div>
+                       )}
+                     </div>
+                     <Link
+                       to={`/${organization.slug}/workspaces/${ws.id}`}
+                       className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                     >
+                       Open
+                     </Link>
+                   </li>
+                 ))}
+               </ul>
+             ) : (
+               <p className="text-sm text-gray-500">No workspaces yet for this organization.</p>
+             )}
+           </div>
+ 
+           <div className="bg-white rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-gray-900 mb-3">Upcoming Event Milestones</h2>
+             {upcomingMilestones.length > 0 ? (
+               <ul className="space-y-3 text-sm text-gray-700">
+                 {upcomingMilestones.map((event) => (
+                   <li key={event.id} className="flex items-center justify-between">
+                     <div>
+                       <div className="font-medium text-gray-900">{event.name}</div>
+                       <div className="text-xs text-gray-500">
+                         Starts {new Date(event.startDate).toLocaleDateString()}
+                       </div>
+                     </div>
+                     <Link
+                       to={`/events/${event.id}`}
+                       className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                     >
+                       View
+                     </Link>
+                   </li>
+                 ))}
+               </ul>
+             ) : (
+               <p className="text-sm text-gray-500">No upcoming events scheduled.</p>
+             )}
+           </div>
+ 
+           <div className="bg-white rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-gray-900 mb-3">Quick Links</h2>
+             <div className="space-y-3 text-sm">
+               <Link
+                 to={`/${organization.slug}/workspaces`}
+                 className="block w-full text-left px-4 py-2 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium"
+               >
+                 Go to Workspaces
+               </Link>
+               <Link
+                 to="/dashboard/organizations"
+                 className="block w-full text-left px-4 py-2 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium"
+               >
+                 Manage Organizations
+               </Link>
+             </div>
+           </div>
+         </div>
+ 
+         {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
+         {isProfileIncomplete && (
+           <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+             <div className="flex">
+               <div className="flex-shrink-0">
+                 <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                 </svg>
+               </div>
+               <div className="ml-3">
+                 <h3 className="text-sm font-medium text-yellow-800">
+                   Complete Your Profile
+                 </h3>
+                 <div className="mt-2 text-sm text-yellow-700">
+                   <p>
+                     Complete your organizer profile to unlock all dashboard features and improve your event management experience.
+                   </p>
+                 </div>
+                 <div className="mt-4">
+                   <div className="-mx-2 -my-1.5 flex">
+                     <Link
+                       to="/complete-profile"
+                       className="bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                     >
+                       Complete Profile
+                     </Link>
+                     <button
+                       type="button"
+                       onClick={() => setShowProfilePrompt(false)}
+                       className="ml-3 bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                     >
+                       Dismiss
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         )}
 
         {activeTab === 'events' && (
           <div>
@@ -213,11 +320,11 @@ export function OrganizerDashboard() {
                         Edit
                       </Link>
                       <Link
-                        to={`/workspaces/${event.id}`}
-                        className="text-green-600 hover:text-green-800 text-sm font-medium"
-                      >
-                        Event Workspace
-                      </Link>
+                         to={`/${organization.slug}/workspaces?eventId=${event.id}`}
+                         className="text-green-600 hover:text-green-800 text-sm font-medium"
+                       >
+                         Event Workspace
+                       </Link>
                     </div>
                   </div>
                 ))}
