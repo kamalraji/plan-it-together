@@ -62,10 +62,13 @@ export const OrgScopedLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isMemberOfOrg = !!memberOrganizations?.some((org: { id: string }) => org.id === organization.id);
+  // Treat org owners as implicit members so legacy orgs remain accessible
+  const isMemberOfOrg =
+    !!memberOrganizations?.some((org: { id: string }) => org.id === organization.id) ||
+    organization.owner_id === user.id;
 
   if (!isMemberOfOrg) {
-    // User is authenticated but not a member of this organization; send them back to generic dashboard
+    // User is authenticated but not a member of this organization; send them to generic dashboard
     return <Navigate to="/dashboard" replace />;
   }
 
