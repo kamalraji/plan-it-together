@@ -64,10 +64,10 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
 
   if (eventLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading event...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading event...</p>
         </div>
       </div>
     );
@@ -75,16 +75,16 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
 
   if (eventError || !event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
-          <div className="text-red-500 text-4xl mb-4 font-bold">!</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Event Not Found</h1>
-          <p className="text-gray-600 mb-6">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md w-full bg-card rounded-lg shadow-md p-6 text-center border border-border">
+          <div className="text-destructive text-4xl mb-4 font-bold">!</div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Event Not Found</h1>
+          <p className="text-muted-foreground mb-6">
             The event you're looking for doesn't exist or has been removed.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            className="bg-primary text-primary-foreground px-6 py-2 rounded-md hover:bg-primary/90 transition-colors"
           >
             Go Home
           </button>
@@ -100,8 +100,8 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="max-w-md w-full bg-card rounded-lg shadow-md p-6 border border-border">
         {/* Event Header */}
         <div className="text-center mb-6">
           {event.organization?.branding?.logoUrl && (
@@ -111,12 +111,12 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
               className="h-16 w-16 object-contain mx-auto mb-4"
             />
           )}
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{event.name}</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{event.name}</h1>
           {event.organization && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Hosted by {event.organization.name}
               {event.organization.verificationStatus === 'VERIFIED' && (
-                <span className="ml-1 text-blue-500">✓</span>
+                <span className="ml-1 text-primary">✓</span>
               )}
             </p>
           )}
@@ -126,8 +126,8 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
         <div className="border-t pt-6">
           <div className="text-center mb-6">
             <div className="text-yellow-500 text-4xl mb-3">🔒</div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Private Event</h2>
-            <p className="text-gray-600 text-sm">
+            <h2 className="text-lg font-semibold text-foreground mb-2">Private Event</h2>
+            <p className="text-muted-foreground text-sm">
               This is a private event. You need an invitation to access it.
             </p>
           </div>
@@ -136,14 +136,14 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
           {!inviteToken && (
             <form onSubmit={handleAccessCodeSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Access Code
                 </label>
                 <input
                   type="text"
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   placeholder="Enter your access code"
                   required
                 />
@@ -152,7 +152,7 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
               <button
                 type="submit"
                 disabled={validateAccessMutation.isPending || !accessCode.trim()}
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {validateAccessMutation.isPending ? 'Validating...' : 'Access Event'}
               </button>
@@ -162,8 +162,8 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
           {/* Validating invite token */}
           {inviteToken && validateAccessMutation.isPending && (
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-3"></div>
-              <p className="text-gray-600">Validating your invitation...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+              <p className="text-muted-foreground">Validating your invitation...</p>
             </div>
           )}
 
@@ -181,9 +181,9 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
           )}
 
           {/* Member Criteria Information (Requirements 24.3) */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <h3 className="text-sm font-medium text-blue-900 mb-2">How to get access:</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/30 rounded-md">
+            <h3 className="text-sm font-medium text-primary mb-2">How to get access:</h3>
+            <ul className="text-sm text-primary space-y-1">
               <li>• Contact the event organizer for an invitation</li>
               <li>• Use the invite link shared with you</li>
               {event.organization && (
@@ -194,7 +194,7 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
 
           {/* Contact Information */}
           <div className="mt-4 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Need help? Contact the event organizer
             </p>
           </div>
@@ -204,7 +204,7 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
         <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/')}
-            className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+            className="text-primary hover:text-primary/80 text-sm font-medium"
           >
             ← Back to Home
           </button>

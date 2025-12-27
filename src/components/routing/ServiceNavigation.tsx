@@ -419,8 +419,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                   onClick={() => handleServiceClick(service)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isItemActive(service)
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
                   }`}
                 >
                     <div className="flex-1 text-left">
@@ -458,7 +458,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Favorites Section */}
         {!searchQuery.trim() && favoriteServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center">
               <StarIcon className="h-3 w-3 mr-1" />
               Favorites
             </h3>
@@ -483,7 +483,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Recent Services Section */}
         {!searchQuery.trim() && recentServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center">
               <ClockIcon className="h-3 w-3 mr-1" />
               Recent
             </h3>
