@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '../../../hooks/useAuth';
@@ -34,14 +34,14 @@ export const OrganizationServiceDashboard: React.FC = () => {
   const { toast } = useToast();
   const createOrganization = useCreateOrganization();
 
-  const [newOrgName, setNewOrgName] = useState('');
-  const [newOrgSlug, setNewOrgSlug] = useState('');
-  const [newOrgCategory, setNewOrgCategory] = useState<
+  const [newOrgName, setNewOrgName] = React.useState('');
+  const [newOrgSlug, setNewOrgSlug] = React.useState('');
+  const [newOrgCategory, setNewOrgCategory] = React.useState<
     'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT'
   >('COMPANY');
 
-  const [transferOrgId, setTransferOrgId] = useState<string>('');
-  const [transferTargetUserId, setTransferTargetUserId] = useState<string>('');
+  const [transferOrgId, setTransferOrgId] = React.useState<string>('');
+  const [transferTargetUserId, setTransferTargetUserId] = React.useState<string>('');
 
   const isOrganizer =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
@@ -212,8 +212,12 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <span className="text-xl sm:text-2xl">🏢</span>
                 </div>
                 <div className="ml-3 sm:ml-4">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Organizations</p>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.totalOrganizations}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    Total Organizations
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    {metrics.totalOrganizations}
+                  </p>
                 </div>
               </div>
             </div>
@@ -224,8 +228,12 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <span className="text-xl sm:text-2xl">👑</span>
                 </div>
                 <div className="ml-3 sm:ml-4">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Managed Organizations</p>
-                  <p className="text-xl sm:text-2xl font-bold text-primary">{metrics.managedOrganizations}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    Managed Organizations
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary">
+                    {metrics.managedOrganizations}
+                  </p>
                 </div>
               </div>
             </div>
@@ -236,8 +244,12 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <span className="text-xl sm:text-2xl">👥</span>
                 </div>
                 <div className="ml-3 sm:ml-4">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Members</p>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.totalMembers}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    Total Members
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    {metrics.totalMembers}
+                  </p>
                 </div>
               </div>
             </div>
@@ -248,8 +260,12 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <span className="text-xl sm:text-2xl">❤️</span>
                 </div>
                 <div className="ml-3 sm:ml-4">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Followers</p>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.totalFollowers}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    Total Followers
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    {metrics.totalFollowers}
+                  </p>
                 </div>
               </div>
             </div>
@@ -260,8 +276,12 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <span className="text-xl sm:text-2xl">📅</span>
                 </div>
                 <div className="ml-3 sm:ml-4">
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Events</p>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.activeEvents}</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                    Active Events
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">
+                    {metrics.activeEvents}
+                  </p>
                 </div>
               </div>
             </div>
@@ -351,7 +371,9 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <select
                     value={newOrgCategory}
                     onChange={(e) =>
-                      setNewOrgCategory(e.target.value as 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT')
+                      setNewOrgCategory(
+                        e.target.value as 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT',
+                      )
                     }
                     className="w-full rounded-md border border-border bg-background px-3 py-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
@@ -425,7 +447,7 @@ export const OrganizationServiceDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
             <h3 className="text-base sm:text-lg font-medium text-foreground">Your Organizations</h3>
             <Link
-              to="/console/organizations/list"
+              to="/dashboard/organizations"
               className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
             >
               View all organizations →
@@ -459,41 +481,48 @@ export const OrganizationServiceDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-background divide-y divide-border">
-                    {recentOrganizations.map((org) => (
-                      <tr key={org.id} className="hover:bg-muted/60">
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">{org.name}</div>
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                            {org.role}
-                          </span>
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {org.memberCount}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {org.eventCount}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {org.followerCount}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                          <Link
-                            to={`/console/organizations/${org.id}`}
-                            className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
-                          >
-                            View
-                          </Link>
-                          <Link
-                            to={`/console/organizations/${org.id}/members`}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            Manage
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
+                    {recentOrganizations.map((org) => {
+                      const matchedOrg = organizations?.find((o) => o.id === org.id);
+                      const basePath = matchedOrg?.slug
+                        ? `/${matchedOrg.slug}/organizations`
+                        : '/dashboard/organizations';
+
+                      return (
+                        <tr key={org.id} className="hover:bg-muted/60">
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-foreground">{org.name}</div>
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                            <span className="inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                              {org.role}
+                            </span>
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
+                            {org.memberCount}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
+                            {org.eventCount}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
+                            {org.followerCount}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+                            <Link
+                              to={basePath}
+                              className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
+                            >
+                              View
+                            </Link>
+                            <Link
+                              to={`${basePath}/members`}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              Manage
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -541,19 +570,27 @@ export const OrganizationServiceDashboard: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-muted-foreground">
                       <div className="flex items-center justify-between">
                         <span>Draft</span>
-                        <span className="text-foreground font-medium">{analytics.draftEvents}</span>
+                        <span className="text-foreground font-medium">
+                          {analytics.draftEvents}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Published</span>
-                        <span className="text-foreground font-medium">{analytics.publishedEvents}</span>
+                        <span className="text-foreground font-medium">
+                          {analytics.publishedEvents}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Ongoing</span>
-                        <span className="text-foreground font-medium">{analytics.ongoingEvents}</span>
+                        <span className="text-foreground font-medium">
+                          {analytics.ongoingEvents}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Completed</span>
-                        <span className="text-foreground font-medium">{analytics.completedEvents}</span>
+                        <span className="text-foreground font-medium">
+                          {analytics.completedEvents}
+                        </span>
                       </div>
                     </div>
                   </div>
