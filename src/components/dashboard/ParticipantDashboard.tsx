@@ -175,27 +175,27 @@ export function ParticipantDashboard() {
     `)}`;
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Participant Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user?.name}</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={logout}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+   return (
+     <div className="min-h-screen bg-gray-50">
+       {/* Header */}
+       <header className="bg-white shadow">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6">
+             <div>
+               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Participant Dashboard</h1>
+               <p className="text-sm sm:text-base text-gray-600">Welcome back, {user?.name}</p>
+             </div>
+             <div className="flex items-center gap-3">
+               <button
+                 onClick={logout}
+                 className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+               >
+                 Logout
+               </button>
+             </div>
+           </div>
+         </div>
+       </header>
 
       {/* QR Pass Modal */}
       {canShowQrPass && qrCoreRegistration && qrRegistration && (
@@ -226,10 +226,10 @@ export function ParticipantDashboard() {
         </div>
       )}
 
-      {/* Navigation Tabs */}
-       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+       {/* Navigation Tabs */}
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 sm:mt-0">
          <div className="border-b border-border">
-           <nav className="-mb-px flex space-x-8">
+           <nav className="-mb-px flex gap-4 overflow-x-auto">
              {[
                { key: 'events', label: 'My Events' },
                { key: 'certificates', label: 'Certificates' },
@@ -238,7 +238,7 @@ export function ParticipantDashboard() {
                <button
                  key={tab.key}
                  onClick={() => setActiveTab(tab.key as any)}
-                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                 className={`py-2 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                    activeTab === tab.key
                      ? 'border-primary text-primary'
                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -251,54 +251,54 @@ export function ParticipantDashboard() {
          </div>
        </div>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'events' && (
-          <div className="space-y-10">
-            <div>
-            <div className="flex justify-between items-center mb-6">
-               <h2 className="text-2xl font-bold text-foreground">My Registered Events</h2>
-               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                 <span>
-                   {registrations?.length || 0} event
-                   {(registrations?.length || 0) !== 1 ? 's' : ''} registered
-                 </span>
-                 <button
-                   onClick={() => navigate('/dashboard/participant-events')}
-                   className="text-primary hover:text-primary/80 font-medium"
-                 >
-                   Browse all events
-                 </button>
+       {/* Content */}
+       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+         {activeTab === 'events' && (
+           <div className="space-y-8 sm:space-y-10">
+             <div>
+               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+                 <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Registered Events</h2>
+                 <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                   <span>
+                     {registrations?.length || 0} event
+                     {(registrations?.length || 0) !== 1 ? 's' : ''} registered
+                   </span>
+                   <button
+                     onClick={() => navigate('/dashboard/participant-events')}
+                     className="text-primary hover:text-primary/80 font-medium"
+                   >
+                     Browse all events
+                   </button>
+                 </div>
                </div>
-             </div>
 
-              {registrations && registrations.length > 0 ? (
-                <div className="space-y-6">
-                  {registrations.map((registration) => (
-                    <div
-                      key={registration.id}
-                      className="bg-white rounded-lg shadow overflow-hidden"
-                    >
-                      {/* Event Header */}
-                      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                      <div className="flex justify-between items-start">
-                           <div>
-                             <h3 className="text-lg font-semibold text-foreground">
-                               {registration.event.name}
-                             </h3>
-                             <p className="text-sm text-muted-foreground mt-1">
-                               {new Date(
-                                 registration.event.startDate,
-                               ).toLocaleDateString()}{' '}
-                               -{' '}
-                               {new Date(
-                                 registration.event.endDate,
-                               ).toLocaleDateString()}
-                             </p>
-                           </div>
-                           <div className="flex items-center space-x-2">
-                             <span
-                               className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+             {registrations && registrations.length > 0 ? (
+               <div className="space-y-4 sm:space-y-6">
+                 {registrations.map((registration) => (
+                   <div
+                     key={registration.id}
+                     className="bg-white rounded-lg shadow overflow-hidden"
+                   >
+                   {/* Event Header */}
+                   <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                       <div>
+                         <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                           {registration.event.name}
+                         </h3>
+                         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                           {new Date(
+                             registration.event.startDate,
+                           ).toLocaleDateString()}{' '}
+                           -{' '}
+                           {new Date(
+                             registration.event.endDate,
+                           ).toLocaleDateString()}
+                         </p>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <span
+                           className={`inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
                                  registration.status === 'CONFIRMED'
                                    ? 'bg-emerald-100 text-emerald-800'
                                    : registration.status === 'WAITLISTED'
@@ -308,69 +308,69 @@ export function ParticipantDashboard() {
                              >
                                {registration.status}
                              </span>
-                             {registration.attendance && (
-                               <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-800">
-                                 Checked In
-                               </span>
-                             )}
-                           </div>
+                           {registration.attendance && (
+                             <span className="inline-flex px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-sky-100 text-sky-800">
+                               Checked In
+                             </span>
+                           )}
                          </div>
-                      </div>
+                       </div>
+                     </div>
 
-                      <div className="p-6">
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+                     <div className="p-4 sm:p-6">
+                       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 sm:gap-6">
                          <div className="flex-1">
-                             <p className="text-muted-foreground text-sm mb-4">
-                               {registration.event.description}
-                             </p>
-
-                            {/* Event Details Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                               <div className="space-y-2">
+                           <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">
+                             {registration.event.description}
+                           </p>
+ 
+                           {/* Event Details Grid */}
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                             <div className="space-y-2">
+                               <div className="flex justify-between">
+                                 <span className="text-muted-foreground">Start Time:</span>
+                                 <span className="text-foreground">
+                                   {new Date(
+                                     registration.event.startDate,
+                                   ).toLocaleString()}
+                                 </span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-muted-foreground">End Time:</span>
+                                 <span className="text-foreground">
+                                   {new Date(
+                                     registration.event.endDate,
+                                   ).toLocaleString()}
+                                 </span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-muted-foreground">Event Mode:</span>
+                                 <span className="text-foreground capitalize">
+                                   {registration.event.mode.toLowerCase()}
+                                 </span>
+                               </div>
+                             </div>
+                             <div className="space-y-2">
+                               <div className="flex justify-between">
+                                 <span className="text-muted-foreground">Registered:</span>
+                                 <span className="text-foreground">
+                                   {new Date(
+                                     registration.registeredAt,
+                                   ).toLocaleDateString()}
+                                 </span>
+                               </div>
+                               {registration.attendance && (
                                  <div className="flex justify-between">
-                                   <span className="text-muted-foreground">Start Time:</span>
+                                   <span className="text-muted-foreground">Checked In:</span>
                                    <span className="text-foreground">
                                      {new Date(
-                                       registration.event.startDate,
+                                       registration.attendance.checkInTime,
                                      ).toLocaleString()}
                                    </span>
                                  </div>
-                                 <div className="flex justify-between">
-                                   <span className="text-muted-foreground">End Time:</span>
-                                   <span className="text-foreground">
-                                     {new Date(
-                                       registration.event.endDate,
-                                     ).toLocaleString()}
-                                   </span>
-                                 </div>
-                                 <div className="flex justify-between">
-                                   <span className="text-muted-foreground">Event Mode:</span>
-                                   <span className="text-foreground capitalize">
-                                     {registration.event.mode.toLowerCase()}
-                                   </span>
-                                 </div>
-                               </div>
-                              <div className="space-y-2">
-                                 <div className="flex justify-between">
-                                   <span className="text-muted-foreground">Registered:</span>
-                                   <span className="text-foreground">
-                                     {new Date(
-                                       registration.registeredAt,
-                                     ).toLocaleDateString()}
-                                   </span>
-                                 </div>
-                                 {registration.attendance && (
-                                   <div className="flex justify-between">
-                                     <span className="text-muted-foreground">Checked In:</span>
-                                     <span className="text-foreground">
-                                       {new Date(
-                                         registration.attendance.checkInTime,
-                                       ).toLocaleString()}
-                                     </span>
-                                   </div>
-                                 )}
-                               </div>
-                            </div>
+                               )}
+                             </div>
+                           </div>
 
                             {/* Location/Virtual Links */}
                              {registration.event.venue && (
