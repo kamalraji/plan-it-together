@@ -261,7 +261,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
             type="submit"
             form="organization-onboarding-form"
             disabled={createOrganization.isPending}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-60"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
           >
             {createOrganization.isPending ? 'Creating…' : 'Create organization'}
           </button>
@@ -422,13 +422,13 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 </button>
               )}
             </div>
-            <button
-              type="submit"
-              disabled={createOrganization.isPending}
-              className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-60"
-            >
-              {createOrganization.isPending ? 'Creating…' : 'Create organization'}
-            </button>
+        <button
+          type="submit"
+          disabled={createOrganization.isPending}
+          className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
+        >
+          {createOrganization.isPending ? 'Creating…' : 'Create organization'}
+        </button>
           </div>
         </form>
       </div>

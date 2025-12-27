@@ -240,7 +240,7 @@ export function RegisterForm() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium text-primary-foreground bg-gradient-to-r from-sunny to-teal shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
               whileHover={!isLoading ? { scale: 1.02 } : undefined}
               whileTap={!isLoading ? { scale: 0.99 } : undefined}
               initial={{ opacity: 0, y: 16 }}
