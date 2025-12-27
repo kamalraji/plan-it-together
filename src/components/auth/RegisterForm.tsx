@@ -113,13 +113,13 @@ export function RegisterForm() {
             
             <div className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Full Name
                 </label>
                 <input
                   {...register('name')}
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Enter your full name"
                 />
                 {errors.name && (
@@ -128,14 +128,14 @@ export function RegisterForm() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email Address
                 </label>
                 <input
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Enter your email address"
                 />
                 {errors.email && (
@@ -144,12 +144,12 @@ export function RegisterForm() {
               </div>
 
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="role" className="block text-sm font-medium text-foreground mb-2">
                   Account Type
                 </label>
                 <select
                   {...register('role')}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                 >
                   <option value={UserRole.PARTICIPANT}>Participant</option>
                   <option value={UserRole.ORGANIZER}>Organizer</option>
@@ -161,13 +161,13 @@ export function RegisterForm() {
 
               {selectedRole === UserRole.PARTICIPANT && (
                 <div>
-                  <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="eventCode" className="block text-sm font-medium text-foreground mb-2">
                     Event Code (Optional)
                   </label>
                   <input
                     {...register('eventCode')}
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                     placeholder="Enter event code if you have one"
                   />
                   {errors.eventCode && (
@@ -177,14 +177,14 @@ export function RegisterForm() {
               )}
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                   Password
                 </label>
                 <input
                   {...register('password')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Create a secure password"
                 />
                 {errors.password && (
@@ -193,14 +193,14 @@ export function RegisterForm() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
                   Confirm Password
                 </label>
                 <input
                   {...register('confirmPassword')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
@@ -212,11 +212,11 @@ export function RegisterForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-sunny to-teal hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-primary-foreground bg-gradient-to-r from-sunny to-teal hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
                   <span>Creating account...</span>
                 </div>
               ) : (
