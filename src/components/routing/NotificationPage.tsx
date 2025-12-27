@@ -18,6 +18,8 @@ import {
 import { PageHeader } from './PageHeader';
 import type { Notification } from './NotificationCenter';
 import { useNotificationFeed } from '@/hooks/useNotificationFeed';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface NotificationPageProps {
   notifications?: Notification[];
@@ -36,6 +38,8 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
   onDeleteNotification,
   onClearAll,
 }) => {
+  const { user } = useAuth();
+
   const {
     notifications: liveNotifications,
     markAsRead,
@@ -118,6 +122,40 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
     { id: 'task', label: 'Tasks', count: stats.types.task || 0 },
   ].filter(type => type.count > 0);
 
+  const seedSampleNotifications = async () => {
+    if (!user) return;
+
+    const { error } = await supabase.from('notifications').insert([
+      {
+        title: 'New Task Assignment',
+        message: 'You have been assigned a new task in Marketing Workspace.',
+        type: 'task',
+        category: 'workspace',
+        user_id: user.id,
+        metadata: { workspace: 'Marketing', priority: 'high' },
+      },
+      {
+        title: 'Event Registration Milestone',
+        message: 'Annual Conference 2025 has reached 500 registrations.',
+        type: 'event',
+        category: 'event',
+        user_id: user.id,
+        metadata: { eventName: 'Annual Conference 2025' },
+      },
+      {
+        title: 'System Update',
+        message: 'We have shipped improvements to the dashboard experience.',
+        type: 'system',
+        category: 'system',
+        user_id: user.id,
+      },
+    ]);
+
+    if (error) {
+      console.error('Failed to seed notifications:', error.message);
+    }
+  };
+
   const handleMarkAsRead = (notificationId: string) => {
     if (onMarkAsRead) {
       onMarkAsRead(notificationId);
@@ -164,9 +202,10 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
       disabled: stats.total === 0,
     },
     {
-      label: 'Settings',
-      action: () => {/* Navigate to notification settings */},
+      label: 'Create Sample Notifications',
+      action: () => { void seedSampleNotifications(); },
       variant: 'secondary' as const,
+      disabled: !user,
     },
   ];
 
