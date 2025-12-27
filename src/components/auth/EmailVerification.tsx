@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
 
 export function EmailVerification() {
   const [searchParams] = useSearchParams();
@@ -35,15 +36,26 @@ export function EmailVerification() {
   }, [token, verifyEmail]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Subtle patterned background image with gradient overlay */}
+      <div className="absolute inset-0">
+        <img
+          src={heroPattern}
+          alt="Abstract technology pattern background for email verification"
+          className="h-full w-full object-cover opacity-60"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      </div>
+
+      <div className="relative max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-foreground">
+          <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             Email Verification
           </h2>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-4 bg-white/80 backdrop-blur-sm rounded-2xl border border-border/40 p-8 shadow-doodle">
           {status === 'loading' && (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
