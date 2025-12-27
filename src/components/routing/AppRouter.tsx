@@ -467,7 +467,7 @@ export const AppRouter: React.FC = () => {
             <Route
               path="/onboarding/organization"
               element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]} requireEmailVerification={false}>
+                <ConsoleRoute requireEmailVerification={false}>
                   <OrganizationRegistrationPage />
                 </ConsoleRoute>
               }

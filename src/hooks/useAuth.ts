@@ -189,6 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             name: data.name,
             eventCode: data.eventCode,
+            desiredRole: data.role,
           },
         },
       });

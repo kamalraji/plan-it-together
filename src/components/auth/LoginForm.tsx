@@ -43,7 +43,10 @@ export function LoginForm() {
       return;
     }
 
-    navigate('/dashboard');
+    // Support deep-linking into organizer onboarding after signup
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+    navigate(next || '/dashboard');
     setIsLoading(false);
   };
 
