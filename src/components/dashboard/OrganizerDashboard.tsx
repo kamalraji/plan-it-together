@@ -8,6 +8,7 @@ import { MarketplaceOrganizerInterface } from '../marketplace';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
 import { supabase } from '@/integrations/supabase/client';
+import heroImage from '@/assets/dashboard-hero.jpg';
 
 interface Event {
   id: string;
@@ -166,57 +167,68 @@ export function OrganizerDashboard() {
         <span className="text-foreground font-medium">Organizer Dashboard</span>
       </div>
 
-      {/* Hero with floating organization card */}
+      {/* Hero with glassmorphic organization summary */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/90 via-accent/80 to-secondary/80 shadow-xl min-h-[180px] sm:min-h-[220px]">
-          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_hsl(var(--card))/0.2,_transparent_60%),_radial-gradient(circle_at_bottom,_hsl(var(--primary-foreground))/0.15,_transparent_55%)]" />
-          <div className="relative px-6 sm:px-10 py-7 sm:py-9 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-xs sm:text-sm text-primary-foreground/80 mb-1">/ Organizer view</p>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-primary-foreground">
+        <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[180px] sm:min-h-[220px]">
+          {/* Rich background image */}
+          <div className="absolute inset-0">
+            <img
+              src={heroImage}
+              alt="Abstract collaboration background for organizer dashboard hero"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/60 to-background/95" />
+          </div>
+
+          {/* Glassmorphic overlay */}
+          <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 sm:px-6 py-4 shadow-2xl">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">/ Organizer view</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 Organizer Dashboard
               </h1>
-              <p className="mt-2 text-sm sm:text-base text-primary-foreground/80 max-w-xl">
+              <p className="mt-2 text-sm sm:text-base text-muted-foreground">
                 Welcome back{user?.name ? `, ${user.name}` : ''}. Manage your events, analytics, marketplace,
                 and organizer profile in one place.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              {!vendorLoading && (
-                <Link
-                  to={isVendor ? '/vendor/dashboard' : '/vendor/register'}
-                  className="text-[11px] sm:text-xs md:text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground underline-offset-2 hover:underline"
-                >
-                  {isVendor ? 'Vendor Dashboard' : 'Become a Vendor'}
-                </Link>
-              )}
-              <Link
-                to="/events/create"
-                className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors"
-              >
-                Create event
-              </Link>
-              <button
-                onClick={logout}
-                className="inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1.5 text-xs sm:text-sm font-medium text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
 
-          {/* Floating organization card */}
-          <div className="pointer-events-none absolute -bottom-9 sm:-bottom-10 left-4 sm:left-10 right-4 sm:right-auto">
-            <div className="pointer-events-auto rounded-2xl border border-border/60 bg-card/95 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 shadow-2xl max-w-sm sm:min-w-[260px]">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                Active organization
-              </p>
-              <p className="text-sm sm:text-base font-semibold text-foreground truncate">
-                {organization.name}
-              </p>
-              <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
-                {organization.slug}
-              </p>
+            <div className="flex flex-col items-start sm:items-end gap-3">
+              <div className="rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 py-3 shadow-xl min-w-[220px] max-w-xs">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Active organization
+                </p>
+                <p className="text-sm sm:text-base font-semibold text-foreground truncate">
+                  {organization.name}
+                </p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                  {organization.slug}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {!vendorLoading && (
+                  <Link
+                    to={isVendor ? '/vendor/dashboard' : '/vendor/register'}
+                    className="text-[11px] sm:text-xs md:text-sm font-medium text-foreground hover:text-foreground/80 underline-offset-2 hover:underline"
+                  >
+                    {isVendor ? 'Vendor Dashboard' : 'Become a Vendor'}
+                  </Link>
+                )}
+                <Link
+                  to="/events/create"
+                  className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Create event
+                </Link>
+                <button
+                  onClick={logout}
+                  className="inline-flex items-center rounded-full border border-border/70 bg-background/80 backdrop-blur px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground hover:bg-background/90 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>
