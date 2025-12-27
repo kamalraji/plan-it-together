@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
-import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
+
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -87,15 +87,12 @@ export function LoginForm() {
   };
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Subtle patterned background image with gradient overlay */}
-      <div className="absolute inset-0">
-        <img
-          src={heroPattern}
-          alt="Abstract technology pattern background for login"
-          className="h-full w-full object-cover opacity-60"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      {/* Gradient backdrop with blurred color glows */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
+        <div className="absolute -top-32 -left-24 h-72 w-72 rounded-full bg-gradient-to-br from-teal/40 via-sunny/35 to-coral/35 blur-3xl opacity-70" />
+        <div className="absolute -bottom-40 -right-32 h-80 w-80 rounded-full bg-gradient-to-tr from-teal/35 via-coral/40 to-sunny/35 blur-3xl opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
       </div>
 
       <motion.div
@@ -124,7 +121,7 @@ export function LoginForm() {
 
         {/* Login Form */}
         <motion.div
-          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-doodle"
+          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
           initial={{ opacity: 0, y: 24, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}

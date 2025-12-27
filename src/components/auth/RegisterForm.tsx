@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
-import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
+import { motion } from 'framer-motion';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -81,15 +81,12 @@ export function RegisterForm() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Subtle patterned background image with gradient overlay */}
-      <div className="absolute inset-0">
-        <img
-          src={heroPattern}
-          alt="Abstract technology pattern background for registration"
-          className="h-full w-full object-cover opacity-60"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      {/* Gradient backdrop with blurred color shapes */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
+        <div className="absolute -top-32 -right-20 h-72 w-72 rounded-full bg-gradient-to-br from-teal/40 via-sunny/40 to-coral/30 blur-3xl opacity-70" />
+        <div className="absolute -bottom-40 -left-24 h-80 w-80 rounded-full bg-gradient-to-tr from-coral/40 via-sunny/35 to-teal/35 blur-3xl opacity-65" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
       </div>
 
       <div className="relative max-w-md w-full space-y-8">
@@ -112,7 +109,9 @@ export function RegisterForm() {
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-doodle">
+        <motion.div
+          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+        >
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
@@ -124,7 +123,11 @@ export function RegisterForm() {
             )}
             
             <div className="space-y-4">
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12 }}
+              >
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Full Name
                 </label>

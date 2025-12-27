@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
+
 
 export function EmailVerification() {
   const [searchParams] = useSearchParams();
@@ -37,15 +37,12 @@ export function EmailVerification() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Subtle patterned background image with gradient overlay */}
-      <div className="absolute inset-0">
-        <img
-          src={heroPattern}
-          alt="Abstract technology pattern background for email verification"
-          className="h-full w-full object-cover opacity-60"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      {/* Gradient backdrop with blurred color glows */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
+        <div className="absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-gradient-to-br from-teal/40 via-sunny/35 to-coral/30 blur-3xl opacity-75" />
+        <div className="absolute -bottom-40 right-1/4 h-72 w-72 rounded-full bg-gradient-to-tr from-coral/35 via-sunny/35 to-teal/35 blur-3xl opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
       </div>
 
       <div className="relative max-w-md w-full space-y-8">
@@ -55,7 +52,7 @@ export function EmailVerification() {
           </h2>
         </div>
 
-        <div className="mt-4 bg-white/80 backdrop-blur-sm rounded-2xl border border-border/40 p-8 shadow-doodle">
+        <div className="mt-4 relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           {status === 'loading' && (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
