@@ -10,6 +10,7 @@ import { OrganizationTeamManagement } from './OrganizationTeamManagement';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
+import { OrgSettingsDashboard } from './OrgSettingsDashboard';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -85,6 +86,8 @@ export const OrgScopedLayout: React.FC = () => {
               <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
                 <Routes>
                   <Route path="dashboard" element={<OrganizerDashboard />} />
+                  <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
+                  <Route path="settings/dashboard" element={<OrgSettingsDashboard />} />
                   <Route path="eventmanagement/*" element={<EventService />} />
                   <Route path="workspaces/*" element={<WorkspaceService />} />
                   <Route path="organizations/*" element={<OrganizationService />} />
