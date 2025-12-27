@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { WorkspaceServiceDashboard } from './WorkspaceServiceDashboard';
 import { WorkspaceListPage } from './WorkspaceListPage';
 import { WorkspaceDetailPage } from './WorkspaceDetailPage';
+import { WorkspaceCreatePage } from './WorkspaceCreatePage';
 
 /**
  * WorkspaceService component provides the main routing structure for the Workspace Management Service.
@@ -20,7 +21,10 @@ export const WorkspaceService: React.FC = () => {
       
       {/* Workspace List Page */}
       <Route path="list" element={<WorkspaceListPage />} />
-      
+
+      {/* Workspace Create Page */}
+      <Route path="create" element={<WorkspaceCreatePage />} />
+
       {/* Workspace Detail with tabs */}
       <Route path=":workspaceId" element={<WorkspaceDetailPage />} />
       <Route path=":workspaceId/tasks" element={<WorkspaceDetailPage defaultTab="tasks" />} />
