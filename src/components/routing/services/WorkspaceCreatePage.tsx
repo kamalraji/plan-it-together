@@ -44,6 +44,10 @@ export const WorkspaceCreatePage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
+  const selectedEvent = isOrgContext && orgEvents
+    ? (orgEvents as any[]).find((event) => event.id === formValues.eventId)
+    : null;
+
   const canManageWorkspaces =
     !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
 
@@ -181,6 +185,11 @@ export const WorkspaceCreatePage: React.FC = () => {
                 className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Paste or confirm event ID"
               />
+            )}
+            {isOrgContext && selectedEvent && (
+              <p className="mt-1 text-xs text-gray-600">
+                {new Date(selectedEvent.start_date).toLocaleDateString()} · {selectedEvent.mode} · {selectedEvent.status}
+              </p>
             )}
             {eventIdFromQuery && !isOrgContext && (
               <p className="mt-1 text-xs text-gray-500">
