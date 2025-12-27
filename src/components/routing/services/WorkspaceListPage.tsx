@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { 
   MagnifyingGlassIcon, 
@@ -24,15 +24,32 @@ import api from '../../../lib/api';
  * - Quick actions for common workspace operations
  */
 export const WorkspaceListPage: React.FC = () => {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkspaceStatus | 'all'>('all');
   const [selectedWorkspaces, setSelectedWorkspaces] = useState<string[]>([]);
 
+  const currentPath = location.pathname;
+  const orgSlugCandidate = currentPath.split('/')[1];
+  const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+  const eventId = searchParams.get('eventId');
+
+  const baseWorkspacePath = isOrgContext && orgSlugCandidate
+    ? `/${orgSlugCandidate}/workspaces`
+    : '/dashboard/workspaces';
+
   // Fetch workspaces
   const { data: workspaces, isLoading, error } = useQuery({
-    queryKey: ['user-workspaces'],
+    queryKey: ['user-workspaces', orgSlugCandidate, eventId],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces');
+      const response = await api.get('/workspaces/my-workspaces', {
+        params: {
+          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
+          eventId: eventId || undefined,
+        },
+      });
       return response.data.workspaces as Workspace[];
     },
   });
@@ -207,7 +224,9 @@ export const WorkspaceListPage: React.FC = () => {
   const pageActions = [
     {
       label: 'Create Workspace',
-      action: () => window.location.href = '/dashboard/workspaces/create',
+      action: () => {
+        window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
+      },
       variant: 'primary' as const,
     },
     {
@@ -404,7 +423,7 @@ export const WorkspaceListPage: React.FC = () => {
             </p>
             {(!searchTerm && statusFilter === 'all') && (
               <Link
-                to="/dashboard/workspaces/create"
+                to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 <PlusIcon className="w-4 h-4 mr-2" />
