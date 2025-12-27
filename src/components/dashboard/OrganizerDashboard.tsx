@@ -165,13 +165,7 @@ export function OrganizerDashboard() {
   const activeEvents = analytics?.activeEvents ?? 0;
   const totalRegistrations = analytics?.totalRegistrations ?? 0;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const isSummaryLoading = isLoading || !events;
 
   return (
     <div className="min-h-screen bg-background">
@@ -244,35 +238,46 @@ export function OrganizerDashboard() {
       {/* Summary metrics */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-20">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
-            <div className="text-xs font-medium text-muted-foreground mb-1">Total events</div>
-            <div className="flex items-end justify-between gap-2">
-              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
-                {totalEvents}
+          {isSummaryLoading ? (
+            [...Array(3)].map((_, index) => (
+              <div
+                key={index}
+                className="bg-muted border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 animate-pulse h-24 sm:h-28"
+              />
+            ))
+          ) : (
+            <>
+              <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+                <div className="text-xs font-medium text-muted-foreground mb-1">Total events</div>
+                <div className="flex items-end justify-between gap-2">
+                  <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                    {totalEvents}
+                  </div>
+                  <span className="text-[11px] sm:text-xs text-muted-foreground">Across all time</span>
+                </div>
               </div>
-              <span className="text-[11px] sm:text-xs text-muted-foreground">Across all time</span>
-            </div>
-          </div>
 
-          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
-            <div className="text-xs font-medium text-muted-foreground mb-1">Active events</div>
-            <div className="flex items-end justify-between gap-2">
-              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
-                {activeEvents}
+              <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+                <div className="text-xs font-medium text-muted-foreground mb-1">Active events</div>
+                <div className="flex items-end justify-between gap-2">
+                  <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                    {activeEvents}
+                  </div>
+                  <span className="text-[11px] sm:text-xs text-muted-foreground">Published or ongoing</span>
+                </div>
               </div>
-              <span className="text-[11px] sm:text-xs text-muted-foreground">Published or ongoing</span>
-            </div>
-          </div>
 
-          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
-            <div className="text-xs font-medium text-muted-foreground mb-1">Total registrations</div>
-            <div className="flex items-end justify-between gap-2">
-              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
-                {totalRegistrations}
+              <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+                <div className="text-xs font-medium text-muted-foreground mb-1">Total registrations</div>
+                <div className="flex items-end justify-between gap-2">
+                  <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                    {totalRegistrations}
+                  </div>
+                  <span className="text-[11px] sm:text-xs text-muted-foreground">All events combined</span>
+                </div>
               </div>
-              <span className="text-[11px] sm:text-xs text-muted-foreground">All events combined</span>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </section>
 

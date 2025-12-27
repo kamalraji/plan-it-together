@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { checkApiHealth } from '@/lib/api';
 
 export const useApiHealth = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<boolean>({
     queryKey: ['api-health'],
     queryFn: async () => {
       return checkApiHealth();
