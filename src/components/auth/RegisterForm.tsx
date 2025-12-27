@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
+import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -79,10 +80,21 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sunny/5 to-teal/10 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Subtle patterned background image with gradient overlay */}
+      <div className="absolute inset-0">
+        <img
+          src={heroPattern}
+          alt="Abstract technology pattern background for registration"
+          className="h-full w-full object-cover opacity-60"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      </div>
+
+      <div className="relative max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
             Join the Adventure!
           </h2>
           <p className="text-gray-600 mb-2">

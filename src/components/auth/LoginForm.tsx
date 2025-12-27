@@ -97,12 +97,12 @@ export function LoginForm() {
         <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
       </div>
 
-      <div className="relative max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
-            Welcome Back!
-          </h2>
-          <p className="text-muted-foreground mb-2">
+      <div className="relative max-w-md w-full space-y-10">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl sm:text-4xl font-semibold sm:font-bold tracking-tight text-foreground">
+            Welcome back
+          </h1>
+          <p className="text-base sm:text-lg text-muted-foreground">
             Sign in to continue your amazing journey
           </p>
           <p className="text-sm text-muted-foreground">
@@ -176,7 +176,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="w-full flex justify-center items-center py-3.5 px-6 rounded-xl text-base sm:text-[15px] font-medium tracking-tight text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
