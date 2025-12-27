@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
+import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
 import { EventService, WorkspaceService, OrganizationService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
@@ -41,7 +41,7 @@ const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> =
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
+  const { data: memberOrganizations, isLoading: orgsLoading } = useMyMemberOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
 
   const isLoadingAny = isLoading || orgsLoading || orgLoading;
@@ -62,11 +62,10 @@ export const OrgScopedLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isAdminOfOrg = !!myOrganizations?.some((org: { id: string }) => org.id === organization.id);
-  const allowedAdminOrgSlug = 'thittam1hub';
+  const isMemberOfOrg = !!memberOrganizations?.some((org: { id: string }) => org.id === organization.id);
 
-  if (!isAdminOfOrg || orgSlug !== allowedAdminOrgSlug) {
-    // User is authenticated but not an admin of this org, or trying to access a non-primary org; send them back to generic dashboard
+  if (!isMemberOfOrg) {
+    // User is authenticated but not a member of this organization; send them back to generic dashboard
     return <Navigate to="/dashboard" replace />;
   }
 
