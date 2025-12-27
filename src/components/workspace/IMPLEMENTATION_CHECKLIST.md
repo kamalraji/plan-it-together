@@ -46,22 +46,22 @@ Focus on: `TeamMemberRoster.tsx`, `TeamManagement.tsx`, `TeamRosterManagement.ts
 
 ### 2.1 Roles display in team views
 
-- [ ] Ensure each member clearly shows workspace role(s) (badge/tag component)
-- [ ] Align role labels with backend roles / permissions model
-- [ ] Provide safe fallbacks for empty/unknown roles (e.g. "Member")
+- [x] Ensure each member clearly shows workspace role(s) (badge/tag component)
+- [x] Align role labels with backend roles / permissions model
+- [x] Provide safe fallbacks for empty/unknown roles (e.g. "Member")
 
 ### 2.2 Role editing flows
 
-- [ ] In `TeamManagement` and related forms:
-  - [ ] Add clear control (select / segmented control) for changing member roles
-  - [ ] Show brief descriptions for each role so organizers understand permissions
-  - [ ] Add optimistic updates and success/error toasts when roles change
+- [x] In `TeamManagement` and related forms:
+  - [x] Add clear control (select / segmented control) for changing member roles
+  - [x] Show brief descriptions for each role so organizers understand permissions
+  - [x] Add optimistic updates and success/error toasts when roles change
 
 ### 2.3 Accessibility & responsive behavior
 
-- [ ] Make role badges/controls keyboard accessible
-- [ ] Add screen-reader labels / descriptions for roles and changes
-- [ ] Verify layouts remain readable and usable on mobile breakpoints
+- [x] Make role badges/controls keyboard accessible
+- [x] Add screen-reader labels / descriptions for roles and changes
+- [x] Verify layouts remain readable and usable on mobile breakpoints
 
 ---
 
