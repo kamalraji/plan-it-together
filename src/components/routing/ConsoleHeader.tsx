@@ -16,6 +16,7 @@ interface ConsoleHeaderProps {
   onSearch: (query: string) => void;
   onLogout: () => void;
   onToggleMobileMenu?: () => void;
+  showServiceNavigation?: boolean;
 }
 
 interface ServiceDefinition {
@@ -85,6 +86,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   onSearch,
   onLogout,
   onToggleMobileMenu,
+  showServiceNavigation = true,
 }) => {
   const [isServiceSwitcherOpen, setIsServiceSwitcherOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -125,13 +127,15 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
       <div className="flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={onToggleMobileMenu}
-            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </button>
+          {/* Mobile Menu Button (only when service navigation is available) */}
+          {showServiceNavigation && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            >
+              <Bars3Icon className="h-6 w-6" />
+            </button>
+          )}
 
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center space-x-2">

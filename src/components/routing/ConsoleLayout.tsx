@@ -51,6 +51,7 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
         onSearch={handleSearch}
         onLogout={handleLogout}
         onToggleMobileMenu={toggleMobileMenu}
+        showServiceNavigation={showServiceNavigation}
       />
 
       <div className="flex">
