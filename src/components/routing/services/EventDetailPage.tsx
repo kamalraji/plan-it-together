@@ -293,7 +293,7 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
       </div>
 
       <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Branding</h4>
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Branding & workspace template</h4>
         <dl className="space-y-2">
           <div className="flex justify-between">
             <dt className="text-sm text-gray-500">Primary Color:</dt>
@@ -316,6 +316,20 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
             </div>
           )}
         </dl>
+
+        {event.branding?.workspaceTemplateId && (
+          <div className="mt-4 border-t border-gray-200 pt-3">
+            <p className="text-sm font-medium text-gray-900">Workspace template</p>
+            <p className="mt-1 text-sm text-gray-700">
+              This event will provision a workspace using template
+              <span className="font-semibold"> {event.branding.workspaceTemplateId}</span>.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              The template preconfigures team roles, task categories, communication channels, and milestone
+              timeline for your organizers.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   </div>
