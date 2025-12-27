@@ -22,13 +22,13 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
-  // Load events for the organizer from Supabase (RLS will scope visibility)
+  // Load events for the organizer from Supabase (RLS + active organization will scope visibility)
   const { data: events = [] } = useQuery<Event[]>({
     queryKey: ['organizer-events', filterBy],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
-        .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at')
+        .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id')
         .order('start_date', { ascending: true });
 
       if (error) throw error;
