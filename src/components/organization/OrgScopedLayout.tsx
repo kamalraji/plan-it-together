@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
-import { EventService, WorkspaceService } from '@/components/routing/services';
+import { EventService, WorkspaceService, OrganizationService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
@@ -61,7 +61,7 @@ export const OrgScopedLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isAdminOfOrg = !!myOrganizations?.some((org) => org.id === organization.id);
+  const isAdminOfOrg = !!myOrganizations?.some((org: { id: string }) => org.id === organization.id);
 
   if (!isAdminOfOrg) {
     // User is authenticated but not an admin of this org; send them back to generic dashboard
@@ -84,6 +84,7 @@ export const OrgScopedLayout: React.FC = () => {
                 <Route path="dashboard" element={<OrganizerDashboard />} />
                 <Route path="eventmanagement/*" element={<EventService />} />
                 <Route path="workspaces/*" element={<WorkspaceService />} />
+                <Route path="organizations/*" element={<OrganizationService />} />
                 <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
                 <Route path="team" element={<OrganizationTeamManagement />} />
                 <Route path="*" element={<Navigate to="dashboard" replace />} />
