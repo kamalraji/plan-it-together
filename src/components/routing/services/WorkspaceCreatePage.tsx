@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
+import api from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 const workspaceCreateSchema = z.object({
   name: z
@@ -22,6 +24,7 @@ export const WorkspaceCreatePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
 
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
@@ -63,18 +66,36 @@ export const WorkspaceCreatePage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // TODO: Wire to real API endpoint for workspace creation.
-      // For now, we just log the payload to avoid unsafe network calls.
-      console.log('Creating workspace with payload:', {
-        ...parseResult.data,
+      const payload = {
+        name: parseResult.data.name,
+        eventId: parseResult.data.eventId,
         orgSlug: isOrgContext ? orgSlugCandidate : undefined,
+      };
+
+      const response = await api.post('/workspaces', payload);
+      const created = response.data?.workspace ?? response.data;
+
+      toast({
+        title: 'Workspace created',
+        description: 'Your workspace has been created successfully.',
       });
 
-      // After successful creation, send the user back to the appropriate list.
       const baseWorkspacePath = isOrgContext && orgSlugCandidate
         ? `/${orgSlugCandidate}/workspaces`
         : '/dashboard/workspaces';
-      navigate(`${baseWorkspacePath}/list`, { replace: true });
+
+      if (created?.id) {
+        navigate(`${baseWorkspacePath}/${created.id}`, { replace: true });
+      } else {
+        navigate(`${baseWorkspacePath}/list`, { replace: true });
+      }
+    } catch (error: any) {
+      console.error('Failed to create workspace', error);
+      toast({
+        title: 'Failed to create workspace',
+        description: error?.response?.data?.message ?? 'Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setSubmitting(false);
     }
