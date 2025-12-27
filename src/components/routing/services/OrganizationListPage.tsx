@@ -1,80 +1,79 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceListPage } from '../ResourceListPage';
+import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
 
 interface OrganizationListPageProps {
   filterBy?: 'all' | 'managed' | 'member';
 }
 
+interface OrganizationListRow {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  role: 'OWNER' | 'MEMBER';
+  memberCount: number;
+  eventCount: number;
+  followerCount: number;
+  verificationStatus: 'VERIFIED' | 'PENDING' | 'UNVERIFIED';
+  lastActivity: string;
+  description?: string | null;
+}
+
 /**
  * OrganizationListPage provides AWS-style resource list interface for organizations.
- * Features:
- * - Table view with filtering and sorting
- * - Bulk actions for organization management
- * - Search and filter capabilities
- * - Role-based access controls
+ * The mock data has been replaced with Supabase-backed organizations via
+ * useOrganizerOrganizations, and actions are constrained to owned organizations.
  */
-export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({ 
-  filterBy = 'all' 
+export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
+  filterBy = 'all',
 }) => {
-  // Mock data - in real implementation, this would come from API
-  const organizations = [
-    {
-      id: '1',
-      name: 'Tech Innovation Hub',
-      category: 'COMPANY',
-      role: 'OWNER',
-      memberCount: 15,
-      eventCount: 12,
-      followerCount: 456,
-      verificationStatus: 'VERIFIED',
-      lastActivity: '2024-01-15T10:30:00Z',
-      description: 'Leading technology innovation and startup acceleration',
-    },
-    {
-      id: '2',
-      name: 'Startup Accelerator',
-      category: 'INDUSTRY',
-      role: 'ADMIN',
-      memberCount: 8,
-      eventCount: 5,
-      followerCount: 234,
-      verificationStatus: 'PENDING',
-      lastActivity: '2024-01-14T15:45:00Z',
-      description: 'Supporting early-stage startups with mentorship and funding',
-    },
-    {
-      id: '3',
-      name: 'AI Research Collective',
-      category: 'COLLEGE',
-      role: 'MEMBER',
-      memberCount: 24,
-      eventCount: 18,
-      followerCount: 1144,
-      verificationStatus: 'VERIFIED',
-      lastActivity: '2024-01-13T09:15:00Z',
-      description: 'Advancing artificial intelligence research and education',
-    },
-    {
-      id: '4',
-      name: 'Green Energy Initiative',
-      category: 'NON_PROFIT',
-      role: 'MEMBER',
-      memberCount: 32,
-      eventCount: 7,
-      followerCount: 678,
-      verificationStatus: 'VERIFIED',
-      lastActivity: '2024-01-12T14:20:00Z',
-      description: 'Promoting sustainable energy solutions and environmental awareness',
-    },
-  ];
+  const {
+    organizations,
+    managedOrganizations,
+    perOrgAnalytics,
+    isLoadingOrganizations,
+    isLoadingEvents,
+  } = useOrganizerOrganizations();
 
-  const filteredOrganizations = organizations.filter(org => {
-    if (filterBy === 'managed') return org.role === 'OWNER' || org.role === 'ADMIN';
-    if (filterBy === 'member') return org.role === 'MEMBER';
-    return true;
-  });
+  const organizationsWithMetrics: OrganizationListRow[] = useMemo(() => {
+    if (!organizations) return [];
+
+    return organizations.map((org) => {
+      const isManaged = managedOrganizations.some((m) => m.id === org.id);
+      const analytics = perOrgAnalytics[org.id] ?? {
+        totalEvents: 0,
+      };
+
+      return {
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        category: org.category,
+        role: isManaged ? 'OWNER' : 'MEMBER',
+        // These aggregates can be wired to real metrics once available
+        memberCount: 0,
+        eventCount: analytics.totalEvents,
+        followerCount: 0,
+        verificationStatus: 'VERIFIED',
+        lastActivity: org.created_at,
+        // description is not part of OrganizerOrganizationRow currently
+        description: null,
+      };
+    });
+  }, [organizations, managedOrganizations, perOrgAnalytics]);
+
+  const filteredOrganizations = useMemo(() => {
+    if (filterBy === 'managed') {
+      return organizationsWithMetrics.filter((org) => org.role === 'OWNER');
+    }
+    if (filterBy === 'member') {
+      return organizationsWithMetrics.filter((org) => org.role === 'MEMBER');
+    }
+    return organizationsWithMetrics;
+  }, [filterBy, organizationsWithMetrics]);
 
   const columns = [
     {
@@ -82,7 +81,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       label: 'Organization Name',
       sortable: true,
       filterable: true,
-      render: (_value: string, record: any) => (
+      render: (_value: string, record: OrganizationListRow) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
             <div className="h-10 w-10 rounded-lg bg-gray-300 flex items-center justify-center">
@@ -93,9 +92,11 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">{record.name}</div>
-            <div className="text-sm text-gray-500 truncate max-w-xs">
-              {record.description}
-            </div>
+            {record.description && (
+              <div className="text-sm text-gray-500 truncate max-w-xs">
+                {record.description}
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -106,13 +107,19 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: true,
       render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'COMPANY' ? 'bg-purple-100 text-purple-800' :
-          value === 'COLLEGE' ? 'bg-blue-100 text-blue-800' :
-          value === 'INDUSTRY' ? 'bg-green-100 text-green-800' :
-          value === 'NON_PROFIT' ? 'bg-orange-100 text-orange-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'COMPANY'
+              ? 'bg-purple-100 text-purple-800'
+              : value === 'COLLEGE'
+              ? 'bg-blue-100 text-blue-800'
+              : value === 'INDUSTRY'
+              ? 'bg-green-100 text-green-800'
+              : value === 'NON_PROFIT'
+              ? 'bg-orange-100 text-orange-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
           {value.replace('_', ' ')}
         </span>
       ),
@@ -123,11 +130,15 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: true,
       render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'OWNER' ? 'bg-purple-100 text-purple-800' :
-          value === 'ADMIN' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'OWNER'
+              ? 'bg-purple-100 text-purple-800'
+              : value === 'ADMIN'
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
           {value}
         </span>
       ),
@@ -165,11 +176,15 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: true,
       render: (value: string) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          value === 'VERIFIED' ? 'bg-green-100 text-green-800' :
-          value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'VERIFIED'
+              ? 'bg-green-100 text-green-800'
+              : value === 'PENDING'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
           {value}
         </span>
       ),
@@ -179,24 +194,24 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       label: 'Actions',
       sortable: false,
       filterable: false,
-      render: (_value: any, record: any) => (
+      render: (_value: any, record: OrganizationListRow) => (
         <div className="flex space-x-2">
           <Link
-            to={`/console/organizations/${record.id}`}
+            to={`/${record.slug}/organizations`}
             className="text-blue-600 hover:text-blue-500 text-sm font-medium"
           >
             View
           </Link>
-          {(record.role === 'OWNER' || record.role === 'ADMIN') && (
+          {record.role === 'OWNER' && (
             <>
               <Link
-                to={`/console/organizations/${record.id}/members`}
+                to={`/${record.slug}/organizations/members`}
                 className="text-gray-600 hover:text-gray-500 text-sm font-medium"
               >
                 Members
               </Link>
               <Link
-                to={`/console/organizations/${record.id}/settings`}
+                to={`/${record.slug}/organizations/settings`}
                 className="text-gray-600 hover:text-gray-500 text-sm font-medium"
               >
                 Settings
@@ -226,7 +241,6 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       type: 'select' as const,
       options: [
         { value: 'OWNER', label: 'Owner' },
-        { value: 'ADMIN', label: 'Admin' },
         { value: 'MEMBER', label: 'Member' },
       ],
     },
@@ -245,14 +259,16 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
   const bulkActions = [
     {
       label: 'Export Selected',
-      action: (selectedItems: any[]) => {
-        console.log('Exporting organizations:', selectedItems);
+      action: (selectedItems: OrganizationListRow[]) => {
+        // This is read-only and safe for any role
+        console.log('Exporting organizations:', selectedItems.map((i) => i.id));
       },
     },
     {
       label: 'View Analytics',
-      action: (selectedItems: any[]) => {
-        console.log('Viewing analytics for organizations:', selectedItems);
+      action: (selectedItems: OrganizationListRow[]) => {
+        const manageable = selectedItems.filter((i) => i.role === 'OWNER');
+        console.log('Viewing analytics for manageable organizations:', manageable.map((i) => i.id));
       },
     },
   ];
@@ -260,7 +276,9 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
   const pageActions = [
     {
       label: 'View Analytics',
-      action: () => window.location.href = '/console/analytics',
+      action: () => {
+        window.location.href = '/console/analytics';
+      },
       variant: 'secondary' as const,
     },
     {
@@ -311,6 +329,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
           bulkActions={bulkActions}
           searchable={true}
           exportable={true}
+          loading={isLoadingOrganizations || isLoadingEvents}
         />
       </div>
     </div>
