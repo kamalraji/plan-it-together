@@ -76,23 +76,27 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-        <div className="min-h-screen flex w-full bg-background pt-16">
-          <OrganizationSidebar />
+        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
+          <div className="relative flex w-full pt-16">
+            <OrganizationSidebar />
 
-          <SidebarInset>
-            <div className="px-4 py-6">
-              <Routes>
-                <Route path="dashboard" element={<OrganizerDashboard />} />
-                <Route path="eventmanagement/*" element={<EventService />} />
-                <Route path="workspaces/*" element={<WorkspaceService />} />
-                <Route path="organizations/*" element={<OrganizationService />} />
-                <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
-                <Route path="team" element={<OrganizationTeamManagement />} />
-                <Route path="*" element={<Navigate to="dashboard" replace />} />
-              </Routes>
-            </div>
-          </SidebarInset>
+            <SidebarInset>
+              <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
+                <Routes>
+                  <Route path="dashboard" element={<OrganizerDashboard />} />
+                  <Route path="eventmanagement/*" element={<EventService />} />
+                  <Route path="workspaces/*" element={<WorkspaceService />} />
+                  <Route path="organizations/*" element={<OrganizationService />} />
+                  <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
+                  <Route path="team" element={<OrganizationTeamManagement />} />
+                  <Route path="*" element={<Navigate to="dashboard" replace />} />
+                </Routes>
+              </div>
+            </SidebarInset>
+          </div>
         </div>
+
       </SidebarProvider>
     </OrganizationProvider>
   );
