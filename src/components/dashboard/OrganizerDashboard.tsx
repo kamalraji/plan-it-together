@@ -177,14 +177,14 @@ export function OrganizerDashboard() {
       </div>
 
       {/* Hero with glassmorphic organization summary */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[180px] sm:min-h-[220px]">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[150px] sm:min-h-[200px]">
           {/* Themed gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-primary/5" />
 
           {/* Glassmorphic overlay */}
-          <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-xl rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 sm:px-6 py-4 shadow-2xl">
+          <div className="relative px-4 sm:px-10 py-4 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 sm:px-6 py-3 sm:py-4 shadow-2xl">
               <p className="text-xs sm:text-sm text-muted-foreground mb-1">/ Organizer view</p>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 Organizer Dashboard
@@ -195,8 +195,8 @@ export function OrganizerDashboard() {
               </p>
             </div>
 
-            <div className="flex flex-col items-start sm:items-end gap-3">
-              <div className="rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 py-3 shadow-xl min-w-[220px] max-w-xs">
+            <div className="flex flex-col items-stretch xs:items-end gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 py-3 shadow-xl min-w-[220px] max-w-xs self-stretch sm:self-auto">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                   Active organization
                 </p>
@@ -208,24 +208,24 @@ export function OrganizerDashboard() {
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full">
                 {!vendorLoading && (
                   <Link
                     to={isVendor ? '/vendor/dashboard' : '/vendor/register'}
-                    className="text-[11px] sm:text-xs md:text-sm font-medium text-foreground hover:text-foreground/80 underline-offset-2 hover:underline"
+                    className="flex-1 min-w-[120px] text-center text-[11px] sm:text-xs md:text-sm font-medium text-foreground hover:text-foreground/80 underline-offset-2 hover:underline"
                   >
                     {isVendor ? 'Vendor Dashboard' : 'Become a Vendor'}
                   </Link>
                 )}
                 <Link
                   to="/events/create"
-                  className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors"
+                  className="flex-1 min-w-[120px] inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors"
                 >
                   Create event
                 </Link>
                 <button
                   onClick={logout}
-                  className="inline-flex items-center rounded-full border border-border/70 bg-background/80 backdrop-blur px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground hover:bg-background/90 transition-colors"
+                  className="flex-1 min-w-[120px] inline-flex items-center justify-center rounded-full border border-border/70 bg-background/80 backdrop-blur px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground hover:bg-background/90 transition-colors"
                 >
                   Logout
                 </button>
@@ -236,7 +236,7 @@ export function OrganizerDashboard() {
       </section>
 
       {/* Summary metrics */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-20">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-10 sm:mt-16">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {isSummaryLoading ? (
             [...Array(3)].map((_, index) => (
@@ -282,7 +282,7 @@ export function OrganizerDashboard() {
       </section>
 
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-8 sm:mt-10">
         <div className="bg-card border border-border/60 rounded-2xl px-2 sm:px-3 py-2 shadow-sm overflow-x-auto">
           <nav className="flex gap-2 sm:gap-3 min-w-max">
             {[
@@ -308,7 +308,7 @@ export function OrganizerDashboard() {
       </div>
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-14 sm:pt-16">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 pt-10 sm:pt-14">
          {/* Onboarding Checklist */}
          {/* Onboarding Checklist */}
          <div className="mb-6">
@@ -316,7 +316,7 @@ export function OrganizerDashboard() {
          </div>
  
          {/* Organizer overview widgets */}
-         <div className="mb-6 sm:mb-8 grid gap-4 sm:gap-6 lg:grid-cols-3">
+         <div className="mb-6 sm:mb-8 grid gap-4 sm:gap-6 lg:grid-cols-3 lg:items-start">
            <div className="bg-card rounded-lg shadow p-4 sm:p-6">
              <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Top Workspaces</h2>
              {topWorkspaces.length > 0 ? (
@@ -485,7 +485,7 @@ export function OrganizerDashboard() {
              </div>
 
               {events && events.length > 0 ? (
-                <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
                   {events.map((event) => (
                     <div key={event.id} className="bg-card rounded-lg shadow p-4 sm:p-6 border border-border/60">
                       <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">
