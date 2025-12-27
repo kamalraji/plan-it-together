@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 import api from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
+import { useOrganizationEvents } from '@/hooks/useOrganization';
 
 const workspaceCreateSchema = z.object({
   name: z
@@ -30,6 +32,10 @@ export const WorkspaceCreatePage: React.FC = () => {
   const orgSlugCandidate = currentPath.split('/')[1];
   const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
   const eventIdFromQuery = searchParams.get('eventId') || '';
+
+  const organizationCtx = isOrgContext ? useCurrentOrganization() : null;
+  const organizationId = organizationCtx?.organization?.id as string | undefined;
+  const { data: orgEvents } = useOrganizationEvents(organizationId || '', undefined);
 
   const [formValues, setFormValues] = useState({
     name: '',
@@ -152,15 +158,31 @@ export const WorkspaceCreatePage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="event-id">
               Associated event
             </label>
-            <input
-              id="event-id"
-              type="text"
-              value={formValues.eventId}
-              onChange={handleChange('eventId')}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Paste or confirm event ID"
-            />
-            {eventIdFromQuery && (
+            {isOrgContext && orgEvents && orgEvents.length > 0 ? (
+              <select
+                id="event-id"
+                value={formValues.eventId}
+                onChange={handleChange('eventId')}
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              >
+                <option value="">Select an event</option>
+                {orgEvents.map((event: any) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                id="event-id"
+                type="text"
+                value={formValues.eventId}
+                onChange={handleChange('eventId')}
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Paste or confirm event ID"
+              />
+            )}
+            {eventIdFromQuery && !isOrgContext && (
               <p className="mt-1 text-xs text-gray-500">
                 Prefilled from URL query parameter <code>eventId</code>.
               </p>
