@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-
+import { AuthLayout } from './AuthLayout';
 
 export function EmailVerification() {
   const [searchParams] = useSearchParams();
@@ -36,16 +36,8 @@ export function EmailVerification() {
   }, [token, verifyEmail]);
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Gradient backdrop with blurred color glows */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background" />
-        <div className="absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-gradient-to-br from-teal/40 via-sunny/35 to-coral/30 blur-3xl opacity-75" />
-        <div className="absolute -bottom-40 right-1/4 h-72 w-72 rounded-full bg-gradient-to-tr from-coral/35 via-sunny/35 to-teal/35 blur-3xl opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/40 to-background/95" />
-      </div>
-
-      <div className="relative max-w-md w-full space-y-8">
+    <AuthLayout>
+      <div className="space-y-8">
         <div className="text-center">
           <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             Email Verification
@@ -141,6 +133,6 @@ export function EmailVerification() {
           )}
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
