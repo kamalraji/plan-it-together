@@ -252,6 +252,50 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_memberships: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string
+          role: Database["public"]["Enums"]["organization_membership_role"]
+          status: Database["public"]["Enums"]["organization_membership_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id: string
+          role?: Database["public"]["Enums"]["organization_membership_role"]
+          status?: Database["public"]["Enums"]["organization_membership_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string
+          role?: Database["public"]["Enums"]["organization_membership_role"]
+          status?: Database["public"]["Enums"]["organization_membership_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           category: string
@@ -621,6 +665,12 @@ export type Database = {
         | "CANCELLED"
       event_visibility: "PUBLIC" | "PRIVATE" | "UNLISTED"
       organization_category: "COLLEGE" | "COMPANY" | "INDUSTRY" | "NON_PROFIT"
+      organization_membership_role: "OWNER" | "ADMIN" | "ORGANIZER" | "VIEWER"
+      organization_membership_status:
+        | "PENDING"
+        | "ACTIVE"
+        | "REJECTED"
+        | "REMOVED"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
       user_role:
         | "SUPER_ADMIN"
@@ -773,6 +823,13 @@ export const Constants = {
       event_status: ["DRAFT", "PUBLISHED", "ONGOING", "COMPLETED", "CANCELLED"],
       event_visibility: ["PUBLIC", "PRIVATE", "UNLISTED"],
       organization_category: ["COLLEGE", "COMPANY", "INDUSTRY", "NON_PROFIT"],
+      organization_membership_role: ["OWNER", "ADMIN", "ORGANIZER", "VIEWER"],
+      organization_membership_status: [
+        "PENDING",
+        "ACTIVE",
+        "REJECTED",
+        "REMOVED",
+      ],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
       user_role: [
         "SUPER_ADMIN",
