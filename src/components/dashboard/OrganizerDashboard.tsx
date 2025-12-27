@@ -7,6 +7,7 @@ import { useVendorStatus } from '../../hooks/useVendorStatus';
 import { MarketplaceOrganizerInterface } from '../marketplace';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Event {
   id: string;
@@ -85,6 +86,65 @@ export function OrganizerDashboard() {
       .slice(0, 3);
   }, [events]);
  
+  const { data: currentEvent } = useQuery({
+    queryKey: ['organizer-current-event', organization.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('organization_id', organization.id)
+        .in('status', ['PUBLISHED', 'ONGOING'])
+        .order('start_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+ 
+      if (error) throw error;
+      return data;
+    },
+  });
+ 
+  const { data: currentEventMetrics } = useQuery({
+    enabled: !!currentEvent,
+    queryKey: ['organizer-current-event-metrics', currentEvent?.id],
+    queryFn: async () => {
+      if (!currentEvent) return null;
+      const eventId = currentEvent.id as string;
+ 
+      const [registrationsRes, confirmedRes, checkinsRes, tasksRes] = await Promise.all([
+        supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventId),
+        supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventId)
+          .eq('status', 'CONFIRMED'),
+        supabase
+          .from('attendance_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', eventId),
+        supabase
+          .from('workspace_activities')
+          .select('*', { count: 'exact', head: true })
+          .eq('type', 'task')
+          .eq('workspace_id', eventId),
+      ]);
+ 
+      if (registrationsRes.error) throw registrationsRes.error;
+      if (confirmedRes.error) throw confirmedRes.error;
+      if (checkinsRes.error) throw checkinsRes.error;
+      if (tasksRes.error) throw tasksRes.error;
+ 
+      return {
+        totalRegistrations: registrationsRes.count ?? 0,
+        confirmedRegistrations: confirmedRes.count ?? 0,
+        checkins: checkinsRes.count ?? 0,
+        tasks: tasksRes.count ?? 0,
+      };
+    },
+  });
+ 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -162,7 +222,7 @@ export function OrganizerDashboard() {
            <OrganizerOnboardingChecklist />
          </div>
  
-         {/* Organizer overview widgets */}
+        {/* Organizer overview widgets */}
          <div className="mb-8 grid gap-6 lg:grid-cols-3">
            <div className="bg-card rounded-lg shadow p-6">
              <h2 className="text-lg font-semibold text-foreground mb-3">Top Workspaces</h2>
@@ -234,6 +294,45 @@ export function OrganizerDashboard() {
              </div>
            </div>
          </div>
+ 
+         {/* Current event overview */}
+         {currentEvent && currentEventMetrics && (
+           <div className="mb-8 bg-card rounded-lg shadow p-6">
+             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+               <div>
+                 <h2 className="text-xl font-semibold text-foreground">Current Event Overview</h2>
+                 <p className="text-sm text-muted-foreground">
+                   {currentEvent.name} · {new Date(currentEvent.start_date).toLocaleDateString()} –{' '}
+                   {new Date(currentEvent.end_date).toLocaleDateString()}
+                 </p>
+               </div>
+               <Link
+                 to={`/events/${currentEvent.id}`}
+                 className="text-sm font-medium text-primary hover:text-primary/80"
+               >
+                 View event details
+               </Link>
+             </div>
+             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+               <div className="bg-background rounded-lg border border-border p-4">
+                 <p className="text-xs text-muted-foreground mb-1">Total registrations</p>
+                 <p className="text-2xl font-bold text-foreground">{currentEventMetrics.totalRegistrations}</p>
+               </div>
+               <div className="bg-background rounded-lg border border-border p-4">
+                 <p className="text-xs text-muted-foreground mb-1">Confirmed</p>
+                 <p className="text-2xl font-bold text-emerald-500">{currentEventMetrics.confirmedRegistrations}</p>
+               </div>
+               <div className="bg-background rounded-lg border border-border p-4">
+                 <p className="text-xs text-muted-foreground mb-1">Check-ins</p>
+                 <p className="text-2xl font-bold text-sky-500">{currentEventMetrics.checkins}</p>
+               </div>
+               <div className="bg-background rounded-lg border border-border p-4">
+                 <p className="text-xs text-muted-foreground mb-1">Workspace tasks</p>
+                 <p className="text-2xl font-bold text-violet-500">{currentEventMetrics.tasks}</p>
+               </div>
+             </div>
+           </div>
+         )}
  
          {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
          {isProfileIncomplete && (

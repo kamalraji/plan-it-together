@@ -227,29 +227,29 @@ export function ParticipantDashboard() {
       )}
 
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { key: 'events', label: 'My Events' },
-              { key: 'certificates', label: 'Certificates' },
-              { key: 'profile', label: 'Profile' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.key
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="border-b border-border">
+           <nav className="-mb-px flex space-x-8">
+             {[
+               { key: 'events', label: 'My Events' },
+               { key: 'certificates', label: 'Certificates' },
+               { key: 'profile', label: 'Profile' },
+             ].map((tab) => (
+               <button
+                 key={tab.key}
+                 onClick={() => setActiveTab(tab.key as any)}
+                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                   activeTab === tab.key
+                     ? 'border-primary text-primary'
+                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                 }`}
+               >
+                 {tab.label}
+               </button>
+             ))}
+           </nav>
+         </div>
+       </div>
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -257,20 +257,20 @@ export function ParticipantDashboard() {
           <div className="space-y-10">
             <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">My Registered Events</h2>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <span>
-                  {registrations?.length || 0} event
-                  {(registrations?.length || 0) !== 1 ? 's' : ''} registered
-                </span>
-                <button
-                  onClick={() => navigate('/dashboard/participant-events')}
-                  className="text-indigo-600 hover:text-indigo-800 font-medium"
-                >
-                  Browse all events
-                </button>
-              </div>
-            </div>
+               <h2 className="text-2xl font-bold text-foreground">My Registered Events</h2>
+               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                 <span>
+                   {registrations?.length || 0} event
+                   {(registrations?.length || 0) !== 1 ? 's' : ''} registered
+                 </span>
+                 <button
+                   onClick={() => navigate('/dashboard/participant-events')}
+                   className="text-primary hover:text-primary/80 font-medium"
+                 >
+                   Browse all events
+                 </button>
+               </div>
+             </div>
 
               {registrations && registrations.length > 0 ? (
                 <div className="space-y-6">
@@ -281,129 +281,129 @@ export function ParticipantDashboard() {
                     >
                       {/* Event Header */}
                       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {registration.event.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {new Date(
-                                registration.event.startDate,
-                              ).toLocaleDateString()}{' '}
-                              -{' '}
-                              {new Date(
-                                registration.event.endDate,
-                              ).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span
-                              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                                registration.status === 'CONFIRMED'
-                                  ? 'bg-green-100 text-green-800'
-                                  : registration.status === 'WAITLISTED'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {registration.status}
-                            </span>
-                            {registration.attendance && (
-                              <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Checked In
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                      <div className="flex justify-between items-start">
+                           <div>
+                             <h3 className="text-lg font-semibold text-foreground">
+                               {registration.event.name}
+                             </h3>
+                             <p className="text-sm text-muted-foreground mt-1">
+                               {new Date(
+                                 registration.event.startDate,
+                               ).toLocaleDateString()}{' '}
+                               -{' '}
+                               {new Date(
+                                 registration.event.endDate,
+                               ).toLocaleDateString()}
+                             </p>
+                           </div>
+                           <div className="flex items-center space-x-2">
+                             <span
+                               className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                                 registration.status === 'CONFIRMED'
+                                   ? 'bg-emerald-100 text-emerald-800'
+                                   : registration.status === 'WAITLISTED'
+                                   ? 'bg-amber-100 text-amber-800'
+                                   : 'bg-muted text-muted-foreground'
+                               }`}
+                             >
+                               {registration.status}
+                             </span>
+                             {registration.attendance && (
+                               <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-800">
+                                 Checked In
+                               </span>
+                             )}
+                           </div>
+                         </div>
                       </div>
 
                       <div className="p-6">
                         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-                          <div className="flex-1">
-                            <p className="text-gray-600 text-sm mb-4">
-                              {registration.event.description}
-                            </p>
+                         <div className="flex-1">
+                             <p className="text-muted-foreground text-sm mb-4">
+                               {registration.event.description}
+                             </p>
 
                             {/* Event Details Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                               <div className="space-y-2">
+                                 <div className="flex justify-between">
+                                   <span className="text-muted-foreground">Start Time:</span>
+                                   <span className="text-foreground">
+                                     {new Date(
+                                       registration.event.startDate,
+                                     ).toLocaleString()}
+                                   </span>
+                                 </div>
+                                 <div className="flex justify-between">
+                                   <span className="text-muted-foreground">End Time:</span>
+                                   <span className="text-foreground">
+                                     {new Date(
+                                       registration.event.endDate,
+                                     ).toLocaleString()}
+                                   </span>
+                                 </div>
+                                 <div className="flex justify-between">
+                                   <span className="text-muted-foreground">Event Mode:</span>
+                                   <span className="text-foreground capitalize">
+                                     {registration.event.mode.toLowerCase()}
+                                   </span>
+                                 </div>
+                               </div>
                               <div className="space-y-2">
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">Start Time:</span>
-                                  <span className="text-gray-900">
-                                    {new Date(
-                                      registration.event.startDate,
-                                    ).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">End Time:</span>
-                                  <span className="text-gray-900">
-                                    {new Date(
-                                      registration.event.endDate,
-                                    ).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">Event Mode:</span>
-                                  <span className="text-gray-900 capitalize">
-                                    {registration.event.mode.toLowerCase()}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">Registered:</span>
-                                  <span className="text-gray-900">
-                                    {new Date(
-                                      registration.registeredAt,
-                                    ).toLocaleDateString()}
-                                  </span>
-                                </div>
-                                {registration.attendance && (
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-500">Checked In:</span>
-                                    <span className="text-gray-900">
-                                      {new Date(
-                                        registration.attendance.checkInTime,
-                                      ).toLocaleString()}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                                 <div className="flex justify-between">
+                                   <span className="text-muted-foreground">Registered:</span>
+                                   <span className="text-foreground">
+                                     {new Date(
+                                       registration.registeredAt,
+                                     ).toLocaleDateString()}
+                                   </span>
+                                 </div>
+                                 {registration.attendance && (
+                                   <div className="flex justify-between">
+                                     <span className="text-muted-foreground">Checked In:</span>
+                                     <span className="text-foreground">
+                                       {new Date(
+                                         registration.attendance.checkInTime,
+                                       ).toLocaleString()}
+                                     </span>
+                                   </div>
+                                 )}
+                               </div>
                             </div>
 
                             {/* Location/Virtual Links */}
-                            {registration.event.venue && (
-                              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-start">
-                                  <svg
-                                    className="h-5 w-5 text-gray-400 mt-0.5 mr-2"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                    />
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                  </svg>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-900">Venue</p>
-                                    <p className="text-sm text-gray-600">
-                                      {registration.event.venue.address}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                             {registration.event.venue && (
+                               <div className="mt-4 p-3 bg-muted rounded-lg">
+                                 <div className="flex items-start">
+                                   <svg
+                                     className="h-5 w-5 text-muted-foreground mt-0.5 mr-2"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                   >
+                                     <path
+                                       strokeLinecap="round"
+                                       strokeLinejoin="round"
+                                       strokeWidth={2}
+                                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 111.314 0z"
+                                     />
+                                     <path
+                                       strokeLinecap="round"
+                                       strokeLinejoin="round"
+                                       strokeWidth={2}
+                                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                     />
+                                   </svg>
+                                   <div>
+                                     <p className="text-sm font-medium text-foreground">Venue</p>
+                                     <p className="text-sm text-muted-foreground">
+                                       {registration.event.venue.address}
+                                     </p>
+                                   </div>
+                                 </div>
+                               </div>
+                             )}
 
                             {registration.event.virtualLinks && (
                               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
