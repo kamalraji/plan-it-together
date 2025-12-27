@@ -8,7 +8,7 @@ import { MarketplaceOrganizerInterface } from '../marketplace';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
 import { supabase } from '@/integrations/supabase/client';
-import heroImage from '@/assets/dashboard-hero.jpg';
+
 
 interface Event {
   id: string;
@@ -170,16 +170,8 @@ export function OrganizerDashboard() {
       {/* Hero with glassmorphic organization summary */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[180px] sm:min-h-[220px]">
-          {/* Rich background image */}
-          <div className="absolute inset-0">
-            <img
-              src={heroImage}
-              alt="Abstract collaboration background for organizer dashboard hero"
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/60 to-background/95" />
-          </div>
+          {/* Themed gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-primary/5" />
 
           {/* Glassmorphic overlay */}
           <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
