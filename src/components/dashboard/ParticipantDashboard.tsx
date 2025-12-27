@@ -614,123 +614,121 @@ export function ParticipantDashboard() {
         )}
 
         {activeTab === 'certificates' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-2xl font-bold text-gray-900">My Certificates</h2>
-              <Link
-                to="/verify-certificate"
-                className="text-sm text-indigo-600 hover:text-indigo-800"
-              >
-                Public certificate verification
-              </Link>
-            </div>
-
-            {certificates && certificates.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {certificates.map((certificate) => (
-                  <div
-                    key={certificate.id}
-                    className="bg-white rounded-lg shadow p-4 flex flex-col justify-between"
-                  >
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {certificate.event.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">Certificate ID</p>
-                      <p className="text-xs font-mono text-gray-800 break-all mb-3">
-                        {certificate.code}
-                      </p>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-auto">
-                      Issued on{' '}
-                      {new Date(certificate.issuedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-white rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No Certificates Yet
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Certificates from completed events will appear here.
-                </p>
-                <p className="text-sm text-gray-500">
-                  If you think you're missing a certificate, please contact the event
-                  organizer.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+           <div className="space-y-6 sm:space-y-8">
+             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+               <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Certificates</h2>
+               <Link
+                 to="/verify-certificate"
+                 className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
+               >
+                 Public certificate verification
+               </Link>
+             </div>
+ 
+             {certificates && certificates.length > 0 ? (
+               <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+                 {certificates.map((certificate) => (
+                   <div
+                     key={certificate.id}
+                     className="bg-card rounded-lg shadow p-4 flex flex-col justify-between"
+                   >
+                     <div>
+                       <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
+                         {certificate.event.name}
+                       </h3>
+                       <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Certificate ID</p>
+                       <p className="text-[11px] sm:text-xs font-mono text-foreground break-all mb-2.5 sm:mb-3">
+                         {certificate.code}
+                       </p>
+                     </div>
+                     <p className="text-[11px] sm:text-xs text-muted-foreground mt-auto">
+                       Issued on {new Date(certificate.issuedAt).toLocaleDateString()}
+                     </p>
+                   </div>
+                 ))}
+               </div>
+             ) : (
+               <div className="text-center py-10 sm:py-12 bg-card rounded-lg shadow">
+                 <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
+                   No Certificates Yet
+                 </h3>
+                 <p className="text-sm text-muted-foreground mb-3 sm:mb-4">
+                   Certificates from completed events will appear here.
+                 </p>
+                 <p className="text-xs sm:text-sm text-muted-foreground">
+                   If you think you're missing a certificate, please contact the event organizer.
+                 </p>
+               </div>
+             )}
+           </div>
+         )}
 
         {activeTab === 'profile' && (
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Profile Settings</h2>
               <Link
                 to="/complete-profile"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
               >
                 Edit Profile
               </Link>
             </div>
-
-            <div className="space-y-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+ 
+            <div className="space-y-6 sm:space-y-8">
+              <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Name
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <p className="mt-1 text-sm text-foreground">
                         {user?.name || 'Not provided'}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Email
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+                      <p className="mt-1 text-sm text-foreground">{user?.email}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Role
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">{user?.role}</p>
+                      <p className="mt-1 text-sm text-foreground">{user?.role}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Organization
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <p className="mt-1 text-sm text-foreground">
                         {user?.organization || 'Not provided'}
                       </p>
                     </div>
                   </div>
-
-                  <div className="space-y-4">
+ 
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Phone
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <p className="mt-1 text-sm text-foreground">
                         {user?.phone || 'Not provided'}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Website
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <p className="mt-1 text-sm text-foreground">
                         {user?.website ? (
                           <a
                             href={user.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-indigo-600 hover:text-indigo-800"
+                            className="text-primary hover:text-primary/80"
                           >
                             {user.website}
                           </a>
@@ -740,15 +738,15 @@ export function ParticipantDashboard() {
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-xs sm:text-sm font-medium text-muted-foreground">
                         Email Status
                       </label>
-                      <p className="mt-1 text-sm text-gray-900">
+                      <p className="mt-1 text-sm text-foreground">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          className={`inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${
                             user?.emailVerified
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-amber-100 text-amber-800'
                           }`}
                         >
                           {user?.emailVerified ? 'Verified' : 'Pending Verification'}
@@ -757,26 +755,26 @@ export function ParticipantDashboard() {
                     </div>
                   </div>
                 </div>
-
+ 
                 {user?.bio && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <label className="block text-sm font-medium text-gray-700">Bio</label>
-                    <p className="mt-1 text-sm text-gray-900">{user.bio}</p>
+                  <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
+                    <label className="block text-xs sm:text-sm font-medium text-muted-foreground">Bio</label>
+                    <p className="mt-1 text-sm text-foreground">{user.bio}</p>
                   </div>
                 )}
-
+ 
                 {user?.socialLinks && Object.keys(user.socialLinks).length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-border">
+                    <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">
                       Social Links
                     </label>
-                    <div className="flex space-x-4">
+                    <div className="flex flex-wrap gap-3 text-sm">
                       {user.socialLinks.linkedin && (
                         <a
                           href={user.socialLinks.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-800"
+                          className="text-primary hover:text-primary/80"
                         >
                           LinkedIn
                         </a>
@@ -786,7 +784,7 @@ export function ParticipantDashboard() {
                           href={user.socialLinks.twitter}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-800"
+                          className="text-primary hover:text-primary/80"
                         >
                           Twitter
                         </a>
@@ -796,7 +794,7 @@ export function ParticipantDashboard() {
                           href={user.socialLinks.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-800"
+                          className="text-primary hover:text-primary/80"
                         >
                           GitHub
                         </a>
@@ -805,12 +803,12 @@ export function ParticipantDashboard() {
                   </div>
                 )}
               </div>
-
+ 
               <section>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1.5 sm:mb-2">
                   Followed Organizations
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                   Stay up to date with announcements and events from organizations you
                   follow.
                 </p>
