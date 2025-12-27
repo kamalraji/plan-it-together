@@ -165,7 +165,7 @@ export function OrganizerDashboard() {
   const activeEvents = analytics?.activeEvents ?? 0;
   const totalRegistrations = analytics?.totalRegistrations ?? 0;
 
-  const isSummaryLoading = isLoading || !events;
+  const isSummaryLoading = isLoading && isHealthy !== false;
 
   return (
     <div className="min-h-screen bg-background">
