@@ -1,4 +1,5 @@
 import { Workspace, WorkspaceRole } from '../../types';
+import { WorkspaceRoleBadge } from './WorkspaceBadges';
 
 interface TeamMemberRosterProps {
   workspace: Workspace;
@@ -109,9 +110,7 @@ export function TeamMemberRoster({
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {member.user.name}
                     </p>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getRoleColor(member.role)}`}>
-                      {getRoleDisplayName(member.role)}
-                    </span>
+                    <WorkspaceRoleBadge role={member.role} />
                   </div>
                   <p className="text-sm text-gray-500 truncate">
                     {member.user.email}
