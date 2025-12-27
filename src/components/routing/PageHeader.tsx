@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Badge } from '@/components/ui/badge';
 
 interface BreadcrumbItem {
   label: string;
@@ -171,12 +172,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 >
                   {tab.label}
                   {tab.badge && (
-                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tab.current
-                        ? 'bg-indigo-100 text-indigo-600'
-                        : 'bg-gray-100 text-gray-600'
-                      }`}>
+                    <Badge
+                      variant={tab.current ? 'default' : 'outline'}
+                      className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium"
+                    >
                       {tab.badge}
-                    </span>
+                    </Badge>
                   )}
                 </button>
               ))}
