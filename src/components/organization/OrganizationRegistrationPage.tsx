@@ -22,6 +22,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
   const [errors, setErrors] = useState<{ name?: string; slug?: string; form?: string }>({});
   const [createdOrg, setCreatedOrg] = useState<{ id: string; slug: string } | null>(null);
   const [isCheckingExistingOrg, setIsCheckingExistingOrg] = useState(true);
+  const [roleStatus, setRoleStatus] = useState<'idle' | 'checking' | 'granted' | 'failed'>('idle');
 
   useEffect(() => {
     const checkExistingOrg = async () => {
@@ -50,6 +51,51 @@ export const OrganizationRegistrationPage: React.FC = () => {
 
     void checkExistingOrg();
   }, [user?.id]);
+
+  // After an organization is created, wait for organizer role to be applied
+  useEffect(() => {
+    if (!createdOrg || !user?.id || roleStatus === 'granted' || roleStatus === 'failed') {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const checkRole = async (attempt: number) => {
+      if (isCancelled) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (!error && data && data.some((row: { role: string }) => row.role === 'organizer' || row.role === 'admin')) {
+          if (!isCancelled) {
+            setRoleStatus('granted');
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn('Error while checking organizer role after org creation', err);
+      }
+
+      if (attempt >= 10 || isCancelled) {
+        if (!isCancelled) {
+          setRoleStatus('failed');
+        }
+        return;
+      }
+
+      setTimeout(() => void checkRole(attempt + 1), 1000);
+    };
+
+    setRoleStatus('checking');
+    void checkRole(1);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [createdOrg, user?.id, roleStatus]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -148,6 +194,8 @@ export const OrganizationRegistrationPage: React.FC = () => {
 
   if (createdOrg) {
     const orgDashboardPath = `/${createdOrg.slug}/dashboard`;
+    const isWaitingForRole = roleStatus === 'checking' || roleStatus === 'idle';
+    const roleFailed = roleStatus === 'failed';
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-cream/20 px-4">
@@ -157,18 +205,40 @@ export const OrganizationRegistrationPage: React.FC = () => {
           </h1>
           <p className="text-gray-600 text-sm">
             <span className="font-medium">{formState.name || 'Your organization'}</span> is ready.
-            Use the button below to open your organizer dashboard.
+            {roleStatus === 'granted'
+              ? ' Organizer access has been granted. Use the button below to open your organizer dashboard.'
+              : ' We are finalizing your organizer access. This usually takes just a few seconds.'}
           </p>
+          {roleFailed && (
+            <p className="text-xs text-red-500">
+              We could not confirm organizer access yet. You can continue to your main dashboard and try again later,
+              or contact a Thittam1Hub admin if this persists.
+            </p>
+          )}
           <button
             type="button"
-            onClick={() => navigate(orgDashboardPath, { replace: true })}
-            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-lg border border-transparent shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral"
+            disabled={isWaitingForRole}
+            onClick={() => {
+              if (roleStatus === 'granted') {
+                navigate(orgDashboardPath, { replace: true });
+              } else {
+                navigate('/dashboard', { replace: true });
+              }
+            }}
+            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-lg border border-transparent shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-60"
           >
-            Go to organizer dashboard
+            {isWaitingForRole
+              ? 'Preparing your organizer dashboard…'
+              : roleStatus === 'granted'
+                ? 'Go to organizer dashboard'
+                : 'Go to main dashboard'}
           </button>
           <p className="text-xs text-gray-400">
             Or visit
-            <span className="ml-1 font-mono text-gray-500">{window.location.origin}{orgDashboardPath}</span>
+            <span className="ml-1 font-mono text-gray-500">
+              {window.location.origin}
+              {roleStatus === 'granted' ? orgDashboardPath : '/dashboard'}
+            </span>
           </p>
         </div>
       </div>
