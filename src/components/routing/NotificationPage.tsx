@@ -46,12 +46,6 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
 
   const effectiveNotifications = notifications ?? liveNotifications ?? [];
 
-  const {
-    notifications: liveNotifications,
-  } = useNotificationFeed();
-
-  const effectiveNotifications = notifications ?? liveNotifications ?? [];
-
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -127,24 +121,32 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
   const handleMarkAsRead = (notificationId: string) => {
     if (onMarkAsRead) {
       onMarkAsRead(notificationId);
+    } else {
+      void markAsRead(notificationId);
     }
   };
-
+ 
   const handleMarkAllAsRead = () => {
     if (onMarkAllAsRead) {
       onMarkAllAsRead();
+    } else {
+      void markAllAsRead();
     }
   };
-
+ 
   const handleDeleteNotification = (notificationId: string) => {
     if (onDeleteNotification) {
       onDeleteNotification(notificationId);
+    } else {
+      void deleteNotification(notificationId);
     }
   };
-
+ 
   const handleClearAll = () => {
     if (onClearAll) {
       onClearAll();
+    } else {
+      void clearAll();
     }
   };
 
