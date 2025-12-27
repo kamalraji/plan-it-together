@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
+import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -84,8 +85,19 @@ export function LoginForm() {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream to-lavender/20 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen relative flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Subtle patterned background image with gradient overlay */}
+      <div className="absolute inset-0">
+        <img
+          src={heroPattern}
+          alt="Abstract technology pattern background for login"
+          className="h-full w-full object-cover opacity-60"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
+      </div>
+
+      <div className="relative max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
             Welcome Back!
