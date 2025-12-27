@@ -278,20 +278,20 @@ export function OrganizerDashboard() {
  
            <div className="bg-card rounded-lg shadow p-4 sm:p-6">
              <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Quick Links</h2>
-             <div className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
-               <Link
-                 to={`/${organization.slug}/workspaces`}
-                 className="block w-full text-left px-3 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 font-medium"
-               >
-                 Go to Workspaces
-               </Link>
-               <Link
-                 to="/dashboard/organizations"
-                 className="block w-full text-left px-3 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80 font-medium"
-               >
-                 Manage Organizations
-               </Link>
-             </div>
+              <div className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+                <Link
+                  to={`/${organization.slug}/workspaces`}
+                  className="block w-full text-left px-3 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 font-medium"
+                >
+                  Go to Workspaces
+                </Link>
+                <Link
+                  to={`/${organization.slug}/organizations`}
+                  className="block w-full text-left px-3 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80 font-medium"
+                >
+                  Manage Organizations
+                </Link>
+              </div>
            </div>
          </div>
  
