@@ -2,13 +2,14 @@ import React from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
-import { ConsoleLayout } from '@/components/routing/ConsoleLayout';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
 import { EventService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationSwitcher } from './OrganizationSwitcher';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { OrganizationSidebar } from './OrganizationSidebar';
 
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
@@ -39,23 +40,26 @@ export const OrgScopedLayout: React.FC = () => {
 
   return (
     <OrganizationProvider value={{ organization }}>
-      <div className="min-h-screen bg-background">
-        <div className="border-b bg-card px-6 py-3">
-          <OrganizationSwitcher />
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <OrganizationSidebar />
+          <SidebarInset>
+            <div className="border-b bg-card px-4 py-3 flex items-center gap-3">
+              <SidebarTrigger className="mr-1" />
+              <OrganizationSwitcher />
+            </div>
+            <div className="px-4 py-6">
+              <Routes>
+                <Route path="dashboard" element={<OrganizerDashboard />} />
+                <Route path="eventmanagement/*" element={<EventService />} />
+                <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
+                <Route path="team" element={<OrganizationTeamManagement />} />
+                <Route path="*" element={<Navigate to="dashboard" replace />} />
+              </Routes>
+            </div>
+          </SidebarInset>
         </div>
-        <ConsoleLayout 
-          showServiceNavigation={false} 
-          showBreadcrumbs={false}
-        >
-          <Routes>
-            <Route path="dashboard" element={<OrganizerDashboard />} />
-            <Route path="eventmanagement/*" element={<EventService />} />
-            <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
-            <Route path="team" element={<OrganizationTeamManagement />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </ConsoleLayout>
-      </div>
+      </SidebarProvider>
     </OrganizationProvider>
   );
 };
