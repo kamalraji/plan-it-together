@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '@/integrations/supabase/looseClient';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -43,13 +44,45 @@ export function LoginForm() {
       return;
     }
 
-    // Support deep-linking into organizer onboarding after signup
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get('next');
-    navigate(next || '/dashboard');
-    setIsLoading(false);
-  };
+    try {
+      // Support deep-linking into organizer onboarding after signup
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
 
+      // If a specific next URL is provided, always respect it
+      if (next) {
+        navigate(next);
+        return;
+      }
+
+      // Otherwise, check if this is an organizer signup without an organization yet
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (!userError && userData?.user) {
+        const sbUser = userData.user;
+        const desiredRole = sbUser.user_metadata?.desiredRole;
+
+        if (desiredRole === 'ORGANIZER') {
+          const { data: org, error: orgError } = await supabase
+            .from('organizations')
+            .select('id')
+            .eq('owner_id', sbUser.id)
+            .maybeSingle();
+
+          // Only redirect to onboarding if there is clearly no organization yet
+          if (!orgError && !org) {
+            navigate('/onboarding/organization');
+            return;
+          }
+        }
+      }
+    } catch (checkError) {
+      console.warn('Failed to run organizer onboarding redirect logic', checkError);
+    } finally {
+      // Fallback: if we didn't navigate earlier, go to dashboard
+      navigate('/dashboard');
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream to-lavender/20 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
