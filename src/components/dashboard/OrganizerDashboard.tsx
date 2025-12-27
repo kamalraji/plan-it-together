@@ -87,73 +87,73 @@ export function OrganizerDashboard() {
  
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Organizer Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user?.name}</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {!vendorLoading && (
-                <Link
-                  to={isVendor ? "/vendor/dashboard" : "/vendor/register"}
-                  className="text-indigo-600 hover:text-indigo-700 transition-colors font-medium"
-                >
-                  {isVendor ? "Vendor Dashboard" : "Become a Vendor"}
-                </Link>
-              )}
-              <Link
-                to="/events/create"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                Create Event
-              </Link>
-              <button
-                onClick={logout}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
+       {/* Header */}
+       <header className="bg-card shadow">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="flex justify-between items-center py-6">
+             <div>
+               <h1 className="text-3xl font-bold text-foreground">Organizer Dashboard</h1>
+               <p className="text-muted-foreground">Welcome back, {user?.name}</p>
+             </div>
+             <div className="flex items-center space-x-4">
+               {!vendorLoading && (
+                 <Link
+                   to={isVendor ? "/vendor/dashboard" : "/vendor/register"}
+                   className="text-primary hover:text-primary/80 transition-colors font-medium"
+                 >
+                   {isVendor ? "Vendor Dashboard" : "Become a Vendor"}
+                 </Link>
+               )}
+               <Link
+                 to="/events/create"
+                 className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+               >
+                 Create Event
+               </Link>
+               <button
+                 onClick={logout}
+                 className="text-muted-foreground hover:text-foreground transition-colors"
+               >
+                 Logout
+               </button>
+             </div>
+           </div>
+         </div>
+       </header>
 
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { key: 'events', label: 'My Events' },
-              { key: 'analytics', label: 'Analytics' },
-              { key: 'marketplace', label: 'Marketplace' },
-              { key: 'profile', label: 'Profile' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.key
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="border-b border-border">
+           <nav className="-mb-px flex space-x-8">
+             {[
+               { key: 'events', label: 'My Events' },
+               { key: 'analytics', label: 'Analytics' },
+               { key: 'marketplace', label: 'Marketplace' },
+               { key: 'profile', label: 'Profile' },
+             ].map((tab) => (
+               <button
+                 key={tab.key}
+                 onClick={() => setActiveTab(tab.key as any)}
+                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                   activeTab === tab.key
+                     ? 'border-primary text-primary'
+                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                 }`}
+               >
+                 {tab.label}
+               </button>
+             ))}
+           </nav>
+         </div>
+       </div>
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -164,21 +164,21 @@ export function OrganizerDashboard() {
  
          {/* Organizer overview widgets */}
          <div className="mb-8 grid gap-6 lg:grid-cols-3">
-           <div className="bg-white rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-gray-900 mb-3">Top Workspaces</h2>
+           <div className="bg-card rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-foreground mb-3">Top Workspaces</h2>
              {topWorkspaces.length > 0 ? (
-               <ul className="space-y-3 text-sm text-gray-700">
+               <ul className="space-y-3 text-sm text-muted-foreground">
                  {topWorkspaces.map((ws) => (
                    <li key={ws.id} className="flex items-center justify-between">
                      <div>
-                       <div className="font-medium text-gray-900">{ws.name}</div>
+                       <div className="font-medium text-foreground">{ws.name}</div>
                        {ws.event && (
-                         <div className="text-xs text-gray-500">Event: {ws.event.name}</div>
+                         <div className="text-xs text-muted-foreground">Event: {ws.event.name}</div>
                        )}
                      </div>
                      <Link
                        to={`/${organization.slug}/workspaces/${ws.id}`}
-                       className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                       className="text-primary hover:text-primary/80 text-xs font-medium"
                      >
                        Open
                      </Link>
@@ -186,25 +186,25 @@ export function OrganizerDashboard() {
                  ))}
                </ul>
              ) : (
-               <p className="text-sm text-gray-500">No workspaces yet for this organization.</p>
+               <p className="text-sm text-muted-foreground">No workspaces yet for this organization.</p>
              )}
            </div>
  
-           <div className="bg-white rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-gray-900 mb-3">Upcoming Event Milestones</h2>
+           <div className="bg-card rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-foreground mb-3">Upcoming Event Milestones</h2>
              {upcomingMilestones.length > 0 ? (
-               <ul className="space-y-3 text-sm text-gray-700">
+               <ul className="space-y-3 text-sm text-muted-foreground">
                  {upcomingMilestones.map((event) => (
                    <li key={event.id} className="flex items-center justify-between">
                      <div>
-                       <div className="font-medium text-gray-900">{event.name}</div>
-                       <div className="text-xs text-gray-500">
+                       <div className="font-medium text-foreground">{event.name}</div>
+                       <div className="text-xs text-muted-foreground">
                          Starts {new Date(event.startDate).toLocaleDateString()}
                        </div>
                      </div>
                      <Link
                        to={`/events/${event.id}`}
-                       className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                       className="text-primary hover:text-primary/80 text-xs font-medium"
                      >
                        View
                      </Link>
@@ -212,22 +212,22 @@ export function OrganizerDashboard() {
                  ))}
                </ul>
              ) : (
-               <p className="text-sm text-gray-500">No upcoming events scheduled.</p>
+               <p className="text-sm text-muted-foreground">No upcoming events scheduled.</p>
              )}
            </div>
  
-           <div className="bg-white rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-gray-900 mb-3">Quick Links</h2>
+           <div className="bg-card rounded-lg shadow p-6">
+             <h2 className="text-lg font-semibold text-foreground mb-3">Quick Links</h2>
              <div className="space-y-3 text-sm">
                <Link
                  to={`/${organization.slug}/workspaces`}
-                 className="block w-full text-left px-4 py-2 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium"
+                 className="block w-full text-left px-4 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 font-medium"
                >
                  Go to Workspaces
                </Link>
                <Link
                  to="/dashboard/organizations"
-                 className="block w-full text-left px-4 py-2 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium"
+                 className="block w-full text-left px-4 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80 font-medium"
                >
                  Manage Organizations
                </Link>
@@ -237,18 +237,18 @@ export function OrganizerDashboard() {
  
          {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
          {isProfileIncomplete && (
-           <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+           <div className="mb-6 bg-amber-50 border border-amber-200 rounded-md p-4">
              <div className="flex">
                <div className="flex-shrink-0">
-                 <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                 <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                  </svg>
                </div>
                <div className="ml-3">
-                 <h3 className="text-sm font-medium text-yellow-800">
+                 <h3 className="text-sm font-medium text-amber-800">
                    Complete Your Profile
                  </h3>
-                 <div className="mt-2 text-sm text-yellow-700">
+                 <div className="mt-2 text-sm text-amber-700">
                    <p>
                      Complete your organizer profile to unlock all dashboard features and improve your event management experience.
                    </p>
@@ -257,14 +257,14 @@ export function OrganizerDashboard() {
                    <div className="-mx-2 -my-1.5 flex">
                      <Link
                        to="/complete-profile"
-                       className="bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                       className="bg-amber-50 px-2 py-1.5 rounded-md text-sm font-medium text-amber-800 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-amber-50 focus:ring-amber-600"
                      >
                        Complete Profile
                      </Link>
                      <button
                        type="button"
                        onClick={() => setShowProfilePrompt(false)}
-                       className="ml-3 bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                       className="ml-3 bg-amber-50 px-2 py-1.5 rounded-md text-sm font-medium text-amber-800 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-amber-50 focus:ring-amber-600"
                      >
                        Dismiss
                      </button>
@@ -276,16 +276,16 @@ export function OrganizerDashboard() {
          )}
 
         {activeTab === 'events' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">My Events</h2>
-              <Link
-                to={`/${organization.slug}/eventmanagement/create`}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                Create New Event
-              </Link>
-            </div>
+           <div>
+             <div className="flex justify-between items-center mb-6">
+               <h2 className="text-2xl font-bold text-foreground">My Events</h2>
+               <Link
+                 to={`/${organization.slug}/eventmanagement/create`}
+                 className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+               >
+                 Create New Event
+               </Link>
+             </div>
 
             {events && events.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -349,50 +349,50 @@ export function OrganizerDashboard() {
         )}
 
         {activeTab === 'analytics' && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Analytics Overview</h2>
-            {analytics ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Total Events
-                  </h3>
-                  <p className="text-3xl font-bold text-indigo-600">
-                    {analytics.totalEvents || 0}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Total Registrations
-                  </h3>
-                  <p className="text-3xl font-bold text-green-600">
-                    {analytics.totalRegistrations || 0}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Active Events
-                  </h3>
-                  <p className="text-3xl font-bold text-blue-600">
-                    {analytics.activeEvents || 0}
-                  </p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Certificates Issued
-                  </h3>
-                  <p className="text-3xl font-bold text-purple-600">
-                    {analytics.certificatesIssued || 0}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-600">Loading analytics...</p>
-              </div>
-            )}
-          </div>
-        )}
+           <div>
+             <h2 className="text-2xl font-bold text-foreground mb-6">Analytics Overview</h2>
+             {analytics ? (
+               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                 <div className="bg-card rounded-lg shadow p-6">
+                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                     Total Events
+                   </h3>
+                   <p className="text-3xl font-bold text-primary">
+                     {analytics.totalEvents || 0}
+                   </p>
+                 </div>
+                 <div className="bg-card rounded-lg shadow p-6">
+                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                     Total Registrations
+                   </h3>
+                   <p className="text-3xl font-bold text-emerald-500">
+                     {analytics.totalRegistrations || 0}
+                   </p>
+                 </div>
+                 <div className="bg-card rounded-lg shadow p-6">
+                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                     Active Events
+                   </h3>
+                   <p className="text-3xl font-bold text-sky-500">
+                     {analytics.activeEvents || 0}
+                   </p>
+                 </div>
+                 <div className="bg-card rounded-lg shadow p-6">
+                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                     Certificates Issued
+                   </h3>
+                   <p className="text-3xl font-bold text-violet-500">
+                     {analytics.certificatesIssued || 0}
+                   </p>
+                 </div>
+               </div>
+             ) : (
+               <div className="text-center py-12">
+                 <p className="text-muted-foreground">Loading analytics...</p>
+               </div>
+             )}
+           </div>
+         )}
 
         {activeTab === 'marketplace' && (
           <MarketplaceOrganizerInterface />
