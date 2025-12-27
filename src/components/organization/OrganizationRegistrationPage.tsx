@@ -103,6 +103,23 @@ export const OrganizationRegistrationPage: React.FC = () => {
         phone: formState.phone.trim() || undefined,
       });
 
+      // After successfully creating an organization, automatically grant
+      // organizer role to the current user via a secure edge function.
+      try {
+        const { error } = await supabase.functions.invoke('self-approve-organizer');
+        if (error) {
+          console.error('Failed to self-approve organizer role', error);
+          toast({
+            title: 'Organization created, but role upgrade failed',
+            description:
+              'Your organization is ready, but we could not automatically grant organizer access. A Thittam1Hub admin may need to help.',
+            variant: 'destructive',
+          });
+        }
+      } catch (err) {
+        console.error('Unexpected error invoking self-approve-organizer', err);
+      }
+
       if (organization?.slug) {
         setCreatedOrg(organization);
       } else {

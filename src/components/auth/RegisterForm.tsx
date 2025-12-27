@@ -64,8 +64,13 @@ export function RegisterForm() {
         return;
       }
       
-      // After registration, redirect to login so they can sign in after email verification
-      navigate('/login');
+      // After registration, redirect to login. Organizer signups will be guided
+      // into the organization onboarding flow after login.
+      if (data.role === UserRole.ORGANIZER) {
+        navigate('/login?next=/onboarding/organization');
+      } else {
+        navigate('/login');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -222,8 +227,9 @@ export function RegisterForm() {
             {selectedRole === UserRole.ORGANIZER && (
               <div className="rounded-xl bg-teal/10 border border-teal/20 p-4">
                 <div className="text-sm text-teal">
-                  <strong>Organizer Account:</strong> Your account will need approval from a Super-Admin. 
-                  You'll receive an email once your account is approved and ready to go!
+                  <strong>Organizer Account:</strong> After you verify your email and sign in,
+                  you'll be guided to set up your organization. Once your first organization is
+                  created, you'll automatically get organizer access.
                 </div>
               </div>
             )}
