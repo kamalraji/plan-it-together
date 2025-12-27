@@ -14,6 +14,7 @@ import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
+import { AuthLayout } from '../auth/AuthLayout';
 import { DashboardDataLab } from '../enhanced/DashboardDataLab';
 import { DashboardRouter } from '../dashboard/DashboardRouter';
 import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
@@ -41,35 +42,72 @@ const queryClient = new QueryClient({
   },
 });
 
-// Enhanced Forgot Password page without doodle illustrations
+// Forgot Password page using shared AuthLayout
 const ForgotPasswordPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-mint/10">
-      <div className="max-w-md w-full space-y-8">
+    <AuthLayout>
+      <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
-            Reset Password
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
+            Forgot your password?
           </h2>
-          <p className="text-gray-600 mb-8">
-            Don't worry! Password reset functionality will be implemented in later tasks.
+          <p className="text-sm text-muted-foreground">
+            Password reset functionality will be implemented in upcoming updates.
           </p>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-soft">
-            <div className="flex items-center justify-center space-x-4 mb-6">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-900">Coming Soon!</h3>
-                <p className="text-sm text-gray-600">We're working on this feature.</p>
-              </div>
+        </div>
+
+        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+          <div className="space-y-4 text-center">
+            <div>
+              <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
+              <p className="text-sm text-muted-foreground">
+                You&apos;ll be able to request a secure reset link to your email from here.
+              </p>
             </div>
-            <Link 
-              to="/login" 
-              className="inline-flex items-center justify-center w-full py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle transition-all duration-200 hover:scale-105"
+
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
             >
-              Back to Login
+              Back to login
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </AuthLayout>
+  );
+};
+
+// Password Reset page placeholder using shared AuthLayout
+const ResetPasswordPage = () => {
+  return (
+    <AuthLayout>
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
+            Reset your password
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            The secure password reset experience will be available soon.
+          </p>
+        </div>
+
+        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+          <div className="space-y-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Once implemented, this page will let you choose a new password after opening a
+              verified reset link from your email.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              Back to login
+            </Link>
+          </div>
+        </div>
+      </div>
+    </AuthLayout>
   );
 };
 
@@ -462,6 +500,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Organizer onboarding */}
             <Route
