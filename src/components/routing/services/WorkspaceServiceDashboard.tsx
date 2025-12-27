@@ -167,8 +167,8 @@ export const WorkspaceServiceDashboard: React.FC = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Page Header */}
         <PageHeader
           title="Workspace Management"
@@ -184,10 +184,10 @@ export const WorkspaceServiceDashboard: React.FC = () => {
  
         {/* Event Filter (org-scoped) */}
         {dashboardData && (
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-muted-foreground">Filter by event:</span>
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">Filter by event:</span>
             <select
-              className="border border-border rounded-md px-3 py-1.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="border border-border rounded-md px-3 py-1.5 text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               value={eventId || ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -219,76 +219,76 @@ export const WorkspaceServiceDashboard: React.FC = () => {
 
         {/* Service Overview Metrics */}
         {dashboardData && (
-          <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-              <div className="bg-card rounded-lg border border-border p-6">
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">🏗️</span>
+                    <span className="text-xl sm:text-2xl">🏗️</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Total Workspaces</p>
-                    <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalWorkspaces}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Workspaces</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalWorkspaces}</p>
                   </div>
                 </div>
               </div>
  
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">🟢</span>
+                    <span className="text-xl sm:text-2xl">🟢</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Active Workspaces</p>
-                    <p className="text-2xl font-bold text-primary">{dashboardData.metrics.activeWorkspaces}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Workspaces</p>
+                    <p className="text-xl sm:text-2xl font-bold text-primary">{dashboardData.metrics.activeWorkspaces}</p>
                   </div>
                 </div>
               </div>
  
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">📝</span>
+                    <span className="text-xl sm:text-2xl">📝</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Provisioning</p>
-                    <p className="text-2xl font-bold text-yellow-500">{dashboardData.metrics.provisioningWorkspaces}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Provisioning</p>
+                    <p className="text-xl sm:text-2xl font-bold text-yellow-500">{dashboardData.metrics.provisioningWorkspaces}</p>
                   </div>
                 </div>
               </div>
  
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">⏳</span>
+                    <span className="text-xl sm:text-2xl">⏳</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Winding Down</p>
-                    <p className="text-2xl font-bold text-blue-500">{dashboardData.metrics.windingDownWorkspaces}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Winding Down</p>
+                    <p className="text-xl sm:text-2xl font-bold text-blue-500">{dashboardData.metrics.windingDownWorkspaces}</p>
                   </div>
                 </div>
               </div>
  
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">📋</span>
+                    <span className="text-xl sm:text-2xl">📋</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Total Tasks</p>
-                    <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalTasks}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTasks}</p>
                   </div>
                 </div>
               </div>
  
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <span className="text-2xl">👥</span>
+                    <span className="text-xl sm:text-2xl">👥</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Team Members</p>
-                    <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalTeamMembers}</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Team Members</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTeamMembers}</p>
                   </div>
                 </div>
               </div>
@@ -298,26 +298,26 @@ export const WorkspaceServiceDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         {dashboardData && (
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-foreground mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-medium text-foreground">Quick Actions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {dashboardData.quickActions.map((action, index) => (
                 <Link
                   key={index}
                   to={action.href}
-                  className={`block p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                  className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
                     action.primary
                       ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
                       : 'border-border bg-card hover:bg-muted'
                   }`}
                 >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <span className="text-2xl">{action.icon}</span>
-                    <h4 className={`font-medium ${action.primary ? 'text-primary' : 'text-foreground'}`}>
+                  <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-3">
+                    <span className="text-xl sm:text-2xl">{action.icon}</span>
+                    <h4 className={`text-sm sm:text-base font-medium ${action.primary ? 'text-primary' : 'text-foreground'}`}>
                       {action.title}
                     </h4>
                   </div>
-                  <p className={`text-sm ${action.primary ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <p className={`text-xs sm:text-sm ${action.primary ? 'text-primary' : 'text-muted-foreground'}`}>
                     {action.description}
                   </p>
                 </Link>
@@ -328,12 +328,12 @@ export const WorkspaceServiceDashboard: React.FC = () => {
 
         {/* Recent Workspaces */}
         {dashboardData && dashboardData.recentWorkspaces.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-foreground">Recent Workspaces</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
+              <h3 className="text-base sm:text-lg font-medium text-foreground">Recent Workspaces</h3>
               <Link
                 to={`${baseWorkspacePath}/list${eventId ? `?eventId=${eventId}` : ''}`}
-                className="text-sm text-primary hover:text-primary/80 font-medium"
+                className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
               >
                 View all workspaces →
               </Link>
@@ -344,22 +344,22 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                 <table className="min-w-full divide-y divide-border">
                   <thead className="bg-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Workspace Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Event
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Team Size
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Last Updated
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -367,32 +367,32 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                   <tbody className="bg-background divide-y divide-border">
                     {dashboardData.recentWorkspaces.map((workspace) => (
                       <tr key={workspace.id} className="hover:bg-muted/60">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-foreground">{workspace.name}</div>
                           {workspace.description && (
-                            <div className="text-sm text-muted-foreground truncate max-w-xs">
+                            <div className="text-xs sm:text-sm text-muted-foreground truncate max-w-xs">
                               {workspace.description}
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(workspace.status)}`}>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${getStatusColor(workspace.status)}`}>
                             {workspace.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
                           {workspace.event ? workspace.event.name : 'No event'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
                           {workspace.teamMembers?.length || 0} members
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
                           {new Date(workspace.updatedAt).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                           <Link
                             to={`${baseWorkspacePath}/${workspace.id}`}
-                            className="text-primary hover:text-primary/80 mr-4"
+                            className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
                           >
                             View
                           </Link>
@@ -411,15 +411,16 @@ export const WorkspaceServiceDashboard: React.FC = () => {
             </div>
           </div>
         )}
-
+ 
         {/* Service Information */}
-        <div className="bg-primary/5 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-primary mb-2">About Workspace Management Service</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            The Workspace Management Service provides comprehensive tools for creating, managing, and collaborating in event workspaces. 
-            From team coordination to task management, organize your entire event preparation in collaborative workspaces.
+        <div className="bg-primary/5 rounded-lg p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-medium text-primary mb-2">About Workspace Management Service</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
+            The Workspace Management Service provides comprehensive tools for creating, managing, and collaborating in
+            event workspaces. From team coordination to task management, organize your entire event preparation in
+            collaborative workspaces.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
             <div>
               <h4 className="font-medium text-foreground mb-1">Team Collaboration</h4>
               <p className="text-muted-foreground">Invite team members, assign roles, and coordinate event preparation tasks.</p>
