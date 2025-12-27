@@ -71,7 +71,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
     },
   });
 
-  // Update role mutation
+  // Update role mutation with optimistic UI
   const updateRoleMutation = useMutation({
     mutationFn: async ({ memberId, role }: { memberId: string; role: WorkspaceRole }) => {
       await api.patch(`/workspaces/${workspace.id}/team-members/${memberId}`, { role });
@@ -84,20 +84,45 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
         metadata: { memberId, role },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
-      queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
-      toast({
-        title: 'Role updated',
-        description: 'The team member role has been updated successfully.',
-      });
+    onMutate: async ({ memberId, role }) => {
+      await queryClient.cancelQueries({ queryKey: ['workspace-team-members', workspace.id] });
+
+      const previousMembers = queryClient.getQueryData<TeamMember[]>([
+        'workspace-team-members',
+        workspace.id,
+      ]);
+
+      if (previousMembers) {
+        const nextMembers = previousMembers.map((member) =>
+          member.id === memberId ? { ...member, role } : member,
+        );
+        queryClient.setQueryData(['workspace-team-members', workspace.id], nextMembers);
+      }
+
+      return { previousMembers };
     },
-    onError: () => {
+    onError: (_error, _variables, context) => {
+      if (context?.previousMembers) {
+        queryClient.setQueryData(
+          ['workspace-team-members', workspace.id],
+          context.previousMembers,
+        );
+      }
       toast({
         title: 'Failed to update role',
         description: 'Please try again or check your permissions.',
         variant: 'destructive',
       });
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Role updated',
+        description: 'The team member role has been updated successfully.',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
+      queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
     },
   });
 
