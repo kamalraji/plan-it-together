@@ -8,7 +8,7 @@ import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationSwitcher } from './OrganizationSwitcher';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
-import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 
@@ -82,7 +82,6 @@ export const OrgScopedLayout: React.FC = () => {
           <SidebarInset>
             {/* Organization switcher bar inside the org-scoped console */}
             <div className="border-b bg-card px-4 py-3 flex items-center gap-3">
-              <SidebarTrigger className="mr-1" />
               <OrganizationSwitcher />
             </div>
 
