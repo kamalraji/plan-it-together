@@ -393,6 +393,7 @@ export function TeamRosterManagement({
                           onClick={() => onRemoveMember(member.id)}
                           className="p-1 text-red-400 hover:text-red-600"
                           title="Remove Member"
+                          aria-label={`Remove ${member.user.name} from workspace`}
                         >
                           <UserMinusIcon className="w-4 h-4" />
                         </button>

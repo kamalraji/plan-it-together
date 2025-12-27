@@ -41,7 +41,9 @@ export function TeamMemberRoster({
   };
 
   const getRoleDisplayName = (role: WorkspaceRole) => {
-    return role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    if (!role) return 'Member';
+    const roleString = String(role).replace(/_/g, ' ').toLowerCase();
+    return roleString.replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const getInitials = (name: string) => {
