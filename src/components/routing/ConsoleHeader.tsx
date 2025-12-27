@@ -172,139 +172,139 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
     const target = getServicePath(serviceId);
     navigate(target);
   };
-  return (
-    <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 h-16">
-      <div className="flex items-center justify-between h-full px-4 sm:px-6 lg:px-8">
-        {/* Left Section */}
-        <div className="flex items-center space-x-4">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={onToggleMobileMenu}
-            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </button>
-
-          {/* Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2">
-            <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">T1</span>
-            </div>
-            <span className="hidden sm:block text-xl font-semibold text-gray-900">
-              Thittam1Hub
-            </span>
-          </Link>
+   return (
+     <header className="bg-card border-b border-border fixed top-0 left-0 right-0 z-50 h-14 sm:h-16">
+       <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
+         {/* Left Section */}
+         <div className="flex items-center gap-3 sm:gap-4">
+           {/* Mobile Menu Button */}
+           <button
+             onClick={onToggleMobileMenu}
+             className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+           >
+             <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+           </button>
+ 
+           {/* Logo */}
+           <Link to="/dashboard" className="flex items-center gap-2">
+             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+               <span className="text-primary-foreground font-bold text-xs sm:text-sm">T1</span>
+             </div>
+             <span className="hidden sm:block text-lg sm:text-xl font-semibold text-foreground">
+               Thittam1Hub
+             </span>
+           </Link>
 
           {/* Service Switcher - visible only for organizer/admin roles */}
-          {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (
-            <div className="relative" ref={serviceSwitcherRef}>
-              <button
-                onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100 hover-scale focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <span className="hidden sm:block truncate max-w-[140px]">
-                  {currentServiceData?.displayName || 'Dashboard'}
-                </span>
-                <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </button>
-
-              {/* Service Switcher Dropdown */}
-              {isServiceSwitcherOpen && (
-                <div className="absolute top-full left-0 mt-1 w-72 sm:w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 animate-enter">
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3 tracking-tight">Switch Service</h3>
-                    <div className="space-y-0.5">
-                      {services.map((service) => (
-                        <button
-                          key={service.id}
-                          onClick={() => handleServiceSelect(service.id)}
-                          className={`w-full flex items-start space-x-2 sm:space-x-3 px-2.5 py-1.5 text-xs sm:text-sm rounded-md text-left transition-colors duration-150 ${
-                            service.id === currentService
-                              ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{service.displayName}</div>
-                            <div className="text-[11px] sm:text-xs text-gray-500 truncate">
-                              {service.description}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+           {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (
+             <div className="relative" ref={serviceSwitcherRef}>
+               <button
+                 onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
+                 className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-muted-foreground bg-muted border border-border rounded-md hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+               >
+                 <span className="hidden sm:block truncate max-w-[140px]">
+                   {currentServiceData?.displayName || 'Dashboard'}
+                 </span>
+                 <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+               </button>
+ 
+               {/* Service Switcher Dropdown */}
+               {isServiceSwitcherOpen && (
+                 <div className="absolute top-full left-0 mt-1 w-72 sm:w-80 bg-card rounded-md shadow-lg ring-1 ring-border z-50 animate-enter">
+                   <div className="p-3 sm:p-4">
+                     <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3 tracking-tight">Switch Service</h3>
+                     <div className="space-y-0.5">
+                       {services.map((service) => (
+                         <button
+                           key={service.id}
+                           onClick={() => handleServiceSelect(service.id)}
+                           className={`w-full flex items-start gap-2 sm:gap-3 px-2.5 py-1.5 text-xs sm:text-sm rounded-md text-left transition-colors duration-150 ${
+                             service.id === currentService
+                               ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                               : 'text-muted-foreground hover:bg-muted'
+                           }`}
+                         >
+                           <div className="flex-1 min-w-0">
+                             <div className="font-medium truncate text-foreground">{service.displayName}</div>
+                             <div className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                               {service.description}
+                             </div>
+                           </div>
+                         </button>
+                       ))}
+                     </div>
+                   </div>
+                 </div>
+               )}
+             </div>
+           )}
 
         </div>
 
-        {/* Center Section - Global Search */}
-        <div className="flex-1 max-w-lg mx-4">
-          <GlobalSearch 
-            onSearch={onSearch}
-            placeholder="Search services, resources..."
-            showShortcuts={true}
-          />
-        </div>
+         {/* Center Section - Global Search */}
+         <div className="flex-1 max-w-lg mx-3 sm:mx-4">
+           <GlobalSearch
+             onSearch={onSearch}
+             placeholder="Search services, resources..."
+             showShortcuts={true}
+           />
+         </div>
 
-        {/* Right Section */}
-        <div className="flex items-center space-x-4">
-          {/* Notification Center */}
-          <NotificationCenter />
+         {/* Right Section */}
+         <div className="flex items-center gap-3 sm:gap-4">
+           {/* Notification Center */}
+           <NotificationCenter />
+ 
+           {/* User Menu */}
+           <div className="relative" ref={userMenuRef}>
+             <button
+               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+               className="flex items-center gap-2 px-2 py-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+             >
+               <UserCircleIcon className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground" />
+               <span className="hidden sm:block truncate max-w-[120px]">{user?.name || 'User'}</span>
+               <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+             </button>
 
-          {/* User Menu */}
-          <div className="relative" ref={userMenuRef}>
-            <button
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center space-x-2 p-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <UserCircleIcon className="h-8 w-8 text-gray-400" />
-              <span className="hidden sm:block">{user?.name || 'User'}</span>
-              <ChevronDownIcon className="h-4 w-4" />
-            </button>
-
-            {/* User Menu Dropdown */}
-            {isUserMenuOpen && (
-              <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                <div className="p-4 border-b border-gray-100">
-                  <div className="text-sm font-medium text-gray-900">{user?.name || 'User'}</div>
-                  <div className="text-sm text-gray-500">{user?.email || 'user@example.com'}</div>
-                  <div className="text-xs text-gray-400 mt-1">{user?.role || 'User'}</div>
-                </div>
-                <div className="py-1">
-                  <Link
-                    to="/dashboard/profile"
-                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => setIsUserMenuOpen(false)}
-                  >
-                    <UserCircleIcon className="h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
-                  <Link
-                    to="/dashboard/profile/settings"
-                    className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => setIsUserMenuOpen(false)}
-                  >
-                    <Cog6ToothIcon className="h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      onLogout();
-                    }}
-                    className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
-                  >
-                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                    <span>Sign out</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+             {/* User Menu Dropdown */}
+             {isUserMenuOpen && (
+               <div className="absolute top-full right-0 mt-1 w-56 bg-card rounded-md shadow-lg ring-1 ring-border z-50">
+                 <div className="p-3 sm:p-4 border-b border-border">
+                   <div className="text-sm font-medium text-foreground">{user?.name || 'User'}</div>
+                   <div className="text-xs sm:text-sm text-muted-foreground">{user?.email || 'user@example.com'}</div>
+                   <div className="text-[11px] text-muted-foreground mt-1">{user?.role || 'User'}</div>
+                 </div>
+                 <div className="py-1">
+                   <Link
+                     to="/dashboard/profile"
+                     className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm text-muted-foreground hover:bg-muted"
+                     onClick={() => setIsUserMenuOpen(false)}
+                   >
+                     <UserCircleIcon className="h-4 w-4" />
+                     <span>Profile</span>
+                   </Link>
+                   <Link
+                     to="/dashboard/profile/settings"
+                     className="flex items-center gap-2 px-4 py-2 text-xs sm:text-sm text-muted-foreground hover:bg-muted"
+                     onClick={() => setIsUserMenuOpen(false)}
+                   >
+                     <Cog6ToothIcon className="h-4 w-4" />
+                     <span>Settings</span>
+                   </Link>
+                   <button
+                     onClick={() => {
+                       setIsUserMenuOpen(false);
+                       onLogout();
+                     }}
+                     className="flex items-center gap-2 w-full px-4 py-2 text-xs sm:text-sm text-muted-foreground hover:bg-muted text-left"
+                   >
+                     <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                     <span>Sign out</span>
+                   </button>
+                 </div>
+               </div>
+             )}
+           </div>
         </div>
       </div>
     </header>

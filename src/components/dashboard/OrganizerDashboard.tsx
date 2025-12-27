@@ -449,45 +449,45 @@ export function OrganizerDashboard() {
 
         {activeTab === 'analytics' && (
            <div>
-             <h2 className="text-2xl font-bold text-foreground mb-6">Analytics Overview</h2>
+             <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Analytics Overview</h2>
              {analytics ? (
-               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                 <div className="bg-card rounded-lg shadow p-6">
-                   <h3 className="text-lg font-semibold text-foreground mb-2">
+               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+                 <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Total Events
                    </h3>
-                   <p className="text-3xl font-bold text-primary">
+                   <p className="text-2xl sm:text-3xl font-bold text-primary">
                      {analytics.totalEvents || 0}
                    </p>
                  </div>
-                 <div className="bg-card rounded-lg shadow p-6">
-                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                 <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Total Registrations
                    </h3>
-                   <p className="text-3xl font-bold text-emerald-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-emerald-500">
                      {analytics.totalRegistrations || 0}
                    </p>
                  </div>
-                 <div className="bg-card rounded-lg shadow p-6">
-                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                 <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Active Events
                    </h3>
-                   <p className="text-3xl font-bold text-sky-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-sky-500">
                      {analytics.activeEvents || 0}
                    </p>
                  </div>
-                 <div className="bg-card rounded-lg shadow p-6">
-                   <h3 className="text-lg font-semibold text-foreground mb-2">
+                 <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Certificates Issued
                    </h3>
-                   <p className="text-3xl font-bold text-violet-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-violet-500">
                      {analytics.certificatesIssued || 0}
                    </p>
                  </div>
                </div>
              ) : (
-               <div className="text-center py-12">
-                 <p className="text-muted-foreground">Loading analytics...</p>
+               <div className="text-center py-8 sm:py-12">
+                 <p className="text-sm sm:text-base text-muted-foreground">Loading analytics...</p>
                </div>
              )}
            </div>
