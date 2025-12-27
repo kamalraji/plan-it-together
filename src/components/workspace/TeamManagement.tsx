@@ -162,7 +162,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
       [WorkspaceRole.TECHNICAL_SPECIALIST]: 'bg-orange-100 text-orange-800',
       [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-gray-100 text-gray-800',
-    };
+    } as const;
 
     const roleLabels = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
@@ -172,11 +172,14 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
       [WorkspaceRole.TECHNICAL_SPECIALIST]: 'Tech Specialist',
       [WorkspaceRole.MARKETING_LEAD]: 'Marketing Lead',
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
-    };
+    } as const;
+
+    const roleClassName = roleColors[role] || 'bg-gray-100 text-gray-800';
+    const roleLabel = roleLabels[role] || 'Member';
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[role]}`}>
-        {roleLabels[role]}
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClassName}`}>
+        {roleLabel}
       </span>
     );
   };
