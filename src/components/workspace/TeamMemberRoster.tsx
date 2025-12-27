@@ -22,21 +22,21 @@ export function TeamMemberRoster({
   const getRoleColor = (role: WorkspaceRole) => {
     switch (role) {
       case WorkspaceRole.WORKSPACE_OWNER:
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-primary/10 text-primary';
       case WorkspaceRole.TEAM_LEAD:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-secondary/10 text-secondary-foreground';
       case WorkspaceRole.EVENT_COORDINATOR:
-        return 'bg-green-100 text-green-800';
+        return 'bg-accent/10 text-accent-foreground';
       case WorkspaceRole.VOLUNTEER_MANAGER:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-muted text-foreground';
       case WorkspaceRole.TECHNICAL_SPECIALIST:
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 text-primary-foreground';
       case WorkspaceRole.MARKETING_LEAD:
-        return 'bg-pink-100 text-pink-800';
+        return 'bg-accent text-accent-foreground';
       case WorkspaceRole.GENERAL_VOLUNTEER:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
