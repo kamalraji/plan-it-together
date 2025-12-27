@@ -81,12 +81,16 @@ export const OrganizationServiceDashboard: React.FC = () => {
   const pageActions = [
     {
       label: 'Manage Organizations',
-      action: () => window.location.href = '/dashboard/organizations/list',
+      action: () => {
+        window.location.href = '/dashboard/organizations/list';
+      },
       variant: 'primary' as const,
     },
     {
       label: 'View Analytics',
-      action: () => window.location.href = '/dashboard/analytics',
+      action: () => {
+        window.location.href = '/dashboard/analytics';
+      },
       variant: 'secondary' as const,
     },
   ];
@@ -100,66 +104,66 @@ export const OrganizationServiceDashboard: React.FC = () => {
           subtitle="Manage your organizations, members, and settings"
           actions={pageActions}
         />
-
+ 
         {/* Service Overview Metrics */}
         <div className="mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <span className="text-2xl">🏢</span>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Organizations</p>
-                  <p className="text-2xl font-bold text-gray-900">{dashboardData.metrics.totalOrganizations}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Organizations</p>
+                  <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalOrganizations}</p>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+ 
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <span className="text-2xl">👑</span>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Managed Organizations</p>
-                  <p className="text-2xl font-bold text-blue-600">{dashboardData.metrics.managedOrganizations}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Managed Organizations</p>
+                  <p className="text-2xl font-bold text-primary">{dashboardData.metrics.managedOrganizations}</p>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+ 
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <span className="text-2xl">👥</span>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Members</p>
-                  <p className="text-2xl font-bold text-green-600">{dashboardData.metrics.totalMembers}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Members</p>
+                  <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalMembers}</p>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+ 
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <span className="text-2xl">❤️</span>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Followers</p>
-                  <p className="text-2xl font-bold text-purple-600">{dashboardData.metrics.totalFollowers}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Followers</p>
+                  <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.totalFollowers}</p>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+ 
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <span className="text-2xl">📅</span>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Active Events</p>
-                  <p className="text-2xl font-bold text-orange-600">{dashboardData.metrics.activeEvents}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Active Events</p>
+                  <p className="text-2xl font-bold text-foreground">{dashboardData.metrics.activeEvents}</p>
                 </div>
               </div>
             </div>
@@ -168,7 +172,7 @@ export const OrganizationServiceDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {dashboardData.quickActions.map((action, index) => (
               <Link
@@ -176,17 +180,17 @@ export const OrganizationServiceDashboard: React.FC = () => {
                 to={action.href}
                 className={`block p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
                   action.primary
-                    ? 'border-blue-200 bg-blue-50 hover:bg-blue-100'
-                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                    ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                    : 'border-border bg-card hover:bg-muted'
                 }`}
               >
                 <div className="flex items-center space-x-3 mb-3">
                   <span className="text-2xl">{action.icon}</span>
-                  <h4 className={`font-medium ${action.primary ? 'text-blue-900' : 'text-gray-900'}`}>
+                  <h4 className={`font-medium ${action.primary ? 'text-primary' : 'text-foreground'}`}>
                     {action.title}
                   </h4>
                 </div>
-                <p className={`text-sm ${action.primary ? 'text-blue-700' : 'text-gray-600'}`}>
+                <p className={`text-sm ${action.primary ? 'text-primary' : 'text-muted-foreground'}`}>
                   {action.description}
                 </p>
               </Link>
@@ -197,75 +201,75 @@ export const OrganizationServiceDashboard: React.FC = () => {
         {/* Recent Organizations */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Your Organizations</h3>
+            <h3 className="text-lg font-medium text-foreground">Your Organizations</h3>
             <Link
               to="/console/organizations/list"
-              className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+              className="text-sm text-primary hover:text-primary/80 font-medium"
             >
               View all organizations →
             </Link>
           </div>
           
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Organization Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Your Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Members
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Events
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Followers
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-background divide-y divide-border">
                   {dashboardData.recentOrganizations.map((org) => (
-                    <tr key={org.id} className="hover:bg-gray-50">
+                    <tr key={org.id} className="hover:bg-muted/60">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{org.name}</div>
+                        <div className="text-sm font-medium text-foreground">{org.name}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           org.role === 'OWNER' ? 'bg-purple-100 text-purple-800' :
                           org.role === 'ADMIN' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-muted text-muted-foreground'
                         }`}>
                           {org.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {org.memberCount}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {org.eventCount}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {org.followerCount}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
                           to={`/console/organizations/${org.id}`}
-                          className="text-blue-600 hover:text-blue-500 mr-4"
+                          className="text-primary hover:text-primary/80 mr-4"
                         >
                           View
                         </Link>
                         {(org.role === 'OWNER' || org.role === 'ADMIN') && (
                           <Link
                             to={`/console/organizations/${org.id}/members`}
-                            className="text-gray-600 hover:text-gray-500"
+                            className="text-muted-foreground hover:text-foreground"
                           >
                             Manage
                           </Link>
@@ -278,27 +282,27 @@ export const OrganizationServiceDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
+ 
         {/* Service Information */}
-        <div className="bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-blue-900 mb-2">About Organization Management Service</h3>
-          <p className="text-blue-700 mb-4">
+        <div className="bg-primary/5 rounded-lg p-6">
+          <h3 className="text-lg font-medium text-primary mb-2">About Organization Management Service</h3>
+          <p className="text-sm text-muted-foreground mb-4">
             The Organization Management Service provides comprehensive tools for managing your organizations, 
             members, and organizational settings. Oversee multiple organizations, track analytics, and 
             configure branding and policies from one centralized location.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <h4 className="font-medium text-blue-900 mb-1">Member Management</h4>
-              <p className="text-blue-700">Invite, manage, and assign roles to organization members with granular permissions.</p>
+              <h4 className="font-medium text-foreground mb-1">Member Management</h4>
+              <p className="text-muted-foreground">Invite, manage, and assign roles to organization members with granular permissions.</p>
             </div>
             <div>
-              <h4 className="font-medium text-blue-900 mb-1">Organization Settings</h4>
-              <p className="text-blue-700">Configure branding, policies, and organizational preferences.</p>
+              <h4 className="font-medium text-foreground mb-1">Organization Settings</h4>
+              <p className="text-muted-foreground">Configure branding, policies, and organizational preferences.</p>
             </div>
             <div>
-              <h4 className="font-medium text-blue-900 mb-1">Analytics & Insights</h4>
-              <p className="text-blue-700">Track organization growth, member activity, and event performance.</p>
+              <h4 className="font-medium text-foreground mb-1">Analytics & Insights</h4>
+              <p className="text-muted-foreground">Track organization growth, member activity, and event performance.</p>
             </div>
           </div>
         </div>
