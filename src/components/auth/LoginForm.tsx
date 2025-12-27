@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
 import heroPattern from '@/assets/dashboard-hero-pattern.jpg';
@@ -97,7 +98,12 @@ export function LoginForm() {
         <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/95" />
       </div>
 
-      <div className="relative max-w-md w-full space-y-10">
+      <motion.div
+        className="relative max-w-md w-full space-y-10"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         <div className="text-center space-y-3">
           <h1 className="text-3xl sm:text-4xl font-semibold sm:font-bold tracking-tight text-foreground">
             Welcome back
@@ -117,19 +123,33 @@ export function LoginForm() {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-doodle">
+        <motion.div
+          className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-doodle"
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
+        >
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
-              <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
+              <motion.div
+                className="rounded-xl bg-coral/10 border border-coral/20 p-4"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
                 <div className="flex items-center space-x-2">
                   <span className="text-coral">⚠️</span>
                   <div className="text-sm text-coral font-medium">{error}</div>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             <div className="space-y-4">
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12 }}
+              >
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email address
                 </label>
@@ -143,9 +163,13 @@ export function LoginForm() {
                 {errors.email && (
                   <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.18 }}
+              >
                 <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                   Password
                 </label>
@@ -159,10 +183,15 @@ export function LoginForm() {
                 {errors.password && (
                   <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <motion.div
+              className="flex items-center justify-between"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.24 }}
+            >
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
@@ -171,25 +200,30 @@ export function LoginForm() {
                   Forgot your password?
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={isLoading}
               className="w-full flex justify-center items-center py-3.5 px-6 rounded-xl text-base sm:text-[15px] font-medium tracking-tight text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              whileHover={!isLoading ? { scale: 1.02 } : undefined}
+              whileTap={!isLoading ? { scale: 0.99 } : undefined}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.3, ease: 'easeOut' }}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   <span>Signing in...</span>
                 </div>
               ) : (
                 <span>Sign in</span>
               )}
-            </button>
+            </motion.button>
           </form>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

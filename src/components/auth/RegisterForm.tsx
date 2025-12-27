@@ -137,9 +137,13 @@ export function RegisterForm() {
                 {errors.name && (
                   <p className="mt-2 text-sm text-coral">{errors.name.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.16 }}
+              >
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email Address
                 </label>
@@ -153,9 +157,13 @@ export function RegisterForm() {
                 {errors.email && (
                   <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
                 <label htmlFor="role" className="block text-sm font-medium text-foreground mb-2">
                   Account Type
                 </label>
@@ -169,10 +177,14 @@ export function RegisterForm() {
                 {errors.role && (
                   <p className="mt-2 text-sm text-coral">{errors.role.message}</p>
                 )}
-              </div>
+              </motion.div>
 
               {selectedRole === UserRole.PARTICIPANT && (
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.28 }}
+                >
                   <label htmlFor="eventCode" className="block text-sm font-medium text-foreground mb-2">
                     Event Code (Optional)
                   </label>
@@ -185,10 +197,14 @@ export function RegisterForm() {
                   {errors.eventCode && (
                     <p className="mt-2 text-sm text-coral">{errors.eventCode.message}</p>
                   )}
-                </div>
+                </motion.div>
               )}
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.32 }}
+              >
                 <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                   Password
                 </label>
@@ -202,9 +218,13 @@ export function RegisterForm() {
                 {errors.password && (
                   <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.36 }}
+              >
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
                   Confirm Password
                 </label>
@@ -218,35 +238,45 @@ export function RegisterForm() {
                 {errors.confirmPassword && (
                   <p className="mt-2 text-sm text-coral">{errors.confirmPassword.message}</p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-primary-foreground bg-gradient-to-r from-sunny to-teal hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium text-primary-foreground bg-gradient-to-r from-sunny to-teal shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              whileHover={!isLoading ? { scale: 1.02 } : undefined}
+              whileTap={!isLoading ? { scale: 0.99 } : undefined}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.4, ease: 'easeOut' }}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground" />
                   <span>Creating account...</span>
                 </div>
               ) : (
                 <span>Create account</span>
               )}
-            </button>
+            </motion.button>
 
             {selectedRole === UserRole.ORGANIZER && (
-              <div className="rounded-xl bg-teal/10 border border-teal/20 p-4">
+              <motion.div
+                className="rounded-xl bg-teal/10 border border-teal/20 p-4"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.44 }}
+              >
                 <div className="text-sm text-teal">
                   <strong>Organizer Account:</strong> After you verify your email and sign in,
                   you'll be guided to set up your organization. Once your first organization is
                   created, you'll automatically get organizer access.
                 </div>
-              </div>
+              </motion.div>
             )}
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
