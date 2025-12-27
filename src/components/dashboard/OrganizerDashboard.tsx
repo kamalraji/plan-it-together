@@ -158,29 +158,29 @@ export function OrganizerDashboard() {
        {/* Header */}
        <header className="bg-card shadow">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="flex justify-between items-center py-6">
+           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6">
              <div>
-               <h1 className="text-3xl font-bold text-foreground">Organizer Dashboard</h1>
-               <p className="text-muted-foreground">Welcome back, {user?.name}</p>
+               <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Organizer Dashboard</h1>
+               <p className="text-sm sm:text-base text-muted-foreground">Welcome back, {user?.name}</p>
              </div>
-             <div className="flex items-center space-x-4">
+             <div className="flex flex-wrap items-center gap-3">
                {!vendorLoading && (
                  <Link
                    to={isVendor ? "/vendor/dashboard" : "/vendor/register"}
-                   className="text-primary hover:text-primary/80 transition-colors font-medium"
+                   className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                  >
                    {isVendor ? "Vendor Dashboard" : "Become a Vendor"}
                  </Link>
                )}
                <Link
                  to="/events/create"
-                 className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                 className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
                >
                  Create Event
                </Link>
                <button
                  onClick={logout}
-                 className="text-muted-foreground hover:text-foreground transition-colors"
+                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                >
                  Logout
                </button>
@@ -190,9 +190,9 @@ export function OrganizerDashboard() {
        </header>
 
       {/* Navigation Tabs */}
-       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 sm:mt-0">
          <div className="border-b border-border">
-           <nav className="-mb-px flex space-x-8">
+           <nav className="-mb-px flex gap-4 overflow-x-auto">
              {[
                { key: 'events', label: 'My Events' },
                { key: 'analytics', label: 'Analytics' },
@@ -202,7 +202,7 @@ export function OrganizerDashboard() {
                <button
                  key={tab.key}
                  onClick={() => setActiveTab(tab.key as any)}
-                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                 className={`py-2 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                    activeTab === tab.key
                      ? 'border-primary text-primary'
                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -222,18 +222,18 @@ export function OrganizerDashboard() {
            <OrganizerOnboardingChecklist />
          </div>
  
-        {/* Organizer overview widgets */}
-         <div className="mb-8 grid gap-6 lg:grid-cols-3">
-           <div className="bg-card rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-foreground mb-3">Top Workspaces</h2>
+         {/* Organizer overview widgets */}
+         <div className="mb-6 sm:mb-8 grid gap-4 sm:gap-6 lg:grid-cols-3">
+           <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+             <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Top Workspaces</h2>
              {topWorkspaces.length > 0 ? (
-               <ul className="space-y-3 text-sm text-muted-foreground">
+               <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
                  {topWorkspaces.map((ws) => (
                    <li key={ws.id} className="flex items-center justify-between">
                      <div>
-                       <div className="font-medium text-foreground">{ws.name}</div>
+                       <div className="font-medium text-foreground text-sm sm:text-base">{ws.name}</div>
                        {ws.event && (
-                         <div className="text-xs text-muted-foreground">Event: {ws.event.name}</div>
+                         <div className="text-[11px] sm:text-xs text-muted-foreground">Event: {ws.event.name}</div>
                        )}
                      </div>
                      <Link
@@ -246,19 +246,19 @@ export function OrganizerDashboard() {
                  ))}
                </ul>
              ) : (
-               <p className="text-sm text-muted-foreground">No workspaces yet for this organization.</p>
+               <p className="text-xs sm:text-sm text-muted-foreground">No workspaces yet for this organization.</p>
              )}
            </div>
  
-           <div className="bg-card rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-foreground mb-3">Upcoming Event Milestones</h2>
+           <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+             <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Upcoming Event Milestones</h2>
              {upcomingMilestones.length > 0 ? (
-               <ul className="space-y-3 text-sm text-muted-foreground">
+               <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
                  {upcomingMilestones.map((event) => (
                    <li key={event.id} className="flex items-center justify-between">
                      <div>
-                       <div className="font-medium text-foreground">{event.name}</div>
-                       <div className="text-xs text-muted-foreground">
+                       <div className="font-medium text-foreground text-sm sm:text-base">{event.name}</div>
+                       <div className="text-[11px] sm:text-xs text-muted-foreground">
                          Starts {new Date(event.startDate).toLocaleDateString()}
                        </div>
                      </div>
@@ -272,22 +272,22 @@ export function OrganizerDashboard() {
                  ))}
                </ul>
              ) : (
-               <p className="text-sm text-muted-foreground">No upcoming events scheduled.</p>
+               <p className="text-xs sm:text-sm text-muted-foreground">No upcoming events scheduled.</p>
              )}
            </div>
  
-           <div className="bg-card rounded-lg shadow p-6">
-             <h2 className="text-lg font-semibold text-foreground mb-3">Quick Links</h2>
-             <div className="space-y-3 text-sm">
+           <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+             <h2 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Quick Links</h2>
+             <div className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
                <Link
                  to={`/${organization.slug}/workspaces`}
-                 className="block w-full text-left px-4 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 font-medium"
+                 className="block w-full text-left px-3 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 font-medium"
                >
                  Go to Workspaces
                </Link>
                <Link
                  to="/dashboard/organizations"
-                 className="block w-full text-left px-4 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80 font-medium"
+                 className="block w-full text-left px-3 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80 font-medium"
                >
                  Manage Organizations
                </Link>
@@ -297,38 +297,38 @@ export function OrganizerDashboard() {
  
          {/* Current event overview */}
          {currentEvent && currentEventMetrics && (
-           <div className="mb-8 bg-card rounded-lg shadow p-6">
-             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+           <div className="mb-6 sm:mb-8 bg-card rounded-lg shadow p-4 sm:p-6">
+             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-3 md:mb-4">
                <div>
-                 <h2 className="text-xl font-semibold text-foreground">Current Event Overview</h2>
-                 <p className="text-sm text-muted-foreground">
+                 <h2 className="text-lg md:text-xl font-semibold text-foreground">Current Event Overview</h2>
+                 <p className="text-xs sm:text-sm text-muted-foreground">
                    {currentEvent.name} · {new Date(currentEvent.start_date).toLocaleDateString()} –{' '}
                    {new Date(currentEvent.end_date).toLocaleDateString()}
                  </p>
                </div>
                <Link
                  to={`/events/${currentEvent.id}`}
-                 className="text-sm font-medium text-primary hover:text-primary/80"
+                 className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80"
                >
                  View event details
                </Link>
              </div>
-             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-               <div className="bg-background rounded-lg border border-border p-4">
-                 <p className="text-xs text-muted-foreground mb-1">Total registrations</p>
-                 <p className="text-2xl font-bold text-foreground">{currentEventMetrics.totalRegistrations}</p>
+             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
+               <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
+                 <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Total registrations</p>
+                 <p className="text-xl sm:text-2xl font-bold text-foreground">{currentEventMetrics.totalRegistrations}</p>
                </div>
-               <div className="bg-background rounded-lg border border-border p-4">
-                 <p className="text-xs text-muted-foreground mb-1">Confirmed</p>
-                 <p className="text-2xl font-bold text-emerald-500">{currentEventMetrics.confirmedRegistrations}</p>
+               <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
+                 <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Confirmed</p>
+                 <p className="text-xl sm:text-2xl font-bold text-emerald-500">{currentEventMetrics.confirmedRegistrations}</p>
                </div>
-               <div className="bg-background rounded-lg border border-border p-4">
-                 <p className="text-xs text-muted-foreground mb-1">Check-ins</p>
-                 <p className="text-2xl font-bold text-sky-500">{currentEventMetrics.checkins}</p>
+               <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
+                 <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Check-ins</p>
+                 <p className="text-xl sm:text-2xl font-bold text-sky-500">{currentEventMetrics.checkins}</p>
                </div>
-               <div className="bg-background rounded-lg border border-border p-4">
-                 <p className="text-xs text-muted-foreground mb-1">Workspace tasks</p>
-                 <p className="text-2xl font-bold text-violet-500">{currentEventMetrics.tasks}</p>
+               <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
+                 <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Workspace tasks</p>
+                 <p className="text-xl sm:text-2xl font-bold text-violet-500">{currentEventMetrics.tasks}</p>
                </div>
              </div>
            </div>
@@ -376,27 +376,27 @@ export function OrganizerDashboard() {
 
         {activeTab === 'events' && (
            <div>
-             <div className="flex justify-between items-center mb-6">
-               <h2 className="text-2xl font-bold text-foreground">My Events</h2>
+             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+               <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Events</h2>
                <Link
                  to={`/${organization.slug}/eventmanagement/create`}
-                 className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                 className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
                >
                  Create New Event
                </Link>
              </div>
 
             {events && events.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {events.map((event) => (
-                  <div key={event.id} className="bg-white rounded-lg shadow p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <div key={event.id} className="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">
                       {event.name}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
                       {event.description}
                     </p>
-                    <div className="space-y-2 text-sm text-gray-500">
+                    <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-500">
                       <p>Start: {new Date(event.startDate).toLocaleDateString()}</p>
                       <p>End: {new Date(event.endDate).toLocaleDateString()}</p>
                       <p>Status: <span className="capitalize">{event.status}</span></p>
