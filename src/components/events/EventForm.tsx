@@ -5,14 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Event, 
-  EventMode, 
-  EventTemplate, 
-  CreateEventDTO, 
+import {
+  Event,
+  EventMode,
+  EventTemplate,
+  CreateEventDTO,
   EventVisibility,
-  Organization
+  Organization,
 } from '../../types';
+import { WorkspaceTemplateLibrary } from '@/components/workspace/WorkspaceTemplateLibrary';
+import type { WorkspaceTemplate as WorkspaceWorkspaceTemplate } from '@/types/workspace-template';
 
 interface EventFormProps {
   event?: Event;
@@ -24,6 +26,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [selectedTemplate, setSelectedTemplate] = useState<EventTemplate | null>(null);
+  const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = useState<WorkspaceWorkspaceTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'branding' | 'timeline' | 'details'>('basic');
   const [inviteLink, setInviteLink] = useState<string | null>(event?.inviteLink || null);
 
@@ -142,7 +145,10 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         registration_deadline: data.registrationDeadline,
         organization_id: data.organizationId || null,
         visibility: data.visibility,
-        branding: (data.branding || {}) as any,
+        branding: {
+          ...(data.branding || {}),
+          workspaceTemplateId: selectedWorkspaceTemplate?.id,
+        } as any,
         venue: (data.venue || null) as any,
         virtual_links: (data.virtualLinks || null) as any,
       };
@@ -361,6 +367,34 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                       <p className="mt-1 text-sm text-gray-500">
                         Publishing under an organization will display their branding on your event page
                       </p>
+                    </div>
+                  )}
+
+                  {/* Workspace Template Selection (Workspace templates into event creation) */}
+                  {!isEditing && (
+                    <div className="border border-dashed border-gray-300 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900">Workspace template (optional)</h4>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Choose a workspace template to pre-structure tasks, roles, and communication for this event.
+                          </p>
+                        </div>
+                        {selectedWorkspaceTemplate && (
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                            {selectedWorkspaceTemplate.name}
+                          </span>
+                        )}
+                      </div>
+
+
+                      <div className="mt-4">
+                        <WorkspaceTemplateLibrary
+                          onTemplateSelect={(tpl) => setSelectedWorkspaceTemplate(tpl)}
+                          showActions
+                          eventSize={watch('capacity')}
+                        />
+                      </div>
                     </div>
                   )}
 
