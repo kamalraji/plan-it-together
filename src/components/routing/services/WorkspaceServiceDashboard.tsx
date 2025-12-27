@@ -18,13 +18,17 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 export const WorkspaceServiceDashboard: React.FC = () => {
   useAuth();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-
+  const [searchParams, setSearchParams] = useSearchParams();
+ 
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
   const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
   const eventId = searchParams.get('eventId');
-
+ 
+  const baseWorkspacePath = isOrgContext && orgSlugCandidate
+    ? `/${orgSlugCandidate}/workspaces`
+    : '/dashboard/workspaces';
+ 
   // Fetch user's workspaces (scoped by org/event via query params when available)
   const { data: workspaces, isLoading } = useQuery({
     queryKey: ['user-workspaces', orgSlugCandidate, eventId],
@@ -42,11 +46,11 @@ export const WorkspaceServiceDashboard: React.FC = () => {
   // Calculate dashboard metrics, optionally scoped by event
   const dashboardData = React.useMemo(() => {
     if (!workspaces) return null;
-
+ 
     const scopedWorkspaces = eventId
       ? workspaces.filter((w) => w.eventId === eventId)
       : workspaces;
-
+ 
     if (!scopedWorkspaces.length) {
       return {
         metrics: {
@@ -61,18 +65,14 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         quickActions: [],
       };
     }
-
+ 
     const activeWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.ACTIVE);
     const provisioningWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.PROVISIONING);
     const windingDownWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.WINDING_DOWN);
-
+ 
     const totalTasks = scopedWorkspaces.reduce((sum, w) => sum + (w.taskSummary?.total || 0), 0);
     const totalTeamMembers = scopedWorkspaces.reduce((sum, w) => sum + (w.teamMembers?.length || 0), 0);
-
-    const baseWorkspacePath = isOrgContext && orgSlugCandidate
-      ? `/${orgSlugCandidate}/workspaces`
-      : '/dashboard/workspaces';
-
+ 
     return {
       metrics: {
         totalWorkspaces: scopedWorkspaces.length,
@@ -116,12 +116,14 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         },
       ],
     };
-  }, [workspaces, eventId, isOrgContext, orgSlugCandidate]);
+  }, [workspaces, eventId, isOrgContext, orgSlugCandidate, baseWorkspacePath]);
 
   const pageActions = [
     {
       label: 'Create Workspace',
-      action: () => window.location.href = '/console/workspaces/create',
+      action: () => {
+        window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
+      },
       variant: 'primary' as const,
     },
     {
@@ -179,6 +181,41 @@ export const WorkspaceServiceDashboard: React.FC = () => {
           }
           actions={pageActions}
         />
+ 
+        {/* Event Filter (org-scoped) */}
+        {dashboardData && (
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Filter by event:</span>
+            <select
+              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              value={eventId || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                const params = new URLSearchParams(searchParams);
+                if (value) {
+                  params.set('eventId', value);
+                } else {
+                  params.delete('eventId');
+                }
+                setSearchParams(params);
+              }}
+            >
+              <option value="">All events</option>
+              {workspaces &&
+                Array.from(
+                  new Map(
+                    workspaces
+                      .filter((w) => w.event)
+                      .map((w) => [w.event!.id, w.event!.name] as [string, string])
+                  ).entries()
+                ).map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
 
         {/* Service Overview Metrics */}
         {dashboardData && (
@@ -293,14 +330,14 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         {dashboardData && dashboardData.recentWorkspaces.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Recent Workspaces</h3>
-              <Link
-                to="/console/workspaces/list"
-                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
-              >
-                View all workspaces →
-              </Link>
-            </div>
+               <h3 className="text-lg font-medium text-gray-900">Recent Workspaces</h3>
+               <Link
+                 to={`${baseWorkspacePath}/list${eventId ? `?eventId=${eventId}` : ''}`}
+                 className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+               >
+                 View all workspaces →
+               </Link>
+             </div>
             
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
@@ -354,17 +391,17 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <Link
-                            to={`/console/workspaces/${workspace.id}`}
-                            className="text-blue-600 hover:text-blue-500 mr-4"
-                          >
-                            View
-                          </Link>
-                          <Link
-                            to={`/console/workspaces/${workspace.id}/tasks`}
-                            className="text-gray-600 hover:text-gray-500"
-                          >
-                            Tasks
-                          </Link>
+                             to={`${baseWorkspacePath}/${workspace.id}`}
+                             className="text-blue-600 hover:text-blue-500 mr-4"
+                           >
+                             View
+                           </Link>
+                           <Link
+                             to={`${baseWorkspacePath}/${workspace.id}/tasks`}
+                             className="text-gray-600 hover:text-gray-500"
+                           >
+                             Tasks
+                           </Link>
                         </td>
                       </tr>
                     ))}
