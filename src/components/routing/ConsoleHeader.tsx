@@ -200,29 +200,35 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
             <div className="relative" ref={serviceSwitcherRef}>
               <button
                 onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
-                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100 hover-scale focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <span className="hidden sm:block">{currentServiceData?.displayName || 'Dashboard'}</span>
-                <ChevronDownIcon className="h-4 w-4" />
+                <span className="hidden sm:block truncate max-w-[140px]">
+                  {currentServiceData?.displayName || 'Dashboard'}
+                </span>
+                <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
 
               {/* Service Switcher Dropdown */}
               {isServiceSwitcherOpen && (
-                <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  <div className="p-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">Switch Service</h3>
-                    <div className="space-y-1">
+                <div className="absolute top-full left-0 mt-1 w-72 sm:w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 animate-enter">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3 tracking-tight">Switch Service</h3>
+                    <div className="space-y-0.5">
                       {services.map((service) => (
                         <button
                           key={service.id}
                           onClick={() => handleServiceSelect(service.id)}
-                          className={`w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-md text-left hover:bg-gray-50 ${
-                            service.id === currentService ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'
+                          className={`w-full flex items-start space-x-2 sm:space-x-3 px-2.5 py-1.5 text-xs sm:text-sm rounded-md text-left transition-colors duration-150 ${
+                            service.id === currentService
+                              ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500'
+                              : 'text-gray-700 hover:bg-gray-50'
                           }`}
                         >
-                          <div className="flex-1">
-                            <div className="font-medium">{service.displayName}</div>
-                            <div className="text-xs text-gray-500">{service.description}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{service.displayName}</div>
+                            <div className="text-[11px] sm:text-xs text-gray-500 truncate">
+                              {service.description}
+                            </div>
                           </div>
                         </button>
                       ))}
