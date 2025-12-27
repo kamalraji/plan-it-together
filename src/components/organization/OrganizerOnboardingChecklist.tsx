@@ -56,7 +56,7 @@ export const OrganizerOnboardingChecklist: React.FC = () => {
         label: 'Complete organization profile',
         description: 'Add description and contact details so participants can trust your brand.',
         completed: hasBasicProfile,
-        action: { label: 'Edit profile', path: `/${organization.slug}/settings` },
+        action: { label: 'Edit profile', path: `/${organization.slug}/settings/dashboard` },
       },
       {
         id: 'first-event',
