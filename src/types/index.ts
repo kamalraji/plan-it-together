@@ -100,6 +100,7 @@ export interface BrandingConfig {
   primaryColor?: string;
   secondaryColor?: string;
   customCss?: string;
+  workspaceTemplateId?: string;
 }
 
 export interface VenueConfig {
