@@ -8,16 +8,41 @@ import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationSwitcher } from './OrganizationSwitcher';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
+import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
+const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => void }> = ({ user, onLogout }) => {
+  const { toggleSidebar } = useSidebar();
+
+  const handleServiceChange = (service: string) => {
+    console.log('Service changed to:', service);
+  };
+
+  const handleSearch = (query: string) => {
+    console.log('Global search:', query);
+  };
+
+  return (
+    <ConsoleHeader
+      user={user}
+      onServiceChange={handleServiceChange}
+      onSearch={handleSearch}
+      onLogout={onLogout}
+      onToggleMobileMenu={toggleSidebar}
+    />
+  );
+};
 
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
-
   const isLoadingAny = isLoading || orgsLoading || orgLoading;
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   if (isLoadingAny) {
     return (
@@ -44,6 +69,7 @@ export const OrgScopedLayout: React.FC = () => {
         <div className="min-h-screen flex w-full bg-background">
           <OrganizationSidebar />
           <SidebarInset>
+            <OrgConsoleHeader user={user} onLogout={handleLogout} />
             <div className="border-b bg-card px-4 py-3 flex items-center gap-3">
               <SidebarTrigger className="mr-1" />
               <OrganizationSwitcher />
