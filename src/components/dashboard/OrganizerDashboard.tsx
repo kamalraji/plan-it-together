@@ -8,6 +8,7 @@ import { MarketplaceOrganizerInterface } from '../marketplace';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
 import { supabase } from '@/integrations/supabase/client';
+import { useApiHealth } from '@/hooks/useApiHealth';
 
 
 interface Event {
@@ -36,12 +37,14 @@ export function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState<'events' | 'analytics' | 'marketplace' | 'profile'>('events');
   const [, setShowProfilePrompt] = useState(false);
 
+  const { isHealthy } = useApiHealth();
+
   // Check if profile completion is needed (Requirements 2.4, 2.5)
   const isProfileIncomplete = !user?.profileCompleted || 
     !user?.bio || 
     !user?.organization;
 
-  const { data: events, isLoading } = useQuery({
+  const { data: events, isLoading } = useQuery<Event[]>({
     queryKey: ['organizer-events', organization.id],
     queryFn: async () => {
       const response = await api.get('/events/my-events', {
@@ -49,9 +52,13 @@ export function OrganizerDashboard() {
       });
       return response.data.events as Event[];
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
  
-  const { data: workspaces } = useQuery({
+  const { data: workspaces } = useQuery<WorkspaceSummary[]>({
     queryKey: ['organizer-workspaces', organization.id],
     queryFn: async () => {
       const response = await api.get('/workspaces/my-workspaces', {
@@ -59,9 +66,13 @@ export function OrganizerDashboard() {
       });
       return response.data.workspaces as WorkspaceSummary[];
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
  
-  const { data: analytics } = useQuery({
+  const { data: analytics } = useQuery<any>({
     queryKey: ['organizer-analytics', organization.id],
     queryFn: async () => {
       const response = await api.get('/analytics/organizer-summary', {
@@ -69,6 +80,10 @@ export function OrganizerDashboard() {
       });
       return response.data;
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
 
   const topWorkspaces = useMemo(() => {

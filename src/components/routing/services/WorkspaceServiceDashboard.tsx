@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
 import api from '../../../lib/api';
-import { useLocation, useSearchParams } from 'react-router-dom';
 import { UserRole } from '@/types';
+import { useApiHealth } from '@/hooks/useApiHealth';
 
 
 /**
@@ -31,8 +31,10 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     ? `/${orgSlugCandidate}/workspaces`
     : '/dashboard/workspaces';
  
+  const { isHealthy } = useApiHealth();
+ 
   // Fetch user's workspaces (scoped by org/event via query params when available)
-  const { data: workspaces, isLoading } = useQuery({
+  const { data: workspaces, isLoading } = useQuery<Workspace[]>({
     queryKey: ['user-workspaces', orgSlugCandidate, eventId],
     queryFn: async () => {
       const response = await api.get('/workspaces/my-workspaces', {
@@ -43,6 +45,10 @@ export const WorkspaceServiceDashboard: React.FC = () => {
       });
       return response.data.workspaces as Workspace[];
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
 
   // Calculate dashboard metrics, optionally scoped by event

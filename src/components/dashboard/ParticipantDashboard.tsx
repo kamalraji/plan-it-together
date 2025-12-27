@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
+import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 
 
@@ -66,6 +67,8 @@ export function ParticipantDashboard() {
     return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
   });
   const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
+
+  const { isHealthy } = useApiHealth();
 
   useEffect(() => {
     const checkOrganizerSignup = async () => {
@@ -156,14 +159,22 @@ export function ParticipantDashboard() {
         return registration;
       });
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
-
+ 
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
       const response = await api.get('/certificates/my-certificates');
       return response.data.certificates as Certificate[];
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
 
   const isProfileIncomplete = !user?.profileCompleted;
