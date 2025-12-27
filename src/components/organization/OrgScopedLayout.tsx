@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
@@ -11,16 +11,21 @@ import { OrganizationTeamManagement } from './OrganizationTeamManagement';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
-const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => void }> = ({ user, onLogout }) => {
+
+/**
+ * Thin wrapper that reuses the global ConsoleHeader but
+ * wires the three-line menu to the Shadcn sidebar for org-scoped routes.
+ */
+const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> = ({ user, onLogout }) => {
   const { toggleSidebar } = useSidebar();
 
-  const handleServiceChange = (service: string) => {
-    console.log('Service changed to:', service);
-  };
+  const handleServiceChange = useCallback((service: string) => {
+    console.log('Org console service change:', service);
+  }, []);
 
-  const handleSearch = (query: string) => {
-    console.log('Global search:', query);
-  };
+  const handleSearch = useCallback((query: string) => {
+    console.log('Org console global search:', query);
+  }, []);
 
   return (
     <ConsoleHeader
@@ -38,11 +43,12 @@ export const OrgScopedLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
+
   const isLoadingAny = isLoading || orgsLoading || orgLoading;
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await logout();
-  };
+  }, [logout]);
 
   if (isLoadingAny) {
     return (
@@ -56,7 +62,7 @@ export const OrgScopedLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const isAdminOfOrg = (myOrganizations || []).some((org: any) => org.id === organization.id);
+  const isAdminOfOrg = !!myOrganizations?.some((org) => org.id === organization.id);
 
   if (!isAdminOfOrg) {
     // User is authenticated but not an admin of this org; send them back to generic dashboard
@@ -66,14 +72,20 @@ export const OrgScopedLayout: React.FC = () => {
   return (
     <OrganizationProvider value={{ organization }}>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
+        {/* Global console header fixed at the top */}
+        <OrgConsoleHeader user={user} onLogout={handleLogout} />
+
+        {/* Sidebar + content, padded so it sits below the fixed header */}
+        <div className="min-h-screen flex w-full bg-background pt-16">
           <OrganizationSidebar />
+
           <SidebarInset>
-            <OrgConsoleHeader user={user} onLogout={handleLogout} />
+            {/* Organization switcher bar inside the org-scoped console */}
             <div className="border-b bg-card px-4 py-3 flex items-center gap-3">
               <SidebarTrigger className="mr-1" />
               <OrganizationSwitcher />
             </div>
+
             <div className="px-4 py-6">
               <Routes>
                 <Route path="dashboard" element={<OrganizerDashboard />} />
