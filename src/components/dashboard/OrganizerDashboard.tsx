@@ -109,7 +109,7 @@ export function OrganizerDashboard() {
     queryFn: async () => {
       if (!currentEvent) return null;
       const eventId = currentEvent.id as string;
- 
+
       const [registrationsRes, confirmedRes, checkinsRes, tasksRes] = await Promise.all([
         supabase
           .from('registrations')
@@ -130,12 +130,12 @@ export function OrganizerDashboard() {
           .eq('type', 'task')
           .eq('workspace_id', eventId),
       ]);
- 
+
       if (registrationsRes.error) throw registrationsRes.error;
       if (confirmedRes.error) throw confirmedRes.error;
       if (checkinsRes.error) throw checkinsRes.error;
       if (tasksRes.error) throw tasksRes.error;
- 
+
       return {
         totalRegistrations: registrationsRes.count ?? 0,
         confirmedRegistrations: confirmedRes.count ?? 0,
@@ -144,7 +144,11 @@ export function OrganizerDashboard() {
       };
     },
   });
- 
+
+  const totalEvents = analytics?.totalEvents ?? (events?.length ?? 0);
+  const activeEvents = analytics?.activeEvents ?? 0;
+  const totalRegistrations = analytics?.totalRegistrations ?? 0;
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -155,68 +159,133 @@ export function OrganizerDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-       {/* Header */}
-       <header className="bg-card shadow">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6">
-             <div>
-               <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Organizer Dashboard</h1>
-               <p className="text-sm sm:text-base text-muted-foreground">Welcome back, {user?.name}</p>
-             </div>
-             <div className="flex flex-wrap items-center gap-3">
-               {!vendorLoading && (
-                 <Link
-                   to={isVendor ? "/vendor/dashboard" : "/vendor/register"}
-                   className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                 >
-                   {isVendor ? "Vendor Dashboard" : "Become a Vendor"}
-                 </Link>
-               )}
-               <Link
-                 to="/events/create"
-                 className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm hover:bg-primary/90 transition-colors"
-               >
-                 Create Event
-               </Link>
-               <button
-                 onClick={logout}
-                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-               >
-                 Logout
-               </button>
-             </div>
-           </div>
-         </div>
-       </header>
+      {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+        <span className="text-muted-foreground/70">Home</span>
+        <span>/</span>
+        <span className="text-foreground font-medium">Organizer Dashboard</span>
+      </div>
+
+      {/* Hero with floating organization card */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/90 via-accent/80 to-secondary/80 shadow-xl min-h-[180px] sm:min-h-[220px]">
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_hsl(var(--card))/0.2,_transparent_60%),_radial-gradient(circle_at_bottom,_hsl(var(--primary-foreground))/0.15,_transparent_55%)]" />
+          <div className="relative px-6 sm:px-10 py-7 sm:py-9 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="text-xs sm:text-sm text-primary-foreground/80 mb-1">/ Organizer view</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-primary-foreground">
+                Organizer Dashboard
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-primary-foreground/80 max-w-xl">
+                Welcome back{user?.name ? `, ${user.name}` : ''}. Manage your events, analytics, marketplace,
+                and organizer profile in one place.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {!vendorLoading && (
+                <Link
+                  to={isVendor ? '/vendor/dashboard' : '/vendor/register'}
+                  className="text-[11px] sm:text-xs md:text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground underline-offset-2 hover:underline"
+                >
+                  {isVendor ? 'Vendor Dashboard' : 'Become a Vendor'}
+                </Link>
+              )}
+              <Link
+                to="/events/create"
+                className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                Create event
+              </Link>
+              <button
+                onClick={logout}
+                className="inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1.5 text-xs sm:text-sm font-medium text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+
+          {/* Floating organization card */}
+          <div className="pointer-events-none absolute -bottom-9 sm:-bottom-10 left-4 sm:left-10 right-4 sm:right-auto">
+            <div className="pointer-events-auto rounded-2xl border border-border/60 bg-card/95 backdrop-blur px-4 sm:px-6 py-3 sm:py-4 shadow-2xl max-w-sm sm:min-w-[260px]">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                Active organization
+              </p>
+              <p className="text-sm sm:text-base font-semibold text-foreground truncate">
+                {organization.name}
+              </p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                {organization.slug}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Summary metrics */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Total events</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {totalEvents}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">Across all time</span>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Active events</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {activeEvents}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">Published or ongoing</span>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-4 flex flex-col justify-between">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Total registrations</div>
+            <div className="flex items-end justify-between gap-2">
+              <div className="text-2xl sm:text-3xl font-semibold text-foreground">
+                {totalRegistrations}
+              </div>
+              <span className="text-[11px] sm:text-xs text-muted-foreground">All events combined</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Navigation Tabs */}
-       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 sm:mt-0">
-         <div className="border-b border-border">
-           <nav className="-mb-px flex gap-4 overflow-x-auto">
-             {[
-               { key: 'events', label: 'My Events' },
-               { key: 'analytics', label: 'Analytics' },
-               { key: 'marketplace', label: 'Marketplace' },
-               { key: 'profile', label: 'Profile' },
-             ].map((tab) => (
-               <button
-                 key={tab.key}
-                 onClick={() => setActiveTab(tab.key as any)}
-                 className={`py-2 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
-                   activeTab === tab.key
-                     ? 'border-primary text-primary'
-                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                 }`}
-               >
-                 {tab.label}
-               </button>
-             ))}
-           </nav>
-         </div>
-       </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-12">
+        <div className="bg-card border border-border/60 rounded-2xl px-2 sm:px-3 py-2 shadow-sm overflow-x-auto">
+          <nav className="flex gap-2 sm:gap-3 min-w-max">
+            {[
+              { key: 'events', label: 'My Events' },
+              { key: 'analytics', label: 'Analytics' },
+              { key: 'marketplace', label: 'Marketplace' },
+              { key: 'profile', label: 'Profile' },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                  activeTab === tab.key
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
 
       {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-14 sm:pt-16">
+         {/* Onboarding Checklist */}
          {/* Onboarding Checklist */}
          <div className="mb-6">
            <OrganizerOnboardingChecklist />
