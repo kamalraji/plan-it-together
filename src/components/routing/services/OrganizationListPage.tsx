@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceListPage } from '../ResourceListPage';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
+import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
+import MembershipBadge from '@/components/organization/MembershipBadge';
 
 interface OrganizationListPageProps {
   filterBy?: 'all' | 'managed' | 'member';
@@ -13,7 +15,8 @@ interface OrganizationListRow {
   name: string;
   slug: string;
   category: string;
-  role: 'OWNER' | 'MEMBER';
+  role: 'OWNER' | 'ADMIN' | 'ORGANIZER' | 'VIEWER' | 'UNKNOWN';
+  status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED' | 'UNKNOWN';
   memberCount: number;
   eventCount: number;
   followerCount: number;
@@ -38,6 +41,8 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
     isLoadingEvents,
   } = useOrganizerOrganizations();
 
+  const { data: myMemberships } = useMyOrganizationMemberships();
+
   const organizationsWithMetrics: OrganizationListRow[] = useMemo(() => {
     if (!organizations) return [];
 
@@ -47,12 +52,22 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
         totalEvents: 0,
       };
 
+      const membership = (myMemberships || []).find(
+        (m: any) => m.organization_id === org.id,
+      );
+
+      const role = (membership?.role as OrganizationListRow['role'])
+        || (isManaged ? 'OWNER' : 'VIEWER');
+      const status = (membership?.status as OrganizationListRow['status'])
+        || (isManaged ? 'ACTIVE' : 'UNKNOWN');
+
       return {
         id: org.id,
         name: org.name,
         slug: org.slug,
         category: org.category,
-        role: isManaged ? 'OWNER' : 'MEMBER',
+        role,
+        status,
         // These aggregates can be wired to real metrics once available
         memberCount: 0,
         eventCount: analytics.totalEvents,
@@ -63,14 +78,16 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
         description: null,
       };
     });
-  }, [organizations, managedOrganizations, perOrgAnalytics]);
+  }, [organizations, managedOrganizations, perOrgAnalytics, myMemberships]);
 
   const filteredOrganizations = useMemo(() => {
     if (filterBy === 'managed') {
-      return organizationsWithMetrics.filter((org) => org.role === 'OWNER');
+      return organizationsWithMetrics.filter((org) =>
+        ['OWNER', 'ADMIN', 'ORGANIZER'].includes(org.role),
+      );
     }
     if (filterBy === 'member') {
-      return organizationsWithMetrics.filter((org) => org.role === 'MEMBER');
+      return organizationsWithMetrics.filter((org) => org.status === 'ACTIVE');
     }
     return organizationsWithMetrics;
   }, [filterBy, organizationsWithMetrics]);
@@ -267,8 +284,13 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
     {
       label: 'View Analytics',
       action: (selectedItems: OrganizationListRow[]) => {
-        const manageable = selectedItems.filter((i) => i.role === 'OWNER');
-        console.log('Viewing analytics for manageable organizations:', manageable.map((i) => i.id));
+        const manageable = selectedItems.filter((i) =>
+          ['OWNER', 'ADMIN', 'ORGANIZER'].includes(i.role),
+        );
+        console.log(
+          'Viewing analytics for manageable organizations:',
+          manageable.map((i) => i.id),
+        );
       },
     },
   ];
