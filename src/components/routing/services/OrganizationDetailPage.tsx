@@ -1,60 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceDetailPage } from '../ResourceDetailPage';
 import OrganizationPage from '../../organization/OrganizationPage';
 import { useAuth } from '../../../hooks/useAuth';
+import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
 
 /**
  * OrganizationDetailPage provides AWS-style resource detail interface for organizations.
- * Features:
- * - Tabbed content with organization details, events, and analytics
- * - Resource actions for organization management
- * - Integration with existing OrganizationPage component
- * - Role-based access controls
+ * Now backed by real Supabase data via useOrganizerOrganizations.
  */
 export const OrganizationDetailPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
   const { user } = useAuth();
-  const [organization, setOrganization] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { organizations, perOrgAnalytics, isLoadingOrganizations } = useOrganizerOrganizations();
 
-  useEffect(() => {
-    // Mock data - in real implementation, this would come from API
-    const mockOrganization = {
-      id: organizationId,
-      name: 'Tech Innovation Hub',
-      category: 'COMPANY',
-      role: 'OWNER',
-      memberCount: 15,
-      eventCount: 12,
-      followerCount: 456,
-      verificationStatus: 'VERIFIED',
-      description: 'Leading technology innovation and startup acceleration',
-      branding: {
-        logoUrl: null,
-        bannerUrl: null,
-      },
-      socialLinks: {
-        website: 'https://techinnovationhub.com',
-        linkedin: 'https://linkedin.com/company/tech-innovation-hub',
-      },
-    };
+  const organization = useMemo(
+    () => organizations?.find((org) => org.id === organizationId) ?? null,
+    [organizations, organizationId],
+  );
 
-    setTimeout(() => {
-      setOrganization(mockOrganization);
-      setLoading(false);
-    }, 500);
-  }, [organizationId]);
+  const analytics = organization ? perOrgAnalytics[organization.id] : undefined;
 
-  if (loading) {
+  const userRole: 'OWNER' | 'MEMBER' = organization && user && organization.owner_id === user.id
+    ? 'OWNER'
+    : 'MEMBER';
+
+  if (isLoadingOrganizations && !organizations) {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
+            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8" />
+            <div className="h-64 bg-gray-200 rounded" />
           </div>
         </div>
       </div>
@@ -66,12 +45,14 @@ export const OrganizationDetailPage: React.FC = () => {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Organization Not Found</h2>
-          <p className="text-gray-600 mb-4">The organization you are looking for does not exist.</p>
+          <p className="text-gray-600 mb-4">
+            The organization you are looking for does not exist or you do not have access.
+          </p>
           <Link
             to="/dashboard/organizations"
             className="text-blue-600 hover:text-blue-500 font-medium"
           >
-            ← Back to Organizations
+            Back to Organizations
           </Link>
         </div>
       </div>
@@ -83,96 +64,124 @@ export const OrganizationDetailPage: React.FC = () => {
       id: 'overview',
       label: 'Overview',
       component: () => (
-        <OrganizationPage 
-          organizationId={organizationId!} 
-          currentUser={user ?? undefined} 
+        <OrganizationPage
+          organizationId={organization.id}
+          currentUser={user ?? undefined}
         />
       ),
     },
     {
       id: 'members',
       label: 'Members',
-      badge: organization.memberCount,
+      badge: 0,
       component: () => (
         <div className="p-6">
-          <p className="text-gray-600">Member management interface would be displayed here.</p>
+          <p className="text-gray-600">
+            Member management interface is available on the Member Management page.
+          </p>
           <Link
-            to={`/dashboard/organizations/${organizationId}/members`}
+            to={`/dashboard/organizations/${organization.id}/members`}
             className="mt-4 inline-block text-blue-600 hover:text-blue-500 font-medium"
           >
-            Go to Member Management →
+            Go to Member Management
           </Link>
         </div>
       ),
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
     {
       id: 'settings',
       label: 'Settings',
       component: () => (
         <div className="p-6">
-          <p className="text-gray-600">Organization settings interface would be displayed here.</p>
+          <p className="text-gray-600">
+            Organization settings interface is available on the Settings page.
+          </p>
           <Link
-            to={`/dashboard/organizations/${organizationId}/settings`}
+            to={`/dashboard/organizations/${organization.id}/settings`}
             className="mt-4 inline-block text-blue-600 hover:text-blue-500 font-medium"
           >
-            Go to Organization Settings →
+            Go to Organization Settings
           </Link>
         </div>
       ),
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
     {
       id: 'analytics',
       label: 'Analytics',
       component: () => (
-        <div className="p-6">
-          <p className="text-gray-600">Organization analytics interface would be displayed here.</p>
+        <div className="p-6 space-y-4">
+          <p className="text-gray-600">
+            View high-level analytics for this organization or open the full analytics dashboard.
+          </p>
+          {analytics ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <p className="text-xs font-medium text-gray-500">Total Events</p>
+                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.totalEvents}</p>
+              </div>
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <p className="text-xs font-medium text-gray-500">Published</p>
+                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.publishedEvents}</p>
+              </div>
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <p className="text-xs font-medium text-gray-500">Ongoing</p>
+                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.ongoingEvents}</p>
+              </div>
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <p className="text-xs font-medium text-gray-500">Completed</p>
+                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.completedEvents}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No analytics data available yet.</p>
+          )}
           <Link
-            to={`/dashboard/organizations/${organizationId}/analytics`}
-            className="mt-4 inline-block text-blue-600 hover:text-blue-500 font-medium"
+            to={`/dashboard/organizations/${organization.id}/analytics`}
+            className="inline-block text-blue-600 hover:text-blue-500 font-medium"
           >
-            Go to Analytics Dashboard →
+            Open Analytics Dashboard
           </Link>
         </div>
       ),
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
   ];
 
   const actions = [
     {
       label: 'Manage Members',
-      action: () => { window.location.href = `/dashboard/organizations/${organizationId}/members`; },
+      action: () => {
+        window.location.href = `/dashboard/organizations/${organization.id}/members`;
+      },
       variant: 'primary' as const,
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
     {
       label: 'View Analytics',
-      action: () => { window.location.href = `/dashboard/organizations/${organizationId}/analytics`; },
+      action: () => {
+        window.location.href = `/dashboard/organizations/${organization.id}/analytics`;
+      },
       variant: 'secondary' as const,
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
     {
       label: 'Organization Settings',
-      action: () => { window.location.href = `/dashboard/organizations/${organizationId}/settings`; },
+      action: () => {
+        window.location.href = `/dashboard/organizations/${organization.id}/settings`;
+      },
       variant: 'secondary' as const,
-      roles: ['OWNER', 'ADMIN'],
+      roles: ['OWNER'],
     },
   ];
 
-  // Filter actions and tabs based on user role
-  const userRole = organization.role;
-  const filteredActions = actions.filter(action => 
-    !action.roles || action.roles.includes(userRole)
-  );
-  const filteredTabs = tabs.filter(tab => 
-    !tab.roles || tab.roles.includes(userRole)
-  );
+  const filteredActions = actions.filter((action) => !action.roles || action.roles.includes(userRole));
+  const filteredTabs = tabs.filter((tab) => !tab.roles || tab.roles.includes(userRole));
 
   const breadcrumbs = [
     { label: 'Organizations', href: '/dashboard/organizations' },
-    { label: organization.name, href: `/dashboard/organizations/${organizationId}` },
+    { label: organization.name, href: `/dashboard/organizations/${organization.id}` },
   ];
 
   return (
@@ -180,14 +189,14 @@ export const OrganizationDetailPage: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <PageHeader
           title={organization.name}
-          subtitle={organization.description}
+          subtitle={`Category: ${organization.category}`}
           breadcrumbs={breadcrumbs}
           actions={filteredActions}
         />
 
         <ResourceDetailPage
           title={organization.name}
-          resourceId={organizationId!}
+          resourceId={organization.id}
           resourceType="organization"
           tabs={filteredTabs}
           actions={filteredActions}
