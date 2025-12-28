@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { supabase } from '@/integrations/supabase/looseClient';
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -18,25 +21,112 @@ interface EventFormPageProps {
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const organization = useCurrentOrganization();
+  const { toast } = useToast();
+  const [submitIntent, setSubmitIntent] = useState<'draft' | 'publish'>('publish');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Use eventId for edit mode
   console.log('Event ID for editing:', eventId);
 
   const pageTitle = mode === 'create' ? 'Create New Event' : 'Edit Event';
-  const pageSubtitle = mode === 'create' 
-    ? 'Fill in the details to create your event'
-    : 'Update your event information';
+  const pageSubtitle =
+    mode === 'create'
+      ? 'Fill in the details to create your event'
+      : 'Update your event information';
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const formData = new FormData(event.currentTarget);
+
+    const name = (formData.get('event-name') as string)?.trim();
+    const description = (formData.get('event-description') as string)?.trim();
+    const modeValue = (formData.get('event-mode') as string) || '';
+    const capacityRaw = (formData.get('event-capacity') as string) || '';
+    const startDate = formData.get('start-date') as string;
+    const endDate = formData.get('end-date') as string;
+    const registrationDeadline = formData.get('registration-deadline') as string;
+    const primaryColor = formData.get('primary-color') as string;
+    const logoUrl = (formData.get('logo-url') as string)?.trim();
+
+    if (!name || !description || !modeValue || !startDate || !endDate) {
+      toast({
+        title: 'Missing required fields',
+        description: 'Please fill in all required fields before continuing.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
+
+      const { error } = await supabase.from('events').insert({
+        name,
+        description,
+        mode: modeValue,
+        start_date: startDate,
+        end_date: endDate,
+        capacity: capacityRaw ? Number(capacityRaw) : null,
+        organization_id: organization?.id ?? null,
+        visibility: 'PUBLIC',
+        status,
+        registration_deadline: registrationDeadline || null,
+        branding: {
+          primaryColor: primaryColor || undefined,
+          logoUrl: logoUrl || undefined,
+        },
+      } as any);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: submitIntent === 'draft' ? 'Draft saved' : 'Event created',
+        description:
+          submitIntent === 'draft'
+            ? 'Your event draft has been saved.'
+            : 'Your event has been created successfully.',
+      });
+
+      navigate('../list');
+    } catch (err: any) {
+      console.error('Failed to save event', err);
+      toast({
+        title: 'Failed to save event',
+        description: err?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const pageActions = [
     {
       label: 'Cancel',
-      action: () => navigate('/console/events'),
+      action: () => navigate('../list'),
       icon: XMarkIcon,
       variant: 'secondary' as const,
     },
     {
       label: mode === 'create' ? 'Create Event' : 'Save Changes',
-      action: () => console.log('Save event'),
+      action: () => {
+        const form = document.getElementById('event-form') as HTMLFormElement | null;
+        if (form) {
+          setSubmitIntent('publish');
+          if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+          } else {
+            form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+        }
+      },
       icon: CheckIcon,
       variant: 'primary' as const,
     },
@@ -45,15 +135,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <PageHeader
-          title={pageTitle}
-          subtitle={pageSubtitle}
-          actions={pageActions}
-        />
+        <PageHeader title={pageTitle} subtitle={pageSubtitle} actions={pageActions} />
 
         {/* Event Form Content */}
         <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
-          <div className="space-y-6">
+          <form id="event-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information Section */}
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
@@ -65,6 +151,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="text"
                     id="event-name"
+                    name="event-name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter event name"
                   />
@@ -76,6 +163,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   </label>
                   <textarea
                     id="event-description"
+                    name="event-description"
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Describe your event"
@@ -89,6 +177,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     </label>
                     <select
                       id="event-mode"
+                      name="event-mode"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select mode</option>
@@ -105,6 +194,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     <input
                       type="number"
                       id="event-capacity"
+                      name="event-capacity"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter capacity (optional)"
                     />
@@ -124,6 +214,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="datetime-local"
                     id="start-date"
+                    name="start-date"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -135,6 +226,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="datetime-local"
                     id="end-date"
+                    name="end-date"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -146,6 +238,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="datetime-local"
                     id="registration-deadline"
+                    name="registration-deadline"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -163,6 +256,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="color"
                     id="primary-color"
+                    name="primary-color"
                     className="h-10 w-20 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -174,6 +268,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   <input
                     type="url"
                     id="logo-url"
+                    name="logo-url"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="https://example.com/logo.png"
                   />
@@ -185,34 +280,36 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             <div className="border-t border-gray-200 pt-6 flex items-center justify-end space-x-3">
               <button
                 type="button"
-                onClick={() => navigate('/console/events')}
+                onClick={() => navigate('../list')}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Cancel
               </button>
               <button
-                type="button"
-                onClick={() => console.log('Save as draft')}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                type="submit"
+                onClick={() => setSubmitIntent('draft')}
+                disabled={isSubmitting}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
               >
                 Save as Draft
               </button>
               <button
                 type="submit"
-                onClick={() => console.log('Create/Update event')}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => setSubmitIntent('publish')}
+                disabled={isSubmitting}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
               >
-                {mode === 'create' ? 'Create Event' : 'Save Changes'}
+                {isSubmitting ? (mode === 'create' ? 'Creating...' : 'Saving...') : mode === 'create' ? 'Create Event' : 'Save Changes'}
               </button>
             </div>
-          </div>
+          </form>
         </div>
 
         {/* Help Text */}
         <div className="mt-6 bg-blue-50 rounded-lg p-4">
           <h4 className="text-sm font-medium text-blue-900 mb-2">Need Help?</h4>
           <p className="text-sm text-blue-700">
-            {mode === 'create' 
+            {mode === 'create'
               ? 'Fill in the required fields to create your event. You can save as draft and continue editing later.'
               : 'Update your event information. Changes will be reflected immediately after saving.'}
           </p>
