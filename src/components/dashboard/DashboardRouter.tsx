@@ -118,15 +118,11 @@ export const DashboardRouter: React.FC = () => {
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
- 
+
   if (shouldRedirectToOnboarding) {
     return <Navigate to="/dashboard/onboarding/organizer" replace />;
   }
- 
-  if (user.role === UserRole.ORGANIZER) {
-    return <Navigate to="/organizer/dashboard" replace />;
-  }
- 
+
   return <ParticipantDashboard />;
 };
 

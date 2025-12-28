@@ -30,7 +30,6 @@ import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
-import { OrganizerRootDashboard } from '../dashboard/OrganizerRootDashboard';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -695,18 +694,6 @@ export const AppRouter: React.FC = () => {
               />
             </Route>
 
-            {/* Standalone organizer home for organizers without an active org context */}
-            <Route
-              path="/organizer/dashboard"
-              element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <GlobalErrorBoundary>
-                    <OrganizerRootDashboard />
-                  </GlobalErrorBoundary>
-                </ConsoleRoute>
-              }
-            />
- 
             {/* Standalone Marketplace - public marketplace for browsing services */}
             <Route 
               path="/marketplace/*" 
