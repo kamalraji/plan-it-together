@@ -65,6 +65,94 @@ export type Database = {
           },
         ]
       }
+      certificate_criteria: {
+        Row: {
+          conditions: Json
+          created_at: string
+          event_id: string
+          id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          conditions?: Json
+          created_at?: string
+          event_id: string
+          id?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: Json
+          created_at?: string
+          event_id?: string
+          id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_criteria_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      certificates: {
+        Row: {
+          certificate_id: string
+          created_at: string
+          distributed_at: string | null
+          event_id: string
+          id: string
+          issued_at: string
+          metadata: Json
+          pdf_url: string | null
+          qr_payload: string
+          recipient_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          certificate_id: string
+          created_at?: string
+          distributed_at?: string | null
+          event_id: string
+          id?: string
+          issued_at?: string
+          metadata?: Json
+          pdf_url?: string | null
+          qr_payload: string
+          recipient_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          certificate_id?: string
+          created_at?: string
+          distributed_at?: string | null
+          event_id?: string
+          id?: string
+          issued_at?: string
+          metadata?: Json
+          pdf_url?: string | null
+          qr_payload?: string
+          recipient_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           branding: Json | null
