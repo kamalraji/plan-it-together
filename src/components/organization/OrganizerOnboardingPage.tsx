@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2, Info } from 'lucide-react';
 
 interface OnboardingChecklistRow {
   id: string;
@@ -77,6 +78,8 @@ export const OrganizerOnboardingPage: React.FC = () => {
   }, []);
 
   const isCompleted = !!checklist?.completed_at;
+  const progressPercent = isCompleted ? 100 : 40;
+  const statusLabel = isCompleted ? 'Checklist completed' : 'In progress';
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-cream to-lavender/30">
@@ -95,8 +98,24 @@ export const OrganizerOnboardingPage: React.FC = () => {
         </header>
 
         <Card className="bg-card/90 backdrop-blur border-border/70 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg">Getting started checklist</CardTitle>
+          <CardHeader className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-lg">Getting started checklist</CardTitle>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                <CheckCircle2 className={`h-3.5 w-3.5 ${isCompleted ? 'text-primary' : 'text-muted-foreground'}`} />
+                {statusLabel}
+              </span>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Three quick steps to get your organizer workspace ready. You can come back here any
+              time from your dashboard.
+            </p>
           </CardHeader>
           <CardContent className="space-y-6">
             <ol className="space-y-4 text-sm text-foreground">
@@ -105,15 +124,36 @@ export const OrganizerOnboardingPage: React.FC = () => {
                   1
                 </span>
                 <div>
-                  <p className="font-medium">Confirm your organization details</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">Confirm your organization details</p>
+                    <span
+                      className="inline-flex items-center justify-center rounded-full bg-muted px-1.5 py-1 cursor-help"
+                      aria-label="Why this matters"
+                      title="A clear organization profile builds trust with participants and partners."
+                    >
+                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    </span>
+                  </div>
                   <p className="text-muted-foreground text-xs sm:text-sm">
-                    Review your organization profile, logo, and contact details so participants
-                    know who&apos;s running the event.
+                    Review your organization profile, logo, and contact details so participants know
+                    who&apos;s running the event.
                   </p>
-                  <div className="mt-2">
-                    <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/organizations')}>
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate('/dashboard/organizations')}
+                    >
                       Open organization dashboard
                     </Button>
+                    <a
+                      href="https://thittam1hub.com/help/organizer-organization-setup"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] font-medium text-primary hover:underline"
+                    >
+                      How to structure your organization profile
+                    </a>
                   </div>
                 </div>
               </li>
@@ -122,15 +162,35 @@ export const OrganizerOnboardingPage: React.FC = () => {
                   2
                 </span>
                 <div>
-                  <p className="font-medium">Create your first event</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">Create your first event</p>
+                    <span
+                      className="inline-flex items-center justify-center rounded-full bg-muted px-1.5 py-1 cursor-help"
+                      aria-label="Why this matters"
+                      title="Defining dates, format, and capacity early helps you communicate clearly and plan operations."
+                    >
+                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    </span>
+                  </div>
                   <p className="text-muted-foreground text-xs sm:text-sm">
                     Define the basics: name, date, format (online/offline), and capacity for your
                     first event.
                   </p>
-                  <div className="mt-2">
-                    <Button size="sm" onClick={() => navigate('/dashboard/eventmanagement/events/create')}>
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <Button
+                      size="sm"
+                      onClick={() => navigate('/dashboard/eventmanagement/events/create')}
+                    >
                       Create event
                     </Button>
+                    <a
+                      href="https://thittam1hub.com/help/organizer-first-event"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Tips for a high-impact first event
+                    </a>
                   </div>
                 </div>
               </li>
@@ -139,15 +199,32 @@ export const OrganizerOnboardingPage: React.FC = () => {
                   3
                 </span>
                 <div>
-                  <p className="font-medium">Invite your core team</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">Invite your core team</p>
+                    <span
+                      className="inline-flex items-center justify-center rounded-full bg-muted px-1.5 py-1 cursor-help"
+                      aria-label="Why this matters"
+                      title="Bringing co-organizers, volunteers, and judges in early spreads the workload and improves quality."
+                    >
+                      <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                    </span>
+                  </div>
                   <p className="text-muted-foreground text-xs sm:text-sm">
                     Share access with co-organizers, volunteers, or judges so they can help manage
                     registrations and run the event.
                   </p>
-                  <div className="mt-2">
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
                     <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/team')}>
                       Manage team members
                     </Button>
+                    <a
+                      href="https://thittam1hub.com/help/organizer-team-roles"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Best practices for team roles
+                    </a>
                   </div>
                 </div>
               </li>
