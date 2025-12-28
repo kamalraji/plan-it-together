@@ -68,6 +68,7 @@ export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const { profile, isLoading, error, updateProfile } = useUserProfile();
   const [saving, setSaving] = useState(false);
+  const [showQr, setShowQr] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -95,6 +96,13 @@ export const ProfilePage: React.FC = () => {
     if (!profile) return 0;
     return computeCompletion(profile);
   }, [profile]);
+
+  const qrImageUrl = useMemo(() => {
+    if (!profile?.qr_code) return null;
+    return `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
+      profile.qr_code,
+    )}&size=256x256`;
+  }, [profile?.qr_code]);
 
   const initialValues: ProfileFormData = {
     name: profile?.full_name ?? '',
@@ -343,17 +351,56 @@ export const ProfilePage: React.FC = () => {
               {profile?.qr_code ? (
                 <>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Use this QR at events to check in quickly. A visual QR code will be added in a later step; for now, this is your unique check-in ID.
+                    Use this QR at events to check in quickly. You can copy the raw code or display a scannable QR.
                   </p>
-                  <div className="flex items-center justify-between rounded-md border border-dashed border-border/80 bg-background px-3 py-2">
-                    <code className="text-xs text-muted-foreground truncate mr-2">{profile.qr_code}</code>
-                    <button
-                      type="button"
-                      onClick={() => navigator.clipboard.writeText(profile.qr_code)}
-                      className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-1 text-[11px] font-medium text-foreground hover:bg-background"
-                    >
-                      Copy
-                    </button>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between rounded-md border border-dashed border-border/80 bg-background px-3 py-2">
+                      <code className="text-xs text-muted-foreground truncate mr-2">{profile.qr_code}</code>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => navigator.clipboard.writeText(profile.qr_code)}
+                          className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-1 text-[11px] font-medium text-foreground hover:bg-background"
+                       >
+                          Copy
+                        </button>
+                        {qrImageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setShowQr(true)}
+                            className="inline-flex items-center rounded-md bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+                          >
+                            Display QR
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {showQr && qrImageUrl && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setShowQr(false)}>
+                        <div
+                          className="rounded-xl border border-border bg-background p-5 shadow-xl max-w-xs w-full mx-4 text-center"
+                          onClick={(e) => e.stopPropagation()}
+                       >
+                          <h3 className="text-sm font-semibold text-foreground mb-3">Your Check-in QR</h3>
+                          <img
+                            src={qrImageUrl}
+                            alt="Check-in QR code for your profile"
+                            className="mx-auto rounded-lg border border-border/60 bg-card p-2"
+                            loading="lazy"
+                          />
+                          <p className="mt-3 text-[11px] text-muted-foreground">
+                            Ask event staff to scan this code at entry. You can close this view once checked in.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setShowQr(false)}
+                            className="mt-4 inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
