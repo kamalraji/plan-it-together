@@ -67,6 +67,10 @@ export function ParticipantDashboard() {
     return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
   });
   const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
+  const [showOrganizerSummaryBanner, setShowOrganizerSummaryBanner] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('th1_organizer_summary_banner_dismissed') !== '1';
+  });
 
   const { isHealthy } = useApiHealth();
 
@@ -176,6 +180,33 @@ export function ParticipantDashboard() {
     refetchOnWindowFocus: false,
     enabled: isHealthy !== false,
   });
+
+  const { data: organizerOnboardingStatus } = useQuery<{ completed_at: string | null } | null>({
+    queryKey: ['organizer-onboarding-status', user?.id],
+    queryFn: async () => {
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('onboarding_checklist')
+        .select('completed_at')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!user && user.role === 'ORGANIZER' && isHealthy !== false,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const hasCompletedOrganizerOnboarding = !!organizerOnboardingStatus?.completed_at;
+
 
   const isProfileIncomplete = !user?.profileCompleted;
 
@@ -323,6 +354,45 @@ export function ParticipantDashboard() {
         </div>
       )}
 
+      {/* Organizer summary banner after onboarding completion */}
+      {user?.role === 'ORGANIZER' && hasCompletedOrganizerOnboarding && showOrganizerSummaryBanner && (
+        <div className="bg-accent text-accent-foreground border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs sm:text-sm">
+            <div className="space-y-1">
+              <p className="font-medium text-foreground">You're all set as an organizer.</p>
+              <p className="text-muted-foreground">
+                Create and manage events, invite your team, and keep everything organized from your organizer console.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => navigate('/dashboard/eventmanagement/events')}
+                className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:bg-primary/90"
+              >
+                View events
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/team')}
+                className="inline-flex items-center rounded-md bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-secondary/90"
+              >
+                Manage team
+              </button>
+              <button
+                onClick={() => {
+                  setShowOrganizerSummaryBanner(false);
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('th1_organizer_summary_banner_dismissed', '1');
+                  }
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground ml-1"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Profile completion banner */}
       {isProfileIncomplete && showProfileBanner && (
         <div className="bg-accent text-accent-foreground border-b border-border">
@@ -352,6 +422,7 @@ export function ParticipantDashboard() {
           </div>
         </div>
       )}
+
 
       {/* QR Pass Modal */}
       {canShowQrPass && qrCoreRegistration && qrRegistration && (
