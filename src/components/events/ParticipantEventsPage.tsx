@@ -229,13 +229,21 @@ export function ParticipantEventsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
-                  <Link
-                    to={`/events/${event.id}`}
-                    className="text-sm font-medium text-primary hover:text-primary/80"
-                  >
-                    View details
-                  </Link>
+                <div className="flex items-center justify-between pt-4 border-t border-border mt-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={`/events/${event.id}#register`}
+                      className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                   >
+                      Quick register
+                    </Link>
+                    <Link
+                      to={`/events/${event.id}`}
+                      className="text-xs font-medium text-primary hover:text-primary/80"
+                    >
+                      View details
+                    </Link>
+                  </div>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
                     {event.status === EventStatus.ONGOING && 'Ongoing'}
                     {event.status === EventStatus.PUBLISHED && 'Upcoming'}
