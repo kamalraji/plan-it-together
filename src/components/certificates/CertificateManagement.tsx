@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { CertificateQr } from '@/components/certificates/CertificateQr';
 
 // Types for certificate management
 export interface CertificateType {
@@ -497,6 +498,9 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {certificate.certificateId}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <CertificateQr certificateId={certificate.certificateId} size={72} />
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(certificate.issuedAt).toLocaleDateString()}
