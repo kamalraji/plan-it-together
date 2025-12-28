@@ -12,6 +12,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
+  refreshUserRoles: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -222,6 +223,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshUserRoles = async (): Promise<void> => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) return;
+    const userWithRoles = await mapSupabaseUserToAppUserWithRoles(data.user);
+    setUser(userWithRoles);
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -231,6 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     verifyEmail,
+    refreshUserRoles,
   };
 
   return React.createElement(AuthContext.Provider, { value }, children);

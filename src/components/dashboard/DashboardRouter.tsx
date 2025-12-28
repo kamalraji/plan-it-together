@@ -16,9 +16,16 @@ import { UserRole } from '@/types';
  * onboarding checklist are redirected once to the dedicated onboarding flow.
  */
 export const DashboardRouter: React.FC = () => {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, refreshUserRoles } = useAuth();
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false);
+
+  // Refresh roles once when the dashboard mounts so any server-side
+  // changes (like new organizer approvals) are reflected in the client.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    void refreshUserRoles();
+  }, [isAuthenticated, refreshUserRoles]);
 
   useEffect(() => {
     const checkOnboarding = async () => {
