@@ -9,6 +9,7 @@ import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
 import { supabase } from '@/integrations/supabase/client';
 import { useApiHealth } from '@/hooks/useApiHealth';
+import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
 
 
 interface Event {
@@ -234,9 +235,15 @@ export function OrganizerDashboard() {
           </div>
         </div>
       </section>
-
+ 
+      {/* Role-aware access banner for this organization */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-6 sm:mt-8">
+        <OrgRoleAccessBanner />
+      </section>
+ 
       {/* Summary metrics */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-10 sm:mt-16">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-6">
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {isSummaryLoading ? (
             [...Array(3)].map((_, index) => (
