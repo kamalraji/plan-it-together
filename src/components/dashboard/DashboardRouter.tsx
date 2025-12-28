@@ -24,35 +24,68 @@ export const DashboardRouter: React.FC = () => {
   // changes (like new organizer approvals) are reflected in the client.
   useEffect(() => {
     if (!isAuthenticated) return;
-    void refreshUserRoles();
-  }, [isAuthenticated, refreshUserRoles]);
-
+    console.log('[DashboardRouter] Refreshing user roles on mount. Current user:', {
+      id: user?.id,
+      role: user?.role,
+      isAuthenticated,
+    });
+    void refreshUserRoles().then(() => {
+      console.log('[DashboardRouter] Finished refreshing user roles. Updated user:', {
+        id: user?.id,
+        role: user?.role,
+      });
+    });
+  }, [isAuthenticated, refreshUserRoles, user?.id, user?.role]);
+ 
   useEffect(() => {
     const checkOnboarding = async () => {
       if (!isAuthenticated || !user) {
+        console.log('[DashboardRouter] Skipping onboarding check: not authenticated or no user', {
+          isAuthenticated,
+          hasUser: !!user,
+        });
         setCheckingOnboarding(false);
         return;
       }
-
+ 
+      console.log('[DashboardRouter] Running onboarding check for user:', {
+        id: user.id,
+        role: user.role,
+      });
+ 
       if (user.role !== UserRole.ORGANIZER) {
+        console.log('[DashboardRouter] User is not an organizer, skipping organizer onboarding redirect.', {
+          id: user.id,
+          role: user.role,
+        });
         setCheckingOnboarding(false);
         return;
       }
-
+ 
       try {
         const { data, error } = await supabase
           .from('onboarding_checklist')
           .select('completed_at')
           .eq('user_id', user.id)
           .maybeSingle();
-
+ 
+        console.log('[DashboardRouter] Onboarding checklist query result:', {
+          userId: user.id,
+          data,
+          error,
+        });
+ 
         if (error) {
           console.warn('Failed to load organizer onboarding checklist status', error);
           setCheckingOnboarding(false);
           return;
         }
-
+ 
         const isCompleted = !!data?.completed_at;
+        console.log('[DashboardRouter] Computed onboarding status:', {
+          userId: user.id,
+          isCompleted,
+        });
         setShouldRedirectToOnboarding(!isCompleted);
       } catch (err) {
         console.warn('Unexpected error while checking organizer onboarding status', err);
@@ -60,7 +93,7 @@ export const DashboardRouter: React.FC = () => {
         setCheckingOnboarding(false);
       }
     };
-
+ 
     void checkOnboarding();
   }, [isAuthenticated, user?.id, user?.role]);
 
