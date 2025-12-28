@@ -32,3 +32,6 @@ verify_jwt = true
 
 [functions.judging-leaderboard]
 verify_jwt = false
+
+[functions.certificates]
+verify_jwt = false
