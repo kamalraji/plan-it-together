@@ -38,10 +38,16 @@ export const JoinOrganizationPage: React.FC = () => {
 
   const [requestingOrgId, setRequestingOrgId] = useState<string | null>(null);
   const requestJoin = useRequestJoinOrganization();
-
-  const handleRequestJoin = (organizationId: string) => {
-    setRequestingOrgId(organizationId);
-    requestJoin.mutate(organizationId, {
+ 
+  const handleRequestJoin = (organization: any) => {
+    setRequestingOrgId(organization.id);
+    requestJoin.mutate(organization.id, {
+      onSuccess: () => {
+        setRequestingOrgId(null);
+        navigate('/dashboard/organizations/join/success', {
+          state: { organizationName: organization.name },
+        });
+      },
       onSettled: () => setRequestingOrgId(null),
     });
   };
