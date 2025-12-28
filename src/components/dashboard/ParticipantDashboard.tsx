@@ -303,14 +303,14 @@ export function ParticipantDashboard() {
         <div className="bg-accent/80 text-accent-foreground border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
             <span>
-              You signed up as an organizer. To unlock organizer tools, first create your organization.
+              You signed up as an organizer. To unlock organizer tools, first join or create an organization.
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate('/onboarding/organization')}
+                onClick={() => navigate('/dashboard/organizations/join')}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
               >
-                Set up organization
+                Join or create organization
               </button>
               <button
                 onClick={() => setShowOrganizerBanner(false)}
