@@ -503,9 +503,19 @@ export const AppRouter: React.FC = () => {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Organizer onboarding */}
+            {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
             <Route
               path="/onboarding/organization"
+              element={
+                <ConsoleRoute requireEmailVerification={false}>
+                  <Navigate to="/dashboard/organizations/join" replace />
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Create organization page */}
+            <Route
+              path="/organizations/create"
               element={
                 <ConsoleRoute requireEmailVerification={false}>
                   <OrganizationRegistrationPage />
