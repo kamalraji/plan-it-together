@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileForm } from './ProfileForm';
@@ -63,6 +64,7 @@ const computeCompletion = (values: {
 };
 
 export const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, isLoading, error, updateProfile } = useUserProfile();
   const [saving, setSaving] = useState(false);
@@ -108,7 +110,15 @@ export const ProfilePage: React.FC = () => {
   };
 
   const handleSubmit = async (values: ProfileFormData) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: 'Not signed in',
+        description: 'Please log in again to update your profile.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -123,14 +133,36 @@ export const ProfilePage: React.FC = () => {
         github_url: values.socialLinks?.github || null,
       });
 
-      if (!updateError) {
-        await supabase.auth.updateUser({
-          data: {
-            name: values.name,
-            profileCompleted: true,
-          },
+      if (updateError) {
+        console.error('Failed to update profile', updateError);
+        toast({
+          title: 'Could not save profile',
+          description: 'Something went wrong while saving your details. Please try again.',
+          variant: 'destructive',
         });
+        return;
       }
+
+      await supabase.auth.updateUser({
+        data: {
+          name: values.name,
+          profileCompleted: true,
+        },
+      });
+
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile details were saved successfully.',
+      });
+
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Unexpected error updating profile', err);
+      toast({
+        title: 'Unexpected error',
+        description: 'We could not save your profile. Please try again in a moment.',
+        variant: 'destructive',
+      });
     } finally {
       setSaving(false);
     }

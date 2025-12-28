@@ -30,12 +30,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Full name *</label>
+          <label className="block text-sm font-medium text-foreground mb-1">Display name *</label>
           <input
             {...register('name')}
             type="text"
             className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/30"
-            placeholder="Enter your full name"
+            placeholder="Enter the name you want others to see"
           />
           {errors.name && (
             <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>
