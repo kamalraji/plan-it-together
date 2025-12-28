@@ -22,6 +22,7 @@ export const JoinOrganizationPage: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
@@ -40,12 +41,22 @@ export const JoinOrganizationPage: React.FC = () => {
   const requestJoin = useRequestJoinOrganization();
  
   const handleRequestJoin = (organization: any) => {
+    setJoinError(null);
     setRequestingOrgId(organization.id);
     requestJoin.mutate(organization.id, {
       onSuccess: () => {
         navigate('/dashboard/organizations/join/success', {
           state: { organizationName: organization.name },
         });
+      },
+      onError: (error: any) => {
+        const message =
+          (error as any)?.message ||
+          (error as any)?.data?.message ||
+          'Failed to send join request. Please try again.';
+        setJoinError(message);
+        // eslint-disable-next-line no-console
+        console.error('Join organization error', error);
       },
       onSettled: () => setRequestingOrgId(null),
     });
@@ -125,7 +136,7 @@ export const JoinOrganizationPage: React.FC = () => {
                             </p>
                           </div>
 
-                          <div className="ml-3 flex items-center gap-2">
+                          <div className="ml-3 flex flex-col items-end gap-1">
                             {isActive ? (
                               <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-500">
                                 Joined
@@ -135,14 +146,23 @@ export const JoinOrganizationPage: React.FC = () => {
                                 Pending approval
                               </span>
                             ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleRequestJoin(org)}
-                                disabled={requestingOrgId === org.id || requestJoin.isPending}
-                              >
-                                {requestingOrgId === org.id ? 'Requesting...' : 'Request to join'}
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleRequestJoin(org)}
+                                  disabled={requestingOrgId === org.id || requestJoin.isPending}
+                                >
+                                  {requestingOrgId === org.id
+                                    ? 'Requesting...'
+                                    : 'Request to join'}
+                                </Button>
+                                {joinError && (
+                                  <p className="max-w-xs text-right text-[11px] text-destructive">
+                                    {joinError}
+                                  </p>
+                                )}
+                              </>
                             )}
                           </div>
 
