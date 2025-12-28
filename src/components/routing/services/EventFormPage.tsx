@@ -145,6 +145,19 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
     setServerError(null);
 
+    // Guard: organization context is required before attempting to save
+    if (!organization?.id) {
+      const message =
+        'You need to be inside an organization workspace with permission to create events before saving.';
+      setServerError(message);
+      toast({
+        title: 'Missing organization context',
+        description: message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
@@ -157,7 +170,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         end_date: values.endDate,
         capacity:
           values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
-        organization_id: organization?.id ?? null,
+        organization_id: organization.id,
         visibility: 'PUBLIC',
         status,
       };
