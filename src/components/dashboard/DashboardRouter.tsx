@@ -19,7 +19,8 @@ export const DashboardRouter: React.FC = () => {
   const { user, isLoading, isAuthenticated, refreshUserRoles } = useAuth();
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false);
-
+  const [rolesRefreshed, setRolesRefreshed] = useState(false);
+ 
   // Refresh roles once when the dashboard mounts so any server-side
   // changes (like new organizer approvals) are reflected in the client.
   useEffect(() => {
@@ -34,8 +35,9 @@ export const DashboardRouter: React.FC = () => {
         id: user?.id,
         role: user?.role,
       });
+      setRolesRefreshed(true);
     });
-  }, [isAuthenticated, refreshUserRoles, user?.id, user?.role]);
+  }, [isAuthenticated, refreshUserRoles, user?.id]);
  
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -45,6 +47,14 @@ export const DashboardRouter: React.FC = () => {
           hasUser: !!user,
         });
         setCheckingOnboarding(false);
+        return;
+      }
+ 
+      if (!rolesRefreshed) {
+        console.log('[DashboardRouter] Waiting for roles to be refreshed before onboarding check', {
+          id: user.id,
+          role: user.role,
+        });
         return;
       }
  
@@ -95,7 +105,7 @@ export const DashboardRouter: React.FC = () => {
     };
  
     void checkOnboarding();
-  }, [isAuthenticated, user?.id, user?.role]);
+  }, [isAuthenticated, rolesRefreshed, user?.id, user?.role]);
 
   if (isLoading || checkingOnboarding) {
     return (
