@@ -302,38 +302,56 @@ export type Database = {
       organizations: {
         Row: {
           category: string
+          city: string | null
+          country: string | null
           created_at: string
           description: string | null
           email: string | null
+          gov_registration_id: string | null
           id: string
           name: string
           owner_id: string
           phone: string | null
           slug: string
+          state: string | null
+          verification_source: string | null
+          verification_status: string | null
           website: string | null
         }
         Insert: {
           category: string
+          city?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
+          gov_registration_id?: string | null
           id?: string
           name: string
           owner_id: string
           phone?: string | null
           slug: string
+          state?: string | null
+          verification_source?: string | null
+          verification_status?: string | null
           website?: string | null
         }
         Update: {
           category?: string
+          city?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
+          gov_registration_id?: string | null
           id?: string
           name?: string
           owner_id?: string
           phone?: string | null
           slug?: string
+          state?: string | null
+          verification_source?: string | null
+          verification_status?: string | null
           website?: string | null
         }
         Relationships: []
