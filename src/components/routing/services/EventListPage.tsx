@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { Event, EventStatus, EventMode } from '../../../types';
-import { useEventCreatePath } from '@/hooks/useEventCreatePath';
+import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import {
@@ -19,7 +19,7 @@ interface EventListPageProps {
 
 export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
   const navigate = useNavigate();
-  const createEventPath = useEventCreatePath();
+  const { createPath, eventDetailPath, eventEditPath } = useEventManagementPaths();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
@@ -117,7 +117,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
   const pageActions = [
     {
       label: filterBy === 'templates' ? 'Create Template' : 'Create Event',
-      action: () => navigate(createEventPath),
+      action: () => navigate(createPath),
       icon: PlusIcon,
       variant: 'primary' as const,
     },
@@ -239,14 +239,14 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
                             <Link
-                              to={`/console/events/${event.id}`}
+                              to={eventDetailPath(event.id)}
                               className="text-indigo-600 hover:text-indigo-500"
                               title="View Event"
                             >
                               <EyeIcon className="h-4 w-4" />
                             </Link>
                             <Link
-                              to={`/console/events/${event.id}/edit`}
+                              to={eventEditPath(event.id)}
                               className="text-gray-600 hover:text-gray-500"
                               title="Edit Event"
                             >
@@ -337,7 +337,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                   : 'Get started by creating your first event.'}
               </p>
               <Link
-                to={createEventPath}
+                to={createPath}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />

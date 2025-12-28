@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
-import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
+import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -18,6 +19,7 @@ const eventSchema = z
     name: z.string().trim().min(1, 'Event name is required'),
     description: z.string().trim().min(1, 'Description is required'),
     mode: z.enum(['ONLINE', 'OFFLINE', 'HYBRID'], { required_error: 'Mode is required' }),
+    organizationId: z.string().min(1, 'Organization is required'),
     capacity: z
       .string()
       .optional()
@@ -56,12 +58,15 @@ type EventFormValues = z.infer<typeof eventSchema>;
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const organization = useCurrentOrganization();
   const { toast } = useToast();
+  const { listPath } = useEventManagementPaths();
+  const { data: myOrganizations = [], isLoading: isLoadingOrganizations } =
+    useMyMemberOrganizations();
   const [submitIntent, setSubmitIntent] = useState<'draft' | 'publish'>('publish');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isRequestingAccess, setIsRequestingAccess] = useState(false);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -69,6 +74,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       name: '',
       description: '',
       mode: 'ONLINE',
+      organizationId: '',
       capacity: '',
       startDate: '',
       endDate: '',
@@ -111,6 +117,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           name: data.name ?? '',
           description: data.description ?? '',
           mode: data.mode ?? 'ONLINE',
+          organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
@@ -145,19 +152,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
     setServerError(null);
 
-    // Guard: organization context is required before attempting to save
-    if (!organization?.id) {
-      const message =
-        'You need to be inside an organization workspace with permission to create events before saving.';
-      setServerError(message);
-      toast({
-        title: 'Missing organization context',
-        description: message,
-        variant: 'destructive',
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
@@ -170,7 +164,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         end_date: values.endDate,
         capacity:
           values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
-        organization_id: organization.id,
+        organization_id: values.organizationId,
         visibility: 'PUBLIC',
         status,
       };
@@ -206,18 +200,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             : 'Your changes have been saved.',
       });
 
-      navigate('../list');
+      navigate(listPath);
     } catch (err: any) {
       console.error('Failed to save event', err);
       const rawMessage = err?.message || 'Please try again.';
 
-      // If we still hit an RLS error even with an organization selected, give
-      // a clearer hint that the user may not have sufficient permissions.
-      const isRlsError = rawMessage.toLowerCase().includes('row-level security');
-      const message =
-        isRlsError && organization?.id
-          ? 'You may not have organizer/admin permissions for this organization. Please contact an organizer or admin to create events.'
-          : rawMessage;
+      // Surface the exact Supabase error so we can properly debug issues
+      const message = rawMessage;
+
 
       setServerError(message);
       toast({
@@ -233,7 +223,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const pageActions = [
     {
       label: 'Cancel',
-      action: () => navigate('../list'),
+      action: () => navigate(listPath),
       icon: XMarkIcon,
       variant: 'secondary' as const,
     },
@@ -271,13 +261,73 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
               noValidate
             >
               {serverError && (
-                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-2">
-                  {serverError}
+                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-2 space-y-2">
+                  <p>{serverError}</p>
+                  {serverError.includes('organizer/admin permissions') && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (isRequestingAccess) return;
+                        setIsRequestingAccess(true);
+                        try {
+                          const { error } = await supabase.functions.invoke('self-approve-organizer');
+                          if (error) throw error;
+                          toast({
+                            title: 'Organizer access requested',
+                            description:
+                              'We have recorded your request to become an organizer. Try again after your access updates.',
+                          });
+                        } catch (err: any) {
+                          toast({
+                            title: 'Failed to request organizer access',
+                            description: err?.message || 'Please try again.',
+                            variant: 'destructive',
+                          });
+                        } finally {
+                          setIsRequestingAccess(false);
+                        }
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 rounded-md border border-red-300 text-xs font-medium text-red-700 bg-white hover:bg-red-50"
+                    >
+                      {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
+                    </button>
+                  )}
                 </div>
               )}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
                 <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label
+                      htmlFor="organization-id"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Organization *
+                    </label>
+                    <select
+                      id="organization-id"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
+                      {...register('organizationId')}
+                    >
+                      <option value="">
+                        {isLoadingOrganizations
+                          ? 'Loading organizations...'
+                          : myOrganizations.length === 0
+                            ? 'No organizations available'
+                            : 'Select an organization'}
+                      </option>
+                      {myOrganizations.map((org: any) => (
+                        <option key={org.id} value={org.id}>
+                          {org.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.organizationId && (
+                      <p className="mt-1 text-sm text-red-600">{errors.organizationId.message}</p>
+                    )}
+                  </div>
+
                   <div>
                     <label htmlFor="event-name" className="block text-sm font-medium text-gray-700 mb-2">
                       Event Name *
@@ -461,7 +511,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 <button
                   type="submit"
                   onClick={() => setSubmitIntent('draft')}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || myOrganizations.length === 0}
                   className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
                 >
                   Save as Draft
@@ -469,7 +519,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 <button
                   type="submit"
                   onClick={() => setSubmitIntent('publish')}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || myOrganizations.length === 0}
                   className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
                 >
                   {isSubmitting
