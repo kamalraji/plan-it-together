@@ -6,6 +6,7 @@ import { OrganizationDetailPage } from './OrganizationDetailPage';
 import { OrganizationMembersPage } from './OrganizationMembersPage';
 import { OrganizationSettingsPage } from './OrganizationSettingsPage';
 import { OrganizationAnalyticsPage } from './OrganizationAnalyticsPage';
+import { OrganizationMembershipReviewPage } from '@/components/organization/OrganizationMembershipReviewPage';
 
 
 /**
@@ -30,9 +31,10 @@ export const OrganizationService: React.FC = () => {
       {/* Organization Detail and Management */}
       <Route path=":organizationId" element={<OrganizationDetailPage />} />
       <Route path=":organizationId/members" element={<OrganizationMembersPage />} />
+      <Route path=":organizationId/memberships/review" element={<OrganizationMembershipReviewPage />} />
       <Route path=":organizationId/settings" element={<OrganizationSettingsPage />} />
       <Route path=":organizationId/analytics" element={<OrganizationAnalyticsPage />} />
-      
+
       {/* Multi-organization management */}
       <Route path="multi-org" element={<OrganizationListPage filterBy="managed" />} />
 
