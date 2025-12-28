@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AttendanceRecord } from '../../types';
+import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser';
 
 interface QRCodeScannerProps {
   eventId: string;
@@ -35,7 +36,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const [lastScanResult, setLastScanResult] = useState<ScanResult | null>(null);
   const [scanMode, setScanMode] = useState<'camera' | 'manual'>('camera');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const codeReaderRef = useRef<BrowserQRCodeReader | null>(null);
+  const controlsRef = useRef<IScannerControls | null>(null);
   const queryClient = useQueryClient();
 
   const checkInMutation = useMutation<any, Error, string>({
@@ -84,29 +86,57 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     },
   });
 
-  // Start camera for QR scanning
+  // Start camera and begin QR scanning
   const startCamera = async () => {
+    if (!videoRef.current) return;
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }, // Use back camera if available
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsScanning(true);
+      if (!codeReaderRef.current) {
+        codeReaderRef.current = new BrowserQRCodeReader();
       }
+
+      setIsScanning(true);
+
+      const controls = await codeReaderRef.current.decodeFromVideoDevice(
+        undefined,
+        videoRef.current,
+        async (result, _err) => {
+          if (result) {
+            const qrText = result.getText();
+
+            try {
+              await checkInMutation.mutateAsync(qrText.trim());
+            } catch (error: any) {
+              const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
+              setLastScanResult({
+                success: false,
+                error: errorMessage,
+              });
+            } finally {
+              // Stop scanning after a successful decode to avoid duplicates
+              if (controlsRef.current) {
+                controlsRef.current.stop();
+                controlsRef.current = null;
+              }
+              setIsScanning(false);
+            }
+          }
+        },
+      );
+
+      controlsRef.current = controls;
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      console.error('Error accessing camera or decoding QR:', error);
+      setIsScanning(false);
       setScanMode('manual');
     }
   };
 
-  // Stop camera
+  // Stop camera and QR scanning
   const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+    if (controlsRef.current) {
+      controlsRef.current.stop();
+      controlsRef.current = null;
     }
     setIsScanning(false);
   };
@@ -127,21 +157,6 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     }
   };
 
-  // Simulate QR code detection (in a real app, you'd use a QR code library like qr-scanner)
-  const handleCameraCapture = async () => {
-    const mockQRCode = prompt('Enter QR code (for demo purposes):');
-    if (!mockQRCode) return;
-
-    try {
-      await checkInMutation.mutateAsync(mockQRCode.trim());
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
-      setLastScanResult({
-        success: false,
-        error: errorMessage,
-      });
-    }
-  };
 
   useEffect(() => {
     if (scanMode === 'camera') {
@@ -304,11 +319,11 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             {/* Capture button */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
               <button
-                onClick={handleCameraCapture}
-                disabled={!isScanning}
+                onClick={startCamera}
+                disabled={isScanning}
                 className="bg-white text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50"
               >
-                Scan QR Code
+                {isScanning ? 'Scanning…' : 'Start Scanner'}
               </button>
             </div>
           </div>
