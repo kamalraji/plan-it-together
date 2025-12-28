@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { useCurrentOrganization } from './OrganizationContext';
-import { useOrganizationEvents } from '@/hooks/useOrganization';
+import { useOrganizationEvents, useOrganizationMemberships } from '@/hooks/useOrganization';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ export const OrganizerOnboardingChecklist: React.FC = () => {
   const navigate = useNavigate();
   const organization = useCurrentOrganization();
   const { data: events } = useOrganizationEvents(organization?.id);
+  const { data: activeMembers } = useOrganizationMemberships(organization?.id || '', 'ACTIVE');
   const { user } = useAuth();
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
 
@@ -48,7 +49,11 @@ export const OrganizerOnboardingChecklist: React.FC = () => {
       organization.description || organization.website || organization.email || organization.phone,
     );
 
-    const hasAnyEvent = (events?.length || 0) > 0;
+    const hasActiveEvent = (events ?? []).some(
+      (event: any) => event.status === 'PUBLISHED' || event.status === 'ONGOING',
+    );
+
+    const hasActiveTeamMember = (activeMembers?.length || 0) > 0;
 
     const items: ChecklistItem[] = [
       {
@@ -62,21 +67,21 @@ export const OrganizerOnboardingChecklist: React.FC = () => {
         id: 'first-event',
         label: 'Create your first event',
         description: 'Set up your first hackathon or meetup to start inviting participants.',
-        completed: hasAnyEvent,
+        completed: hasActiveEvent,
         action: { label: 'Create event', path: `/${organization.slug}/eventmanagement/create` },
       },
       {
         id: 'team',
         label: 'Invite team members',
         description: 'Add co-organizers and volunteers so you are not running events alone.',
-        completed: false,
+        completed: hasActiveTeamMember,
         action: { label: 'Manage team', path: `/${organization.slug}/team` },
       },
       {
         id: 'analytics',
         label: 'Review analytics setup',
         description: 'Monitor registrations, check-ins, and tasks for your live events.',
-        completed: hasAnyEvent,
+        completed: hasActiveEvent,
         action: { label: 'View analytics', path: `/${organization.slug}/analytics` },
       },
     ];
