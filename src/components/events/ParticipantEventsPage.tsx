@@ -47,12 +47,10 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
   };
 }
 
-type DateFilter = 'ALL' | 'UPCOMING' | 'PAST';
-
 export function ParticipantEventsPage() {
-  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>(EventStatus.PUBLISHED);
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
-  const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
+  const [showPastArchive, setShowPastArchive] = useState(false);
 
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ['participant-events'],
@@ -60,6 +58,7 @@ export function ParticipantEventsPage() {
       const { data, error } = await supabase
         .from('events')
         .select('id, name, description, mode, start_date, end_date, capacity, visibility, status')
+        .eq('visibility', 'PUBLIC')
         .order('start_date', { ascending: true });
 
       if (error) throw error;
@@ -95,16 +94,16 @@ export function ParticipantEventsPage() {
 
   const filteredEvents = (events || []).filter((event) => {
     const startTime = new Date(event.startDate).getTime();
+    const isPast = startTime < now;
 
-    const matchesDate =
-      dateFilter === 'ALL' ||
-      (dateFilter === 'UPCOMING' && startTime >= now) ||
-      (dateFilter === 'PAST' && startTime < now);
+    if (!showPastArchive && isPast) {
+      return false;
+    }
 
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
 
-    return matchesDate && matchesStatus && matchesMode;
+    return matchesStatus && matchesMode;
   });
 
   return (
@@ -129,16 +128,19 @@ export function ParticipantEventsPage() {
         <div className="bg-card rounded-lg shadow-sm border border-border p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="flex flex-wrap gap-3">
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Date</label>
-              <select
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value as DateFilter)}
-                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
-              >
-                <option value="ALL">All dates</option>
-                <option value="UPCOMING">Upcoming only</option>
-                <option value="PAST">Past only</option>
-              </select>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Archive</label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="show-archive"
+                  type="checkbox"
+                  checked={showPastArchive}
+                  onChange={(e) => setShowPastArchive(e.target.checked)}
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                />
+                <label htmlFor="show-archive" className="text-sm text-foreground">
+                  Include past events (archive)
+                </label>
+              </div>
             </div>
 
             <div>
