@@ -484,69 +484,70 @@ export function OrganizerDashboard() {
                </Link>
              </div>
 
-              {events && events.length > 0 ? (
-                <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                  {events.map((event) => (
-                    <div key={event.id} className="bg-card rounded-lg shadow p-4 sm:p-6 border border-border/60">
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">
-                        {event.name}
-                      </h3>
-                      <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
-                        {event.description}
-                      </p>
-                      <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
-                        <p>Start: {new Date(event.startDate).toLocaleDateString()}</p>
-                        <p>End: {new Date(event.endDate).toLocaleDateString()}</p>
-                        <p>
-                          Status: <span className="capitalize text-foreground">{event.status}</span>
-                        </p>
-                        <p>
-                          Registrations: <span className="text-foreground">{event.registrationCount}</span>
-                          {event.capacity && <span className="text-muted-foreground">{` / ${event.capacity}`}</span>}
-                        </p>
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <Link
-                          to={`/events/${event.id}`}
-                          className="text-primary hover:text-primary/80 text-sm font-medium"
-                        >
-                          View details
-                        </Link>
-                        <Link
-                          to={`/events/${event.id}/edit`}
-                          className="text-muted-foreground hover:text-foreground text-sm font-medium"
-                        >
-                          Edit
-                        </Link>
-                        <Link
-                          to={`/${organization.slug}/workspaces?eventId=${event.id}`}
-                          className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
-                        >
-                          Event workspace
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-card rounded-lg border border-border/60">
-                  <h3 className="text-lg font-medium text-foreground mb-2">No events yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Get started by creating your first event.
-                  </p>
-                  <Link
-                    to="/events/create"
-                    className="bg-primary text-primary-foreground px-4 py-2 rounded-full hover:bg-primary/90 transition-colors text-sm font-medium"
-                  >
-                    Create your first event
-                  </Link>
-                </div>
-              )}
-          </div>
-        )}
+             {events && events.length > 0 ? (
+               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+                 {events.map((event) => (
+                   <div key={event.id} className="bg-card rounded-lg shadow p-4 sm:p-6 border border-border/60">
+                     <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">
+                       {event.name}
+                     </h3>
+                     <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+                       {event.description}
+                     </p>
+                     <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
+                       <p>Start: {new Date(event.startDate).toLocaleDateString()}</p>
+                       <p>End: {new Date(event.endDate).toLocaleDateString()}</p>
+                       <p>
+                         Status: <span className="capitalize text-foreground">{event.status}</span>
+                       </p>
+                       <p>
+                         Registrations: <span className="text-foreground">{event.registrationCount}</span>
+                         {event.capacity && <span className="text-muted-foreground">{` / ${event.capacity}`}</span>}
+                       </p>
+                     </div>
+                     <div className="mt-4 flex flex-wrap gap-2">
+                       <Link
+                         to={`/events/${event.id}`}
+                         className="text-primary hover:text-primary/80 text-sm font-medium"
+                       >
+                         View details
+                       </Link>
+                       <Link
+                         to={`/events/${event.id}/edit`}
+                         className="text-muted-foreground hover:text-foreground text-sm font-medium"
+                       >
+                         Edit
+                       </Link>
+                       <Link
+                         to={`/${organization.slug}/workspaces?eventId=${event.id}`}
+                         className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+                       >
+                         Event workspace
+                       </Link>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             ) : (
+               <div className="text-center py-12 bg-card rounded-lg border border-border/60">
+                 <h3 className="text-lg font-medium text-foreground mb-2">No events yet</h3>
+                 <p className="text-muted-foreground mb-4">
+                   Get started by creating your first event.
+                 </p>
+                 <Link
+                   to={`/${organization.slug}/eventmanagement/create`}
+                   className="bg-primary text-primary-foreground px-4 py-2 rounded-full hover:bg-primary/90 transition-colors text-sm font-medium"
+                 >
+                   Create your first event
+                 </Link>
+               </div>
+             )}
+           </div>
+          )}
 
         {activeTab === 'analytics' && (
            <div>
+
              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Analytics Overview</h2>
              {analytics ? (
                <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
