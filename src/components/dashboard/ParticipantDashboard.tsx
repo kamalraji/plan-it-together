@@ -390,7 +390,7 @@ export function ParticipantDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 mb-16 sm:mb-24">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar navigation for participants (desktop/tablet) */}
-          <aside className="hidden lg:flex lg:w-60 flex-col gap-3 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 shadow-sm">
+          <aside className="hidden lg:flex lg:w-64 flex-col gap-4 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 shadow-sm">
             <div className="flex flex-col gap-1 mb-1">
               <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
                 Participant
@@ -438,6 +438,44 @@ export function ParticipantDashboard() {
                 <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">P</span>
               </button>
             </nav>
+
+            {/* Contextual quick actions */}
+            <div className="mt-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-3 flex flex-col gap-2">
+              <p className="text-[11px] font-semibold tracking-wide uppercase text-muted-foreground/80">
+                Quick actions
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('events');
+                  setPage(1);
+                  if (typeof window !== 'undefined') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="inline-flex items-center justify-between rounded-full px-3 py-2 text-xs font-medium text-foreground bg-muted/70 hover:bg-muted transition-colors"
+              >
+                <span>View upcoming events</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">Go</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={!certificates || certificates.length === 0}
+                onClick={() => {
+                  if (!certificates || certificates.length === 0) return;
+                  setActiveTab('certificates');
+                  if (typeof window !== 'undefined') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="inline-flex items-center justify-between rounded-full px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-primary/10 text-primary hover:bg-primary/15"
+              >
+                <span>{certificates && certificates.length > 0 ? 'Go to latest certificate' : 'No certificates yet'}</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">Cert</span>
+              </button>
+            </div>
           </aside>
 
           {/* Main content */}
