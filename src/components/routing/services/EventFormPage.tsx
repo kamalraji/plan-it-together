@@ -160,15 +160,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       };
 
       if (values.registrationDeadline) {
-        payload.registration_deadline = values.registrationDeadline;
+        // registration_deadline column does not exist in events table; keep only in UI for now
       }
 
-      if (values.primaryColor || values.logoUrl) {
-        payload.branding = {
-          primaryColor: values.primaryColor,
-          logoUrl: values.logoUrl || undefined,
-        };
-      }
+      // Only include fields that actually exist on the events table schema
+      // (no branding/registration_deadline columns in current DB schema)
 
       let error;
       if (mode === 'create') {
