@@ -17,7 +17,6 @@ import { RegisterForm } from '../auth/RegisterForm';
 import { AuthLayout } from '../auth/AuthLayout';
 import { DashboardDataLab } from '../enhanced/DashboardDataLab';
 import { DashboardRouter } from '../dashboard/DashboardRouter';
-import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
 import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
 import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
@@ -551,20 +550,6 @@ export const AppRouter: React.FC = () => {
                 </ConsoleRoute>
               }
             />
-
-            {/* Organizer root dashboard */}
-            <Route
-              path="/organizer/dashboard"
-              element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <GlobalErrorBoundary>
-                    <ConsoleLayout />
-                  </GlobalErrorBoundary>
-                </ConsoleRoute>
-              }
-            >
-              <Route index element={<OrganizerSpecificDashboard />} />
-            </Route>
 
             {/* Dashboard routes - all protected with enhanced authentication */}
             <Route

@@ -123,10 +123,6 @@ export const DashboardRouter: React.FC = () => {
     return <Navigate to="/dashboard/onboarding/organizer" replace />;
   }
 
-  if (user.role === UserRole.ORGANIZER) {
-    return <Navigate to="/organizer/dashboard" replace />;
-  }
-
   return <ParticipantDashboard />;
 };
 
