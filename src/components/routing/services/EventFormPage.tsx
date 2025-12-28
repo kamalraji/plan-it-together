@@ -61,6 +61,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [submitIntent, setSubmitIntent] = useState<'draft' | 'publish'>('publish');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -91,7 +92,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         setIsLoadingEvent(true);
         const { data, error } = await supabase
           .from('events')
-          .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id')
+          .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id, branding')
           .eq('id', eventId)
           .maybeSingle();
 
@@ -114,8 +115,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
           registrationDeadline: '',
-          primaryColor: '#2563eb',
-          logoUrl: '',
+          primaryColor: (data.branding as any)?.primaryColor ?? '#2563eb',
+          logoUrl: (data.branding as any)?.logoUrl ?? '',
         });
       } catch (err: any) {
         console.error('Failed to load event', err);
@@ -142,6 +143,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const onSubmit = async (values: EventFormValues) => {
     if (isSubmitting) return;
 
+    setServerError(null);
+
     try {
       setIsSubmitting(true);
       const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
@@ -159,12 +162,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         status,
       };
 
-      if (values.registrationDeadline) {
-        // registration_deadline column does not exist in events table; keep only in UI for now
+      if (values.primaryColor || values.logoUrl) {
+        payload.branding = {
+          primaryColor: values.primaryColor,
+          logoUrl: values.logoUrl || undefined,
+        };
       }
-
-      // Only include fields that actually exist on the events table schema
-      // (no branding/registration_deadline columns in current DB schema)
 
       let error;
       if (mode === 'create') {
@@ -193,9 +196,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       navigate('../list');
     } catch (err: any) {
       console.error('Failed to save event', err);
+      const message = err?.message || 'Please try again.';
+      setServerError(message);
       toast({
         title: 'Failed to save event',
-        description: err?.message || 'Please try again.',
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -243,6 +248,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
               className="space-y-6"
               noValidate
             >
+              {serverError && (
+                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-2">
+                  {serverError}
+                </div>
+              )}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
                 <div className="grid grid-cols-1 gap-6">
