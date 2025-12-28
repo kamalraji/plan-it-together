@@ -62,7 +62,10 @@ export const JoinOrganizationPage: React.FC = () => {
     };
   }, []);
 
+  const [requestingOrgId, setRequestingOrgId] = useState<string | null>(null);
+
   const handleRequestJoin = async (organizationId: string) => {
+    setRequestingOrgId(organizationId);
     try {
       await organizationService.requestJoinOrganization(organizationId);
       toast({
@@ -70,7 +73,7 @@ export const JoinOrganizationPage: React.FC = () => {
         description: 'Your request to join this organization is pending approval.',
       });
 
-      // Refresh memberships
+      // Refresh memberships so we can immediately show "Pending approval"
       const result = await organizationService.getMyOrganizationMemberships();
       setMemberships(result as any);
     } catch (e: any) {
@@ -79,6 +82,8 @@ export const JoinOrganizationPage: React.FC = () => {
         description: e?.message || 'Failed to send join request',
         variant: 'destructive',
       });
+    } finally {
+      setRequestingOrgId(null);
     }
   };
 
@@ -170,11 +175,13 @@ export const JoinOrganizationPage: React.FC = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleRequestJoin(org.id)}
+                                disabled={requestingOrgId === org.id}
                               >
-                                Request to join
+                                {requestingOrgId === org.id ? 'Requesting...' : 'Request to join'}
                               </Button>
                             )}
                           </div>
+
                         </div>
                       );
                     })}

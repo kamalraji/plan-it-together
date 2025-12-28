@@ -299,7 +299,29 @@ class OrganizationService {
     const { data: session } = await supabase.auth.getSession();
     const user = session?.session?.user;
 
-    if (!user) throw new Error('Not authenticated');
+    if (!user) throw new Error('You must be logged in to request to join an organization.');
+
+    // Check if a membership already exists for this org + user
+    const { data: existing, error: existingError } = await supabase
+      .from('organization_memberships')
+      .select('id, status')
+      .eq('organization_id', organizationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (existingError && existingError.code !== 'PGRST116') {
+      // PGRST116 = no rows found for maybeSingle; treat others as real errors
+      throw new Error(existingError.message);
+    }
+
+    if (existing) {
+      if (existing.status === 'PENDING') {
+        throw new Error('You already have a pending request for this organization.');
+      }
+      if (existing.status === 'ACTIVE') {
+        throw new Error('You are already a member of this organization.');
+      }
+    }
 
     const { data, error } = await supabase
       .from('organization_memberships')
