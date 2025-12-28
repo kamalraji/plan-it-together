@@ -600,7 +600,9 @@ export function OrganizerDashboard() {
          )}
 
         {activeTab === 'marketplace' && (
-          <MarketplaceOrganizerInterface />
+          <div className="w-full overflow-x-auto">
+            <MarketplaceOrganizerInterface />
+          </div>
         )}
 
         {activeTab === 'profile' && (
