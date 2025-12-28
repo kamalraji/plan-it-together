@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventStatus } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SupabaseEventRow {
   id: string;
@@ -48,6 +49,7 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
 }
 
 export function ParticipantEventsPage() {
+  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>(EventStatus.PUBLISHED);
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
   const [showPastArchive, setShowPastArchive] = useState(false);
@@ -66,6 +68,23 @@ export function ParticipantEventsPage() {
       const mapped = (data as SupabaseEventRow[]).map(mapRowToEvent).filter(Boolean) as Event[];
       return mapped;
     },
+  });
+
+  const { data: registeredEventIds } = useQuery<Set<string>>({
+    queryKey: ['user-registered-events', user?.id],
+    queryFn: async () => {
+      if (!user) return new Set<string>();
+
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('event_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      return new Set((data || []).map((r: any) => r.event_id));
+    },
+    enabled: !!user,
   });
 
   useEffect(() => {
@@ -195,14 +214,26 @@ export function ParticipantEventsPage() {
           {filteredEvents.map((event) => {
             const start = new Date(event.startDate);
             const end = new Date(event.endDate);
+            const isRegistered = registeredEventIds?.has(event.id) ?? false;
 
             return (
               <div
                 key={event.id}
-                className="bg-card rounded-lg border border-border p-5 flex flex-col justify-between hover:shadow-md transition-shadow"
+                className={`rounded-lg border p-5 flex flex-col justify-between hover:shadow-md transition-shadow ${
+                  isRegistered
+                    ? 'bg-primary/5 border-primary/30'
+                    : 'bg-card border-border'
+                }`}
               >
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground mb-1 line-clamp-1">{event.name}</h2>
+                  <div className="flex items-start justify-between mb-1 gap-2">
+                    <h2 className="text-lg font-semibold text-foreground line-clamp-1">{event.name}</h2>
+                    {isRegistered && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground whitespace-nowrap">
+                        Registered
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
 
                   <div className="space-y-2 text-sm mb-4">
@@ -235,7 +266,7 @@ export function ParticipantEventsPage() {
                       to={`/events/${event.id}#register`}
                       className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                    >
-                      Quick register
+                      {isRegistered ? 'View registration' : 'Quick register'}
                     </Link>
                     <Link
                       to={`/events/${event.id}`}
