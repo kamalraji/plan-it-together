@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 // Types for certificate management
 export interface CertificateType {
@@ -61,8 +61,11 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
   const { data: criteria, isLoading: criteriaLoading } = useQuery({
     queryKey: ['certificate-criteria', eventId],
     queryFn: async () => {
-      const response = await api.get(`/certificates/criteria/${eventId}`);
-      return response.data.data as CertificateCriteria[];
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'getCriteria', eventId },
+      });
+      if (error) throw error;
+      return (data?.data || []) as CertificateCriteria[];
     },
   });
 
@@ -70,19 +73,22 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
   const { data: certificates, isLoading: certificatesLoading } = useQuery({
     queryKey: ['event-certificates', eventId],
     queryFn: async () => {
-      const response = await api.get(`/certificates/event/${eventId}`);
-      return response.data.data as Certificate[];
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'listEventCertificates', eventId },
+      });
+      if (error) throw error;
+      return (data?.data || []) as Certificate[];
     },
   });
 
   // Store certificate criteria mutation
   const storeCriteriaMutation = useMutation({
     mutationFn: async (criteria: CertificateCriteria[]) => {
-      const response = await api.post('/certificates/criteria', {
-        eventId,
-        criteria,
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'saveCriteria', eventId, criteria },
       });
-      return response.data;
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['certificate-criteria', eventId] });
@@ -92,10 +98,11 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
   // Batch generate certificates mutation
   const batchGenerateMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post('/certificates/batch-generate', {
-        eventId,
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'batchGenerate', eventId },
       });
-      return response.data;
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-certificates', eventId] });
@@ -105,10 +112,11 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
   // Distribute certificates mutation
   const distributeMutation = useMutation({
     mutationFn: async (certificateIds: string[]) => {
-      const response = await api.post('/certificates/distribute', {
-        certificateIds,
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'distribute', certificateIds },
       });
-      return response.data.data as DistributionResult;
+      if (error) throw error;
+      return data as DistributionResult;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-certificates', eventId] });

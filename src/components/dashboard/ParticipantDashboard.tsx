@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 import { FollowedOrganizations } from '@/components/organization';
@@ -172,8 +171,11 @@ export function ParticipantDashboard() {
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
-      const response = await api.get('/certificates/my-certificates');
-      return response.data.certificates as Certificate[];
+      const { data, error } = await supabase.functions.invoke('certificates', {
+        body: { action: 'getMyCertificates' },
+      });
+      if (error) throw error;
+      return (data?.certificates || []) as Certificate[];
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
