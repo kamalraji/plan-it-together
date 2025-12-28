@@ -570,22 +570,31 @@ export function ParticipantDashboard() {
                     />
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="rowsPerPage" className="text-sm text-muted-foreground">
-                      Rows per page:
-                    </label>
-                    <select
-                      id="rowsPerPage"
-                      value={rowsPerPage}
-                      onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                      className="rounded-md border border-border/60 px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="rowsPerPage" className="text-sm text-muted-foreground">
+                        Rows per page:
+                      </label>
+                      <select
+                        id="rowsPerPage"
+                        value={rowsPerPage}
+                        onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                        className="rounded-md border border-border/60 px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        {[5, 10, 20].map((num) => (
+                          <option key={num} value={num}>
+                            {num}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <Link
+                      to="/events"
+                      className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs sm:text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
                     >
-                      {[5, 10, 20].map((num) => (
-                        <option key={num} value={num}>
-                          {num}
-                        </option>
-                      ))}
-                    </select>
+                      Browse public events
+                    </Link>
                   </div>
                 </div>
 
