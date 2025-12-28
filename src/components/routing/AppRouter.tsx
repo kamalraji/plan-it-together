@@ -23,6 +23,7 @@ import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
 import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
+import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { ProfilePage } from '../profile/ProfilePage';
@@ -503,6 +504,16 @@ export const AppRouter: React.FC = () => {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Organizer onboarding - appears for new organizers */}
+            <Route
+              path="/dashboard/onboarding/organizer"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <OrganizerOnboardingPage />
+                </ConsoleRoute>
+              }
+            />
 
             {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
             <Route
