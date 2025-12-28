@@ -146,18 +146,8 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       label: 'Your Role',
       sortable: true,
       filterable: true,
-      render: (value: string) => (
-        <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-            value === 'OWNER'
-              ? 'bg-purple-100 text-purple-800'
-              : value === 'ADMIN'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {value}
-        </span>
+      render: (_value: string, record: OrganizationListRow) => (
+        <MembershipBadge role={record.role} status={record.status} />
       ),
     },
     {
