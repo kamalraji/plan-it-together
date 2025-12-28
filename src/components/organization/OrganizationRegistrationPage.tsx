@@ -138,7 +138,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
       return;
     }
 
-    try {
+  try {
       const organization = await createOrganization.mutateAsync({
         name: formState.name.trim(),
         slug: formState.slug.trim(),
@@ -161,6 +161,10 @@ export const OrganizationRegistrationPage: React.FC = () => {
               'Your organization is ready, but we could not automatically grant organizer access. A Thittam1Hub admin may need to help.',
             variant: 'destructive',
           });
+        } else {
+          // If the edge function succeeded, we can trust that the role will be present
+          // and skip the polling-based check to avoid confusing error states.
+          setRoleStatus('granted');
         }
       } catch (err) {
         console.error('Unexpected error invoking self-approve-organizer', err);
