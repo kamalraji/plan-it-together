@@ -43,7 +43,6 @@ export const JoinOrganizationPage: React.FC = () => {
     setRequestingOrgId(organization.id);
     requestJoin.mutate(organization.id, {
       onSuccess: () => {
-        setRequestingOrgId(null);
         navigate('/dashboard/organizations/join/success', {
           state: { organizationName: organization.name },
         });
@@ -139,8 +138,8 @@ export const JoinOrganizationPage: React.FC = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleRequestJoin(org.id)}
-                                disabled={requestingOrgId === org.id}
+                                onClick={() => handleRequestJoin(org)}
+                                disabled={requestingOrgId === org.id || requestJoin.isPending}
                               >
                                 {requestingOrgId === org.id ? 'Requesting...' : 'Request to join'}
                               </Button>
