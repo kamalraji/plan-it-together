@@ -172,32 +172,38 @@ class OrganizationService {
   async searchOrganizations(params: SearchOrganizationsParams): Promise<Organization[]> {
     let query = supabase.from('organizations').select('*');
 
-    // Filter by verified status
+    // Optional: filter by verification status (column now exists)
     if (params.verifiedOnly) {
       query = query.eq('verification_status', 'VERIFIED');
     }
 
-    // Filter by category
+    // Optional: filter by category
     if (params.category) {
       query = query.eq('category', params.category);
     }
 
-    // Search by name (case-insensitive)
+    // Search by name or slug (case-insensitive)
     if (params.query) {
-      query = query.ilike('name', `%${params.query}%`);
+      query = query.or(
+        `name.ilike.%${params.query}%,slug.ilike.%${params.query}%`
+      );
     }
 
     // Pagination
-    const limit = params.limit || 20;
-    const offset = params.offset || 0;
+    const limit = params.limit ?? 20;
+    const offset = params.offset ?? 0;
     query = query.range(offset, offset + limit - 1);
 
-    // Order by follower count and name
-    query = query.order('follower_count', { ascending: false }).order('name');
+    // Simple, stable ordering
+    query = query.order('verification_status', { ascending: false }).order('name');
 
     const { data, error } = await query;
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error('Error searching organizations', error);
+      throw new Error(error.message);
+    }
+
     return data || [];
   }
 
