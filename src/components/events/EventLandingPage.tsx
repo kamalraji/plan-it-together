@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
-
+import { useToast } from '@/hooks/use-toast';
 interface EventLandingPageProps {
   eventId?: string;
 }
@@ -14,9 +14,10 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const eventId = propEventId || paramEventId;
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-
+  const [handledQuickRegistration, setHandledQuickRegistration] = useState(false);
   // Fetch event details directly from Lovable Cloud
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
@@ -78,6 +79,27 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
       }
     }
   }, [event, eventId, navigate]);
+
+  // Handle quick-registration deep link (#register)
+  useEffect(() => {
+    if (!event || handledQuickRegistration) return;
+
+    if (window.location.hash === '#register') {
+      const el = document.getElementById('event-registration');
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          toast({
+            title: 'Ready to register',
+            description: isAuthenticated
+              ? 'You are at the registration section. Click "Register Now" to confirm your spot.'
+              : 'You are at the registration section. Sign in or sign up to complete your registration.',
+          });
+        }, 100);
+        setHandledQuickRegistration(true);
+      }
+    }
+  }, [event, handledQuickRegistration, toast, isAuthenticated]);
 
   // Registration mutation - store registrations in Lovable Cloud
   const registrationMutation = useMutation({
@@ -411,7 +433,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Registration Card */}
-              <div className="bg-white rounded-lg shadow p-6">
+              <div id="event-registration" className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Registration</h3>
                 {isAuthenticated ? (
                   <button
