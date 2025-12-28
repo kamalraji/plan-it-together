@@ -13,7 +13,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.attendance-qr]
-verify_jwt = true
+verify_jwt = false
 
 [functions.attendance-checkin]
 verify_jwt = true
