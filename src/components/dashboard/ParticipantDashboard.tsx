@@ -7,6 +7,7 @@ import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 import { CertificateQr } from '@/components/certificates/CertificateQr';
+import { ParticipantProfileEditor } from '@/components/dashboard/ParticipantProfileEditor';
 
 interface Registration {
   id: string;
@@ -223,8 +224,21 @@ export function ParticipantDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'past' | 'attended'>('all');
+
+  const now = new Date();
 
   const filteredRegistrations = (registrations ?? []).filter((registration) => {
+    const eventStart = new Date(registration.event.startDate);
+    const eventEnd = new Date(registration.event.endDate);
+    const isUpcoming = eventStart >= now;
+    const isPast = eventEnd < now;
+    const isAttended = !!registration.attendance;
+
+    if (statusFilter === 'upcoming' && !isUpcoming) return false;
+    if (statusFilter === 'past' && !isPast) return false;
+    if (statusFilter === 'attended' && !isAttended) return false;
+
     if (!searchTerm.trim()) return true;
     const query = searchTerm.toLowerCase();
     return (
@@ -517,14 +531,45 @@ export function ParticipantDashboard() {
             {/* Events Tab */}
             {activeTab === 'events' && (
               <section className="mt-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Search events..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64 rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
+                <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                    <div className="inline-flex flex-wrap gap-1 rounded-full border border-border/60 bg-card/80 px-2 py-1">
+                      {[
+                        { key: 'all', label: 'All' },
+                        { key: 'upcoming', label: 'Upcoming' },
+                        { key: 'past', label: 'Past' },
+                        { key: 'attended', label: 'Attended' },
+                      ].map((chip) => (
+                        <button
+                          key={chip.key}
+                          type="button"
+                          onClick={() => {
+                            setStatusFilter(chip.key as typeof statusFilter);
+                            setPage(1);
+                          }}
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
+                            statusFilter === chip.key
+                              ? 'bg-primary text-primary-foreground shadow-xs'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Search events..."
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setPage(1);
+                      }}
+                      className="w-full sm:w-64 rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <label htmlFor="rowsPerPage" className="text-sm text-muted-foreground">
                       Rows per page:
@@ -662,11 +707,9 @@ export function ParticipantDashboard() {
               </section>
             )}
 
-            {/* Profile Tab */}
-            {activeTab === 'profile' && (
+            {activeTab === 'profile' && user && (
               <section className="mt-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4">Profile</h2>
-                <p className="text-muted-foreground">Profile management coming soon.</p>
+                <ParticipantProfileEditor userId={user.id} userEmail={user.email ?? undefined} />
               </section>
             )}
           </section>
