@@ -276,11 +276,27 @@ export function useRequestJoinOrganization() {
   return useMutation({
     mutationFn: (organizationId: string) =>
       organizationService.requestJoinOrganization(organizationId),
-    onSuccess: (_data, organizationId) => {
+    onSuccess: (data, organizationId) => {
       toast({
         title: 'Request sent',
         description: 'Your request to join this organization is pending approval.',
       });
+
+      // Optimistically merge the new membership into the cached list so
+      // components like JoinOrganizationPage immediately show "Pending"/
+      // "Joined" instead of reverting back to the "Request to join" button.
+      queryClient.setQueryData<any[]>(orgKeys.myMemberships, (old) => {
+        const previous = old || [];
+        if (!data || !organizationId) return previous;
+
+        const exists = previous.some(
+          (m) => m.organization_id === organizationId && m.user_id === data.user_id,
+        );
+        if (exists) return previous;
+
+        return [...previous, data];
+      });
+
       queryClient.invalidateQueries({ queryKey: orgKeys.myMemberships });
       if (organizationId) {
         queryClient.invalidateQueries({ queryKey: orgKeys.memberships(organizationId) });
