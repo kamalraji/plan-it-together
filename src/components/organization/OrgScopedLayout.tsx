@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect } from 'react';
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
@@ -40,6 +40,7 @@ const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> =
 
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
+  const navigate = useNavigate();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { data: memberOrganizations, isLoading: orgsLoading } = useMyMemberOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
@@ -49,6 +50,42 @@ export const OrgScopedLayout: React.FC = () => {
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
+
+  // Keyboard shortcuts for power users inside the org console
+  useEffect(() => {
+    if (!orgSlug) return;
+
+    const base = `/${orgSlug}`;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isModifier = event.metaKey || event.ctrlKey;
+      if (!isModifier || event.altKey) return;
+
+      switch (event.key) {
+        case '1':
+          event.preventDefault();
+          navigate(`${base}/dashboard`);
+          break;
+        case '2':
+          event.preventDefault();
+          navigate(`${base}/eventmanagement`);
+          break;
+        case '3':
+          event.preventDefault();
+          navigate(`${base}/analytics`);
+          break;
+        case '4':
+          event.preventDefault();
+          navigate(`${base}/team`);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate, orgSlug]);
 
   if (isLoadingAny) {
     return (
@@ -79,13 +116,13 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-          <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-hidden">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
-            <div className="relative flex w-full pt-16 items-stretch">
-              <OrganizationSidebar />
+        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
+          <div className="relative flex w-full pt-16 md:pt-20 items-stretch">
+            <OrganizationSidebar />
 
             <SidebarInset>
-              <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
+              <div className="mx-2 my-4 md:mx-4 md:my-6 w-full rounded-none md:rounded-3xl border border-border/60 bg-card/80 px-3 py-4 md:px-4 md:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
                 <Routes>
                   <Route path="dashboard" element={<OrganizerDashboard />} />
                   <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
@@ -101,7 +138,6 @@ export const OrgScopedLayout: React.FC = () => {
             </SidebarInset>
           </div>
         </div>
-
       </SidebarProvider>
     </OrganizationProvider>
   );
