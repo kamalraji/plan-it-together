@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
-import { OrganizerOnboardingChecklist } from '@/components/organization/OrganizerOnboardingChecklist';
 
 export function OrganizerSpecificDashboard() {
   const { user, logout } = useAuth();
@@ -57,9 +56,10 @@ export function OrganizerSpecificDashboard() {
       </section>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 pt-10 sm:pt-14">
-        {/* Onboarding checklist keeps existing behavior for organizers */}
-        <div className="mb-6">
-          <OrganizerOnboardingChecklist />
+        {/* Organizer overview note (org-agnostic) */}
+        <div className="mb-6 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-4 sm:p-5 text-xs sm:text-sm text-muted-foreground">
+          From here you can access all of your organizations. Detailed onboarding steps and role-aware
+          access details are shown inside each organization&apos;s own dashboard.
         </div>
 
         {/* Organizations section */}
