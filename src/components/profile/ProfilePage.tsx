@@ -95,7 +95,7 @@ export const ProfilePage: React.FC = () => {
   }, [profile]);
 
   const initialValues: ProfileFormData = {
-    name: profile?.full_name ?? user?.name ?? '',
+    name: profile?.full_name ?? '',
     bio: profile?.bio ?? '',
     organization: profile?.organization ?? '',
     phone: profile?.phone ?? '',
