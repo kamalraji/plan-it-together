@@ -209,7 +209,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       navigate('../list');
     } catch (err: any) {
       console.error('Failed to save event', err);
-      const message = err?.message || 'Please try again.';
+      const rawMessage = err?.message || 'Please try again.';
+
+      // If we still hit an RLS error even with an organization selected, give
+      // a clearer hint that the user may not have sufficient permissions.
+      const isRlsError = rawMessage.toLowerCase().includes('row-level security');
+      const message =
+        isRlsError && organization?.id
+          ? 'You may not have organizer/admin permissions for this organization. Please contact an organizer or admin to create events.'
+          : rawMessage;
+
       setServerError(message);
       toast({
         title: 'Failed to save event',
