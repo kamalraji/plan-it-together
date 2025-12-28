@@ -292,9 +292,6 @@ class OrganizationService {
     return !error && !!data;
   }
 
-  /**
-   * Request to join an organization as ORGANIZER (PENDING)
-   */
   async requestJoinOrganization(organizationId: string): Promise<any> {
     const { data: session } = await supabase.auth.getSession();
     const user = session?.session?.user;
@@ -310,8 +307,12 @@ class OrganizationService {
       .maybeSingle();
 
     if (existingError && existingError.code !== 'PGRST116') {
-      // PGRST116 = no rows found for maybeSingle; treat others as real errors
-      throw new Error(existingError.message);
+      console.error('Error checking existing membership', {
+        organizationId,
+        userId: user.id,
+        error: existingError,
+      });
+      throw new Error(existingError.message || 'Failed to check existing membership');
     }
 
     if (existing) {
@@ -334,7 +335,18 @@ class OrganizationService {
       .select('*')
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error('Error creating membership request', {
+        organizationId,
+        userId: user.id,
+        error,
+      });
+      const message =
+        error.message?.includes('violates row-level security policy')
+          ? 'You do not have permission to request to join this organization.'
+          : error.message;
+      throw new Error(message || 'Failed to send join request');
+    }
     return data;
   }
 

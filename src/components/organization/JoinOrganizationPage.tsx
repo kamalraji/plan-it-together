@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearchOrganizations } from '@/hooks/useOrganization';
-import { organizationService } from '@/services/organizationService';
-import { useToast } from '@/hooks/use-toast';
+import { useSearchOrganizations, useMyOrganizationMemberships, useRequestJoinOrganization } from '@/hooks/useOrganization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,7 +19,6 @@ export interface JoinOrganizationMembership {
 
 export const JoinOrganizationPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -37,60 +34,22 @@ export const JoinOrganizationPage: React.FC = () => {
     offset: 0,
   });
 
-  const [memberships, setMemberships] = useState<JoinOrganizationMembership[] | null>(null);
-  const [loadingMemberships, setLoadingMemberships] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadMemberships = async () => {
-      setLoadingMemberships(true);
-      try {
-        const result = await organizationService.getMyOrganizationMemberships();
-        if (isMounted) setMemberships(result as any);
-      } catch (e: any) {
-        console.error('Failed to load memberships', e);
-      } finally {
-        if (isMounted) setLoadingMemberships(false);
-      }
-    };
-
-    loadMemberships();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: memberships, isLoading: loadingMemberships } = useMyOrganizationMemberships();
 
   const [requestingOrgId, setRequestingOrgId] = useState<string | null>(null);
+  const requestJoin = useRequestJoinOrganization();
 
-  const handleRequestJoin = async (organizationId: string) => {
+  const handleRequestJoin = (organizationId: string) => {
     setRequestingOrgId(organizationId);
-    try {
-      await organizationService.requestJoinOrganization(organizationId);
-      toast({
-        title: 'Request sent',
-        description: 'Your request to join this organization is pending approval.',
-      });
-
-      // Refresh memberships so we can immediately show "Pending approval"
-      const result = await organizationService.getMyOrganizationMemberships();
-      setMemberships(result as any);
-    } catch (e: any) {
-      toast({
-        title: 'Error',
-        description: e?.message || 'Failed to send join request',
-        variant: 'destructive',
-      });
-    } finally {
-      setRequestingOrgId(null);
-    }
+    requestJoin.mutate(organizationId, {
+      onSettled: () => setRequestingOrgId(null),
+    });
   };
 
   const getMembershipForOrg = useMemo(
     () =>
       (orgId: string) =>
-        memberships?.find((m) => m.organization_id === orgId) ?? null,
+        memberships?.find((m: any) => m.organization_id === orgId) ?? null,
     [memberships],
   );
 
