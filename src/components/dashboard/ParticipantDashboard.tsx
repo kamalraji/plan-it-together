@@ -388,191 +388,251 @@ export function ParticipantDashboard() {
       )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 mb-16 sm:mb-24">
-        {/* Tabs */}
-        <div className="flex gap-4 border-b border-border/60">
-          <button
-            onClick={() => setActiveTab('events')}
-            className={`py-2 px-4 text-sm font-semibold ${
-              activeTab === 'events' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            Events
-          </button>
-          <button
-            onClick={() => setActiveTab('certificates')}
-            className={`py-2 px-4 text-sm font-semibold ${
-              activeTab === 'certificates' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            Certificates
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`py-2 px-4 text-sm font-semibold ${
-              activeTab === 'profile' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            Profile
-          </button>
-        </div>
-
-        {/* Events Tab */}
-        {activeTab === 'events' && (
-          <section className="mt-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64 rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <div className="flex items-center gap-2">
-                <label htmlFor="rowsPerPage" className="text-sm text-muted-foreground">
-                  Rows per page:
-                </label>
-                <select
-                  id="rowsPerPage"
-                  value={rowsPerPage}
-                  onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                  className="rounded-md border border-border/60 px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {[5, 10, 20].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Sidebar navigation for participants (desktop/tablet) */}
+          <aside className="hidden lg:flex lg:w-60 flex-col gap-3 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 shadow-sm">
+            <div className="flex flex-col gap-1 mb-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
+                Participant
+              </span>
+              <p className="text-sm font-semibold text-foreground">Your workspace</p>
             </div>
 
-            {paginatedRegistrations.length > 0 ? (
-              <div className="space-y-4">
-                {paginatedRegistrations.map((registration) => (
-                  <div
-                    key={registration.id}
-                    className="rounded-2xl border border-border/60 bg-background/70 backdrop-blur-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-                  >
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">{registration.event.name}</h3>
-                      <p className="text-sm text-muted-foreground">{registration.event.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(registration.event.startDate).toLocaleDateString()} -{' '}
-                        {new Date(registration.event.endDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => setQrRegistration(registration)}
-                        className="rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90 transition-colors text-sm"
-                      >
-                        Show QR Pass
-                      </button>
-                      <Link
-                        to={`/events/${registration.event.id}`}
-                        className="text-primary text-sm font-medium hover:underline"
-                      >
-                        View Event
-                      </Link>
-                    </div>
+            <nav className="flex flex-col gap-1 mt-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('events')}
+                className={`flex items-center justify-between rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'events'
+                    ? 'bg-primary/10 text-primary shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
+                }`}
+              >
+                <span>My events</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">E</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('certificates')}
+                className={`flex items-center justify-between rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'certificates'
+                    ? 'bg-primary/10 text-primary shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
+                }`}
+              >
+                <span>Certificates</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">C</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center justify-between rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'profile'
+                    ? 'bg-primary/10 text-primary shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
+                }`}
+              >
+                <span>Profile</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80">P</span>
+              </button>
+            </nav>
+          </aside>
+
+          {/* Main content */}
+          <section className="flex-1">
+            {/* Compact tab row for smaller screens */}
+            <div className="flex gap-4 border-b border-border/60 lg:hidden">
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`py-2 px-4 text-sm font-semibold transition-colors ${
+                  activeTab === 'events'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Events
+              </button>
+              <button
+                onClick={() => setActiveTab('certificates')}
+                className={`py-2 px-4 text-sm font-semibold transition-colors ${
+                  activeTab === 'certificates'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Certificates
+              </button>
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`py-2 px-4 text-sm font-semibold transition-colors ${
+                  activeTab === 'profile'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Profile
+              </button>
+            </div>
+
+            {/* Events Tab */}
+            {activeTab === 'events' && (
+              <section className="mt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Search events..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full sm:w-64 rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="rowsPerPage" className="text-sm text-muted-foreground">
+                      Rows per page:
+                    </label>
+                    <select
+                      id="rowsPerPage"
+                      value={rowsPerPage}
+                      onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                      className="rounded-md border border-border/60 px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      {[5, 10, 20].map((num) => (
+                        <option key={num} value={num}>
+                          {num}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-muted-foreground mt-10">No events found.</p>
+                </div>
+
+                {paginatedRegistrations.length > 0 ? (
+                  <div className="space-y-4">
+                    {paginatedRegistrations.map((registration) => (
+                      <div
+                        key={registration.id}
+                        className="rounded-2xl border border-border/60 bg-background/70 backdrop-blur-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                      >
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">{registration.event.name}</h3>
+                          <p className="text-sm text-muted-foreground">{registration.event.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(registration.event.startDate).toLocaleDateString()} -{' '}
+                            {new Date(registration.event.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => setQrRegistration(registration)}
+                            className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
+                          >
+                            Show QR Pass
+                          </button>
+                          <Link
+                            to={`/events/${registration.event.id}`}
+                            className="text-primary text-sm font-medium hover:underline"
+                          >
+                            View Event
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground mt-10">No events found.</p>
+                )}
+
+                {/* Pagination */}
+                <div className="flex justify-center items-center gap-4 mt-6">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-md border border-border/60 px-3 py-1 text-sm text-foreground disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="rounded-md border border-border/60 px-3 py-1 text-sm text-foreground disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </section>
             )}
 
-            {/* Pagination */}
-            <div className="flex justify-center items-center gap-4 mt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="rounded-md border border-border/60 px-3 py-1 text-sm text-foreground disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="text-sm text-muted-foreground">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="rounded-md border border-border/60 px-3 py-1 text-sm text-foreground disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* Certificates Tab */}
-        {activeTab === 'certificates' && (
-          <section className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground">My Certificates</h2>
-                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                  Certificates from completed events will appear here once issued by organizers.
-                </p>
-              </div>
-              <Link
-                to="/verify-certificate"
-                className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
-              >
-                Public certificate verification
-              </Link>
-            </div>
-
-            {certificates && certificates.length > 0 ? (
-              <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {certificates.map((certificate) => (
-                  <div
-                    key={certificate.id}
-                    className="bg-background rounded-xl border border-border/60 p-4 flex flex-col justify-between shadow-xs"
-                  >
-                    <div className="space-y-3">
-                      <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
-                          {certificate.event.name}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Certificate ID</p>
-                        <p className="text-[11px] sm:text-xs font-mono text-foreground break-all">
-                          {certificate.code}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <CertificateQr certificateId={certificate.code} size={112} />
-                      </div>
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-3">
-                      Issued on {new Date(certificate.issuedAt).toLocaleDateString()}
+            {/* Certificates Tab */}
+            {activeTab === 'certificates' && (
+              <section className="mt-6 bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-semibold text-foreground">My Certificates</h2>
+                    <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                      Certificates from completed events will appear here once issued by organizers.
                     </p>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 sm:py-12 rounded-2xl border border-dashed border-border/70 bg-background">
-                <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
-                  No certificates yet
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3 sm:mb-4">
-                  Certificates from completed events will appear here.
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  If you think you're missing a certificate, please contact the event organizer.
-                </p>
-              </div>
+                  <Link
+                    to="/verify-certificate"
+                    className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
+                  >
+                    Public certificate verification
+                  </Link>
+                </div>
+
+                {certificates && certificates.length > 0 ? (
+                  <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {certificates.map((certificate) => (
+                      <div
+                        key={certificate.id}
+                        className="bg-background rounded-xl border border-border/60 p-4 flex flex-col justify-between shadow-xs"
+                      >
+                        <div className="space-y-3">
+                          <div>
+                            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
+                              {certificate.event.name}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2">Certificate ID</p>
+                            <p className="text-[11px] sm:text-xs font-mono text-foreground break-all">
+                              {certificate.code}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <CertificateQr certificateId={certificate.code} size={112} />
+                          </div>
+                        </div>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mt-3">
+                          Issued on {new Date(certificate.issuedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 sm:py-12 rounded-2xl border border-dashed border-border/70 bg-background">
+                    <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">No certificates yet</h3>
+                    <p className="text-sm text-muted-foreground mb-3 sm:mb-4">
+                      Certificates from completed events will appear here.
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      If you think you're missing a certificate, please contact the event organizer.
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Profile Tab */}
+            {activeTab === 'profile' && (
+              <section className="mt-6">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Profile</h2>
+                <p className="text-muted-foreground">Profile management coming soon.</p>
+              </section>
             )}
           </section>
-        )}
-
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <section className="mt-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Profile</h2>
-            <p className="text-muted-foreground">Profile management coming soon.</p>
-          </section>
-        )}
+        </div>
       </main>
     </div>
   );
