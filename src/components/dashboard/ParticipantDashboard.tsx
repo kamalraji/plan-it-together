@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
-import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
@@ -221,13 +220,6 @@ export function ParticipantDashboard() {
     }
   }, [user, navigate, isProfileIncomplete]);
 
-  const upcomingRegistrations =
-    registrations?.filter((registration) => {
-      const start = new Date(registration.event.startDate).getTime();
-      const now = Date.now();
-      return start >= now;
-    }) ?? [];
-
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -262,17 +254,6 @@ export function ParticipantDashboard() {
     canShowQrPass && user
       ? mapToCoreRegistration(qrRegistration as Registration, user.id)
       : null;
-
-  const generateQRCode = (qrCode: string) => {
-    return `data:image/svg+xml;base64,${btoa(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-        <rect width="200" height="200" fill="white"/>
-        <text x="100" y="100" text-anchor="middle" font-family="monospace" font-size="12" fill="black">
-          QR: ${qrCode.substring(0, 10)}...
-        </text>
-      </svg>
-    `)}`;
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -385,7 +366,7 @@ export function ParticipantDashboard() {
       )}
 
       {/* QR Pass Modal */}
-      {canShowQrPass && qrCoreRegistration && (
+      {canShowQrPass && qrCoreRegistration && qrRegistration && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setQrRegistration(null)}
@@ -395,7 +376,7 @@ export function ParticipantDashboard() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-semibold mb-4 text-foreground">Your QR Pass</h2>
-            <QRCodeDisplay qrCode={qrCoreRegistration.qrCode} size={200} />
+            <QRCodeDisplay registration={qrCoreRegistration} eventName={qrRegistration.event.name} />
             <button
               onClick={() => setQrRegistration(null)}
               className="mt-6 w-full rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90 transition-colors"
