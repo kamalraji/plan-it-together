@@ -666,6 +666,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_org_admin_for_org: {
+        Args: { _organization_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
