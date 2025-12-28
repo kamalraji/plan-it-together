@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Info } from 'lucide-react';
+import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 
 interface OnboardingChecklistRow {
   id: string;
@@ -18,6 +19,11 @@ export const OrganizerOnboardingPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { data: memberOrganizations, isLoading: loadingMemberOrgs } = useMyMemberOrganizations();
+
+  const primaryOrganization = memberOrganizations && memberOrganizations.length > 0
+    ? memberOrganizations[0]
+    : null;
 
   const { data: checklist, isLoading } = useQuery<OnboardingChecklistRow | null>({
     queryKey: ['organizer-onboarding-checklist', user?.id],
@@ -142,9 +148,16 @@ export const OrganizerOnboardingPage: React.FC = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate('/dashboard/organizations')}
+                      disabled={loadingMemberOrgs}
+                      onClick={() => {
+                        if (primaryOrganization) {
+                          navigate(`/${primaryOrganization.slug}/settings/dashboard`);
+                        } else {
+                          navigate('/dashboard/organizations/join');
+                        }
+                      }}
                     >
-                      Open organization dashboard
+                      {primaryOrganization ? 'Manage organization settings' : 'Join or create organization'}
                     </Button>
                     <a
                       href="https://thittam1hub.com/help/organizer-organization-setup"
