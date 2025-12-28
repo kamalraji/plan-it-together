@@ -105,7 +105,7 @@ export const DashboardRouter: React.FC = () => {
     };
  
     void checkOnboarding();
-  }, [isAuthenticated, rolesRefreshed, user?.id, user?.role]);
+  }, [isAuthenticated, rolesRefreshed, user?.id]);
 
   if (isLoading || checkingOnboarding) {
     return (
