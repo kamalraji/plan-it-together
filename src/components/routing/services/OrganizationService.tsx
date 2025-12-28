@@ -6,7 +6,7 @@ import { OrganizationDetailPage } from './OrganizationDetailPage';
 import { OrganizationMembersPage } from './OrganizationMembersPage';
 import { OrganizationSettingsPage } from './OrganizationSettingsPage';
 import { OrganizationAnalyticsPage } from './OrganizationAnalyticsPage';
-import { JoinOrganizationPage } from '@/components/organization/JoinOrganizationPage';
+
 
 /**
  * OrganizationService component provides the main routing structure for the Organization Management Service.
@@ -36,9 +36,6 @@ export const OrganizationService: React.FC = () => {
       {/* Multi-organization management */}
       <Route path="multi-org" element={<OrganizationListPage filterBy="managed" />} />
 
-      {/* Join organization discovery */}
-      <Route path="join" element={<JoinOrganizationPage />} />
-      
       {/* Redirect unknown routes to dashboard */}
       <Route path="*" element={<Navigate to="/dashboard/organizations" replace />} />
     </Routes>

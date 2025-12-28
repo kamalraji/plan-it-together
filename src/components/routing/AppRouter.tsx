@@ -22,6 +22,7 @@ import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
+import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { ProfilePage } from '../profile/ProfilePage';
@@ -568,8 +569,14 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-
-              {/* Service routes with role-based access control */}
+              <Route
+                path="organizations/join"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <JoinOrganizationPage />
+                  </ConsoleRoute>
+                }
+              />
               <Route 
                 path="eventmanagement/*" 
                 element={
