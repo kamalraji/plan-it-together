@@ -3,13 +3,46 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const Index = () => {
-  useEffect(() => {
-    const title = "Thittam1Hub – Unified event, workspace & certificate hub";
-    const description =
-      "Plan, run, and verify events in one place – registrations, QR check-ins, workspaces, certificates, and vendors.";
+const sections = [
+  {
+    id: "overview",
+    title: "Overview",
+    description:
+      "Thittam1Hub is a unified event management and publishing platform for organizers, participants, and organizations.",
+  },
+  {
+    id: "architecture",
+    title: "Architecture",
+    description:
+      "Three-tier architecture with React frontend, Node.js/Express backend, PostgreSQL database, and external services.",
+  },
+  {
+    id: "core-services",
+    title: "Core Domain Services",
+    description:
+      "Authentication, events, registration, attendance, judging, certificates, organizations, and marketplace.",
+  },
+  {
+    id: "roles",
+    title: "User Roles",
+    description:
+      "Super-Admins, Organizers, Participants, Volunteers, Judges, Speakers, Organization Admins, and Vendors.",
+  },
+  {
+    id: "requirements",
+    title: "Key Functional Requirements",
+    description:
+      "High-level view of major capabilities derived from the requirements specification.",
+  },
+];
 
-    document.title = title;
+const Index = () => {
+
+  useEffect(() => {
+    document.title = "Thittam1Hub Documentation";
+
+    const description =
+      "Functional and architectural documentation for Thittam1Hub unified event management and publishing platform.";
 
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
@@ -25,250 +58,351 @@ const Index = () => {
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute("href", window.location.origin + "/");
+    canonical.setAttribute("href", window.location.href);
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
       <header className="border-b border-border/60 bg-background/60 backdrop-blur">
-        <div className="container flex flex-col gap-10 py-10 md:flex-row md:items-center md:justify-between md:py-16">
-          <div className="max-w-xl space-y-6 animate-fade-in">
-            <div className="inline-flex items-center gap-3 rounded-full border border-border/60 bg-background/80 px-3 py-1 text-xs text-muted-foreground shadow-[0_0_0_1px_hsl(var(--border))]">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent text-[0.65rem] font-semibold text-primary-foreground">
+        <div className="container grid gap-6 py-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center md:py-10">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-secondary to-accent text-xs font-semibold text-primary-foreground shadow-[0_0_0_1px_hsl(var(--border))]">
                 T1
               </span>
-              <span className="uppercase tracking-[0.22em] text-[0.65rem] text-muted-foreground/80">
-                Event OS for ambitious teams
-              </span>
+              <div>
+                <p className="text-sm font-semibold tracking-wide text-muted-foreground">Documentation</p>
+                <p className="text-base font-medium text-foreground">Thittam1Hub Platform</p>
+              </div>
             </div>
-
-            <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              Run hackathons, festivals & launches
-              <br className="hidden sm:block" />
-              without losing the plot.
+            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+              Clean lines for complex event worlds
             </h1>
-
-            <p className="max-w-lg text-sm md:text-base text-muted-foreground">
-              Thittam1Hub brings registrations, QR check-ins, workspaces, judging, and certificates into a single
-              Ligne&nbsp;Claire-inspired console – so every stakeholder sees the same clean story of your event.
+            <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+              A Ligne Claire-inspired design system for planning, running, and verifying events—from first sketch to
+              signed certificate.
             </p>
-
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Badge variant="outline" className="border-primary/40 bg-primary/5 text-xs font-normal text-primary">
+                v1.0 Design &amp; Requirements
+              </Badge>
               <Button
-                size="lg"
-                className="hover-scale bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                onClick={() => {
-                  window.location.href = "/events";
-                }}
-              >
-                Browse upcoming events
-              </Button>
-              <Button
-                size="lg"
                 variant="outline"
-                className="hover-scale border-border/70 bg-background/80 text-sm text-muted-foreground"
+                className="group border-primary/40 bg-primary/5 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground"
                 onClick={() => {
-                  window.location.href = "/login";
+                  const el = document.getElementById('requirements');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
               >
-                Sign in to console
+                View key requirements
+                <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </Button>
             </div>
-
-            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground/90">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                Live QR passes & certificate vaults for participants
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-accent" />
-                Organizer workspaces with tasks, comms & analytics
-              </div>
-            </div>
           </div>
 
-          <div className="relative flex-1 max-w-md animate-scale-in">
-            <div className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-primary/15 via-secondary/10 to-accent/5 blur-2xl" />
-            <Card className="relative overflow-hidden rounded-3xl border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center justify-between text-sm font-medium">
-                  <span>Weekend Hackathon 2025</span>
-                  <Badge variant="outline" className="text-[0.65rem] uppercase tracking-wide text-primary">
-                    Live demo
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-xs text-muted-foreground">
-                <div className="grid grid-cols-3 gap-3 text-[0.7rem]">
-                  <div>
-                    <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground/80">Participants</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">320</p>
-                  </div>
-                  <div>
-                    <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground/80">Check-ins</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">92%</p>
-                  </div>
-                  <div>
-                    <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground/80">Certificates</p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">+610</p>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-border/70 bg-muted/40 p-3">
-                  <p className="text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground/80">
-                    Participant view
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    "Everything is in one place – QR pass, schedule, workspace and certificates. I stopped hunting
-                    through email threads."
-                  </p>
-                </div>
-
-                <div className="grid gap-2 text-[0.7rem] md:grid-cols-2">
-                  <div className="rounded-xl border border-border/60 bg-background/60 p-2">
-                    <p className="text-[0.65rem] font-semibold text-foreground">Participant dashboard</p>
-                    <p className="mt-1 text-[0.7rem] text-muted-foreground">
-                      Upcoming events, QR passes, certificate vault – built for mobile thumbs first.
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-border/60 bg-background/60 p-2">
-                    <p className="text-[0.65rem] font-semibold text-foreground">Organizer console</p>
-                    <p className="mt-1 text-[0.7rem] text-muted-foreground">
-                      Workspaces, tasks, and analytics stitched into a single control surface.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <div className="flex flex-wrap items-center gap-3">{/* placeholder, illustration added below */}</div>
         </div>
+
       </header>
 
-      <main className="container space-y-16 py-10 md:py-16">
-        <section className="space-y-6">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">A clean story for every role</h2>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            Thittam1Hub keeps organizers, participants, judges, volunteers, and vendors aligned on a single source of
-            truth – from first announcement to the last certificate verification.
-          </p>
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card className="border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">For participants</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>Mobile-first dashboard with QR passes and live schedule.</li>
-                  <li>Certificate vault with verification-ready links.</li>
-                  <li>Team registration built for hackathons &amp; competitions.</li>
-                </ul>
-              </CardContent>
-            </Card>
+      <main className="container grid gap-10 py-8 md:grid-cols-[260px_minmax(0,1fr)] md:py-12">
+        <aside className="sticky top-24 space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">On this page</p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {sections.map((section) => (
+              <li key={section.id}>
+                <button
+                  type="button"
+                  className="w-full rounded-md px-2 py-1.5 text-left text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                  onClick={() => {
+                    const el = document.getElementById(section.id);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  {section.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-            <Card className="border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">For organizers</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>Workspace-style console for every event.</li>
-                  <li>Live snapshots of registrations, attendance and scores.</li>
-                  <li>Certificate rules that auto-issue the right documents.</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">For organizations &amp; vendors</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>Verified organization pages with event portfolios.</li>
-                  <li>Marketplace for production, venues, and tooling partners.</li>
-                  <li>Signals of trust baked into every certificate.</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="space-y-6">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Under the hood</h2>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            A modular event OS that covers the full lifecycle: setup, registrations, attendance, judging, certificates,
-            organizations, workspaces, and the marketplace around them.
-          </p>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">Event &amp; workspace engine</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>Template-driven creation for hackathons, fests, and meetups.</li>
-                  <li>Per-event workspace with tasks, notes, and team comms.</li>
-                  <li>Hybrid-friendly flows for offline, online, and mixed formats.</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/70 bg-card/80 backdrop-blur">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">Certificates &amp; verification</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>Rule-based criteria for attendance, roles, and scores.</li>
-                  <li>Signed PDFs with QR codes pointing to live verification.</li>
-                  <li>Org-level views of issued certificates and disputes.</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-border/70 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 px-6 py-8 md:px-10 md:py-10">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Ready to see it in action?</h2>
-              <p className="max-w-xl text-sm text-muted-foreground">
-                Explore public events as a participant or sign in as an organizer to start wiring your own workspaces,
-                judges, and certificate flows.
-              </p>
+        <section className="space-y-10 pb-12">
+          <section id="overview" className="scroll-mt-28 space-y-4">
+            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Thittam1Hub System Documentation</h1>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              Thittam1Hub is a full-stack web application that centralizes the planning, management, tracking, and
+              publishing of events. It supports high-scale, multi-event operations with secure certificate generation and
+              public verification as core capabilities.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-semibold text-muted-foreground">Primary personas</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-foreground/90">
+                  Organizers, participants, volunteers, judges, speakers, organization admins, vendors, and
+                  super-admins.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-semibold text-muted-foreground">Core value</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-foreground/90">
+                  Unified event operations, from registration and attendance to judging, certificates, and
+                  verification.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-semibold text-muted-foreground">Key extensions</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-foreground/90">
+                  Official organization pages and an integrated B2B event services marketplace.
+                </CardContent>
+              </Card>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                size="lg"
-                className="hover-scale bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                onClick={() => {
-                  window.location.href = "/events";
-                }}
-              >
-                Explore events
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="hover-scale border-border/70 bg-background/80 text-sm text-muted-foreground"
-                onClick={() => {
-                  window.location.href = "/register";
-                }}
-              >
-                Create organizer account
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                className="hover-scale text-sm text-muted-foreground underline-offset-4 hover:underline"
-                onClick={() => {
-                  window.location.href = "/docs";
-                }}
-              >
-                View technical documentation
-              </Button>
+          </section>
+
+          <section id="architecture" className="scroll-mt-28 space-y-4">
+            <h2 className="text-xl font-semibold tracking-tight">Architecture</h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              The system follows a three-tier architecture with a React client, a modular Node.js/Express application
+              layer, a PostgreSQL data layer, and focused integrations with email, storage, QR generation, and PDF
+              rendering services.
+            </p>
+            <Card className="border-border/70 bg-card/60 backdrop-blur">
+              <CardContent className="pt-6 text-xs font-mono leading-relaxed text-muted-foreground">
+                <pre className="whitespace-pre overflow-auto text-[0.7rem]">
+                  {`Client Layer (React)
+  - Organizer UI
+  - Participant UI
+  - Volunteer & judging interfaces
+
+Application Layer (Node.js / Express)
+  - Auth, Event, Registration, Attendance
+  - Judging, Certificate, Communication
+  - Organization, Discovery, Marketplace
+  - Vendor, Booking, Payment
+
+Data Layer (PostgreSQL)
+  - Users, Events, Certificates
+  - Registrations, Attendance, Judging
+
+External Services
+  - Email provider (SendGrid / SES)
+  - Storage (S3-compatible)
+  - QR code generation
+  - Certificate PDF rendering`}
+                </pre>
+              </CardContent>
+            </Card>
+          </section>
+
+          <section id="core-services" className="scroll-mt-28 space-y-4">
+            <h2 className="text-xl font-semibold tracking-tight">Core domain services</h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              Logical backend services encapsulate key functional areas. Each exposes clear interfaces and enforces
+              role-based access control.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Auth & user access</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>User registration, login, and email verification.</li>
+                    <li>JWT-based authentication with refresh tokens.</li>
+                    <li>Role-based access control for all protected operations.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Events & registrations</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Event creation, templates, modes (offline/online/hybrid).</li>
+                    <li>Configurable registration forms, capacity, and waitlists.</li>
+                    <li>Landing page generation with branded assets.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Attendance & judging</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>QR-based check-in, session-level attendance reporting.</li>
+                    <li>Rubric-based judging, weighted scores, leaderboards.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Certificates & verification</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Automatic certificate generation from event rules.</li>
+                    <li>Unique certificate IDs with embedded verification QR.</li>
+                    <li>Public verification portal for third parties.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Organizations & official pages</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Verified organization profiles with branding and categories.</li>
+                    <li>Organization-scoped admin management and event listing.</li>
+                    <li>Follower model for discovery and updates.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold">Marketplace & vendors</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Vendor profiles, service listings, and service packages.</li>
+                    <li>Booking requests, agreements, and platform commissions.</li>
+                    <li>Vendor dashboards with analytics and communication tools.</li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
-          </div>
+          </section>
+
+          <section id="roles" className="scroll-mt-28 space-y-4">
+            <h2 className="text-xl font-semibold tracking-tight">User roles</h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              The platform defines clear roles for access control and workflow separation. Sub-roles inherit base
+              permissions and add role-specific capabilities.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Super-Admin</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Controls organizer onboarding, organization verification, and global configuration.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Organizer</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Creates events, manages registrations, communications, judging, certificates, and analytics.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Participant</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Self-service registration, dashboard access, QR check-in, leaderboard and certificate visibility.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Volunteer</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Operates event-side tooling such as QR-based check-in and attendance dashboards.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Judge</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Accesses assigned submissions only and submits rubric-based scores.
+                </CardContent>
+              </Card>
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Organization Admin & Vendor</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  Manage organization pages, teams, events, and marketplace offerings and bookings.
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          <section id="requirements" className="scroll-mt-28 space-y-4">
+            <h2 className="text-xl font-semibold tracking-tight">Key functional requirements</h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              This section summarizes major requirements from the specification. Refer to the full requirements document
+              for exhaustive acceptance criteria and edge cases.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">User management & onboarding</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Role model with organizers, participants, and sub-roles (volunteer, judge, speaker).</li>
+                    <li>Invitation-based organizer onboarding controlled by Super-Admins.</li>
+                    <li>Self-service participant registration tied to event codes and invitations.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Event lifecycle</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Template-driven event creation with branding, schedule, and sponsors.</li>
+                    <li>Mode configuration (offline/online/hybrid) with venue and virtual link requirements.</li>
+                    <li>Auto-generated, SEO-optimized event landing pages with share graphics.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Attendance, judging, and analytics</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>QR-based attendance tracking with immediate status updates.</li>
+                    <li>Rubric-based scoring with weighted criteria and real-time leaderboards.</li>
+                    <li>Analytics dashboards for registrations, attendance, scoring, and exports.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/70 bg-card/60 backdrop-blur">
+                <CardHeader className="pb-1">
+                  <CardTitle className="text-sm font-semibold">Certificates, organizations, and marketplace</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Automated certificate generation, distribution, and verification portal.</li>
+                    <li>Official organization pages with verification and team management.</li>
+                    <li>Integrated vendor marketplace with bookings, agreements, and commissions.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
         </section>
       </main>
     </div>
