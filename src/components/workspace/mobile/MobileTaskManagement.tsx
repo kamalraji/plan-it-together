@@ -330,13 +330,7 @@ export function MobileTaskManagement({
               }
             </p>
             {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
-              <button
-                onClick={onCreateTask}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Create Task
-              </button>
+              <></>
             )}
           </div>
         ) : (
