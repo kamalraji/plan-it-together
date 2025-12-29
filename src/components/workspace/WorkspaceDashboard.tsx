@@ -28,6 +28,7 @@ import { TaskManagementInterface } from './TaskManagementInterface';
 import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
 import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
+import { WorkspacePermissionsBanner } from './WorkspacePermissionsBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -341,7 +342,14 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         onWorkspaceSwitch={handleWorkspaceSwitch}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <WorkspacePermissionsBanner
+          userRole={user?.role}
+          workspaceRole={currentMember?.role as WorkspaceRole}
+          hasGlobalAccess={isGlobalWorkspaceManager}
+          hasWorkspaceManagerAccess={isWorkspaceRoleManager}
+        />
+
         {activeTab === 'overview' && (
           <div className="space-y-8">
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />

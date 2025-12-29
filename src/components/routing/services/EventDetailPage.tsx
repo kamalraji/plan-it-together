@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { Event, EventStatus, EventMode, UserRole, WorkspaceStatus, WorkspaceRole } from '../../../types';
-import { WorkspacePermissionsBanner } from '@/components/workspace/WorkspacePermissionsBanner';
 import { WorkspaceRolePermissionsTable } from '@/components/workspace/WorkspaceRolePermissionsTable';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -503,14 +502,6 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
   });
 
   const currentMember = teamMembers?.find((member: any) => member.userId === user?.id);
-  const managerWorkspaceRoles: WorkspaceRole[] = [
-    WorkspaceRole.WORKSPACE_OWNER,
-    WorkspaceRole.TEAM_LEAD,
-    WorkspaceRole.EVENT_COORDINATOR,
-  ];
-  const isWorkspaceManager = currentMember
-    ? managerWorkspaceRoles.includes(currentMember.role as WorkspaceRole)
-    : false;
 
   const updateWorkspaceMutation = useMutation({
     mutationFn: async () => {
@@ -648,14 +639,6 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
       </div>
 
       <div className="lg:col-span-3 space-y-4">
-        {selectedWorkspace && (
-          <WorkspacePermissionsBanner
-            userRole={user?.role}
-            workspaceRole={currentMember?.role as WorkspaceRole}
-            hasGlobalAccess={canManageEventWorkspaces}
-            hasWorkspaceManagerAccess={isWorkspaceManager}
-          />
-        )}
 
         {selectedWorkspace && !isTeamMembersLoading && (
           <WorkspaceRolePermissionsTable highlightedRole={currentMember?.role as WorkspaceRole} />
