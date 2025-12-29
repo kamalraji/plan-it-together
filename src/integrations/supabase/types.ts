@@ -164,6 +164,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
+          owner_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
           updated_at: string
@@ -179,6 +180,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -194,6 +196,7 @@ export type Database = {
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -844,6 +847,7 @@ export type Database = {
           due_date: string | null
           id: string
           priority: string
+          role_scope: string | null
           status: string
           title: string
           updated_at: string
@@ -856,6 +860,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -868,6 +873,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title?: string
           updated_at?: string
