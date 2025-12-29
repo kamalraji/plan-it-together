@@ -1,73 +1,63 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useCreateOrganization } from '@/hooks/useOrganization';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const organizationRegistrationSchema = z.object({
+  name: z.string().trim().min(1, { message: 'Organization name is required' }),
+  slug: z
+    .string()
+    .trim()
+    .min(1, { message: 'URL handle is required' })
+    .regex(/^[a-z0-9-]+$/, { message: 'Use only lowercase letters, numbers, and hyphens' }),
+  category: z.enum(['COLLEGE', 'COMPANY', 'INDUSTRY', 'NON_PROFIT']),
+  description: z.string().optional(),
+  website: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+type OrganizationRegistrationValues = z.infer<typeof organizationRegistrationSchema>;
 
 export const OrganizationRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
   const createOrganization = useCreateOrganization();
-  const [formState, setFormState] = useState({
-    name: '',
-    slug: '',
-    category: 'COLLEGE' as 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT',
-    description: '',
-    website: '',
-    email: '',
-    phone: '',
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const form = useForm<OrganizationRegistrationValues>({
+    resolver: zodResolver(organizationRegistrationSchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      category: 'COLLEGE',
+      description: '',
+      website: '',
+      email: '',
+      phone: '',
+    },
   });
-  const [errors, setErrors] = useState<{ name?: string; slug?: string; form?: string }>({});
 
-
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-
-    // Normalize slug input and clear field-specific errors
-    if (name === 'slug') {
-      const normalized = value
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, '-')
-        .replace(/-{2,}/g, '-')
-        .replace(/^-+|-+$/g, '');
-      setFormState((prev) => ({ ...prev, slug: normalized }));
-      setErrors((prev) => ({ ...prev, slug: undefined, form: undefined }));
-      return;
-    }
-
-    setFormState((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: undefined, form: undefined }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    // Basic client-side validation
-    const newErrors: { name?: string; slug?: string } = {};
-    if (!formState.name.trim()) {
-      newErrors.name = 'Organization name is required';
-    }
-    if (!formState.slug.trim()) {
-      newErrors.slug = 'URL handle is required';
-    } else if (!/^[a-z0-9-]+$/.test(formState.slug)) {
-      newErrors.slug = 'Use only lowercase letters, numbers, and hyphens';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors((prev) => ({ ...prev, ...newErrors }));
-      return;
-    }
+  const onSubmit = async (values: OrganizationRegistrationValues) => {
+    setFormError(null);
 
     try {
       const organization = await createOrganization.mutateAsync({
-        name: formState.name.trim(),
-        slug: formState.slug.trim(),
-        category: formState.category,
-        description: formState.description.trim() || undefined,
-        website: formState.website.trim() || undefined,
-        email: formState.email.trim() || undefined,
-        phone: formState.phone.trim() || undefined,
+        name: values.name.trim(),
+        slug: values.slug.trim(),
+        category: values.category,
+        description: values.description?.trim() || undefined,
+        website: values.website?.trim() || undefined,
+        email: values.email?.trim() || undefined,
+        phone: values.phone?.trim() || undefined,
       });
 
       if (organization?.slug) {
@@ -78,176 +68,246 @@ export const OrganizationRegistrationPage: React.FC = () => {
     } catch (err: any) {
       const message = err?.message || 'Failed to create organization';
 
-      // Surface duplicate-slug and other field errors inline
       if (message.toLowerCase().includes('url handle') || message.toLowerCase().includes('slug')) {
-        setErrors({ slug: message });
+        form.setError('slug', { message });
       } else {
-        setErrors({ form: message });
+        setFormError(message);
       }
-      // The hook already shows a toast; no need to re-toast here.
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-cream/20 px-4">
-      <div className="max-w-2xl w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-soft border border-coral/10 p-8">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-2">
-              Set up your organization
-            </h1>
-            <p className="text-gray-600">
-              Tell us about your organization so we can personalize your organizer dashboard.
-            </p>
-          </div>
-          <button
-            type="submit"
-            form="organization-onboarding-form"
-            disabled={createOrganization.isPending}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
-          >
-            {createOrganization.isPending ? 'Creating…' : 'Create organization'}
-          </button>
-        </div>
-        {errors.form && (
-          <div className="mb-4 rounded-md bg-red-50 border border-red-100 px-3 py-2 text-xs text-red-700">
-            {errors.form}
-          </div>
-        )}
+  const normalizeSlug = (value: string) =>
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-+|-+$/g, '');
 
-        <form id="organization-onboarding-form" onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">
-                Organization name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formState.name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral"
-              />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+  const isSubmitting = createOrganization.isPending || form.formState.isSubmitting;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/80 to-muted px-4 py-8">
+      <Card className="w-full max-w-2xl shadow-soft border border-border/60">
+        <CardHeader className="space-y-4 pb-4 sm:pb-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Set up your organization
+              </CardTitle>
+              <CardDescription>
+                Tell us about your organization so we can personalize your organizer dashboard.
+              </CardDescription>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="slug">
-                URL handle
-              </label>
-              <div className="flex rounded-lg shadow-sm">
-                <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">
-                  {window.location.origin}/
-                </span>
-                <input
-                  id="slug"
+            <Button
+              type="submit"
+              form="organization-onboarding-form"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {isSubmitting ? 'Creating…' : 'Create organization'}
+            </Button>
+          </div>
+          {formError && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+              {formError}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              id="organization-onboarding-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
+            >
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Organization name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          autoComplete="organization"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (formError) setFormError(null);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="slug"
-                  type="text"
-                  required
-                  value={formState.slug}
-                  onChange={handleChange}
-                  className="mt-0 flex-1 rounded-r-lg border border-gray-300 focus:border-coral focus:ring-coral text-sm"
-                  placeholder="your-organization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL handle</FormLabel>
+                      <div className="flex rounded-xl border border-input bg-background text-sm overflow-hidden">
+                        <span className="inline-flex items-center border-r border-border bg-muted px-3 text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                          {typeof window !== 'undefined' ? `${window.location.origin}/` : '/'}
+                        </span>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="border-0 rounded-l-none"
+                            placeholder="your-organization"
+                            onChange={(e) => {
+                              const normalized = normalizeSlug(e.target.value);
+                              field.onChange(normalized);
+                              if (formError) setFormError(null);
+                            }}
+                          />
+                        </FormControl>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Lowercase letters, numbers, and hyphens only.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
-              {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category">
-                Category
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formState.category}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
-              >
-                <option value="COLLEGE">College / University</option>
-                <option value="COMPANY">Company</option>
-                <option value="INDUSTRY">Industry body</option>
-                <option value="NON_PROFIT">Non-profit / Community</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="website">
-                Website
-              </label>
-              <input
-                id="website"
-                name="website"
-                type="url"
-                value={formState.website}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
-                placeholder="https://example.com"
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            if (formError) setFormError(null);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="COLLEGE">College / University</SelectItem>
+                            <SelectItem value="COMPANY">Company</SelectItem>
+                            <SelectItem value="INDUSTRY">Industry body</SelectItem>
+                            <SelectItem value="NON_PROFIT">Non-profit / Community</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Website</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="url"
+                          placeholder="https://example.com"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (formError) setFormError(null);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (formError) setFormError(null);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact phone</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="tel"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (formError) setFormError(null);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        rows={4}
+                        placeholder="Briefly describe your organization and the kind of events you run."
+                        className="resize-y rounded-xl border-border bg-card"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (formError) setFormError(null);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
-                Contact email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formState.email}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="phone">
-                Contact phone
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formState.phone}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="description">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
-              value={formState.description}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
-              placeholder="Briefly describe your organization and the kind of events you run."
-            />
-          </div>
-
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pt-4">
-            <div className="text-xs text-gray-500">
-              <p>You can update these details later from your organization settings.</p>
-            </div>
-            <button
-              type="submit"
-              disabled={createOrganization.isPending}
-              className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
-            >
-              {createOrganization.isPending ? 'Creating…' : 'Create organization'}
-            </button>
-          </div>
-        </form>
-      </div>
+              <div className="flex flex-col gap-3 border-t border-border/40 pt-4 md:flex-row md:items-center md:justify-between">
+                <p className="text-xs text-muted-foreground">
+                  You can update these details later from your organization settings.
+                </p>
+                <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
+                  {isSubmitting ? 'Creating…' : 'Create organization'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
