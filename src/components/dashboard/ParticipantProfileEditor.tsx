@@ -182,6 +182,22 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
     }
   };
 
+  const handleShareLinksCopy = async () => {
+    const origin = window.location.origin;
+    const portfolioUrl = `${origin}/portfolio/${userId}`;
+    const embedUrl = `${origin}/embed/portfolio/${userId}`;
+    const text = `Portfolio: ${portfolioUrl}\nEmbed: ${embedUrl}`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setError(null);
+      setSuccess('Portfolio share links copied to clipboard.');
+    } catch (err) {
+      console.error('Failed to copy portfolio links', err);
+      setError('Could not copy links automatically. Please copy them from the address bar.');
+    }
+  };
+
   const initials =
     formState.full_name?.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() ||
     userEmail?.[0]?.toUpperCase() ||
@@ -463,7 +479,14 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
             <p className="text-xs text-emerald-500 mt-1">{success}</p>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-end gap-3 pt-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleShareLinksCopy}
+              className="inline-flex items-center rounded-full border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/70 transition-colors"
+            >
+              Copy share links
+            </button>
             <button
               type="submit"
               disabled={saving}
