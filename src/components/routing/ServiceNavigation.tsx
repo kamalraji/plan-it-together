@@ -346,7 +346,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${collapsed && !isMobile ? 'w-16' : 'w-64'}`}>
+    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${isMobile ? 'w-full' : collapsed ? 'w-16' : 'w-64'}`}>
       {/* Mobile Header */}
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
