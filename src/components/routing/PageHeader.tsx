@@ -117,7 +117,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
         {/* Title and Actions */}
         <div className="py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
                 {title}
@@ -129,7 +129,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
             {/* Actions */}
             {actions && actions.length > 0 && (
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-2 justify-end sm:justify-start">
                 {actions.map((action, index) => (
                   <button
                     key={index}

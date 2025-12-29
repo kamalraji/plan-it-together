@@ -356,11 +356,6 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
       variant: 'secondary' as const,
     },
     {
-      label: 'Create Task',
-      action: () => setActiveTab('tasks'),
-      variant: 'primary' as const,
-    },
-    {
       label: 'Settings',
       action: () => navigate(`/console/workspaces/${workspaceId}/settings`),
       variant: 'secondary' as const,
