@@ -31,6 +31,7 @@ import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { PublicLandingPage } from '../landing/PublicLandingPage';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -497,8 +498,8 @@ export const AppRouter: React.FC = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Root redirect to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Public landing page at root */}
+            <Route path="/" element={<PublicLandingPage />} />
             
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
