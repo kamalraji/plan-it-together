@@ -8,7 +8,7 @@ import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 import { CertificateQr } from '@/components/certificates/CertificateQr';
 import { ParticipantProfileEditor } from '@/components/dashboard/ParticipantProfileEditor';
-
+import { useUserProfile } from '@/hooks/useUserProfile';
 interface Registration {
   id: string;
   status: string;
@@ -43,6 +43,13 @@ interface Certificate {
   };
 }
 
+interface RecentCheckIn {
+  id: string;
+  eventName: string;
+  checkInTime: string;
+  method: string;
+}
+
 const mapToCoreRegistration = (registration: Registration, userId: string): CoreRegistration => {
   return {
     id: registration.id,
@@ -72,6 +79,7 @@ export function ParticipantDashboard() {
   });
 
   const { isHealthy } = useApiHealth();
+  const { profile } = useUserProfile();
 
   useEffect(() => {
     const checkOrganizerSignup = async () => {
@@ -179,6 +187,35 @@ export function ParticipantDashboard() {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: isHealthy !== false,
+  });
+
+  const { data: recentCheckIns, isLoading: recentCheckInsLoading } = useQuery<RecentCheckIn[]>({
+    queryKey: ['participant-recent-checkins', user?.id],
+    queryFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select(
+          `id, check_in_time, check_in_method, event:events (id, name, start_date)`,
+        )
+        .eq('user_id', user.id)
+        .order('check_in_time', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+
+      return (data ?? []).map((record: any) => ({
+        id: record.id,
+        eventName: record.event?.name ?? 'Event',
+        checkInTime: record.check_in_time,
+        method: record.check_in_method,
+      }));
+    },
+    enabled: !!user && isHealthy !== false,
+    retry: 1,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: organizerOnboardingStatus } = useQuery<{ completed_at: string | null } | null>({
@@ -530,7 +567,79 @@ export function ParticipantDashboard() {
 
             {/* Events Tab */}
             {activeTab === 'events' && (
-              <section className="mt-6">
+              <section className="mt-6 space-y-4">
+                {/* My QR Pass section */}
+                {user && (
+                  <div className="rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-full bg-primary/10 text-primary flex items-center justify-center w-10 h-10 text-sm font-semibold">
+                        QR
+                      </div>
+                      <div>
+                        <h2 className="text-base sm:text-lg font-semibold text-foreground">My QR Pass</h2>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          This is your personal check-in QR from your profile. Use it to check in to any event
+                          you join.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 w-full flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-end">
+                      {/* Profile QR */}
+                      <div className="flex items-center justify-center">
+                        {profile ? (
+                          <div className="rounded-xl border border-border/60 bg-background p-3 sm:p-4 shadow-xs">
+                            <img
+                              src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
+                                profile.qr_code,
+                              )}&size=192x192`}
+                              alt="Personal QR pass"
+                              className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl border border-dashed border-border/70 flex items-center justify-center text-xs text-muted-foreground">
+                            {user ? 'Generating your QR…' : 'Sign in to see your QR'}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Recent check-ins */}
+                      <div className="w-full sm:max-w-xs space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">
+                          Recent check-ins
+                        </p>
+                        {recentCheckIns && recentCheckIns.length > 0 ? (
+                          <ul className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            {recentCheckIns.map((checkIn) => (
+                              <li
+                                key={checkIn.id}
+                                className="rounded-lg border border-border/60 bg-background px-3 py-2 flex items-center justify-between gap-2"
+                              >
+                                <div>
+                                  <p className="text-xs sm:text-sm font-medium text-foreground truncate">
+                                    {checkIn.eventName}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    {new Date(checkIn.checkInTime).toLocaleString()}
+                                  </p>
+                                </div>
+                                <span className="inline-flex items-center rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                                  {checkIn.method === 'QR_SCAN' ? 'QR' : 'Manual'}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            {recentCheckInsLoading ? 'Loading recent check-ins…' : 'No recent check-ins yet.'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                     <div className="inline-flex flex-wrap gap-1 rounded-full border border-border/60 bg-card/80 px-2 py-1">
