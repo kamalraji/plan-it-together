@@ -37,9 +37,6 @@ export function OrganizerDashboard() {
   const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
   const { isHealthy } = useApiHealth();
 
-  // Check if profile completion is needed (Requirements 2.4, 2.5)
-  const isProfileIncomplete = !user?.profileCompleted || !user?.bio || !user?.organization;
-
   const { data: events, isLoading } = useQuery<Event[]>({
     queryKey: ['organizer-events', organization.id],
     queryFn: async () => {
@@ -420,48 +417,6 @@ export function OrganizerDashboard() {
               <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
                 <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Workspace tasks</p>
                 <p className="text-xl sm:text-2xl font-bold text-violet-500">{currentEventMetrics.tasks}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
-        {isProfileIncomplete && (
-          <div className="order-4 mb-6 bg-amber-950/10 border border-amber-500/40 rounded-lg p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-amber-800 dark:text-amber-300">Complete your profile</h3>
-                <div className="mt-2 text-sm text-amber-700 dark:text-amber-200">
-                  <p>
-                    Complete your organizer profile to unlock all dashboard features and improve your event management
-                    experience.
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <div className="-mx-2 -my-1.5 flex">
-                    <Link
-                      to="/complete-profile"
-                      className="bg-amber-500/10 px-2 py-1.5 rounded-md text-sm font-medium text-amber-800 dark:text-amber-100 hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-                    >
-                      Complete profile
-                    </Link>
-                    <button
-                      type="button"
-                      className="ml-3 bg-amber-500/5 px-2 py-1.5 rounded-md text-sm font-medium text-amber-800 dark:text-amber-100 hover:bg-amber-500/15 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
