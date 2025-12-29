@@ -15,6 +15,7 @@ import { WorkspaceReportExport } from '../../workspace/WorkspaceReportExport';
 import { EventMarketplaceIntegration } from '../../marketplace';
 import { WorkspaceTemplateManagement } from '../../workspace/WorkspaceTemplateManagement';
 import { supabase } from '@/integrations/supabase/client';
+import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess';
 
 interface WorkspaceDetailPageProps {
   defaultTab?: string;
@@ -32,9 +33,11 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
+ 
+  const { canView, isLoading: accessLoading } = useWorkspaceAccess(workspaceId);
 
   // Fetch workspace data from Supabase
-  const { data: workspace, isLoading, error } = useQuery({
+  const { data: workspace, isLoading: workspaceLoading, error } = useQuery({
     queryKey: ['workspace', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -42,10 +45,10 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         .select('id, name, status, created_at, updated_at')
         .eq('id', workspaceId as string)
         .maybeSingle();
-
+ 
       if (error) throw error;
       if (!data) throw new Error('Workspace not found');
-
+ 
       const mapped = {
         id: data.id as string,
         eventId: '',
@@ -59,11 +62,13 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         taskSummary: undefined,
         channels: [],
       } as Workspace;
-
+ 
       return mapped;
     },
-    enabled: !!workspaceId,
+    enabled: !!workspaceId && canView,
   });
+ 
+  const isLoading = accessLoading || workspaceLoading;
 
   // Fetch workspace tasks from Supabase
   const { data: tasks = [] } = useQuery({
@@ -74,9 +79,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         .select('*')
         .eq('workspace_id', workspaceId as string)
         .order('created_at', { ascending: true });
-
+ 
       if (error) throw error;
-
+ 
       return (data || []).map((row) => ({
         id: row.id,
         workspaceId: row.workspace_id,
@@ -92,11 +97,11 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         metadata: {},
       })) as unknown as WorkspaceTask[];
     },
-    enabled: !!workspaceId,
+    enabled: !!workspaceId && canView,
   });
 
   const queryClient = useQueryClient();
-
+ 
   const createTaskMutation = useMutation({
     mutationFn: async () => {
       if (!workspaceId) throw new Error('Workspace ID is required');
@@ -111,7 +116,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         })
         .select('*')
         .single();
-
+ 
       if (error) throw error;
       return data;
     },
@@ -127,7 +132,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         .update({ status })
         .eq('id', taskId)
         .eq('workspace_id', workspaceId as string);
-
+ 
       if (error) throw error;
     },
     onSuccess: () => {
@@ -142,7 +147,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         .delete()
         .eq('id', taskId)
         .eq('workspace_id', workspaceId as string);
-
+ 
       if (error) throw error;
     },
     onSuccess: () => {
@@ -159,9 +164,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         .select('*')
         .eq('workspace_id', workspaceId as string)
         .order('joined_at', { ascending: true });
-
+ 
       if (error) throw error;
-
+ 
       return (data || []).map((row) => ({
         id: row.id,
         userId: row.user_id,
@@ -176,7 +181,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         },
       })) as TeamMember[];
     },
-    enabled: !!workspaceId,
+    enabled: !!workspaceId && canView,
   });
 
   const tabs = [

@@ -6,6 +6,7 @@ import { Event, EventStatus, EventMode, UserRole, WorkspaceStatus, WorkspaceRole
 import { WorkspacePermissionsBanner } from '@/components/workspace/WorkspacePermissionsBanner';
 import { WorkspaceRolePermissionsTable } from '@/components/workspace/WorkspaceRolePermissionsTable';
 import { useAuth } from '@/hooks/useAuth';
+import { useEventAccess } from '@/hooks/useEventAccess';
 import {
   PencilIcon,
   ShareIcon,
@@ -27,12 +28,9 @@ interface EventDetailPageProps {
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = 'overview' }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const { user } = useAuth();
+  const { canView, canManage, isLoading: accessLoading } = useEventAccess(eventId);
 
-  const canManageEvents =
-    user?.role === UserRole.ORGANIZER || user?.role === UserRole.SUPER_ADMIN;
-
-  const { data: event, isLoading, error } = useQuery<Event | null>({
+  const { data: event, isLoading: eventLoading, error } = useQuery<Event | null>({
     queryKey: ['organizer-event', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -40,10 +38,10 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         .select('*')
         .eq('id', eventId as string)
         .maybeSingle();
-
+ 
       if (error) throw error;
       if (!data) return null;
-
+ 
       return {
         id: data.id,
         name: data.name,
@@ -64,6 +62,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
     },
     enabled: !!eventId,
   });
+ 
+  const isLoading = accessLoading || eventLoading;
 
   if (isLoading) {
     return (
@@ -72,12 +72,12 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       </div>
     );
   }
-
-  if (error || !event) {
+ 
+  if (error || !event || !canView) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event not found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event not found or access denied</h1>
           <Link to="/console/events/list" className="text-indigo-600 hover:text-indigo-800">
             Back to events
           </Link>
@@ -124,7 +124,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   };
 
   const pageActions = [
-    ...(canManageEvents
+    ...(canManage
       ? [
           {
             label: 'Edit Event',
@@ -146,7 +146,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       icon: ChartBarIcon,
       variant: 'secondary' as const,
     },
-    ...(canManageEvents
+    ...(canManage
       ? [
           {
             label: 'Open Ops Console',
@@ -170,7 +170,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       badge: '156',
       component: RegistrationsTab,
     },
-    ...(canManageEvents
+    ...(canManage
       ? [
           {
             id: 'workspace',
@@ -224,7 +224,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
           }))}
         />
 
-        {!canManageEvents && (
+        {!canManage && (
           <div className="mt-4 bg-blue-50 border border-blue-100 rounded-md p-3 text-xs sm:text-sm text-blue-800">
             You’re viewing this event as a participant or viewer. Editing, attendance, and ops tools are
             available only to organizers and admins of the hosting organization.
