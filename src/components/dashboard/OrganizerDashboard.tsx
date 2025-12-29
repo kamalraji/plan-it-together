@@ -423,15 +423,15 @@ export function OrganizerDashboard() {
                </div>
                <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
                  <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Confirmed</p>
-                 <p className="text-xl sm:text-2xl font-bold text-emerald-500">{currentEventMetrics.confirmedRegistrations}</p>
+                 <p className="text-xl sm:text-2xl font-bold text-primary">{currentEventMetrics.confirmedRegistrations}</p>
                </div>
                <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
                  <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Check-ins</p>
-                 <p className="text-xl sm:text-2xl font-bold text-sky-500">{currentEventMetrics.checkins}</p>
+                 <p className="text-xl sm:text-2xl font-bold text-accent-foreground">{currentEventMetrics.checkins}</p>
                </div>
                <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
                  <p className="text-[11px] sm:text-xs text-muted-foreground mb-1">Workspace tasks</p>
-                 <p className="text-xl sm:text-2xl font-bold text-violet-500">{currentEventMetrics.tasks}</p>
+                 <p className="text-xl sm:text-2xl font-bold text-secondary-foreground">{currentEventMetrics.tasks}</p>
                </div>
              </div>
            </div>
@@ -573,7 +573,7 @@ export function OrganizerDashboard() {
                    <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Total Registrations
                    </h3>
-                   <p className="text-2xl sm:text-3xl font-bold text-emerald-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-accent-foreground">
                      {analytics.totalRegistrations || 0}
                    </p>
                  </div>
@@ -581,7 +581,7 @@ export function OrganizerDashboard() {
                    <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Active Events
                    </h3>
-                   <p className="text-2xl sm:text-3xl font-bold text-sky-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-secondary-foreground">
                      {analytics.activeEvents || 0}
                    </p>
                  </div>
@@ -589,7 +589,7 @@ export function OrganizerDashboard() {
                    <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                      Certificates Issued
                    </h3>
-                   <p className="text-2xl sm:text-3xl font-bold text-violet-500">
+                   <p className="text-2xl sm:text-3xl font-bold text-foreground">
                      {analytics.certificatesIssued || 0}
                    </p>
                  </div>
