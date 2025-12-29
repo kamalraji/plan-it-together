@@ -637,7 +637,7 @@ export function ParticipantDashboard() {
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => setQrRegistration(registration)}
-                            className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
+                            className="rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm transition-colors hover:bg-primary/90 hover-scale animate-fade-in"
                           >
                             Show QR Pass
                           </button>
