@@ -77,13 +77,16 @@ export function OrganizerDashboard() {
     refetchOnWindowFocus: false,
   });
 
+  const eventIds = useMemo(() => (events ?? []).map((evt) => evt.id), [events]);
+
   const { data: workspaces } = useQuery<WorkspaceSummary[]>({
-    queryKey: ['organizer-workspaces', organization.id],
+    queryKey: ['organizer-workspaces', organization.id, eventIds],
+    enabled: eventIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
         .select('id, name, status, updated_at, event_id')
-        .eq('organizer_id', organization.id)
+        .in('event_id', eventIds)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -101,8 +104,6 @@ export function OrganizerDashboard() {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
-
-  const eventIds = useMemo(() => (events ?? []).map((evt) => evt.id), [events]);
 
   const { data: aggregateMetrics } = useQuery<{
     totalRegistrations: number;
