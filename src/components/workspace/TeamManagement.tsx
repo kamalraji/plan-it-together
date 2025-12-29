@@ -1,21 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  UserPlusIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { UserPlusIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace, TeamMember, WorkspaceRole } from '../../types';
+import { Workspace, TeamMember, WorkspaceRole, WorkspaceRoleScope } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
 import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
 
 interface TeamManagementProps {
   workspace: Workspace;
+  roleScope?: WorkspaceRoleScope;
 }
 
-export function TeamManagement({ workspace }: TeamManagementProps) {
+export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
   const [activeView, setActiveView] = useState<'roster' | 'invite' | 'bulk-invite'>('roster');
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<WorkspaceRole | 'all'>('all');
@@ -145,7 +143,11 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   });
 
   const handleRemoveTeamMember = async (memberId: string) => {
-    if (window.confirm('Are you sure you want to remove this team member? They will lose access to the workspace immediately.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to remove this team member? They will lose access to the workspace immediately.',
+      )
+    ) {
       await removeTeamMemberMutation.mutateAsync(memberId);
     }
   };
@@ -154,17 +156,24 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
     await updateRoleMutation.mutateAsync({ memberId, role });
   };
 
-  const filteredMembers = teamMembers?.filter(member => {
-    const matchesSearch = member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || member.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'active' && member.status === 'ACTIVE') ||
-                         (statusFilter === 'pending' && member.status === 'PENDING') ||
-                         (statusFilter === 'inactive' && member.status === 'INACTIVE');
-    
-    return matchesSearch && matchesRole && matchesStatus;
-  }) || [];
+  const filteredMembers =
+    teamMembers?.filter((member) => {
+      if (roleScope && roleScope !== 'ALL' && member.role !== roleScope) {
+        return false;
+      }
+
+      const matchesSearch =
+        member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = roleFilter === 'all' || member.role === roleFilter;
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && member.status === 'ACTIVE') ||
+        (statusFilter === 'pending' && member.status === 'PENDING') ||
+        (statusFilter === 'inactive' && member.status === 'INACTIVE');
+
+      return matchesSearch && matchesRole && matchesStatus;
+    }) || [];
 
   const getStatusBadge = (status: string) => {
     return <WorkspaceStatusBadge status={status} />;
@@ -173,6 +182,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const getRoleBadge = (role: WorkspaceRole) => {
     return <WorkspaceRoleBadge role={role} />;
   };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">

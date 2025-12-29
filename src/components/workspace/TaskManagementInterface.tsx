@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { WorkspaceTask, TaskStatus, TeamMember } from '../../types';
+import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
@@ -8,6 +8,7 @@ import { TaskFilterBar, TaskFilters } from './TaskFilterBar';
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
   teamMembers: TeamMember[];
+  roleScope?: WorkspaceRoleScope;
   onTaskEdit?: (task: WorkspaceTask) => void;
   onTaskDelete?: (taskId: string) => void;
   onTaskStatusChange?: (taskId: string, status: TaskStatus) => void;
@@ -21,6 +22,7 @@ type ViewMode = 'list' | 'kanban';
 export function TaskManagementInterface({
   tasks,
   teamMembers,
+  roleScope,
   onTaskEdit,
   onTaskDelete,
   onTaskStatusChange,
@@ -57,7 +59,14 @@ export function TaskManagementInterface({
   const filteredTasks = useMemo(() => {
     const base = [...tasks];
 
-    const scoped = base.filter((task) => {
+    const scopedByRole = base.filter((task) => {
+      if (!roleScope || roleScope === 'ALL') return true;
+      const taskScope = task.roleScope || (task.metadata?.roleScope as WorkspaceRoleScope | undefined);
+      if (!taskScope) return false;
+      return taskScope === roleScope;
+    });
+
+    const scoped = scopedByRole.filter((task) => {
       if (filters.status !== 'ALL' && task.status !== filters.status) {
         return false;
       }
@@ -96,7 +105,7 @@ export function TaskManagementInterface({
     });
 
     return scoped;
-  }, [tasks, filters]);
+  }, [tasks, filters, roleScope]);
 
   const commonProps = {
     tasks,

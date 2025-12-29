@@ -11,6 +11,7 @@ import {
   TaskStatus,
   UserRole,
   WorkspaceRole,
+  WorkspaceRoleScope,
 } from '../../types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { TaskSummaryCards } from './TaskSummaryCards';
@@ -249,6 +250,9 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     enabled: !!workspaceId,
   });
 
+  const [activeRoleSpace, setActiveRoleSpace] = useState<WorkspaceRoleScope>('ALL');
+  const roleSpaces: WorkspaceRoleScope[] = ['ALL', ...(teamMembers?.map((m) => m.role) || [])];
+
   const isGlobalWorkspaceManager =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
@@ -334,6 +338,25 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         onManageSettings={isGlobalWorkspaceManager ? handleManageSettings : undefined}
       />
 
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
+        {/* Role-based sub workspace selector */}
+        <div className="flex flex-wrap gap-2">
+          {roleSpaces.map((roleSpace) => (
+            <button
+              key={roleSpace}
+              onClick={() => setActiveRoleSpace(roleSpace)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                activeRoleSpace === roleSpace
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-border hover:bg-muted'
+              }`}
+            >
+              {roleSpace === 'ALL' ? 'All teams' : roleSpace.replace(/_/g, ' ').toLowerCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <WorkspaceNavigation
         workspace={workspace}
         userWorkspaces={userWorkspaces || []}
@@ -371,6 +394,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
             <TaskManagementInterface
               tasks={tasks || []}
               teamMembers={teamMembers || []}
+              roleScope={activeRoleSpace}
               onTaskEdit={(task) => {
                 if (!canManageTasks) return;
                 console.log('Edit task:', task);
@@ -388,10 +412,14 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           <EventMarketplaceIntegration eventId={workspace.event.id} eventName={workspace.event.name} />
         )}
 
-        {activeTab === 'team' && <TeamManagement workspace={workspace} />}
+        {activeTab === 'team' && <TeamManagement workspace={workspace} roleScope={activeRoleSpace} />}
 
         {activeTab === 'communication' && (
-          <WorkspaceCommunication workspaceId={workspace.id} teamMembers={teamMembers} />
+          <WorkspaceCommunication
+            workspaceId={workspace.id}
+            teamMembers={teamMembers}
+            roleScope={activeRoleSpace}
+          />
         )}
 
         {activeTab === 'analytics' && <WorkspaceAnalyticsDashboard workspace={workspace} />}
