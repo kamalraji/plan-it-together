@@ -387,6 +387,88 @@ export type Database = {
           },
         ]
       }
+      organization_sponsors: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          organization_id: string
+          position: number | null
+          tier: string | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          organization_id: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          organization_id?: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_sponsors_organization_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_testimonials: {
+        Row: {
+          author_name: string
+          author_role: string | null
+          created_at: string
+          highlight: boolean
+          id: string
+          organization_id: string
+          position: number | null
+          quote: string
+        }
+        Insert: {
+          author_name: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id: string
+          position?: number | null
+          quote: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id?: string
+          position?: number | null
+          quote?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_testimonials_organization_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           category: string

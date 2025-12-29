@@ -5,73 +5,126 @@ import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrganizationProfile } from '@/components/organization/OrganizationProfile';
-import { Badge } from '@/components/ui/badge';
 import { Calendar, Quote, Star } from 'lucide-react';
 
 
 type OrganizationRow = Tables<'organizations'>;
 
+type TestimonialRow = Tables<'organization_testimonials'>;
+type SponsorRow = Tables<'organization_sponsors'>;
+type EventRow = Tables<'events'>;
+
 export const OrganizationLandingPage: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const [organization, setOrganization] = useState<OrganizationRow | null>(null);
+  const [featuredEvents, setFeaturedEvents] = useState<EventRow[]>([]);
+  const [testimonials, setTestimonials] = useState<TestimonialRow[]>([]);
+  const [sponsors, setSponsors] = useState<SponsorRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrganization = async () => {
+    const fetchOrganizationAndContent = async () => {
       if (!orgSlug) {
         setError('Organization not found');
         setIsLoading(false);
         return;
       }
 
-      const { data, error } = await supabase
+      const { data: org, error: orgError } = await supabase
         .from('organizations')
         .select('*')
         .eq('slug', orgSlug)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error loading organization by slug', error);
+      if (orgError) {
+        console.error('Error loading organization by slug', orgError);
         setError('Unable to load organization');
-      } else if (!data) {
+        setIsLoading(false);
+        return;
+      }
+
+      if (!org) {
         setError('Organization not found');
-      } else {
-        setOrganization(data as OrganizationRow);
-        try {
-          document.title = `${data.name} | Thittam1Hub`;
+        setIsLoading(false);
+        return;
+      }
 
-          const description =
-            data.description ||
-            `Discover events and updates from ${data.name} on Thittam1Hub.`;
+      setOrganization(org as OrganizationRow);
 
-          let meta = document.querySelector('meta[name="description"]');
-          if (!meta) {
-            meta = document.createElement('meta');
-            meta.setAttribute('name', 'description');
-            document.head.appendChild(meta);
-          }
-          meta.setAttribute('content', description);
+      try {
+        document.title = `${org.name} | Thittam1Hub`;
 
-          let canonical = document.querySelector('link[rel="canonical"]');
-          if (!canonical) {
-            canonical = document.createElement('link');
-            canonical.setAttribute('rel', 'canonical');
-            document.head.appendChild(canonical);
-          }
-          canonical.setAttribute(
-            'href',
-            `${window.location.origin}/${data.slug}`,
-          );
-        } catch (seoError) {
-          console.warn('Unable to set SEO metadata for organization page', seoError);
+        const description =
+          org.description ||
+          `Discover events and updates from ${org.name} on Thittam1Hub.`;
+
+        let meta = document.querySelector('meta[name="description"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', 'description');
+          document.head.appendChild(meta);
         }
+        meta.setAttribute('content', description);
+
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (!canonical) {
+          canonical = document.createElement('link');
+          canonical.setAttribute('rel', 'canonical');
+          document.head.appendChild(canonical);
+        }
+        canonical.setAttribute(
+          'href',
+          `${window.location.origin}/${org.slug}`,
+        );
+      } catch (seoError) {
+        console.warn('Unable to set SEO metadata for organization page', seoError);
+      }
+
+      try {
+        const [eventsResult, testimonialsResult, sponsorsResult] = await Promise.all([
+          supabase
+            .from('events')
+            .select('*')
+            .eq('organization_id', org.id)
+            .eq('visibility', 'PUBLIC')
+            .eq('status', 'PUBLISHED')
+            .order('start_date', { ascending: false })
+            .limit(3),
+          supabase
+            .from('organization_testimonials')
+            .select('*')
+            .eq('organization_id', org.id)
+            .order('highlight', { ascending: false })
+            .order('position', { ascending: true })
+            .limit(4),
+          supabase
+            .from('organization_sponsors')
+            .select('*')
+            .eq('organization_id', org.id)
+            .order('position', { ascending: true })
+            .limit(8),
+        ]);
+
+        if (eventsResult.data) {
+          setFeaturedEvents(eventsResult.data as EventRow[]);
+        }
+
+        if (testimonialsResult.data) {
+          setTestimonials(testimonialsResult.data as TestimonialRow[]);
+        }
+
+        if (sponsorsResult.data) {
+          setSponsors(sponsorsResult.data as SponsorRow[]);
+        }
+      } catch (sidebarError) {
+        console.error('Failed to load organization sidebar content', sidebarError);
       }
 
       setIsLoading(false);
     };
 
-    fetchOrganization();
+    fetchOrganizationAndContent();
   }, [orgSlug]);
 
   if (isLoading) {
@@ -108,7 +161,6 @@ export const OrganizationLandingPage: React.FC = () => {
   const copyShareUrl = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      // Simple fallback toast-free feedback; integrate with toast system later if needed
       alert('Public link copied to clipboard');
     } catch (err) {
       console.error('Failed to copy link', err);
@@ -116,12 +168,12 @@ export const OrganizationLandingPage: React.FC = () => {
   };
 
   return (
-    <main className="bg-gradient-to-b from-cream to-lavender/30 min-h-screen">
+    <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
       <section className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">Organization</p>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Welcome to <span className="bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent">{organization.name}</span>
+            Welcome to <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{organization.name}</span>
           </h1>
           {organization.city && (
             <p className="mt-2 text-sm text-muted-foreground">
@@ -159,19 +211,30 @@ export const OrganizationLandingPage: React.FC = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-primary" />
-                  Featured moments
+                  Featured events
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  Highlight key events or milestones here to give visitors a quick snapshot of what this
-                  organization is known for.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Badge variant="outline">Flagship Event</Badge>
-                  <Badge variant="outline">Annual Meetup</Badge>
-                  <Badge variant="outline">Community Impact</Badge>
-                </div>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                {featuredEvents.length === 0 ? (
+                  <p className="text-xs text-muted-foreground/80">
+                    Once this organization has public events, the most recent ones will be highlighted here.
+                  </p>
+                ) : (
+                  <ul className="space-y-3">
+                    {featuredEvents.map((event) => (
+                      <li key={event.id} className="flex flex-col rounded-xl border border-border/60 bg-background/80 px-3 py-2">
+                        <span className="text-xs font-semibold text-foreground line-clamp-1">{event.name}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {new Date(event.start_date).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
             </Card>
 
@@ -183,11 +246,23 @@ export const OrganizationLandingPage: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  “This organization runs some of the most well-organized events I&apos;ve attended. The
-                  team is thoughtful, responsive, and community-first.”
-                </p>
-                <p className="text-xs text-muted-foreground/80">— Happy participant (sample testimonial)</p>
+                {testimonials.length === 0 ? (
+                  <p className="text-xs text-muted-foreground/80">
+                    Testimonials from participants, partners, and collaborators will appear here.
+                  </p>
+                ) : (
+                  <ul className="space-y-3">
+                    {testimonials.map((testimonial) => (
+                      <li key={testimonial.id} className="rounded-xl border border-border/60 bg-background/80 px-3 py-2">
+                        <p className="text-sm leading-snug">“{testimonial.quote}”</p>
+                        <p className="mt-1 text-xs text-muted-foreground/80">
+                          — {testimonial.author_name}
+                          {testimonial.author_role ? `, ${testimonial.author_role}` : ''}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
             </Card>
 
@@ -199,16 +274,25 @@ export const OrganizationLandingPage: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-3">
-                  {['Partner One', 'Studio Two', 'Collective Three'].map((partner) => (
-                    <div
-                      key={partner}
-                      className="flex h-10 items-center justify-center rounded-full border border-border bg-muted px-4 text-xs font-medium text-muted-foreground"
-                    >
-                      {partner}
-                    </div>
-                  ))}
-                </div>
+                {sponsors.length === 0 ? (
+                  <p className="text-xs text-muted-foreground/80">
+                    Sponsors and partners for this organization will be showcased here.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    {sponsors.map((sponsor) => (
+                      <a
+                        key={sponsor.id}
+                        href={sponsor.website_url || undefined}
+                        target={sponsor.website_url ? '_blank' : undefined}
+                        rel={sponsor.website_url ? 'noopener noreferrer' : undefined}
+                        className="flex h-10 items-center justify-center rounded-full border border-border bg-muted px-4 text-xs font-medium text-muted-foreground hover:bg-muted/80 transition-colors"
+                      >
+                        {sponsor.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </aside>
