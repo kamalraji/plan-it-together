@@ -53,6 +53,7 @@ export function ParticipantEventsPage() {
   const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>(EventStatus.PUBLISHED);
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
   const [showPastArchive, setShowPastArchive] = useState(false);
+  const [registeredFilter, setRegisteredFilter] = useState<'ALL' | 'ONLY_REGISTERED' | 'HIDE_REGISTERED'>('ALL');
 
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ['participant-events'],
@@ -70,19 +71,19 @@ export function ParticipantEventsPage() {
     },
   });
 
-  const { data: registeredEventIds } = useQuery<Set<string>>({
+  const { data: registrationStatusMap } = useQuery<Map<string, string>>({
     queryKey: ['user-registered-events', user?.id],
     queryFn: async () => {
-      if (!user) return new Set<string>();
+      if (!user) return new Map<string, string>();
 
       const { data, error } = await supabase
         .from('registrations')
-        .select('event_id')
+        .select('event_id, status')
         .eq('user_id', user.id);
 
       if (error) throw error;
 
-      return new Set((data || []).map((r: any) => r.event_id));
+      return new Map((data || []).map((r: any) => [r.event_id, r.status]));
     },
     enabled: !!user,
   });
@@ -110,6 +111,7 @@ export function ParticipantEventsPage() {
   }, []);
 
   const now = new Date().getTime();
+  const registrationMap = registrationStatusMap ?? new Map<string, string>();
 
   const filteredEvents = (events || []).filter((event) => {
     const startTime = new Date(event.startDate).getTime();
@@ -119,10 +121,15 @@ export function ParticipantEventsPage() {
       return false;
     }
 
+    const isRegistered = registrationMap.has(event.id);
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
+    const matchesRegistrationFilter =
+      registeredFilter === 'ALL' ||
+      (registeredFilter === 'ONLY_REGISTERED' && isRegistered) ||
+      (registeredFilter === 'HIDE_REGISTERED' && !isRegistered);
 
-    return matchesStatus && matchesMode;
+    return matchesStatus && matchesMode && matchesRegistrationFilter;
   });
 
   return (
@@ -189,6 +196,19 @@ export function ParticipantEventsPage() {
                 <option value={EventMode.HYBRID}>Hybrid</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Registration</label>
+              <select
+                value={registeredFilter}
+                onChange={(e) => setRegisteredFilter(e.target.value as any)}
+                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
+              >
+                <option value="ALL">All events</option>
+                <option value="ONLY_REGISTERED">Only registered</option>
+                <option value="HIDE_REGISTERED">Hide registered</option>
+              </select>
+            </div>
           </div>
 
           <div className="text-sm text-muted-foreground mt-2 md:mt-0">
@@ -214,7 +234,8 @@ export function ParticipantEventsPage() {
           {filteredEvents.map((event) => {
             const start = new Date(event.startDate);
             const end = new Date(event.endDate);
-            const isRegistered = registeredEventIds?.has(event.id) ?? false;
+            const registrationStatus = registrationMap.get(event.id);
+            const isRegistered = !!registrationStatus;
 
             return (
               <div
@@ -230,7 +251,10 @@ export function ParticipantEventsPage() {
                     <h2 className="text-lg font-semibold text-foreground line-clamp-1">{event.name}</h2>
                     {isRegistered && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground whitespace-nowrap">
-                        Registered
+                        Registered  b7 {registrationStatus === 'PENDING' && 'Pending'}
+                        {registrationStatus === 'CONFIRMED' && 'Confirmed'}
+                        {registrationStatus === 'WAITLISTED' && 'Waitlisted'}
+                        {registrationStatus === 'CANCELLED' && 'Cancelled'}
                       </span>
                     )}
                   </div>
@@ -265,7 +289,7 @@ export function ParticipantEventsPage() {
                     <Link
                       to={`/events/${event.id}#register`}
                       className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                   >
+                    >
                       {isRegistered ? 'View registration' : 'Quick register'}
                     </Link>
                     <Link
