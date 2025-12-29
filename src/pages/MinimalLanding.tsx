@@ -150,16 +150,18 @@ const MinimalLanding = () => {
         <section aria-labelledby="hero-title" className="border-b border-border/60 bg-background">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-2 lg:px-6 lg:py-20">
             <div className="space-y-6">
-              <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Built for universities</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                Built for universities, tech communities, and modern teams
+              </p>
               <h1
                 id="hero-title"
                 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
               >
-                One hub for every university event, attendance, and certificate.
+                One hub for every event, attendance, and certificate.
               </h1>
               <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
-                Thittam1Hub quietly powers registrations, attendance, and certificates behind the scenes so your campus
-                can focus on learning, not logistics.
+                Thittam1Hub quietly powers registrations, attendance, and certificates so universities, tech clubs,
+                corporate L&amp;D teams, and small businesses can focus on outcomes, not logistics.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Button size="lg" onClick={() => scrollTo(sections.how)}>
@@ -173,16 +175,25 @@ const MinimalLanding = () => {
               <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>Multi-department ready</span>
+                  <span>Multi-department and multi-team ready</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>Audit-friendly reports</span>
+                  <span>Audit-friendly, exportable reports</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>QR certificate verification</span>
+                  <span>QR certificate verification for learners</span>
                 </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                {["Universities & colleges", "Student clubs", "Tech communities", "Corporate L&D", "Small businesses"].map(
+                  (label) => (
+                    <span key={label} className="rounded-full border border-border/60 bg-background px-3 py-1">
+                      {label}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
 
@@ -237,27 +248,27 @@ const MinimalLanding = () => {
           <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 max-w-2xl space-y-2">
               <h2 id="why-heading" className="text-xl font-semibold tracking-tight">
-                Why universities choose Thittam1Hub
+                Why universities and tech-savvy teams choose Thittam1Hub
               </h2>
               <p className="text-sm text-muted-foreground">
-                A single, reliable system for departments, exam cells, and central administration to run events and
-                prove outcomes.
+                A single, reliable system for departments, exam cells, tech communities, corporate academies, and small
+                teams to run events and prove outcomes.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Centralized control",
-                  body: "All departments and events in one structured view for university leadership.",
+                  title: "For universities",
+                  body: "All departments and events in one structured view for leadership, IQAC, and exam cells.",
                 },
                 {
-                  title: "Certificates that verify themselves",
-                  body: "Institute-branded templates with QR-based verification for students and recruiters.",
+                  title: "For tech communities",
+                  body: "Branded certificates with QR-based verification for meetups, hackathons, and bootcamps.",
                 },
                 {
-                  title: "Reliable attendance & reports",
-                  body: "Attendance and certificate logs ready when NAAC/NBA or internal audits ask.",
+                  title: "For corporate L&D & small businesses",
+                  body: "Attendance and certificate logs ready when managers, HR, or auditors ask.",
                 },
               ].map((item) => (
                 <Card key={item.title} className="border-border/60 bg-background">
@@ -281,11 +292,11 @@ const MinimalLanding = () => {
             <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 id="how-heading" className="text-xl font-semibold tracking-tight">
-                  How it works for your university
+                  How it works for campuses, communities, and teams
                 </h2>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-                  Thittam1Hub is simple enough for departments to start in days and structured enough for campus-wide
-                  rollout.
+                  Thittam1Hub is simple enough for departments, student clubs, and L&amp;D teams to start in days and
+                  structured enough for campus-wide or company-wide rollout.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => scrollTo(sections.pricing)}>
@@ -297,18 +308,18 @@ const MinimalLanding = () => {
               {[
                 {
                   step: "01",
-                  title: "Create event or program",
-                  body: "Departments set up events with dates, registration forms, and roles in a few clicks.",
+                  title: "Create an event or program",
+                  body: "Set up events with dates, registration forms, and roles for departments, clubs, or teams.",
                 },
                 {
                   step: "02",
-                  title: "Run and monitor",
-                  body: "Track registrations, check-ins, and attendance as events progress.",
+                  title: "Run and monitor in one place",
+                  body: "Track registrations, check-ins, and attendance as events progress across campuses or offices.",
                 },
                 {
                   step: "03",
                   title: "Issue & verify certificates",
-                  body: "Bulk-generate certificates and let students verify them online anytime.",
+                  body: "Bulk-generate certificates and let learners, students, or employees verify them online anytime.",
                 },
               ].map((item) => (
                 <Card key={item.step} className="border-border/60 bg-background">
@@ -335,7 +346,7 @@ const MinimalLanding = () => {
                 The essentials, done properly
               </h2>
               <p className="text-sm text-muted-foreground">
-                Four core capabilities your campus can rely on every semester.
+                Four core capabilities your campus, community, or company can rely on every cycle.
               </p>
             </div>
 
@@ -344,22 +355,22 @@ const MinimalLanding = () => {
                 {
                   icon: FileBadge2,
                   title: "Certificate Studio",
-                  body: "Create institute-branded templates with dynamic data and reuse them across events.",
+                  body: "Create branded templates with dynamic data for universities, meetups, trainings, and more.",
                 },
                 {
                   icon: Users,
                   title: "Attendance Engine",
-                  body: "Capture and export attendance by event, session, and department.",
+                  body: "Capture and export attendance by event, session, department, or team.",
                 },
                 {
                   icon: LayoutDashboard,
-                  title: "Multi-department workspaces",
-                  body: "Departments work in their own space while central admin sees the whole picture.",
+                  title: "Multi-workspace overview",
+                  body: "Give departments, clubs, and L&D teams their own space while leadership sees the whole picture.",
                 },
                 {
                   icon: ShieldCheck,
                   title: "Access & security",
-                  body: "Roles for admin, coordinators, and staff with activity logs for accountability.",
+                  body: "Roles for admin, coordinators, and managers with activity logs for accountability.",
                 },
               ].map(({ icon: Icon, title, body }) => (
                 <Card key={title} className="border-border/60 bg-background">
@@ -381,10 +392,11 @@ const MinimalLanding = () => {
           <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 max-w-2xl space-y-2">
               <h2 id="analytics-heading" className="text-xl font-semibold tracking-tight">
-                Clear reports for management and accreditation
+                Clear reports for councils, managers, and stakeholders
               </h2>
               <p className="text-sm text-muted-foreground">
-                Evidence of participation, attendance, and certificates is always ready when you need it.
+                Evidence of participation, attendance, and certificates is always ready for accreditation bodies,
+                leadership reviews, or client audits.
               </p>
             </div>
 
@@ -408,11 +420,11 @@ const MinimalLanding = () => {
               </Card>
 
               <div className="space-y-4 text-xs text-muted-foreground">
-                <p className="text-sm font-medium text-foreground">Designed for real university reporting</p>
+                <p className="text-sm font-medium text-foreground">Designed for real reporting contexts</p>
                 <ul className="space-y-2 list-disc pl-4">
-                  <li>Downloadable participation reports per event and department.</li>
-                  <li>Attendance summaries aligned with NAAC/NBA or internal requirements.</li>
-                  <li>Certificate logs that show when and to whom certificates were issued.</li>
+                  <li>Downloadable participation reports per event, department, or team.</li>
+                  <li>Attendance summaries aligned with NAAC/NBA, HR, or internal requirements.</li>
+                  <li>Certificate logs that show when and to whom certificates were issued across audiences.</li>
                 </ul>
               </div>
             </div>

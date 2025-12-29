@@ -384,13 +384,13 @@ const Index = () => {
           <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <h2 id="pillars-heading" className="text-lg font-semibold tracking-tight md:text-xl">
-                  Everything your campus needs in four intelligent pillars.
-                </h2>
-                <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-                  From planning to proof of participation, Thittam1Hub keeps every step auditable, efficient, and
-                  student-friendly.
-                </p>
+              <h2 id="pillars-heading" className="text-lg font-semibold tracking-tight md:text-xl">
+                Everything your campus, community, or company needs in four pillars.
+              </h2>
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+                From planning to proof of participation, Thittam1Hub keeps every step auditable for universities,
+                tech communities, corporate L&amp;D, and small businesses.
+              </p>
               </div>
               <Button
                 variant="outline"
@@ -406,23 +406,23 @@ const Index = () => {
               {[
                 {
                   icon: LayoutDashboard,
-                  label: "Unified Event Workspace",
-                  body: "Run conferences, fests, FDPs, and workshops from one pane of glass.",
+                  label: "Unified workspaces",
+                  body: "Run conferences, fests, trainings, and client programs from one pane of glass.",
                 },
                 {
                   icon: BadgeCheck,
-                  label: "Smart Certificates & QR Verify",
-                  body: "Design once, issue at scale, and let recruiters verify with a single scan.",
+                  label: "Smart certificates & QR verify",
+                  body: "Design once, issue at scale, and let students, learners, or clients verify with a scan.",
                 },
                 {
                   icon: Users,
-                  label: "Attendance & Participation Insights",
-                  body: "Track registrations, check-ins, and session-level participation.",
+                  label: "Attendance & participation insights",
+                  body: "Track registrations, check-ins, and session-level participation across campuses or offices.",
                 },
                 {
                   icon: ShieldCheck,
-                  label: "University-grade Access Control",
-                  body: "Granular roles for central admin, HoDs, coordinators, and reviewers.",
+                  label: "Granular access control",
+                  body: "Give central admin, organizers, managers, and reviewers precise permissions.",
                 },
               ].map(({ icon: Icon, label, body }) => (
                 <Card
@@ -460,17 +460,17 @@ const Index = () => {
                   {
                     step: "01",
                     title: "Create events and programs",
-                    text: "Departments configure events, roles, and registration forms with your campus branding.",
+                    text: "Configure events, cohorts, and trainings with roles and forms for departments, clubs, or teams.",
                   },
                   {
                     step: "02",
                     title: "Run and monitor live",
-                    text: "Track registrations, check-ins, and engagement in real time, with alerts for low fill rates.",
+                    text: "Track registrations, check-ins, and engagement in real time across campuses or offices.",
                   },
                   {
                     step: "03",
                     title: "Issue and verify certificates",
-                    text: "Bulk-generate QR-enabled certificates that students and recruiters can verify in seconds.",
+                    text: "Bulk-generate QR-enabled certificates that students, participants, or employees can verify in seconds.",
                   },
                 ].map((item) => (
                   <li key={item.step} className="flex gap-4">
@@ -555,17 +555,17 @@ const Index = () => {
             <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 id="usecases-heading" className="text-lg font-semibold tracking-tight md:text-xl">
-                  From hackathons to L&D, one consistent experience.
+                  From hackathons to L&amp;D, one consistent experience.
                 </h2>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">
                   Thittam1Hub adapts to cultural events, technical symposiums, corporate trainings, community meetups,
-                  and everything in between.
+                  and internal workshops.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 text-xs">
-              {["Technical & Cultural Fests", "FDPs & Workshops", "Seminars & Webinars", "MOOCs & Certification Programs"].map(
+             <div className="flex flex-wrap gap-2 text-xs">
+              {["University fests & FDPs", "Tech meetups & hackathons", "Corporate trainings & L&D", "Small business events"].map(
                 (label) => (
                   <span
                     key={label}
