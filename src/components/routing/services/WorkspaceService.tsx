@@ -2,30 +2,33 @@ import React from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { WorkspaceServiceDashboard } from './WorkspaceServiceDashboard';
 import { WorkspaceListPage } from './WorkspaceListPage';
-import { WorkspaceDetailPage } from './WorkspaceDetailPage';
 import { WorkspaceCreatePage } from './WorkspaceCreatePage';
-import { OrgWorkspacePage } from '@/components/organization/OrgWorkspacePage';
-
-/**
- * WorkspaceService component provides the main routing structure for the Workspace Management Service.
- * It implements AWS-style service interface with:
- * - Service dashboard (landing page with workspace analytics)
- * - Resource list view (workspaces list)
- * - Resource detail view (workspace details with tabs for tasks, team, communication)
- * - Workspace context switching and navigation
- */
+import { WorkspaceDetailPage } from './WorkspaceDetailPage';
+import { RequireWorkspaceAccess } from './RequireWorkspaceAccess';
 
 const WorkspaceIndexRoute: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug?: string }>();
 
-  // When under an organization route (/:orgSlug/workspaces), render the
-  // organization-scoped workspace portal. For global dashboard routes
-  // (/dashboard/workspaces) keep using the generic service dashboard.
+  // When under an organization route (/:orgSlug/workspaces), we could render
+  // an organization-scoped workspace portal. For now, always show the
+  // generic service dashboard.
   if (orgSlug) {
-    return <OrgWorkspacePage />;
+    return <WorkspaceServiceDashboard />;
   }
 
   return <WorkspaceServiceDashboard />;
+};
+
+const WorkspaceAccessRoute: React.FC<{ requireManage?: boolean; children: React.ReactNode }> = ({
+  requireManage,
+  children,
+}) => {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+  return (
+    <RequireWorkspaceAccess workspaceId={workspaceId} requireManage={requireManage}>
+      {children}
+    </RequireWorkspaceAccess>
+  );
 };
 
 export const WorkspaceService: React.FC = () => {
@@ -40,20 +43,74 @@ export const WorkspaceService: React.FC = () => {
       {/* Workspace Create Page */}
       <Route path="create" element={<WorkspaceCreatePage />} />
 
-      {/* Workspace Detail with tabs */}
-      <Route path=":workspaceId" element={<WorkspaceDetailPage />} />
-      <Route path=":workspaceId/tasks" element={<WorkspaceDetailPage defaultTab="tasks" />} />
-      <Route path=":workspaceId/team" element={<WorkspaceDetailPage defaultTab="team" />} />
-      <Route path=":workspaceId/communication" element={<WorkspaceDetailPage defaultTab="communication" />} />
-      <Route path=":workspaceId/analytics" element={<WorkspaceDetailPage defaultTab="analytics" />} />
-      <Route path=":workspaceId/reports" element={<WorkspaceDetailPage defaultTab="reports" />} />
-      <Route path=":workspaceId/marketplace" element={<WorkspaceDetailPage defaultTab="marketplace" />} />
-      <Route path=":workspaceId/templates" element={<WorkspaceDetailPage defaultTab="templates" />} />
+      {/* Workspace Detail with tabs (guarded by workspace access) */}
+      <Route
+        path=":workspaceId"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/tasks"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="tasks" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/team"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="team" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/communication"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="communication" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/analytics"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="analytics" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/reports"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="reports" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/marketplace"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="marketplace" />
+          </WorkspaceAccessRoute>
+        }
+      />
+      <Route
+        path=":workspaceId/templates"
+        element={
+          <WorkspaceAccessRoute>
+            <WorkspaceDetailPage defaultTab="templates" />
+          </WorkspaceAccessRoute>
+        }
+      />
       
       {/* Redirect unknown routes to dashboard */}
       <Route path="*" element={<Navigate to="/console/workspaces" replace />} />
     </Routes>
   );
 };
-
-export default WorkspaceService;
