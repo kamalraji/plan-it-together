@@ -29,7 +29,7 @@ interface WorkspaceDetailPageProps {
  * - Resource actions and management capabilities
  */
 export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaultTab = 'overview' }) => {
-  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId, orgSlug } = useParams<{ workspaceId: string; orgSlug?: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
 
@@ -39,7 +39,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at')
+        .select(
+          `id, name, status, created_at, updated_at, event_id, events!inner(id, name, start_date, end_date, status)`
+        )
         .eq('id', workspaceId as string)
         .maybeSingle();
 
@@ -48,13 +50,21 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
 
       const mapped = {
         id: data.id as string,
-        eventId: '',
+        eventId: (data as any).event_id as string | undefined,
         name: data.name as string,
         status: data.status as WorkspaceStatus,
         createdAt: data.created_at as string,
         updatedAt: data.updated_at as string,
         description: '',
-        event: undefined,
+        event: (data as any).events
+          ? {
+              id: (data as any).events.id as string,
+              name: (data as any).events.name as string,
+              startDate: (data as any).events.start_date as string,
+              endDate: (data as any).events.end_date as string,
+              status: (data as any).events.status as string,
+            }
+          : undefined,
         teamMembers: [],
         taskSummary: undefined,
         channels: [],
@@ -434,9 +444,18 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
     },
   ];
 
+  const baseWorkspacePath = orgSlug ? `/${orgSlug}/workspaces` : '/console/workspaces';
+  const eventManagementBase = orgSlug ? `/${orgSlug}/eventmanagement` : '/dashboard/eventmanagement';
+
   const breadcrumbs = [
-    { label: 'Workspaces', href: '/console/workspaces' },
-    { label: workspace?.name || 'Loading...', href: `/console/workspaces/${workspaceId}` },
+    ...(workspace?.event
+      ? [
+          { label: 'Events', href: eventManagementBase },
+          { label: workspace.event.name, href: `${eventManagementBase}/${workspace.event.id}` },
+        ]
+      : []),
+    { label: 'Workspaces', href: baseWorkspacePath },
+    { label: workspace?.name || 'Loading...', href: `${baseWorkspacePath}/${workspaceId}` },
   ];
 
   if (isLoading) {
@@ -478,6 +497,16 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Mobile back navigation */}
+        <button
+          type="button"
+          onClick={() => navigate(baseWorkspacePath)}
+          className="mt-3 mb-3 inline-flex items-center text-sm text-gray-600 hover:text-gray-900 sm:hidden"
+        >
+          <ArrowLeftIcon className="w-4 h-4 mr-1" />
+          Back to workspaces
+        </button>
+
         {/* Page Header */}
         <PageHeader
           title={workspace.name}
@@ -492,6 +521,43 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
             onClick: () => setActiveTab(tab.id),
           }))}
         />
+
+        {/* Linked event + status header */}
+        {workspace.event && (
+          <section className="mt-4 sm:mt-6 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Linked event</p>
+              <Link
+                to={`${eventManagementBase}/${workspace.event.id}`}
+                className="mt-0.5 block text-sm font-medium text-blue-600 hover:text-blue-500"
+              >
+                {workspace.event.name}
+              </Link>
+              <p className="mt-0.5 text-xs text-gray-500">
+                {workspace.event.startDate && workspace.event.endDate
+                  ? `${new Date(workspace.event.startDate).toLocaleDateString()} – ${new Date(workspace.event.endDate).toLocaleDateString()}`
+                  : null}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
+                Workspace status: {workspace.status}
+              </span>
+              {workspace.event.status && (
+                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                  Event status: {workspace.event.status}
+                </span>
+              )}
+              <Link
+                to={`${eventManagementBase}/${workspace.event.id}`}
+                className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
+              >
+                <ArrowLeftIcon className="w-4 h-4 mr-1" />
+                Open event console
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Tab Content */}
         <div className="mt-4 sm:mt-6">

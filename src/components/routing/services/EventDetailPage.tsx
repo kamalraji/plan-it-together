@@ -17,7 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { AttendanceList } from '@/components/attendance';
 import { supabase } from '@/integrations/supabase/looseClient';
-import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
+
 
 interface EventDetailPageProps {
   defaultTab?: string;
@@ -457,17 +457,6 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
       ? workspaces.find((ws) => ws.id === selectedWorkspaceId)
       : undefined;
 
-  const [workspaceNameDraft, setWorkspaceNameDraft] = useState<string>('');
-  const [workspaceStatusDraft, setWorkspaceStatusDraft] = useState<WorkspaceStatus | undefined>(
-    undefined,
-  );
-
-  useEffect(() => {
-    if (!selectedWorkspace) return;
-    setWorkspaceNameDraft(selectedWorkspace.name);
-    setWorkspaceStatusDraft(selectedWorkspace.status as WorkspaceStatus);
-  }, [selectedWorkspace?.id]);
-
   const {
     data: teamMembers,
     isLoading: isTeamMembersLoading,
@@ -502,30 +491,6 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
   });
 
   const currentMember = teamMembers?.find((member: any) => member.userId === user?.id);
-
-  const updateWorkspaceMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedWorkspace?.id) return;
-      const payload: { name?: string; status?: WorkspaceStatus } = {};
-      if (workspaceNameDraft && workspaceNameDraft !== selectedWorkspace.name) {
-        payload.name = workspaceNameDraft;
-      }
-      if (workspaceStatusDraft && workspaceStatusDraft !== selectedWorkspace.status) {
-        payload.status = workspaceStatusDraft;
-      }
-      if (Object.keys(payload).length === 0) return;
-
-      const { error } = await supabase
-        .from('workspaces')
-        .update(payload)
-        .eq('id', selectedWorkspace.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['event-workspaces', event.id] });
-    },
-  });
 
   if (isLoading || createWorkspaceMutation.isPending) {
     return (
@@ -639,52 +604,32 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
       </div>
 
       <div className="lg:col-span-3 space-y-4">
-
         {selectedWorkspace && !isTeamMembersLoading && (
           <WorkspaceRolePermissionsTable highlightedRole={currentMember?.role as WorkspaceRole} />
         )}
 
-        {canManageEventWorkspaces && selectedWorkspace && (
-          <div className="bg-card rounded-lg border border-border p-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div className="w-full md:w-2/3 space-y-2">
-              <label className="block text-xs font-medium text-muted-foreground">
-                Workspace name
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                  value={workspaceNameDraft}
-                  onChange={(e) => setWorkspaceNameDraft(e.target.value)}
-                  placeholder="Workspace name"
-                />
-              </label>
+        {selectedWorkspace ? (
+          <div className="bg-card rounded-lg border border-border p-6 space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">Workspace console</p>
+                <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
+                  Open the dedicated workspace console to manage tasks, team, communication, analytics and
+                  reports. The event page only handles listing and basic setup for workspaces.
+                </p>
+              </div>
+              {selectedWorkspaceId && (
+                <WorkspaceConsoleLink workspaceId={selectedWorkspaceId} />
+              )}
             </div>
-            <div className="w-full md:w-1/3 space-y-2">
-              <label className="block text-xs font-medium text-muted-foreground">
-                Workspace status
-                <select
-                  className="mt-1 block w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-                  value={workspaceStatusDraft || WorkspaceStatus.ACTIVE}
-                  onChange={(e) => setWorkspaceStatusDraft(e.target.value as WorkspaceStatus)}
-                >
-                  <option value={WorkspaceStatus.ACTIVE}>Active</option>
-                  <option value={WorkspaceStatus.WINDING_DOWN}>Winding down</option>
-                  <option value={WorkspaceStatus.DISSOLVED}>Dissolved</option>
-                </select>
-              </label>
-              <button
-                type="button"
-                onClick={() => updateWorkspaceMutation.mutate()}
-                className="mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 w-full"
-                disabled={updateWorkspaceMutation.isPending}
-              >
-                Save changes
-              </button>
-            </div>
-          </div>
-        )}
 
-        {selectedWorkspaceId ? (
-          <WorkspaceDashboard workspaceId={selectedWorkspaceId} />
+            {!selectedWorkspaceId && (
+              <p className="text-xs text-muted-foreground">
+                Select a workspace on the left {canManageEventWorkspaces && 'or create a new one'} to open its
+                console.
+              </p>
+            )}
+          </div>
         ) : (
           <div className="bg-card rounded-lg border border-border p-6 flex items-center justify-center text-sm text-muted-foreground">
             Select a workspace on the left {canManageEventWorkspaces && 'or create a new one'} to get started.
@@ -692,6 +637,20 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
         )}
       </div>
     </div>
+  );
+};
+
+const WorkspaceConsoleLink: React.FC<{ workspaceId: string }> = ({ workspaceId }) => {
+  const { orgSlug } = useParams<{ orgSlug?: string }>();
+  const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/console/workspaces';
+
+  return (
+    <Link
+      to={`${basePath}/${workspaceId}`}
+      className="inline-flex items-center justify-center rounded-md border border-primary/40 bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+    >
+      Open workspace console
+    </Link>
   );
 };
 
