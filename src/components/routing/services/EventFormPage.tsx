@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -71,11 +71,11 @@ type EventFormValues = z.infer<typeof eventSchema>;
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { listPath } = useEventManagementPaths();
   const { data: myOrganizations = [], isLoading: isLoadingOrganizations } =
     useMyMemberOrganizations();
-  const [submitIntent, setSubmitIntent] = useState<'draft' | 'publish'>('publish');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
@@ -175,7 +175,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
     try {
       setIsSubmitting(true);
-      const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
 
       const payload: any = {
         name: values.name.trim(),
@@ -187,7 +186,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
         organization_id: values.organizationId,
         visibility: 'PUBLIC',
-        status,
         branding: {
           primaryColor: values.primaryColor,
           logoUrl: values.logoUrl || undefined,
@@ -198,38 +196,53 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         },
       };
 
-      let error;
+      let createdEventId: string | undefined;
+
       if (mode === 'create') {
-        ({ error } = await supabase.from('events').insert(payload));
+        payload.status = 'DRAFT';
+
+        const { data, error } = await supabase
+          .from('events')
+          .insert(payload)
+          .select('id')
+          .maybeSingle();
+
+        if (error) throw error;
+        createdEventId = data?.id as string | undefined;
       } else {
-        ({ error } = await supabase.from('events').update(payload).eq('id', eventId));
+        const { error } = await supabase.from('events').update(payload).eq('id', eventId);
+        if (error) throw error;
       }
 
-      if (error) throw error;
-
       toast({
-        title:
-          mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Draft saved'
-              : 'Event created'
-            : 'Event updated',
+        title: mode === 'create' ? 'Event draft saved' : 'Event updated',
         description:
           mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Your event draft has been saved.'
-              : 'Your event has been created successfully.'
+            ? 'Your event has been saved as a draft. Next, create a workspace to manage and publish it.'
             : 'Your changes have been saved.',
       });
 
-      navigate(listPath);
+      if (mode === 'create') {
+        const currentPath = location.pathname;
+        const orgSlugCandidate = currentPath.split('/')[1];
+        const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+        const baseWorkspacePath = isOrgContext
+          ? `/${orgSlugCandidate}/workspaces`
+          : '/dashboard/workspaces';
+
+        if (createdEventId) {
+          navigate(`${baseWorkspacePath}/create?eventId=${createdEventId}`);
+        } else {
+          navigate(listPath);
+        }
+      } else {
+        navigate(listPath);
+      }
     } catch (err: any) {
       console.error('Failed to save event', err);
       const rawMessage = err?.message || 'Please try again.';
 
-      // Surface the exact Supabase error so we can properly debug issues
       const message = rawMessage;
-
 
       setServerError(message);
       toast({
@@ -250,11 +263,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       variant: 'secondary' as const,
     },
     {
-      label: mode === 'create' ? 'Create Event' : 'Save Changes',
+      label: mode === 'create' ? 'Save & continue to workspace' : 'Save Changes',
       action: () => {
         const formEl = document.getElementById('event-form') as HTMLFormElement | null;
         if (formEl) {
-          setSubmitIntent('publish');
           if (typeof formEl.requestSubmit === 'function') {
             formEl.requestSubmit();
           } else {
@@ -797,24 +809,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   </Button>
                   <Button
                     type="submit"
-                    variant="outline"
-                    onClick={() => setSubmitIntent('draft')}
-                    disabled={isSubmitting || myOrganizations.length === 0}
-                  >
-                    Save as draft
-                  </Button>
-                  <Button
-                    type="submit"
                     variant="default"
-                    onClick={() => setSubmitIntent('publish')}
                     disabled={isSubmitting || myOrganizations.length === 0}
                   >
                     {isSubmitting
                       ? mode === 'create'
-                        ? 'Creating...'
+                        ? 'Saving...'
                         : 'Saving...'
                       : mode === 'create'
-                        ? 'Create event'
+                        ? 'Save & continue to workspace'
                         : 'Save changes'}
                   </Button>
                 </div>
@@ -827,7 +830,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           <h4 className="text-sm font-medium text-blue-900 mb-2">Need Help?</h4>
           <p className="text-sm text-blue-700">
             {mode === 'create'
-              ? 'Fill in the required fields to create your event. You can save as draft and continue editing later.'
+              ? 'Fill in the required fields to create your event. After saving, you will be guided to create a workspace before publishing.'
               : 'Update your event information. Changes will be reflected immediately after saving.'}
           </p>
         </div>
