@@ -2,6 +2,9 @@ import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import { PortfolioPreviewCard } from '@/components/portfolio/PortfolioPreviewCard';
+
+const portfolioSections = ['about', 'links', 'highlights'] as const;
 
 const profileSchema = z.object({
   full_name: z.string().trim().max(200).optional(),
@@ -12,6 +15,10 @@ const profileSchema = z.object({
   linkedin_url: z.string().trim().url().max(300).optional().or(z.literal('')),
   twitter_url: z.string().trim().max(300).optional(),
   github_url: z.string().trim().max(300).optional(),
+  portfolio_accent_color: z.enum(['default', 'vibrant', 'soft']).optional(),
+  portfolio_layout: z.enum(['stacked', 'grid']).optional(),
+  portfolio_sections: z.array(z.enum(portfolioSections)).optional(),
+  portfolio_is_public: z.boolean().optional(),
 });
 
 interface ParticipantProfileEditorProps {
@@ -29,6 +36,10 @@ interface UserProfileRow {
   twitter_url: string | null;
   github_url: string | null;
   avatar_url: string | null;
+  portfolio_accent_color: string | null;
+  portfolio_layout: 'stacked' | 'grid' | null;
+  portfolio_sections: string[] | null;
+  portfolio_is_public: boolean | null;
 }
 
 export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfileEditorProps) {
@@ -43,7 +54,9 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('full_name, organization, phone, bio, website, linkedin_url, twitter_url, github_url, avatar_url')
+        .select(
+          'full_name, organization, phone, bio, website, linkedin_url, twitter_url, github_url, avatar_url, portfolio_accent_color, portfolio_layout, portfolio_sections, portfolio_is_public',
+        )
         .eq('id', userId)
         .maybeSingle();
 
@@ -59,10 +72,27 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
   }, [profile]);
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = event.target;
+    const target = event.target as HTMLInputElement & HTMLTextAreaElement & HTMLSelectElement;
+    const { name, value, type, checked } = target;
+
+    if (name === 'portfolio_is_public' && type === 'checkbox') {
+      setFormState((prev) => ({ ...prev, portfolio_is_public: checked }));
+      return;
+    }
+
     setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSectionsChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    const current = (formState.portfolio_sections as string[] | undefined) ?? ['about', 'links', 'highlights'];
+
+    const next = checked
+      ? Array.from(new Set([...current, name]))
+      : current.filter((section) => section !== name);
+
+    setFormState((prev) => ({ ...prev, portfolio_sections: next }));
   };
 
   const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +149,11 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
       linkedin_url: formState.linkedin_url ?? '',
       twitter_url: formState.twitter_url ?? '',
       github_url: formState.github_url ?? '',
+      portfolio_accent_color: (formState.portfolio_accent_color as string | undefined) ?? 'default',
+      portfolio_layout: (formState.portfolio_layout as 'stacked' | 'grid' | undefined) ?? 'stacked',
+      portfolio_sections:
+        (formState.portfolio_sections as string[] | undefined) ?? ['about', 'links', 'highlights'],
+      portfolio_is_public: formState.portfolio_is_public ?? true,
     };
 
     const parsed = profileSchema.safeParse(payload);
@@ -151,6 +186,8 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
     formState.full_name?.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() ||
     userEmail?.[0]?.toUpperCase() ||
     'P';
+
+  const sections = (formState.portfolio_sections as string[] | undefined) ?? ['about', 'links', 'highlights'];
 
   return (
     <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
@@ -317,6 +354,104 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
                 onChange={handleChange}
                 className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="https://github.com/username"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] gap-4 lg:gap-6">
+            <div className="space-y-3 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Public portfolio</h3>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Control how your public portfolio at /portfolio shows up.
+                  </p>
+                </div>
+                <label className="inline-flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    name="portfolio_is_public"
+                    checked={formState.portfolio_is_public ?? true}
+                    onChange={handleChange}
+                    className="h-3.5 w-3.5 rounded border border-border/70 bg-background text-primary focus:ring-primary"
+                  />
+                  <span>Public</span>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-medium text-muted-foreground" htmlFor="portfolio_layout">
+                    Card layout
+                  </label>
+                  <select
+                    id="portfolio_layout"
+                    name="portfolio_layout"
+                    value={(formState.portfolio_layout as 'stacked' | 'grid' | undefined) ?? 'stacked'}
+                    onChange={handleChange}
+                    className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="stacked">Stacked story</option>
+                    <option value="grid">Split columns</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-medium text-muted-foreground" htmlFor="portfolio_accent_color">
+                    Accent mood
+                  </label>
+                  <select
+                    id="portfolio_accent_color"
+                    name="portfolio_accent_color"
+                    value={(formState.portfolio_accent_color as string | undefined) ?? 'default'}
+                    onChange={handleChange}
+                    className="w-full rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="default">Default glow</option>
+                    <option value="vibrant">Vibrant</option>
+                    <option value="soft">Soft</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-2 space-y-1.5">
+                <span className="text-[11px] font-medium text-muted-foreground">Sections</span>
+                <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+                  {portfolioSections.map((sectionKey) => (
+                    <label key={sectionKey} className="inline-flex items-center gap-1.5">
+                      <input
+                        type="checkbox"
+                        name={sectionKey}
+                        checked={sections.includes(sectionKey)}
+                        onChange={handleSectionsChange}
+                        className="h-3.5 w-3.5 rounded border border-border/70 bg-background text-primary focus:ring-primary"
+                      />
+                      <span className="capitalize">{sectionKey}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground">Live preview</p>
+              <PortfolioPreviewCard
+                profile={{
+                  id: userId,
+                  full_name: formState.full_name ?? null,
+                  organization: formState.organization ?? null,
+                  bio: formState.bio ?? null,
+                  website: formState.website ?? null,
+                  linkedin_url: formState.linkedin_url ?? null,
+                  twitter_url: formState.twitter_url ?? null,
+                  github_url: formState.github_url ?? null,
+                  avatar_url: formState.avatar_url ?? null,
+                  portfolio_accent_color: (formState.portfolio_accent_color as string | null) ?? null,
+                  portfolio_layout: (formState.portfolio_layout as 'stacked' | 'grid' | null) ?? 'stacked',
+                  portfolio_sections: sections,
+                  created_at: new Date().toISOString(),
+                }}
+                href={undefined}
               />
             </div>
           </div>
