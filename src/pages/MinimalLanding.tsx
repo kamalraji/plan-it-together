@@ -9,7 +9,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-
+import { AnimateOnScroll } from "@/components/AnimateOnScroll";
+ 
 const sections = {
   why: "why",
   how: "how",
@@ -243,9 +244,8 @@ const MinimalLanding = () => {
           </div>
         </section>
 
-        {/* Why universities choose Thittam1Hub */}
         <section id={sections.why} aria-labelledby="why-heading" className="border-b border-border/60 bg-background">
-          <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
+          <AnimateOnScroll className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 max-w-2xl space-y-2">
               <h2 id="why-heading" className="text-xl font-semibold tracking-tight">
                 Why universities and tech-savvy teams choose Thittam1Hub
@@ -279,7 +279,7 @@ const MinimalLanding = () => {
                 </Card>
               ))}
             </div>
-          </div>
+          </AnimateOnScroll>
         </section>
 
         {/* How it works */}
@@ -288,7 +288,7 @@ const MinimalLanding = () => {
           aria-labelledby="how-heading"
           className="border-b border-border/60 bg-muted/50"
         >
-          <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
+          <AnimateOnScroll className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 id="how-heading" className="text-xl font-semibold tracking-tight">
@@ -331,7 +331,7 @@ const MinimalLanding = () => {
                 </Card>
               ))}
             </div>
-          </div>
+          </AnimateOnScroll>
         </section>
 
         {/* Features */}
