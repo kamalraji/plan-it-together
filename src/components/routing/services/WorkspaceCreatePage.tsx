@@ -45,11 +45,15 @@ export const WorkspaceCreatePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const selectedEvent = isOrgContext && orgEvents
-    ? (orgEvents as any[]).find((event) => event.id === formValues.eventId)
-    : null;
-
-  const canManageWorkspaces =
-    !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
+     ? (orgEvents as any[]).find((event) => event.id === formValues.eventId)
+     : null;
+ 
+   const canManageWorkspaces =
+     !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
+ 
+   const eventCreatePath = isOrgContext && orgSlugCandidate
+     ? `/${orgSlugCandidate}/eventmanagement/create`
+     : '/dashboard/eventmanagement/create';
 
   const handleChange = (field: keyof typeof formValues) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -168,29 +172,45 @@ export const WorkspaceCreatePage: React.FC = () => {
               Associated event
             </label>
             {isOrgContext ? (
-              <select
-                id="event-id"
-                value={formValues.eventId}
-                onChange={handleChange('eventId')}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-              >
-                {orgEventsLoading && <option value="">Loading events…</option>}
+              <>
+                <select
+                  id="event-id"
+                  value={formValues.eventId}
+                  onChange={handleChange('eventId')}
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  {orgEventsLoading && <option value="">Loading events…</option>}
+                  {!orgEventsLoading && (!orgEvents || orgEvents.length === 0) && (
+                    <option value="" disabled>
+                      No events available – create an event first
+                    </option>
+                  )}
+                  {!orgEventsLoading && orgEvents && orgEvents.length > 0 && (
+                    <>
+                      <option value="">Select an event</option>
+                      {orgEvents.map((event: any) => (
+                        <option key={event.id} value={event.id}>
+                          {event.name}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
                 {!orgEventsLoading && (!orgEvents || orgEvents.length === 0) && (
-                  <option value="" disabled>
-                    No events available
-                  </option>
+                  <div className="mt-2 flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <span>
+                      No events found for this organization. Create an event before creating a workspace.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigate(eventCreatePath)}
+                      className="ml-3 inline-flex items-center rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-amber-700"
+                    >
+                      Create event
+                    </button>
+                  </div>
                 )}
-                {!orgEventsLoading && orgEvents && orgEvents.length > 0 && (
-                  <>
-                    <option value="">Select an event</option>
-                    {orgEvents.map((event: any) => (
-                      <option key={event.id} value={event.id}>
-                        {event.name}
-                      </option>
-                    ))}
-                  </>
-                )}
-              </select>
+              </>
             ) : (
               <input
                 id="event-id"
