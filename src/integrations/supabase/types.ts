@@ -654,6 +654,10 @@ export type Database = {
           linkedin_url: string | null
           organization: string | null
           phone: string | null
+          portfolio_accent_color: string | null
+          portfolio_is_public: boolean
+          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections: string[]
           qr_code: string
           twitter_url: string | null
           website: string | null
@@ -668,6 +672,10 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
+          portfolio_accent_color?: string | null
+          portfolio_is_public?: boolean
+          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections?: string[]
           qr_code: string
           twitter_url?: string | null
           website?: string | null
@@ -682,6 +690,10 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
+          portfolio_accent_color?: string | null
+          portfolio_is_public?: boolean
+          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections?: string[]
           qr_code?: string
           twitter_url?: string | null
           website?: string | null
@@ -870,6 +882,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_portfolio: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          created_at: string
+          full_name: string
+          github_url: string
+          id: string
+          linkedin_url: string
+          organization: string
+          portfolio_accent_color: string
+          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections: string[]
+          twitter_url: string
+          website: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -907,6 +937,7 @@ export type Database = {
         | "ACTIVE"
         | "REJECTED"
         | "REMOVED"
+      portfolio_layout: "stacked" | "grid"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
       user_role:
         | "SUPER_ADMIN"
@@ -1066,6 +1097,7 @@ export const Constants = {
         "REJECTED",
         "REMOVED",
       ],
+      portfolio_layout: ["stacked", "grid"],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
       user_role: [
         "SUPER_ADMIN",
