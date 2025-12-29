@@ -176,6 +176,28 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     try {
       setIsSubmitting(true);
 
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+
+      if (!user) {
+        throw new Error('You must be logged in to create events.');
+      }
+
+      if (mode === 'create' && values.organizationId) {
+        const { data: membership, error: membershipError } = await supabase
+          .from('organization_memberships')
+          .select('status, role')
+          .eq('user_id', user.id)
+          .eq('organization_id', values.organizationId)
+          .maybeSingle();
+
+        if (membershipError) throw membershipError;
+
+        if (!membership || membership.status !== 'ACTIVE' || !['OWNER', 'ADMIN', 'ORGANIZER'].includes(membership.role)) {
+          throw new Error('You must be an active organizer for this organization to create events.');
+        }
+      }
+
       const payload: any = {
         name: values.name.trim(),
         description: values.description.trim(),
@@ -194,6 +216,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           primaryCtaLabel: values.primaryCtaLabel?.trim() || undefined,
           secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
         },
+        owner_id: user.id,
       };
 
       let createdEventId: string | undefined;

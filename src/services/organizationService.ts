@@ -157,7 +157,8 @@ class OrganizationService {
       .from('organization_memberships')
       .select('organizations(*)')
       .eq('user_id', user.id)
-      .eq('status', 'ACTIVE');
+      .eq('status', 'ACTIVE')
+      .in('role', ['OWNER', 'ADMIN', 'ORGANIZER']);
 
     if (error) throw new Error(error.message);
 
