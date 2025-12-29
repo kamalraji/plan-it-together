@@ -37,11 +37,15 @@ export const OrganizationSidebar: React.FC = () => {
             <SidebarMenu>
               {orgItems.map((item) => {
                 const to = `${base}/${item.path}`;
-                const isActive = currentPath === to;
+                const isActive = currentPath === to || currentPath.startsWith(`${to}/`);
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className="data-[active=true]:bg-muted data-[active=true]:text-primary data-[active=true]:font-semibold hover:bg-muted/70 transition-colors"
+                    >
                       <NavLink
                         to={to}
                         end
