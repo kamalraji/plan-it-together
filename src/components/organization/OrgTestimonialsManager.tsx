@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { useCurrentOrganization } from './OrganizationContext';
@@ -7,12 +7,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
 
 type TestimonialRow = Tables<'organization_testimonials'>;
 
 export const OrgTestimonialsManager: React.FC = () => {
   const organization = useCurrentOrganization();
   const { toast } = useToast();
+  const { data: memberships } = useMyOrganizationMemberships();
+
+  const activeMembership = useMemo(() => {
+    if (!memberships || !organization?.id) return undefined;
+    return memberships.find(
+      (m: any) => m.organization_id === organization.id && m.status === 'ACTIVE',
+    );
+  }, [memberships, organization?.id]);
+
+  const canEdit = activeMembership?.role === 'OWNER' || activeMembership?.role === 'ADMIN';
 
   const [items, setItems] = useState<TestimonialRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,6 +70,16 @@ export const OrgTestimonialsManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can edit testimonials.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!form.author_name.trim() || !form.quote.trim()) {
       toast({
         title: 'Missing required fields',
@@ -93,7 +114,10 @@ export const OrgTestimonialsManager: React.FC = () => {
       }
       toast({ title: 'Testimonial updated' });
     } else {
-      const maxPosition = items.reduce((max, t) => (t.position ?? 0) > max ? (t.position ?? 0) : max, 0);
+      const maxPosition = items.reduce(
+        (max, t) => ((t.position ?? 0) > max ? (t.position ?? 0) : max),
+        0,
+      );
       const { error } = await supabase
         .from('organization_testimonials')
         .insert({ ...payload, position: maxPosition + 1 });
@@ -125,6 +149,15 @@ export const OrgTestimonialsManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can delete testimonials.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from('organization_testimonials')
       .delete()
@@ -160,6 +193,15 @@ export const OrgTestimonialsManager: React.FC = () => {
   };
 
   const persistOrder = async () => {
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can reorder testimonials.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSavingOrder(true);
     const updates = items.map((item, index) =>
       supabase
@@ -185,7 +227,10 @@ export const OrgTestimonialsManager: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3 sm:p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3 sm:p-4"
+      >
         <div className="grid gap-2 sm:grid-cols-2">
           <div className="space-y-1">
             <label className="text-xs font-medium text-muted-foreground">Author name</label>
@@ -193,14 +238,18 @@ export const OrgTestimonialsManager: React.FC = () => {
               value={form.author_name}
               onChange={(e) => setForm((f) => ({ ...f, author_name: e.target.value }))}
               placeholder="Jane Doe"
+              disabled={!canEdit}
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Author role (optional)</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Author role (optional)
+            </label>
             <Input
               value={form.author_role}
               onChange={(e) => setForm((f) => ({ ...f, author_role: e.target.value }))}
               placeholder="Founder, Example Org"
+              disabled={!canEdit}
             />
           </div>
         </div>
@@ -211,6 +260,7 @@ export const OrgTestimonialsManager: React.FC = () => {
             onChange={(e) => setForm((f) => ({ ...f, quote: e.target.value }))}
             rows={3}
             placeholder="This event series completely changed how we connect with our community."
+            disabled={!canEdit}
           />
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -219,6 +269,7 @@ export const OrgTestimonialsManager: React.FC = () => {
               id="highlight"
               checked={form.highlight}
               onCheckedChange={(checked) => setForm((f) => ({ ...f, highlight: checked }))}
+              disabled={!canEdit}
             />
             <label htmlFor="highlight" className="text-xs sm:text-sm text-muted-foreground">
               Highlight this testimonial on the public page
@@ -226,11 +277,17 @@ export const OrgTestimonialsManager: React.FC = () => {
           </div>
           <div className="flex gap-2">
             {editingId && (
-              <Button type="button" variant="outline" size="sm" onClick={resetForm}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={resetForm}
+                disabled={!canEdit}
+              >
                 Cancel
               </Button>
             )}
-            <Button type="submit" size="sm">
+            <Button type="submit" size="sm" disabled={!canEdit}>
               {editingId ? 'Save changes' : 'Add testimonial'}
             </Button>
           </div>
@@ -240,18 +297,22 @@ export const OrgTestimonialsManager: React.FC = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            Drag testimonials to reorder how they appear. Changes are saved when you click
-            <span className="font-semibold"> Save order</span>.
+            {canEdit
+              ? 'Drag testimonials to reorder how they appear. Changes are saved when you click'
+              : 'Testimonials are managed by organization owners and admins.'}{' '}
+            {canEdit && <span className="font-semibold">Save order</span>}.
           </p>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={savingOrder || loading || items.length === 0}
-            onClick={persistOrder}
-          >
-            {savingOrder ? 'Saving…' : 'Save order'}
-          </Button>
+          {canEdit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={savingOrder || loading || items.length === 0}
+              onClick={persistOrder}
+            >
+              {savingOrder ? 'Saving…' : 'Save order'}
+            </Button>
+          )}
         </div>
 
         <div className="space-y-2">
