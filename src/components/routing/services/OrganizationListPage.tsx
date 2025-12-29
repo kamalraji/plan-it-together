@@ -204,10 +204,10 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       render: (_value: any, record: OrganizationListRow) => (
         <div className="flex space-x-2">
           <Link
-            to={`/${record.slug}/organizations`}
+            to={`/${record.slug}`}
             className="text-blue-600 hover:text-blue-500 text-sm font-medium"
           >
-            View
+            View Public Page
           </Link>
           {record.role === 'OWNER' && (
             <>
