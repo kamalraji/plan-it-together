@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember } from '../../types';
-
+import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember, WorkspaceRoleScope } from '../../types';
+import { supabase } from '@/integrations/supabase/client';
 interface TaskComment {
   id: string;
   userId: string;
@@ -49,6 +49,7 @@ interface TaskDetailViewProps {
 
 export function TaskDetailView({
   task,
+  teamMembers,
   comments = [],
   files = [],
   activities = [],
@@ -67,7 +68,10 @@ export function TaskDetailView({
   const [editCommentContent, setEditCommentContent] = useState('');
   const [progressValue, setProgressValue] = useState(task.progress);
   const [isEditingProgress, setIsEditingProgress] = useState(false);
-
+  const [isSavingRoleScope, setIsSavingRoleScope] = useState(false);
+  const [roleScopeValue, setRoleScopeValue] = useState<string>(
+    (task.roleScope || (task.metadata?.roleScope as WorkspaceRoleScope | undefined) || '') as string,
+  );
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.NOT_STARTED:
@@ -177,6 +181,22 @@ export function TaskDetailView({
     }
   };
 
+  const handleRoleScopeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as WorkspaceRoleScope | '';
+    setRoleScopeValue(value || '');
+    setIsSavingRoleScope(true);
+
+    const { error } = await supabase
+      .from('workspace_tasks')
+      .update({ role_scope: value || null })
+      .eq('id', task.id);
+
+    if (error) {
+      console.error('Failed to update task role scope', error);
+    }
+
+    setIsSavingRoleScope(false);
+  };
   const tabs = [
     { id: 'details', name: 'Details' },
     { id: 'comments', name: 'Comments', count: comments.length },
@@ -327,6 +347,23 @@ export function TaskDetailView({
                   </div>
                 </div>
 
+                {/* Role Space (sub workspace) */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Role Space (sub workspace)</h4>
+                  <select
+                    value={roleScopeValue}
+                    onChange={handleRoleScopeChange}
+                    disabled={isSavingRoleScope}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="">All teams (no specific role)</option>
+                    {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
+                      <option key={role} value={role}>
+                        {role.replace('_', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {/* Progress */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
