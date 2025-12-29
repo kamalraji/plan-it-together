@@ -29,10 +29,7 @@ interface WorkspaceSummary {
   } | null;
 }
 export function OrganizerDashboard() {
-  const {
-    user,
-    logout
-  } = useAuth();
+  const { user } = useAuth();
   const organization = useCurrentOrganization();
   const [activeTab, setActiveTab] = useState<'events' | 'analytics'>('events');
   const [isChecklistOpen, setIsChecklistOpen] = useState(true);
