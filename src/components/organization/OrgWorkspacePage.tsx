@@ -74,15 +74,8 @@ export const OrgWorkspacePage: React.FC = () => {
   };
 
   const handleOpenWorkspace = (workspace: Workspace) => {
-    // Navigate to the event-specific workspace tab on the Event detail page.
-    const baseEventPath = orgSlug
-      ? `/${orgSlug}/eventmanagement`
-      : '/dashboard/eventmanagement';
-    const eventId = (workspace as any).eventId;
-
-    if (eventId) {
-      navigate(`${baseEventPath}/${eventId}/workspace`);
-    }
+    // Navigate directly to the dedicated workspace console detail page.
+    navigate(`${baseWorkspacePath}/${workspace.id}`);
   };
 
   return (
