@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { PortfolioPreviewCard } from '@/components/portfolio/PortfolioPreviewCard';
+import { User2, Building2, Phone, Globe2, Linkedin, Twitter, Github } from 'lucide-react';
 
 const portfolioSections = ['about', 'links', 'highlights'] as const;
 
@@ -206,17 +207,20 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
   const sections = (formState.portfolio_sections as string[] | undefined) ?? ['about', 'links', 'highlights'];
 
   return (
-    <div className="bg-card border border-border/60 rounded-2xl shadow-sm px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="relative overflow-hidden bg-card border border-border/60 rounded-2xl shadow-[0_18px_60px_rgba(15,23,42,0.35)] px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-8">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-28 -bottom-32 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
+
+      <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Your profile</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Participant profile</h2>
           <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-            Update your basic details, avatar, and social links used across events.
+            Tune your public presence, avatar, and links used across events and workspaces.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+      <div className="relative flex flex-col md:flex-row gap-6 md:gap-8">
         <div className="flex flex-col items-center md:items-start gap-4 md:w-64">
           <div className="relative">
             {formState.avatar_url ? (
@@ -249,66 +253,78 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 space-y-5">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="full_name">
                 Full name
               </label>
-              <input
-                id="full_name"
-                name="full_name"
-                type="text"
-                value={formState.full_name ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Your preferred display name"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <User2 className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="full_name"
+                  name="full_name"
+                  type="text"
+                  value={formState.full_name ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="Your preferred display name"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="organization">
                 Organization
               </label>
-              <input
-                id="organization"
-                name="organization"
-                type="text"
-                value={formState.organization ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="School, company, community, etc."
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="organization"
+                  name="organization"
+                  type="text"
+                  value={formState.organization ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="School, company, community, etc."
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="phone">
                 Phone
               </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formState.phone ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Optional contact number"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formState.phone ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="Optional contact number"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="website">
                 Website
               </label>
-              <input
-                id="website"
-                name="website"
-                type="url"
-                value={formState.website ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="https://example.com"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Globe2 className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="website"
+                  name="website"
+                  type="url"
+                  value={formState.website ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="https://example.com"
+                />
+              </div>
             </div>
           </div>
 
@@ -322,55 +338,64 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
               value={formState.bio ?? ''}
               onChange={handleChange}
               rows={4}
-              className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              className="w-full rounded-xl border border-border/60 bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/70 resize-none"
               placeholder="A short introduction that organizers and teammates may see."
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="linkedin_url">
                 LinkedIn
               </label>
-              <input
-                id="linkedin_url"
-                name="linkedin_url"
-                type="url"
-                value={formState.linkedin_url ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="https://www.linkedin.com/in/username"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Linkedin className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="linkedin_url"
+                  name="linkedin_url"
+                  type="url"
+                  value={formState.linkedin_url ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="https://www.linkedin.com/in/username"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="twitter_url">
                 X / Twitter
               </label>
-              <input
-                id="twitter_url"
-                name="twitter_url"
-                type="text"
-                value={formState.twitter_url ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="@handle or full URL"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Twitter className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="twitter_url"
+                  name="twitter_url"
+                  type="text"
+                  value={formState.twitter_url ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="@handle or full URL"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="github_url">
                 GitHub
               </label>
-              <input
-                id="github_url"
-                name="github_url"
-                type="text"
-                value={formState.github_url ?? ''}
-                onChange={handleChange}
-                className="w-full rounded-md border border-border/60 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="https://github.com/username"
-              />
+              <div className="relative flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2">
+                <Github className="h-4 w-4 text-muted-foreground" />
+                <input
+                  id="github_url"
+                  name="github_url"
+                  type="text"
+                  value={formState.github_url ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  placeholder="https://github.com/username"
+                />
+              </div>
             </div>
           </div>
 
