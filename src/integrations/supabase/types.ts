@@ -164,6 +164,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
+          owner_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
           updated_at: string
@@ -179,6 +180,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -194,6 +196,7 @@ export type Database = {
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -380,6 +383,88 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "organization_memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_sponsors: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          organization_id: string
+          position: number | null
+          tier: string | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          organization_id: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          organization_id?: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_sponsors_organization_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_testimonials: {
+        Row: {
+          author_name: string
+          author_role: string | null
+          created_at: string
+          highlight: boolean
+          id: string
+          organization_id: string
+          position: number | null
+          quote: string
+        }
+        Insert: {
+          author_name: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id: string
+          position?: number | null
+          quote: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id?: string
+          position?: number | null
+          quote?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_testimonials_organization_fk"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -762,6 +847,7 @@ export type Database = {
           due_date: string | null
           id: string
           priority: string
+          role_scope: string | null
           status: string
           title: string
           updated_at: string
@@ -774,6 +860,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -786,6 +873,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title?: string
           updated_at?: string
