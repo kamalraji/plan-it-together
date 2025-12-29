@@ -79,7 +79,7 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-          <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-hidden">
+          <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-auto">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
             <div className="relative flex w-full pt-16 items-stretch">
               <OrganizationSidebar />
