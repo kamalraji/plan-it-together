@@ -30,16 +30,25 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
   const { data: attendanceRecords } = useQuery<AttendanceRecord[]>({
     queryKey: ['attendance-records', registration.eventId, registration.userId],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('attendance-report', {
-        body: { eventId: registration.eventId },
-      });
-      if (error || !data?.success) {
-        throw error || new Error('Failed to load attendance');
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select('registration_id, user_id, check_in_time, check_in_method')
+        .eq('event_id', registration.eventId)
+        .eq('user_id', registration.userId)
+        .order('check_in_time', { ascending: false });
+
+      if (error) {
+        throw error;
       }
-      const report = data.data;
-      return (report.attendanceRecords || []).filter(
-        (r: any) => r.userId === registration.userId,
-      ) as AttendanceRecord[];
+
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        registrationId: row.registration_id,
+        sessionId: row.session_id ?? null,
+        checkInTime: row.check_in_time,
+        checkInMethod: row.check_in_method as 'QR_SCAN' | 'MANUAL',
+        volunteerId: row.volunteer_id ?? null,
+      })) as AttendanceRecord[];
     },
     enabled: !!registration,
   });
