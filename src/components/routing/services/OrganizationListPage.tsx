@@ -101,16 +101,16 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       render: (_value: string, record: OrganizationListRow) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-lg bg-gray-300 flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span className="text-sm font-medium text-primary">
                 {record.name.charAt(0).toUpperCase()}
               </span>
             </div>
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">{record.name}</div>
+            <div className="text-sm font-medium text-foreground">{record.name}</div>
             {record.description && (
-              <div className="text-sm text-gray-500 truncate max-w-xs">
+              <div className="text-sm text-muted-foreground truncate max-w-xs">
                 {record.description}
               </div>
             )}
@@ -127,14 +127,14 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
         <span
           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
             value === 'COMPANY'
-              ? 'bg-purple-100 text-purple-800'
+              ? 'bg-primary/10 text-primary'
               : value === 'COLLEGE'
-              ? 'bg-blue-100 text-blue-800'
+              ? 'bg-secondary/10 text-secondary-foreground'
               : value === 'INDUSTRY'
-              ? 'bg-green-100 text-green-800'
+              ? 'bg-accent/10 text-accent-foreground'
               : value === 'NON_PROFIT'
-              ? 'bg-orange-100 text-orange-800'
-              : 'bg-gray-100 text-gray-800'
+              ? 'bg-muted text-foreground'
+              : 'bg-muted text-foreground'
           }`}
         >
           {value.replace('_', ' ')}
@@ -156,7 +156,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-gray-900">{value}</span>
+        <span className="text-sm text-foreground">{value}</span>
       ),
     },
     {
@@ -165,7 +165,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-gray-900">{value}</span>
+        <span className="text-sm text-foreground">{value}</span>
       ),
     },
     {
@@ -174,7 +174,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-gray-900">{value.toLocaleString()}</span>
+        <span className="text-sm text-foreground">{value.toLocaleString()}</span>
       ),
     },
     {
