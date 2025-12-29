@@ -134,6 +134,18 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     },
   });
 
+  // Helper to generate a unique, slug-like landing page URL
+  const generateLandingPageSlug = (name: string) => {
+    const base = name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
+    return `${base}-${randomSuffix}`;
+  };
+
   // Create/Update event mutation using Lovable Cloud
   const eventMutation = useMutation({
     mutationFn: async (data: CreateEventDTO) => {
@@ -172,7 +184,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
       } else {
         const insertPayload: any = {
           ...(payload as any),
-          owner_id: user.id,
+          organizer_id: user.id,
+          landing_page_url: generateLandingPageSlug(data.name),
         };
 
         const { data: created, error } = await supabase
