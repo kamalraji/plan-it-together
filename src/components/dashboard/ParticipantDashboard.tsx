@@ -8,6 +8,8 @@ import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 import { CertificateQr } from '@/components/certificates/CertificateQr';
 import { ParticipantProfileEditor } from '@/components/dashboard/ParticipantProfileEditor';
+import { AnimatePresence, motion } from 'framer-motion';
+import { X } from 'lucide-react';
 interface Registration {
   id: string;
   status: string;
@@ -379,27 +381,47 @@ export function ParticipantDashboard() {
       )}
 
       {/* QR Pass Modal */}
-      {canShowQrPass && qrCoreRegistration && qrRegistration && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => setQrRegistration(null)}
-        >
-          <div
-            className="bg-background rounded-2xl p-6 max-w-sm w-full shadow-lg"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {canShowQrPass && qrCoreRegistration && qrRegistration && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setQrRegistration(null)}
           >
-            <h2 className="text-lg font-semibold mb-4 text-foreground">Your QR Pass</h2>
-            <QRCodeDisplay registration={qrCoreRegistration} eventName={qrRegistration.event.name} />
-            <button
-              onClick={() => setQrRegistration(null)}
-              className="mt-6 w-full rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90 transition-colors"
+            <motion.div
+              className="bg-background rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl relative"
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
             >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <h2 className="text-base sm:text-lg font-semibold text-foreground">Your QR Pass</h2>
+                <button
+                  type="button"
+                  onClick={() => setQrRegistration(null)}
+                  className="ml-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/80 text-muted-foreground hover:bg-muted/80 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  aria-label="Close QR pass"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
 
+              <QRCodeDisplay registration={qrCoreRegistration} eventName={qrRegistration.event.name} />
+
+              <button
+                onClick={() => setQrRegistration(null)}
+                className="mt-4 sm:mt-6 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 mb-16 sm:mb-24">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar navigation for participants (desktop/tablet) */}
