@@ -218,6 +218,12 @@ export function OrganizerDashboard() {
               <div className="flex flex-wrap items-center gap-2 justify-center xs:justify-end text-[11px] sm:text-xs text-muted-foreground">
                 <span className="hidden sm:inline">Shortcuts:</span>
                 <Link
+                  to="/organizer/dashboard"
+                  className="inline-flex items-center rounded-full px-3 py-1 bg-primary/10 border border-primary/40 text-primary font-medium hover:bg-primary/15 text-xs"
+                >
+                  My organizer dashboard
+                </Link>
+                <Link
                   to={`/${organization.slug}/workspaces`}
                   className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium"
                 >
