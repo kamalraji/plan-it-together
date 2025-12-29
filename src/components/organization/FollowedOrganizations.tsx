@@ -128,7 +128,7 @@ function FollowedOrganizationCard({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            <Link to={`/organizations/${organization.id}`} className="flex items-center">
+            <Link to={`/${organization.slug}`} className="flex items-center">
               <div className="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
                 {organization.name.charAt(0).toUpperCase()}
               </div>
@@ -180,7 +180,7 @@ function FollowedOrganizationCard({
             Event updates from this organization are available on their public page.
           </p>
           <Link
-            to={`/organizations/${organization.id}`}
+            to={`/${organization.slug}`}
             className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
           >
             View upcoming events
