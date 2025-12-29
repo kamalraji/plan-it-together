@@ -32,6 +32,17 @@ const eventStepSchema = z.object({
   eventId: workspaceCreateSchema.shape.eventId,
 });
 
+const teamLookupSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .min(2, { message: 'Enter at least 2 characters to search' })
+    .max(100, { message: 'Search term must be under 100 characters' })
+    .regex(/^[A-Za-z0-9 .'-]+$/, {
+      message: 'Use letters, numbers, spaces, and basic name characters only',
+    }),
+});
+
 const steps = [
   { id: 1, key: 'name', label: 'Name', description: 'Give your workspace a clear, recognizable name.' },
   { id: 2, key: 'event', label: 'Event', description: 'Connect this workspace to the right event.' },
@@ -40,7 +51,9 @@ const steps = [
 ] as const;
 
 interface PendingTeamMember {
-  userId: string;
+  identifier: string; // name search term
+  resolvedUserId?: string;
+  resolvedName?: string | null;
   role: WorkspaceRole;
 }
 
@@ -108,12 +121,10 @@ export const WorkspaceCreatePage: React.FC = () => {
       const value = e.target.value;
       setFormValues((prev) => ({ ...prev, [field]: value }));
 
-      // Clear any existing timeout
       if (typingTimeoutId) {
         window.clearTimeout(typingTimeoutId);
       }
 
-      // Debounced live validation for this field
       const timeoutId = window.setTimeout(() => {
         validateFieldLive(field, value);
       }, 300);
@@ -148,6 +159,79 @@ export const WorkspaceCreatePage: React.FC = () => {
     return true;
   };
 
+  const handleResolveTeamMember = async (index: number) => {
+    const member = teamMembers[index];
+    const parsed = teamLookupSchema.safeParse({ query: member.identifier });
+
+    if (!parsed.success) {
+      const message = parsed.error.issues[0]?.message ?? 'Enter a valid search term.';
+      toast({
+        title: 'Invalid search term',
+        description: message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const query = parsed.data.query;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .ilike('full_name', `%${query}%`)
+        .limit(5);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        toast({
+          title: 'No users found',
+          description: 'No matching profiles were found for that name.',
+          variant: 'destructive',
+        });
+        setTeamMembers((prev) => {
+          const next = [...prev];
+          next[index] = {
+            ...next[index],
+            resolvedUserId: undefined,
+            resolvedName: undefined,
+          };
+          return next;
+        });
+        return;
+      }
+
+      const primaryMatch = data[0];
+
+      setTeamMembers((prev) => {
+        const next = [...prev];
+        next[index] = {
+          ...next[index],
+          identifier: primaryMatch.full_name || query,
+          resolvedUserId: primaryMatch.id,
+          resolvedName: primaryMatch.full_name,
+        };
+        return next;
+      });
+
+      toast({
+        title: 'User linked',
+        description:
+          data.length > 1
+            ? `Linked to ${primaryMatch.full_name}. ${data.length - 1} other match(es) found.`
+            : `Linked to ${primaryMatch.full_name}.`,
+      });
+    } catch (err: any) {
+      console.error('Failed to look up user profile', err);
+      toast({
+        title: 'Lookup failed',
+        description: 'Unable to search users right now. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleFinalSubmit = async () => {
     if (!canManageWorkspaces || !user) return;
 
@@ -180,13 +264,12 @@ export const WorkspaceCreatePage: React.FC = () => {
 
       const createdId = data?.id as string | undefined;
 
-      // Optionally pre-add team members to this workspace
       if (createdId && teamMembers.length > 0) {
         const rows = teamMembers
-          .filter((m) => m.userId.trim().length > 0)
+          .filter((m) => m.resolvedUserId)
           .map((m) => ({
             workspace_id: createdId,
-            user_id: m.userId.trim(),
+            user_id: m.resolvedUserId as string,
             role: m.role || WorkspaceRole.GENERAL_VOLUNTEER,
             status: 'PENDING',
           }));
@@ -239,7 +322,6 @@ export const WorkspaceCreatePage: React.FC = () => {
       return;
     }
 
-    // On the final step, validate all fields once more then submit.
     handleFinalSubmit();
   };
 
@@ -271,6 +353,8 @@ export const WorkspaceCreatePage: React.FC = () => {
     return false;
   });
 
+  const verifiedTeamCount = teamMembers.filter((m) => m.resolvedUserId).length;
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto">
@@ -283,7 +367,6 @@ export const WorkspaceCreatePage: React.FC = () => {
           }
         />
 
-        {/* Progress indicator */}
         <div className="mt-6">
           <ol className="flex items-center justify-between text-xs sm:text-sm">
             {steps.map((step, index) => {
@@ -450,8 +533,8 @@ export const WorkspaceCreatePage: React.FC = () => {
               <div>
                 <h3 className="text-sm font-medium text-gray-900">Team members (optional)</h3>
                 <p className="text-xs text-gray-500 mt-1">
-                  Pre-add internal users by their user ID so they appear on the workspace team immediately. You
-                  can also invite people later from the workspace dashboard.
+                  Look up existing users by their full name from the directory. Only verified matches will be added
+                  to this workspace. You can also invite people later from the workspace dashboard.
                 </p>
               </div>
 
@@ -470,24 +553,37 @@ export const WorkspaceCreatePage: React.FC = () => {
                       className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
                     >
                       <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-700" htmlFor={`team-user-${index}`}>
-                          User ID
+                        <label
+                          className="block text-xs font-medium text-gray-700"
+                          htmlFor={`team-identifier-${index}`}
+                        >
+                          Name
                         </label>
                         <input
-                          id={`team-user-${index}`}
+                          id={`team-identifier-${index}`}
                           type="text"
-                          value={member.userId}
+                          value={member.identifier}
                           onChange={(e) => {
                             const value = e.target.value;
                             setTeamMembers((prev) => {
                               const next = [...prev];
-                              next[index] = { ...next[index], userId: value };
+                              next[index] = {
+                                ...next[index],
+                                identifier: value,
+                                resolvedUserId: undefined,
+                                resolvedName: undefined,
+                              };
                               return next;
                             });
                           }}
                           className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="Paste internal user ID (UUID)"
+                          placeholder="Type a name to search"
                         />
+                        {member.resolvedUserId && (
+                          <p className="mt-1 text-[11px] text-green-700">
+                            Linked to {member.resolvedName}.
+                          </p>
+                        )}
                       </div>
                       <div className="w-full sm:w-48">
                         <label className="block text-xs font-medium text-gray-700" htmlFor={`team-role-${index}`}>
@@ -514,7 +610,14 @@ export const WorkspaceCreatePage: React.FC = () => {
                           <option value={WorkspaceRole.GENERAL_VOLUNTEER}>General Volunteer</option>
                         </select>
                       </div>
-                      <div className="flex items-center sm:self-end">
+                      <div className="flex items-center gap-3 sm:self-end">
+                        <button
+                          type="button"
+                          onClick={() => handleResolveTeamMember(index)}
+                          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                        >
+                          Lookup user
+                        </button>
                         <button
                           type="button"
                           onClick={() => {
@@ -536,7 +639,7 @@ export const WorkspaceCreatePage: React.FC = () => {
                   setTeamMembers((prev) => [
                     ...prev,
                     {
-                      userId: '',
+                      identifier: '',
                       role: WorkspaceRole.GENERAL_VOLUNTEER,
                     },
                   ])
@@ -574,9 +677,9 @@ export const WorkspaceCreatePage: React.FC = () => {
                   <div className="flex items-start justify-between gap-4">
                     <dt className="font-semibold text-gray-600">Initial team members</dt>
                     <dd className="text-gray-900">
-                      {teamMembers.length === 0
+                      {verifiedTeamCount === 0
                         ? 'None added yet'
-                        : `${teamMembers.length} member${teamMembers.length > 1 ? 's' : ''} will be added`}
+                        : `${verifiedTeamCount} verified member${verifiedTeamCount > 1 ? 's' : ''} will be added`}
                     </dd>
                   </div>
                 </dl>
