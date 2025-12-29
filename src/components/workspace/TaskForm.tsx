@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope } from '../../types';
-
+import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope, TaskStatus } from '../../types';
+import { supabase } from '@/integrations/supabase/client';
 interface TaskFormProps {
   task?: WorkspaceTask;
   teamMembers: TeamMember[];
   availableTasks: WorkspaceTask[];
-  onSubmit: (taskData: TaskFormData) => void;
+  workspaceId?: string;
+  onSubmit?: (taskData: TaskFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
-
 export interface TaskFormData {
   title: string;
   description: string;
@@ -70,6 +70,7 @@ export function TaskForm({
   task, 
   teamMembers, 
   availableTasks, 
+  workspaceId,
   onSubmit, 
   onCancel, 
   isLoading = false 
@@ -83,7 +84,8 @@ export function TaskForm({
     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
     dependencies: task?.dependencies || [],
     tags: task?.tags || [],
-    templateId: ''
+    templateId: '',
+    roleScope: task?.roleScope || (task?.metadata?.roleScope as WorkspaceRoleScope | undefined),
   });
 
   const [newTag, setNewTag] = useState('');
@@ -187,16 +189,34 @@ export function TaskForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
-    onSubmit(formData);
-  };
+    // Persist to Supabase workspace_tasks when a workspaceId is provided
+    if (workspaceId) {
+      const payload: any = {
+        id: task?.id,
+        workspace_id: workspaceId,
+        title: formData.title,
+        description: formData.description,
+        priority: formData.priority,
+        status: task?.status || TaskStatus.NOT_STARTED,
+        due_date: formData.dueDate || null,
+        role_scope: formData.roleScope ?? null,
+      };
 
+      const { error } = await supabase.from('workspace_tasks').upsert(payload, { onConflict: 'id' });
+      if (error) {
+        console.error('Failed to upsert workspace task', error);
+      }
+    }
+
+    onSubmit?.(formData);
+  };
   return (
     <div className="bg-white shadow-lg rounded-lg">
       <div className="px-6 py-4 border-b border-gray-200">
