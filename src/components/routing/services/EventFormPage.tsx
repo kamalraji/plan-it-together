@@ -4,7 +4,7 @@ import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
@@ -12,13 +12,13 @@ import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 interface EventFormPageProps {
   mode: 'create' | 'edit';
 }
@@ -94,11 +94,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   });
 
   const {
-    register,
     handleSubmit,
-    formState: { errors },
     reset,
     control,
+    watch,
   } = form;
 
   useEffect(() => {
@@ -264,389 +263,457 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           {isLoadingEvent ? (
             <div className="py-12 text-center text-sm text-muted-foreground">Loading event...</div>
           ) : (
-            <form
-              id="event-form"
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-8"
-              noValidate
-            >
-              {serverError && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertTitle>Failed to save event</AlertTitle>
-                  <AlertDescription>
-                    <p>{serverError}</p>
-                    {serverError.includes('organizer/admin permissions') && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-3 border-destructive text-destructive hover:bg-destructive/10"
-                        disabled={isRequestingAccess}
-                        onClick={async () => {
-                          if (isRequestingAccess) return;
-                          setIsRequestingAccess(true);
-                          try {
-                            const { error } = await supabase.functions.invoke('self-approve-organizer');
-                            if (error) throw error;
-                            toast({
-                              title: 'Organizer access requested',
-                              description:
-                                'We have recorded your request to become an organizer. Try again after your access updates.',
-                            });
-                          } catch (err: any) {
-                            toast({
-                              title: 'Failed to request organizer access',
-                              description: err?.message || 'Please try again.',
-                              variant: 'destructive',
-                            });
-                          } finally {
-                            setIsRequestingAccess(false);
-                          }
-                        }}
-                      >
-                        {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
-                      </Button>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
-              <div>
-                <h3 className="mb-4 text-lg font-semibold text-foreground">Basic Information</h3>
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <Label htmlFor="organization-id" className="mb-2 block">
-                      Organization *
-                    </Label>
-                    <select
-                      id="organization-id"
-                      className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
-                      {...register('organizationId')}
-                    >
-                      <option value="">
-                        {isLoadingOrganizations
-                          ? 'Loading organizations...'
-                          : myOrganizations.length === 0
-                            ? 'No organizations available'
-                            : 'Select an organization'}
-                      </option>
-                      {myOrganizations.map((org: any) => (
-                        <option key={org.id} value={org.id}>
-                          {org.name}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.organizationId && (
-                      <p className="mt-1 text-sm text-destructive">{errors.organizationId.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="event-name" className="mb-2 block">
-                      Event Name *
-                    </Label>
-                    <Input
-                      type="text"
-                      id="event-name"
-                      placeholder="Enter event name"
-                      {...register('name')}
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="event-description" className="mb-2 block">
-                      Description *
-                    </Label>
-                    <Textarea
-                      id="event-description"
-                      rows={4}
-                      placeholder="Describe your event"
-                      {...register('description')}
-                    />
-                    {errors.description && (
-                      <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="event-mode" className="block text-sm font-medium text-gray-700 mb-2">
-                        Event Mode *
-                      </label>
-                      <select
-                        id="event-mode"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        {...register('mode')}
-                      >
-                        <option value="ONLINE">Online</option>
-                        <option value="OFFLINE">Offline</option>
-                        <option value="HYBRID">Hybrid</option>
-                      </select>
-                      {errors.mode && (
-                        <p className="mt-1 text-sm text-red-600">{errors.mode.message}</p>
+            <Form {...form}>
+              <form
+                id="event-form"
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-8"
+                noValidate
+              >
+                {serverError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertTitle>Failed to save event</AlertTitle>
+                    <AlertDescription>
+                      <p>{serverError}</p>
+                      {serverError.includes('organizer/admin permissions') && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 border-destructive text-destructive hover:bg-destructive/10"
+                          disabled={isRequestingAccess}
+                          onClick={async () => {
+                            if (isRequestingAccess) return;
+                            setIsRequestingAccess(true);
+                            try {
+                              const { error } = await supabase.functions.invoke('self-approve-organizer');
+                              if (error) throw error;
+                              toast({
+                                title: 'Organizer access requested',
+                                description:
+                                  'We have recorded your request to become an organizer. Try again after your access updates.',
+                              });
+                            } catch (err: any) {
+                              toast({
+                                title: 'Failed to request organizer access',
+                                description: err?.message || 'Please try again.',
+                                variant: 'destructive',
+                              });
+                            } finally {
+                              setIsRequestingAccess(false);
+                            }
+                          }}
+                        >
+                          {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
+                        </Button>
                       )}
-                    </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Basic Information</h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    <FormField
+                      control={control}
+                      name="organizationId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Organization *</FormLabel>
+                          <FormControl>
+                            <select
+                              className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
+                              {...field}
+                            >
+                              <option value="">
+                                {isLoadingOrganizations
+                                  ? 'Loading organizations...'
+                                  : myOrganizations.length === 0
+                                    ? 'No organizations available'
+                                    : 'Select an organization'}
+                              </option>
+                              {myOrganizations.map((org: any) => (
+                                <option key={org.id} value={org.id}>
+                                  {org.name}
+                                </option>
+                              ))}
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                    <div>
-                      <label
-                        htmlFor="event-capacity"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Capacity
-                      </label>
-                      <input
-                        type="number"
-                        id="event-capacity"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter capacity (optional)"
-                        {...register('capacity')}
+                    <FormField
+                      control={control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Name *</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="Enter event name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description *</FormLabel>
+                          <FormControl>
+                            <Textarea rows={4} placeholder="Describe your event" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event Mode *</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full rounded-xl border-2 border-border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                {...field}
+                              >
+                                <option value="ONLINE">Online</option>
+                                <option value="OFFLINE">Offline</option>
+                                <option value="HYBRID">Hybrid</option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                      {errors.capacity && (
-                        <p className="mt-1 text-sm text-red-600">{errors.capacity.message as string}</p>
-                      )}
+
+                      <FormField
+                        control={control}
+                        name="capacity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Capacity</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Enter capacity (optional)"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>Leave blank if there is no fixed capacity.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-border pt-6">
-                <h3 className="mb-4 text-lg font-semibold text-foreground">Date and Time</h3>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="start-date" className="mb-2 block">
-                      Start Date *
-                    </Label>
-                    <Controller
+                <div className="border-t border-border pt-6">
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Date and Time</h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <FormField
                       control={control}
                       name="startDate"
                       render={({ field }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className={cn(
-                                  'w-full justify-start text-left font-normal',
-                                  !dateValue && 'text-muted-foreground',
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateValue ? (
-                                  format(dateValue, 'PPP p')
-                                ) : (
-                                  <span>Select start date & time</span>
-                                )}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={dateValue}
-                                onSelect={(date) => {
-                                  if (!date) {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                  field.onChange(formatted);
-                                }}
-                                initialFocus
-                                className={cn('p-3 pointer-events-auto')}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormItem>
+                            <FormLabel>Start Date *</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select start date & time</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>Times are saved using your current timezone.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
                         );
                       }}
                     />
-                    {errors.startDate && (
-                      <p className="mt-1 text-sm text-destructive">{errors.startDate.message}</p>
-                    )}
-                  </div>
 
-                  <div>
-                    <Label htmlFor="end-date" className="mb-2 block">
-                      End Date *
-                    </Label>
-                    <Controller
+                    <FormField
                       control={control}
                       name="endDate"
                       render={({ field }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className={cn(
-                                  'w-full justify-start text-left font-normal',
-                                  !dateValue && 'text-muted-foreground',
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateValue ? (
-                                  format(dateValue, 'PPP p')
-                                ) : (
-                                  <span>Select end date & time</span>
-                                )}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={dateValue}
-                                onSelect={(date) => {
-                                  if (!date) {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                  field.onChange(formatted);
-                                }}
-                                initialFocus
-                                className={cn('p-3 pointer-events-auto')}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormItem>
+                            <FormLabel>End Date *</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select end date & time</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>Must be after the start date.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
                         );
                       }}
                     />
-                    {errors.endDate && (
-                      <p className="mt-1 text-sm text-destructive">{errors.endDate.message}</p>
-                    )}
-                  </div>
 
-                  <div>
-                    <Label htmlFor="registration-deadline" className="mb-2 block">
-                      Registration Deadline
-                    </Label>
-                    <Controller
+                    <FormField
                       control={control}
                       name="registrationDeadline"
                       render={({ field }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className={cn(
-                                  'w-full justify-start text-left font-normal',
-                                  !dateValue && 'text-muted-foreground',
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateValue ? (
-                                  format(dateValue, 'PPP p')
-                                ) : (
-                                  <span>Select registration deadline (optional)</span>
-                                )}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={dateValue}
-                                onSelect={(date) => {
-                                  if (!date) {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                  field.onChange(formatted);
-                                }}
-                                initialFocus
-                                className={cn('p-3 pointer-events-auto')}
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormItem>
+                            <FormLabel>Registration Deadline</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select registration deadline (optional)</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>
+                              Optional: registrations will be closed after this time.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
                         );
                       }}
                     />
-                    {errors.registrationDeadline && (
-                      <p className="mt-1 text-sm text-destructive">
-                        {errors.registrationDeadline.message as string}
-                      </p>
-                    )}
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-border pt-6">
-                <h3 className="mb-4 text-lg font-semibold text-foreground">Branding</h3>
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <Label htmlFor="primary-color" className="mb-2 block">
-                      Primary Color
-                    </Label>
-                    <Input
-                      type="color"
-                      id="primary-color"
-                      className="h-10 w-24 cursor-pointer px-2 py-1"
-                      {...register('primaryColor')}
-                    />
-                    {errors.primaryColor && (
-                      <p className="mt-1 text-sm text-destructive">
-                        {errors.primaryColor.message as string}
-                      </p>
-                    )}
-                  </div>
+                <div className="border-t border-border pt-6">
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Branding</h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="space-y-6">
+                      <FormField
+                        control={control}
+                        name="primaryColor"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Color</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="color"
+                                className="h-10 w-24 cursor-pointer px-2 py-1"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              This color will be used as the accent for your event branding.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <div>
-                    <Label htmlFor="logo-url" className="mb-2 block">
-                      Logo URL
-                    </Label>
-                    <Input
-                      type="url"
-                      id="logo-url"
-                      placeholder="https://example.com/logo.png"
-                      {...register('logoUrl')}
-                    />
-                    {errors.logoUrl && (
-                      <p className="mt-1 text-sm text-destructive">{errors.logoUrl.message}</p>
-                    )}
+                      <FormField
+                        control={control}
+                        name="logoUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Logo URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://example.com/logo.png"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional: link to an image that will appear on your public event page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      {(() => {
+                        const primaryColor = watch('primaryColor') || '#2563eb';
+                        const logoUrl = watch('logoUrl');
+
+                        return (
+                          <div
+                            className="relative flex h-full flex-col justify-between rounded-2xl border bg-card p-4 shadow-sm"
+                            style={{ borderColor: primaryColor }}
+                            aria-label="Event branding preview"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted overflow-hidden">
+                                {logoUrl ? (
+                                  <img
+                                    src={logoUrl}
+                                    alt="Event logo preview"
+                                    className="h-full w-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                ) : (
+                                  <span className="text-xs font-semibold text-muted-foreground">
+                                    Logo
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">Preview</p>
+                                <p className="text-base font-semibold text-foreground">
+                                  {watch('name') || 'Your event name'}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 flex items-center justify-between">
+                              <div className="space-y-1">
+                                <div className="h-2 w-24 rounded-full bg-muted" />
+                                <div className="h-2 w-32 rounded-full bg-muted" />
+                              </div>
+                              <div
+                                className="rounded-full px-3 py-1 text-xs font-medium text-primary-foreground"
+                                style={{ backgroundColor: primaryColor }}
+                              >
+                                Register
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => navigate('../list')}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="outline"
-                  onClick={() => setSubmitIntent('draft')}
-                  disabled={isSubmitting || myOrganizations.length === 0}
-                >
-                  Save as draft
-                </Button>
-                <Button
-                  type="submit"
-                  variant="default"
-                  onClick={() => setSubmitIntent('publish')}
-                  disabled={isSubmitting || myOrganizations.length === 0}
-                >
-                  {isSubmitting
-                    ? mode === 'create'
-                      ? 'Creating...'
-                      : 'Saving...'
-                    : mode === 'create'
-                      ? 'Create event'
-                      : 'Save changes'}
-                </Button>
-              </div>
-            </form>
+                <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => navigate('../list')}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    onClick={() => setSubmitIntent('draft')}
+                    disabled={isSubmitting || myOrganizations.length === 0}
+                  >
+                    Save as draft
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="default"
+                    onClick={() => setSubmitIntent('publish')}
+                    disabled={isSubmitting || myOrganizations.length === 0}
+                  >
+                    {isSubmitting
+                      ? mode === 'create'
+                        ? 'Creating...'
+                        : 'Saving...'
+                      : mode === 'create'
+                        ? 'Create event'
+                        : 'Save changes'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           )}
         </div>
 
