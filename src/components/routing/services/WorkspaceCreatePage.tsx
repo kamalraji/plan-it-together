@@ -378,21 +378,19 @@ export const WorkspaceCreatePage: React.FC = () => {
                 <li key={step.id} className="flex-1 flex items-center">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold ${
-                        isCompleted
+                      className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold ${isCompleted
                           ? 'border-blue-600 bg-blue-600 text-white'
                           : isActive
-                          ? 'border-blue-600 text-blue-600'
-                          : 'border-gray-300 text-gray-400'
-                      }`}
+                            ? 'border-blue-600 text-blue-600'
+                            : 'border-gray-300 text-gray-400'
+                        }`}
                     >
                       {isCompleted ? '✓' : step.id}
                     </div>
                     <div className="hidden sm:block">
                       <p
-                        className={`text-xs font-medium ${
-                          isActive ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-400'
-                        }`}
+                        className={`text-xs font-medium ${isActive ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-400'
+                          }`}
                       >
                         {step.label}
                       </p>
@@ -670,8 +668,8 @@ export const WorkspaceCreatePage: React.FC = () => {
                       {selectedEvent
                         ? selectedEvent.name
                         : formValues.eventId
-                        ? 'Custom event ID'
-                        : 'Not selected yet'}
+                          ? 'Custom event ID'
+                          : 'Not selected yet'}
                     </dd>
                   </div>
                   <div className="flex items-start justify-between gap-4">

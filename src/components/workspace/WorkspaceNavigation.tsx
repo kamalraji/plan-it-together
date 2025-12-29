@@ -6,16 +6,16 @@ interface WorkspaceNavigationProps {
   workspace: Workspace;
   userWorkspaces: Workspace[];
   activeTab:
-    | 'overview'
-    | 'tasks'
-    | 'team'
-    | 'communication'
-    | 'analytics'
-    | 'reports'
-    | 'marketplace'
-    | 'templates'
-    | 'audit'
-    | 'role-management';
+  | 'overview'
+  | 'tasks'
+  | 'team'
+  | 'communication'
+  | 'analytics'
+  | 'reports'
+  | 'marketplace'
+  | 'templates'
+  | 'audit'
+  | 'role-management';
   onTabChange: (
     tab:
       | 'overview'
@@ -244,9 +244,8 @@ export function WorkspaceNavigation({
                           onWorkspaceSwitch(ws.id);
                           setShowWorkspaceSwitcher(false);
                         }}
-                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 ${
-                          ws.id === workspace.id ? 'bg-indigo-50 border-r-2 border-indigo-500' : ''
-                        }`}
+                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 ${ws.id === workspace.id ? 'bg-indigo-50 border-r-2 border-indigo-500' : ''
+                          }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -279,11 +278,10 @@ export function WorkspaceNavigation({
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex shrink-0 items-center space-x-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm ${
-                  activeTab === tab.id
+                className={`flex shrink-0 items-center space-x-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm ${activeTab === tab.id
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 {tab.icon}
                 <span className="whitespace-nowrap">{tab.name}</span>

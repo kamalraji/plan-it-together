@@ -224,31 +224,28 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveView('roster')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'roster'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'roster'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Team Roster ({filteredMembers.length})
           </button>
           <button
             onClick={() => setActiveView('invite')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'invite'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'invite'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Invite Members
           </button>
           <button
             onClick={() => setActiveView('bulk-invite')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'bulk-invite'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'bulk-invite'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Bulk Invite
             {pendingInvitations && pendingInvitations.length > 0 && (

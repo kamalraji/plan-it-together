@@ -33,7 +33,7 @@ export const WorkspaceService: React.FC = () => {
     <Routes>
       {/* Service Dashboard or Org Workspace Page - default route */}
       <Route index element={<WorkspaceIndexRoute />} />
-      
+
       {/* Workspace List Page */}
       <Route path="list" element={<WorkspaceListPage />} />
 
@@ -49,7 +49,7 @@ export const WorkspaceService: React.FC = () => {
       <Route path=":workspaceId/reports" element={<WorkspaceDetailPage defaultTab="reports" />} />
       <Route path=":workspaceId/marketplace" element={<WorkspaceDetailPage defaultTab="marketplace" />} />
       <Route path=":workspaceId/templates" element={<WorkspaceDetailPage defaultTab="templates" />} />
-      
+
       {/* Redirect unknown routes to dashboard */}
       <Route path="*" element={<Navigate to="/console/workspaces" replace />} />
     </Routes>

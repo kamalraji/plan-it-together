@@ -157,7 +157,8 @@ class OrganizationService {
       .from('organization_memberships')
       .select('organizations(*)')
       .eq('user_id', user.id)
-      .eq('status', 'ACTIVE');
+      .eq('status', 'ACTIVE')
+      .in('role', ['OWNER', 'ADMIN', 'ORGANIZER']);
 
     if (error) throw new Error(error.message);
 
@@ -234,7 +235,7 @@ class OrganizationService {
     role: string = 'ADMIN'
   ): Promise<OrganizationAdmin> {
     const { data: session } = await supabase.auth.getSession();
-    
+
     const { data: admin, error } = await supabase
       .from('organization_admins')
       .insert({
@@ -449,7 +450,7 @@ class OrganizationService {
       .eq('user_id', userId);
 
     if (error) throw new Error(error.message);
-    
+
     return (data || [])
       .map((item: any) => item.organizations)
       .filter(Boolean);

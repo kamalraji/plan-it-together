@@ -137,11 +137,10 @@ export function TaskManagementInterface({
         <div className="flex self-start rounded-md shadow-sm md:self-auto">
           <button
             onClick={() => setViewMode('list')}
-            className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
-              viewMode === 'list'
+            className={`px-4 py-2 text-sm font-medium rounded-l-md border ${viewMode === 'list'
                 ? 'bg-primary/10 border-primary text-primary z-10'
                 : 'bg-background border-border text-muted-foreground hover:bg-muted'
-            }`}
+              }`}
           >
             <div className="flex items-center space-x-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,11 +156,10 @@ export function TaskManagementInterface({
           </button>
           <button
             onClick={() => setViewMode('kanban')}
-            className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${
-              viewMode === 'kanban'
+            className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${viewMode === 'kanban'
                 ? 'bg-primary/10 border-primary text-primary z-10'
                 : 'bg-background border-border text-muted-foreground hover:bg-muted'
-            }`}
+              }`}
           >
             <div className="flex items-center space-x-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

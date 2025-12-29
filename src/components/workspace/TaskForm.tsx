@@ -66,14 +66,14 @@ const TASK_TEMPLATES = [
   }
 ];
 
-export function TaskForm({ 
-  task, 
-  teamMembers, 
-  availableTasks, 
+export function TaskForm({
+  task,
+  teamMembers,
+  availableTasks,
   workspaceId,
-  onSubmit, 
-  onCancel, 
-  isLoading = false 
+  onSubmit,
+  onCancel,
+  isLoading = false
 }: TaskFormProps) {
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
@@ -139,7 +139,7 @@ export function TaskForm({
     const newDependencies = selectedDependencies.includes(taskId)
       ? selectedDependencies.filter(id => id !== taskId)
       : [...selectedDependencies, taskId];
-    
+
     setSelectedDependencies(newDependencies);
     setFormData(prev => ({ ...prev, dependencies: newDependencies }));
   };
@@ -147,20 +147,20 @@ export function TaskForm({
   // Check for circular dependencies
   const wouldCreateCircularDependency = (taskId: string): boolean => {
     if (!task?.id) return false;
-    
+
     const checkCircular = (currentTaskId: string, targetTaskId: string, visited: Set<string>): boolean => {
       if (visited.has(currentTaskId)) return true;
       if (currentTaskId === targetTaskId) return true;
-      
+
       visited.add(currentTaskId);
       const currentTask = availableTasks.find(t => t.id === currentTaskId);
       if (!currentTask) return false;
-      
-      return currentTask.dependencies.some(depId => 
+
+      return currentTask.dependencies.some(depId =>
         checkCircular(depId, targetTaskId, new Set(visited))
       );
     };
-    
+
     return checkCircular(taskId, task.id, new Set());
   };
 
@@ -179,7 +179,7 @@ export function TaskForm({
       const dueDate = new Date(formData.dueDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (dueDate < today) {
         newErrors.dueDate = 'Due date cannot be in the past';
       }
@@ -257,9 +257,8 @@ export function TaskForm({
             id="title"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-            }`}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+              }`}
             placeholder="Enter task title"
           />
           {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
@@ -275,9 +274,8 @@ export function TaskForm({
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-            }`}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+              }`}
             placeholder="Describe the task in detail"
           />
           {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
@@ -352,9 +350,8 @@ export function TaskForm({
               id="dueDate"
               value={formData.dueDate}
               onChange={(e) => handleInputChange('dueDate', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.dueDate ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-              }`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.dueDate ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+                }`}
             />
             {errors.dueDate && <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>}
           </div>
@@ -393,9 +390,8 @@ export function TaskForm({
                 return (
                   <label
                     key={availableTask.id}
-                    className={`flex items-center space-x-2 py-1 ${
-                      wouldCreateCircular ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
+                    className={`flex items-center space-x-2 py-1 ${wouldCreateCircular ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                      }`}
                   >
                     <input
                       type="checkbox"

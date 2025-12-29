@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Bars3Icon,
   PlusIcon,
   UserPlusIcon,
@@ -203,7 +203,7 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
             </section>
 
             {/* Existing rich panels below the overview cards */}
-            <MobileFeaturesPanel 
+            <MobileFeaturesPanel
               workspaceId={workspace.id}
               onLocationUpdate={(location) => {
                 console.log('Location updated:', location);
@@ -216,14 +216,14 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
               }}
             />
 
-            <MobileTaskSummary 
-              workspace={workspace} 
-              onViewTasks={() => handleQuickAction('view-tasks')} 
+            <MobileTaskSummary
+              workspace={workspace}
+              onViewTasks={() => handleQuickAction('view-tasks')}
             />
-            
-            <MobileTeamOverview 
-              workspace={workspace} 
-              onViewTeam={() => handleQuickAction('view-team')} 
+
+            <MobileTeamOverview
+              workspace={workspace}
+              onViewTeam={() => handleQuickAction('view-team')}
             />
           </div>
         )}
@@ -262,55 +262,50 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
         <div className="flex justify-around">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'overview' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'overview'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <Bars3Icon className="w-5 h-5" />
             <span className="text-xs mt-1">Overview</span>
           </button>
           <button
             onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'tasks' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'tasks'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <PlusIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Tasks</span>
           </button>
           <button
             onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'team' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'team'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <UserPlusIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Team</span>
           </button>
           <button
             onClick={() => setActiveTab('communication')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'communication' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'communication'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <ChatBubbleLeftRightIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Chat</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'analytics' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'analytics'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <ChartBarIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Stats</span>

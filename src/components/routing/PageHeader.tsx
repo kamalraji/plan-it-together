@@ -117,7 +117,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
         {/* Title and Actions */}
         <div className="py-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
                 {title}
@@ -158,104 +158,108 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
 
         {/* Tabs */}
-        {tabs && tabs.length > 0 && (
-          <div className="border-b border-border">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={tab.onClick}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${tab.current
+        {
+          tabs && tabs.length > 0 && (
+            <div className="border-b border-border">
+              <nav className="-mb-px flex space-x-8 overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={tab.onClick}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${tab.current
                       ? 'border-primary text-primary'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                    }`}
-                >
-                  {tab.label}
-                  {tab.badge && (
-                    <Badge
-                      variant={tab.current ? 'default' : 'outline'}
-                      className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium"
-                    >
-                      {tab.badge}
-                    </Badge>
-                  )}
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
-
-        {/* Filters and View Controls */}
-        {(filters || viewControls) && (
-          <div className="py-4 flex items-center justify-between">
-            {/* Filters */}
-            {filters && filters.length > 0 && (
-              <div className="flex items-center space-x-4">
-                {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center space-x-2">
-                    <label className="text-sm font-medium text-foreground">
-                      {filter.label}:
-                    </label>
-                    {filter.type === 'select' && (
-                      <select
-                        value={filter.value}
-                        onChange={(e) => filter.onChange(e.target.value)}
-                        className="border-input rounded-md text-sm focus:ring-primary focus:border-primary bg-background/80"
-                      >
-                        {filter.options?.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                    {filter.type === 'search' && (
-                      <input
-                        type="text"
-                        value={filter.value}
-                        onChange={(e) => filter.onChange(e.target.value)}
-                        placeholder={`Search ${filter.label.toLowerCase()}...`}
-                        className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                    )}
-                    {filter.type === 'toggle' && (
-                      <button
-                        onClick={() => filter.onChange(!filter.value)}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-gray-200'
-                          }`}
-                      >
-                        <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filter.value ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                        />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* View Controls */}
-            {viewControls && viewControls.length > 0 && (
-              <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
-                {viewControls.map((control) => (
-                  <button
-                    key={control.type}
-                    onClick={() => control.onChange(control.type)}
-                    className={`px-3 py-1 text-sm font-medium rounded ${control.active
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
                       }`}
                   >
-                    {control.type.charAt(0).toUpperCase() + control.type.slice(1)}
+                    {tab.label}
+                    {tab.badge && (
+                      <Badge
+                        variant={tab.current ? 'default' : 'outline'}
+                        className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium"
+                      >
+                        {tab.badge}
+                      </Badge>
+                    )}
                   </button>
                 ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+              </nav>
+            </div>
+          )
+        }
+
+        {/* Filters and View Controls */}
+        {
+          (filters || viewControls) && (
+            <div className="py-4 flex items-center justify-between">
+              {/* Filters */}
+              {filters && filters.length > 0 && (
+                <div className="flex items-center space-x-4">
+                  {filters.map((filter) => (
+                    <div key={filter.id} className="flex items-center space-x-2">
+                      <label className="text-sm font-medium text-foreground">
+                        {filter.label}:
+                      </label>
+                      {filter.type === 'select' && (
+                        <select
+                          value={filter.value}
+                          onChange={(e) => filter.onChange(e.target.value)}
+                          className="border-input rounded-md text-sm focus:ring-primary focus:border-primary bg-background/80"
+                        >
+                          {filter.options?.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {filter.type === 'search' && (
+                        <input
+                          type="text"
+                          value={filter.value}
+                          onChange={(e) => filter.onChange(e.target.value)}
+                          placeholder={`Search ${filter.label.toLowerCase()}...`}
+                          className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                      )}
+                      {filter.type === 'toggle' && (
+                        <button
+                          onClick={() => filter.onChange(!filter.value)}
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-gray-200'
+                            }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filter.value ? 'translate-x-5' : 'translate-x-0'
+                              }`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* View Controls */}
+              {viewControls && viewControls.length > 0 && (
+                <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+                  {viewControls.map((control) => (
+                    <button
+                      key={control.type}
+                      onClick={() => control.onChange(control.type)}
+                      className={`px-3 py-1 text-sm font-medium rounded ${control.active
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                      {control.type.charAt(0).toUpperCase() + control.type.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        }
+      </div >
+    </div >
   );
 };
 

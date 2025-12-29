@@ -68,7 +68,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
       // Check if user has access via invite token in URL
       const urlParams = new URLSearchParams(window.location.search);
       const inviteToken = urlParams.get('invite');
-      
+
       if (inviteToken) {
         // Redirect to access page with invite token
         navigate(`/events/${eventId}/access?invite=${inviteToken}`);
@@ -171,7 +171,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
-      <div 
+      <div
         className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
         style={{
           backgroundColor: event.branding.primaryColor || undefined,
@@ -207,7 +207,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
             )}
             <h1 className="text-4xl md:text-6xl font-bold mb-4">{event.name}</h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">{event.description}</p>
-            
+
             <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 mb-8">
               <div className="flex items-center space-x-2">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +215,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </svg>
                 <span>{formatDate(event.startDate)}</span>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -244,7 +244,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   disabled={registrationMutation.isPending}
                   className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
-                  {registrationMutation.isPending ? 'Registering...' : 'Register Now'}
+                  {registrationMutation.isPending
+                    ? 'Registering...'
+                    : (event.branding?.primaryCtaLabel || 'Register Now')}
                 </button>
               ) : (
                 <button
@@ -264,7 +266,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   title="Share on Twitter"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                   </svg>
                 </button>
                 <button
@@ -273,7 +275,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   title="Share on Facebook"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                 </button>
                 <button
@@ -282,7 +284,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   title="Share on LinkedIn"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                 </button>
                 <button
@@ -313,11 +315,10 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.key
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.key
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -449,10 +450,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className={`font-medium capitalize ${
-                      event.status === 'PUBLISHED' ? 'text-green-600' : 
-                      event.status === 'DRAFT' ? 'text-yellow-600' : 'text-gray-600'
-                    }`}>
+                    <span className={`font-medium capitalize ${event.status === 'PUBLISHED' ? 'text-green-600' :
+                        event.status === 'DRAFT' ? 'text-yellow-600' : 'text-gray-600'
+                      }`}>
                       {event.status.toLowerCase()}
                     </span>
                   </div>
@@ -493,12 +493,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
                           <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            item.type === 'session' ? 'bg-blue-100 text-blue-800' :
-                            item.type === 'break' ? 'bg-green-100 text-green-800' :
-                            item.type === 'networking' ? 'bg-purple-100 text-purple-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-blue-100 text-blue-800' :
+                              item.type === 'break' ? 'bg-green-100 text-green-800' :
+                                item.type === 'networking' ? 'bg-purple-100 text-purple-800' :
+                                  'bg-gray-100 text-gray-800'
+                            }`}>
                             {item.type}
                           </span>
                         </div>
@@ -551,29 +550,28 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   {event.prizes
                     .sort((a: PrizeInfo, b: PrizeInfo) => a.position - b.position)
                     .map((prize: PrizeInfo, index: number) => (
-                    <div key={prize.id || index} className="border border-gray-200 rounded-lg p-6">
-                      <div className="text-center">
-                        <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-                          prize.position === 1 ? 'bg-yellow-100 text-yellow-600' :
-                          prize.position === 2 ? 'bg-gray-100 text-gray-600' :
-                          prize.position === 3 ? 'bg-orange-100 text-orange-600' :
-                          'bg-blue-100 text-blue-600'
-                        }`}>
-                          <span className="text-lg font-bold">#{prize.position}</span>
+                      <div key={prize.id || index} className="border border-gray-200 rounded-lg p-6">
+                        <div className="text-center">
+                          <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${prize.position === 1 ? 'bg-yellow-100 text-yellow-600' :
+                              prize.position === 2 ? 'bg-gray-100 text-gray-600' :
+                                prize.position === 3 ? 'bg-orange-100 text-orange-600' :
+                                  'bg-blue-100 text-blue-600'
+                            }`}>
+                            <span className="text-lg font-bold">#{prize.position}</span>
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{prize.title}</h3>
+                          {prize.value && (
+                            <p className="text-2xl font-bold text-indigo-600 mb-3">{prize.value}</p>
+                          )}
+                          <p className="text-gray-600 text-sm">{prize.description}</p>
+                          {prize.category && (
+                            <span className="inline-block mt-3 px-3 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                              {prize.category}
+                            </span>
+                          )}
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{prize.title}</h3>
-                        {prize.value && (
-                          <p className="text-2xl font-bold text-indigo-600 mb-3">{prize.value}</p>
-                        )}
-                        <p className="text-gray-600 text-sm">{prize.description}</p>
-                        {prize.category && (
-                          <span className="inline-block mt-3 px-3 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
-                            {prize.category}
-                          </span>
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -601,27 +599,24 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
                     return (
                       <div key={tier}>
-                        <h3 className={`text-xl font-semibold mb-4 ${
-                          tier === 'title' ? 'text-purple-600' :
-                          tier === 'platinum' ? 'text-gray-600' :
-                          tier === 'gold' ? 'text-yellow-600' :
-                          tier === 'silver' ? 'text-gray-500' :
-                          'text-orange-600'
-                        }`}>
+                        <h3 className={`text-xl font-semibold mb-4 ${tier === 'title' ? 'text-purple-600' :
+                            tier === 'platinum' ? 'text-gray-600' :
+                              tier === 'gold' ? 'text-yellow-600' :
+                                tier === 'silver' ? 'text-gray-500' :
+                                  'text-orange-600'
+                          }`}>
                           {tier.charAt(0).toUpperCase() + tier.slice(1)} Sponsors
                         </h3>
-                        <div className={`grid gap-6 ${
-                          tier === 'title' ? 'grid-cols-1 md:grid-cols-2' :
-                          tier === 'platinum' ? 'grid-cols-2 md:grid-cols-3' :
-                          'grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
-                        }`}>
+                        <div className={`grid gap-6 ${tier === 'title' ? 'grid-cols-1 md:grid-cols-2' :
+                            tier === 'platinum' ? 'grid-cols-2 md:grid-cols-3' :
+                              'grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
+                          }`}>
                           {tierSponsors.map((sponsor: SponsorInfo, index: number) => (
                             <div key={sponsor.id || index} className="text-center">
-                              <div className={`bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow ${
-                                tier === 'title' ? 'p-8' :
-                                tier === 'platinum' ? 'p-6' :
-                                'p-4'
-                              }`}>
+                              <div className={`bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow ${tier === 'title' ? 'p-8' :
+                                  tier === 'platinum' ? 'p-6' :
+                                    'p-4'
+                                }`}>
                                 {sponsor.website ? (
                                   <a
                                     href={sponsor.website}
@@ -632,12 +627,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                                     <img
                                       src={sponsor.logoUrl}
                                       alt={sponsor.name}
-                                      className={`mx-auto object-contain ${
-                                        tier === 'title' ? 'h-20' :
-                                        tier === 'platinum' ? 'h-16' :
-                                        tier === 'gold' ? 'h-12' :
-                                        'h-10'
-                                      }`}
+                                      className={`mx-auto object-contain ${tier === 'title' ? 'h-20' :
+                                          tier === 'platinum' ? 'h-16' :
+                                            tier === 'gold' ? 'h-12' :
+                                              'h-10'
+                                        }`}
                                     />
                                     <p className="mt-2 text-sm font-medium text-gray-900">{sponsor.name}</p>
                                   </a>
@@ -646,12 +640,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                                     <img
                                       src={sponsor.logoUrl}
                                       alt={sponsor.name}
-                                      className={`mx-auto object-contain ${
-                                        tier === 'title' ? 'h-20' :
-                                        tier === 'platinum' ? 'h-16' :
-                                        tier === 'gold' ? 'h-12' :
-                                        'h-10'
-                                      }`}
+                                      className={`mx-auto object-contain ${tier === 'title' ? 'h-20' :
+                                          tier === 'platinum' ? 'h-16' :
+                                            tier === 'gold' ? 'h-12' :
+                                              'h-10'
+                                        }`}
                                     />
                                     <p className="mt-2 text-sm font-medium text-gray-900">{sponsor.name}</p>
                                   </>

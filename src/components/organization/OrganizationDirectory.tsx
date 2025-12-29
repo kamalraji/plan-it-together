@@ -1,223 +1,230 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSearchOrganizations } from '@/hooks/useOrganization';
-import { organizationService } from '@/services/organizationService';
+import { supabase } from '@/integrations/supabase/looseClient';
+import { Tables } from '@/integrations/supabase/types';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Keep a local view of categories in sync with backend enum
-export type OrganizationCategory = 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
 
-// Infer organization type from service result
-export type DirectoryOrganization = Awaited<
-  ReturnType<typeof organizationService.searchOrganizations>
->[number];
+type OrganizationRow = Tables<'organizations'>;
 
-interface OrganizationDirectoryProps {
-  className?: string;
+export interface DirectoryOrganization extends OrganizationRow {
+  follower_count: number;
+  logo_url?: string | null;
+  banner_url?: string | null;
 }
 
-const categoryIcons: Record<OrganizationCategory, string> = {
-  COLLEGE: 'COL',
-  COMPANY: 'COM',
-  INDUSTRY: 'IND',
-  NON_PROFIT: 'NPO',
-};
-
-const categoryLabels: Record<OrganizationCategory, string> = {
+const categoryLabels: Record<string, string> = {
   COLLEGE: 'College',
   COMPANY: 'Company',
-  INDUSTRY: 'Industry',
+  INDUSTRY: 'Industry Association',
   NON_PROFIT: 'Non-Profit',
 };
 
-const CATEGORIES: OrganizationCategory[] = ['COLLEGE', 'COMPANY', 'INDUSTRY', 'NON_PROFIT'];
+const categoryIcons: Record<string, string> = {
+  COLLEGE: '🎓',
+  COMPANY: '🏢',
+  INDUSTRY: '🏭',
+  NON_PROFIT: '🤝',
+};
 
-export default function OrganizationDirectory({ className = '' }: OrganizationDirectoryProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<OrganizationCategory | ''>('');
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+const sortOptions = [
+  { value: 'name_asc', label: 'Name (A-Z)' },
+  { value: 'name_desc', label: 'Name (Z-A)' },
+  { value: 'followers_desc', label: 'Most followers' },
+  { value: 'recent', label: 'Recently added' },
+];
 
-  // Debounced search
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+export const OrganizationDirectory: React.FC = () => {
+  const [organizations, setOrganizations] = useState<DirectoryOrganization[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [sort, setSort] = useState('followers_desc');
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
+    const loadOrganizations = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+      if (error) {
+        console.error('Error loading organizations directory', error);
+        setOrganizations([]);
+      } else {
+        const withFollowers: DirectoryOrganization[] = (data ?? []).map((org: any) => ({
+          ...org,
+          follower_count: org.follower_count ?? 0,
+        }));
+        setOrganizations(withFollowers);
+      }
 
-  const { data: organizations, isLoading, error } = useSearchOrganizations({
-    query: debouncedQuery.trim() || undefined,
-    category: selectedCategory || undefined,
-    verifiedOnly,
-    limit: 50,
-    offset: 0,
-  });
+      setIsLoading(false);
+    };
 
-  const handleClearFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
-    setVerifiedOnly(false);
-  };
+    loadOrganizations();
+  }, []);
 
-  const hasActiveFilters = searchQuery || selectedCategory || verifiedOnly;
+  useEffect(() => {
+    document.title = 'Organizations | Thittam1Hub';
+
+    const description =
+      'Discover and follow organizations on Thittam1Hub to stay updated on their latest events.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', `${window.location.origin}/organizations`);
+  }, []);
+
+  const filtered = organizations
+    .filter((org) => {
+      const matchesSearch =
+        !search ||
+        org.name.toLowerCase().includes(search.toLowerCase()) ||
+        (org.description ?? '').toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = !categoryFilter || org.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (sort) {
+        case 'name_asc':
+          return a.name.localeCompare(b.name);
+        case 'name_desc':
+          return b.name.localeCompare(a.name);
+        case 'followers_desc':
+          return (b.follower_count ?? 0) - (a.follower_count ?? 0);
+        case 'recent':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+  const hasActiveFilters = !!search || !!categoryFilter;
 
   return (
-    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Directory</h1>
-        <p className="text-gray-600">
-          Discover verified organizations and their upcoming events
-        </p>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-400">🔍</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Search organizations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
-        {/* Filter Toggle */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <span className="mr-2">🔽</span>
-            Filters
-            {hasActiveFilters && (
-              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                Active
+    <div className="bg-gradient-to-b from-cream to-lavender/30 min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">
+              Discover
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              Explore organizations on{' '}
+              <span className="bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent">
+                Thittam1Hub
               </span>
-            )}
-          </button>
-
-          {hasActiveFilters && (
-            <button
-              onClick={handleClearFilters}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
-            >
-              Clear all filters
-            </button>
-          )}
-        </div>
-
-        {/* Filters Panel */}
-        {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as OrganizationCategory | '')}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">All Categories</option>
-                  {CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {categoryLabels[category]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Verification Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Verification Status
-                </label>
-                <div className="flex items-center">
-                  <input
-                    id="verified-only"
-                    type="checkbox"
-                    checked={verifiedOnly}
-                    onChange={(e) => setVerifiedOnly(e.target.checked)}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="verified-only" className="ml-2 block text-sm text-gray-900">
-                    Show only verified organizations
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Results */}
-      <div>
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-600">Error loading organizations. Please try again.</p>
-          </div>
-        ) : !organizations || organizations.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-4xl text-gray-400 mb-4">🏢</div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No organizations found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {hasActiveFilters 
-                ? 'Try adjusting your search criteria or filters.'
-                : 'No organizations are currently available.'}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+              Find colleges, companies, industry groups, and non-profits running events and programs on
+              Thittam1Hub.
             </p>
           </div>
-        ) : (
-          <>
-            {/* Results Count */}
-            <div className="mb-6">
-              <p className="text-sm text-gray-700">
-                Showing {organizations.length} organization{organizations.length !== 1 ? 's' : ''}
-                {hasActiveFilters && ' matching your criteria'}
-              </p>
-            </div>
+        </header>
 
-            {/* Organization Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {organizations.map((organization) => (
-                <OrganizationCard key={organization.id} organization={organization} />
+        <section className="mb-6 grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <Input
+            placeholder="Search by name or description"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-white/80 border-border/60"
+          />
+          <Select
+            value={categoryFilter ?? 'all'}
+            onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value)}
+          >
+            <SelectTrigger className="bg-white/80 border-border/60">
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              <SelectItem value="COLLEGE">College</SelectItem>
+              <SelectItem value="COMPANY">Company</SelectItem>
+              <SelectItem value="INDUSTRY">Industry Association</SelectItem>
+              <SelectItem value="NON_PROFIT">Non-Profit</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sort} onValueChange={setSort}>
+            <SelectTrigger className="bg-white/80 border-border/60">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </section>
+
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-border/60 p-4 sm:p-6 shadow-sm">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-40 w-full rounded-xl" />
               ))}
             </div>
-          </>
-        )}
+          ) : filtered.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-base font-semibold mb-2">No organizations found</p>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {hasActiveFilters
+                  ? 'Try adjusting your search criteria or filters.'
+                  : 'No organizations are currently available.'}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-4 sm:mb-6">
+                <p className="text-sm text-muted-foreground">
+                  Showing {filtered.length} organization
+                  {filtered.length !== 1 ? 's' : ''}
+                  {hasActiveFilters && ' matching your criteria'}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {filtered.map((organization) => (
+                  <OrganizationCard key={organization.id} organization={organization} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
-}
+};
 
 interface OrganizationCardProps {
   organization: DirectoryOrganization;
 }
 
 function OrganizationCard({ organization }: OrganizationCardProps) {
-  const categoryIcon = categoryIcons[organization.category as OrganizationCategory];
+  const categoryIcon = categoryIcons[organization.category as keyof typeof categoryIcons];
 
   return (
     <Link
-      to={`/organizations/${organization.id}`}
+      to={`/${organization.slug}`}
       className="block bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
     >
       <div className="p-6">
-        {/* Header with Logo and Verification */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
             {organization.logo_url ? (
@@ -233,34 +240,35 @@ function OrganizationCard({ organization }: OrganizationCardProps) {
             )}
           </div>
           {organization.verification_status === 'VERIFIED' && (
-            <span className="text-blue-500 text-xl" title="Verified Organization">✓</span>
+            <span className="text-blue-500 text-xl" title="Verified Organization">
+              ✓
+            </span>
           )}
         </div>
 
-        {/* Organization Info */}
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
             {organization.name}
           </h3>
           <div className="flex items-center text-sm text-gray-500 mb-2">
             <span className="mr-1">{categoryIcon}</span>
-            {categoryLabels[organization.category as OrganizationCategory]}
+            {categoryLabels[organization.category as keyof typeof categoryLabels]}
           </div>
           {organization.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {organization.description}
-            </p>
+            <p className="text-sm text-gray-600 line-clamp-2">{organization.description}</p>
           )}
         </div>
 
-        {/* Stats */}
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center">
             <span className="mr-1">Followers:</span>
-            {organization.follower_count} follower{organization.follower_count !== 1 ? 's' : ''}
+            {organization.follower_count} follower
+            {organization.follower_count !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
     </Link>
   );
 }
+
+export default OrganizationDirectory;

@@ -11,6 +11,7 @@ import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sideb
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { OrgSettingsDashboard } from './OrgSettingsDashboard';
+import { OrgStorySettingsPage } from './OrgStorySettingsPage';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -79,10 +80,10 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-          <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-hidden">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
-            <div className="relative flex w-full pt-16 items-stretch">
-              <OrganizationSidebar />
+        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-auto">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
+          <div className="relative flex w-full pt-16 items-stretch">
+            <OrganizationSidebar />
 
             <SidebarInset>
               <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
@@ -90,6 +91,7 @@ export const OrgScopedLayout: React.FC = () => {
                   <Route path="dashboard" element={<OrganizerDashboard />} />
                   <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
                   <Route path="settings/dashboard" element={<OrgSettingsDashboard />} />
+                  <Route path="settings/story" element={<OrgStorySettingsPage />} />
                   <Route path="eventmanagement/*" element={<EventService />} />
                   <Route path="workspaces/*" element={<WorkspaceService />} />
                   <Route path="organizations/*" element={<OrganizationService />} />

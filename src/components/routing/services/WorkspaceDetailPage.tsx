@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
+import {
   ArrowLeftIcon,
   BuildingStorefrontIcon,
 } from '@heroicons/react/24/outline';
@@ -58,12 +58,12 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         description: '',
         event: (data as any).events
           ? {
-              id: (data as any).events.id as string,
-              name: (data as any).events.name as string,
-              startDate: (data as any).events.start_date as string,
-              endDate: (data as any).events.end_date as string,
-              status: (data as any).events.status as string,
-            }
+            id: (data as any).events.id as string,
+            name: (data as any).events.name as string,
+            startDate: (data as any).events.start_date as string,
+            endDate: (data as any).events.end_date as string,
+            status: (data as any).events.status as string,
+          }
           : undefined,
         teamMembers: [],
         taskSummary: undefined,
@@ -205,15 +205,14 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
               <div>
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    workspace?.status === WorkspaceStatus.ACTIVE
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${workspace?.status === WorkspaceStatus.ACTIVE
                       ? 'bg-green-100 text-green-800'
                       : workspace?.status === WorkspaceStatus.PROVISIONING
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : workspace?.status === WorkspaceStatus.WINDING_DOWN
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : workspace?.status === WorkspaceStatus.WINDING_DOWN
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
+                    }`}>
                     {workspace?.status}
                   </span>
                 </dd>
@@ -297,7 +296,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                         {Math.round(
                           ((workspace?.taskSummary?.completed || 0) /
                             Math.max(workspace?.taskSummary?.total || 1, 1)) *
-                            100,
+                          100,
                         )}%
                       </p>
                     </div>
@@ -348,7 +347,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                     {Math.round(
                       ((workspace?.taskSummary?.completed || 0) /
                         Math.max(workspace?.taskSummary?.total || 1, 1)) *
-                        100,
+                      100,
                     )}%
                   </p>
                 </div>
@@ -398,8 +397,8 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
       id: 'marketplace',
       label: 'Marketplace',
       component: () => workspace?.event ? (
-        <EventMarketplaceIntegration 
-          eventId={workspace.event.id} 
+        <EventMarketplaceIntegration
+          eventId={workspace.event.id}
           eventName={workspace.event.name}
         />
       ) : (
@@ -450,9 +449,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
   const breadcrumbs = [
     ...(workspace?.event
       ? [
-          { label: 'Events', href: eventManagementBase },
-          { label: workspace.event.name, href: `${eventManagementBase}/${workspace.event.id}` },
-        ]
+        { label: 'Events', href: eventManagementBase },
+        { label: workspace.event.name, href: `${eventManagementBase}/${workspace.event.id}` },
+      ]
       : []),
     { label: 'Workspaces', href: baseWorkspacePath },
     { label: workspace?.name || 'Loading...', href: `${baseWorkspacePath}/${workspaceId}` },

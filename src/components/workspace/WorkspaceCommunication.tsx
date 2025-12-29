@@ -217,13 +217,12 @@ export function WorkspaceCommunication({
                 key={tab.key}
                 onClick={() => !tab.disabled && setActiveTab(tab.key as any)}
                 disabled={tab.disabled}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                  activeTab === tab.key
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.key
                     ? 'border-primary text-primary'
                     : tab.disabled
-                    ? 'border-transparent text-muted-foreground/40 cursor-not-allowed'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                }`}
+                      ? 'border-transparent text-muted-foreground/40 cursor-not-allowed'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                  }`}
               >
                 <span>{tab.label}</span>
               </button>

@@ -50,9 +50,9 @@ export const OrgWorkspacePage: React.FC = () => {
         description: undefined,
         event: row.events
           ? {
-              id: row.events.id,
-              name: row.events.name,
-            }
+            id: row.events.id,
+            name: row.events.name,
+          }
           : undefined,
         teamMembers: [],
         taskSummary: undefined,

@@ -101,6 +101,9 @@ export interface BrandingConfig {
   secondaryColor?: string;
   customCss?: string;
   workspaceTemplateId?: string;
+  heroSubtitle?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
 }
 
 export interface VenueConfig {
@@ -735,7 +738,6 @@ export interface WorkspaceTask {
   completedAt?: string;
 }
 
-
 export interface WorkspaceChannel {
   id: string;
   workspaceId: string;
@@ -748,7 +750,6 @@ export interface WorkspaceChannel {
   createdAt: string;
   updatedAt: string;
 }
-
 
 export interface CreateChannelDTO {
   name: string;

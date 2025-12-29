@@ -33,6 +33,10 @@ import { WorkspacePermissionsBanner } from './WorkspacePermissionsBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface WorkspaceDashboardProps {
   workspaceId?: string;
@@ -138,6 +142,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   });
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: tasks, isLoading: isTasksLoading } = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
@@ -272,6 +277,36 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     : false;
 
   const canManageTasks = isGlobalWorkspaceManager || isWorkspaceRoleManager;
+  const canPublishEvent = isGlobalWorkspaceManager && !!workspace?.eventId;
+
+  const publishEventMutation = useMutation({
+    mutationFn: async () => {
+      if (!workspace?.eventId) throw new Error('No event linked to this workspace');
+
+      const { error } = await supabase
+        .from('events')
+        .update({ status: 'PUBLISHED' })
+        .eq('id', workspace.eventId as string);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Event published',
+        description: 'Your event has been marked as published.',
+      });
+      if (workspace?.eventId) {
+        queryClient.invalidateQueries({ queryKey: ['event', workspace.eventId] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to publish event',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleInviteTeamMember = () => {
     if (!workspaceId) return;
@@ -359,11 +394,10 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
                 }
                 setSearchParams(next);
               }}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                activeRoleSpace === roleSpace
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${activeRoleSpace === roleSpace
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-muted-foreground border-border hover:bg-muted'
-              }`}
+                }`}
             >
               {roleSpace === 'ALL' ? 'All teams' : roleSpace.replace(/_/g, ' ').toLowerCase()}
             </button>
@@ -379,16 +413,28 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         onWorkspaceSwitch={handleWorkspaceSwitch}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <WorkspacePermissionsBanner
-          userRole={user?.role}
-          workspaceRole={currentMember?.role as WorkspaceRole}
-          hasGlobalAccess={isGlobalWorkspaceManager}
-          hasWorkspaceManagerAccess={isWorkspaceRoleManager}
-        />
-
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'overview' && (
           <div className="space-y-8">
+            {canPublishEvent && (
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted p-4">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">Publish event</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This workspace is linked to an event. Publish it here to make the landing page public.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => publishEventMutation.mutate()}
+                  disabled={publishEventMutation.isPending}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm font-semibold"
+                >
+                  {publishEventMutation.isPending ? 'Publishing…' : 'Publish event'}
+                </button>
+              </div>
+            )}
+
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
