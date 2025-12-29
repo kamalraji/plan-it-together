@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole } from '@/types';
+import { UserRole, WorkspaceRole } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
@@ -35,8 +35,14 @@ const eventStepSchema = z.object({
 const steps = [
   { id: 1, key: 'name', label: 'Name', description: 'Give your workspace a clear, recognizable name.' },
   { id: 2, key: 'event', label: 'Event', description: 'Connect this workspace to the right event.' },
-  { id: 3, key: 'team', label: 'Team', description: 'Review how your team will use this workspace.' },
+  { id: 3, key: 'team', label: 'Team', description: 'Optionally pre-add key collaborators.' },
+  { id: 4, key: 'review', label: 'Review', description: 'Confirm details before creating the workspace.' },
 ] as const;
+
+interface PendingTeamMember {
+  userId: string;
+  role: WorkspaceRole;
+}
 
 export const WorkspaceCreatePage: React.FC = () => {
   const { user } = useAuth();
@@ -60,7 +66,9 @@ export const WorkspaceCreatePage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [teamMembers, setTeamMembers] = useState<PendingTeamMember[]>([]);
+  const [typingTimeoutId, setTypingTimeoutId] = useState<number | null>(null);
 
   const selectedEvent = isOrgContext && orgEvents
     ? (orgEvents as any[]).find((event) => event.id === formValues.eventId)
@@ -73,13 +81,47 @@ export const WorkspaceCreatePage: React.FC = () => {
     ? `/${orgSlugCandidate}/eventmanagement/create`
     : '/dashboard/eventmanagement/create';
 
+  const validateFieldLive = (field: keyof typeof formValues, value: string) => {
+    if (field === 'name') {
+      const parsed = nameStepSchema.safeParse({ name: value });
+      if (!parsed.success) {
+        const issue = parsed.error.issues[0];
+        setFormErrors((prev) => ({ ...prev, name: issue.message }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, name: '' }));
+      }
+    }
+
+    if (field === 'eventId') {
+      const parsed = eventStepSchema.safeParse({ eventId: value });
+      if (!parsed.success) {
+        const issue = parsed.error.issues[0];
+        setFormErrors((prev) => ({ ...prev, eventId: issue.message }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, eventId: '' }));
+      }
+    }
+  };
+
   const handleChange = (field: keyof typeof formValues) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setFormValues((prev) => ({ ...prev, [field]: e.target.value }));
-      setFormErrors((prev) => ({ ...prev, [field]: '' }));
+      const value = e.target.value;
+      setFormValues((prev) => ({ ...prev, [field]: value }));
+
+      // Clear any existing timeout
+      if (typingTimeoutId) {
+        window.clearTimeout(typingTimeoutId);
+      }
+
+      // Debounced live validation for this field
+      const timeoutId = window.setTimeout(() => {
+        validateFieldLive(field, value);
+      }, 300);
+
+      setTypingTimeoutId(timeoutId);
     };
 
-  const validateStep = (step: 1 | 2 | 3): boolean => {
+  const validateStep = (step: 1 | 2 | 3 | 4): boolean => {
     if (step === 1) {
       const parsed = nameStepSchema.safeParse({ name: formValues.name });
       if (!parsed.success) {
@@ -102,7 +144,7 @@ export const WorkspaceCreatePage: React.FC = () => {
       return true;
     }
 
-    // Step 3 currently has no additional fields to validate.
+    // Step 3 (team) is optional and currently has no blocking validation.
     return true;
   };
 
@@ -138,6 +180,28 @@ export const WorkspaceCreatePage: React.FC = () => {
 
       const createdId = data?.id as string | undefined;
 
+      // Optionally pre-add team members to this workspace
+      if (createdId && teamMembers.length > 0) {
+        const rows = teamMembers
+          .filter((m) => m.userId.trim().length > 0)
+          .map((m) => ({
+            workspace_id: createdId,
+            user_id: m.userId.trim(),
+            role: m.role || WorkspaceRole.GENERAL_VOLUNTEER,
+            status: 'PENDING',
+          }));
+
+        if (rows.length > 0) {
+          const { error: membersError } = await supabase
+            .from('workspace_team_members')
+            .insert(rows);
+
+          if (membersError) {
+            console.error('Failed to add initial team members', membersError);
+          }
+        }
+      }
+
       toast({
         title: 'Workspace created',
         description: 'Your workspace has been created successfully.',
@@ -167,10 +231,10 @@ export const WorkspaceCreatePage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       const isValid = validateStep(currentStep);
       if (isValid) {
-        setCurrentStep((prev) => (prev === 1 ? 2 : 3));
+        setCurrentStep((prev) => (prev === 1 ? 2 : prev === 2 ? 3 : 4));
       }
       return;
     }
@@ -180,7 +244,7 @@ export const WorkspaceCreatePage: React.FC = () => {
   };
 
   const handleBack = () => {
-    setCurrentStep((prev) => (prev === 3 ? 2 : 1));
+    setCurrentStep((prev) => (prev === 4 ? 3 : prev === 3 ? 2 : 1));
   };
 
   if (!canManageWorkspaces) {
@@ -222,9 +286,10 @@ export const WorkspaceCreatePage: React.FC = () => {
         {/* Progress indicator */}
         <div className="mt-6">
           <ol className="flex items-center justify-between text-xs sm:text-sm">
-            {steps.map((step) => {
+            {steps.map((step, index) => {
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
+              const isLast = index === steps.length - 1;
 
               return (
                 <li key={step.id} className="flex-1 flex items-center">
@@ -251,7 +316,7 @@ export const WorkspaceCreatePage: React.FC = () => {
                       <p className="text-[11px] text-gray-400">{step.description}</p>
                     </div>
                   </div>
-                  {step.id < steps.length && (
+                  {!isLast && (
                     <div className="ml-2 hidden flex-1 border-t border-dashed border-gray-200 sm:block" />
                   )}
                 </li>
@@ -382,11 +447,114 @@ export const WorkspaceCreatePage: React.FC = () => {
 
           {currentStep === 3 && (
             <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">Team members (optional)</h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Pre-add internal users by their user ID so they appear on the workspace team immediately. You
+                  can also invite people later from the workspace dashboard.
+                </p>
+              </div>
+
+              {teamMembers.length === 0 && (
+                <p className="text-xs text-gray-500 border border-dashed border-gray-200 rounded-md px-3 py-2 bg-gray-50">
+                  No team members added yet. Use the button below to add team members now, or skip this step and
+                  manage the team later.
+                </p>
+              )}
+
+              {teamMembers.length > 0 && (
+                <div className="space-y-3">
+                  {teamMembers.map((member, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
+                    >
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-700" htmlFor={`team-user-${index}`}>
+                          User ID
+                        </label>
+                        <input
+                          id={`team-user-${index}`}
+                          type="text"
+                          value={member.userId}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setTeamMembers((prev) => {
+                              const next = [...prev];
+                              next[index] = { ...next[index], userId: value };
+                              return next;
+                            });
+                          }}
+                          className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Paste internal user ID (UUID)"
+                        />
+                      </div>
+                      <div className="w-full sm:w-48">
+                        <label className="block text-xs font-medium text-gray-700" htmlFor={`team-role-${index}`}>
+                          Role
+                        </label>
+                        <select
+                          id={`team-role-${index}`}
+                          value={member.role}
+                          onChange={(e) => {
+                            const value = e.target.value as WorkspaceRole;
+                            setTeamMembers((prev) => {
+                              const next = [...prev];
+                              next[index] = { ...next[index], role: value };
+                              return next;
+                            });
+                          }}
+                          className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value={WorkspaceRole.TEAM_LEAD}>Team Lead</option>
+                          <option value={WorkspaceRole.EVENT_COORDINATOR}>Event Coordinator</option>
+                          <option value={WorkspaceRole.VOLUNTEER_MANAGER}>Volunteer Manager</option>
+                          <option value={WorkspaceRole.TECHNICAL_SPECIALIST}>Technical Specialist</option>
+                          <option value={WorkspaceRole.MARKETING_LEAD}>Marketing Lead</option>
+                          <option value={WorkspaceRole.GENERAL_VOLUNTEER}>General Volunteer</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center sm:self-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTeamMembers((prev) => prev.filter((_, i) => i !== index));
+                          }}
+                          className="text-xs text-red-600 hover:text-red-700"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setTeamMembers((prev) => [
+                    ...prev,
+                    {
+                      userId: '',
+                      role: WorkspaceRole.GENERAL_VOLUNTEER,
+                    },
+                  ])
+                }
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                Add team member
+              </button>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="space-y-4">
               <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
                 <p className="font-medium mb-1">Review workspace details</p>
                 <p className="text-xs text-gray-500 mb-2">
-                  Confirm how this workspace will appear to your team. You can invite specific members after
-                  creation from the workspace page.
+                  Confirm how this workspace will appear to your team. You can always adjust settings and manage
+                  team members after creation.
                 </p>
                 <dl className="space-y-2 text-xs">
                   <div className="flex items-start justify-between gap-4">
@@ -396,13 +564,25 @@ export const WorkspaceCreatePage: React.FC = () => {
                   <div className="flex items-start justify-between gap-4">
                     <dt className="font-semibold text-gray-600">Associated event</dt>
                     <dd className="text-gray-900">
-                      {selectedEvent ? selectedEvent.name : formValues.eventId ? 'Custom event ID' : 'Not selected yet'}
+                      {selectedEvent
+                        ? selectedEvent.name
+                        : formValues.eventId
+                        ? 'Custom event ID'
+                        : 'Not selected yet'}
+                    </dd>
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="font-semibold text-gray-600">Initial team members</dt>
+                    <dd className="text-gray-900">
+                      {teamMembers.length === 0
+                        ? 'None added yet'
+                        : `${teamMembers.length} member${teamMembers.length > 1 ? 's' : ''} will be added`}
                     </dd>
                   </div>
                 </dl>
               </div>
               <div className="rounded-md border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-900">
-                <p className="font-semibold mb-1">Next: add your team</p>
+                <p className="font-semibold mb-1">Next: manage your team and tasks</p>
                 <p>
                   Once this workspace is created, you can invite collaborators, assign roles, and track tasks
                   directly from the workspace dashboard.
@@ -435,7 +615,7 @@ export const WorkspaceCreatePage: React.FC = () => {
               disabled={submitting}
               className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {currentStep < 3 ? 'Next' : submitting ? 'Creating…' : 'Create workspace'}
+              {currentStep < 4 ? 'Next' : submitting ? 'Creating…' : 'Create workspace'}
             </button>
           </div>
         </form>
