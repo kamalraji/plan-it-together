@@ -432,11 +432,14 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
 
                   <div className="flex-1 space-y-1.5 text-sm text-muted-foreground">
                     {columns.slice(1).map((column) => (
-                      <div key={column.key} className="flex justify-between space-x-4">
-                        <span className="text-xs font-medium text-muted-foreground truncate">
+                      <div
+                        key={column.key}
+                        className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:space-x-4"
+                      >
+                        <span className="text-xs font-medium text-muted-foreground truncate sm:flex-1">
                           {column.label}
                         </span>
-                        <span className="text-sm text-foreground text-right truncate max-w-[55%]">
+                        <span className="text-sm text-foreground truncate sm:text-right sm:max-w-[55%]">
                           {column.render
                             ? column.render(item[column.key], item)
                             : String(item[column.key] ?? '')}
