@@ -132,8 +132,11 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">Your Event QR Code</h3>
-        <p className="text-gray-600 mb-6">
-          Show this QR code at the event for quick check-in
+        <p className="text-gray-600 mb-2">
+          Show this QR code at the event for quick check-in.
+        </p>
+        <p className="text-gray-500 text-xs mb-6">
+          This is your personal check-in QR from your profile and stays the same across all events you join.
         </p>
 
         {/* Check-in Status */}
@@ -245,7 +248,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
           <div className="space-y-2 text-sm text-gray-600">
             <div className="flex items-start">
               <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium mr-3 mt-0.5">1</span>
-              <span>Save this QR code to your phone or take a screenshot</span>
+              <span>Save this personal QR code from your profile to your phone or take a screenshot</span>
             </div>
             <div className="flex items-start">
               <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium mr-3 mt-0.5">2</span>
@@ -253,7 +256,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
             </div>
             <div className="flex items-start">
               <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium mr-3 mt-0.5">3</span>
-              <span>Show your QR code to volunteers at the check-in desk</span>
+              <span>Show your QR code to volunteers at the check-in desk for any event you&apos;re registered for</span>
             </div>
             <div className="flex items-start">
               <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium mr-3 mt-0.5">4</span>
