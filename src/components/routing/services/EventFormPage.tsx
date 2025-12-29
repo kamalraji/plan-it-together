@@ -4,7 +4,7 @@ import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
@@ -14,7 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 interface EventFormPageProps {
   mode: 'create' | 'edit';
 }
@@ -94,6 +98,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = form;
 
   useEffect(() => {
@@ -414,10 +419,49 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     <Label htmlFor="start-date" className="mb-2 block">
                       Start Date *
                     </Label>
-                    <Input
-                      type="datetime-local"
-                      id="start-date"
-                      {...register('startDate')}
+                    <Controller
+                      control={control}
+                      name="startDate"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                  'w-full justify-start text-left font-normal',
+                                  !dateValue && 'text-muted-foreground',
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateValue ? (
+                                  format(dateValue, 'PPP p')
+                                ) : (
+                                  <span>Select start date & time</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={dateValue}
+                                onSelect={(date) => {
+                                  if (!date) {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                  field.onChange(formatted);
+                                }}
+                                initialFocus
+                                className={cn('p-3 pointer-events-auto')}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      }}
                     />
                     {errors.startDate && (
                       <p className="mt-1 text-sm text-destructive">{errors.startDate.message}</p>
@@ -428,10 +472,49 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     <Label htmlFor="end-date" className="mb-2 block">
                       End Date *
                     </Label>
-                    <Input
-                      type="datetime-local"
-                      id="end-date"
-                      {...register('endDate')}
+                    <Controller
+                      control={control}
+                      name="endDate"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                  'w-full justify-start text-left font-normal',
+                                  !dateValue && 'text-muted-foreground',
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateValue ? (
+                                  format(dateValue, 'PPP p')
+                                ) : (
+                                  <span>Select end date & time</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={dateValue}
+                                onSelect={(date) => {
+                                  if (!date) {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                  field.onChange(formatted);
+                                }}
+                                initialFocus
+                                className={cn('p-3 pointer-events-auto')}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      }}
                     />
                     {errors.endDate && (
                       <p className="mt-1 text-sm text-destructive">{errors.endDate.message}</p>
@@ -442,10 +525,49 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     <Label htmlFor="registration-deadline" className="mb-2 block">
                       Registration Deadline
                     </Label>
-                    <Input
-                      type="datetime-local"
-                      id="registration-deadline"
-                      {...register('registrationDeadline')}
+                    <Controller
+                      control={control}
+                      name="registrationDeadline"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className={cn(
+                                  'w-full justify-start text-left font-normal',
+                                  !dateValue && 'text-muted-foreground',
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateValue ? (
+                                  format(dateValue, 'PPP p')
+                                ) : (
+                                  <span>Select registration deadline (optional)</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={dateValue}
+                                onSelect={(date) => {
+                                  if (!date) {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                  field.onChange(formatted);
+                                }}
+                                initialFocus
+                                className={cn('p-3 pointer-events-auto')}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      }}
                     />
                     {errors.registrationDeadline && (
                       <p className="mt-1 text-sm text-destructive">
