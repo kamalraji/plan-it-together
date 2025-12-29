@@ -42,7 +42,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = (propWorkspaceId || paramWorkspaceId) as string | undefined;
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskIdFromUrl = searchParams.get('taskId') || undefined;
   const [activeTab, setActiveTab] = useState<
     | 'overview'
@@ -163,6 +163,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         dependencies: [],
         tags: [],
         metadata: {},
+        roleScope: row.role_scope as WorkspaceRoleScope | undefined,
       })) as unknown as WorkspaceTask[];
     },
     enabled: !!workspaceId,
@@ -180,6 +181,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           description: '',
           priority: TaskPriority.MEDIUM,
           status: TaskStatus.NOT_STARTED,
+          role_scope: activeRoleSpace === 'ALL' ? null : activeRoleSpace,
         })
         .select('*')
         .single();
@@ -250,7 +252,10 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     enabled: !!workspaceId,
   });
 
-  const [activeRoleSpace, setActiveRoleSpace] = useState<WorkspaceRoleScope>('ALL');
+  const initialRoleScopeParam = searchParams.get('roleSpace') as WorkspaceRoleScope | null;
+  const [activeRoleSpace, setActiveRoleSpace] = useState<WorkspaceRoleScope>(
+    initialRoleScopeParam || 'ALL',
+  );
   const roleSpaces: WorkspaceRoleScope[] = ['ALL', ...(teamMembers?.map((m) => m.role) || [])];
 
   const isGlobalWorkspaceManager =
@@ -344,7 +349,16 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           {roleSpaces.map((roleSpace) => (
             <button
               key={roleSpace}
-              onClick={() => setActiveRoleSpace(roleSpace)}
+              onClick={() => {
+                setActiveRoleSpace(roleSpace);
+                const next = new URLSearchParams(searchParams);
+                if (roleSpace === 'ALL') {
+                  next.delete('roleSpace');
+                } else {
+                  next.set('roleSpace', roleSpace);
+                }
+                setSearchParams(next);
+              }}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                 activeRoleSpace === roleSpace
                   ? 'bg-primary text-primary-foreground border-primary'
@@ -422,7 +436,9 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           />
         )}
 
-        {activeTab === 'analytics' && <WorkspaceAnalyticsDashboard workspace={workspace} />}
+        {activeTab === 'analytics' && (
+          <WorkspaceAnalyticsDashboard workspace={workspace} roleScope={activeRoleSpace} />
+        )}
 
         {activeTab === 'reports' && <WorkspaceReportExport workspace={workspace} teamMembers={teamMembers} />}
 
