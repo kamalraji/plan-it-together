@@ -14,7 +14,7 @@ export const OrgSettingsDashboard: React.FC = () => {
 
   const orgSettingsPath = `/dashboard/organizations/${organization.id}/settings`;
   const teamPath = `/${organization.slug}/team`;
-  const profileSettingsPath = '/dashboard/profile/settings';
+  const storySettingsPath = `/${organization.slug}/settings/story`;
 
   return (
     <main className="min-h-screen bg-transparent">
@@ -98,23 +98,23 @@ export const OrgSettingsDashboard: React.FC = () => {
             </span>
           </Link>
 
-          {/* Personal notifications & profile */}
+          {/* Story & social proof */}
           <Link
-             to={profileSettingsPath}
+             to={storySettingsPath}
              className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-0.5">Your preferences</p>
-                <p className="text-sm sm:text-base font-semibold text-foreground">Profile & notifications</p>
+                <p className="text-xs font-medium text-muted-foreground mb-0.5">Story & social proof</p>
+                <p className="text-sm sm:text-base font-semibold text-foreground">Testimonials & sponsors</p>
               </div>
-              <span className="text-lg sm:text-xl">🔔</span>
+              <span className="text-lg sm:text-xl">✨</span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Adjust your personal profile, notification channels, and other per-user settings.
+              Manage the testimonials and sponsor logos shown on your public organization page.
             </p>
             <span className="mt-1 text-xs sm:text-sm font-medium text-primary story-link">
-              Open your settings
+              Open story settings
             </span>
           </Link>
         </div>
