@@ -11,6 +11,7 @@ import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sideb
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { OrgSettingsDashboard } from './OrgSettingsDashboard';
+import { OrgStorySettingsPage } from './OrgStorySettingsPage';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -84,21 +85,22 @@ export const OrgScopedLayout: React.FC = () => {
             <div className="relative flex w-full pt-16 items-stretch">
               <OrganizationSidebar />
 
-            <SidebarInset>
-              <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
-                <Routes>
-                  <Route path="dashboard" element={<OrganizerDashboard />} />
-                  <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
-                  <Route path="settings/dashboard" element={<OrgSettingsDashboard />} />
-                  <Route path="eventmanagement/*" element={<EventService />} />
-                  <Route path="workspaces/*" element={<WorkspaceService />} />
-                  <Route path="organizations/*" element={<OrganizationService />} />
-                  <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
-                  <Route path="team" element={<OrganizationTeamManagement />} />
-                  <Route path="*" element={<Navigate to="dashboard" replace />} />
-                </Routes>
-              </div>
-            </SidebarInset>
+              <SidebarInset>
+               <div className="mx-4 my-6 w-full rounded-3xl border border-border/60 bg-card/75 px-4 py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
+                 <Routes>
+                   <Route path="dashboard" element={<OrganizerDashboard />} />
+                   <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
+                   <Route path="settings/dashboard" element={<OrgSettingsDashboard />} />
+                   <Route path="settings/story" element={<OrgStorySettingsPage />} />
+                   <Route path="eventmanagement/*" element={<EventService />} />
+                   <Route path="workspaces/*" element={<WorkspaceService />} />
+                   <Route path="organizations/*" element={<OrganizationService />} />
+                   <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
+                   <Route path="team" element={<OrganizationTeamManagement />} />
+                   <Route path="*" element={<Navigate to="dashboard" replace />} />
+                 </Routes>
+               </div>
+             </SidebarInset>
           </div>
         </div>
 
