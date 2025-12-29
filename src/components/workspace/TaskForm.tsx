@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember } from '../../types';
+import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope } from '../../types';
 
 interface TaskFormProps {
   task?: WorkspaceTask;
@@ -20,6 +20,7 @@ export interface TaskFormData {
   dependencies: string[];
   tags: string[];
   templateId?: string;
+  roleScope?: WorkspaceRoleScope;
 }
 
 const TASK_TEMPLATES = [
@@ -302,7 +303,7 @@ export function TaskForm({
         </div>
 
         {/* Assignee and Due Date */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="assignee" className="block text-sm font-medium text-gray-700 mb-1">
               Assignee
@@ -314,7 +315,7 @@ export function TaskForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">Unassigned</option>
-              {teamMembers.map(member => (
+              {teamMembers.map((member) => (
                 <option key={member.id} value={member.userId}>
                   {member.user.name} ({member.role.replace('_', ' ')})
                 </option>
@@ -336,6 +337,27 @@ export function TaskForm({
               }`}
             />
             {errors.dueDate && <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="roleScope" className="block text-sm font-medium text-gray-700 mb-1">
+              Role Space (sub workspace)
+            </label>
+            <select
+              id="roleScope"
+              value={formData.roleScope || ''}
+              onChange={(e) =>
+                handleInputChange('roleScope', (e.target.value || undefined) as WorkspaceRoleScope | undefined)
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All teams (no specific role)</option>
+              {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
+                <option key={role} value={role}>
+                  {role.replace('_', ' ')}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
