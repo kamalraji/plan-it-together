@@ -84,18 +84,18 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
     // Apply search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item =>
-        columns.some(col => {
+      filtered = filtered.filter((item) =>
+        columns.some((col) => {
           const value = item[col.key];
           return value && value.toString().toLowerCase().includes(query);
-        })
+        }),
       );
     }
 
     // Apply filters
     Object.entries(filterValues).forEach(([key, value]) => {
       if (value !== undefined && value !== '' && value !== null) {
-        filtered = filtered.filter(item => {
+        filtered = filtered.filter((item) => {
           const itemValue = item[key];
           if (typeof value === 'boolean') {
             return itemValue === value;
@@ -135,13 +135,12 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   const totalPages = Math.ceil(sortedData.length / pageSize);
 
   const handleSort = (columnKey: string) => {
-    setSortConfig(current => {
+    setSortConfig((current) => {
       if (current?.key === columnKey) {
         if (current.direction === 'asc') {
           return { key: columnKey, direction: 'desc' };
-        } else {
-          return null; // Remove sorting
         }
+        return null; // Remove sorting
       }
       return { key: columnKey, direction: 'asc' };
     });
@@ -151,7 +150,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
     if (selectedItems.size === paginatedData.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(paginatedData.map(item => item.id)));
+      setSelectedItems(new Set(paginatedData.map((item) => item.id)));
     }
   };
 
@@ -166,7 +165,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   };
 
   const handleBulkAction = (action: BulkAction) => {
-    const selectedData = data.filter(item => selectedItems.has(item.id));
+    const selectedData = data.filter((item) => selectedItems.has(item.id));
     if (action.confirmationRequired) {
       if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()} ${selectedItems.size} items?`)) {
         action.action(selectedData);
@@ -190,23 +189,23 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   };
 
   // Prepare page header props
-  const pageActions = [];
+  const pageActions: { label: string; action: () => void; variant: 'primary' | 'secondary' }[] = [];
   if (onCreateNew) {
     pageActions.push({
       label: `Create ${resourceType}`,
       action: onCreateNew,
-      variant: 'primary' as const,
+      variant: 'primary',
     });
   }
   if (onRefresh) {
     pageActions.push({
       label: 'Refresh',
       action: onRefresh,
-      variant: 'secondary' as const,
+      variant: 'secondary',
     });
   }
 
-  const pageFilters = [];
+  const pageFilters: any[] = [];
   if (searchable) {
     pageFilters.push({
       id: 'search',
@@ -217,21 +216,33 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
     });
   }
 
-  filters.forEach(filter => {
+  filters.forEach((filter) => {
     pageFilters.push({
       id: filter.key,
       label: filter.label,
       type: filter.type,
       value: filterValues[filter.key] || '',
       options: filter.options,
-      onChange: (value: any) => setFilterValues(prev => ({ ...prev, [filter.key]: value })),
+      onChange: (value: any) => setFilterValues((prev) => ({ ...prev, [filter.key]: value })),
     });
   });
 
   const viewControls = [
-    { type: 'table' as const, active: viewType === 'table', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
-    { type: 'cards' as const, active: viewType === 'cards', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
-    { type: 'list' as const, active: viewType === 'list', onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list') },
+    {
+      type: 'table' as const,
+      active: viewType === 'table',
+      onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list'),
+    },
+    {
+      type: 'cards' as const,
+      active: viewType === 'cards',
+      onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list'),
+    },
+    {
+      type: 'list' as const,
+      active: viewType === 'list',
+      onChange: (type: string) => setViewType(type as 'table' | 'cards' | 'list'),
+    },
   ];
 
   return (
@@ -306,7 +317,11 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                       <th
                         key={column.key}
                         className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                          column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
+                          column.align === 'center'
+                            ? 'text-center'
+                            : column.align === 'right'
+                            ? 'text-right'
+                            : 'text-left'
                         }`}
                         style={{ width: column.width }}
                       >
@@ -350,7 +365,11 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                         <td
                           key={column.key}
                           className={`px-6 py-4 whitespace-nowrap text-sm ${
-                            column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
+                            column.align === 'center'
+                              ? 'text-center'
+                              : column.align === 'right'
+                              ? 'text-right'
+                              : 'text-left'
                           }`}
                         >
                           {column.render ? column.render(item[column.key], item) : item[column.key]}
@@ -371,6 +390,65 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                   ))}
                 </tbody>
               </table>
+            </div>
+          ) : viewType === 'cards' ? (
+            <div className="p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {paginatedData.map((item) => (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 rounded-lg p-4 flex flex-col space-y-3 hover:shadow-sm transition-shadow"
+                  onClick={() => onRowClick?.(item)}
+                >
+                  <div className="flex items-start justify-between space-x-3">
+                    <div className="flex-1 min-w-0">
+                      {columns[0] &&
+                        (columns[0].render
+                          ? columns[0].render(item[columns[0].key], item)
+                          : (
+                              <div className="text-sm font-medium text-gray-900 truncate">
+                                {String(item[columns[0].key])}
+                              </div>
+                            ))}
+                    </div>
+                    {bulkActions.length > 0 && (
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded flex-shrink-0"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-1 text-sm text-gray-700">
+                    {columns.slice(1).map((column) => (
+                      <div key={column.key} className="flex justify-between space-x-4">
+                        <span className="text-xs font-medium text-gray-500 truncate">
+                          {column.label}
+                        </span>
+                        <span className="text-sm text-gray-900 text-right truncate max-w-[55%]">
+                          {column.render
+                            ? column.render(item[column.key], item)
+                            : String(item[column.key] ?? '')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle row actions menu
+                      }}
+                      className="inline-flex items-center text-xs font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      <EllipsisHorizontalIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="p-6">
