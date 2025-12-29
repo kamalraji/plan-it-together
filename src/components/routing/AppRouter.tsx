@@ -31,6 +31,7 @@ import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { ParticipantPortfolioPage } from '../portfolio/ParticipantPortfolioPage';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -539,6 +540,9 @@ export const AppRouter: React.FC = () => {
             {/* Public participant event listing */}
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
+
+            {/* Public participant portfolio */}
+            <Route path="/portfolio/:userId" element={<ParticipantPortfolioPage />} />
 
             {/* Organization-scoped organizer console */}
             <Route
