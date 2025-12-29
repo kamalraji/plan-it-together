@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import api from '../../lib/api';
+
 import { useAuth } from '../../hooks/useAuth';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
@@ -26,6 +26,7 @@ interface WorkspaceSummary {
   name: string;
   status: string;
   updatedAt: string;
+  eventId?: string | null;
   event?: { id: string; name: string } | null;
 }
 
@@ -40,10 +41,37 @@ export function OrganizerDashboard() {
   const { data: events, isLoading } = useQuery<Event[]>({
     queryKey: ['organizer-events', organization.id],
     queryFn: async () => {
-      const response = await api.get('/events/my-events', {
-        params: { organizationId: organization.id },
-      });
-      return response.data.events as Event[];
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, name, description, start_date, end_date, status, capacity')
+        .eq('organization_id', organization.id)
+        .order('start_date', { ascending: true });
+
+      if (error) throw error;
+
+      const eventsWithCounts: Event[] = await Promise.all(
+        (data ?? []).map(async (evt) => {
+          const { count, error: registrationsError } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', evt.id as string);
+
+          if (registrationsError) throw registrationsError;
+
+          return {
+            id: evt.id as string,
+            name: evt.name as string,
+            description: (evt as any).description ?? '',
+            startDate: (evt as any).start_date,
+            endDate: (evt as any).end_date,
+            status: (evt as any).status,
+            registrationCount: count ?? 0,
+            capacity: (evt as any).capacity ?? undefined,
+          };
+        }),
+      );
+
+      return eventsWithCounts;
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
@@ -54,10 +82,22 @@ export function OrganizerDashboard() {
   const { data: workspaces } = useQuery<WorkspaceSummary[]>({
     queryKey: ['organizer-workspaces', organization.id],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: { orgSlug: organization.slug },
-      });
-      return response.data.workspaces as WorkspaceSummary[];
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('id, name, status, updated_at, event_id')
+        .eq('organizer_id', organization.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data ?? []).map((ws) => ({
+        id: ws.id as string,
+        name: ws.name as string,
+        status: (ws as any).status,
+        updatedAt: (ws as any).updated_at,
+        eventId: (ws as any).event_id ?? null,
+        event: null,
+      }));
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
@@ -65,28 +105,54 @@ export function OrganizerDashboard() {
     enabled: isHealthy !== false,
   });
 
-  const { data: analytics } = useQuery<any>({
-    queryKey: ['organizer-analytics', organization.id],
+  const eventIds = useMemo(() => (events ?? []).map((evt) => evt.id), [events]);
+
+  const { data: aggregateMetrics } = useQuery<{
+    totalRegistrations: number;
+    certificatesIssued: number;
+  }>({
+    enabled: isHealthy !== false && eventIds.length > 0,
+    queryKey: ['organizer-aggregate-metrics', organization.id, eventIds],
     queryFn: async () => {
-      const response = await api.get('/analytics/organizer-summary', {
-        params: { organizationId: organization.id },
-      });
-      return response.data;
+      const [registrationsRes, certificatesRes] = await Promise.all([
+        supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true })
+          .in('event_id', eventIds),
+        supabase
+          .from('certificates')
+          .select('*', { count: 'exact', head: true })
+          .in('event_id', eventIds),
+      ]);
+
+      if (registrationsRes.error) throw registrationsRes.error;
+      if (certificatesRes.error) throw certificatesRes.error;
+
+      return {
+        totalRegistrations: registrationsRes.count ?? 0,
+        certificatesIssued: certificatesRes.count ?? 0,
+      };
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
   });
 
   const eventCreatePath = useEventCreatePath();
 
   const topWorkspaces = useMemo(() => {
     if (!workspaces) return [];
+
+    const eventsById = new Map((events ?? []).map((evt) => [evt.id, evt] as const));
+
     return [...workspaces]
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      .slice(0, 3);
-  }, [workspaces]);
+      .slice(0, 3)
+      .map((ws) => ({
+        ...ws,
+        event: ws.eventId ? eventsById.get(ws.eventId) ?? null : null,
+      }));
+  }, [workspaces, events]);
 
   const upcomingMilestones = useMemo(() => {
     if (!events) return [];
@@ -153,9 +219,12 @@ export function OrganizerDashboard() {
     },
   });
 
-  const totalEvents = analytics?.totalEvents ?? (events?.length ?? 0);
-  const activeEvents = analytics?.activeEvents ?? 0;
-  const totalRegistrations = analytics?.totalRegistrations ?? 0;
+  const totalEvents = events?.length ?? 0;
+  const activeEvents = (events ?? []).filter(
+    (event) => event.status === 'PUBLISHED' || event.status === 'ONGOING',
+  ).length;
+  const totalRegistrations = aggregateMetrics?.totalRegistrations ?? 0;
+  const certificatesIssued = aggregateMetrics?.certificatesIssued ?? 0;
 
   const isSummaryLoading = isLoading && isHealthy !== false;
 
@@ -500,30 +569,30 @@ export function OrganizerDashboard() {
         {activeTab === 'analytics' && (
           <div className="order-1 mt-6 sm:mt-8">
             <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Analytics Overview</h2>
-            {analytics ? (
+            {events ? (
               <div className="grid gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <div className="bg-card rounded-lg shadow p-3 sm:p-6">
                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">Total Events</h3>
-                  <p className="text-xl sm:text-3xl font-bold text-primary">{analytics.totalEvents || 0}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-primary">{totalEvents}</p>
                 </div>
                 <div className="bg-card rounded-lg shadow p-3 sm:p-6">
                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                     Total Registrations
                   </h3>
                   <p className="text-xl sm:text-3xl font-bold text-emerald-500">
-                    {analytics.totalRegistrations || 0}
+                    {totalRegistrations}
                   </p>
                 </div>
                 <div className="bg-card rounded-lg shadow p-3 sm:p-6">
                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">Active Events</h3>
-                  <p className="text-xl sm:text-3xl font-bold text-sky-500">{analytics.activeEvents || 0}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-sky-500">{activeEvents}</p>
                 </div>
                 <div className="bg-card rounded-lg shadow p-3 sm:p-6">
                   <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1.5 sm:mb-2">
                     Certificates Issued
                   </h3>
                   <p className="text-xl sm:text-3xl font-bold text-violet-500">
-                    {analytics.certificatesIssued || 0}
+                    {certificatesIssued}
                   </p>
                 </div>
               </div>
