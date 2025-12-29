@@ -45,6 +45,10 @@ const eventSchema = z
     registrationDeadline: z.string().optional(),
     primaryColor: z.string().optional(),
     logoUrl: z.string().url('Logo URL must be a valid URL').optional().or(z.literal('')),
+    heroSubtitle: z.string().trim().optional(),
+    bannerUrl: z.string().url('Banner URL must be a valid URL').optional().or(z.literal('')),
+    primaryCtaLabel: z.string().trim().optional(),
+    secondaryCtaLabel: z.string().trim().optional(),
   })
   .refine(
     (data) => {
@@ -90,6 +94,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       registrationDeadline: '',
       primaryColor: '#2563eb',
       logoUrl: '',
+      heroSubtitle: '',
+      bannerUrl: '',
+      primaryCtaLabel: '',
+      secondaryCtaLabel: '',
     },
   });
 
@@ -133,6 +141,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           registrationDeadline: '',
           primaryColor: (data.branding as any)?.primaryColor ?? '#2563eb',
           logoUrl: (data.branding as any)?.logoUrl ?? '',
+          heroSubtitle: (data.branding as any)?.heroSubtitle ?? '',
+          bannerUrl: (data.branding as any)?.bannerUrl ?? '',
+          primaryCtaLabel: (data.branding as any)?.primaryCtaLabel ?? '',
+          secondaryCtaLabel: (data.branding as any)?.secondaryCtaLabel ?? '',
         });
       } catch (err: any) {
         console.error('Failed to load event', err);
@@ -176,14 +188,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         organization_id: values.organizationId,
         visibility: 'PUBLIC',
         status,
-      };
-
-      if (values.primaryColor || values.logoUrl) {
-        payload.branding = {
+        branding: {
           primaryColor: values.primaryColor,
           logoUrl: values.logoUrl || undefined,
-        };
-      }
+          heroSubtitle: values.heroSubtitle?.trim() || undefined,
+          bannerUrl: values.bannerUrl || undefined,
+          primaryCtaLabel: values.primaryCtaLabel?.trim() || undefined,
+          secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
+        },
+      };
 
       let error;
       if (mode === 'create') {
@@ -624,45 +637,138 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={control}
+                        name="heroSubtitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero Subtitle</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Short tagline shown under the event name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional short sentence to make your landing hero more compelling.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="bannerUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero Banner Image URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://example.com/hero-banner.jpg"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional background image for the top section of your public event page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="primaryCtaLabel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Button Label</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Register now"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Text for the main call-to-action button on your landing page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="secondaryCtaLabel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Secondary Button Label</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Learn more (optional)"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional secondary action shown next to the main button.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
 
                     <div>
                       {(() => {
                         const primaryColor = watch('primaryColor') || '#2563eb';
                         const logoUrl = watch('logoUrl');
+                        const name = watch('name') || 'Your event name';
+                        const heroSubtitle = watch('heroSubtitle');
+                        const primaryCtaLabel = watch('primaryCtaLabel') || 'Register now';
 
                         return (
                           <div
-                            className="relative flex h-full flex-col justify-between rounded-2xl border bg-card p-4 shadow-sm"
+                            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-card shadow-sm"
                             style={{ borderColor: primaryColor }}
-                            aria-label="Event branding preview"
+                            aria-label="Event landing preview"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted overflow-hidden">
-                                {logoUrl ? (
-                                  <img
-                                    src={logoUrl}
-                                    alt="Event logo preview"
-                                    className="h-full w-full object-cover"
-                                    onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                    }}
-                                  />
-                                ) : (
-                                  <span className="text-xs font-semibold text-muted-foreground">
-                                    Logo
-                                  </span>
-                                )}
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">Preview</p>
-                                <p className="text-base font-semibold text-foreground">
-                                  {watch('name') || 'Your event name'}
-                                </p>
+                            <div
+                              className="p-4 text-white"
+                              style={{
+                                backgroundColor: primaryColor,
+                              }}
+                            >
+                              <p className="text-xs font-medium opacity-80">Landing preview</p>
+                              <div className="mt-3 flex items-center gap-3">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/10 overflow-hidden">
+                                  {logoUrl ? (
+                                    <img
+                                      src={logoUrl}
+                                      alt="Event logo preview"
+                                      className="h-full w-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="text-xs font-semibold opacity-80">Logo</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-base font-semibold">{name}</p>
+                                  <p className="text-xs opacity-90">
+                                    {heroSubtitle || 'Add a short subtitle to describe your event at a glance.'}
+                                  </p>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="mt-4 flex items-center justify-between">
+                            <div className="p-4 flex items-center justify-between bg-card">
                               <div className="space-y-1">
                                 <div className="h-2 w-24 rounded-full bg-muted" />
                                 <div className="h-2 w-32 rounded-full bg-muted" />
@@ -671,7 +777,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                 className="rounded-full px-3 py-1 text-xs font-medium text-primary-foreground"
                                 style={{ backgroundColor: primaryColor }}
                               >
-                                Register
+                                {primaryCtaLabel}
                               </div>
                             </div>
                           </div>

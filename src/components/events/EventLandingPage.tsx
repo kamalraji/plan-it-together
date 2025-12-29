@@ -244,7 +244,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   disabled={registrationMutation.isPending}
                   className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
-                  {registrationMutation.isPending ? 'Registering...' : 'Register Now'}
+                  {registrationMutation.isPending
+                    ? 'Registering...'
+                    : (event.branding?.primaryCtaLabel || 'Register Now')}
                 </button>
               ) : (
                 <button

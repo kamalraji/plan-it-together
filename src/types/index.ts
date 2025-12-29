@@ -101,6 +101,9 @@ export interface BrandingConfig {
   secondaryColor?: string;
   customCss?: string;
   workspaceTemplateId?: string;
+  heroSubtitle?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
 }
 
 export interface VenueConfig {
