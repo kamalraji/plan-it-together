@@ -141,20 +141,36 @@ export const WorkspaceCreatePage: React.FC = () => {
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto">
         <PageHeader
-          title={isOrgContext ? 'Create Organization Workspace' : 'Create Workspace'}
-          subtitle={
-            isOrgContext
-              ? 'Set up a new workspace scoped to this organization and event.'
-              : 'Set up a new collaboration workspace for your event team.'
-          }
-        />
-
+           title={isOrgContext ? 'Create Organization Workspace' : 'Create Workspace'}
+           subtitle={
+             isOrgContext
+               ? 'Set up a new workspace scoped to this organization and event.'
+               : 'Set up a new collaboration workspace for your event team.'
+           }
+         />
+ 
+         {Object.keys(formErrors).length > 0 && (
+           <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+             <p className="font-semibold mb-1">Please fix the following before continuing:</p>
+             <ul className="list-disc list-inside space-y-0.5">
+               {Object.entries(formErrors).map(([field, message]) => (
+                 <li key={field}>{message}</li>
+               ))}
+             </ul>
+           </div>
+         )}
+ 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="workspace-name">
-              Workspace name
-            </label>
-            <input
+           <div>
+             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="workspace-name">
+               Workspace name
+             </label>
+             <p className="text-xs text-gray-500 mb-2">
+               Use a short, descriptive name your team will recognize (for example, 
+               <span className="font-medium">"Registration ops"</span> or 
+               <span className="font-medium">"Speaker coordination"</span>).
+             </p>
+             <input
               id="workspace-name"
               type="text"
               value={formValues.name}
@@ -168,9 +184,12 @@ export const WorkspaceCreatePage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="event-id">
-              Associated event
-            </label>
+             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="event-id">
+               Associated event
+             </label>
+             <p className="text-xs text-gray-500 mb-2">
+               Every workspace belongs to a single event so tasks, team members, and reports stay in sync.
+             </p>
             {isOrgContext ? (
               <>
                 <select

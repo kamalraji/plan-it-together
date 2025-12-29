@@ -176,31 +176,64 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         };
       }
 
-      let error;
-      if (mode === 'create') {
-        ({ error } = await supabase.from('events').insert(payload));
-      } else {
-        ({ error } = await supabase.from('events').update(payload).eq('id', eventId));
-      }
-
-      if (error) throw error;
-
-      toast({
-        title:
-          mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Draft saved'
-              : 'Event created'
-            : 'Event updated',
-        description:
-          mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Your event draft has been saved.'
-              : 'Your event has been created successfully.'
-            : 'Your changes have been saved.',
-      });
-
-      navigate(listPath);
+      let createdEventId: string | undefined;
+ 
+       if (mode === 'create') {
+         const { data, error: insertError } = await supabase
+           .from('events')
+           .insert(payload)
+           .select('id')
+           .single();
+ 
+         if (insertError) throw insertError;
+         createdEventId = data?.id as string | undefined;
+       } else {
+         const { error: updateError } = await supabase
+           .from('events')
+           .update(payload)
+           .eq('id', eventId);
+ 
+         if (updateError) throw updateError;
+       }
+ 
+       const workspaceCreatePath =
+         mode === 'create' && submitIntent !== 'draft' && createdEventId && listPath.includes('/eventmanagement')
+           ? `${listPath
+               .replace('/eventmanagement', '/workspaces')
+               .replace(/\/events.*$/, '')}/create?eventId=${createdEventId}`
+           : undefined;
+ 
+       const successDescription: React.ReactNode =
+         mode === 'create'
+           ? submitIntent === 'draft'
+             ? 'Your event draft has been saved.'
+             : (
+                 <span>
+                   Your event has been created successfully.
+                   {workspaceCreatePath && (
+                     <button
+                       type="button"
+                       onClick={() => navigate(workspaceCreatePath)}
+                       className="ml-2 inline-flex items-center rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-blue-700"
+                     >
+                       Create workspace for this event
+                     </button>
+                   )}
+                 </span>
+               )
+           : 'Your changes have been saved.';
+ 
+       toast({
+         title:
+           mode === 'create'
+             ? submitIntent === 'draft'
+               ? 'Draft saved'
+               : 'Event created'
+             : 'Event updated',
+         description: successDescription,
+       });
+ 
+       navigate(listPath);
     } catch (err: any) {
       console.error('Failed to save event', err);
       const rawMessage = err?.message || 'Please try again.';
