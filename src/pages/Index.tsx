@@ -21,10 +21,10 @@ type SectionKey = keyof typeof sections;
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Thittam1Hub – University Event & Certificate Hub";
+    document.title = "Thittam1Hub – Event & Certificate Hub for Universities and Teams";
 
     const descriptionContent =
-      "Thittam1Hub is the futuristic hub for university events, attendance, and smart certificates in one place.";
+      "Thittam1Hub is a futuristic hub for events, attendance, and smart certificates for universities, tech communities, corporate L&D teams, and small businesses.";
 
     let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     if (!meta) {
@@ -171,22 +171,23 @@ const Index = () => {
             <div className="relative z-10 space-y-7 animate-fade-in">
               <p className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/50 px-3 py-1 text-xs text-primary shadow-[0_0_25px_hsl(var(--primary)/0.3)] backdrop-blur-xl">
                 <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                Built for Universities & Colleges
+                Built for universities, tech organizers, and modern teams
               </p>
               <h1
                 id="hero-title"
                 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
               >
-                One hub for every university event, attendance, and certificate.
+                One hub for every event, attendance, and certificate.
               </h1>
               <p className="max-w-xl text-balance text-sm text-muted-foreground sm:text-base">
-                Thittam1Hub is the futuristic command center for your campusfrom technical fests to FDPsuniting
-                registrations, check-ins, and smart certificates in a single, secure workspace.
+                Thittam1Hub is a futuristic command center for universities, tech communities, corporate L&amp;D, and
+                small businesses&mdash;uniting registrations, check-ins, and smart certificates in a single, secure
+                workspace.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Button
                   size="lg"
-                  className="hover-scale bg-primary text-primary-foreground shadow-[0_12px_45px_rgba(59,130,246,0.6)]"
+                  className="hover-scale bg-primary text-primary-foreground shadow-[0_0_40px_hsl(var(--primary)/0.7)] ring-1 ring-primary/70 ring-offset-2 ring-offset-background"
                   onClick={() => scrollTo(sections.resources)}
                 >
                   Book Campus Demo
@@ -214,6 +215,18 @@ const Index = () => {
                   <span className="h-6 w-6 rounded-full bg-violet-500/25" />
                   <span>Smart certificate verification</span>
                 </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                {["Universities & colleges", "Student clubs", "Tech communities", "Corporate L&D", "Small businesses"].map(
+                  (label) => (
+                    <span
+                      key={label}
+                      className="rounded-full border border-border/60 bg-background/70 px-3 py-1 backdrop-blur-xl"
+                    >
+                      {label}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
 
@@ -316,11 +329,11 @@ const Index = () => {
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 id="product-heading" className="text-lg font-semibold tracking-tight md:text-xl">
-                  Built for real university complexity.
+                  Built for real-world event complexity.
                 </h2>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-                  Thittam1Hub understands multi-department events, academic audits, and large-scale certificate
-                  issuance across an entire campus.
+                  Thittam1Hub understands multi-department campuses, tech communities, corporate academies, and
+                  recurring training programs across organizations.
                 </p>
               </div>
             </div>
@@ -434,10 +447,10 @@ const Index = () => {
           <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
             <div className="mb-8 max-w-2xl">
               <h2 id="how-heading" className="text-lg font-semibold tracking-tight md:text-xl">
-                How Thittam1Hub fits into a university semester.
+                How Thittam1Hub fits into your program calendar.
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                From planning to verified certificates, your entire journey is mapped and measurable.
+                From planning to verified certificates, your entire journey is mapped and measurable for every cohort.
               </p>
             </div>
 
@@ -542,11 +555,11 @@ const Index = () => {
             <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 id="usecases-heading" className="text-lg font-semibold tracking-tight md:text-xl">
-                  From fests to FDPs, one consistent experience.
+                  From hackathons to L&D, one consistent experience.
                 </h2>
                 <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-                  Thittam1Hub adapts to cultural events, technical symposiums, training programs, and everything in
-                  between.
+                  Thittam1Hub adapts to cultural events, technical symposiums, corporate trainings, community meetups,
+                  and everything in between.
                 </p>
               </div>
             </div>
