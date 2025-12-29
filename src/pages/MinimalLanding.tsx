@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, FileBadge2, LayoutDashboard, LineChart, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
 const sections = {
   why: "why",
@@ -16,6 +17,8 @@ const sections = {
   pricing: "pricing",
   faq: "faq",
 } as const;
+
+type SectionKey = keyof typeof sections;
 
 const MinimalLanding = () => {
   useEffect(() => {
@@ -41,6 +44,41 @@ const MinimalLanding = () => {
     canonical.href = window.location.href;
   }, []);
 
+  const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id as (typeof sections)[SectionKey];
+            const matchedKey = (Object.keys(sections) as SectionKey[]).find(
+              (key) => sections[key] === id,
+            );
+            if (matchedKey) {
+              setActiveSection(matchedKey);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-64px 0px -60% 0px",
+        threshold: 0.3,
+      },
+    );
+
+    const sectionElements = (Object.values(sections) as string[])
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    sectionElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -58,16 +96,40 @@ const MinimalLanding = () => {
           </div>
 
           <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <button onClick={() => scrollTo(sections.why)} className="hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.why)}
+              className={cn(
+                "transition-colors hover:text-foreground",
+                activeSection === "why" && "text-foreground font-medium",
+              )}
+            >
               Why Thittam1Hub
             </button>
-            <button onClick={() => scrollTo(sections.how)} className="hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.how)}
+              className={cn(
+                "transition-colors hover:text-foreground",
+                activeSection === "how" && "text-foreground font-medium",
+              )}
+            >
               How it works
             </button>
-            <button onClick={() => scrollTo(sections.pricing)} className="hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.pricing)}
+              className={cn(
+                "transition-colors hover:text-foreground",
+                activeSection === "pricing" && "text-foreground font-medium",
+              )}
+            >
               Pricing
             </button>
-            <button onClick={() => scrollTo(sections.faq)} className="hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.faq)}
+              className={cn(
+                "transition-colors hover:text-foreground",
+                activeSection === "faq" && "text-foreground font-medium",
+              )}
+            >
               FAQ
             </button>
           </nav>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, CalendarRange, LayoutDashboard, BadgeCheck, ShieldCheck, BarChart3, Users, University } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
 const sections = {
   product: "product",
@@ -15,6 +16,8 @@ const sections = {
   pricing: "pricing",
   resources: "resources",
 } as const;
+
+type SectionKey = keyof typeof sections;
 
 const Index = () => {
   useEffect(() => {
@@ -40,6 +43,41 @@ const Index = () => {
     canonical.href = window.location.href;
   }, []);
 
+  const [activeSection, setActiveSection] = useState<SectionKey | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id as (typeof sections)[SectionKey];
+            const matchedKey = (Object.keys(sections) as SectionKey[]).find(
+              (key) => sections[key] === id,
+            );
+            if (matchedKey) {
+              setActiveSection(matchedKey);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-64px 0px -60% 0px",
+        threshold: 0.3,
+      },
+    );
+
+    const sectionElements = (Object.values(sections) as string[])
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    sectionElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -62,16 +100,40 @@ const Index = () => {
           </div>
 
           <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <button onClick={() => scrollTo(sections.product)} className="story-link hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.product)}
+              className={cn(
+                "story-link transition-colors hover:text-foreground",
+                activeSection === "product" && "text-foreground",
+              )}
+            >
               Product
             </button>
-            <button onClick={() => scrollTo(sections.solutions)} className="story-link hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.solutions)}
+              className={cn(
+                "story-link transition-colors hover:text-foreground",
+                activeSection === "solutions" && "text-foreground",
+              )}
+            >
               Solutions
             </button>
-            <button onClick={() => scrollTo(sections.pricing)} className="story-link hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.pricing)}
+              className={cn(
+                "story-link transition-colors hover:text-foreground",
+                activeSection === "pricing" && "text-foreground",
+              )}
+            >
               Pricing
             </button>
-            <button onClick={() => scrollTo(sections.resources)} className="story-link hover:text-foreground">
+            <button
+              onClick={() => scrollTo(sections.resources)}
+              className={cn(
+                "story-link transition-colors hover:text-foreground",
+                activeSection === "resources" && "text-foreground",
+              )}
+            >
               Resources
             </button>
           </nav>
