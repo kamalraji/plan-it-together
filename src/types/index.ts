@@ -676,6 +676,7 @@ export interface Workspace {
   createdAt: string;
   updatedAt: string;
   dissolvedAt?: string;
+  parentWorkspaceId?: string | null;
 }
 
 export interface TeamMember {
