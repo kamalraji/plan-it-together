@@ -148,23 +148,26 @@ export const OrganizationRegistrationPage: React.FC = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>URL handle</FormLabel>
-                      <div className="flex rounded-xl border border-input bg-background text-sm overflow-hidden">
-                        <span className="inline-flex items-center border-r border-border bg-muted px-3 text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-                          {typeof window !== 'undefined' ? `${window.location.origin}/` : '/'}
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="my-org"
+                          onChange={(e) => {
+                            const normalized = normalizeSlug(e.target.value);
+                            field.onChange(normalized);
+                            if (formError) setFormError(null);
+                          }}
+                        />
+                      </FormControl>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Your organization URL will be:
+                        <br />
+                        <span className="font-mono text-[11px] sm:text-xs">
+                          {typeof window !== 'undefined'
+                            ? `${window.location.origin}/${field.value || 'my-org'}`
+                            : `/${field.value || 'my-org'}`}
                         </span>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="border-0 rounded-l-none"
-                            placeholder="your-organization"
-                            onChange={(e) => {
-                              const normalized = normalizeSlug(e.target.value);
-                              field.onChange(normalized);
-                              if (formError) setFormError(null);
-                            }}
-                          />
-                        </FormControl>
-                      </div>
+                      </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         Lowercase letters, numbers, and hyphens only.
                       </p>
