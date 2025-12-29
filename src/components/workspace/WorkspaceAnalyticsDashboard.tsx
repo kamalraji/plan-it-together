@@ -59,6 +59,7 @@ interface WorkspaceAnalytics {
 
 interface WorkspaceAnalyticsDashboardProps {
   workspace: Workspace;
+  roleScope: string;
 }
 
 export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDashboardProps) {
