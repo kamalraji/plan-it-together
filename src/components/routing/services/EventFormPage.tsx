@@ -9,6 +9,11 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -250,63 +255,66 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       <div className="max-w-4xl mx-auto">
         <PageHeader title={pageTitle} subtitle={pageSubtitle} actions={pageActions} />
 
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
+        <div className="mt-6 rounded-2xl border border-border bg-card/60 p-6 shadow-soft">
           {isLoadingEvent ? (
-            <div className="py-12 text-center text-gray-500 text-sm">Loading event...</div>
+            <div className="py-12 text-center text-sm text-muted-foreground">Loading event...</div>
           ) : (
             <form
               id="event-form"
               onSubmit={handleSubmit(onSubmit)}
-              className="space-y-6"
+              className="space-y-8"
               noValidate
             >
               {serverError && (
-                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-2 space-y-2">
-                  <p>{serverError}</p>
-                  {serverError.includes('organizer/admin permissions') && (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (isRequestingAccess) return;
-                        setIsRequestingAccess(true);
-                        try {
-                          const { error } = await supabase.functions.invoke('self-approve-organizer');
-                          if (error) throw error;
-                          toast({
-                            title: 'Organizer access requested',
-                            description:
-                              'We have recorded your request to become an organizer. Try again after your access updates.',
-                          });
-                        } catch (err: any) {
-                          toast({
-                            title: 'Failed to request organizer access',
-                            description: err?.message || 'Please try again.',
-                            variant: 'destructive',
-                          });
-                        } finally {
-                          setIsRequestingAccess(false);
-                        }
-                      }}
-                      className="inline-flex items-center px-3 py-1.5 rounded-md border border-red-300 text-xs font-medium text-red-700 bg-white hover:bg-red-50"
-                    >
-                      {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
-                    </button>
-                  )}
-                </div>
+                <Alert variant="destructive" className="mb-4">
+                  <AlertTitle>Failed to save event</AlertTitle>
+                  <AlertDescription>
+                    <p>{serverError}</p>
+                    {serverError.includes('organizer/admin permissions') && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 border-destructive text-destructive hover:bg-destructive/10"
+                        disabled={isRequestingAccess}
+                        onClick={async () => {
+                          if (isRequestingAccess) return;
+                          setIsRequestingAccess(true);
+                          try {
+                            const { error } = await supabase.functions.invoke('self-approve-organizer');
+                            if (error) throw error;
+                            toast({
+                              title: 'Organizer access requested',
+                              description:
+                                'We have recorded your request to become an organizer. Try again after your access updates.',
+                            });
+                          } catch (err: any) {
+                            toast({
+                              title: 'Failed to request organizer access',
+                              description: err?.message || 'Please try again.',
+                              variant: 'destructive',
+                            });
+                          } finally {
+                            setIsRequestingAccess(false);
+                          }
+                        }}
+                      >
+                        {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
+                      </Button>
+                    )}
+                  </AlertDescription>
+                </Alert>
               )}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+                <h3 className="mb-4 text-lg font-semibold text-foreground">Basic Information</h3>
                 <div className="grid grid-cols-1 gap-6">
                   <div>
-                    <label
-                      htmlFor="organization-id"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
+                    <Label htmlFor="organization-id" className="mb-2 block">
                       Organization *
-                    </label>
+                    </Label>
                     <select
                       id="organization-id"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
                       {...register('organizationId')}
                     >
@@ -324,42 +332,37 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       ))}
                     </select>
                     {errors.organizationId && (
-                      <p className="mt-1 text-sm text-red-600">{errors.organizationId.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.organizationId.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="event-name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <Label htmlFor="event-name" className="mb-2 block">
                       Event Name *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="text"
                       id="event-name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter event name"
                       {...register('name')}
                     />
                     {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="event-description"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
+                    <Label htmlFor="event-description" className="mb-2 block">
                       Description *
-                    </label>
-                    <textarea
+                    </Label>
+                    <Textarea
                       id="event-description"
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Describe your event"
                       {...register('description')}
                     />
                     {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>
                     )}
                   </div>
 
@@ -404,54 +407,48 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Date and Time</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border-t border-border pt-6">
+                <h3 className="mb-4 text-lg font-semibold text-foreground">Date and Time</h3>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-2">
+                    <Label htmlFor="start-date" className="mb-2 block">
                       Start Date *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="datetime-local"
                       id="start-date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       {...register('startDate')}
                     />
                     {errors.startDate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.startDate.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-2">
+                    <Label htmlFor="end-date" className="mb-2 block">
                       End Date *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="datetime-local"
                       id="end-date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       {...register('endDate')}
                     />
                     {errors.endDate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.endDate.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="registration-deadline"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
+                    <Label htmlFor="registration-deadline" className="mb-2 block">
                       Registration Deadline
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="datetime-local"
                       id="registration-deadline"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       {...register('registrationDeadline')}
                     />
                     {errors.registrationDeadline && (
-                      <p className="mt-1 text-sm text-red-600">
+                      <p className="mt-1 text-sm text-destructive">
                         {errors.registrationDeadline.message as string}
                       </p>
                     )}
@@ -459,77 +456,73 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Branding</h3>
+              <div className="border-t border-border pt-6">
+                <h3 className="mb-4 text-lg font-semibold text-foreground">Branding</h3>
                 <div className="grid grid-cols-1 gap-6">
                   <div>
-                    <label
-                      htmlFor="primary-color"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
+                    <Label htmlFor="primary-color" className="mb-2 block">
                       Primary Color
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="color"
                       id="primary-color"
-                      className="h-10 w-20 border border-gray-300 rounded-md"
+                      className="h-10 w-24 cursor-pointer px-2 py-1"
                       {...register('primaryColor')}
                     />
                     {errors.primaryColor && (
-                      <p className="mt-1 text-sm text-red-600">
+                      <p className="mt-1 text-sm text-destructive">
                         {errors.primaryColor.message as string}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="logo-url" className="block text-sm font-medium text-gray-700 mb-2">
+                    <Label htmlFor="logo-url" className="mb-2 block">
                       Logo URL
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="url"
                       id="logo-url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="https://example.com/logo.png"
                       {...register('logoUrl')}
                     />
                     {errors.logoUrl && (
-                      <p className="mt-1 text-sm text-red-600">{errors.logoUrl.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.logoUrl.message}</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6 flex items-center justify-end space-x-3">
-                <button
+              <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => navigate('../list')}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="outline"
                   onClick={() => setSubmitIntent('draft')}
                   disabled={isSubmitting || myOrganizations.length === 0}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
                 >
-                  Save as Draft
-                </button>
-                <button
+                  Save as draft
+                </Button>
+                <Button
                   type="submit"
+                  variant="default"
                   onClick={() => setSubmitIntent('publish')}
                   disabled={isSubmitting || myOrganizations.length === 0}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
                 >
                   {isSubmitting
                     ? mode === 'create'
                       ? 'Creating...'
                       : 'Saving...'
                     : mode === 'create'
-                      ? 'Create Event'
-                      : 'Save Changes'}
-                </button>
+                      ? 'Create event'
+                      : 'Save changes'}
+                </Button>
               </div>
             </form>
           )}
