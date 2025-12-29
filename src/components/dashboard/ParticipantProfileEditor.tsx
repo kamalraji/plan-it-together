@@ -75,10 +75,11 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const target = event.target as HTMLInputElement & HTMLTextAreaElement & HTMLSelectElement;
-    const { name, value, type, checked } = target;
+    const { name, value } = target;
 
-    if (name === 'portfolio_is_public' && type === 'checkbox') {
-      setFormState((prev) => ({ ...prev, portfolio_is_public: checked }));
+    if (name === 'portfolio_is_public') {
+      const checkboxTarget = target as HTMLInputElement;
+      setFormState((prev) => ({ ...prev, portfolio_is_public: checkboxTarget.checked }));
       return;
     }
 
@@ -94,7 +95,6 @@ export function ParticipantProfileEditor({ userId, userEmail }: ParticipantProfi
 
     setFormState((prev) => ({ ...prev, portfolio_sections: next }));
   };
-
   const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
