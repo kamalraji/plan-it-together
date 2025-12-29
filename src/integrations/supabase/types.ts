@@ -839,6 +839,47 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_role_views: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          last_active_tab: string
+          role_scope: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_active_tab?: string
+          role_scope: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_active_tab?: string
+          role_scope?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_role_views_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_tasks: {
         Row: {
           assigned_to: string | null
@@ -934,6 +975,7 @@ export type Database = {
           id: string
           name: string
           organizer_id: string
+          parent_workspace_id: string | null
           status: string
           updated_at: string
         }
@@ -943,6 +985,7 @@ export type Database = {
           id?: string
           name: string
           organizer_id: string
+          parent_workspace_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -952,6 +995,7 @@ export type Database = {
           id?: string
           name?: string
           organizer_id?: string
+          parent_workspace_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -961,6 +1005,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspaces_parent_workspace_id_fkey"
+            columns: ["parent_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]

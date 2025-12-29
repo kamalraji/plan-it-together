@@ -62,7 +62,7 @@ interface WorkspaceAnalyticsDashboardProps {
   roleScope: string;
 }
 
-export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDashboardProps) {
+export function WorkspaceAnalyticsDashboard({ workspace, roleScope }: WorkspaceAnalyticsDashboardProps) {
   const [analytics, setAnalytics] = useState<WorkspaceAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,8 +84,9 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
       const response = await api.get(`/workspaces/${workspace.id}/analytics`, {
         params: {
           startDate: dateRange.startDate,
-          endDate: dateRange.endDate
-        }
+          endDate: dateRange.endDate,
+          roleScope,
+        },
       });
 
       setAnalytics(response.data.analytics);

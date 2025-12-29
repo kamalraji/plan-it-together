@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -33,6 +33,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { TablesInsert } from '@/integrations/supabase/types';
 
 interface WorkspaceDashboardProps {
   workspaceId?: string;
@@ -64,7 +65,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
         .eq('id', workspaceId as string)
         .maybeSingle();
 
@@ -83,6 +84,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         teamMembers: [],
         taskSummary: undefined,
         channels: [],
+        parentWorkspaceId: data.parent_workspace_id as string | null,
       };
 
       return mapped as unknown as Workspace;
@@ -108,7 +110,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
       let query = supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
         .order('created_at', { ascending: false });
 
       if (eventId) {
@@ -121,7 +123,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
       const mapped = (data || []).map((row: any) => ({
         id: row.id as string,
-        eventId: eventId,
+        eventId: row.event_id as string | undefined,
         name: row.name as string,
         status: row.status as WorkspaceStatus,
         createdAt: row.created_at as string,
@@ -131,6 +133,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         teamMembers: [],
         taskSummary: undefined,
         channels: [],
+        parentWorkspaceId: row.parent_workspace_id as string | null,
       }));
 
       return mapped as unknown as Workspace[];
@@ -259,6 +262,54 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   );
   const roleSpaces: WorkspaceRoleScope[] = ['ALL', ...(teamMembers?.map((m) => m.role) || [])];
 
+  type WorkspaceRoleViewInsert = TablesInsert<'workspace_role_views'>;
+
+  const upsertRoleViewMutation = useMutation({
+    mutationFn: async ({
+      roleScope,
+      lastActiveTab,
+    }: {
+      roleScope: WorkspaceRoleScope;
+      lastActiveTab: string;
+    }) => {
+      if (!workspaceId || !user?.id) return;
+
+      const payload: WorkspaceRoleViewInsert = {
+        workspace_id: workspaceId,
+        user_id: user.id,
+        role_scope: roleScope,
+        last_active_tab: lastActiveTab,
+      };
+
+      const { error } = await supabase
+        .from('workspace_role_views')
+        .upsert(payload, { onConflict: 'workspace_id,user_id,role_scope' });
+
+      if (error) throw error;
+    },
+  });
+
+  useEffect(() => {
+    if (!workspaceId || !user?.id) return;
+
+    const loadInitialView = async () => {
+      const { data, error } = await supabase
+        .from('workspace_role_views')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('user_id', user.id);
+
+      if (error || !data || data.length === 0) return;
+
+      const currentRoleView = data.find((view) => view.role_scope === activeRoleSpace);
+      if (currentRoleView && activeTab === 'overview') {
+        setActiveTab(currentRoleView.last_active_tab as typeof activeTab);
+      }
+    };
+
+    void loadInitialView();
+  }, [workspaceId, user?.id, activeRoleSpace, activeTab]);
+
   const isGlobalWorkspaceManager =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
@@ -321,6 +372,10 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
   const handleViewTasks = () => {
     setActiveTab('tasks');
+    upsertRoleViewMutation.mutate({
+      roleScope: activeRoleSpace,
+      lastActiveTab: 'tasks',
+    });
   };
 
   const handleWorkspaceSwitch = (newWorkspaceId: string) => {
@@ -389,6 +444,11 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
                   next.set('roleSpace', roleSpace);
                 }
                 setSearchParams(next);
+
+                upsertRoleViewMutation.mutate({
+                  roleScope: roleSpace,
+                  lastActiveTab: activeTab,
+                });
               }}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${activeRoleSpace === roleSpace
                   ? 'bg-primary text-primary-foreground border-primary'
@@ -405,7 +465,13 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         workspace={workspace}
         userWorkspaces={userWorkspaces || []}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          upsertRoleViewMutation.mutate({
+            roleScope: activeRoleSpace,
+            lastActiveTab: tab,
+          });
+        }}
         onWorkspaceSwitch={handleWorkspaceSwitch}
       />
 
