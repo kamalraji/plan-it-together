@@ -179,7 +179,10 @@ export function WorkspaceCommunication({
   };
 
   const handleCreateChannel = async (channelData: CreateChannelDTO) => {
-    await createChannelMutation.mutateAsync(channelData);
+    await createChannelMutation.mutateAsync({
+      ...channelData,
+      roleScope: roleScope === 'ALL' ? undefined : roleScope,
+    });
   };
 
   if (channelsLoading) {

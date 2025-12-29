@@ -756,6 +756,7 @@ export interface CreateChannelDTO {
   description?: string;
   members?: string[];
   isPrivate?: boolean;
+  roleScope?: WorkspaceRoleScope;
 }
 
 export interface SendMessageDTO {

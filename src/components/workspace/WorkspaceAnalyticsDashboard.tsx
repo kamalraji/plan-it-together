@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Workspace, TaskPriority } from '../../types';
+import { Workspace, TaskPriority, WorkspaceRoleScope } from '../../types';
 import { WorkspaceAnalyticsChart } from './WorkspaceAnalyticsChart';
 import api from '../../lib/api';
 
@@ -59,15 +59,19 @@ interface WorkspaceAnalytics {
 
 interface WorkspaceAnalyticsDashboardProps {
   workspace: Workspace;
+  roleScope?: WorkspaceRoleScope;
 }
 
-export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDashboardProps) {
+export function WorkspaceAnalyticsDashboard({
+  workspace,
+  roleScope,
+}: WorkspaceAnalyticsDashboardProps) {
   const [analytics, setAnalytics] = useState<WorkspaceAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
+    endDate: new Date().toISOString().split('T')[0],
   });
   const [exportLoading, setExportLoading] = useState(false);
 
@@ -79,12 +83,13 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await api.get(`/workspaces/${workspace.id}/analytics`, {
         params: {
           startDate: dateRange.startDate,
-          endDate: dateRange.endDate
-        }
+          endDate: dateRange.endDate,
+          roleScope: roleScope && roleScope !== 'ALL' ? roleScope : undefined,
+        },
       });
       
       setAnalytics(response.data.analytics);
