@@ -1,16 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { useCurrentOrganization } from './OrganizationContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
 
 type SponsorRow = Tables<'organization_sponsors'>;
 
 export const OrgSponsorsManager: React.FC = () => {
   const organization = useCurrentOrganization();
   const { toast } = useToast();
+  const { data: memberships } = useMyOrganizationMemberships();
+
+  const activeMembership = useMemo(() => {
+    if (!memberships || !organization?.id) return undefined;
+    return memberships.find(
+      (m: any) => m.organization_id === organization.id && m.status === 'ACTIVE',
+    );
+  }, [memberships, organization?.id]);
+
+  const canEdit = activeMembership?.role === 'OWNER' || activeMembership?.role === 'ADMIN';
 
   const [items, setItems] = useState<SponsorRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,6 +68,16 @@ export const OrgSponsorsManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can edit sponsors.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!form.name.trim()) {
       toast({
         title: 'Missing name',
@@ -91,7 +112,10 @@ export const OrgSponsorsManager: React.FC = () => {
       }
       toast({ title: 'Sponsor updated' });
     } else {
-      const maxPosition = items.reduce((max, s) => (s.position ?? 0) > max ? (s.position ?? 0) : max, 0);
+      const maxPosition = items.reduce(
+        (max, s) => ((s.position ?? 0) > max ? (s.position ?? 0) : max),
+        0,
+      );
       const { error } = await supabase
         .from('organization_sponsors')
         .insert({ ...payload, position: maxPosition + 1 });
@@ -123,6 +147,15 @@ export const OrgSponsorsManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can delete sponsors.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from('organization_sponsors')
       .delete()
@@ -158,6 +191,15 @@ export const OrgSponsorsManager: React.FC = () => {
   };
 
   const persistOrder = async () => {
+    if (!canEdit) {
+      toast({
+        title: 'Read-only access',
+        description: 'Only organization owners and admins can reorder sponsors.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSavingOrder(true);
     const updates = items.map((item, index) =>
       supabase
@@ -183,13 +225,17 @@ export const OrgSponsorsManager: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3 sm:p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3 sm:p-4"
+      >
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Sponsor name</label>
           <Input
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Acme Corp"
+            disabled={!canEdit}
           />
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -199,6 +245,7 @@ export const OrgSponsorsManager: React.FC = () => {
               value={form.logo_url}
               onChange={(e) => setForm((f) => ({ ...f, logo_url: e.target.value }))}
               placeholder="https://.../logo.png"
+              disabled={!canEdit}
             />
           </div>
           <div className="space-y-1">
@@ -207,6 +254,7 @@ export const OrgSponsorsManager: React.FC = () => {
               value={form.website_url}
               onChange={(e) => setForm((f) => ({ ...f, website_url: e.target.value }))}
               placeholder="https://acme.example"
+              disabled={!canEdit}
             />
           </div>
         </div>
@@ -216,15 +264,22 @@ export const OrgSponsorsManager: React.FC = () => {
             value={form.tier}
             onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value }))}
             placeholder="Gold / Silver / Community partner"
+            disabled={!canEdit}
           />
         </div>
         <div className="flex items-center justify-end gap-2">
           {editingId && (
-            <Button type="button" variant="outline" size="sm" onClick={resetForm}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={resetForm}
+              disabled={!canEdit}
+            >
               Cancel
             </Button>
           )}
-          <Button type="submit" size="sm">
+          <Button type="submit" size="sm" disabled={!canEdit}>
             {editingId ? 'Save changes' : 'Add sponsor'}
           </Button>
         </div>
@@ -233,18 +288,22 @@ export const OrgSponsorsManager: React.FC = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            Drag sponsors to reorder how they appear. Changes are saved when you click
-            <span className="font-semibold"> Save order</span>.
+            {canEdit
+              ? 'Drag sponsors to reorder how they appear. Changes are saved when you click'
+              : 'Sponsors are managed by organization owners and admins.'}{' '}
+            {canEdit && <span className="font-semibold">Save order</span>}.
           </p>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={savingOrder || loading || items.length === 0}
-            onClick={persistOrder}
-          >
-            {savingOrder ? 'Saving…' : 'Save order'}
-          </Button>
+          {canEdit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={savingOrder || loading || items.length === 0}
+              onClick={persistOrder}
+            >
+              {savingOrder ? 'Saving…' : 'Save order'}
+            </Button>
+          )}
         </div>
 
         <div className="space-y-2">
