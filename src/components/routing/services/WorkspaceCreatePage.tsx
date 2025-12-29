@@ -13,12 +13,15 @@ const workspaceCreateSchema = z.object({
   name: z
     .string()
     .trim()
-    .nonempty({ message: 'Workspace name is required' })
-    .max(100, { message: 'Workspace name must be under 100 characters' }),
+    .min(3, { message: 'Workspace name must be at least 3 characters' })
+    .max(60, { message: 'Workspace name must be under 60 characters' })
+    .regex(/^[A-Za-z0-9 ,.\-]+$/, {
+      message: 'Use only letters, numbers, spaces, and basic punctuation in the workspace name',
+    }),
   eventId: z
     .string()
     .trim()
-    .nonempty({ message: 'An associated event is required' }),
+    .nonempty({ message: 'An associated event is required to keep workspaces tied to a single event' }),
 });
 
 export const WorkspaceCreatePage: React.FC = () => {
@@ -251,7 +254,16 @@ export const WorkspaceCreatePage: React.FC = () => {
               </p>
             )}
             {formErrors.eventId && (
-              <p className="mt-1 text-xs text-red-600">{formErrors.eventId}</p>
+              <div className="mt-1 flex items-center justify-between gap-2">
+                <p className="text-xs text-red-600">{formErrors.eventId}</p>
+                <button
+                  type="button"
+                  onClick={() => navigate(eventCreatePath)}
+                  className="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-red-700"
+                >
+                  Create event
+                </button>
+              </div>
             )}
           </div>
 
