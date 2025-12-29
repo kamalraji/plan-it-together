@@ -196,10 +196,13 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    workspace?.status === WorkspaceStatus.ACTIVE ? 'bg-green-100 text-green-800' :
-                    workspace?.status === WorkspaceStatus.PROVISIONING ? 'bg-yellow-100 text-yellow-800' :
-                    workspace?.status === WorkspaceStatus.WINDING_DOWN ? 'bg-blue-100 text-blue-800' :
-                    'bg-gray-100 text-gray-800'
+                    workspace?.status === WorkspaceStatus.ACTIVE
+                      ? 'bg-green-100 text-green-800'
+                      : workspace?.status === WorkspaceStatus.PROVISIONING
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : workspace?.status === WorkspaceStatus.WINDING_DOWN
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
                   }`}>
                     {workspace?.status}
                   </span>
@@ -209,7 +212,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 <dt className="text-sm font-medium text-gray-500">Associated Event</dt>
                 <dd className="mt-1 text-sm text-gray-900">
                   {workspace?.event ? (
-                    <Link 
+                    <Link
                       to={`/console/events/${workspace.event.id}`}
                       className="text-blue-600 hover:text-blue-500"
                     >
@@ -223,7 +226,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
               <div>
                 <dt className="text-sm font-medium text-gray-500">Created</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {workspace?.createdAt ? new Date(workspace.createdAt).toLocaleDateString() : 'Unknown'}
+                  {workspace?.createdAt
+                    ? new Date(workspace.createdAt).toLocaleDateString()
+                    : 'Unknown'}
                 </dd>
               </div>
               <div className="sm:col-span-2">
@@ -235,8 +240,65 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
             </dl>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Quick Stats - collapsible on mobile for better spacing */}
+          <div className="sm:hidden">
+            <details className="bg-white rounded-lg border border-gray-200 p-4">
+              <summary className="flex items-center justify-between cursor-pointer text-sm font-medium text-gray-700">
+                Workspace stats
+                <span className="text-xs text-gray-400">Tap to expand</span>
+              </summary>
+              <div className="mt-4 grid grid-cols-1 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <span className="text-2xl">📋</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Tasks</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {workspace?.taskSummary?.total || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <span className="text-2xl">👥</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Team Members</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {workspace?.teamMembers?.length || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <span className="text-2xl">📈</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Progress</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {Math.round(
+                          ((workspace?.taskSummary?.completed || 0) /
+                            Math.max(workspace?.taskSummary?.total || 1, 1)) *
+                            100,
+                        )}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          {/* Desktop / tablet stats layout */}
+          <div className="hidden sm:grid sm:grid-cols-3 sm:gap-6">
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -244,7 +306,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                  <p className="text-2xl font-bold text-gray-900">{workspace?.taskSummary?.total || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {workspace?.taskSummary?.total || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -256,7 +320,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Team Members</p>
-                  <p className="text-2xl font-bold text-gray-900">{workspace?.teamMembers?.length || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {workspace?.teamMembers?.length || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -268,7 +334,13 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Progress</p>
-                  <p className="text-2xl font-bold text-gray-900">{Math.round((workspace?.taskSummary?.completed || 0) / Math.max(workspace?.taskSummary?.total || 1, 1) * 100)}%</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {Math.round(
+                      ((workspace?.taskSummary?.completed || 0) /
+                        Math.max(workspace?.taskSummary?.total || 1, 1)) *
+                        100,
+                    )}%
+                  </p>
                 </div>
               </div>
             </div>
@@ -422,10 +494,22 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         />
 
         {/* Tab Content */}
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           {tabs.find(tab => tab.id === activeTab)?.component()}
         </div>
       </div>
+
+      {/* Mobile task create FAB for a single entry point */}
+      {activeTab === 'tasks' && (
+        <button
+          type="button"
+          onClick={() => createTaskMutation.mutate()}
+          className="fixed bottom-20 right-4 sm:hidden inline-flex items-center px-4 py-3 rounded-full shadow-lg bg-indigo-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <span className="mr-2 text-xl leading-none">＋</span>
+          <span className="text-sm font-medium">New Task</span>
+        </button>
+      )}
     </div>
   );
 };
