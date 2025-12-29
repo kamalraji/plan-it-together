@@ -6,7 +6,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardingChecklist';
 import { supabase } from '@/integrations/supabase/client';
-import { useApiHealth } from '@/hooks/useApiHealth';
 import { useEventCreatePath } from '@/hooks/useEventCreatePath';
 import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
 
@@ -36,7 +35,7 @@ export function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState<'events' | 'analytics'>('events');
   const [isChecklistOpen, setIsChecklistOpen] = useState(true);
   const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
-  const { isHealthy } = useApiHealth();
+
 
   const { data: events, isLoading } = useQuery<Event[]>({
     queryKey: ['organizer-events', organization.id],
@@ -76,7 +75,6 @@ export function OrganizerDashboard() {
     retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
   });
 
   const { data: workspaces } = useQuery<WorkspaceSummary[]>({
@@ -102,7 +100,6 @@ export function OrganizerDashboard() {
     retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
   });
 
   const eventIds = useMemo(() => (events ?? []).map((evt) => evt.id), [events]);
@@ -111,7 +108,7 @@ export function OrganizerDashboard() {
     totalRegistrations: number;
     certificatesIssued: number;
   }>({
-    enabled: isHealthy !== false && eventIds.length > 0,
+    enabled: eventIds.length > 0,
     queryKey: ['organizer-aggregate-metrics', organization.id, eventIds],
     queryFn: async () => {
       const [registrationsRes, certificatesRes] = await Promise.all([
@@ -226,7 +223,7 @@ export function OrganizerDashboard() {
   const totalRegistrations = aggregateMetrics?.totalRegistrations ?? 0;
   const certificatesIssued = aggregateMetrics?.certificatesIssued ?? 0;
 
-  const isSummaryLoading = isLoading && isHealthy !== false;
+  const isSummaryLoading = isLoading;
 
   return (
     <div className="min-h-screen bg-background">
