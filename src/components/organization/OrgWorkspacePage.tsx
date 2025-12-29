@@ -111,12 +111,12 @@ export const OrgWorkspacePage: React.FC = () => {
                     : 'No event workspaces have been created yet'}
               </p>
             </div>
-            <a
-              href={`${baseWorkspacePath}/create`}
-              className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-            >
-              New
-            </a>
+          <a
+             href={`${baseWorkspacePath}/create`}
+             className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+           >
+             Create workspace
+           </a>
           </div>
 
           {isLoading ? (
