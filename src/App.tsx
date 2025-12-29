@@ -1,47 +1,27 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
+const queryClient = new QueryClient();
 
-// Root application component
-// Currently a minimal shell just to get the app compiling and rendering.
-// We'll expand this according to requirements/design docs in later steps.
-
-function App() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold tracking-tight">
-            Thittam1Hub
-          </h1>
-          <nav aria-label="Primary">
-            <a
-              href="#main"
-              className="text-sm underline-offset-4 hover:underline"
-            >
-              Skip to main content
-            </a>
-          </nav>
-        </div>
-      </header>
-      <main
-        id="main"
-        className="mx-auto max-w-5xl px-4 py-12 flex flex-col gap-6"
-      >
-        <section aria-labelledby="app-intro">
-          <h2
-            id="app-intro"
-            className="text-2xl font-semibold tracking-tight mb-2"
-          >
-            Welcome to Thittam1Hub
-          </h2>
-          <p className="text-sm text-muted-foreground max-w-2xl">
-            The core application shell is now running. Next steps: we can wire this
-            up to Supabase, implement routing, and build the dashboards described
-            in your requirements and design documents.
-          </p>
-        </section>
-      </main>
-    </div>
-  );
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
