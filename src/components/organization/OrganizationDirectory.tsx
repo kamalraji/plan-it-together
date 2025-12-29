@@ -67,39 +67,39 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Organization Directory</h1>
-        <p className="text-gray-600">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Organization Directory</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Discover verified organizations and their upcoming events
         </p>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6 mb-6 sm:mb-8">
         {/* Search Bar */}
         <div className="relative mb-4">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-400">🔍</span>
+            <span className="text-muted-foreground">🔍</span>
           </div>
           <input
             type="text"
             placeholder="Search organizations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full pl-10 pr-3 py-2 rounded-md border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           />
         </div>
 
         {/* Filter Toggle */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-3 py-2 border border-border text-sm font-medium rounded-md text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
             <span className="mr-2">🔽</span>
             Filters
             {hasActiveFilters && (
-              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                 Active
               </span>
             )}
@@ -108,7 +108,7 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
+              className="text-sm font-medium text-primary hover:text-primary/80"
             >
               Clear all filters
             </button>
@@ -117,17 +117,17 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t border-border">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Category Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Category
                 </label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value as OrganizationCategory | '')}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full px-3 py-2 rounded-md border border-border bg-background text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 >
                   <option value="">All Categories</option>
                   {CATEGORIES.map((category) => (
@@ -140,7 +140,7 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
 
               {/* Verification Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Verification Status
                 </label>
                 <div className="flex items-center">
@@ -149,9 +149,9 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
                     type="checkbox"
                     checked={verifiedOnly}
                     onChange={(e) => setVerifiedOnly(e.target.checked)}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
                   />
-                  <label htmlFor="verified-only" className="ml-2 block text-sm text-gray-900">
+                  <label htmlFor="verified-only" className="ml-2 block text-sm text-foreground">
                     Show only verified organizations
                   </label>
                 </div>
@@ -165,18 +165,18 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
       <div>
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600">Error loading organizations. Please try again.</p>
+            <p className="text-destructive">Error loading organizations. Please try again.</p>
           </div>
         ) : !organizations || organizations.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-4xl text-gray-400 mb-4">🏢</div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No organizations found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {hasActiveFilters 
+            <div className="text-4xl text-muted-foreground mb-4">🏢</div>
+            <h3 className="mt-2 text-sm font-medium text-foreground">No organizations found</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {hasActiveFilters
                 ? 'Try adjusting your search criteria or filters.'
                 : 'No organizations are currently available.'}
             </p>
@@ -184,15 +184,15 @@ export default function OrganizationDirectory({ className = '' }: OrganizationDi
         ) : (
           <>
             {/* Results Count */}
-            <div className="mb-6">
-              <p className="text-sm text-gray-700">
+            <div className="mb-4 sm:mb-6">
+              <p className="text-sm text-muted-foreground">
                 Showing {organizations.length} organization{organizations.length !== 1 ? 's' : ''}
                 {hasActiveFilters && ' matching your criteria'}
               </p>
             </div>
 
             {/* Organization Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {organizations.map((organization) => (
                 <OrganizationCard key={organization.id} organization={organization} />
               ))}
