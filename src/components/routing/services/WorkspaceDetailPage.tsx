@@ -386,7 +386,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
     {
       id: 'analytics',
       label: 'Analytics',
-      component: () => workspace ? <WorkspaceAnalyticsDashboard workspace={workspace} /> : null,
+      component: () => workspace ? <WorkspaceAnalyticsDashboard workspace={workspace} roleScope="ALL" /> : null,
     },
     {
       id: 'reports',
