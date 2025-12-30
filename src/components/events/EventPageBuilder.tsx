@@ -43,6 +43,7 @@ export const EventPageBuilder: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [state, setState] = useState<EventPageBuilderState>({ slug: '', loading: true, saving: false });
   const [device, setDevice] = useState<'Desktop' | 'Mobile'>('Desktop');
+  const [hasCustomLanding, setHasCustomLanding] = useState<boolean>(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -69,6 +70,8 @@ export const EventPageBuilder: React.FC = () => {
         const branding = (eventRow.branding as any) || {};
         const existingLanding: LandingPageData | null = (eventRow as any).landing_page_data ?? null;
         const existingSlug: string = (eventRow as any).landing_page_slug ?? '';
+
+        setHasCustomLanding(!!existingLanding?.html);
 
         setState((prev) => ({
           ...prev,
@@ -258,6 +261,11 @@ export const EventPageBuilder: React.FC = () => {
               Event page builder
             </p>
             <h1 className="text-xl font-semibold text-foreground">Design your public event page</h1>
+            {hasCustomLanding && (
+              <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
+                This GrapesJS layout is currently live on your public landing page.
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5">

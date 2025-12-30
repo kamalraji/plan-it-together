@@ -175,6 +175,24 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     });
   };
 
+  // Prefer GrapesJS-built landing page when available
+  if (event.landingPageData && (event.landingPageData as any).html) {
+    const lp = event.landingPageData as any as { html: string; css?: string | null; meta?: { title?: string; description?: string } };
+
+    return (
+      <div className="min-h-screen bg-background">
+        <section className="border-b border-border bg-background">
+          {/* Inject GrapesJS CSS into the page scope */}
+          {lp.css && <style dangerouslySetInnerHTML={{ __html: lp.css }} />}
+          <div
+            className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+            dangerouslySetInnerHTML={{ __html: lp.html }}
+          />
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Optional custom designed hero canvas */}
