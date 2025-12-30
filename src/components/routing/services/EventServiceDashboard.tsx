@@ -23,7 +23,7 @@ type DashboardEventRow = {
 
 export const EventServiceDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { createPath, listPath } = useEventManagementPaths();
+  const { createPath, listPath, eventDetailPath, eventEditPath } = useEventManagementPaths();
 
   useEffect(() => {
     document.title = 'Event Management Dashboard | Thittam1Hub';
@@ -118,7 +118,7 @@ export const EventServiceDashboard: React.FC = () => {
     {
       title: 'Browse Templates',
       description: 'Use pre-built event templates',
-      href: '/console/events/templates',
+      href: listPath.replace(/\/list$/, '/templates'),
     },
     {
       title: 'View All Events',
@@ -282,7 +282,7 @@ export const EventServiceDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
             <h3 className="text-base sm:text-lg font-medium text-foreground">Recent Events</h3>
             <Link
-              to="/console/events/list"
+              to={listPath}
               className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
             >
               View all events →
@@ -340,13 +340,13 @@ export const EventServiceDashboard: React.FC = () => {
                       </td>
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                         <Link
-                          to={`/console/events/${event.id}`}
+                          to={eventDetailPath(event.id)}
                           className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
                         >
                           View
                         </Link>
                         <Link
-                          to={`/console/events/${event.id}/edit`}
+                          to={eventEditPath(event.id)}
                           className="text-muted-foreground hover:text-foreground"
                         >
                           Edit
