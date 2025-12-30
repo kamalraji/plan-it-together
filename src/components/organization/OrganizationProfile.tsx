@@ -70,8 +70,11 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
     );
   }
 
-  const socialLinks = organization.social_links as Record<string, string> || {};
-  const location = organization.location as Record<string, any> || {};
+  const location = {
+    city: organization.city as string | null,
+    state: organization.state as string | null,
+    country: organization.country as string | null,
+  };
 
   const shareUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/${organization.slug}`
@@ -279,24 +282,6 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                 </div>
               )}
 
-              {Object.keys(socialLinks).length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Social Links</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(socialLinks).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {platform}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </TabsContent>
