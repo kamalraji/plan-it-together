@@ -393,9 +393,13 @@ export type Database = {
       organization_products: {
         Row: {
           category: string | null
+          click_count: number
           created_at: string
           description: string | null
+          featured_position: number | null
           id: string
+          impression_count: number
+          is_featured: boolean
           link_url: string | null
           name: string
           organization_id: string
@@ -407,9 +411,13 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          click_count?: number
           created_at?: string
           description?: string | null
+          featured_position?: number | null
           id?: string
+          impression_count?: number
+          is_featured?: boolean
           link_url?: string | null
           name: string
           organization_id: string
@@ -421,9 +429,13 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          click_count?: number
           created_at?: string
           description?: string | null
+          featured_position?: number | null
           id?: string
+          impression_count?: number
+          is_featured?: boolean
           link_url?: string | null
           name?: string
           organization_id?: string
@@ -1102,6 +1114,10 @@ export type Database = {
       is_org_admin_for_org: {
         Args: { _organization_id: string; _user_id: string }
         Returns: boolean
+      }
+      record_organization_product_metrics: {
+        Args: { _event_type: string; _product_ids: string[] }
+        Returns: undefined
       }
     }
     Enums: {

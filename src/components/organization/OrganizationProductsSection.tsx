@@ -9,14 +9,26 @@ export type OrganizationProductRow = Tables<'organization_products'>;
 
 interface OrganizationProductsSectionProps {
   products: OrganizationProductRow[];
+  initialSearch?: string;
+  initialCategory?: string;
+  initialOnlyFree?: boolean;
+  onFiltersChange?: (filters: {
+    search: string;
+    category: string;
+    onlyFree: boolean;
+  }) => void;
 }
 
 export const OrganizationProductsSection: React.FC<OrganizationProductsSectionProps> = ({
   products,
+  initialSearch,
+  initialCategory,
+  initialOnlyFree,
+  onFiltersChange,
 }) => {
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<string>('all');
-  const [onlyFree, setOnlyFree] = useState(false);
+  const [search, setSearch] = useState(initialSearch ?? '');
+  const [category, setCategory] = useState<string>(initialCategory ?? 'all');
+  const [onlyFree, setOnlyFree] = useState(initialOnlyFree ?? false);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -81,13 +93,29 @@ export const OrganizationProductsSection: React.FC<OrganizationProductsSectionPr
             type="search"
             placeholder="Search products by name, tag, or description"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearch(value);
+              onFiltersChange?.({
+                search: value,
+                category,
+                onlyFree,
+              });
+            }}
             className="h-9 sm:h-10 w-full sm:w-64"
           />
-          <div className="flex items-center gap-2 text-xs sm:text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:text-sm">
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setCategory(value);
+                onFiltersChange?.({
+                  search,
+                  category: value,
+                  onlyFree,
+                });
+              }}
               className="h-9 rounded-full border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
             >
               <option value="all">All categories</option>
@@ -102,7 +130,15 @@ export const OrganizationProductsSection: React.FC<OrganizationProductsSectionPr
                 type="checkbox"
                 className="h-3 w-3 rounded border-border text-primary focus-visible:ring-primary/60"
                 checked={onlyFree}
-                onChange={(e) => setOnlyFree(e.target.checked)}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setOnlyFree(checked);
+                  onFiltersChange?.({
+                    search,
+                    category,
+                    onlyFree: checked,
+                  });
+                }}
               />
               <span className="text-xs text-muted-foreground">Free only</span>
             </label>

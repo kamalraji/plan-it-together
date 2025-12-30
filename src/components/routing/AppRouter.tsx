@@ -32,6 +32,8 @@ import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
+import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
+
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -543,6 +545,10 @@ export const AppRouter: React.FC = () => {
 
             {/* Public organization landing by slug */}
             <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
+            <Route
+              path="/:orgSlug/products"
+              element={<OrganizationProductsLandingPage />}
+            />
 
             {/* Organization-scoped organizer console */}
             <Route
