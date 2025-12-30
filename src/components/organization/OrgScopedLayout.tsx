@@ -35,7 +35,6 @@ const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> =
       onSearch={handleSearch}
       onLogout={onLogout}
       onToggleMobileMenu={toggleSidebar}
-      hideServiceSwitcher
     />
   );
 };
