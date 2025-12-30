@@ -20,15 +20,13 @@ try {
 } catch (error) {
   console.error('❌ Error starting app:', error);
   
-  // Fallback: inject error message directly into DOM
   const rootElement = document.getElementById('root');
   if (rootElement) {
     rootElement.innerHTML = `
       <div style="padding: 50px; color: red; font-size: 24px; font-family: Arial;">
         <h1>❌ Startup Error</h1>
-        <p>Failed to start React application</p>
-        <p>Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
-        <p>Check the browser console for more details</p>
+        <p>Failed to start the application. Please refresh the page or try again later.</p>
+        <p>If the problem persists, contact support.</p>
       </div>
     `;
   }
