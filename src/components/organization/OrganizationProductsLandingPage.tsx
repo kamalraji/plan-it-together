@@ -161,13 +161,18 @@ export const OrganizationProductsLandingPage: React.FC = () => {
 
   return (
     <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
-      <section className="container mx-auto px-4 pt-8 pb-4 space-y-2">
+      <section className="container mx-auto px-4 pt-8 pb-4 space-y-3 animate-fade-in">
         <OrganizationBreadcrumbs
-          className="mb-2"
+          className="mb-1"
           items={[
             {
               label: organization.name,
               href: `/${organization.slug}`,
+              icon: (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                  {organization.name.charAt(0).toUpperCase()}
+                </span>
+              ),
             },
             {
               label: 'Products',
@@ -175,32 +180,71 @@ export const OrganizationProductsLandingPage: React.FC = () => {
             },
           ]}
         />
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Products
         </p>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
           Products from{' '}
           <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             {organization.name}
           </span>
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground max-w-2xl">
+        <p className="mt-1 text-sm sm:text-base text-muted-foreground max-w-2xl">
           Browse products, programs, and resources offered by this organization.
         </p>
       </section>
 
       <section className="container mx-auto px-4 pb-10">
-        <OrganizationProductsSection
-          products={products}
-          initialSearch={initialSearch}
-          initialCategory={initialCategory}
-          initialOnlyFree={initialOnlyFree}
-          onFiltersChange={handleFiltersChange}
-          onProductClick={(productId) =>
-            recordProductMetrics('click', [productId])
-          }
-          onVisible={(ids) => recordProductMetrics('impression', ids)}
-        />
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(260px,1.2fr)]">
+          <div className="animate-fade-in">
+            <OrganizationProductsSection
+              products={products}
+              initialSearch={initialSearch}
+              initialCategory={initialCategory}
+              initialOnlyFree={initialOnlyFree}
+              onFiltersChange={handleFiltersChange}
+              onProductClick={(productId) =>
+                recordProductMetrics('click', [productId])
+              }
+              onVisible={(ids) => recordProductMetrics('impression', ids)}
+            />
+          </div>
+
+          <aside className="space-y-4 lg:space-y-5">
+            <Card className="border-dashed border-primary/30 bg-card/80 backdrop-blur-sm animate-fade-in">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm sm:text-base flex items-center justify-between gap-2">
+                  <span>Products overview</span>
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                    {products.length} active
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+                <p>
+                  Use search, categories, and the free-only filter to quickly find the most relevant
+                  resources for your participants.
+                </p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground/80">
+                  Organizers can track engagement with each product via the management dashboard.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/80 backdrop-blur-sm border-border/70 animate-fade-in">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm sm:text-base">Tips for exploring</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>Start with featured or top-positioned products.</li>
+                  <li>Use tags and categories to narrow down by theme.</li>
+                  <li>Look for "free" offerings to try things out quickly.</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
       </section>
     </main>
   );
