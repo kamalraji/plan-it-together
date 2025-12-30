@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceStatus } from '@/types';
 import { useCurrentOrganization } from './OrganizationContext';
+import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
 
 /**
  * OrgWorkspacePage
@@ -94,7 +95,20 @@ export const OrgWorkspacePage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="space-y-1">
+      <header className="space-y-2">
+        <OrganizationBreadcrumbs
+          items={[
+            {
+              label: organization?.name ?? 'Organization',
+              href: orgSlug ? `/${orgSlug}` : undefined,
+            },
+            {
+              label: 'Workspaces',
+              isCurrent: true,
+            },
+          ]}
+          className="text-xs"
+        />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {organization?.name ?? 'Organization workspaces'}
         </h1>
