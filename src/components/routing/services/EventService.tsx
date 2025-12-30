@@ -10,6 +10,7 @@ import { VolunteerCheckInInterface } from '@/components/attendance';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '../../../types';
 import { RequireEventAccess } from './RequireEventAccess';
+import { EventAnalyticsOverviewPage } from './EventAnalyticsOverviewPage';
 
 /**
  * EventService component provides the main routing structure for the Event Management Service.
@@ -24,6 +25,9 @@ export const EventService: React.FC = () => {
     <Routes>
       {/* Service Dashboard - default route */}
       <Route index element={<EventServiceDashboard />} />
+
+      {/* Event Analytics Overview */}
+      <Route path="analytics" element={<EventAnalyticsOverviewPage />} />
 
       {/* Event List Page */}
       <Route path="list" element={<EventListPage />} />
