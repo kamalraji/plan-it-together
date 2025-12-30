@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { motion } from 'framer-motion';
 import { AuthLayout } from './AuthLayout';
+import { useToast } from '@/hooks/use-toast';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -28,6 +29,7 @@ export function RegisterForm() {
   const { register: registerUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   
   // Get event code from URL if present
   const eventCodeFromUrl = searchParams.get('eventCode');
@@ -60,12 +62,22 @@ export function RegisterForm() {
     try {
       const { confirmPassword, ...registerData } = data;
       const { error: registerError } = await registerUser(registerData);
-      
+
       if (registerError) {
         setError(registerError.message || 'Registration failed. Please try again.');
+        toast({
+          variant: 'destructive',
+          title: 'Registration failed',
+          description: registerError.message || 'Please check your details and try again.',
+        });
         return;
       }
-      
+
+      toast({
+        title: 'Account created',
+        description: 'Check your email to verify your account, then sign in.',
+      });
+
       // After registration, redirect to login. Organizer signups will be guided
       // into the organization onboarding flow after login.
       if (data.role === UserRole.ORGANIZER) {
@@ -75,6 +87,11 @@ export function RegisterForm() {
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
+      toast({
+        variant: 'destructive',
+        title: 'Registration failed',
+        description: err.message || 'Something went wrong. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +146,7 @@ export function RegisterForm() {
                   placeholder="Enter your full name"
                 />
                 {errors.name && (
-                  <p className="mt-2 text-sm text-coral">{errors.name.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.name.message}</p>
                 )}
               </motion.div>
 
@@ -149,7 +166,7 @@ export function RegisterForm() {
                   placeholder="Enter your email address"
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.email.message}</p>
                 )}
               </motion.div>
 
@@ -169,7 +186,7 @@ export function RegisterForm() {
                   <option value={UserRole.ORGANIZER}>Organizer</option>
                 </select>
                 {errors.role && (
-                  <p className="mt-2 text-sm text-coral">{errors.role.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.role.message}</p>
                 )}
               </motion.div>
 
@@ -189,7 +206,7 @@ export function RegisterForm() {
                     placeholder="Enter event code if you have one"
                   />
                   {errors.eventCode && (
-                    <p className="mt-2 text-sm text-coral">{errors.eventCode.message}</p>
+                    <p className="mt-2 text-sm text-destructive">{errors.eventCode.message}</p>
                   )}
                 </motion.div>
               )}
@@ -210,7 +227,7 @@ export function RegisterForm() {
                   placeholder="Create a secure password"
                 />
                 {errors.password && (
-                  <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.password.message}</p>
                 )}
               </motion.div>
 
@@ -230,7 +247,7 @@ export function RegisterForm() {
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
-                  <p className="mt-2 text-sm text-coral">{errors.confirmPassword.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.confirmPassword.message}</p>
                 )}
               </motion.div>
             </div>

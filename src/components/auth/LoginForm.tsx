@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthLayout } from './AuthLayout';
+import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -20,6 +21,7 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const {
     register,
@@ -42,9 +44,19 @@ export function LoginForm() {
     const { error } = await login(data.email, data.password);
     if (error) {
       setError(error.message);
+      toast({
+        variant: 'destructive',
+        title: 'Sign-in failed',
+        description: error.message || 'Please check your details and try again.',
+      });
       setIsLoading(false);
       return;
     }
+
+    toast({
+      title: 'Signed in',
+      description: 'Redirecting you to your workspace...',
+    });
 
     try {
       // Support deep-linking into organizer onboarding after signup

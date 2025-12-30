@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { Event, Registration, RegistrationFormData, RegistrationStatus } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface RegistrationFormProps {
   event: Event;
@@ -25,6 +26,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<Record<string, any>>({
     name: user?.name || '',
     email: user?.email || '',
@@ -67,11 +69,22 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       return response.data.data;
     },
     onSuccess: () => {
+      toast({
+        title: 'Registration submitted',
+        description: 'We\'ve saved your spot. Check your email for details shortly.',
+      });
       if (onSuccess) {
         onSuccess();
       } else {
         navigate('/dashboard');
       }
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'destructive',
+        title: 'Registration failed',
+        description: error?.message || 'Something went wrong. Please try again.',
+      });
     },
   });
 
