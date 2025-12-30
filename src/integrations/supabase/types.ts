@@ -162,6 +162,8 @@ export type Database = {
           description: string | null
           end_date: string
           id: string
+          landing_page_data: Json | null
+          landing_page_slug: string | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
@@ -179,6 +181,8 @@ export type Database = {
           description?: string | null
           end_date: string
           id?: string
+          landing_page_data?: Json | null
+          landing_page_slug?: string | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
@@ -196,6 +200,8 @@ export type Database = {
           description?: string | null
           end_date?: string
           id?: string
+          landing_page_data?: Json | null
+          landing_page_slug?: string | null
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
