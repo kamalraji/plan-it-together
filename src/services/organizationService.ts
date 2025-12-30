@@ -29,6 +29,11 @@ export interface UpdateOrganizationDTO {
   category?: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
   logo_url?: string | null;
   banner_url?: string | null;
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_image_url?: string | null;
   website?: string | null;
   email?: string | null;
   phone?: string | null;

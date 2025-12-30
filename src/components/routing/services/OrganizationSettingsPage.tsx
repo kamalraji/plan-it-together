@@ -93,6 +93,54 @@ export const OrganizationSettingsPage: React.FC = () => {
     country: z.string().trim().max(120).optional().or(z.literal('')),
   });
 
+  const brandingSeoSchema = z.object({
+    logo_url: z
+      .string()
+      .trim()
+      .url('Please enter a valid logo URL starting with http or https')
+      .max(1024)
+      .optional()
+      .or(z.literal('')),
+    banner_url: z
+      .string()
+      .trim()
+      .url('Please enter a valid banner URL starting with http or https')
+      .max(1024)
+      .optional()
+      .or(z.literal('')),
+    primary_color: z
+      .string()
+      .trim()
+      .regex(/^#([0-9a-fA-F]{3}){1,2}$/i, 'Use a valid hex color like #2563EB')
+      .optional()
+      .or(z.literal('')),
+    secondary_color: z
+      .string()
+      .trim()
+      .regex(/^#([0-9a-fA-F]{3}){1,2}$/i, 'Use a valid hex color like #4B5563')
+      .optional()
+      .or(z.literal('')),
+    seo_title: z
+      .string()
+      .trim()
+      .max(120, 'SEO title must be at most 120 characters')
+      .optional()
+      .or(z.literal('')),
+    seo_description: z
+      .string()
+      .trim()
+      .max(200, 'SEO description must be at most 200 characters')
+      .optional()
+      .or(z.literal('')),
+    seo_image_url: z
+      .string()
+      .trim()
+      .url('Please enter a valid SEO image URL starting with http or https')
+      .max(1024)
+      .optional()
+      .or(z.literal('')),
+  });
+
   const handleGeneralSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!organization || !organizationId) return;
@@ -498,33 +546,104 @@ export const OrganizationSettingsPage: React.FC = () => {
             )}
 
             {activeTab === 'branding' && (
-              <div className="space-y-6">
+              <form
+                className="space-y-6"
+                onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
+                  event.preventDefault();
+                  if (!organization || !organizationId) return;
+
+                  const formData = new FormData(event.currentTarget);
+                  const rawValues = {
+                    logo_url: String(formData.get('logo_url') ?? ''),
+                    banner_url: String(formData.get('banner_url') ?? ''),
+                    primary_color: String(formData.get('primary_color') ?? ''),
+                    secondary_color: String(formData.get('secondary_color') ?? ''),
+                    seo_title: String(formData.get('seo_title') ?? ''),
+                    seo_description: String(formData.get('seo_description') ?? ''),
+                    seo_image_url: String(formData.get('seo_image_url') ?? ''),
+                  };
+
+                  const result = brandingSeoSchema.safeParse(rawValues);
+
+                  if (!result.success) {
+                    const fieldErrors: Record<string, string> = {};
+                    for (const issue of result.error.issues) {
+                      const path = issue.path[0] as string;
+                      if (!fieldErrors[path]) {
+                        fieldErrors[path] = issue.message;
+                      }
+                    }
+                    setErrors(fieldErrors);
+                    return;
+                  }
+
+                  const values = result.data;
+                  setErrors({});
+                  setSaving(true);
+
+                  try {
+                    await updateOrganization.mutateAsync({
+                      logo_url: values.logo_url?.trim() || null,
+                      banner_url: values.banner_url?.trim() || null,
+                      primary_color: values.primary_color?.trim() || null,
+                      secondary_color: values.secondary_color?.trim() || null,
+                      seo_title: values.seo_title?.trim() || null,
+                      seo_description: values.seo_description?.trim() || null,
+                      seo_image_url: values.seo_image_url?.trim() || null,
+                    });
+
+                    setOrganization((prev: any) =>
+                      prev
+                        ? {
+                            ...prev,
+                            logo_url: values.logo_url || null,
+                            banner_url: values.banner_url || null,
+                            primary_color: values.primary_color || null,
+                            secondary_color: values.secondary_color || null,
+                            seo_title: values.seo_title || null,
+                            seo_description: values.seo_description || null,
+                            seo_image_url: values.seo_image_url || null,
+                          }
+                        : prev,
+                    );
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+                noValidate
+              >
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Logo & Banner</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Organization Logo
+                        Logo URL
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <p className="mt-2 text-sm text-gray-600">Upload organization logo</p>
-                        <button className="mt-2 text-sm text-blue-600 hover:text-blue-500">Choose file</button>
-                      </div>
+                      <input
+                        type="url"
+                        name="logo_url"
+                        defaultValue={organization.logo_url || ''}
+                        placeholder="https://.../logo.png"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.logo_url && (
+                        <p className="mt-1 text-sm text-red-600">{errors.logo_url}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Banner Image
+                        Banner URL
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <p className="mt-2 text-sm text-gray-600">Upload banner image</p>
-                        <button className="mt-2 text-sm text-blue-600 hover:text-blue-500">Choose file</button>
-                      </div>
+                      <input
+                        type="url"
+                        name="banner_url"
+                        defaultValue={organization.banner_url || ''}
+                        placeholder="https://.../banner.jpg"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.banner_url && (
+                        <p className="mt-1 text-sm text-red-600">{errors.banner_url}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -539,15 +658,25 @@ export const OrganizationSettingsPage: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         <input
                           type="color"
-                          defaultValue={organization.branding.primaryColor}
+                          name="primary_color"
+                          defaultValue={organization.primary_color || '#3B82F6'}
                           className="h-10 w-20 border border-gray-300 rounded-md"
                         />
                         <input
                           type="text"
-                          defaultValue={organization.branding.primaryColor}
+                          defaultValue={organization.primary_color || '#3B82F6'}
                           className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          onChange={(e) => {
+                            // Keep color input in sync when typing hex value
+                            const form = e.currentTarget.form;
+                            const colorInput = form?.elements.namedItem('primary_color') as HTMLInputElement | null;
+                            if (colorInput) colorInput.value = e.currentTarget.value;
+                          }}
                         />
                       </div>
+                      {errors.primary_color && (
+                        <p className="mt-1 text-sm text-red-600">{errors.primary_color}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -556,19 +685,89 @@ export const OrganizationSettingsPage: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         <input
                           type="color"
-                          defaultValue={organization.branding.secondaryColor}
+                          name="secondary_color"
+                          defaultValue={organization.secondary_color || '#1E40AF'}
                           className="h-10 w-20 border border-gray-300 rounded-md"
                         />
                         <input
                           type="text"
-                          defaultValue={organization.branding.secondaryColor}
+                          defaultValue={organization.secondary_color || '#1E40AF'}
                           className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          onChange={(e) => {
+                            const form = e.currentTarget.form;
+                            const colorInput = form?.elements.namedItem('secondary_color') as HTMLInputElement | null;
+                            if (colorInput) colorInput.value = e.currentTarget.value;
+                          }}
                         />
                       </div>
+                      {errors.secondary_color && (
+                        <p className="mt-1 text-sm text-red-600">{errors.secondary_color}</p>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
+
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">SEO Settings</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        SEO Title
+                      </label>
+                      <input
+                        type="text"
+                        name="seo_title"
+                        defaultValue={organization.seo_title || ''}
+                        placeholder="Custom page title"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.seo_title && (
+                        <p className="mt-1 text-sm text-red-600">{errors.seo_title}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        SEO Description
+                      </label>
+                      <textarea
+                        name="seo_description"
+                        rows={3}
+                        defaultValue={organization.seo_description || ''}
+                        placeholder="Short description shown in search and social previews"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.seo_description && (
+                        <p className="mt-1 text-sm text-red-600">{errors.seo_description}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        SEO Image URL
+                      </label>
+                      <input
+                        type="url"
+                        name="seo_image_url"
+                        defaultValue={organization.seo_image_url || ''}
+                        placeholder="https://.../social-card.png"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.seo_image_url && (
+                        <p className="mt-1 text-sm text-red-600">{errors.seo_image_url}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={saving || updateOrganization.isPending}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    {saving || updateOrganization.isPending ? 'Saving...' : 'Save Branding & SEO'}
+                  </button>
+                </div>
+              </form>
             )}
 
             {activeTab === 'privacy' && (
