@@ -14,6 +14,10 @@ export interface CreateOrganizationDTO {
   website?: string;
   email?: string;
   phone?: string;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  gov_registration_id?: string | null;
   location?: Record<string, any>;
   social_links?: Record<string, string>;
 }
@@ -23,13 +27,17 @@ export interface UpdateOrganizationDTO {
   slug?: string;
   description?: string;
   category?: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
-  logo_url?: string;
-  banner_url?: string;
-  website?: string;
-  email?: string;
-  phone?: string;
-  location?: Record<string, any>;
-  social_links?: Record<string, string>;
+  logo_url?: string | null;
+  banner_url?: string | null;
+  website?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  gov_registration_id?: string | null;
+  location?: Record<string, any> | null;
+  social_links?: Record<string, string> | null;
 }
 
 export interface SearchOrganizationsParams {
