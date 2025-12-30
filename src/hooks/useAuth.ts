@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext, useContext, ReactNode } from
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { User, UserRole, UserStatus } from '../types';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { logging } from '@/lib/logging';
 
 interface AuthContextType {
   user: User | null;
@@ -124,9 +125,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ data }: any) => {
         const currentSession = data.session ?? null;
         setSession(currentSession);
+
         if (currentSession?.user) {
+          logging.setUserContext(
+            {
+              id: currentSession.user.id,
+              email: currentSession.user.email ?? undefined,
+              role: undefined,
+            },
+            {
+              sessionExpiresAt: currentSession.expires_at
+                ? new Date(currentSession.expires_at * 1000).toISOString()
+                : undefined,
+              provider: currentSession.user.app_metadata?.provider as string | undefined,
+            },
+          );
+
           mapSupabaseUserToAppUserWithRoles(currentSession.user)
-            .then(setUser)
+            .then((u) => {
+              setUser(u);
+              logging.setUserContext(
+                {
+                  id: u.id,
+                  email: u.email,
+                  role: u.role,
+                },
+                {
+                  sessionExpiresAt: currentSession.expires_at
+                    ? new Date(currentSession.expires_at * 1000).toISOString()
+                    : undefined,
+                  provider: currentSession.user.app_metadata?.provider as string | undefined,
+                },
+              );
+            })
             .catch(() => setUser(mapSupabaseUserToAppUserBase(currentSession.user)));
         }
       })
@@ -196,6 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
+    logging.setUserContext(null, null);
   };
 
   // With Lovable Cloud email verification links, verification happens via the link itself.
@@ -205,6 +237,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.user) {
       const userWithRoles = await mapSupabaseUserToAppUserWithRoles(data.user);
       setUser(userWithRoles);
+      logging.setUserContext(
+        {
+          id: userWithRoles.id,
+          email: userWithRoles.email,
+          role: userWithRoles.role,
+        },
+        {
+          sessionExpiresAt: undefined,
+          provider: data.user.app_metadata?.provider as string | undefined,
+        },
+      );
     }
   };
 
@@ -213,6 +256,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error || !data.user) return;
     const userWithRoles = await mapSupabaseUserToAppUserWithRoles(data.user);
     setUser(userWithRoles);
+    logging.setUserContext(
+      {
+        id: userWithRoles.id,
+        email: userWithRoles.email,
+        role: userWithRoles.role,
+      },
+      {
+        sessionExpiresAt: undefined,
+        provider: data.user.app_metadata?.provider as string | undefined,
+      },
+    );
   };
 
   const value: AuthContextType = {
