@@ -1,10 +1,18 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { PageHeader } from '../PageHeader';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
+import { UserRole } from '../../../types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 /**
  * EventServiceDashboard provides the AWS-style service landing page for Event Management.
@@ -108,6 +116,9 @@ export const EventServiceDashboard: React.FC = () => {
     };
   }, [events, registrationsByEvent]);
 
+  const canManageEvents =
+    user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER;
+
   const quickActions = [
     {
       title: 'Create New Event',
@@ -128,7 +139,7 @@ export const EventServiceDashboard: React.FC = () => {
     {
       title: 'Analytics Dashboard',
       description: 'View event performance metrics',
-      href: '/console/analytics',
+      href: listPath.replace(/\/list$/, '/analytics'),
     },
   ];
 
@@ -339,32 +350,55 @@ export const EventServiceDashboard: React.FC = () => {
                         {registrationsByEvent?.[event.id] ?? 0}
                       </td>
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                        <Link
-                          to={eventDetailPath(event.id)}
-                          className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
-                        >
-                          View
-                        </Link>
-                        <Link
-                          to={eventEditPath(event.id)}
-                          className="text-muted-foreground hover:text-foreground mr-3 sm:mr-4"
-                        >
-                          Edit
-                        </Link>
-                        <Link
-                          to={`/events/${event.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
-                        >
-                          Preview public page
-                        </Link>
-                        <Link
-                          to={listPath.replace(/\/list$/, `/${event.id}/page-builder`)}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          Page Builder
-                        </Link>
+                        <div className="flex items-center justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                              <DropdownMenuItem asChild>
+                                <Link to={eventDetailPath(event.id)} className="w-full">
+                                  View
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link to={eventEditPath(event.id)} className="w-full">
+                                  Edit
+                                </Link>
+                              </DropdownMenuItem>
+                              {canManageEvents && (
+                                <>
+                                  <DropdownMenuItem asChild>
+                                    <a
+                                      href={`/events/${event.id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="w-full"
+                                    >
+                                      Preview public page
+                                    </a>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <Link
+                                      to={listPath.replace(/\/list$/, `/${event.id}/page-builder`)}
+                                      className="w-full"
+                                    >
+                                      Page Builder
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <Link
+                                      to={listPath.replace(/\/list$/, `/${event.id}/ops`)}
+                                      className="w-full"
+                                    >
+                                      Ops Console
+                                    </Link>
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </td>
                     </tr>
                   ))}
