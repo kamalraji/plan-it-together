@@ -33,6 +33,7 @@ import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
+import AttendflowLanding from '@/pages/AttendflowLanding';
 
 
 // Create a query client instance with optimized settings for the console application
@@ -500,8 +501,8 @@ export const AppRouter: React.FC = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Root redirect to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Attendflow-style marketing landing at root */}
+            <Route path="/" element={<AttendflowLanding />} />
 
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
