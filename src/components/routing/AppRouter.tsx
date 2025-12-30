@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -8,7 +8,7 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
@@ -120,7 +120,10 @@ const ResetPasswordPage = () => {
   );
 };
 
-// Types for unified dashboard metrics
+const EventServiceLazy = lazy(() =>
+  import('./services/EventService').then((m) => ({ default: m.EventService })),
+);
+
 interface DashboardMetrics {
   activeEvents: number;
   draftEvents: number;
@@ -630,7 +633,9 @@ export const AppRouter: React.FC = () => {
                 path="eventmanagement/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <EventService />
+                    <Suspense fallback={<div className="p-6">Loading Event Management…</div>}>
+                      <EventServiceLazy />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />

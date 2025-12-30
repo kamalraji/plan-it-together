@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { PageHeader } from '../PageHeader';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
-import { UserRole } from '../../../types';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,8 +116,8 @@ export const EventServiceDashboard: React.FC = () => {
     };
   }, [events, registrationsByEvent]);
 
-  const canManageEvents =
-    user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER;
+  const safeReplaceSuffix = (base: string, from: string, to: string) =>
+    base.endsWith(from) ? base.replace(from, to) : `${base}${to}`;
 
   const quickActions = [
     {
@@ -129,7 +129,7 @@ export const EventServiceDashboard: React.FC = () => {
     {
       title: 'Browse Templates',
       description: 'Use pre-built event templates',
-      href: listPath.replace(/\/list$/, '/templates'),
+      href: safeReplaceSuffix(listPath, '/list', '/templates'),
     },
     {
       title: 'View All Events',
@@ -139,12 +139,12 @@ export const EventServiceDashboard: React.FC = () => {
     {
       title: 'Registrations Overview',
       description: 'Review and manage event registrations',
-      href: listPath.replace(/\/list$/, '/registrations'),
+      href: safeReplaceSuffix(listPath, '/list', '/registrations'),
     },
     {
       title: 'Analytics Dashboard',
       description: 'View event performance metrics',
-      href: listPath.replace(/\/list$/, '/analytics'),
+      href: safeReplaceSuffix(listPath, '/list', '/analytics'),
     },
   ];
 
@@ -366,11 +366,11 @@ export const EventServiceDashboard: React.FC = () => {
                                   Edit
                                 </Link>
                               </DropdownMenuItem>
-                              {canManageEvents && (
+                              {(user?.role === 'SUPER_ADMIN' || user?.role === 'ORGANIZER') && (
                                 <>
                                   <DropdownMenuItem asChild>
                                     <Link
-                                      to={listPath.replace(/\/list$/, `/${event.id}/analytics`)}
+                                      to={safeReplaceSuffix(listPath, '/list', `/${event.id}/analytics`)}
                                       className="w-full"
                                     >
                                       View Event Analytics
