@@ -74,7 +74,17 @@ export interface Event {
   updatedAt: string;
   /** Serialized tldraw snapshot for custom hero layouts */
   canvasState?: any;
+  /** GrapesJS landing page output: html, css, and meta */
+  landingPageData?: {
+    html: string;
+    css: string;
+    meta?: {
+      title?: string;
+      description?: string;
+    };
+  } | null;
 }
+
 
 
 export enum EventMode {
