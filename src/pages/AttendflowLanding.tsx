@@ -43,18 +43,22 @@ const AttendflowLanding = () => {
   }, []);
 
   useEffect(() => {
-    supabase
-      .from("organizations")
-      .select("id, name, logo_url")
-      .eq("verification_status", "VERIFIED")
-      .not("logo_url", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(6)
-      .then(({ data, error }) => {
-        if (!error && data) {
-          setLogoOrgs(data);
-        }
-      });
+    const timer = window.setTimeout(() => {
+      supabase
+        .from("organizations")
+        .select("id, name, logo_url")
+        .eq("verification_status", "VERIFIED")
+        .not("logo_url", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(6)
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setLogoOrgs(data);
+          }
+        });
+    }, 400);
+
+    return () => window.clearTimeout(timer);
   }, []);
   return (
     <div className="min-h-screen bg-background text-foreground af-grid-bg">

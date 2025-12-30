@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
@@ -35,6 +35,7 @@ export function OrganizerDashboard() {
     const [activeTab, setActiveTab] = useState<'events' | 'analytics'>('events');
     const [isChecklistOpen, setIsChecklistOpen] = useState(true);
     const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
+    const [metricsEnabled, setMetricsEnabled] = useState(false);
     const { isHealthy } = useApiHealth();
 
     // Check if profile completion is needed (Requirements 2.4, 2.5)
@@ -117,8 +118,18 @@ export function OrganizerDashboard() {
         },
     });
 
+    useEffect(() => {
+        if (!currentEvent) return;
+
+        const timer = window.setTimeout(() => {
+            setMetricsEnabled(true);
+        }, 500);
+
+        return () => window.clearTimeout(timer);
+    }, [currentEvent]);
+
     const { data: currentEventMetrics } = useQuery({
-        enabled: !!currentEvent,
+        enabled: !!currentEvent && metricsEnabled,
         queryKey: ['organizer-current-event-metrics', currentEvent?.id],
         queryFn: async () => {
             if (!currentEvent) return null;
