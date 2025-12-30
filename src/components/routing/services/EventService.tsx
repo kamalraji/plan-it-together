@@ -5,6 +5,7 @@ import { EventListPage } from './EventListPage';
 import { EventDetailPage } from './EventDetailPage';
 import { EventFormPage } from './EventFormPage';
 import { EventOpsConsole } from '@/components/events/EventOpsConsole';
+import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 import { VolunteerCheckInInterface } from '@/components/attendance';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '../../../types';
@@ -78,6 +79,16 @@ export const EventService: React.FC = () => {
         element={
           <EventAccessRoute requireManage>
             <EventOpsConsole />
+          </EventAccessRoute>
+        }
+      />
+
+      {/* Event landing page builder (require manage access) */}
+      <Route
+        path=":eventId/page-builder"
+        element={
+          <EventAccessRoute requireManage>
+            <EventPageBuilder />
           </EventAccessRoute>
         }
       />

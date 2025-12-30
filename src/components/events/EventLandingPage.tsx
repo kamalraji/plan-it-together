@@ -30,6 +30,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
       if (error) throw error;
 
+      const landingPageData = (data as any).landing_page_data ?? null;
+
       // Map Supabase row to the existing Event type shape used in the UI
       const mappedEvent: Event = {
         id: data.id,
@@ -57,6 +59,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         canvasState: (data as any).canvas_state ?? undefined,
+        landingPageData: landingPageData,
       };
 
       return mappedEvent;
