@@ -89,17 +89,17 @@ export function LoginForm() {
     <AuthLayout>
       <div className="space-y-10">
         <div className="text-center space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-semibold sm:font-bold tracking-tight text-foreground">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
             Welcome back
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground">
-            Sign in to continue your amazing journey
+            Sign in to your event workspace
           </p>
           <p className="text-sm text-muted-foreground">
             Or{' '}
             <Link
               to="/register"
-              className="font-medium text-teal hover:text-teal-light transition-colors"
+              className="font-medium text-primary hover:text-primary/80 transition-colors"
             >
               create a new account
             </Link>
@@ -108,22 +108,22 @@ export function LoginForm() {
 
         {/* Login Form */}
         <motion.div
-          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+          className="relative rounded-2xl border border-border/70 bg-card/90 shadow-md"
           initial={{ opacity: 0, y: 24, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
         >
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-6 p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <motion.div
-                className="rounded-xl bg-coral/10 border border-coral/20 p-4"
+                className="rounded-xl bg-destructive/10 border border-destructive/30 p-4"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25 }}
               >
                 <div className="flex items-center space-x-2">
-                  <span className="text-coral">⚠️</span>
-                  <div className="text-sm text-coral font-medium">{error}</div>
+                  <span className="text-destructive">⚠️</span>
+                  <div className="text-sm text-destructive font-medium">{error}</div>
                 </div>
               </motion.div>
             )}
@@ -141,11 +141,11 @@ export function LoginForm() {
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/20 focus:border-coral transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your email"
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.email.message}</p>
                 )}
               </motion.div>
 
@@ -161,11 +161,11 @@ export function LoginForm() {
                   {...register('password')}
                   type="password"
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-coral/20 focus:border-coral transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.password.message}</p>
                 )}
               </motion.div>
             </div>
@@ -179,7 +179,7 @@ export function LoginForm() {
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-teal hover:text-teal-light transition-colors"
+                  className="font-medium text-primary hover:text-primary/80 transition-colors"
                 >
                   Forgot your password?
                 </Link>
@@ -189,7 +189,7 @@ export function LoginForm() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3.5 px-6 rounded-xl text-base sm:text-[15px] font-medium tracking-tight bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center py-3.5 px-6 rounded-full text-base sm:text-[15px] font-medium tracking-tight bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md hover:shadow-lg hover:from-primary hover:to-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
               whileHover={!isLoading ? { scale: 1.02 } : undefined}
               whileTap={!isLoading ? { scale: 0.99 } : undefined}
               initial={{ opacity: 0, y: 16 }}

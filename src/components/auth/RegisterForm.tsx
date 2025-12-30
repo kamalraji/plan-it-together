@@ -83,18 +83,18 @@ export function RegisterForm() {
   return (
     <AuthLayout>
       <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
-            Join the Adventure!
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground mb-1">
+            Create your account
           </h2>
-          <p className="text-gray-600 mb-2">
-            Create your account and start exploring amazing events
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Join your event workspace in a few clicks.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-medium text-teal hover:text-teal-light transition-colors"
+              className="font-medium text-primary hover:text-primary/80 transition-colors"
             >
               Sign in here
             </Link>
@@ -102,15 +102,13 @@ export function RegisterForm() {
         </div>
 
         {/* Registration Form */}
-        <motion.div
-          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
-        >
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <motion.div className="relative rounded-2xl border border-border/70 bg-card/90 shadow-md">
+          <form className="space-y-6 p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
             {error && (
-              <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
+              <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-4">
                 <div className="flex items-center space-x-2">
-                  <span className="text-coral">⚠️</span>
-                  <div className="text-sm text-coral font-medium">{error}</div>
+                  <span className="text-destructive">⚠️</span>
+                  <div className="text-sm text-destructive font-medium">{error}</div>
                 </div>
               </div>
             )}
@@ -127,7 +125,7 @@ export function RegisterForm() {
                 <input
                   {...register('name')}
                   type="text"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your full name"
                 />
                 {errors.name && (
@@ -147,7 +145,7 @@ export function RegisterForm() {
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your email address"
                 />
                 {errors.email && (
@@ -165,7 +163,7 @@ export function RegisterForm() {
                 </label>
                 <select
                   {...register('role')}
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                 >
                   <option value={UserRole.PARTICIPANT}>Participant</option>
                   <option value={UserRole.ORGANIZER}>Organizer</option>
@@ -187,7 +185,7 @@ export function RegisterForm() {
                   <input
                     {...register('eventCode')}
                     type="text"
-                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                     placeholder="Enter event code if you have one"
                   />
                   {errors.eventCode && (
@@ -208,7 +206,7 @@ export function RegisterForm() {
                   {...register('password')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Create a secure password"
                 />
                 {errors.password && (
@@ -228,7 +226,7 @@ export function RegisterForm() {
                   {...register('confirmPassword')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
@@ -240,7 +238,7 @@ export function RegisterForm() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center py-3.5 px-6 rounded-full text-base font-medium bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md hover:shadow-lg hover:from-primary hover:to-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
               whileHover={!isLoading ? { scale: 1.02 } : undefined}
               whileTap={!isLoading ? { scale: 0.99 } : undefined}
               initial={{ opacity: 0, y: 16 }}
@@ -264,7 +262,7 @@ export function RegisterForm() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.44 }}
               >
-                <div className="text-sm text-teal">
+                <div className="text-sm text-primary">
                   <strong>Organizer Account:</strong> After you verify your email and sign in,
                   you'll be guided to set up your organization. Once your first organization is
                   created, you'll automatically get organizer access.
