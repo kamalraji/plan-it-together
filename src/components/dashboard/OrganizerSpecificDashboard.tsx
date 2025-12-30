@@ -9,7 +9,7 @@ export function OrganizerSpecificDashboard() {
   const displayName = user?.name || (user as any)?.full_name || user?.email || 'Organizer';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background af-grid-bg">
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
         <span className="text-muted-foreground/70">Home</span>
