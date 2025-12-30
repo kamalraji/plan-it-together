@@ -2,77 +2,168 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '../../../hooks/useAuth';
+import { useOrganization, useUpdateOrganization } from '@/hooks/useOrganization';
+import { z } from 'zod';
 
 /**
- * OrganizationSettingsPage provides AWS-style interface for organization settings management.
- * Features:
- * - Organization branding configuration
- * - Policy and preference settings
- * - Integration management
- * - Role-based access controls
+ * OrganizationSettingsPage provides interface for organization settings management.
+ * It now reads and updates data from the real `organizations` table instead of mock data.
  */
 export const OrganizationSettingsPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
-  useAuth();
-  const [organization, setOrganization] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const { data: orgData, isLoading } = useOrganization(organizationId || '');
+  const updateOrganization = useUpdateOrganization(organizationId || '');
+
+  const [organization, setOrganization] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState('general');
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // Mock data - in real implementation, this would come from API
-    const mockOrganization = {
-      id: organizationId,
-      name: 'Tech Innovation Hub',
-      category: 'COMPANY',
-      role: 'OWNER',
-      description: 'Leading technology innovation and startup acceleration',
-      branding: {
-        logoUrl: null,
-        bannerUrl: null,
-        primaryColor: '#3B82F6',
-        secondaryColor: '#1E40AF',
-      },
-      settings: {
-        visibility: 'PUBLIC',
-        allowFollowers: true,
-        requireApprovalForEvents: false,
-        emailNotifications: true,
-        memberCanCreateEvents: true,
-      },
-      socialLinks: {
-        website: 'https://techinnovationhub.com',
-        linkedin: 'https://linkedin.com/company/tech-innovation-hub',
-        twitter: '',
-        facebook: '',
-      },
+    if (!orgData) return;
+
+    setOrganization((prev: any) => {
+      const base = prev || {};
+
+      return {
+        ...orgData,
+        // Provide sensible defaults for nested settings used by the legacy UI
+        settings: {
+          visibility: 'PUBLIC',
+          allowFollowers: true,
+          requireApprovalForEvents: false,
+          emailNotifications: true,
+          memberCanCreateEvents: true,
+          ...(base.settings || {}),
+        },
+        branding: {
+          logoUrl: null,
+          bannerUrl: null,
+          primaryColor: '#3B82F6',
+          secondaryColor: '#1E40AF',
+          ...(base.branding || {}),
+        },
+        socialLinks: {
+          website: orgData.website || '',
+          linkedin: '',
+          twitter: '',
+          ...(base.socialLinks || {}),
+        },
+      };
+    });
+  }, [orgData]);
+
+  const orgProfileSchema = z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Organization name is required')
+      .max(120, 'Organization name must be at most 120 characters'),
+    category: z.enum(['COLLEGE', 'COMPANY', 'INDUSTRY', 'NON_PROFIT']),
+    description: z
+      .string()
+      .trim()
+      .max(1000, 'Description must be at most 1000 characters')
+      .optional()
+      .or(z.literal('')),
+    website: z
+      .string()
+      .trim()
+      .url('Please enter a valid URL starting with http or https')
+      .max(255)
+      .optional()
+      .or(z.literal('')),
+    email: z
+      .string()
+      .trim()
+      .email('Please enter a valid email address')
+      .max(255)
+      .optional()
+      .or(z.literal('')),
+    phone: z
+      .string()
+      .trim()
+      .max(50, 'Phone number must be at most 50 characters')
+      .optional()
+      .or(z.literal('')),
+    city: z.string().trim().max(120).optional().or(z.literal('')),
+    state: z.string().trim().max(120).optional().or(z.literal('')),
+    country: z.string().trim().max(120).optional().or(z.literal('')),
+  });
+
+  const handleGeneralSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!organization || !organizationId) return;
+
+    const formData = new FormData(event.currentTarget);
+
+    const rawValues = {
+      name: String(formData.get('name') ?? ''),
+      category: String(formData.get('category') ?? 'COMPANY') as any,
+      description: String(formData.get('description') ?? ''),
+      website: String(formData.get('website') ?? ''),
+      email: String(formData.get('email') ?? ''),
+      phone: String(formData.get('phone') ?? ''),
+      city: String(formData.get('city') ?? ''),
+      state: String(formData.get('state') ?? ''),
+      country: String(formData.get('country') ?? ''),
     };
 
-    setTimeout(() => {
-      setOrganization(mockOrganization);
-      setLoading(false);
-    }, 500);
-  }, [organizationId]);
+    const result = orgProfileSchema.safeParse(rawValues);
 
-  const handleSave = async (section: string, data: any) => {
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const path = issue.path[0] as string;
+        if (!fieldErrors[path]) {
+          fieldErrors[path] = issue.message;
+        }
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
+    const values = result.data;
+    setErrors({});
     setSaving(true);
+
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log(`Saving ${section}:`, data);
-      // Update local state
-      setOrganization((prev: any) => ({
-        ...prev,
-        [section]: { ...prev[section], ...data }
-      }));
-    } catch (error) {
-      console.error('Error saving settings:', error);
+      await updateOrganization.mutateAsync({
+        name: values.name.trim(),
+        category: values.category,
+        description: values.description?.trim() || undefined,
+        website: values.website?.trim() || undefined,
+        email: values.email?.trim() || undefined,
+        phone: values.phone?.trim() || undefined,
+        city: values.city?.trim() || undefined,
+        state: values.state?.trim() || undefined,
+        country: values.country?.trim() || undefined,
+      });
+
+      setOrganization((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              name: values.name.trim(),
+              category: values.category,
+              description: values.description,
+              website: values.website,
+              email: values.email,
+              phone: values.phone,
+              city: values.city,
+              state: values.state,
+              country: values.country,
+            }
+          : prev,
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
+  if (isLoading || !organization) {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -96,15 +187,14 @@ export const OrganizationSettingsPage: React.FC = () => {
             to="/dashboard/organizations"
             className="text-blue-600 hover:text-blue-500 font-medium"
           >
-            ← Back to Organizations
+             Back to Organizations
           </Link>
         </div>
       </div>
     );
   }
 
-  // Check if user has permission to manage settings
-  const canManageSettings = organization.role === 'OWNER' || organization.role === 'ADMIN';
+  const canManageSettings = user && organization && organization.owner_id === user.id;
 
   if (!canManageSettings) {
     return (
@@ -116,7 +206,7 @@ export const OrganizationSettingsPage: React.FC = () => {
             to={`/dashboard/organizations/${organizationId}`}
             className="text-blue-600 hover:text-blue-500 font-medium"
           >
-            ← Back to Organization
+             Back to Organization
           </Link>
         </div>
       </div>
@@ -183,7 +273,7 @@ export const OrganizationSettingsPage: React.FC = () => {
           {/* Tab Content */}
           <div className="mt-8">
             {activeTab === 'general' && (
-              <div className="space-y-6">
+              <form className="space-y-6" onSubmit={handleGeneralSubmit} noValidate>
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,15 +283,20 @@ export const OrganizationSettingsPage: React.FC = () => {
                       </label>
                       <input
                         type="text"
+                        name="name"
                         defaultValue={organization.name}
                         className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       />
+                      {errors.name && (
+                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Category
                       </label>
                       <select
+                        name="category"
                         defaultValue={organization.category}
                         className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       >
@@ -210,6 +305,9 @@ export const OrganizationSettingsPage: React.FC = () => {
                         <option value="INDUSTRY">Industry</option>
                         <option value="NON_PROFIT">Non-Profit</option>
                       </select>
+                      {errors.category && (
+                        <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+                      )}
                     </div>
                   </div>
                   <div className="mt-6">
@@ -217,18 +315,113 @@ export const OrganizationSettingsPage: React.FC = () => {
                       Description
                     </label>
                     <textarea
+                      name="description"
                       rows={3}
-                      defaultValue={organization.description}
+                      defaultValue={organization.description || ''}
                       className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {errors.description && (
+                      <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                    )}
                   </div>
+
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Website
+                      </label>
+                      <input
+                        type="url"
+                        name="website"
+                        defaultValue={organization.website || ''}
+                        placeholder="https://example.com"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.website && (
+                        <p className="mt-1 text-sm text-red-600">{errors.website}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Contact Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        defaultValue={organization.email || ''}
+                        placeholder="org@example.com"
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.email && (
+                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        defaultValue={organization.phone || ''}
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.phone && (
+                        <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        defaultValue={organization.city || ''}
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {errors.city && (
+                        <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        State / Country
+                      </label>
+                      <div className="grid grid-cols-1 gap-3">
+                        <input
+                          type="text"
+                          name="state"
+                          placeholder="State / Region"
+                          defaultValue={organization.state || ''}
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <input
+                          type="text"
+                          name="country"
+                          placeholder="Country"
+                          defaultValue={organization.country || ''}
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      {(errors.state || errors.country) && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.state || errors.country}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="mt-6">
                     <button
-                      onClick={() => handleSave('general', {})}
-                      disabled={saving}
+                      type="submit"
+                      disabled={saving || updateOrganization.isPending}
                       className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     >
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving || updateOrganization.isPending ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 </div>
@@ -245,6 +438,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         type="checkbox"
                         defaultChecked={organization.settings.allowFollowers}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        readOnly
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -256,6 +450,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         type="checkbox"
                         defaultChecked={organization.settings.memberCanCreateEvents}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        readOnly
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -267,11 +462,12 @@ export const OrganizationSettingsPage: React.FC = () => {
                         type="checkbox"
                         defaultChecked={organization.settings.emailNotifications}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        readOnly
                       />
                     </div>
                   </div>
                 </div>
-              </div>
+              </form>
             )}
 
             {activeTab === 'branding' && (
@@ -374,6 +570,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                       type="checkbox"
                       defaultChecked={organization.settings.requireApprovalForEvents}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      readOnly
                     />
                   </div>
                 </div>
@@ -436,7 +633,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         Configure
                       </button>
                     </div>
-                    
+
                     <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <span className="text-2xl">📊</span>
