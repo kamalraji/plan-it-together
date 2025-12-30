@@ -539,6 +539,7 @@ export type Database = {
       }
       organizations: {
         Row: {
+          banner_url: string | null
           category: string
           city: string | null
           country: string | null
@@ -547,9 +548,15 @@ export type Database = {
           email: string | null
           gov_registration_id: string | null
           id: string
+          logo_url: string | null
           name: string
           owner_id: string
           phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          seo_description: string | null
+          seo_image_url: string | null
+          seo_title: string | null
           slug: string
           state: string | null
           verification_source: string | null
@@ -557,6 +564,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          banner_url?: string | null
           category: string
           city?: string | null
           country?: string | null
@@ -565,9 +573,15 @@ export type Database = {
           email?: string | null
           gov_registration_id?: string | null
           id?: string
+          logo_url?: string | null
           name: string
           owner_id: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
           slug: string
           state?: string | null
           verification_source?: string | null
@@ -575,6 +589,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          banner_url?: string | null
           category?: string
           city?: string | null
           country?: string | null
@@ -583,9 +598,15 @@ export type Database = {
           email?: string | null
           gov_registration_id?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
           owner_id?: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
           slug?: string
           state?: string | null
           verification_source?: string | null

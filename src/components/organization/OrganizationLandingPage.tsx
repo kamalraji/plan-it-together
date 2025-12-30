@@ -56,11 +56,13 @@ export const OrganizationLandingPage: React.FC = () => {
       setOrganization(org as OrganizationRow);
 
       try {
-        document.title = `${org.name} | Thittam1Hub`;
-
+        const pageTitle = org.seo_title || `${org.name} | Thittam1Hub`;
         const description =
+          org.seo_description ||
           org.description ||
           `Discover events and updates from ${org.name} on Thittam1Hub.`;
+
+        document.title = pageTitle;
 
         let meta = document.querySelector('meta[name="description"]');
         if (!meta) {
@@ -69,6 +71,32 @@ export const OrganizationLandingPage: React.FC = () => {
           document.head.appendChild(meta);
         }
         meta.setAttribute('content', description);
+
+        let ogTitle = document.querySelector('meta[property="og:title"]');
+        if (!ogTitle) {
+          ogTitle = document.createElement('meta');
+          ogTitle.setAttribute('property', 'og:title');
+          document.head.appendChild(ogTitle);
+        }
+        ogTitle.setAttribute('content', pageTitle);
+
+        let ogDescription = document.querySelector('meta[property="og:description"]');
+        if (!ogDescription) {
+          ogDescription = document.createElement('meta');
+          ogDescription.setAttribute('property', 'og:description');
+          document.head.appendChild(ogDescription);
+        }
+        ogDescription.setAttribute('content', description);
+
+        if (org.seo_image_url) {
+          let ogImage = document.querySelector('meta[property="og:image"]');
+          if (!ogImage) {
+            ogImage = document.createElement('meta');
+            ogImage.setAttribute('property', 'og:image');
+            document.head.appendChild(ogImage);
+          }
+          ogImage.setAttribute('content', org.seo_image_url);
+        }
 
         let canonical = document.querySelector('link[rel="canonical"]');
         if (!canonical) {
@@ -174,12 +202,28 @@ export const OrganizationLandingPage: React.FC = () => {
   }
 
   return (
-    <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
-      <section className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main className="min-h-screen" style={organization.primary_color ? {
+      backgroundImage: `linear-gradient(to bottom, ${organization.primary_color}, rgba(0,0,0,0))`,
+    } : undefined}>
+      <section
+        className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">Organization</p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Welcome to <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{organization.name}</span>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight flex items-center gap-3">
+            {organization.logo_url && (
+              <img
+                src={organization.logo_url}
+                alt={`${organization.name} logo`}
+                className="h-9 w-9 rounded-md object-cover border border-border"
+              />
+            )}
+            <span>
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {organization.name}
+              </span>
+            </span>
           </h1>
           {organization.city && (
             <p className="mt-2 text-sm text-muted-foreground">
@@ -208,6 +252,87 @@ export const OrganizationLandingPage: React.FC = () => {
           <div className="space-y-8">
             <OrganizationProductsSection products={products} />
             <OrganizationProfile organizationId={organization.id} />
+
+            <Card className="border-border/60 bg-background/80 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle>About {organization.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <div>
+                  <span className="font-medium text-foreground">Category:</span>{' '}
+                  <span>{organization.category}</span>
+                </div>
+                {organization.description && (
+                  <div>
+                    <span className="font-medium text-foreground">Summary:</span>{' '}
+                    <span className="whitespace-pre-line">{organization.description}</span>
+                  </div>
+                )}
+                {(organization.city || organization.state || organization.country) && (
+                  <div>
+                    <span className="font-medium text-foreground">Location:</span>{' '}
+                    <span>
+                      {[organization.city, organization.state, organization.country]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </span>
+                  </div>
+                )}
+                {(organization.website || organization.email || organization.phone) && (
+                  <div className="flex flex-col gap-1">
+                    {organization.website && (
+                      <div>
+                        <span className="font-medium text-foreground">Website:</span>{' '}
+                        <a
+                          href={organization.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.website}
+                        </a>
+                      </div>
+                    )}
+                    {organization.email && (
+                      <div>
+                        <span className="font-medium text-foreground">Email:</span>{' '}
+                        <a
+                          href={`mailto:${organization.email}`}
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.email}
+                        </a>
+                      </div>
+                    )}
+                    {organization.phone && (
+                      <div>
+                        <span className="font-medium text-foreground">Phone:</span>{' '}
+                        <a
+                          href={`tel:${organization.phone}`}
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.phone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {(organization.gov_registration_id || organization.verification_status) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {organization.gov_registration_id && (
+                      <span className="text-xs rounded-full bg-muted px-2 py-1">
+                        Reg. ID: {organization.gov_registration_id}
+                      </span>
+                    )}
+                    {organization.verification_status && (
+                      <span className="text-xs rounded-full px-2 py-1 bg-muted">
+                        Status: {organization.verification_status}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
 
