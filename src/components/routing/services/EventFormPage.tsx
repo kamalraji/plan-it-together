@@ -162,11 +162,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     loadEvent();
   }, [mode, eventId, navigate, reset, toast]);
 
-  const pageTitle = mode === 'create' ? 'Create New Event' : 'Edit Event';
+  const pageTitle = mode === 'create' ? 'Create your event' : 'Edit event details';
   const pageSubtitle =
     mode === 'create'
-      ? 'Fill in the details to create your event'
-      : 'Update your event information';
+      ? 'Share a few details to spin up an event-ready landing page and workspace.'
+      : 'Tweak your event information without disrupting attendees.';
 
   const onSubmit = async (values: EventFormValues) => {
     if (isSubmitting) return;
@@ -359,7 +359,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   </Alert>
                 )}
                 <div>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Basic Information</h3>
+                  <h3 className="mb-1 text-lg font-semibold text-foreground">Basic information</h3>
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    Give your event a clear name, short description, and where it lives.
+                  </p>
                   <div className="grid grid-cols-1 gap-6">
                     <FormField
                       control={control}
@@ -367,9 +370,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Organization *</FormLabel>
+                          <FormDescription>
+                            We’ll use this to pull in the right branding and permissions.
+                          </FormDescription>
                           <FormControl>
                             <select
-                              className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="mt-1 flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
                               {...field}
                             >
@@ -397,9 +403,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Event Name *</FormLabel>
+                          <FormLabel>Event name *</FormLabel>
+                          <FormDescription>
+                            This appears on your landing page and emails — keep it short and clear.
+                          </FormDescription>
                           <FormControl>
-                            <Input type="text" placeholder="Enter event name" {...field} />
+                            <Input type="text" placeholder="e.g. Campus DevFest 2025" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -412,8 +421,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Description *</FormLabel>
+                          <FormDescription>
+                            A quick overview that helps attendees understand who this event is for.
+                          </FormDescription>
                           <FormControl>
-                            <Textarea rows={4} placeholder="Describe your event" {...field} />
+                            <Textarea rows={4} placeholder="Share what makes this event special" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -426,10 +438,13 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="mode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Event Mode *</FormLabel>
+                            <FormLabel>Event mode *</FormLabel>
+                            <FormDescription>
+                              Choose how people will join — online, in-person, or a mix of both.
+                            </FormDescription>
                             <FormControl>
                               <select
-                                className="w-full rounded-xl border-2 border-border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="mt-1 w-full rounded-xl border-2 border-border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 {...field}
                               >
                                 <option value="ONLINE">Online</option>
@@ -448,14 +463,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Capacity</FormLabel>
+                            <FormDescription>
+                              Optional: set a soft cap to help us track registrations.
+                            </FormDescription>
                             <FormControl>
                               <Input
                                 type="number"
-                                placeholder="Enter capacity (optional)"
+                                placeholder="e.g. 150"
                                 {...field}
                               />
                             </FormControl>
-                            <FormDescription>Leave blank if there is no fixed capacity.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
