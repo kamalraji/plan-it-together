@@ -173,19 +173,6 @@ export const OrganizationLandingPage: React.FC = () => {
     );
   }
 
-  const shareUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/${organization.slug}`
-    : `/${organization.slug}`;
-
-  const copyShareUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('Public link copied to clipboard');
-    } catch (err) {
-      console.error('Failed to copy link', err);
-    }
-  };
-
   return (
     <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
       <section className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -201,21 +188,6 @@ export const OrganizationLandingPage: React.FC = () => {
               {organization.country ? `, ${organization.country}` : ''}
             </p>
           )}
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <button
-            onClick={copyShareUrl}
-            className="inline-flex items-center justify-center rounded-full border border-border bg-background/80 px-4 py-2 text-xs sm:text-sm font-medium text-foreground shadow-sm hover:bg-muted/80 transition-colors"
-          >
-            <span className="mr-2 text-xs">🔗</span>
-            Copy public link
-          </button>
-          <a
-            href={shareUrl}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs sm:text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-shadow"
-          >
-            Open public page
-          </a>
         </div>
       </section>
 
@@ -234,8 +206,8 @@ export const OrganizationLandingPage: React.FC = () => {
         </div>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <div className="space-y-8">
-            <OrganizationProfile organizationId={organization.id} />
             <OrganizationProductsSection products={products} />
+            <OrganizationProfile organizationId={organization.id} />
           </div>
 
 

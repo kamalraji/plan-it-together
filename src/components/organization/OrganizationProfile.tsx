@@ -73,6 +73,19 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
   const socialLinks = organization.social_links as Record<string, string> || {};
   const location = organization.location as Record<string, any> || {};
 
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/${organization.slug}`
+    : `/${organization.slug}`;
+
+  const handleCopyPublicLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Public link copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy link', err);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header Banner */}
@@ -104,7 +117,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
 
       {/* Organization Info */}
       <div className="mt-16 sm:mt-20 mb-8">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-4xl font-bold">{organization.name}</h1>
@@ -133,13 +146,23 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
             )}
           </div>
 
-          <Button
-            onClick={handleFollowToggle}
-            disabled={followLoading || followMutation.isPending || unfollowMutation.isPending}
-            variant={isFollowing ? 'outline' : 'default'}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            <Button
+              onClick={handleFollowToggle}
+              disabled={followLoading || followMutation.isPending || unfollowMutation.isPending}
+              variant={isFollowing ? 'outline' : 'default'}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </Button>
+            <button
+              type="button"
+              onClick={handleCopyPublicLink}
+              className="inline-flex items-center justify-center rounded-full border border-border bg-background/80 px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm hover:bg-muted/80 transition-colors"
+            >
+              <span className="mr-1 text-xs">🔗</span>
+              Copy public link
+            </button>
+          </div>
         </div>
 
         {/* Contact Info */}
