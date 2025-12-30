@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/form';
 import { Progress } from '@/components/ui/progress';
 import { AfCard } from '@/components/attendflow/AfCard';
+import { EventCanvasEditor } from '@/components/events/EventCanvasEditor';
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -60,6 +61,7 @@ const eventSchema = z
     bannerUrl: z.string().url('Banner URL must be a valid URL').optional().or(z.literal('')),
     primaryCtaLabel: z.string().trim().optional(),
     secondaryCtaLabel: z.string().trim().optional(),
+    canvasState: z.any().optional(),
   })
   .refine(
     (data) => {
@@ -201,6 +203,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       bannerUrl: '',
       primaryCtaLabel: '',
       secondaryCtaLabel: '',
+      canvasState: undefined,
     },
   });
 
@@ -224,7 +227,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         const { data, error } = await supabase
           .from('events')
           .select(
-            'id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id, branding',
+            'id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id, branding, canvas_state',
           )
           .eq('id', eventId)
           .maybeSingle();
@@ -255,6 +258,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           bannerUrl: (data.branding as any)?.bannerUrl ?? '',
           primaryCtaLabel: (data.branding as any)?.primaryCtaLabel ?? '',
           secondaryCtaLabel: (data.branding as any)?.secondaryCtaLabel ?? '',
+          canvasState: (data as any).canvas_state ?? undefined,
         });
       } catch (err: any) {
         console.error('Failed to load event', err);
@@ -331,6 +335,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
         },
         owner_id: user.id,
+        canvas_state: values.canvasState ?? null,
       };
 
       let createdEventId: string | undefined;
@@ -683,13 +688,29 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
                   {currentStep.id === 'schedule_branding' && (
                     <>
-                      <div className="border-t border-border pt-6">
-                        <h3 className="mb-1 text-lg font-semibold text-foreground">
-                          Date & schedule
-                        </h3>
-                        <p className="mb-5 text-sm text-muted-foreground">
-                          Lock in when things start and wrap up. You can always fine-tune sessions later.
-                        </p>
+                      <div className="border-t border-border pt-6 space-y-6">
+                        <div>
+                          <h3 className="mb-1 text-lg font-semibold text-foreground">
+                            Design & branding
+                          </h3>
+                          <p className="mb-4 text-sm text-muted-foreground max-w-2xl">
+                            Use the canvas to sketch the hero of your event page, then fine-tune colors and imagery below.
+                          </p>
+                          <EventCanvasEditor
+                            value={watchedValues.canvasState}
+                            onChange={(snapshot) => {
+                              form.setValue('canvasState', snapshot, { shouldDirty: true });
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <h4 className="mb-1 text-base font-semibold text-foreground">
+                            Date & schedule
+                          </h4>
+                          <p className="mb-5 text-sm text-muted-foreground">
+                            Lock in when things start and wrap up. You can always fine-tune sessions later.
+                          </p>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                           <FormField
                             control={control}
@@ -848,15 +869,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                   <FormDescription>
                                     If set, registrations will automatically close after this time.
                                   </FormDescription>
-                                  <FormMessage />
+                          <FormMessage />
                                 </FormItem>
                               );
                             }}
                           />
                         </div>
                       </div>
-
                       <div className="border-t border-border pt-6">
+
                         <h3 className="mb-1 text-lg font-semibold text-foreground">Branding</h3>
                         <p className="mb-5 text-sm text-muted-foreground max-w-2xl">
                           Give your event a lightweight visual identity. These settings control how your

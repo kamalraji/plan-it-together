@@ -156,6 +156,7 @@ export type Database = {
       events: {
         Row: {
           branding: Json | null
+          canvas_state: Json | null
           capacity: number | null
           created_at: string
           description: string | null
@@ -172,6 +173,7 @@ export type Database = {
         }
         Insert: {
           branding?: Json | null
+          canvas_state?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
@@ -188,6 +190,7 @@ export type Database = {
         }
         Update: {
           branding?: Json | null
+          canvas_state?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
