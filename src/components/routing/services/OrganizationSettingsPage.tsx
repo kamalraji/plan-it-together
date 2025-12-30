@@ -20,6 +20,9 @@ export const OrganizationSettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [seoTitle, setSeoTitle] = useState('');
+  const [seoDescription, setSeoDescription] = useState('');
+  const [seoImageUrl, setSeoImageUrl] = useState('');
 
   useEffect(() => {
     if (!orgData) return;
@@ -53,6 +56,10 @@ export const OrganizationSettingsPage: React.FC = () => {
         },
       };
     });
+
+    setSeoTitle(orgData.seo_title || '');
+    setSeoDescription(orgData.seo_description || '');
+    setSeoImageUrl(orgData.seo_image_url || '');
   }, [orgData]);
 
   const orgProfileSchema = z.object({
@@ -709,51 +716,120 @@ export const OrganizationSettingsPage: React.FC = () => {
 
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">SEO Settings</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        SEO Title
-                      </label>
-                      <input
-                        type="text"
-                        name="seo_title"
-                        defaultValue={organization.seo_title || ''}
-                        placeholder="Custom page title"
-                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      {errors.seo_title && (
-                        <p className="mt-1 text-sm text-red-600">{errors.seo_title}</p>
-                      )}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          SEO Title
+                        </label>
+                        <input
+                          type="text"
+                          name="seo_title"
+                          value={seoTitle}
+                          onChange={(e) => setSeoTitle(e.target.value)}
+                          placeholder="Custom page title"
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        {errors.seo_title && (
+                          <p className="mt-1 text-sm text-red-600">{errors.seo_title}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          SEO Description
+                        </label>
+                        <textarea
+                          name="seo_description"
+                          rows={3}
+                          value={seoDescription}
+                          onChange={(e) => setSeoDescription(e.target.value)}
+                          placeholder="Short description shown in search and social previews"
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        {errors.seo_description && (
+                          <p className="mt-1 text-sm text-red-600">{errors.seo_description}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          SEO Image URL
+                        </label>
+                        <input
+                          type="url"
+                          name="seo_image_url"
+                          value={seoImageUrl}
+                          onChange={(e) => setSeoImageUrl(e.target.value)}
+                          placeholder="https://.../social-card.png"
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        {errors.seo_image_url && (
+                          <p className="mt-1 text-sm text-red-600">{errors.seo_image_url}</p>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Live SEO Preview */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        SEO Description
-                      </label>
-                      <textarea
-                        name="seo_description"
-                        rows={3}
-                        defaultValue={organization.seo_description || ''}
-                        placeholder="Short description shown in search and social previews"
-                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      {errors.seo_description && (
-                        <p className="mt-1 text-sm text-red-600">{errors.seo_description}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        SEO Image URL
-                      </label>
-                      <input
-                        type="url"
-                        name="seo_image_url"
-                        defaultValue={organization.seo_image_url || ''}
-                        placeholder="https://.../social-card.png"
-                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      {errors.seo_image_url && (
-                        <p className="mt-1 text-sm text-red-600">{errors.seo_image_url}</p>
-                      )}
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">Live Preview</h4>
+                      <p className="text-xs text-gray-500 mb-4">
+                        This is an approximate preview of how your organization page may appear in search
+                        results and social shares. Actual rendering can vary per platform.
+                      </p>
+
+                      {/* Search result style preview */}
+                      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-6">
+                        <p className="text-xs text-gray-500 mb-1 truncate">
+                          {(organization.website || window.location.origin) + `/org/${organization.slug}`}
+                        </p>
+                        <p className="text-sm font-medium text-blue-700 mb-1 truncate">
+                          {(seoTitle || organization.seo_title || organization.name) || 'Organization title'}
+                        </p>
+                        <p className="text-xs text-gray-700 line-clamp-2">
+                          {(
+                            seoDescription ||
+                            organization.seo_description ||
+                            organization.description ||
+                            'Add a concise description to help people understand what your organization does.'
+                          ).slice(0, 200)}
+                        </p>
+                      </div>
+
+                      {/* Social card style preview */}
+                      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                        {(
+                          seoImageUrl ||
+                          organization.seo_image_url ||
+                          organization.banner_url ||
+                          organization.logo_url
+                        ) && (
+                          <div className="h-32 bg-gray-200 overflow-hidden">
+                            <img
+                              src={
+                                seoImageUrl ||
+                                organization.seo_image_url ||
+                                organization.banner_url ||
+                                organization.logo_url
+                              }
+                              alt="SEO preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <p className="text-xs text-gray-500 mb-1 truncate">{window.location.host}</p>
+                          <p className="text-sm font-semibold text-gray-900 mb-1 truncate">
+                            {(seoTitle || organization.seo_title || organization.name) || 'Organization title'}
+                          </p>
+                          <p className="text-xs text-gray-700 line-clamp-2">
+                            {(
+                              seoDescription ||
+                              organization.seo_description ||
+                              organization.description ||
+                              'This is how your organization will appear when shared on social media.'
+                            ).slice(0, 140)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
