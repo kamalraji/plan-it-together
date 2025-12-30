@@ -191,6 +191,12 @@ export const EventPageBuilder: React.FC = () => {
     };
   }, [eventId, toast, navigate, device]);
 
+  const handlePreviewPublicPage = () => {
+    if (!eventId) return;
+    const publicUrl = `${window.location.origin}/events/${eventId}`;
+    window.open(publicUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const handleSave = async () => {
     if (!editorRef.current || !eventId) return;
     const editor = editorRef.current;
@@ -304,6 +310,15 @@ export const EventPageBuilder: React.FC = () => {
                 Mobile
               </button>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePreviewPublicPage}
+              disabled={!eventId}
+            >
+              Preview public page
+            </Button>
             <Button onClick={handleSave} disabled={state.saving} size="sm">
               {state.saving ? 'Saving…' : 'Save & publish'}
             </Button>
