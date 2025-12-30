@@ -7,6 +7,7 @@ import {
   ArrowTrendingUpIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import { AfCard } from '@/components/attendflow/AfCard';
 
 interface DashboardWidget {
   id: string;
@@ -173,15 +174,16 @@ export const ServiceDashboard: React.FC<ServiceDashboardProps> = ({
         {/* Dashboard Widgets */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 auto-rows-fr">
           {widgets.map((widget) => (
-            <div
+            <AfCard
               key={widget.id}
-              className={`bg-card rounded-lg border border-border ${getWidgetSizeClasses(widget.size)}`}
+              subtle
+              className={getWidgetSizeClasses(widget.size)}
             >
               <DashboardWidget widget={widget} />
-            </div>
+            </AfCard>
           ))}
         </div>
- 
+
         {/* Empty State */}
         {widgets.length === 0 && (
           <div className="text-center py-10 sm:py-12">
