@@ -19,6 +19,9 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Progress } from '@/components/ui/progress';
+import { AfCard } from '@/components/attendflow/AfCard';
+
 interface EventFormPageProps {
   mode: 'create' | 'edit';
 }
@@ -278,36 +281,103 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     }
   };
 
-  const pageActions = [
+  const checklistSteps = [
     {
-      label: 'Cancel',
-      action: () => navigate(listPath),
-      icon: XMarkIcon,
-      variant: 'secondary' as const,
+      id: 'basic',
+      label: 'Basic details',
+      description: 'Name, org, description, and format.',
+      fields: ['organizationId', 'name', 'description', 'mode'],
     },
     {
-      label: mode === 'create' ? 'Save & continue to workspace' : 'Save Changes',
-      action: () => {
-        const formEl = document.getElementById('event-form') as HTMLFormElement | null;
-        if (formEl) {
-          if (typeof formEl.requestSubmit === 'function') {
-            formEl.requestSubmit();
-          } else {
-            formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-          }
-        }
-      },
-      icon: CheckIcon,
-      variant: 'primary' as const,
+      id: 'schedule',
+      label: 'Schedule',
+      description: 'Start, end, and optional deadline.',
+      fields: ['startDate', 'endDate'],
     },
-  ];
+    {
+      id: 'branding',
+      label: 'Branding',
+      description: 'Colors, logo, and hero content.',
+      fields: ['primaryColor', 'logoUrl', 'heroSubtitle', 'bannerUrl'],
+    },
+    {
+      id: 'publish',
+      label: 'Workspace & publish',
+      description: "We'll hand off to a workspace after this.",
+      fields: ['primaryCtaLabel', 'secondaryCtaLabel'],
+    },
+  ] as const;
+
+  const watchedValues = watch();
+
+  const completedSteps = checklistSteps.filter((step) =>
+    step.fields.every((field) => {
+      const value = (watchedValues as any)[field];
+      if (typeof value === 'string') return value.trim().length > 0;
+      return !!value;
+    }),
+  );
+
+  const progressValue = (completedSteps.length / checklistSteps.length) * 100;
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background af-grid-bg px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto space-y-6">
         <PageHeader title={pageTitle} subtitle={pageSubtitle} actions={pageActions} />
 
-        <div className="mt-6 rounded-2xl border border-border bg-card/60 p-6 shadow-soft">
+        <AfCard className="p-5 sm:p-6">
+          <div className="mb-6 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-semibold tracking-tight text-foreground">
+                  Event creation checklist
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  We9ll guide you through the basics so your public page looks great from day one.
+                </p>
+              </div>
+              <p className="text-[11px] sm:text-xs text-muted-foreground whitespace-nowrap">
+                {completedSteps.length} of {checklistSteps.length} steps complete
+              </p>
+            </div>
+            <Progress value={progressValue} className="h-1.5 rounded-full bg-muted/60" />
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-4 gap-2.5">
+              {checklistSteps.map((step) => {
+                const isDone = completedSteps.some((s) => s.id === step.id);
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    className={cn(
+                      'group flex flex-col items-start rounded-2xl border px-3 py-2 text-left transition-colors',
+                      isDone
+                        ? 'border-primary/60 bg-primary/5 text-foreground'
+                        : 'border-border bg-background/40 hover:bg-muted/60',
+                    )}
+                  >
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span
+                        className={cn(
+                          'inline-flex h-4 w-4 items-center justify-center rounded-full border text-[10px]',
+                          isDone
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background text-muted-foreground',
+                        )}
+                        aria-hidden="true"
+                      >
+                        {isDone ? <CheckIcon className="h-3 w-3" /> : step.id === 'basic' ? 1 : step.id === 'schedule' ? 2 : step.id === 'branding' ? 3 : 4}
+                      </span>
+                      <span className="text-xs font-medium tracking-tight">{step.label}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground group-hover:text-foreground/80">
+                      {step.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {isLoadingEvent ? (
             <div className="py-12 text-center text-sm text-muted-foreground">Loading event...</div>
           ) : (
@@ -482,7 +552,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </div>
 
                 <div className="border-t border-border pt-6">
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Date and Time</h3>
+                  <h3 className="mb-1 text-lg font-semibold text-foreground">Date & schedule</h3>
+                  <p className="mb-5 text-sm text-muted-foreground">
+                    Lock in when things start and wrap up. You can always fine-tune sessions later.
+                  </p>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <FormField
                       control={control}
@@ -491,7 +564,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
                           <FormItem>
-                            <FormLabel>Start Date *</FormLabel>
+                            <FormLabel>Start date & time *</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -507,7 +580,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                     {dateValue ? (
                                       format(dateValue, 'PPP p')
                                     ) : (
-                                      <span>Select start date & time</span>
+                                      <span>Select when your event kicks off</span>
                                     )}
                                   </Button>
                                 </PopoverTrigger>
@@ -529,7 +602,9 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                 </PopoverContent>
                               </Popover>
                             </FormControl>
-                            <FormDescription>Times are saved using your current timezone.</FormDescription>
+                            <FormDescription>
+                              We9ll store this in your local timezone and display it clearly for attendees.
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         );
@@ -543,7 +618,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
                           <FormItem>
-                            <FormLabel>End Date *</FormLabel>
+                            <FormLabel>End date & time *</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -559,7 +634,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                     {dateValue ? (
                                       format(dateValue, 'PPP p')
                                     ) : (
-                                      <span>Select end date & time</span>
+                                      <span>When should things wrap up?</span>
                                     )}
                                   </Button>
                                 </PopoverTrigger>
@@ -581,7 +656,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                 </PopoverContent>
                               </Popover>
                             </FormControl>
-                            <FormDescription>Must be after the start date.</FormDescription>
+                            <FormDescription>Must be after your start time so attendees don9t get confused.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         );
@@ -595,7 +670,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         const dateValue = field.value ? new Date(field.value) : undefined;
                         return (
                           <FormItem>
-                            <FormLabel>Registration Deadline</FormLabel>
+                            <FormLabel>Registration deadline</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -611,7 +686,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                     {dateValue ? (
                                       format(dateValue, 'PPP p')
                                     ) : (
-                                      <span>Select registration deadline (optional)</span>
+                                      <span>Optional: last moment people can sign up</span>
                                     )}
                                   </Button>
                                 </PopoverTrigger>
@@ -634,7 +709,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               </Popover>
                             </FormControl>
                             <FormDescription>
-                              Optional: registrations will be closed after this time.
+                              If set, registrations will automatically close after this time.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -645,7 +720,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </div>
 
                 <div className="border-t border-border pt-6">
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">Branding</h3>
+                  <h3 className="mb-1 text-lg font-semibold text-foreground">Branding</h3>
+                  <p className="mb-5 text-sm text-muted-foreground max-w-2xl">
+                    Give your event a lightweight visual identity. These settings control how your public page feels, not a full design system.
+                  </p>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="space-y-6">
                       <FormField
@@ -653,7 +731,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="primaryColor"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Primary Color</FormLabel>
+                            <FormLabel>Primary color</FormLabel>
                             <FormControl>
                               <Input
                                 type="color"
@@ -662,7 +740,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               />
                             </FormControl>
                             <FormDescription>
-                              This color will be used as the accent for your event branding.
+                              We9ll use this as the accent for buttons and highlights on your event page.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -683,7 +761,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               />
                             </FormControl>
                             <FormDescription>
-                              Optional: link to an image that will appear on your public event page.
+                              Optional: paste a direct image URL and we9ll show it in the header of your event page.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -695,16 +773,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="heroSubtitle"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Hero Subtitle</FormLabel>
+                            <FormLabel>Hero subtitle</FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
-                                placeholder="Short tagline shown under the event name"
+                                placeholder="One line that helps people instantly get the vibe"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription>
-                              Optional short sentence to make your landing hero more compelling.
+                              Short and friendly works best here  think of it as the elevator pitch under your title.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -716,7 +794,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="bannerUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Hero Banner Image URL</FormLabel>
+                            <FormLabel>Hero banner image URL</FormLabel>
                             <FormControl>
                               <Input
                                 type="url"
@@ -725,7 +803,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               />
                             </FormControl>
                             <FormDescription>
-                              Optional background image for the top section of your public event page.
+                              Optional: use a wide image and we9ll handle the rest for the top of your landing page.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -737,7 +815,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="primaryCtaLabel"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Primary Button Label</FormLabel>
+                            <FormLabel>Primary button label</FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
@@ -746,7 +824,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               />
                             </FormControl>
                             <FormDescription>
-                              Text for the main call-to-action button on your landing page.
+                              This is the main call-to-action visitors will see on your event hero.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -758,7 +836,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         name="secondaryCtaLabel"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Secondary Button Label</FormLabel>
+                            <FormLabel>Secondary button label</FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
@@ -767,7 +845,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                               />
                             </FormControl>
                             <FormDescription>
-                              Optional secondary action shown next to the main button.
+                              Optional: a softer action that can point to a schedule, FAQ, or extra details.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>

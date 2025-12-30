@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
+import { AfCard } from '@/components/attendflow/AfCard';
 
 export function OrganizerSpecificDashboard() {
   const { user, logout } = useAuth();
@@ -23,7 +24,7 @@ export function OrganizerSpecificDashboard() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-primary/5" />
 
           <div className="relative px-4 sm:px-10 py-4 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="max-w-xl rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl px-4 sm:px-6 py-3 sm:py-4 shadow-2xl">
+            <AfCard subtle className="max-w-xl px-4 sm:px-6 py-3 sm:py-4">
               <p className="text-xs sm:text-sm text-muted-foreground mb-1">/ Organizer console</p>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 Organizer Dashboard
@@ -31,10 +32,10 @@ export function OrganizerSpecificDashboard() {
               <p className="mt-2 text-sm sm:text-base text-muted-foreground">
                 Welcome back, {displayName}. Use this hub to access and manage all of your organizations.
               </p>
-            </div>
+            </AfCard>
 
             <div className="flex flex-col items-stretch xs:items-end gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl px-4 py-3 shadow-xl min-w-[220px] max-w-xs self-stretch sm:self-auto">
+              <AfCard subtle className="px-4 py-3 min-w-[220px] max-w-xs self-stretch sm:self-auto">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                   Organizer account
                 </p>
@@ -42,7 +43,7 @@ export function OrganizerSpecificDashboard() {
                 <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
                   Select an organization below to open its full dashboard.
                 </p>
-              </div>
+              </AfCard>
 
               <button
                 onClick={logout}
@@ -104,9 +105,10 @@ export function OrganizerSpecificDashboard() {
           ) : (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {memberOrganizations.map((org: any) => (
-                <div
+                <AfCard
                   key={org.id}
-                  className="rounded-2xl border border-border bg-card/80 p-4 sm:p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow"
+                  subtle
+                  className="p-4 sm:p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -138,7 +140,7 @@ export function OrganizerSpecificDashboard() {
                       Settings
                     </Link>
                   </div>
-                </div>
+                </AfCard>
               ))}
             </div>
           )}
