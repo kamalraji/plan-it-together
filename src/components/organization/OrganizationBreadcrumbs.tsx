@@ -13,6 +13,7 @@ export interface OrganizationBreadcrumbItem {
   label: string;
   href?: string;
   isCurrent?: boolean;
+  icon?: React.ReactNode;
 }
 
 interface OrganizationBreadcrumbsProps {
@@ -46,14 +47,16 @@ export const OrganizationBreadcrumbs: React.FC<OrganizationBreadcrumbsProps> = (
                   <BreadcrumbLink asChild>
                     <Link
                       to={item.href}
-                      className="rounded-full px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-primary sm:text-xs"
+                      className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-primary sm:text-xs"
                     >
-                      {item.label}
+                      {item.icon}
+                      <span>{item.label}</span>
                     </Link>
                   </BreadcrumbLink>
                 ) : (
-                  <BreadcrumbPage className="rounded-full bg-muted/60 px-2 py-1 text-[11px] font-semibold text-foreground sm:text-xs">
-                    {item.label}
+                  <BreadcrumbPage className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-1 text-[11px] font-semibold text-foreground sm:text-xs">
+                    {item.icon}
+                    <span>{item.label}</span>
                   </BreadcrumbPage>
                 )}
               </BreadcrumbItem>
