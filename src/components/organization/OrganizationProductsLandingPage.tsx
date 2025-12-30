@@ -159,6 +159,13 @@ export const OrganizationProductsLandingPage: React.FC = () => {
     );
   }
 
+  const handleScrollToProducts = () => {
+    const el = document.getElementById('org-products-list');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
       <section className="container mx-auto px-4 pt-8 pb-4 space-y-3 animate-fade-in">
@@ -183,18 +190,29 @@ export const OrganizationProductsLandingPage: React.FC = () => {
         <p className="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Products
         </p>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-          Products from{' '}
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {organization.name}
-          </span>
-        </h1>
-        <p className="mt-1 text-sm sm:text-base text-muted-foreground max-w-2xl">
-          Browse products, programs, and resources offered by this organization.
-        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1.5 sm:space-y-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+              Products from{' '}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {organization.name}
+              </span>
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+              Browse products, programs, and resources offered by this organization.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleScrollToProducts}
+            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs sm:text-sm font-medium text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:shadow-lg hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px mt-1 sm:mt-0 self-start sm:self-auto"
+          >
+            Explore featured products
+          </button>
+        </div>
       </section>
 
-      <section className="container mx-auto px-4 pb-10">
+      <section className="container mx-auto px-4 pb-10" id="org-products-list">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(260px,1.2fr)]">
           <div className="animate-fade-in">
             <OrganizationProductsSection
