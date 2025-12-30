@@ -687,7 +687,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   )}
 
                   {currentStep.id === 'schedule_branding' && (
-                    <>
+                    <div className="space-y-6">
                       <div className="border-t border-border pt-6 space-y-6">
                         <div>
                           <h3 className="mb-1 text-lg font-semibold text-foreground">
@@ -711,173 +711,174 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           <p className="mb-5 text-sm text-muted-foreground">
                             Lock in when things start and wrap up. You can always fine-tune sessions later.
                           </p>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                          <FormField
-                            control={control}
-                            name="startDate"
-                            render={({ field }) => {
-                              const dateValue = field.value ? new Date(field.value) : undefined;
-                              return (
-                                <FormItem>
-                                  <FormLabel>Start date & time *</FormLabel>
-                                  <FormControl>
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          className={cn(
-                                            'w-full justify-start text-left font-normal',
-                                            !dateValue && 'text-muted-foreground',
-                                          )}
-                                        >
-                                          <CalendarIcon className="mr-2 h-4 w-4" />
-                                          {dateValue ? (
-                                            format(dateValue, 'PPP p')
-                                          ) : (
-                                            <span>Select when your event kicks off</span>
-                                          )}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                          mode="single"
-                                          selected={dateValue}
-                                          onSelect={(date) => {
-                                            if (!date) {
-                                              field.onChange('');
-                                              return;
-                                            }
-                                            const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                            field.onChange(formatted);
-                                          }}
-                                          initialFocus
-                                          className={cn('p-3 pointer-events-auto')}
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-                                  </FormControl>
-                                  <FormDescription>
-                                    We’ll store this in your local timezone and display it clearly for
-                                    attendees.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              );
-                            }}
-                          />
+                          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <FormField
+                              control={control}
+                              name="startDate"
+                              render={({ field }) => {
+                                const dateValue = field.value ? new Date(field.value) : undefined;
+                                return (
+                                  <FormItem>
+                                    <FormLabel>Start date & time *</FormLabel>
+                                    <FormControl>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            className={cn(
+                                              'w-full justify-start text-left font-normal',
+                                              !dateValue && 'text-muted-foreground',
+                                            )}
+                                          >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {dateValue ? (
+                                              format(dateValue, 'PPP p')
+                                            ) : (
+                                              <span>Select when your event kicks off</span>
+                                            )}
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                          <Calendar
+                                            mode="single"
+                                            selected={dateValue}
+                                            onSelect={(date) => {
+                                              if (!date) {
+                                                field.onChange('');
+                                                return;
+                                              }
+                                              const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                              field.onChange(formatted);
+                                            }}
+                                            initialFocus
+                                            className={cn('p-3 pointer-events-auto')}
+                                          />
+                                        </PopoverContent>
+                                      </Popover>
+                                    </FormControl>
+                                    <FormDescription>
+                                      We’ll store this in your local timezone and display it clearly for
+                                      attendees.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                );
+                              }}
+                            />
 
-                          <FormField
-                            control={control}
-                            name="endDate"
-                            render={({ field }) => {
-                              const dateValue = field.value ? new Date(field.value) : undefined;
-                              return (
-                                <FormItem>
-                                  <FormLabel>End date & time *</FormLabel>
-                                  <FormControl>
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          className={cn(
-                                            'w-full justify-start text-left font-normal',
-                                            !dateValue && 'text-muted-foreground',
-                                          )}
-                                        >
-                                          <CalendarIcon className="mr-2 h-4 w-4" />
-                                          {dateValue ? (
-                                            format(dateValue, 'PPP p')
-                                          ) : (
-                                            <span>When should things wrap up?</span>
-                                          )}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                          mode="single"
-                                          selected={dateValue}
-                                          onSelect={(date) => {
-                                            if (!date) {
-                                              field.onChange('');
-                                              return;
-                                            }
-                                            const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                            field.onChange(formatted);
-                                          }}
-                                          initialFocus
-                                          className={cn('p-3 pointer-events-auto')}
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-                                  </FormControl>
-                                  <FormDescription>
-                                    Must be after your start time so attendees don’t get confused.
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              );
-                            }}
-                          />
+                            <FormField
+                              control={control}
+                              name="endDate"
+                              render={({ field }) => {
+                                const dateValue = field.value ? new Date(field.value) : undefined;
+                                return (
+                                  <FormItem>
+                                    <FormLabel>End date & time *</FormLabel>
+                                    <FormControl>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            className={cn(
+                                              'w-full justify-start text-left font-normal',
+                                              !dateValue && 'text-muted-foreground',
+                                            )}
+                                          >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {dateValue ? (
+                                              format(dateValue, 'PPP p')
+                                            ) : (
+                                              <span>When should things wrap up?</span>
+                                            )}
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                          <Calendar
+                                            mode="single"
+                                            selected={dateValue}
+                                            onSelect={(date) => {
+                                              if (!date) {
+                                                field.onChange('');
+                                                return;
+                                              }
+                                              const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                              field.onChange(formatted);
+                                            }}
+                                            initialFocus
+                                            className={cn('p-3 pointer-events-auto')}
+                                          />
+                                        </PopoverContent>
+                                      </Popover>
+                                    </FormControl>
+                                    <FormDescription>
+                                      Must be after your start time so attendees don’t get confused.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                );
+                              }}
+                            />
 
-                          <FormField
-                            control={control}
-                            name="registrationDeadline"
-                            render={({ field }) => {
-                              const dateValue = field.value ? new Date(field.value) : undefined;
-                              return (
-                                <FormItem>
-                                  <FormLabel>Registration deadline</FormLabel>
-                                  <FormControl>
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          className={cn(
-                                            'w-full justify-start text-left font-normal',
-                                            !dateValue && 'text-muted-foreground',
-                                          )}
-                                        >
-                                          <CalendarIcon className="mr-2 h-4 w-4" />
-                                          {dateValue ? (
-                                            format(dateValue, 'PPP p')
-                                          ) : (
-                                            <span>Optional: last moment people can sign up</span>
-                                          )}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                          mode="single"
-                                          selected={dateValue}
-                                          onSelect={(date) => {
-                                            if (!date) {
-                                              field.onChange('');
-                                              return;
-                                            }
-                                            const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                            field.onChange(formatted);
-                                          }}
-                                          initialFocus
-                                          className={cn('p-3 pointer-events-auto')}
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-                                  </FormControl>
-                                  <FormDescription>
-                                    If set, registrations will automatically close after this time.
-                                  </FormDescription>
-                          <FormMessage />
-                                </FormItem>
-                              );
-                            }}
-                          />
+                            <FormField
+                              control={control}
+                              name="registrationDeadline"
+                              render={({ field }) => {
+                                const dateValue = field.value ? new Date(field.value) : undefined;
+                                return (
+                                  <FormItem>
+                                    <FormLabel>Registration deadline</FormLabel>
+                                    <FormControl>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            className={cn(
+                                              'w-full justify-start text-left font-normal',
+                                              !dateValue && 'text-muted-foreground',
+                                            )}
+                                          >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {dateValue ? (
+                                              format(dateValue, 'PPP p')
+                                            ) : (
+                                              <span>Optional: last moment people can sign up</span>
+                                            )}
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                          <Calendar
+                                            mode="single"
+                                            selected={dateValue}
+                                            onSelect={(date) => {
+                                              if (!date) {
+                                                field.onChange('');
+                                                return;
+                                              }
+                                              const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                              field.onChange(formatted);
+                                            }}
+                                            initialFocus
+                                            className={cn('p-3 pointer-events-auto')}
+                                          />
+                                        </PopoverContent>
+                                      </Popover>
+                                    </FormControl>
+                                    <FormDescription>
+                                      If set, registrations will automatically close after this time.
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="border-t border-border pt-6">
 
+                      <div className="border-t border-border pt-6">
                         <h3 className="mb-1 text-lg font-semibold text-foreground">Branding</h3>
                         <p className="mb-5 text-sm text-muted-foreground max-w-2xl">
                           Give your event a lightweight visual identity. These settings control how your
@@ -975,7 +976,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           </div>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
 
                   {currentStep.id === 'workspace' && (
