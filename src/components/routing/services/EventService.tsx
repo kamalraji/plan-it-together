@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '../../../types';
 import { RequireEventAccess } from './RequireEventAccess';
 import { EventAnalyticsOverviewPage } from './EventAnalyticsOverviewPage';
+import { EventAnalyticsPage } from './EventAnalyticsPage';
 
 /**
  * EventService component provides the main routing structure for the Event Management Service.
@@ -72,7 +73,7 @@ export const EventService: React.FC = () => {
         path=":eventId/analytics"
         element={
           <EventAccessRoute requireManage>
-            <EventDetailPage defaultTab="analytics" />
+            <EventAnalyticsPage />
           </EventAccessRoute>
         }
       />
