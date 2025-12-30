@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 const navLinks = [
@@ -18,6 +19,22 @@ const scrollToId = (id: string) => {
 const AttendflowLanding = () => {
   const navigate = useNavigate();
   const [logoOrgs, setLogoOrgs] = useState<{ id: string; name: string; logo_url: string | null }[]>([]);
+  const { data: publicEvents } = useQuery({
+    queryKey: ["public-events"],
+    staleTime: 1000 * 60 * 10,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("id, name, description, start_date, end_date, visibility, status")
+        .eq("visibility", "PUBLIC")
+        .in("status", ["PUBLISHED", "ONGOING"])
+        .order("start_date", { ascending: true })
+        .limit(6);
+
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   useEffect(() => {
     const title = "Event marketing workspace | Thittam1Hub";
     document.title = title;
@@ -251,6 +268,66 @@ const AttendflowLanding = () => {
           </div>
         </section>
 
+        {/* Public events preview */}
+        <motion.section
+          id="events"
+          className="border-t border-border/60 bg-background/95 py-14 md:py-18"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <div className="container space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Public events on Thittam1Hub</h2>
+                <p className="text-sm text-muted-foreground max-w-xl">
+                  A small snapshot of events that organizers have chosen to list publicly. Browse the full directory to
+                  see more.
+                </p>
+              </div>
+              <Link
+                to="/events"
+                className="inline-flex items-center justify-center rounded-full border border-border/60 bg-background px-4 py-2 text-xs md:text-sm font-medium text-foreground hover:bg-muted/80"
+              >
+                View all events
+              </Link>
+            </div>
+
+            {publicEvents && publicEvents.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {publicEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="rounded-2xl border border-border/60 bg-card/80 p-4 flex flex-col justify-between text-sm shadow-sm"
+                  >
+                    <div className="space-y-1">
+                      <h3 className="font-semibold text-foreground line-clamp-2">{event.name}</h3>
+                      {event.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-3">{event.description}</p>
+                      )}
+                      <p className="text-[11px] text-muted-foreground/80 mt-1">
+                        {new Date(event.start_date).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <span className="mt-3 inline-flex items-center rounded-full border border-border/60 px-2 py-0.5 text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
+                      Public event
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground/80">
+                When organizers publish public events, a rotating sample will appear here for quick discovery.
+              </p>
+            )}
+          </div>
+        </motion.section>
+
         {/* Feature strips */}
         <motion.section
           id="features"
@@ -284,8 +361,6 @@ const AttendflowLanding = () => {
             </div>
           </div>
         </motion.section>
-
-        {/* Workflow section */}
         <motion.section
           id="workflow"
           className="border-t border-border/60 bg-background/95 py-16 md:py-20"
