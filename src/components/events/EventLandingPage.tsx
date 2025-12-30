@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { EventCanvasHero } from './EventCanvasHero';
 
 interface EventLandingPageProps {
   eventId?: string;
@@ -17,7 +18,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
-  // Fetch event details directly from Lovable Cloud
+  // Fetch event details directly from Supabase
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
@@ -38,16 +39,16 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         startDate: data.start_date || '',
         endDate: data.end_date || '',
         capacity: data.capacity ?? undefined,
-        registrationDeadline: data.registration_deadline || undefined,
-        organizerId: data.organizer_id,
+        registrationDeadline: (data as any).registration_deadline || undefined,
+        organizerId: (data as any).organizer_id,
         organizationId: data.organization_id || undefined,
         visibility: data.visibility as EventVisibility,
-        inviteLink: data.invite_link || undefined,
+        inviteLink: (data as any).invite_link || undefined,
         branding: (data.branding as any) || {},
-        venue: (data.venue as any) || undefined,
-        virtualLinks: (data.virtual_links as any) || undefined,
+        venue: (data as any).venue || undefined,
+        virtualLinks: (data as any).virtual_links || undefined,
         status: data.status as any,
-        landingPageUrl: data.landing_page_url || '',
+        landingPageUrl: (data as any).landing_page_url || '',
         timeline: [],
         agenda: [],
         prizes: [],
@@ -55,6 +56,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         organization: undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
+        canvasState: (data as any).canvas_state ?? undefined,
       };
 
       return mappedEvent;
@@ -172,6 +174,15 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Optional custom designed hero canvas */}
+      {event.canvasState && (
+        <section className="border-b border-border bg-background/40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+            <EventCanvasHero snapshot={event.canvasState} />
+          </div>
+        </section>
+      )}
+
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
       <div
         className="relative text-primary-foreground bg-gradient-to-r from-primary to-accent overflow-hidden"
