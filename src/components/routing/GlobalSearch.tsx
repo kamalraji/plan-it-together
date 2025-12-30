@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { preferenceStorage } from '@/lib/storage';
 import {
   MagnifyingGlassIcon,
   ClockIcon,
@@ -118,15 +119,11 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Load recent searches from localStorage
+  // Load recent searches from centralized preference storage
   useEffect(() => {
-    const saved = localStorage.getItem('globalSearchRecent');
+    const saved = preferenceStorage.getJSON<string[]>('globalSearchRecent');
     if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved));
-      } catch (error) {
-        console.error('Failed to load recent searches:', error);
-      }
+      setRecentSearches(saved);
     }
   }, []);
 
@@ -224,7 +221,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     // Add to recent searches
     const newRecent = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
     setRecentSearches(newRecent);
-    localStorage.setItem('globalSearchRecent', JSON.stringify(newRecent));
+    preferenceStorage.setJSON('globalSearchRecent', newRecent);
 
     // Perform search
     onSearch(query);
@@ -238,7 +235,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     const searchTerm = result.title;
     const newRecent = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
     setRecentSearches(newRecent);
-    localStorage.setItem('globalSearchRecent', JSON.stringify(newRecent));
+    preferenceStorage.setJSON('globalSearchRecent', newRecent);
 
     navigate(result.url);
     setIsOpen(false);
@@ -255,7 +252,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
   const clearRecentSearches = () => {
     setRecentSearches([]);
-    localStorage.removeItem('globalSearchRecent');
+    preferenceStorage.remove('globalSearchRecent');
   };
 
   return (

@@ -4,13 +4,14 @@
  */
 
 import { useState, useEffect } from 'react';
+import { preferenceStorage } from '@/lib/storage';
 
 export type Theme = 'light' | 'dark' | 'system';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check localStorage first, then system preference
-    const stored = localStorage.getItem('theme') as Theme;
+    // Check stored preference first, then system preference
+    const stored = preferenceStorage.getString('theme') as Theme | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) {
       return stored;
     }
@@ -46,8 +47,8 @@ export const useTheme = () => {
       root.classList.remove('dark');
     }
 
-    // Store theme preference
-    localStorage.setItem('theme', theme);
+    // Store theme preference (non-sensitive)
+    preferenceStorage.setString('theme', theme);
   }, [theme, systemTheme]);
 
   const setThemeMode = (newTheme: Theme) => {
