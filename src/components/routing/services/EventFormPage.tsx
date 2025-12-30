@@ -281,6 +281,30 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     }
   };
 
+  const pageActions = [
+    {
+      label: 'Cancel',
+      action: () => navigate(listPath),
+      icon: XMarkIcon,
+      variant: 'secondary' as const,
+    },
+    {
+      label: mode === 'create' ? 'Save & continue to workspace' : 'Save Changes',
+      action: () => {
+        const formEl = document.getElementById('event-form') as HTMLFormElement | null;
+        if (formEl) {
+          if (typeof formEl.requestSubmit === 'function') {
+            formEl.requestSubmit();
+          } else {
+            formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+        }
+      },
+      icon: CheckIcon,
+      variant: 'primary' as const,
+    },
+  ];
+
   const checklistSteps = [
     {
       id: 'basic',
@@ -942,7 +966,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
               </form>
             </Form>
           )}
-        </div>
+        </AfCard>
 
         <div className="mt-6 bg-blue-50 rounded-lg p-4">
           <h4 className="text-sm font-medium text-blue-900 mb-2">Need Help?</h4>
