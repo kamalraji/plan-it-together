@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCurrentOrganization } from './OrganizationContext';
 import {
@@ -11,14 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon, UsersIcon, TrophyIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { OrganizationReportExport } from './OrganizationReportExport';
+import { supabase } from '@/integrations/supabase/client';
+import { Tables } from '@/integrations/supabase/types';
 
 export const OrgScopedAnalyticsPage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { data: memberships, isLoading: membershipsLoading } = useMyOrganizationMemberships();
   const { data: analytics, isLoading: analyticsLoading } = useOrganizationAnalytics(organization?.id);
   const { data: events, isLoading: eventsLoading } = useOrganizationEvents(organization?.id!);
+  const [products, setProducts] = useState<Tables<'organization_products'>[] | null>(null);
+  const [productsLoading, setProductsLoading] = useState(false);
 
-  const isLoading = membershipsLoading || analyticsLoading || eventsLoading;
+  const isLoading = membershipsLoading || analyticsLoading || eventsLoading || productsLoading;
 
   const activeMembership = useMemo(() => {
     if (!memberships || !organization) return undefined;
@@ -29,6 +33,36 @@ export const OrgScopedAnalyticsPage: React.FC = () => {
       (m.role === 'OWNER' || m.role === 'ADMIN'),
     );
   }, [memberships, organization]);
+
+  useEffect(() => {
+    if (!organization?.id) return;
+
+    let isMounted = true;
+    setProductsLoading(true);
+
+    supabase
+      .from('organization_products')
+      .select('*')
+      .eq('organization_id', organization.id)
+      .order('click_count', { ascending: false })
+      .order('impression_count', { ascending: false })
+      .limit(10)
+      .then(({ data, error }) => {
+        if (!isMounted) return;
+        if (error) {
+          console.error('Failed to load product analytics', error);
+          setProducts(null);
+        } else {
+          setProducts(data ?? []);
+        }
+        setProductsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [organization?.id]);
+
 
   if (!organization) {
     return (
@@ -94,6 +128,16 @@ export const OrgScopedAnalyticsPage: React.FC = () => {
       })
       .slice(0, 3);
   }, [events]);
+
+  const topProducts = useMemo(() => {
+    if (!products || products.length === 0) return [] as Tables<'organization_products'>[];
+
+    return [...products]
+      .filter((p) => p.status === 'ACTIVE')
+      .sort((a, b) => (b.click_count ?? 0) - (a.click_count ?? 0))
+      .slice(0, 5);
+  }, [products]);
+
 
   const statCards = [
     { title: 'Total events', value: totalEvents, icon: CalendarIcon },
@@ -227,11 +271,29 @@ export const OrgScopedAnalyticsPage: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-semibold sm:text-base">Tips</CardTitle>
+              <CardTitle className="text-sm font-semibold sm:text-base">Product performance</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-xs text-muted-foreground">
-              <p>Use active and completed events to understand how your programs perform over time.</p>
-              <p>Track followers and registrations to measure marketing impact across campaigns.</p>
+            <CardContent className="space-y-3 text-xs sm:text-sm">
+              {(!topProducts || topProducts.length === 0) && (
+                <p className="text-muted-foreground">
+                  No product analytics yet. Add products and share your organization page to start
+                  collecting impressions and clicks.
+                </p>
+              )}
+              {topProducts.map((product) => {
+                const impressions = Number(product.impression_count ?? 0);
+                const clicks = Number(product.click_count ?? 0);
+                const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(1) : '0.0';
+
+                return (
+                  <div key={product.id} className="space-y-0.5">
+                    <p className="font-medium truncate">{product.name}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {impressions} impressions · {clicks} clicks · {ctr}% CTR
+                    </p>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
         </div>
@@ -239,3 +301,4 @@ export const OrgScopedAnalyticsPage: React.FC = () => {
     </div>
   );
 };
+
