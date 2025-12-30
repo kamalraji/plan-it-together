@@ -23,6 +23,7 @@ const verifyEmailSchema = z.object({
   token: z.string().min(1, 'Token is required'),
 });
 
+// Kept for backward compatibility during migration; new flows use httpOnly cookie
 const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
@@ -86,10 +87,29 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     // Login user
     const result = await authService.login(validatedData);
 
-    res.json({
-      success: true,
-      data: result,
-    });
+    const isProd = process.env.NODE_ENV === 'production';
+
+    // Set httpOnly cookies for access and refresh tokens
+    res
+      .cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      })
+      .cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        path: '/api/auth',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
+      .json({
+        success: true,
+        data: {
+          user: result.user,
+        },
+      });
   } catch (error: any) {
     if (error.name === 'ZodError') {
       res.status(400).json({
@@ -164,16 +184,60 @@ router.post('/verify-email', async (req: Request, res: Response): Promise<void> 
  */
 router.post('/refresh-token', async (req: Request, res: Response): Promise<void> => {
   try {
-    // Validate request body
-    const validatedData = refreshTokenSchema.parse(req.body);
+    // Prefer httpOnly cookie; fall back to body for backward compatibility
+    const cookieHeader = req.headers.cookie;
+    let cookieRefreshToken: string | null = null;
+
+    if (cookieHeader) {
+      for (const part of cookieHeader.split(';')) {
+        const [rawKey, rawValue] = part.split('=');
+        if (rawKey && rawKey.trim() === 'refreshToken') {
+          cookieRefreshToken = decodeURIComponent(rawValue ?? '');
+          break;
+        }
+      }
+    }
+
+    const bodyToken = typeof req.body?.refreshToken === 'string' ? req.body.refreshToken : undefined;
+    const refreshToken = cookieRefreshToken || bodyToken;
+
+    if (!refreshToken) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'TOKEN_REFRESH_FAILED',
+          message: 'No refresh token provided',
+          timestamp: new Date().toISOString(),
+        },
+      });
+      return;
+    }
 
     // Refresh token
-    const result = await authService.refreshToken(validatedData.refreshToken);
+    const result = await authService.refreshToken(refreshToken);
 
-    res.json({
-      success: true,
-      data: result,
-    });
+    const isProd = process.env.NODE_ENV === 'production';
+
+    res
+      .cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000,
+      })
+      .cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        path: '/api/auth',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        success: true,
+        data: {
+          user: result.user,
+        },
+      });
   } catch (error: any) {
     if (error.name === 'ZodError') {
       res.status(400).json({

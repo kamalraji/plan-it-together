@@ -53,8 +53,8 @@ export const OrganizationReportExport: React.FC<OrganizationReportExportProps> =
 
       const response = await fetch(`/api/organizations/${organizationId}/analytics/export`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ format }),

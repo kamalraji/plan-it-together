@@ -60,8 +60,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
       }
 
       const response = await fetch(`${endpoint}?${params}`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -97,8 +97,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
       const response = await fetch(endpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ format, ...options }),
