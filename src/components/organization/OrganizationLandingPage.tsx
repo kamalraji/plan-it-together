@@ -226,7 +226,7 @@ export const OrganizationLandingPage: React.FC = () => {
           </h2>
           <Link
             to={`/${organization.slug}/products`}
-            className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:shadow-md transition-shadow"
+            className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px"
           >
             <Package className="h-3 w-3" aria-hidden="true" />
             <span>View all products</span>
