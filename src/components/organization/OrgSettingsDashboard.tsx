@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCurrentOrganization } from './OrganizationContext';
+import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
 
 /**
  * OrgSettingsDashboard
@@ -19,10 +20,28 @@ export const OrgSettingsDashboard: React.FC = () => {
   return (
     <main className="min-h-screen bg-transparent">
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
-        <span className="text-muted-foreground/70">Settings</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Organization</span>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2">
+        <OrganizationBreadcrumbs
+          items={[
+            {
+              label: organization.name,
+              href: `/${organization.slug}`,
+              icon: (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                  {organization.name.charAt(0).toUpperCase()}
+                </span>
+              ),
+            },
+            {
+              label: 'Settings',
+            },
+            {
+              label: 'Organization',
+              isCurrent: true,
+            },
+          ]}
+          className="text-xs sm:text-sm"
+        />
       </div>
 
       {/* Hero */}
