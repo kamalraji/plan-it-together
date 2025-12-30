@@ -347,9 +347,23 @@ export const EventServiceDashboard: React.FC = () => {
                         </Link>
                         <Link
                           to={eventEditPath(event.id)}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground mr-3 sm:mr-4"
                         >
                           Edit
+                        </Link>
+                        <Link
+                          to={`/events/${event.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
+                        >
+                          Preview public page
+                        </Link>
+                        <Link
+                          to={listPath.replace(/\/list$/, `/${event.id}/page-builder`)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          Page Builder
                         </Link>
                       </td>
                     </tr>
