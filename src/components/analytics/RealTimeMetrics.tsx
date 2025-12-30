@@ -126,8 +126,8 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           }
 
           const response = await fetch(endpoint, {
+            credentials: 'include',
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
               'Content-Type': 'application/json',
             },
           });
