@@ -369,6 +369,14 @@ export const EventServiceDashboard: React.FC = () => {
                               {canManageEvents && (
                                 <>
                                   <DropdownMenuItem asChild>
+                                    <Link
+                                      to={listPath.replace(/\/list$/, `/${event.id}/analytics`)}
+                                      className="w-full"
+                                    >
+                                      View Event Analytics
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
                                     <a
                                       href={`/events/${event.id}`}
                                       target="_blank"
