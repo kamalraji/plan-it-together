@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { UserRole } from '../../types';
+import { preferenceStorage } from '@/lib/storage';
 
 interface ServiceNavigationProps {
   user: any;

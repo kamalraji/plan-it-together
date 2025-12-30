@@ -8,7 +8,7 @@ import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
-
+import { preferenceStorage } from '@/lib/storage';
 
 interface Registration {
   id: string;
