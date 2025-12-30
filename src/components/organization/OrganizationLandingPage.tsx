@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrganizationProfile } from '@/components/organization/OrganizationProfile';
 import { Calendar, Quote, Star } from 'lucide-react';
+import { OrganizationProductsSection } from '@/components/organization/OrganizationProductsSection';
 
 
 type OrganizationRow = Tables<'organizations'>;
@@ -13,6 +14,7 @@ type OrganizationRow = Tables<'organizations'>;
 type TestimonialRow = Tables<'organization_testimonials'>;
 type SponsorRow = Tables<'organization_sponsors'>;
 type EventRow = Tables<'events'>;
+type ProductRow = Tables<'organization_products'>;
 
 export const OrganizationLandingPage: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
@@ -20,6 +22,7 @@ export const OrganizationLandingPage: React.FC = () => {
   const [featuredEvents, setFeaturedEvents] = useState<EventRow[]>([]);
   const [testimonials, setTestimonials] = useState<TestimonialRow[]>([]);
   const [sponsors, setSponsors] = useState<SponsorRow[]>([]);
+  const [products, setProducts] = useState<ProductRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +85,12 @@ export const OrganizationLandingPage: React.FC = () => {
       }
 
       try {
-        const [eventsResult, testimonialsResult, sponsorsResult] = await Promise.all([
+        const [
+          eventsResult,
+          testimonialsResult,
+          sponsorsResult,
+          productsResult,
+        ] = await Promise.all([
           supabase
             .from('events')
             .select('*')
@@ -104,6 +112,13 @@ export const OrganizationLandingPage: React.FC = () => {
             .eq('organization_id', org.id)
             .order('position', { ascending: true })
             .limit(8),
+          supabase
+            .from('organization_products')
+            .select('*')
+            .eq('organization_id', org.id)
+            .eq('status', 'ACTIVE')
+            .order('position', { ascending: true })
+            .order('created_at', { ascending: false }),
         ]);
 
         if (eventsResult.data) {
@@ -116,6 +131,10 @@ export const OrganizationLandingPage: React.FC = () => {
 
         if (sponsorsResult.data) {
           setSponsors(sponsorsResult.data as SponsorRow[]);
+        }
+
+        if (productsResult.data) {
+          setProducts(productsResult.data as ProductRow[]);
         }
       } catch (sidebarError) {
         console.error('Failed to load organization sidebar content', sidebarError);
@@ -202,9 +221,11 @@ export const OrganizationLandingPage: React.FC = () => {
 
       <section className="container mx-auto px-4 pb-10">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <div>
+          <div className="space-y-8">
             <OrganizationProfile organizationId={organization.id} />
+            <OrganizationProductsSection products={products} />
           </div>
+
 
           <aside className="space-y-4">
             <Card className="border-dashed border-primary/30 bg-card/70 backdrop-blur-sm">

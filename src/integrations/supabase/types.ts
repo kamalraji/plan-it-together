@@ -390,6 +390,59 @@ export type Database = {
           },
         ]
       }
+      organization_products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          link_url: string | null
+          name: string
+          organization_id: string
+          position: number | null
+          price: string | null
+          status: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          link_url?: string | null
+          name: string
+          organization_id: string
+          position?: number | null
+          price?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          link_url?: string | null
+          name?: string
+          organization_id?: string
+          position?: number | null
+          price?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_products_org_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_sponsors: {
         Row: {
           created_at: string
