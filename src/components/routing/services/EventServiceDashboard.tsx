@@ -137,6 +137,11 @@ export const EventServiceDashboard: React.FC = () => {
       href: listPath,
     },
     {
+      title: 'Registrations Overview',
+      description: 'Review and manage event registrations',
+      href: listPath.replace(/\/list$/, '/registrations'),
+    },
+    {
       title: 'Analytics Dashboard',
       description: 'View event performance metrics',
       href: listPath.replace(/\/list$/, '/analytics'),
@@ -150,11 +155,6 @@ export const EventServiceDashboard: React.FC = () => {
         window.location.href = createPath;
       },
       variant: 'primary' as const,
-    },
-    {
-      label: 'Import Events',
-      action: () => console.log('Import events'),
-      variant: 'secondary' as const,
     },
   ];
 
