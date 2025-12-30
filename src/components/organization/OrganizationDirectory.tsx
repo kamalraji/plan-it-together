@@ -11,8 +11,6 @@ type OrganizationRow = Tables<'organizations'>;
 
 export interface DirectoryOrganization extends OrganizationRow {
   follower_count: number;
-  logo_url?: string | null;
-  banner_url?: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
