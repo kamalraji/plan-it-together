@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ interface OrganizationProductsSectionProps {
     category: string;
     onlyFree: boolean;
   }) => void;
+  onProductClick?: (productId: string) => void;
+  onVisible?: (productIds: string[]) => void;
 }
 
 export const OrganizationProductsSection: React.FC<OrganizationProductsSectionProps> = ({
@@ -25,6 +27,8 @@ export const OrganizationProductsSection: React.FC<OrganizationProductsSectionPr
   initialCategory,
   initialOnlyFree,
   onFiltersChange,
+  onProductClick,
+  onVisible,
 }) => {
   const [search, setSearch] = useState(initialSearch ?? '');
   const [category, setCategory] = useState<string>(initialCategory ?? 'all');
@@ -64,6 +68,12 @@ export const OrganizationProductsSection: React.FC<OrganizationProductsSectionPr
         );
       });
   }, [products, category, onlyFree, search]);
+
+  useEffect(() => {
+    if (!onVisible || filtered.length === 0) return;
+    const ids = filtered.map((p) => p.id);
+    onVisible(ids);
+  }, [filtered, onVisible]);
 
   if (!products.length) {
     return null;
@@ -204,6 +214,7 @@ export const OrganizationProductsSection: React.FC<OrganizationProductsSectionPr
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-auto inline-flex items-center text-xs sm:text-sm font-medium text-primary hover:underline"
+                      onClick={() => onProductClick?.(product.id)}
                     >
                       Use this resource
                       <span aria-hidden="true" className="ml-1">

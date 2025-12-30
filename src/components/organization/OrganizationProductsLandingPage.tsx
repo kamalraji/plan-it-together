@@ -117,6 +117,20 @@ export const OrganizationProductsLandingPage: React.FC = () => {
     setSearchParams(next, { replace: true });
   };
 
+  const recordProductMetrics = async (
+    eventType: 'impression' | 'click',
+    productIds: string[],
+  ) => {
+    try {
+      await supabase.rpc('record_organization_product_metrics', {
+        _event_type: eventType,
+        _product_ids: productIds,
+      });
+    } catch (rpcError) {
+      console.error('Error recording product metrics', rpcError);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -168,6 +182,10 @@ export const OrganizationProductsLandingPage: React.FC = () => {
           initialCategory={initialCategory}
           initialOnlyFree={initialOnlyFree}
           onFiltersChange={handleFiltersChange}
+          onProductClick={(productId) =>
+            recordProductMetrics('click', [productId])
+          }
+          onVisible={(ids) => recordProductMetrics('impression', ids)}
         />
       </section>
     </main>
