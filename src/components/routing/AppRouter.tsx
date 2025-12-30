@@ -35,6 +35,7 @@ import { OrganizationLandingPage } from '../organization/OrganizationLandingPage
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import PricingPage from '@/pages/PricingPage';
+import AssetsGalleryPage from '@/pages/AssetsGalleryPage';
 
 
 // Create a query client instance with optimized settings for the console application
@@ -732,6 +733,14 @@ export const AppRouter: React.FC = () => {
                 element={
                   <ConsoleRoute>
                     <DashboardDataLab />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="assets"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <AssetsGalleryPage />
                   </ConsoleRoute>
                 }
               />
