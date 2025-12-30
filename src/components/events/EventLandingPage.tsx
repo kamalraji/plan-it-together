@@ -305,9 +305,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-card/80 border-b border-border/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex gap-4 overflow-x-auto py-2">
             {[
               { key: 'overview', label: 'Overview' },
               { key: 'schedule', label: 'Schedule' },
@@ -317,10 +317,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.key
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                }`}
               >
                 {tab.label}
               </button>
