@@ -5,7 +5,7 @@ import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrganizationProfile } from '@/components/organization/OrganizationProfile';
-import { Calendar, Quote, Star } from 'lucide-react';
+import { Calendar, Quote, Star, Package } from 'lucide-react';
 import { OrganizationProductsSection } from '@/components/organization/OrganizationProductsSection';
 
 
@@ -226,9 +226,10 @@ export const OrganizationLandingPage: React.FC = () => {
           </h2>
           <Link
             to={`/${organization.slug}/products`}
-            className="text-xs font-medium text-primary hover:underline"
+            className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:shadow-md transition-shadow"
           >
-            Open products page
+            <Package className="h-3 w-3" aria-hidden="true" />
+            <span>View all products</span>
           </Link>
         </div>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

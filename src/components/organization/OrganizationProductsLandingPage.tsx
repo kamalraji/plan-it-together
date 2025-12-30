@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -161,6 +161,19 @@ export const OrganizationProductsLandingPage: React.FC = () => {
   return (
     <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
       <section className="container mx-auto px-4 pt-8 pb-4 space-y-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-1 flex items-center gap-1 text-xs text-muted-foreground"
+        >
+          <Link
+            to={`/${organization.slug}`}
+            className="hover:text-primary hover:underline"
+          >
+            {organization.name}
+          </Link>
+          <span className="text-muted-foreground/60">/</span>
+          <span className="text-muted-foreground">Products</span>
+        </nav>
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Products
         </p>
