@@ -114,24 +114,16 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       // Fetch all analytics data
       const [metricsRes, trendsRes, insightsRes, marketRes] = await Promise.all([
         fetch(`/api/vendors/${vendorId}/performance`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
         fetch(`/api/vendors/${vendorId}/trends`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
         fetch(`/api/vendors/${vendorId}/insights`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
         fetch('/api/vendors/market/intelligence', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
       ]);
 

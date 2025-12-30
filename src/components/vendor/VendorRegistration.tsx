@@ -251,9 +251,9 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
 
       const response = await fetch('/api/vendors/register', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(formData),
       });
