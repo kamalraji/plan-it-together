@@ -72,7 +72,10 @@ export interface Event {
   organization?: Organization;
   createdAt: string;
   updatedAt: string;
+  /** Serialized tldraw snapshot for custom hero layouts */
+  canvasState?: any;
 }
+
 
 export enum EventMode {
   OFFLINE = 'OFFLINE',
