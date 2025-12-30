@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -220,6 +220,17 @@ export const OrganizationLandingPage: React.FC = () => {
       </section>
 
       <section className="container mx-auto px-4 pb-10">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-[0.2em]">
+            Products
+          </h2>
+          <Link
+            to={`/${organization.slug}/products`}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Open products page
+          </Link>
+        </div>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <div className="space-y-8">
             <OrganizationProfile organizationId={organization.id} />
