@@ -17,8 +17,9 @@ import { Tables } from '@/integrations/supabase/types';
 export const OrgScopedAnalyticsPage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { data: memberships, isLoading: membershipsLoading } = useMyOrganizationMemberships();
-  const { data: analytics, isLoading: analyticsLoading } = useOrganizationAnalytics(organization?.id);
-  const { data: events, isLoading: eventsLoading } = useOrganizationEvents(organization?.id!);
+  const orgId = organization?.id ?? '';
+  const { data: analytics, isLoading: analyticsLoading } = useOrganizationAnalytics(orgId);
+  const { data: events, isLoading: eventsLoading } = useOrganizationEvents(orgId);
   const [products, setProducts] = useState<Tables<'organization_products'>[] | null>(null);
   const [productsLoading, setProductsLoading] = useState(false);
 
