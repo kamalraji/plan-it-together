@@ -16,6 +16,7 @@ interface ConsoleHeaderProps {
   onSearch: (query: string) => void;
   onLogout: () => void;
   onToggleMobileMenu?: () => void;
+  hideServiceSwitcher?: boolean;
 }
 
 interface ServiceDefinition {
@@ -85,6 +86,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   onSearch,
   onLogout,
   onToggleMobileMenu,
+  hideServiceSwitcher,
 }) => {
   const [isServiceSwitcherOpen, setIsServiceSwitcherOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -220,49 +222,49 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
               </span>
             </Link>
 
-          {/* Service Switcher - visible only for organizer/admin roles */}
-           {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (
-             <div className="relative" ref={serviceSwitcherRef}>
-               <button
-                 onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
-                 className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-muted-foreground bg-muted border border-border rounded-md hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-               >
-                 <span className="hidden sm:block truncate max-w-[140px]">
-                   {currentServiceData?.displayName || 'Dashboard'}
-                 </span>
-                 <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-               </button>
- 
-               {/* Service Switcher Dropdown */}
-               {isServiceSwitcherOpen && (
-                 <div className="absolute top-full left-0 mt-1 w-72 sm:w-80 bg-card rounded-md shadow-lg ring-1 ring-border z-50 animate-enter">
-                   <div className="p-3 sm:p-4">
-                     <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3 tracking-tight">Switch Service</h3>
-                     <div className="space-y-0.5">
-                       {services.map((service) => (
-                         <button
-                           key={service.id}
-                           onClick={() => handleServiceSelect(service.id)}
-                           className={`w-full flex items-start gap-2 sm:gap-3 px-2.5 py-1.5 text-xs sm:text-sm rounded-md text-left transition-colors duration-150 ${
-                             service.id === currentService
-                               ? 'bg-primary/10 text-primary border-l-2 border-primary'
-                               : 'text-muted-foreground hover:bg-muted'
-                           }`}
-                         >
-                           <div className="flex-1 min-w-0">
-                             <div className="font-medium truncate text-foreground">{service.displayName}</div>
-                             <div className="text-[11px] sm:text-xs text-muted-foreground truncate">
-                               {service.description}
-                             </div>
-                           </div>
-                         </button>
-                       ))}
-                     </div>
-                   </div>
-                 </div>
-               )}
-             </div>
-           )}
+          {/* Service Switcher - visible only for organizer/admin roles, and can be hidden via props */}
+          {!hideServiceSwitcher && (user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (
+            <div className="relative" ref={serviceSwitcherRef}>
+              <button
+                onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-medium text-muted-foreground bg-muted border border-border rounded-md hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <span className="hidden sm:block truncate max-w-[140px]">
+                  {currentServiceData?.displayName || 'Dashboard'}
+                </span>
+                <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </button>
+
+              {/* Service Switcher Dropdown */}
+              {isServiceSwitcherOpen && (
+                <div className="absolute top-full left-0 mt-1 w-72 sm:w-80 bg-card rounded-md shadow-lg ring-1 ring-border z-50 animate-enter">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3 tracking-tight">Switch Service</h3>
+                    <div className="space-y-0.5">
+                      {services.map((service) => (
+                        <button
+                          key={service.id}
+                          onClick={() => handleServiceSelect(service.id)}
+                          className={`w-full flex items-start gap-2 sm:gap-3 px-2.5 py-1.5 text-xs sm:text-sm rounded-md text-left transition-colors duration-150 ${
+                            service.id === currentService
+                              ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                              : 'text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate text-foreground">{service.displayName}</div>
+                            <div className="text-[11px] sm:text-xs text-muted-foreground truncate">
+                              {service.description}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
 
