@@ -32,6 +32,7 @@ import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { OrganizerDashboardLayout } from '../dashboard/OrganizerDashboardLayout';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import AttendflowLanding from '@/pages/AttendflowLanding';
@@ -582,7 +583,7 @@ export const AppRouter: React.FC = () => {
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <GlobalErrorBoundary>
-                    <ConsoleLayout />
+                    <OrganizerDashboardLayout />
                   </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
