@@ -242,7 +242,74 @@ export const EventServiceDashboard: React.FC = () => {
               </Link>
             </div>
 
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-3">
+              {(events ?? []).map((event: DashboardEventRow) => (
+                <div key={event.id} className="bg-card rounded-lg border border-border p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-foreground truncate">{event.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {event.start_date ? new Date(event.start_date).toLocaleDateString() : 'No date set'}
+                      </p>
+                    </div>
+                    <span
+                      className={`flex-shrink-0 inline-flex px-2 py-1 text-[11px] font-semibold rounded-full ${
+                        event.status === 'PUBLISHED'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : event.status === 'DRAFT'
+                            ? 'bg-amber-100 text-amber-800'
+                            : event.status === 'ONGOING'
+                              ? 'bg-sky-100 text-sky-800'
+                              : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {event.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">{registrationsByEvent?.[event.id] ?? 0}</span>
+                    <span className="ml-1">registrations</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                    <Link
+                      to={eventDetailPath(event.id)}
+                      className="text-xs font-medium text-primary hover:text-primary/80 px-2 py-1 rounded bg-primary/5 hover:bg-primary/10 transition-colors"
+                    >
+                      View
+                    </Link>
+                    <Link
+                      to={eventEditPath(event.id)}
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground px-2 py-1 rounded bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    <Link
+                      to={`/events/${event.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-medium text-primary hover:text-primary/80 px-2 py-1 rounded bg-primary/5 hover:bg-primary/10 transition-colors"
+                    >
+                      Preview
+                    </Link>
+                    <Link
+                      to={listPath.replace(/\/list$/, `/${event.id}/page-builder`)}
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground px-2 py-1 rounded bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      Page Builder
+                    </Link>
+                  </div>
+                </div>
+              ))}
+              {(events ?? []).length === 0 && (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No events yet. Create your first event!
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-card rounded-lg border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-border">
                   <thead className="bg-muted">
