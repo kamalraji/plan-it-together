@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
-import { useMyMemberOrganizations } from '@/hooks/useOrganization';
+import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -173,13 +173,18 @@ const EventPreviewCard: React.FC<{ values: EventFormValues }> = ({ values }) => 
  * with a live landing preview and workspace handoff.
  */
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId, orgSlug } = useParams<{ eventId: string; orgSlug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { listPath } = useEventManagementPaths();
   const { data: myOrganizations = [], isLoading: isLoadingOrganizations } =
     useMyMemberOrganizations();
+  
+  // Get current org from slug if in org context
+  const isOrgContext = !!orgSlug && orgSlug !== 'dashboard';
+  const { data: currentOrg } = useOrganizationBySlug(orgSlug ?? '');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
@@ -213,7 +218,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     control,
     watch,
     trigger,
+    setValue,
   } = form;
+
+  // Auto-populate organizationId when in org context and creating
+  useEffect(() => {
+    if (mode === 'create' && isOrgContext && currentOrg?.id) {
+      setValue('organizationId', currentOrg.id);
+    }
+  }, [mode, isOrgContext, currentOrg?.id, setValue]);
 
   const watchedValues = watch();
   const currentStep = wizardSteps[currentStepIndex];
