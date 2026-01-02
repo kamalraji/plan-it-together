@@ -90,7 +90,8 @@ const SidebarProvider = React.forwardRef<
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
-  const state = open ? "expanded" : "collapsed";
+  // On mobile, we always treat the sidebar as "expanded" so the Sheet shows full content.
+  const state: SidebarContext["state"] = isMobile ? "expanded" : open ? "expanded" : "collapsed";
 
   const contextValue = React.useMemo<SidebarContext>(
     () => ({
