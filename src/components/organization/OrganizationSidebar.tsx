@@ -59,7 +59,7 @@ export const OrganizationSidebar: React.FC = () => {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="border-r border-border/40 bg-sidebar/95 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/80"
+      className="border-r border-border/40 bg-sidebar"
     >
       <SidebarHeader className="border-b border-border/40 px-4 py-3">
         <div className="flex items-center justify-between">
