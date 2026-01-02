@@ -1,8 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Plus, Eye } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 interface PropertySectionProps {
   title: string;
@@ -15,21 +13,27 @@ const PropertySection: React.FC<PropertySectionProps> = ({
   defaultOpen = false,
   children,
 }) => {
-  const [open, setOpen] = React.useState(defaultOpen);
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="border-b border-border">
-      <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-foreground hover:bg-accent/50 transition-colors">
+    <div className="border-b border-border">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-foreground hover:bg-accent/50 transition-colors"
+      >
         <span>{title}</span>
         <ChevronDown
           size={16}
           className={cn('transition-transform', open && 'rotate-180')}
         />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="px-4 pb-4">
-        {children}
-      </CollapsibleContent>
-    </Collapsible>
+      </button>
+      {open && (
+        <div className="px-4 pb-4">
+          {children}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -48,99 +52,108 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({ color, name }) => (
   </div>
 );
 
-interface RightSidebarProps {
-  // Reserved for future use
-}
+type TabValue = 'design' | 'prototype';
 
-export const RightSidebar: React.FC<RightSidebarProps> = () => {
+export const RightSidebar: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<TabValue>('design');
+
   return (
-    <aside className="w-72 flex-shrink-0 border-l border-border bg-card flex flex-col h-full">
-      <Tabs defaultValue="design" className="flex flex-col h-full">
-        <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent px-4 pt-3 pb-0">
-          <TabsTrigger
-            value="design"
-            className="rounded-t-lg rounded-b-none data-[state=active]:bg-background data-[state=active]:shadow-none px-4 py-2 text-sm"
+    <aside className="w-72 flex-shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
+      {/* Tab buttons */}
+      <div className="flex border-b border-border">
+        {(['design', 'prototype'] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={cn(
+              'flex-1 px-4 py-2.5 text-sm font-medium transition-colors capitalize',
+              activeTab === tab
+                ? 'bg-background text-foreground border-b-2 border-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
-            Design
-          </TabsTrigger>
-          <TabsTrigger
-            value="prototype"
-            className="rounded-t-lg rounded-b-none data-[state=active]:bg-background data-[state=active]:shadow-none px-4 py-2 text-sm"
-          >
-            Prototype
-          </TabsTrigger>
-        </TabsList>
+            {tab}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="design" className="flex-1 overflow-y-auto m-0">
-          {/* Page section */}
-          <PropertySection title="Page" defaultOpen>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded border border-border bg-background flex items-center justify-center">
-                    <div className="h-4 w-4 bg-muted rounded-sm" />
+      {/* Tab content */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === 'design' && (
+          <>
+            {/* Page section */}
+            <PropertySection title="Page" defaultOpen>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-6 w-6 rounded border border-border bg-background flex items-center justify-center">
+                      <div className="h-4 w-4 bg-muted rounded-sm" />
+                    </div>
+                    <span className="text-sm text-muted-foreground">181910</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">181910</span>
+                  <span className="text-sm text-foreground">100%</span>
+                  <Eye size={16} className="text-muted-foreground" />
                 </div>
-                <span className="text-sm text-foreground">100%</span>
-                <Eye size={16} className="text-muted-foreground" />
               </div>
-            </div>
-          </PropertySection>
+            </PropertySection>
 
-          {/* Local variables */}
-          <PropertySection title="Local variables">
-            <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-              <Plus size={14} />
-              Add variable
-            </button>
-          </PropertySection>
+            {/* Local variables */}
+            <PropertySection title="Local variables">
+              <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+                <Plus size={14} />
+                Add variable
+              </button>
+            </PropertySection>
 
-          {/* Local styles */}
-          <PropertySection title="Local styles">
-            <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-              <Plus size={14} />
-              Add style
-            </button>
-          </PropertySection>
+            {/* Local styles */}
+            <PropertySection title="Local styles">
+              <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+                <Plus size={14} />
+                Add style
+              </button>
+            </PropertySection>
 
-          {/* Color styles */}
-          <PropertySection title="Color styles" defaultOpen>
-            <div className="space-y-2">
-              <ColorSwatch color="hsl(222, 47%, 11%)" name="BG" />
-              <ColorSwatch color="hsl(0, 0%, 100%)" name="Well" />
-              <ColorSwatch color="hsl(40, 100%, 50%)" name="Accent" />
-            </div>
-          </PropertySection>
-
-          {/* Effect styles */}
-          <PropertySection title="Effect styles">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="h-5 w-5 rounded-md border border-border bg-background shadow-md" />
-                <span className="text-sm text-foreground">Shadow</span>
+            {/* Color styles */}
+            <PropertySection title="Color styles" defaultOpen>
+              <div className="space-y-2">
+                <ColorSwatch color="hsl(222, 47%, 11%)" name="BG" />
+                <ColorSwatch color="hsl(0, 0%, 100%)" name="Well" />
+                <ColorSwatch color="hsl(40, 100%, 50%)" name="Accent" />
               </div>
-            </div>
-          </PropertySection>
+            </PropertySection>
 
-          {/* GrapesJS style manager container */}
-          <div className="panel-styles px-2" />
+            {/* Effect styles */}
+            <PropertySection title="Effect styles">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-5 rounded-md border border-border bg-background shadow-md" />
+                  <span className="text-sm text-foreground">Shadow</span>
+                </div>
+              </div>
+            </PropertySection>
 
-          {/* Export section */}
-          <PropertySection title="Export">
-            <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-              <Plus size={14} />
-              Add export
-            </button>
-          </PropertySection>
-        </TabsContent>
+            {/* GrapesJS style manager container */}
+            <div className="panel-styles px-2" />
 
-        <TabsContent value="prototype" className="flex-1 overflow-y-auto m-0 p-4">
-          <p className="text-sm text-muted-foreground">
-            Configure interactions and animations
-          </p>
-        </TabsContent>
-      </Tabs>
+            {/* Export section */}
+            <PropertySection title="Export">
+              <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+                <Plus size={14} />
+                Add export
+              </button>
+            </PropertySection>
+          </>
+        )}
+
+        {activeTab === 'prototype' && (
+          <div className="p-4">
+            <p className="text-sm text-muted-foreground">
+              Configure interactions and animations
+            </p>
+          </div>
+        )}
+      </div>
     </aside>
   );
 };
