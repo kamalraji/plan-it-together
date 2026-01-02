@@ -327,8 +327,11 @@ export const EventPageBuilder: React.FC = () => {
       </div>
 
       <main className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4">
-        <section className="rounded-xl border border-border bg-card shadow-sm">
-          <div className="h-[70vh] min-h-[480px] overflow-hidden rounded-xl bg-background" ref={containerRef} />
+        <section className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+          <div 
+            className="h-[70vh] min-h-[480px] bg-background [&_.gjs-one-bg]:bg-card [&_.gjs-two-color]:text-foreground [&_.gjs-three-bg]:bg-muted [&_.gjs-four-color]:text-primary [&_.gjs-pn-panel]:border-border [&_.gjs-cv-canvas]:w-full [&_.gjs-frame-wrapper]:bg-background"
+            ref={containerRef} 
+          />
         </section>
         <p className="text-xs text-muted-foreground">
           Tip: Use the pre-built Hero, Schedule, and Registration blocks from the left sidebar to quickly assemble a
