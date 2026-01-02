@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { SidebarUserFooter } from './SidebarUserFooter';
 import {
   Home,
   LayoutDashboard,
@@ -308,6 +309,8 @@ export const OrganizationSidebar: React.FC = () => {
           </SidebarGroup>
         )}
       </SidebarContent>
+
+      <SidebarUserFooter />
     </Sidebar>
   );
 };
