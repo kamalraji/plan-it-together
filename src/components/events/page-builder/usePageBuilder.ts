@@ -18,6 +18,14 @@ interface LandingPageData {
   meta?: LandingPageDataMeta;
 }
 
+interface EventData {
+  name: string;
+  description: string;
+  branding: any;
+  existingLanding: LandingPageData | null;
+  existingSlug: string;
+}
+
 interface UsePageBuilderOptions {
   eventId?: string;
 }
@@ -26,29 +34,73 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const editorRef = useRef<Editor | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [eventData, setEventData] = useState<EventData | null>(null);
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [device, setDevice] = useState<'Desktop' | 'Mobile'>('Desktop');
   const [hasCustomLanding, setHasCustomLanding] = useState(false);
 
-  const initEditor = useCallback((container: HTMLElement, eventData: {
-    name: string;
-    description: string;
-    branding: any;
-    existingLanding: LandingPageData | null;
-    existingSlug: string;
-  }) => {
-    const { name, description, branding, existingLanding, existingSlug } = eventData;
+  // Fetch event data
+  useEffect(() => {
+    if (!eventId) return;
+
+    const loadEvent = async () => {
+      try {
+        const { data: eventRow, error } = await supabase
+          .from('events')
+          .select('id, name, description, organization_id, branding, landing_page_data, landing_page_slug')
+          .eq('id', eventId)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!eventRow) {
+          toast({
+            title: 'Event not found',
+            description: 'We could not find this event.',
+            variant: 'destructive',
+          });
+          navigate(-1);
+          return;
+        }
+
+        const data: EventData = {
+          name: eventRow.name,
+          description: eventRow.description || '',
+          branding: (eventRow.branding as any) || {},
+          existingLanding: (eventRow as any).landing_page_data ?? null,
+          existingSlug: (eventRow as any).landing_page_slug ?? '',
+        };
+
+        setEventData(data);
+        setSlug(data.existingSlug || slugify(data.name));
+        setHasCustomLanding(!!data.existingLanding?.html);
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to load event', err);
+        toast({
+          title: 'Failed to load builder',
+          description: 'Please refresh the page or try again later.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+      }
+    };
+
+    loadEvent();
+  }, [eventId, toast, navigate]);
+
+  // Initialize GrapesJS editor when container and data are ready
+  useEffect(() => {
+    if (loading || !eventData || !containerRef.current || editorRef.current) return;
+
+    const { name, description, branding, existingLanding } = eventData;
     const primaryColor = branding?.primaryColor || '#2563eb';
     const logoUrl = branding?.logoUrl as string | undefined;
 
-    setHasCustomLanding(!!existingLanding?.html);
-    setSlug(existingSlug || slugify(name));
-    setLoading(false);
-
     const editor = grapesjs.init({
-      container,
+      container: containerRef.current,
       height: '100%',
       width: 'auto',
       fromElement: false,
@@ -61,18 +113,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         ],
       },
       panels: {
-        defaults: [
-          {
-            id: 'layers',
-            el: '.panel-layers',
-            resizable: { tc: false, cl: true, cr: false, bc: false },
-          },
-          {
-            id: 'styles',
-            el: '.panel-styles',
-            resizable: { tc: false, cl: false, cr: true, bc: false },
-          },
-        ],
+        defaults: [],
       },
       blockManager: {
         appendTo: '.panel-blocks',
@@ -147,79 +188,28 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       `);
     }
 
-    return editor;
-  }, []);
-
-  useEffect(() => {
-    if (!eventId) return;
-
-    const loadEvent = async () => {
-      try {
-        const { data: eventRow, error } = await supabase
-          .from('events')
-          .select('id, name, description, organization_id, branding, landing_page_data, landing_page_slug')
-          .eq('id', eventId)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (!eventRow) {
-          toast({
-            title: 'Event not found',
-            description: 'We could not find this event.',
-            variant: 'destructive',
-          });
-          navigate(-1);
-          return null;
-        }
-
-        return {
-          name: eventRow.name,
-          description: eventRow.description || '',
-          branding: (eventRow.branding as any) || {},
-          existingLanding: (eventRow as any).landing_page_data ?? null,
-          existingSlug: (eventRow as any).landing_page_slug ?? '',
-        };
-      } catch (err) {
-        console.error('Failed to load event', err);
-        toast({
-          title: 'Failed to load builder',
-          description: 'Please refresh the page or try again later.',
-          variant: 'destructive',
-        });
-        setLoading(false);
-        return null;
-      }
-    };
-
-    loadEvent().then((eventData) => {
-      if (eventData) {
-        // Store event data for later initialization
-        (window as any).__pageBuilderEventData = eventData;
-      }
-    });
-
     return () => {
       if (editorRef.current) {
         editorRef.current.destroy();
         editorRef.current = null;
       }
     };
-  }, [eventId, toast, navigate]);
+  }, [loading, eventData]);
 
-  const handleDeviceChange = (nextDevice: 'Desktop' | 'Mobile') => {
+  const handleDeviceChange = useCallback((nextDevice: 'Desktop' | 'Mobile') => {
     setDevice(nextDevice);
     if (editorRef.current) {
       editorRef.current.setDevice(nextDevice);
     }
-  };
+  }, []);
 
-  const handlePreview = () => {
+  const handlePreview = useCallback(() => {
     if (!eventId) return;
     const publicUrl = `${window.location.origin}/events/${eventId}`;
     window.open(publicUrl, '_blank', 'noopener,noreferrer');
-  };
+  }, [eventId]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!editorRef.current || !eventId) return;
     const editor = editorRef.current;
     const html = editor.getHtml();
@@ -259,11 +249,10 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     } finally {
       setSaving(false);
     }
-  };
+  }, [eventId, slug, toast]);
 
   return {
-    editorRef,
-    initEditor,
+    containerRef,
     slug,
     setSlug,
     loading,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useParams } from 'react-router-dom';
 import { usePageBuilder } from './page-builder/usePageBuilder';
@@ -16,11 +16,9 @@ import { PageBuilderHeader } from './page-builder/PageBuilderHeader';
  */
 export const EventPageBuilder: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  const editorContainerRef = useRef<HTMLDivElement | null>(null);
 
   const {
-    editorRef,
-    initEditor,
+    containerRef,
     slug,
     setSlug,
     loading,
@@ -31,26 +29,6 @@ export const EventPageBuilder: React.FC = () => {
     handlePreview,
     handleSave,
   } = usePageBuilder({ eventId });
-
-  // Initialize editor once container is mounted and event data is loaded
-  useEffect(() => {
-    if (loading) return;
-
-    const eventData = (window as any).__pageBuilderEventData;
-    if (!eventData || !editorContainerRef.current) return;
-
-    // Only init if editor doesn't exist
-    if (!editorRef.current) {
-      initEditor(editorContainerRef.current, eventData);
-    }
-  }, [loading, initEditor, editorRef]);
-
-  // Update device when changed
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.setDevice(device);
-    }
-  }, [device, editorRef]);
 
   if (loading) {
     return (
@@ -87,7 +65,7 @@ export const EventPageBuilder: React.FC = () => {
         {/* Center - Canvas */}
         <main className="flex-1 flex flex-col overflow-hidden bg-muted/30">
           <div 
-            ref={editorContainerRef}
+            ref={containerRef}
             className="flex-1 gjs-editor-container"
           />
         </main>
