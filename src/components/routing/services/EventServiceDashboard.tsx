@@ -91,8 +91,8 @@ export const EventServiceDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <OrganizerBreadcrumbs current="event-management" />
-      <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+      <main className="px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
+        <div className="w-full space-y-6 sm:space-y-8">
           {/* Page Header */}
           <PageHeader
             title="Event Management"

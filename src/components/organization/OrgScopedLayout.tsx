@@ -80,13 +80,13 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-auto">
+        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
           <div className="relative flex w-full pt-16 items-stretch">
             <OrganizationSidebar />
 
-            <SidebarInset className="flex justify-center">
-              <div className="mx-2 sm:mx-4 lg:mx-6 my-4 sm:my-6 w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
+            <SidebarInset className="flex justify-center overflow-hidden">
+              <div className="mx-2 sm:mx-4 lg:mx-6 my-4 sm:my-6 w-full max-w-5xl xl:max-w-6xl 2xl:max-w-7xl rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-hidden">
                 <Routes>
                   <Route path="dashboard" element={<OrganizerDashboard />} />
                   <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
