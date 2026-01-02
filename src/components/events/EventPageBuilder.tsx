@@ -39,7 +39,7 @@ export const EventPageBuilder: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background overflow-hidden">
       <PageBuilderHeader
         slug={slug}
         onSlugChange={setSlug}
@@ -52,36 +52,36 @@ export const EventPageBuilder: React.FC = () => {
         eventId={eventId}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         {/* Left Panel - Blocks */}
-        <aside className="w-64 flex-shrink-0 border-r border-border bg-card overflow-y-auto">
+        <aside className="w-56 flex-shrink-0 border-r border-border bg-card flex flex-col">
           <div className="p-3 border-b border-border">
-            <h3 className="text-sm font-medium text-foreground">Blocks</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Drag to add sections</p>
+            <h3 className="text-sm font-semibold text-foreground">Blocks</h3>
+            <p className="text-xs text-muted-foreground">Drag to add sections</p>
           </div>
-          <div className="panel-blocks p-2" />
+          <div className="panel-blocks flex-1 overflow-y-auto p-2" />
         </aside>
 
         {/* Center - Canvas */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-muted/30">
+        <main className="flex-1 min-w-0 bg-muted/30 overflow-hidden">
           <div 
             ref={containerRef}
-            className="flex-1 gjs-editor-container"
+            className="h-full w-full gjs-editor-container"
           />
         </main>
 
         {/* Right Panel - Styles */}
-        <aside className="w-72 flex-shrink-0 border-l border-border bg-card overflow-y-auto">
+        <aside className="w-64 flex-shrink-0 border-l border-border bg-card flex flex-col">
           <div className="p-3 border-b border-border">
-            <h3 className="text-sm font-medium text-foreground">Styles</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Customize selected element</p>
+            <h3 className="text-sm font-semibold text-foreground">Styles</h3>
+            <p className="text-xs text-muted-foreground">Customize selected element</p>
           </div>
-          <div className="panel-styles p-2" />
+          <div className="panel-styles flex-1 overflow-y-auto p-2" />
           <div className="p-3 border-t border-border">
-            <h3 className="text-sm font-medium text-foreground">Layers</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Page structure</p>
+            <h3 className="text-sm font-semibold text-foreground">Layers</h3>
+            <p className="text-xs text-muted-foreground">Page structure</p>
           </div>
-          <div className="panel-layers p-2" />
+          <div className="panel-layers overflow-y-auto max-h-48 p-2" />
         </aside>
       </div>
 
