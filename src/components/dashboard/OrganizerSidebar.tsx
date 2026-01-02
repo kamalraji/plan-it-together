@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { NavLink } from '@/components/NavLink';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 import {
@@ -23,63 +23,57 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  Home,
-  LayoutDashboard,
-  CalendarDays,
-  Briefcase,
-  Store,
-  LineChart,
-  ChevronDown,
-  Building2,
-} from 'lucide-react';
+import { Home, ChevronDown, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface OrgMenuItem {
-  title: string;
-  icon: React.ElementType;
-  path: string;
-  description?: string;
-}
-
-const orgSubItems: OrgMenuItem[] = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: 'dashboard', description: 'Overview & metrics' },
-  { title: 'Event Management', icon: CalendarDays, path: 'eventmanagement', description: 'Manage events' },
-  { title: 'Workspace', icon: Briefcase, path: 'workspaces', description: 'Team collaboration' },
-  { title: 'Marketplace', icon: Store, path: 'organizations', description: 'Products & services' },
-  { title: 'Analytics', icon: LineChart, path: 'analytics', description: 'Performance insights' },
-];
+import {
+  MobileSidebarHeader,
+  orgServices,
+  sidebarStyles,
+} from '@/components/sidebar';
 
 export const OrganizerSidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { state } = useSidebar();
+  const { state, isMobile } = useSidebar();
   const isCollapsed = state === 'collapsed';
 
   const { data: memberOrganizations, isLoading } = useMyMemberOrganizations();
 
   const isOrganizerDashboardActive = currentPath === '/organizer/dashboard';
 
+  const handleOrgChange = (org: { slug: string }) => {
+    navigate(`/${org.slug}/dashboard`);
+  };
+
   return (
-    <Sidebar
-      collapsible="offcanvas"
-      className="border-r border-border/40 bg-sidebar/95 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/80"
-    >
-      <SidebarHeader className="border-b border-border/40 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Building2 className="h-4 w-4 text-primary" />
+    <Sidebar collapsible="offcanvas" className={sidebarStyles.sidebar}>
+      {/* Mobile header with close button and org-switcher */}
+      <MobileSidebarHeader
+        title="Organizer Console"
+        subtitle="All organizations"
+        organizations={memberOrganizations || []}
+        onOrgChange={handleOrgChange}
+      />
+
+      {/* Desktop header */}
+      {!isMobile && (
+        <SidebarHeader className={sidebarStyles.header}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Building2 className="h-4 w-4 text-primary" />
+              </div>
+              {!isCollapsed && (
+                <span className="text-sm font-semibold text-foreground animate-fade-in">
+                  Organizer Console
+                </span>
+              )}
             </div>
-            {!isCollapsed && (
-              <span className="text-sm font-semibold text-foreground animate-fade-in">
-                Organizer Console
-              </span>
-            )}
+            <SidebarTrigger className="h-7 w-7" />
           </div>
-          <SidebarTrigger className="h-7 w-7" />
-        </div>
-      </SidebarHeader>
+        </SidebarHeader>
+      )}
 
       <SidebarContent className="px-2 py-3 space-y-2 overflow-y-auto">
         {/* Organizer Dashboard CTA */}
@@ -92,9 +86,9 @@ export const OrganizerSidebar: React.FC = () => {
                   isActive={isOrganizerDashboardActive}
                   tooltip="Organizer Dashboard"
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                    'hover:bg-primary/10 hover:text-primary',
-                    isOrganizerDashboardActive && 'bg-primary/15 text-primary shadow-sm'
+                    sidebarStyles.menuItemBase,
+                    sidebarStyles.menuItemHover,
+                    isOrganizerDashboardActive && sidebarStyles.menuItemActive
                   )}
                 >
                   <NavLink
@@ -103,10 +97,11 @@ export const OrganizerSidebar: React.FC = () => {
                   >
                     <span
                       className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                        sidebarStyles.iconContainer,
+                        sidebarStyles.iconSize,
                         isOrganizerDashboardActive
-                          ? 'bg-primary text-primary-foreground shadow-md'
-                          : 'bg-muted/60 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary'
+                          ? sidebarStyles.iconContainerActive
+                          : sidebarStyles.iconContainerDefault
                       )}
                     >
                       <Home className="h-4 w-4" />
@@ -114,13 +109,13 @@ export const OrganizerSidebar: React.FC = () => {
                     {!isCollapsed && (
                       <span className="flex flex-col items-start animate-fade-in">
                         <span>Organizer Home</span>
-                        <span className="text-[10px] font-normal text-muted-foreground">
+                        <span className={sidebarStyles.textDescription}>
                           All organizations overview
                         </span>
                       </span>
                     )}
                     {isOrganizerDashboardActive && !isCollapsed && (
-                      <span className="ml-auto h-6 w-1 rounded-full bg-primary animate-scale-in" />
+                      <span className={sidebarStyles.activeIndicator} />
                     )}
                   </NavLink>
                 </SidebarMenuButton>
@@ -131,7 +126,7 @@ export const OrganizerSidebar: React.FC = () => {
 
         {/* Organizations List */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
+          <SidebarGroupLabel className={sidebarStyles.sectionLabel}>
             Your Organizations
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -161,14 +156,16 @@ export const OrganizerSidebar: React.FC = () => {
                           <SidebarMenuButton
                             tooltip={org.name}
                             className={cn(
-                              'group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
+                              sidebarStyles.menuItemBase,
                               'hover:bg-muted/70',
                               isOrgActive && 'bg-muted/50 font-medium'
                             )}
                           >
                             <span
                               className={cn(
-                                'flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold uppercase transition-colors duration-200',
+                                sidebarStyles.iconContainer,
+                                sidebarStyles.iconSizeSmall,
+                                'text-xs font-bold uppercase',
                                 isOrgActive
                                   ? 'bg-primary/20 text-primary'
                                   : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
@@ -181,7 +178,7 @@ export const OrganizerSidebar: React.FC = () => {
                                 <span className="flex flex-1 flex-col items-start overflow-hidden animate-fade-in">
                                   <span className="truncate max-w-[140px]">{org.name}</span>
                                   {org.role && (
-                                    <span className="text-[10px] font-normal text-muted-foreground">
+                                    <span className={sidebarStyles.textMeta}>
                                       {org.role}
                                     </span>
                                   )}
@@ -193,8 +190,8 @@ export const OrganizerSidebar: React.FC = () => {
                         </CollapsibleTrigger>
 
                         <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
-                          <SidebarMenuSub className="ml-4 mt-1 space-y-0.5 border-l border-border/40 pl-3">
-                            {orgSubItems.map((item) => {
+                          <SidebarMenuSub className={sidebarStyles.subMenu}>
+                            {orgServices.map((item) => {
                               const itemPath = `${orgBasePath}/${item.path}`;
                               const isItemActive =
                                 currentPath === itemPath ||
@@ -206,9 +203,9 @@ export const OrganizerSidebar: React.FC = () => {
                                     asChild
                                     isActive={isItemActive}
                                     className={cn(
-                                      'group/subitem flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-all duration-150',
-                                      'hover:bg-muted/60 hover:text-foreground',
-                                      isItemActive && 'bg-primary/10 text-primary font-medium'
+                                      sidebarStyles.subMenuItem,
+                                      sidebarStyles.subMenuItemHover,
+                                      isItemActive && sidebarStyles.subMenuItemActive
                                     )}
                                   >
                                     <NavLink
@@ -225,7 +222,7 @@ export const OrganizerSidebar: React.FC = () => {
                                       />
                                       <span className="flex-1">{item.title}</span>
                                       {isItemActive && (
-                                        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-scale-in" />
+                                        <span className={sidebarStyles.activeIndicatorDot} />
                                       )}
                                     </NavLink>
                                   </SidebarMenuSubButton>
