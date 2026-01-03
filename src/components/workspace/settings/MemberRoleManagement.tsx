@@ -4,13 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+  SimpleDropdownTrigger,
+} from '@/components/ui/simple-dropdown';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -220,53 +218,48 @@ export function MemberRoleManagement({
                     <div className="flex items-center gap-2">
                       {canEditThisMember ? (
                         <>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-1.5 text-xs h-8"
-                                disabled={isUpdating}
-                              >
-                                {isUpdating ? (
-                                  <span className="animate-pulse">Updating...</span>
-                                ) : (
-                                  <>
-                                    {getWorkspaceRoleLabel(member.role)}
-                                    <ChevronDown className="h-3 w-3" />
-                                  </>
-                                )}
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
+                        <SimpleDropdown>
+                            <SimpleDropdownTrigger 
+                              className="inline-flex items-center justify-center gap-1.5 text-xs h-8 px-3 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? (
+                                <span className="animate-pulse">Updating...</span>
+                              ) : (
+                                <>
+                                  {getWorkspaceRoleLabel(member.role)}
+                                  <ChevronDown className="h-3 w-3" />
+                                </>
+                              )}
+                            </SimpleDropdownTrigger>
+                            <SimpleDropdownContent align="end" className="w-56">
                               {sortedLevels.map(roleLevel => {
                                 const rolesInLevel = assignableByLevel[roleLevel];
                                 if (rolesInLevel.length === 0) return null;
 
                                 return (
                                   <div key={roleLevel}>
-                                    <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <div className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                                       {getLevelIcon(roleLevel)}
                                       {getLevelLabel(roleLevel)} Roles
-                                    </DropdownMenuLabel>
+                                    </div>
                                     {rolesInLevel.map(role => (
-                                      <DropdownMenuItem
+                                      <SimpleDropdownItem
                                         key={role}
                                         onClick={() => handleRoleChange(member.id, role)}
                                         className={cn(
-                                          'cursor-pointer',
                                           member.role === role && 'bg-accent'
                                         )}
                                       >
                                         {getWorkspaceRoleLabel(role)}
-                                      </DropdownMenuItem>
+                                      </SimpleDropdownItem>
                                     ))}
-                                    <DropdownMenuSeparator />
+                                    <div className="-mx-1 my-1 h-px bg-muted" />
                                   </div>
                                 );
                               })}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                            </SimpleDropdownContent>
+                          </SimpleDropdown>
                           
                           {/* Remove button - only show if not self */}
                           {member.userId !== currentUserId && (
