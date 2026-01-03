@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { 
   PaperAirplaneIcon, 
@@ -8,10 +8,13 @@ import {
   ExclamationTriangleIcon,
   ClockIcon,
   ArrowPathIcon,
-  EyeIcon
+  EyeIcon,
+  ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
 import { Workspace, WorkspaceRole } from '../../types';
 import api from '../../lib/api';
+import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
+import { WorkspaceHierarchyLevel } from '@/lib/workspaceHierarchy';
 
 interface TeamInvitationProps {
   workspace: Workspace;
@@ -25,6 +28,8 @@ interface TeamInvitationProps {
     invitedBy: { name: string };
   }>;
   onInvitationSent: () => void;
+  /** Current user's workspace role - used for RBAC filtering */
+  currentUserRole?: WorkspaceRole | null;
 }
 
 interface InvitationData {
@@ -38,10 +43,21 @@ interface BulkInvitationData {
   customMessage?: string;
 }
 
-export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitationSent }: TeamInvitationProps) {
+export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitationSent, currentUserRole }: TeamInvitationProps) {
+  const rbac = useWorkspaceRBAC(currentUserRole ?? null);
+  
+  // Get the default role based on what the user can assign
+  const getDefaultRole = (): WorkspaceRole => {
+    if (rbac.assignableRoles.length > 0) {
+      // Return the lowest level role the user can assign (most common case)
+      return rbac.assignableRoles[rbac.assignableRoles.length - 1];
+    }
+    return WorkspaceRole.VOLUNTEER_COORDINATOR;
+  };
+
   const [singleInvitation, setSingleInvitation] = useState<InvitationData>({
     email: '',
-    role: WorkspaceRole.VOLUNTEER_COORDINATOR,
+    role: getDefaultRole(),
     customMessage: ''
   });
   
@@ -158,7 +174,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
   };
 
   const addManualInvitation = () => {
-    setBulkInvitations([...bulkInvitations, { email: '', role: WorkspaceRole.VOLUNTEER_COORDINATOR }]);
+    setBulkInvitations([...bulkInvitations, { email: '', role: getDefaultRole() }]);
   };
 
   const updateBulkInvitation = (index: number, field: keyof InvitationData, value: string) => {
@@ -171,46 +187,61 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
     setBulkInvitations(bulkInvitations.filter((_, i) => i !== index));
   };
 
-  const roleOptions = [
+  // All available role options with their groups
+  const allRoleOptions = useMemo(() => [
     // Level 2 - Managers
-    { value: WorkspaceRole.DEPARTMENT_MANAGER, label: 'Department Manager', group: 'Managers' },
+    { value: WorkspaceRole.DEPARTMENT_MANAGER, label: 'Department Manager', group: 'Managers', level: WorkspaceHierarchyLevel.MANAGER },
     // Level 3 - Leads
-    { value: WorkspaceRole.EVENT_LEAD, label: 'Event Lead', group: 'Leads' },
-    { value: WorkspaceRole.CATERING_LEAD, label: 'Catering Lead', group: 'Leads' },
-    { value: WorkspaceRole.LOGISTICS_LEAD, label: 'Logistics Lead', group: 'Leads' },
-    { value: WorkspaceRole.FACILITY_LEAD, label: 'Facility Lead', group: 'Leads' },
-    { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Lead', group: 'Leads' },
-    { value: WorkspaceRole.COMMUNICATION_LEAD, label: 'Communication Lead', group: 'Leads' },
-    { value: WorkspaceRole.SPONSORSHIP_LEAD, label: 'Sponsorship Lead', group: 'Leads' },
-    { value: WorkspaceRole.SOCIAL_MEDIA_LEAD, label: 'Social Media Lead', group: 'Leads' },
-    { value: WorkspaceRole.CONTENT_LEAD, label: 'Content Lead', group: 'Leads' },
-    { value: WorkspaceRole.SPEAKER_LIAISON_LEAD, label: 'Speaker Liaison Lead', group: 'Leads' },
-    { value: WorkspaceRole.JUDGE_LEAD, label: 'Judge Lead', group: 'Leads' },
-    { value: WorkspaceRole.MEDIA_LEAD, label: 'Media Lead', group: 'Leads' },
-    { value: WorkspaceRole.FINANCE_LEAD, label: 'Finance Lead', group: 'Leads' },
-    { value: WorkspaceRole.REGISTRATION_LEAD, label: 'Registration Lead', group: 'Leads' },
-    { value: WorkspaceRole.TECHNICAL_LEAD, label: 'Technical Lead', group: 'Leads' },
-    { value: WorkspaceRole.IT_LEAD, label: 'IT Lead', group: 'Leads' },
-    { value: WorkspaceRole.VOLUNTEERS_LEAD, label: 'Volunteers Lead', group: 'Leads' },
+    { value: WorkspaceRole.EVENT_LEAD, label: 'Event Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.CATERING_LEAD, label: 'Catering Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.LOGISTICS_LEAD, label: 'Logistics Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.FACILITY_LEAD, label: 'Facility Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.COMMUNICATION_LEAD, label: 'Communication Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.SPONSORSHIP_LEAD, label: 'Sponsorship Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.SOCIAL_MEDIA_LEAD, label: 'Social Media Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.CONTENT_LEAD, label: 'Content Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.SPEAKER_LIAISON_LEAD, label: 'Speaker Liaison Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.JUDGE_LEAD, label: 'Judge Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.MEDIA_LEAD, label: 'Media Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.FINANCE_LEAD, label: 'Finance Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.REGISTRATION_LEAD, label: 'Registration Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.TECHNICAL_LEAD, label: 'Technical Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.IT_LEAD, label: 'IT Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
+    { value: WorkspaceRole.VOLUNTEERS_LEAD, label: 'Volunteers Lead', group: 'Leads', level: WorkspaceHierarchyLevel.LEAD },
     // Level 4 - Coordinators
-    { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.CATERING_COORDINATOR, label: 'Catering Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.LOGISTICS_COORDINATOR, label: 'Logistics Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.FACILITY_COORDINATOR, label: 'Facility Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.MARKETING_COORDINATOR, label: 'Marketing Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.COMMUNICATION_COORDINATOR, label: 'Communication Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.SPONSORSHIP_COORDINATOR, label: 'Sponsorship Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.SOCIAL_MEDIA_COORDINATOR, label: 'Social Media Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.CONTENT_COORDINATOR, label: 'Content Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.SPEAKER_LIAISON_COORDINATOR, label: 'Speaker Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.JUDGE_COORDINATOR, label: 'Judge Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.MEDIA_COORDINATOR, label: 'Media Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.FINANCE_COORDINATOR, label: 'Finance Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.REGISTRATION_COORDINATOR, label: 'Registration Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.TECHNICAL_COORDINATOR, label: 'Technical Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.IT_COORDINATOR, label: 'IT Coordinator', group: 'Coordinators' },
-    { value: WorkspaceRole.VOLUNTEER_COORDINATOR, label: 'Volunteer Coordinator', group: 'Coordinators' },
-  ];
+    { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.CATERING_COORDINATOR, label: 'Catering Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.LOGISTICS_COORDINATOR, label: 'Logistics Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.FACILITY_COORDINATOR, label: 'Facility Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.MARKETING_COORDINATOR, label: 'Marketing Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.COMMUNICATION_COORDINATOR, label: 'Communication Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.SPONSORSHIP_COORDINATOR, label: 'Sponsorship Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.SOCIAL_MEDIA_COORDINATOR, label: 'Social Media Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.CONTENT_COORDINATOR, label: 'Content Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.SPEAKER_LIAISON_COORDINATOR, label: 'Speaker Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.JUDGE_COORDINATOR, label: 'Judge Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.MEDIA_COORDINATOR, label: 'Media Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.FINANCE_COORDINATOR, label: 'Finance Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.REGISTRATION_COORDINATOR, label: 'Registration Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.TECHNICAL_COORDINATOR, label: 'Technical Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.IT_COORDINATOR, label: 'IT Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+    { value: WorkspaceRole.VOLUNTEER_COORDINATOR, label: 'Volunteer Coordinator', group: 'Coordinators', level: WorkspaceHierarchyLevel.COORDINATOR },
+  ], []);
+
+  // Filter role options based on RBAC - users can only invite roles they're allowed to manage
+  const roleOptions = useMemo(() => {
+    if (!currentUserRole) {
+      // No role assigned - show all options (will fail server-side validation anyway)
+      return allRoleOptions;
+    }
+    
+    // Filter to only include roles the user can assign
+    return allRoleOptions.filter(option => rbac.canAssign(option.value));
+  }, [allRoleOptions, currentUserRole, rbac]);
+
+  // Check if user has any assignable roles
+  const canInviteAnyone = roleOptions.length > 0;
 
   const getInvitationStatusBadge = (status: string) => {
     switch (status) {
@@ -242,79 +273,112 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
 
   return (
     <div className="space-y-6">
+      {/* No Permission Warning */}
+      {!canInviteAnyone && currentUserRole && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <ShieldExclamationIcon className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Limited Invitation Permissions
+              </h4>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                Your role doesn't allow you to invite team members. Coordinators cannot manage other team members. 
+                Contact your manager or lead to invite new members.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {mode === 'single' ? (
         /* Single Invitation Form */
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Invite Team Member</h3>
-          
-          <form onSubmit={handleSingleInvite} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={singleInvitation.email}
-                onChange={(e) => setSingleInvitation({ ...singleInvitation, email: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter email address"
-                required
-              />
-            </div>
+        <div className="bg-white dark:bg-card shadow rounded-lg p-6">
+          {canInviteAnyone ? (
+            <>
+              <h3 className="text-lg font-medium text-foreground mb-4">Invite Team Member</h3>
+              
+              <form onSubmit={handleSingleInvite} className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-muted-foreground">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={singleInvitation.email}
+                    onChange={(e) => setSingleInvitation({ ...singleInvitation, email: e.target.value })}
+                    className="mt-1 block w-full border-border bg-background text-foreground rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <select
-                id="role"
-                value={singleInvitation.role}
-                onChange={(e) => setSingleInvitation({ ...singleInvitation, role: e.target.value as WorkspaceRole })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                {roleOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div>
+                  <label htmlFor="role" className="block text-sm font-medium text-muted-foreground">
+                    Role
+                  </label>
+                  <select
+                    id="role"
+                    value={singleInvitation.role}
+                    onChange={(e) => setSingleInvitation({ ...singleInvitation, role: e.target.value as WorkspaceRole })}
+                    className="mt-1 block w-full border-border bg-background text-foreground rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                  >
+                    {roleOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Showing {roleOptions.length} roles you can assign based on your hierarchy level
+                  </p>
+                </div>
 
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                Custom Message (Optional)
-              </label>
-              <textarea
-                id="message"
-                rows={3}
-                value={singleInvitation.customMessage}
-                onChange={(e) => setSingleInvitation({ ...singleInvitation, customMessage: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Add a personal message to the invitation..."
-              />
-            </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-muted-foreground">
+                    Custom Message (Optional)
+                  </label>
+                  <textarea
+                    id="message"
+                    rows={3}
+                    value={singleInvitation.customMessage}
+                    onChange={(e) => setSingleInvitation({ ...singleInvitation, customMessage: e.target.value })}
+                    className="mt-1 block w-full border-border bg-background text-foreground rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Add a personal message to the invitation..."
+                  />
+                </div>
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={singleInviteMutation.isPending}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
-              >
-                {singleInviteMutation.isPending ? (
-                  <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <PaperAirplaneIcon className="w-4 h-4 mr-2" />
-                )}
-                Send Invitation
-              </button>
-            </div>
-          </form>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={singleInviteMutation.isPending}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {singleInviteMutation.isPending ? (
+                      <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <PaperAirplaneIcon className="w-4 h-4 mr-2" />
+                    )}
+                    Send Invitation
+                  </button>
+                </div>
+              </form>
 
-          {singleInviteMutation.error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">
-                {(singleInviteMutation.error as any)?.response?.data?.message || 'Failed to send invitation'}
+              {singleInviteMutation.error && (
+                <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <p className="text-sm text-destructive">
+                    {(singleInviteMutation.error as any)?.response?.data?.message || 'Failed to send invitation'}
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <ShieldExclamationIcon className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No Invitation Permission</h3>
+              <p className="text-sm text-muted-foreground">
+                Your current role doesn't allow you to invite team members.
               </p>
             </div>
           )}
