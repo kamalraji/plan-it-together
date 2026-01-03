@@ -97,12 +97,27 @@ export function OrganizerDashboard() {
     refetchOnWindowFocus: false
   });
 
-  // Fetch workspaces directly from Supabase
+  // Fetch workspaces directly from Supabase - scoped to user AND organization
   const {
     data: workspaces
   } = useQuery<WorkspaceSummary[]>({
-    queryKey: ['organizer-workspaces-supabase', organization.id],
+    queryKey: ['organizer-workspaces-supabase', organization.id, user?.id],
     queryFn: async () => {
+      // First get event IDs that belong to this organization
+      const { data: orgEvents, error: eventsError } = await supabase
+        .from('events')
+        .select('id')
+        .eq('organization_id', organization.id);
+      
+      if (eventsError) throw eventsError;
+      
+      const orgEventIds = (orgEvents || []).map(e => e.id);
+      
+      if (orgEventIds.length === 0) {
+        return [];
+      }
+      
+      // Fetch workspaces that belong to the user AND are linked to org events
       const { data, error } = await supabase
         .from('workspaces')
         .select(`
@@ -117,6 +132,7 @@ export function OrganizerDashboard() {
           )
         `)
         .eq('organizer_id', user!.id)
+        .in('event_id', orgEventIds)
         .order('updated_at', { ascending: false });
       
       if (error) throw error;
@@ -132,7 +148,7 @@ export function OrganizerDashboard() {
     retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: !!user?.id
+    enabled: !!user?.id && !!organization.id
   });
   const {
     data: analytics
