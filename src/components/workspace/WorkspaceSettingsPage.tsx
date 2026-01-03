@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Trash2, Bell, Shield, Palette } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Bell, Shield, Palette, Users } from 'lucide-react';
+import { MemberRoleManagement } from './settings/MemberRoleManagement';
+import { WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -276,32 +278,54 @@ export function WorkspaceSettingsPage() {
             )}
 
             {activeTab === 'permissions' && (
-              <div className="rounded-xl border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Permission Settings</h2>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 border-b border-border">
-                    <div>
-                      <p className="font-medium text-foreground">Allow Member Invites</p>
-                      <p className="text-sm text-muted-foreground">Let team leads invite new members</p>
-                    </div>
-                    <Switch defaultChecked />
+              <div className="space-y-6">
+                {/* Member Role Management */}
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Users className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-lg font-semibold text-foreground">Team Member Roles</h2>
                   </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Manage team member roles based on the 4-level hierarchy. Higher roles can change roles of members below them.
+                  </p>
                   
-                  <div className="flex items-center justify-between py-3 border-b border-border">
-                    <div>
-                      <p className="font-medium text-foreground">Task Creation</p>
-                      <p className="text-sm text-muted-foreground">Allow all members to create tasks</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
+                  <MemberRoleManagement
+                    teamMembers={teamMembers || []}
+                    currentUserRole={
+                      teamMembers?.find(m => m.userId === permissions.user?.id)?.role as WorkspaceRole || null
+                    }
+                    workspaceId={workspaceId!}
+                  />
+                </div>
+
+                {/* Permission Toggles */}
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <h2 className="text-lg font-semibold text-foreground mb-4">Permission Settings</h2>
                   
-                  <div className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium text-foreground">Public Visibility</p>
-                      <p className="text-sm text-muted-foreground">Make workspace visible to organization</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-border">
+                      <div>
+                        <p className="font-medium text-foreground">Allow Member Invites</p>
+                        <p className="text-sm text-muted-foreground">Let team leads invite new members</p>
+                      </div>
+                      <Switch defaultChecked />
                     </div>
-                    <Switch />
+                    
+                    <div className="flex items-center justify-between py-3 border-b border-border">
+                      <div>
+                        <p className="font-medium text-foreground">Task Creation</p>
+                        <p className="text-sm text-muted-foreground">Allow all members to create tasks</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-3">
+                      <div>
+                        <p className="font-medium text-foreground">Public Visibility</p>
+                        <p className="text-sm text-muted-foreground">Make workspace visible to organization</p>
+                      </div>
+                      <Switch />
+                    </div>
                   </div>
                 </div>
               </div>
