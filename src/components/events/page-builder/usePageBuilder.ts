@@ -101,7 +101,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     loadEvent();
   }, [eventId, toast, navigate]);
 
-  // Initialize GrapesJS editor with default UI
+  // Initialize GrapesJS editor with full configuration
   useEffect(() => {
     if (loading || !eventData || !containerRef.current || editorRef.current) return;
 
@@ -114,15 +114,165 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       height: '100%',
       width: 'auto',
       fromElement: false,
+      
+      // =============================================
+      // 1. STORAGE MANAGER - Disable default, use custom save
+      // =============================================
       storageManager: false,
-      selectorManager: { componentFirst: true },
+
+      // =============================================
+      // 2. SELECTOR MANAGER - CSS class management
+      // =============================================
+      selectorManager: {
+        componentFirst: true,
+      },
+
+      // =============================================
+      // 3. DEVICE MANAGER - Responsive breakpoints
+      // =============================================
       deviceManager: {
         devices: [
-          { name: 'Desktop', width: '' },
-          { name: 'Tablet', width: '768px' },
-          { name: 'Mobile', width: '375px' },
+          {
+            name: 'Desktop',
+            width: '',
+          },
+          {
+            name: 'Tablet',
+            width: '768px',
+            widthMedia: '992px',
+          },
+          {
+            name: 'Mobile',
+            width: '375px',
+            widthMedia: '480px',
+          },
         ],
       },
+
+      // =============================================
+      // 4. STYLE MANAGER - CSS property editor
+      // =============================================
+      styleManager: {
+        sectors: [
+          {
+            name: 'General',
+            open: true,
+            buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom'],
+          },
+          {
+            name: 'Dimension',
+            open: false,
+            buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+          },
+          {
+            name: 'Typography',
+            open: false,
+            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'text-transform'],
+          },
+          {
+            name: 'Decorations',
+            open: false,
+            buildProps: ['background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+          },
+          {
+            name: 'Extra',
+            open: false,
+            buildProps: ['opacity', 'transition', 'transform', 'cursor', 'overflow'],
+          },
+        ],
+      },
+
+      // =============================================
+      // 5. BLOCK MANAGER - Draggable content blocks
+      // =============================================
+      blockManager: {
+        blocks: [
+          {
+            id: 'section',
+            label: 'Section',
+            category: 'Basic',
+            content: '<section class="gjs-section"><div class="gjs-container"></div></section>',
+            media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="currentColor"/></svg>',
+          },
+          {
+            id: 'text',
+            label: 'Text',
+            category: 'Basic',
+            content: '<div data-gjs-type="text">Insert your text here</div>',
+            media: '<svg viewBox="0 0 24 24"><text x="3" y="17" font-size="14" fill="currentColor">T</text></svg>',
+          },
+          {
+            id: 'image',
+            label: 'Image',
+            category: 'Basic',
+            select: true,
+            content: { type: 'image' },
+            activate: true,
+            media: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/><circle cx="8.5" cy="8.5" r="1.5" fill="white"/><path d="M21 15l-5-5L5 21" fill="white"/></svg>',
+          },
+          {
+            id: 'video',
+            label: 'Video',
+            category: 'Basic',
+            select: true,
+            content: { type: 'video' },
+            media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="currentColor"/><polygon points="10,9 15,12 10,15" fill="white"/></svg>',
+          },
+          {
+            id: 'button',
+            label: 'Button',
+            category: 'Basic',
+            content: '<a class="gjs-button" href="#">Click me</a>',
+            media: '<svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="4" fill="currentColor"/></svg>',
+          },
+          {
+            id: 'divider',
+            label: 'Divider',
+            category: 'Basic',
+            content: '<hr class="gjs-divider" />',
+            media: '<svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>',
+          },
+          {
+            id: 'columns-2',
+            label: '2 Columns',
+            category: 'Layout',
+            content: `<div class="gjs-row">
+              <div class="gjs-cell"></div>
+              <div class="gjs-cell"></div>
+            </div>`,
+            media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="16" fill="currentColor"/><rect x="13" y="4" width="9" height="16" fill="currentColor"/></svg>',
+          },
+          {
+            id: 'columns-3',
+            label: '3 Columns',
+            category: 'Layout',
+            content: `<div class="gjs-row">
+              <div class="gjs-cell"></div>
+              <div class="gjs-cell"></div>
+              <div class="gjs-cell"></div>
+            </div>`,
+            media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="6" height="16" fill="currentColor"/><rect x="9" y="4" width="6" height="16" fill="currentColor"/><rect x="16" y="4" width="6" height="16" fill="currentColor"/></svg>',
+          },
+          {
+            id: 'link',
+            label: 'Link',
+            category: 'Basic',
+            content: '<a href="#">Link text</a>',
+            media: '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+          },
+          {
+            id: 'map',
+            label: 'Map',
+            category: 'Basic',
+            content: { type: 'map' },
+            media: '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="currentColor"/><circle cx="12" cy="10" r="3" fill="white"/></svg>',
+          },
+        ],
+      },
+
+      // =============================================
+      // 6. CANVAS STYLES
+      // =============================================
       canvas: {
         styles: getCanvasStyles(primaryColor),
       },
@@ -130,21 +280,9 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
     editorRef.current = editor;
 
-    // Initialize custom plugins for animations and advanced styling
-    initializePlugins(editor);
-
-    // Add device commands
-    editor.Commands.add('set-device-desktop', {
-      run: (ed) => ed.setDevice('Desktop'),
-    });
-    editor.Commands.add('set-device-tablet', {
-      run: (ed) => ed.setDevice('Tablet'),
-    });
-    editor.Commands.add('set-device-mobile', {
-      run: (ed) => ed.setDevice('Mobile'),
-    });
-
-    // Add custom blocks
+    // =============================================
+    // 7. ADD EVENT-SPECIFIC BLOCKS
+    // =============================================
     const blockManager = editor.BlockManager;
 
     blockManager.add('hero-block', {
@@ -158,14 +296,14 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       label: 'Event Schedule',
       category: 'Event Sections',
       content: scheduleBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>',
     });
 
     blockManager.add('registration-block', {
       label: 'Registration Form',
       category: 'Event Sections',
       content: registrationBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
     });
 
     blockManager.add('speakers-block', {
@@ -186,28 +324,28 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       label: 'FAQ',
       category: 'Event Sections',
       content: faqBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>',
     });
 
     blockManager.add('countdown-block', {
       label: 'Countdown Timer',
       category: 'Event Sections',
       content: countdownBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14" stroke="white" stroke-width="2" fill="none"/></svg>',
     });
 
     blockManager.add('video-block', {
-      label: 'Video',
+      label: 'Event Video',
       category: 'Media',
       content: videoBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 9 15 12 10 15" fill="white"/></svg>',
     });
 
     blockManager.add('gallery-block', {
       label: 'Gallery',
       category: 'Media',
       content: galleryBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
     });
 
     blockManager.add('cta-block', {
@@ -221,24 +359,25 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       label: 'Venue',
       category: 'Event Sections',
       content: venueBlockHtml(),
-      media: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+      media: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>',
     });
 
-    // Load existing content or seed with defaults
-    if (existingLanding?.html) {
-      editor.setComponents(existingLanding.html);
-      if (existingLanding.css) {
-        editor.setStyle(existingLanding.css);
-      }
-    } else {
-      editor.setComponents(`
-        ${heroBlockHtml({ name, description, logoUrl })}
-        ${scheduleBlockHtml()}
-        ${registrationBlockHtml()}
-      `);
-    }
+    // =============================================
+    // 8. CUSTOM COMMANDS
+    // =============================================
+    
+    // Device commands
+    editor.Commands.add('set-device-desktop', {
+      run: (ed) => ed.setDevice('Desktop'),
+    });
+    editor.Commands.add('set-device-tablet', {
+      run: (ed) => ed.setDevice('Tablet'),
+    });
+    editor.Commands.add('set-device-mobile', {
+      run: (ed) => ed.setDevice('Mobile'),
+    });
 
-    // Add save command
+    // Save command
     editor.Commands.add('save-page', {
       run: async () => {
         const html = editor.getHtml();
@@ -262,7 +401,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
           if (error) throw error;
           toast({
             title: 'Landing page saved',
-            description: 'Your event page is live on the public landing URL.',
+            description: 'Your event page has been saved successfully.',
           });
         } catch (err) {
           console.error('Failed to save landing page', err);
@@ -277,12 +416,58 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       },
     });
 
-    // Add save button to the default panel
-    editor.Panels.addButton('options', {
-      id: 'save',
-      className: 'fa fa-floppy-o',
-      command: 'save-page',
-      attributes: { title: 'Save Page' },
+    // Preview command
+    editor.Commands.add('preview-page', {
+      run: () => {
+        if (eventId) {
+          const publicUrl = `${window.location.origin}/events/${eventId}`;
+          window.open(publicUrl, '_blank', 'noopener,noreferrer');
+        }
+      },
+    });
+
+    // Clear canvas command
+    editor.Commands.add('clear-canvas', {
+      run: () => {
+        if (window.confirm('Are you sure you want to clear the canvas?')) {
+          editor.DomComponents.clear();
+          editor.CssComposer.clear();
+        }
+      },
+    });
+
+    // =============================================
+    // 9. INITIALIZE CUSTOM PLUGINS
+    // =============================================
+    initializePlugins(editor);
+
+    // =============================================
+    // 10. LOAD EXISTING CONTENT
+    // =============================================
+    if (existingLanding?.html) {
+      editor.setComponents(existingLanding.html);
+      if (existingLanding.css) {
+        editor.setStyle(existingLanding.css);
+      }
+    } else {
+      editor.setComponents(`
+        ${heroBlockHtml({ name, description, logoUrl })}
+        ${scheduleBlockHtml()}
+        ${registrationBlockHtml()}
+      `);
+    }
+
+    // =============================================
+    // 11. KEYBOARD SHORTCUTS
+    // =============================================
+    editor.on('load', () => {
+      // Add keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          editor.runCommand('save-page');
+        }
+      });
     });
 
     return () => {
