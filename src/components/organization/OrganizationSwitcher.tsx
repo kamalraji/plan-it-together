@@ -4,11 +4,11 @@ import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 import { useCurrentOrganization } from './OrganizationContext';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+  SimpleDropdownTrigger,
+} from '@/components/ui/simple-dropdown';
 
 export const OrganizationSwitcher: React.FC = () => {
   const navigate = useNavigate();
@@ -28,16 +28,16 @@ export const OrganizationSwitcher: React.FC = () => {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 hover:bg-accent rounded-md transition-colors">
+    <SimpleDropdown>
+      <SimpleDropdownTrigger className="flex items-center gap-2 px-4 py-2 hover:bg-accent rounded-md transition-colors">
         <span className="text-sm font-medium truncate max-w-[160px] sm:max-w-xs">
           {currentOrg.name}
         </span>
         <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
+      </SimpleDropdownTrigger>
+      <SimpleDropdownContent align="start" className="w-56">
         {myOrgs.map((org: any) => (
-          <DropdownMenuItem
+          <SimpleDropdownItem
             key={org.id}
             onClick={() => navigate(`/${org.slug}/dashboard`)}
             className={org.id === currentOrg.id ? 'bg-accent' : ''}
@@ -46,9 +46,9 @@ export const OrganizationSwitcher: React.FC = () => {
               <span className="font-medium truncate">{org.name}</span>
               <span className="text-xs text-muted-foreground truncate">{org.category}</span>
             </div>
-          </DropdownMenuItem>
+          </SimpleDropdownItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </SimpleDropdownContent>
+    </SimpleDropdown>
   );
 };

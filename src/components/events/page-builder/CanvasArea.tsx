@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Minus, Plus, Maximize } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+  SimpleDropdownTrigger,
+} from '@/components/ui/simple-dropdown';
 
 interface CanvasAreaProps {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -44,11 +44,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
       {/* Device bar */}
       <div className="flex h-10 items-center justify-between border-b border-[hsl(220,13%,18%)] bg-[hsl(220,13%,10%)] px-4">
         <div className="flex items-center gap-3">
-          <button className="flex h-6 w-6 items-center justify-center rounded bg-primary/20 text-primary">
+          <button className="flex h-6 w-6 items-center justify-center rounded bg-primary/20 text-primary" type="button">
             <Play className="h-3 w-3" fill="currentColor" />
           </button>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => onDeviceChange('Desktop')}
               className={cn(
                 'text-sm transition-colors',
@@ -59,6 +60,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             </button>
             <span className="text-muted-foreground">·</span>
             <button
+              type="button"
               onClick={() => onDeviceChange('Mobile')}
               className={cn(
                 'text-sm transition-colors',
@@ -74,7 +76,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
 
         {/* Zoom Controls */}
         <div className="flex items-center gap-1">
-          <button 
+          <button
+            type="button"
             onClick={() => {
               if (zoom === 'fit') setZoom(1);
               else if (zoom > 0.5) setZoom(Math.max(0.5, zoom - 0.25));
@@ -83,30 +86,26 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-[hsl(220,13%,15%)] hover:text-foreground transition-colors min-w-[52px] justify-center">
-                {getZoomLabel()}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="min-w-[80px]">
+
+          <SimpleDropdown>
+            <SimpleDropdownTrigger className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-[hsl(220,13%,15%)] hover:text-foreground transition-colors min-w-[52px] justify-center">
+              {getZoomLabel()}
+            </SimpleDropdownTrigger>
+            <SimpleDropdownContent align="center" className="min-w-[80px]">
               {ZOOM_LEVELS.map((level) => (
-                <DropdownMenuItem 
+                <SimpleDropdownItem
                   key={level.label}
                   onClick={() => setZoom(level.value)}
-                  className={cn(
-                    'justify-center',
-                    zoom === level.value && 'bg-accent'
-                  )}
+                  className={cn('justify-center', zoom === level.value && 'bg-accent')}
                 >
                   {level.label}
-                </DropdownMenuItem>
+                </SimpleDropdownItem>
               ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <button 
+            </SimpleDropdownContent>
+          </SimpleDropdown>
+
+          <button
+            type="button"
             onClick={() => {
               if (zoom === 'fit') setZoom(1);
               else if (zoom < 1) setZoom(Math.min(1, zoom + 0.25));
@@ -115,13 +114,14 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
-          
-          <button 
+
+          <button
+            type="button"
             onClick={() => setZoom('fit')}
             className={cn(
-              "flex h-7 w-7 items-center justify-center rounded transition-colors ml-1",
-              zoom === 'fit' 
-                ? 'bg-primary/20 text-primary' 
+              'flex h-7 w-7 items-center justify-center rounded transition-colors ml-1',
+              zoom === 'fit'
+                ? 'bg-primary/20 text-primary'
                 : 'text-muted-foreground hover:bg-[hsl(220,13%,15%)] hover:text-foreground'
             )}
           >
@@ -132,9 +132,9 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
 
       {/* Canvas container */}
       <div className="relative flex-1 overflow-auto p-6">
-        <div 
+        <div
           className={cn(
-            "mx-auto h-full overflow-hidden rounded-lg bg-[hsl(220,13%,12%)] shadow-2xl ring-1 ring-[hsl(220,13%,18%)]",
+            'mx-auto h-full overflow-hidden rounded-lg bg-[hsl(220,13%,12%)] shadow-2xl ring-1 ring-[hsl(220,13%,18%)]',
             zoom === 'fit' ? 'max-w-full' : ''
           )}
           style={zoom !== 'fit' ? { width: `${parseInt(deviceWidth) * (typeof zoom === 'number' ? zoom : 1)}px` } : {}}
