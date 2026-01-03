@@ -22,6 +22,9 @@ export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
 export { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
 export { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
+export { WorkspacePermissionGuard, PermissionBadge } from './WorkspacePermissionGuard';
+export { WorkspaceRBACInfo } from './WorkspaceRBACInfo';
+export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
 
 // Mobile Components
 export * from './mobile';
