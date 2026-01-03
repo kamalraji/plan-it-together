@@ -29,6 +29,8 @@ interface BuilderToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   saving: boolean;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export const BuilderToolbar: React.FC<BuilderToolbarProps> = ({
@@ -38,6 +40,8 @@ export const BuilderToolbar: React.FC<BuilderToolbarProps> = ({
   onUndo,
   onRedo,
   saving,
+  canUndo = true,
+  canRedo = true,
 }) => {
   return (
     <TooltipProvider delayDuration={300}>
@@ -65,8 +69,8 @@ export const BuilderToolbar: React.FC<BuilderToolbarProps> = ({
           <div className="mx-2 h-5 w-px bg-[hsl(220,13%,20%)]" />
 
           {/* Undo/Redo */}
-          <ToolButton icon={Undo2} tooltip="Undo (Ctrl+Z)" onClick={onUndo} />
-          <ToolButton icon={Redo2} tooltip="Redo (Ctrl+Y)" onClick={onRedo} />
+          <ToolButton icon={Undo2} tooltip="Undo (Ctrl+Z)" onClick={onUndo} disabled={!canUndo} />
+          <ToolButton icon={Redo2} tooltip="Redo (Ctrl+Y)" onClick={onRedo} disabled={!canRedo} />
         </div>
 
         {/* Center: Project name */}
@@ -114,16 +118,19 @@ interface ToolButtonProps {
   icon: React.ElementType;
   tooltip?: string;
   active?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
-const ToolButton: React.FC<ToolButtonProps> = ({ icon: Icon, tooltip, active, onClick }) => (
+const ToolButton: React.FC<ToolButtonProps> = ({ icon: Icon, tooltip, active, disabled, onClick }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <button
         onClick={onClick}
+        disabled={disabled}
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-md transition-all duration-150',
+          disabled && 'opacity-40 cursor-not-allowed',
           active
             ? 'bg-[hsl(220,13%,18%)] text-foreground shadow-[inset_0_0_0_1px_hsl(220,13%,25%)]'
             : 'text-muted-foreground hover:bg-[hsl(220,13%,15%)] hover:text-foreground'

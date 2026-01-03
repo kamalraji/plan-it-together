@@ -26,11 +26,21 @@ export const EventPageBuilder: React.FC = () => {
     loading,
     saving,
     device,
+    canUndo,
+    canRedo,
+    layers,
+    selectedLayerId,
     handleDeviceChange,
     handleUndo,
     handleRedo,
     handlePreview,
     handleSave,
+    handleLayersReorder,
+    handleLayerSelect,
+    handleLayerVisibilityToggle,
+    handleLayerLockToggle,
+    handleLayerDelete,
+    handleApplyAnimation,
   } = usePageBuilder({ eventId });
 
   if (loading) {
@@ -54,12 +64,22 @@ export const EventPageBuilder: React.FC = () => {
         onUndo={handleUndo}
         onRedo={handleRedo}
         saving={saving}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
 
       {/* Main Content */}
       <div className="flex flex-1 min-h-0">
         {/* Left Panel */}
-        <LeftPanel />
+        <LeftPanel
+          layers={layers}
+          selectedLayerId={selectedLayerId}
+          onLayersReorder={handleLayersReorder}
+          onLayerSelect={handleLayerSelect}
+          onLayerVisibilityToggle={handleLayerVisibilityToggle}
+          onLayerLockToggle={handleLayerLockToggle}
+          onLayerDelete={handleLayerDelete}
+        />
 
         {/* Canvas Area */}
         <CanvasArea
@@ -69,7 +89,7 @@ export const EventPageBuilder: React.FC = () => {
         />
 
         {/* Right Panel */}
-        <RightPanel />
+        <RightPanel onApplyAnimation={handleApplyAnimation} />
       </div>
 
       {/* GrapesJS Custom Styles for dark theme with Framer polish */}
