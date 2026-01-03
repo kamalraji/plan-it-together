@@ -20,6 +20,7 @@ import { getCanvasStyles } from './pageBuilderStyles';
 import { slugify, extractTitleFromHtml, extractDescriptionFromHtml } from './pageBuilderUtils';
 import type { LayerData } from './LeftPanel';
 import type { AnimationConfig } from './RightPanel';
+import type { TemplateData } from './TemplatesGallery';
 
 interface LandingPageDataMeta {
   title?: string;
@@ -59,6 +60,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>();
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | undefined>();
 
   // Fetch event data
   useEffect(() => {
@@ -549,6 +551,36 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     });
   }, [toast]);
 
+  // Load a template into the canvas
+  const handleSelectTemplate = useCallback((template: TemplateData) => {
+    if (!editorRef.current) return;
+
+    const confirmLoad = window.confirm(
+      'Loading a template will replace your current content. Do you want to continue?'
+    );
+
+    if (!confirmLoad) return;
+
+    editorRef.current.setComponents(template.html);
+    if (template.css) {
+      editorRef.current.setStyle(template.css);
+    }
+
+    setSelectedTemplateId(template.id);
+    setHasCustomLanding(true);
+
+    // Sync layers after loading template
+    setTimeout(() => {
+      syncLayers();
+      updateUndoRedoState();
+    }, 100);
+
+    toast({
+      title: 'Template loaded',
+      description: `"${template.name}" template has been applied to your page.`,
+    });
+  }, [syncLayers, updateUndoRedoState, toast]);
+
   return {
     containerRef,
     editorRef,
@@ -562,6 +594,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     canRedo,
     layers,
     selectedLayerId,
+    selectedTemplateId,
     handleDeviceChange,
     handleUndo,
     handleRedo,
@@ -573,6 +606,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     handleLayerLockToggle,
     handleLayerDelete,
     handleApplyAnimation,
+    handleSelectTemplate,
   };
 }
 

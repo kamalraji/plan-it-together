@@ -30,6 +30,7 @@ export const EventPageBuilder: React.FC = () => {
     canRedo,
     layers,
     selectedLayerId,
+    selectedTemplateId,
     handleDeviceChange,
     handleUndo,
     handleRedo,
@@ -41,6 +42,7 @@ export const EventPageBuilder: React.FC = () => {
     handleLayerLockToggle,
     handleLayerDelete,
     handleApplyAnimation,
+    handleSelectTemplate,
   } = usePageBuilder({ eventId });
 
   if (loading) {
@@ -79,6 +81,8 @@ export const EventPageBuilder: React.FC = () => {
           onLayerVisibilityToggle={handleLayerVisibilityToggle}
           onLayerLockToggle={handleLayerLockToggle}
           onLayerDelete={handleLayerDelete}
+          onSelectTemplate={handleSelectTemplate}
+          selectedTemplateId={selectedTemplateId}
         />
 
         {/* Canvas Area */}

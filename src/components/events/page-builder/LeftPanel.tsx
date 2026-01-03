@@ -19,6 +19,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { motion, Reorder, useDragControls } from 'framer-motion';
+import { TemplatesGallery, TemplateData } from './TemplatesGallery';
 
 interface LeftPanelProps {
   blocksContainerRef?: React.RefObject<HTMLDivElement>;
@@ -30,6 +31,8 @@ interface LeftPanelProps {
   onLayerLockToggle?: (layerId: string) => void;
   onLayerDelete?: (layerId: string) => void;
   selectedLayerId?: string;
+  onSelectTemplate?: (template: TemplateData) => void;
+  selectedTemplateId?: string;
 }
 
 export interface LayerData {
@@ -70,6 +73,8 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   onLayerLockToggle,
   onLayerDelete,
   selectedLayerId,
+  onSelectTemplate,
+  selectedTemplateId,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('Layers');
 
@@ -108,7 +113,13 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             selectedLayerId={selectedLayerId}
           />
         )}
-        {activeTab === 'Assets' && <AssetsPanel blocksContainerRef={blocksContainerRef} />}
+        {activeTab === 'Assets' && (
+          <AssetsPanel 
+            blocksContainerRef={blocksContainerRef}
+            onSelectTemplate={onSelectTemplate}
+            selectedTemplateId={selectedTemplateId}
+          />
+        )}
       </div>
     </div>
   );
@@ -311,16 +322,61 @@ const DraggableLayerItem: React.FC<DraggableLayerItemProps> = ({
   );
 };
 
-interface AssetsBlocksPanelProps {
+interface AssetsPanelProps {
   blocksContainerRef?: React.RefObject<HTMLDivElement>;
+  onSelectTemplate?: (template: TemplateData) => void;
+  selectedTemplateId?: string;
 }
 
-const AssetsPanel: React.FC<AssetsBlocksPanelProps> = ({ blocksContainerRef }) => {
+const AssetsPanel: React.FC<AssetsPanelProps> = ({ 
+  blocksContainerRef,
+  onSelectTemplate,
+  selectedTemplateId,
+}) => {
+  const [activeSection, setActiveSection] = useState<'blocks' | 'templates'>('templates');
+
   return (
     <div className="p-2">
-      <p className="mb-3 px-2 text-xs text-muted-foreground">Drag blocks to add sections</p>
-      {/* GrapesJS blocks container */}
-      <div ref={blocksContainerRef} className="panel-blocks" />
+      {/* Toggle between Blocks and Templates */}
+      <div className="flex gap-1 mb-3 p-1 bg-[hsl(220,13%,12%)] rounded-lg">
+        <button
+          onClick={() => setActiveSection('templates')}
+          className={cn(
+            'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
+            activeSection === 'templates'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          Templates
+        </button>
+        <button
+          onClick={() => setActiveSection('blocks')}
+          className={cn(
+            'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
+            activeSection === 'blocks'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          Blocks
+        </button>
+      </div>
+
+      {activeSection === 'templates' && onSelectTemplate && (
+        <TemplatesGallery
+          onSelectTemplate={onSelectTemplate}
+          selectedTemplateId={selectedTemplateId}
+        />
+      )}
+
+      {activeSection === 'blocks' && (
+        <>
+          <p className="mb-3 px-2 text-xs text-muted-foreground">Drag blocks to add sections</p>
+          {/* GrapesJS blocks container */}
+          <div ref={blocksContainerRef} className="panel-blocks" />
+        </>
+      )}
     </div>
   );
 };
