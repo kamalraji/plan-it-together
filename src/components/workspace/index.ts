@@ -18,6 +18,7 @@ export { TaskManagementInterface } from './TaskManagementInterface';
 export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
 export { TaskDetailView } from './TaskDetailView';
+export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 
 // Mobile Components
 export * from './mobile';

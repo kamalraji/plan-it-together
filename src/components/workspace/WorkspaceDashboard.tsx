@@ -29,6 +29,7 @@ import { TaskManagementInterface } from './TaskManagementInterface';
 import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
 import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
+import { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -57,6 +58,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     | 'audit'
     | 'role-management'
   >(taskIdFromUrl ? 'tasks' : 'overview');
+  const [showSubWorkspaceModal, setShowSubWorkspaceModal] = useState(false);
   const { user } = useAuth();
 
   // Workspace from Supabase
@@ -427,7 +429,18 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         onInviteTeamMember={isGlobalWorkspaceManager ? handleInviteTeamMember : undefined}
         onCreateTask={canManageTasks ? handleCreateTask : undefined}
         onManageSettings={isGlobalWorkspaceManager ? handleManageSettings : undefined}
+        onCreateSubWorkspace={isGlobalWorkspaceManager ? () => setShowSubWorkspaceModal(true) : undefined}
       />
+
+      {/* Sub-Workspace Creation Modal */}
+      {workspaceId && workspace?.eventId && (
+        <CreateSubWorkspaceModal
+          open={showSubWorkspaceModal}
+          onOpenChange={setShowSubWorkspaceModal}
+          parentWorkspaceId={workspaceId}
+          eventId={workspace.eventId}
+        />
+      )}
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
         {/* Role-based sub workspace selector */}
