@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { Workspace, WorkspaceStatus } from '../../types';
-import { Breadcrumb } from '../common/Breadcrumb';
+import { 
+  LayoutDashboard, 
+  ClipboardList, 
+  ShoppingBag, 
+  Users, 
+  MessageSquare, 
+  BarChart3, 
+  FileText, 
+  Download, 
+  Clock, 
+  UserCog,
+  ChevronDown,
+  ChevronRight
+} from 'lucide-react';
 
 interface WorkspaceNavigationProps {
   workspace: Workspace;
@@ -32,6 +45,21 @@ interface WorkspaceNavigationProps {
   onWorkspaceSwitch: (workspaceId: string) => void;
 }
 
+type TabId = WorkspaceNavigationProps['activeTab'];
+
+interface Tab {
+  id: TabId;
+  name: string;
+  icon: React.ReactNode;
+  group: 'core' | 'management' | 'analysis';
+}
+
+const tabGroups = {
+  core: { label: 'Core', order: 1 },
+  management: { label: 'Management', order: 2 },
+  analysis: { label: 'Analysis', order: 3 },
+};
+
 export function WorkspaceNavigation({
   workspace,
   userWorkspaces,
@@ -40,201 +68,70 @@ export function WorkspaceNavigation({
   onWorkspaceSwitch,
 }: WorkspaceNavigationProps) {
   const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  const tabs = [
-    {
-      id: 'overview' as const,
-      name: 'Overview',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'tasks' as const,
-      name: 'Tasks',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'marketplace' as const,
-      name: 'Marketplace',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'team' as const,
-      name: 'Team',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.196M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'communication' as const,
-      name: 'Communication',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'analytics' as const,
-      name: 'Analytics',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'templates' as const,
-      name: 'Templates',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'reports' as const,
-      name: 'Reports',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'audit' as const,
-      name: 'Audit Log',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'role-management' as const,
-      name: 'Roles',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      ),
-    },
+  const tabs: Tab[] = [
+    { id: 'overview', name: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, group: 'core' },
+    { id: 'tasks', name: 'Tasks', icon: <ClipboardList className="w-4 h-4" />, group: 'core' },
+    { id: 'team', name: 'Team', icon: <Users className="w-4 h-4" />, group: 'core' },
+    { id: 'communication', name: 'Communication', icon: <MessageSquare className="w-4 h-4" />, group: 'core' },
+    { id: 'marketplace', name: 'Marketplace', icon: <ShoppingBag className="w-4 h-4" />, group: 'management' },
+    { id: 'templates', name: 'Templates', icon: <FileText className="w-4 h-4" />, group: 'management' },
+    { id: 'role-management', name: 'Roles', icon: <UserCog className="w-4 h-4" />, group: 'management' },
+    { id: 'analytics', name: 'Analytics', icon: <BarChart3 className="w-4 h-4" />, group: 'analysis' },
+    { id: 'reports', name: 'Reports', icon: <Download className="w-4 h-4" />, group: 'analysis' },
+    { id: 'audit', name: 'Audit Log', icon: <Clock className="w-4 h-4" />, group: 'analysis' },
   ];
 
   const getStatusColor = (status: WorkspaceStatus) => {
     switch (status) {
       case WorkspaceStatus.ACTIVE:
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case WorkspaceStatus.PROVISIONING:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
       case WorkspaceStatus.DISSOLVED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
-  return (
-    <div className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          {/* Breadcrumb Navigation */}
-          <div className="py-3 sm:py-4">
-            <Breadcrumb
-              items={[
-                { label: 'Dashboard', href: '/dashboard' },
-                {
-                  label: workspace.event?.name || 'Event',
-                  href: workspace.event ? `/events/${workspace.event.id}` : undefined,
-                },
-                { label: 'Workspace', current: true },
-              ]}
-            />
-          </div>
+  const toggleGroup = (group: string) => {
+    setCollapsedGroups(prev => ({ ...prev, [group]: !prev[group] }));
+  };
 
+  // Group tabs by category
+  const groupedTabs = tabs.reduce((acc, tab) => {
+    if (!acc[tab.group]) acc[tab.group] = [];
+    acc[tab.group].push(tab);
+    return acc;
+  }, {} as Record<string, Tab[]>);
+
+  // Check if active tab is in a group
+  const activeTabGroup = tabs.find(t => t.id === activeTab)?.group;
+
+  return (
+    <div className="bg-card shadow-sm border-b border-border">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end py-2 sm:py-3">
           {/* Workspace Switcher */}
           {userWorkspaces.length > 1 && (
-            <div className="relative mb-2 sm:mb-0 self-start sm:self-auto">
+            <div className="relative self-start sm:self-auto">
               <button
                 onClick={() => setShowWorkspaceSwitcher(!showWorkspaceSwitcher)}
-                className="flex items-center space-x-2 px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="flex items-center space-x-2 px-3 py-2 text-xs sm:text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
               >
                 <span className="hidden sm:inline">Switch Workspace</span>
                 <span className="inline sm:hidden">Switch</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown className="w-4 h-4" />
               </button>
 
               {showWorkspaceSwitcher && (
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-card rounded-md shadow-lg ring-1 ring-border z-50">
                   <div className="py-1 max-h-80 overflow-y-auto">
-                    <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                       Your Workspaces
                     </div>
                     {userWorkspaces.map((ws) => (
@@ -244,14 +141,14 @@ export function WorkspaceNavigation({
                           onWorkspaceSwitch(ws.id);
                           setShowWorkspaceSwitcher(false);
                         }}
-                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 ${ws.id === workspace.id ? 'bg-indigo-50 border-r-2 border-indigo-500' : ''
+                        className={`w-full text-left px-4 py-3 hover:bg-muted ${ws.id === workspace.id ? 'bg-primary/10 border-r-2 border-primary' : ''
                           }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{ws.name}</p>
+                            <p className="text-sm font-medium text-foreground truncate">{ws.name}</p>
                             {!!ws.event?.name && (
-                              <p className="text-xs text-gray-500 truncate">{ws.event?.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{ws.event?.name}</p>
                             )}
                           </div>
                           <span
@@ -271,16 +168,17 @@ export function WorkspaceNavigation({
           )}
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200 overflow-x-auto">
-          <nav className="-mb-px flex min-w-max space-x-3 sm:space-x-6 md:space-x-8 px-1">
+        {/* Tab Navigation - Desktop: horizontal, Mobile: grouped */}
+        <div className="border-b border-border">
+          {/* Desktop horizontal tabs */}
+          <nav className="hidden md:flex -mb-px overflow-x-auto space-x-1 px-1 py-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex shrink-0 items-center space-x-2 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm ${activeTab === tab.id
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                className={`flex shrink-0 items-center gap-2 py-2.5 px-3 rounded-lg font-medium text-sm transition-colors ${activeTab === tab.id
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                   }`}
               >
                 {tab.icon}
@@ -288,6 +186,56 @@ export function WorkspaceNavigation({
               </button>
             ))}
           </nav>
+
+          {/* Mobile grouped tabs */}
+          <div className="md:hidden py-2 space-y-1">
+            {Object.entries(tabGroups)
+              .sort((a, b) => a[1].order - b[1].order)
+              .map(([groupKey, groupInfo]) => {
+                const groupTabs = groupedTabs[groupKey] || [];
+                const isCollapsed = collapsedGroups[groupKey] && activeTabGroup !== groupKey;
+                const hasActiveTab = groupTabs.some(t => t.id === activeTab);
+
+                return (
+                  <div key={groupKey} className="border-b border-border/50 last:border-b-0 pb-1">
+                    <button
+                      onClick={() => toggleGroup(groupKey)}
+                      className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide"
+                    >
+                      <span className="flex items-center gap-1">
+                        {groupInfo.label}
+                        {hasActiveTab && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        )}
+                      </span>
+                      {isCollapsed ? (
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+
+                    {!isCollapsed && (
+                      <div className="flex flex-wrap gap-1 px-1 py-1">
+                        {groupTabs.map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => onTabChange(tab.id)}
+                            className={`flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg font-medium text-xs transition-colors ${activeTab === tab.id
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground bg-muted/50 hover:text-foreground hover:bg-muted'
+                              }`}
+                          >
+                            {tab.icon}
+                            <span className="whitespace-nowrap">{tab.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
         </div>
       </div>
     </div>
