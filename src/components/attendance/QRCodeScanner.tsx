@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AttendanceRecord } from '../../types';
 import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser';
+import type { Result } from '@zxing/library';
 
 interface QRCodeScannerProps {
   eventId: string;
@@ -100,7 +101,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       const controls = await codeReaderRef.current.decodeFromVideoDevice(
         undefined,
         videoRef.current,
-        async (result, _err) => {
+        async (result: Result | undefined, _err: Error | undefined) => {
           if (result) {
             const qrText = result.getText();
 
