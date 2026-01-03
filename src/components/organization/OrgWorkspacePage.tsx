@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -480,94 +480,38 @@ export const OrgWorkspacePage: React.FC = () => {
         </div>
       </header>
 
-      {/* Main content with workspace list sidebar */}
-      <div className="flex gap-4 min-h-[500px]">
-        {/* Workspace List Sidebar */}
-        {!hasNoWorkspaces && (
-          <aside className="w-64 flex-shrink-0 hidden md:block">
-            <div className="rounded-xl border border-border/70 bg-card/80 shadow-sm overflow-hidden">
-              <div className="p-3 border-b border-border/50 bg-muted/30">
-                <h3 className="text-sm font-medium text-foreground">Your Workspaces</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {workspaces?.length || 0} workspace{(workspaces?.length || 0) !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <ScrollArea className="h-[420px]">
-                <div className="p-2 space-y-3">
-                  {/* My Workspaces Section */}
-                  {myWorkspaces.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground px-2 mb-1.5">My Workspaces</p>
-                      <div className="space-y-1">
-                        {myWorkspaces.map((workspace: any) => (
-                          <WorkspaceListItem
-                            key={workspace.id}
-                            workspace={workspace}
-                            selectedWorkspaceId={selectedWorkspaceId}
-                            onSelect={handleSelectWorkspace}
-                            showEvent={!eventId}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Organization Workspaces Section */}
-                  {orgWorkspaces.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground px-2 mb-1.5">Organization Workspaces</p>
-                      <div className="space-y-1">
-                        {orgWorkspaces.map((workspace: any) => (
-                          <WorkspaceListItem
-                            key={workspace.id}
-                            workspace={workspace}
-                            selectedWorkspaceId={selectedWorkspaceId}
-                            onSelect={handleSelectWorkspace}
-                            showEvent={!eventId}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
+      {/* Main content - workspace dashboard */}
+      <main className="min-h-[500px]">
+        {selectedWorkspaceId ? (
+          <WorkspaceDashboard workspaceId={selectedWorkspaceId} orgSlug={orgSlug} />
+        ) : hasNoWorkspaces ? (
+          <div className="rounded-2xl border border-border/70 bg-card/80 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <Squares2X2Icon className="h-8 w-8 text-primary" />
             </div>
-          </aside>
+            <h2 className="text-lg font-semibold text-foreground mb-2">No workspaces yet</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
+              Create your first workspace to start organizing tasks, managing your team, and coordinating communication for this event.
+            </p>
+            {canManageWorkspaces && (
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                Create Workspace
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+            <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-md">
+              Choose a workspace from the sidebar to view tasks, team members, and communication.
+            </p>
+          </div>
         )}
-
-        {/* Workspace dashboard */}
-        <main className="flex-1 min-w-0">
-          {selectedWorkspaceId ? (
-            <WorkspaceDashboard workspaceId={selectedWorkspaceId} orgSlug={orgSlug} />
-          ) : hasNoWorkspaces ? (
-            <div className="rounded-2xl border border-border/70 bg-card/80 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                <Squares2X2Icon className="h-8 w-8 text-primary" />
-              </div>
-              <h2 className="text-lg font-semibold text-foreground mb-2">No workspaces yet</h2>
-              <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
-                Create your first workspace to start organizing tasks, managing your team, and coordinating communication for this event.
-              </p>
-              {canManageWorkspaces && (
-                <Button
-                  onClick={() => setIsCreateDialogOpen(true)}
-                  className="gap-2"
-                >
-                  <PlusIcon className="h-4 w-4" />
-                  Create Workspace
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-              <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
-              <p className="text-sm text-muted-foreground text-center max-w-md">
-                Choose a workspace from the sidebar to view tasks, team members, and communication.
-              </p>
-            </div>
-          )}
-        </main>
-      </div>
+      </main>
 
       {/* Mobile workspace selector */}
       {!hasNoWorkspaces && workspaces && workspaces.length > 0 && (

@@ -1,7 +1,10 @@
-import React from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { NavLink } from '@/components/NavLink';
 import { useCurrentOrganization } from './OrganizationContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +19,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { SidebarUserFooter } from './SidebarUserFooter';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Home,
   LayoutDashboard,
@@ -27,8 +31,14 @@ import {
   ExternalLink,
   Building2,
   Shield,
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  Plus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WorkspaceStatus } from '@/types';
 
 interface OrgMenuItem {
   title: string;
@@ -40,7 +50,7 @@ interface OrgMenuItem {
 const orgServices: OrgMenuItem[] = [
   { title: 'Dashboard', icon: LayoutDashboard, path: 'dashboard', description: 'Overview & metrics' },
   { title: 'Event Management', icon: CalendarDays, path: 'eventmanagement', description: 'Manage events' },
-  { title: 'Workspace', icon: Briefcase, path: 'workspaces', description: 'Team collaboration' },
+  // Workspace is now a separate expandable section
   { title: 'Marketplace', icon: Store, path: 'marketplace', description: 'Products & services' },
   { title: 'Analytics', icon: LineChart, path: 'analytics', description: 'Performance insights' },
   { title: 'Team', icon: Users, path: 'team', description: 'Members & roles' },
@@ -49,13 +59,131 @@ const orgServices: OrgMenuItem[] = [
 export const OrganizationSidebar: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
   const organization = useCurrentOrganization();
+  const { user } = useAuth();
+
+  const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
+  const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
+  const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
   const base = `/${orgSlug ?? ''}`.replace(/\/$/, '');
   const currentPath = location.pathname;
   const isThittamHubOrg = orgSlug === 'thittam1hub';
+  const isWorkspacesActive = currentPath.includes('/workspaces');
+  const selectedWorkspaceId = searchParams.get('workspaceId');
+
+  // Fetch workspaces for sidebar
+  const { data: workspacesData } = useQuery({
+    queryKey: ['sidebar-workspaces', organization?.id, user?.id],
+    queryFn: async () => {
+      if (!user?.id || !organization?.id) return { myWorkspaces: [], orgWorkspaces: [] };
+
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select(`
+          id, name, status, event_id, organizer_id, parent_workspace_id,
+          events!inner(id, name, organization_id),
+          workspace_team_members(user_id)
+        `)
+        .eq('events.organization_id', organization.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const allWorkspaces = (data || []).map((row: any) => ({
+        id: row.id,
+        eventId: row.event_id,
+        name: row.name,
+        status: row.status as WorkspaceStatus,
+        organizerId: row.organizer_id,
+        parentWorkspaceId: row.parent_workspace_id,
+        isOwner: row.organizer_id === user?.id,
+        isMember: row.workspace_team_members?.some((m: any) => m.user_id === user?.id),
+        event: row.events,
+      }));
+
+      const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
+      const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
+
+      // Build hierarchy
+      const buildHierarchy = (workspaces: typeof allWorkspaces) => {
+        const roots = workspaces.filter((w) => !w.parentWorkspaceId);
+        const children = workspaces.filter((w) => w.parentWorkspaceId);
+        return roots.map((root) => ({
+          ...root,
+          subWorkspaces: children.filter((c) => c.parentWorkspaceId === root.id),
+        }));
+      };
+
+      return {
+        myWorkspaces: buildHierarchy(myWorkspaces),
+        orgWorkspaces: buildHierarchy(orgWorkspaces),
+      };
+    },
+    enabled: !!user?.id && !!organization?.id,
+  });
+
+  const handleWorkspaceClick = (workspace: any) => {
+    navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+  };
+
+  // Workspace item component
+  const WorkspaceItem = ({ workspace, depth = 0 }: { workspace: any; depth?: number }) => {
+    const [expanded, setExpanded] = useState(true);
+    const hasChildren = workspace.subWorkspaces && workspace.subWorkspaces.length > 0;
+    const isSelected = selectedWorkspaceId === workspace.id;
+
+    return (
+      <div>
+        <button
+          onClick={() => handleWorkspaceClick(workspace)}
+          className={cn(
+            "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+            isSelected ? "bg-primary/10 text-primary" : "text-foreground"
+          )}
+          style={{ paddingLeft: `${8 + depth * 12}px` }}
+        >
+          {hasChildren ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+              }}
+              className="p-0.5 hover:bg-muted-foreground/20 rounded flex-shrink-0"
+            >
+              {expanded ? (
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              )}
+            </button>
+          ) : (
+            <span className="w-4 flex-shrink-0" />
+          )}
+          {expanded && hasChildren ? (
+            <FolderOpen className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          ) : (
+            <Folder className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+          )}
+          <span className="truncate flex-1">{workspace.name}</span>
+          {workspace.isOwner && (
+            <span className="text-[9px] px-1 py-0.5 bg-primary/10 text-primary rounded flex-shrink-0">Owner</span>
+          )}
+        </button>
+        {hasChildren && expanded && (
+          <div>
+            {workspace.subWorkspaces.map((sub: any) => (
+              <WorkspaceItem key={sub.id} workspace={sub} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Sidebar
@@ -185,6 +313,136 @@ export const OrganizationSidebar: React.FC = () => {
               })}
             </SidebarMenu>
           </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Workspaces Section */}
+        <SidebarGroup>
+          <button
+            onClick={() => setWorkspacesExpanded(!workspacesExpanded)}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
+              'hover:bg-primary/10',
+              isWorkspacesActive && 'bg-primary/15'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                  isWorkspacesActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/60 text-muted-foreground'
+                )}
+              >
+                <Briefcase className="h-4 w-4" />
+              </span>
+              {!isCollapsed && (
+                <span className="flex flex-col items-start">
+                  <span className={cn("text-sm font-medium", isWorkspacesActive && "text-primary")}>
+                    Workspaces
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Team collaboration
+                  </span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`${base}/workspaces`);
+                  }}
+                  className="p-1 hover:bg-muted rounded"
+                  title="Create workspace"
+                >
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                {workspacesExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            )}
+          </button>
+
+          {workspacesExpanded && !isCollapsed && (
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2">
+              {/* My Workspaces */}
+              <div className="mb-2">
+                <button
+                  onClick={() => setMyWorkspacesExpanded(!myWorkspacesExpanded)}
+                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>My Workspaces</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] bg-muted px-1 rounded">
+                      {workspacesData?.myWorkspaces?.length || 0}
+                    </span>
+                    {myWorkspacesExpanded ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </div>
+                </button>
+                {myWorkspacesExpanded && (
+                  <ScrollArea className="max-h-[150px]">
+                    <div className="space-y-0.5 mt-1">
+                      {workspacesData?.myWorkspaces?.length === 0 ? (
+                        <p className="px-2 py-1 text-[10px] text-muted-foreground italic">No workspaces yet</p>
+                      ) : (
+                        workspacesData?.myWorkspaces?.map((workspace: any) => (
+                          <WorkspaceItem key={workspace.id} workspace={workspace} />
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+
+              {/* Organization Workspaces */}
+              <div>
+                <button
+                  onClick={() => setOrgWorkspacesExpanded(!orgWorkspacesExpanded)}
+                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="h-3.5 w-3.5" />
+                    <span>Organization</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] bg-muted px-1 rounded">
+                      {workspacesData?.orgWorkspaces?.length || 0}
+                    </span>
+                    {orgWorkspacesExpanded ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </div>
+                </button>
+                {orgWorkspacesExpanded && (
+                  <ScrollArea className="max-h-[150px]">
+                    <div className="space-y-0.5 mt-1">
+                      {workspacesData?.orgWorkspaces?.length === 0 ? (
+                        <p className="px-2 py-1 text-[10px] text-muted-foreground italic">No other workspaces</p>
+                      ) : (
+                        workspacesData?.orgWorkspaces?.map((workspace: any) => (
+                          <WorkspaceItem key={workspace.id} workspace={workspace} />
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+            </div>
+          )}
         </SidebarGroup>
 
         {/* Public Page Link */}
