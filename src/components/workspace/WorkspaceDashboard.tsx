@@ -39,9 +39,10 @@ import { TablesInsert } from '@/integrations/supabase/types';
 
 interface WorkspaceDashboardProps {
   workspaceId?: string;
+  orgSlug?: string;
 }
 
-export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDashboardProps) {
+export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: WorkspaceDashboardProps) {
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = (propWorkspaceId || paramWorkspaceId) as string | undefined;
   const navigate = useNavigate();
@@ -427,6 +428,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     <div className="min-h-screen w-full bg-background flex flex-col">
       <WorkspaceHeader
         workspace={workspace}
+        orgSlug={orgSlug}
         onInviteTeamMember={isGlobalWorkspaceManager ? handleInviteTeamMember : undefined}
         onCreateTask={canManageTasks ? handleCreateTask : undefined}
         onManageSettings={isGlobalWorkspaceManager ? handleManageSettings : undefined}

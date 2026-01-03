@@ -384,7 +384,7 @@ export const OrgWorkspacePage: React.FC = () => {
         {/* Workspace dashboard */}
         <main className="min-h-[400px]">
           {selectedWorkspaceId ? (
-            <WorkspaceDashboard workspaceId={selectedWorkspaceId} />
+            <WorkspaceDashboard workspaceId={selectedWorkspaceId} orgSlug={orgSlug} />
           ) : (
             <div className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
               <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
