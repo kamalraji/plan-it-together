@@ -1,43 +1,52 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace, WorkspaceStatus } from '@/types';
+import { Workspace, WorkspaceStatus, UserRole } from '@/types';
 import { useCurrentOrganization } from './OrganizationContext';
 import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
+import { useAuth } from '@/hooks/useAuth';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
 /**
  * OrgWorkspacePage
  *
  * Organization-scoped workspace portal for the route `/:orgSlug/workspaces`.
- * This page now focuses on the general "workspace service" overview for an
- * organization, and links out to event-specific workspaces instead of
- * embedding the full WorkspaceDashboard inline.
- *
- * On mobile, the workspace list is optimized for small screens with filters
- * and pill-style badges.
+ * Shows workspace list and full workspace dashboard when one is selected.
+ * Supports filtering by eventId via query param.
  */
 export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { orgSlug } = useParams<{ orgSlug: string }>();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const eventIdFilter = searchParams.get('eventId') || undefined;
+  const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
 
   const baseWorkspacePath = `/${orgSlug}/workspaces`;
 
-  // Load workspaces the current user can access. RLS on `workspaces` ensures
-  // we only see rows where the current user is allowed to manage them.
+  // Load workspaces the current user can access
   const { data: workspaces, isLoading } = useQuery<Workspace[]>({
-    queryKey: ['org-workspaces', organization?.id],
+    queryKey: ['org-workspaces', organization?.id, eventIdFilter],
     queryFn: async () => {
       if (!organization?.id) return [] as Workspace[];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('workspaces')
         .select(
           'id, name, status, created_at, updated_at, event_id, events!inner(id, name, organization_id)'
         )
         .eq('events.organization_id', organization.id)
         .order('created_at', { ascending: false });
+
+      if (eventIdFilter) {
+        query = query.eq('event_id', eventIdFilter);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -63,8 +72,35 @@ export const OrgWorkspacePage: React.FC = () => {
     enabled: !!organization?.id,
   });
 
+  // Get event name if filtering by event
+  const { data: filteredEvent } = useQuery({
+    queryKey: ['event-name', eventIdFilter],
+    queryFn: async () => {
+      if (!eventIdFilter) return null;
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, name')
+        .eq('id', eventIdFilter)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!eventIdFilter,
+  });
+
   const [statusFilter, setStatusFilter] = React.useState<'ALL' | WorkspaceStatus>('ALL');
   const [sortOrder, setSortOrder] = React.useState<'recent' | 'oldest'>('recent');
+
+  // Auto-select first workspace if none selected and workspaces exist
+  useEffect(() => {
+    if (!selectedWorkspaceId && workspaces && workspaces.length > 0) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaces[0].id);
+        return next;
+      }, { replace: true });
+    }
+  }, [selectedWorkspaceId, workspaces, setSearchParams]);
 
   const filteredWorkspaces = (workspaces || [])
     .filter((ws) => (statusFilter === 'ALL' ? true : ws.status === statusFilter))
@@ -73,6 +109,44 @@ export const OrgWorkspacePage: React.FC = () => {
       const bTime = new Date(b.updatedAt ?? b.createdAt).getTime();
       return sortOrder === 'recent' ? bTime - aTime : aTime - bTime;
     });
+
+  const canManageWorkspaces =
+    !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
+
+  const createWorkspaceMutation = useMutation({
+    mutationFn: async (workspaceLabel: string) => {
+      if (!user || !eventIdFilter) {
+        throw new Error('You must select an event to create a workspace');
+      }
+
+      const { data: eventData } = await supabase
+        .from('events')
+        .select('name')
+        .eq('id', eventIdFilter)
+        .single();
+
+      const { data, error } = await supabase
+        .from('workspaces')
+        .insert({
+          event_id: eventIdFilter,
+          name: `${eventData?.name || 'Event'} – ${workspaceLabel}`,
+          organizer_id: user.id,
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      return data as { id: string };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['org-workspaces', organization?.id] });
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', data.id);
+        return next;
+      });
+    },
+  });
 
   const getStatusBadgeClass = (status: WorkspaceStatus) => {
     switch (status) {
@@ -88,9 +162,21 @@ export const OrgWorkspacePage: React.FC = () => {
     }
   };
 
-  const handleOpenWorkspace = (workspace: Workspace) => {
-    // Navigate directly to the dedicated workspace console detail page.
-    navigate(`${baseWorkspacePath}/${workspace.id}`);
+  const handleWorkspaceSelect = (workspace: Workspace) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('workspaceId', workspace.id);
+      return next;
+    });
+  };
+
+  const handleClearEventFilter = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('eventId');
+      next.delete('workspaceId');
+      return next;
+    });
   };
 
   return (
@@ -104,18 +190,38 @@ export const OrgWorkspacePage: React.FC = () => {
             },
             {
               label: 'Workspaces',
-              isCurrent: true,
+              isCurrent: !eventIdFilter,
+              href: eventIdFilter ? baseWorkspacePath : undefined,
             },
+            ...(eventIdFilter && filteredEvent
+              ? [{ label: filteredEvent.name, isCurrent: true }]
+              : []),
           ]}
           className="text-xs"
         />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          {organization?.name ?? 'Organization workspaces'}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Use workspaces to organize collaboration around your events. Select a workspace from the list
-          to open its dedicated console with tasks, team, communication, and reports.
-        </p>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              {eventIdFilter && filteredEvent
+                ? `${filteredEvent.name} Workspaces`
+                : 'Organization Workspaces'}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {eventIdFilter
+                ? 'Manage workspaces for this event with tasks, team, and communication.'
+                : 'Use workspaces to organize collaboration around your events.'}
+            </p>
+          </div>
+          {eventIdFilter && (
+            <button
+              type="button"
+              onClick={handleClearEventFilter}
+              className="inline-flex items-center rounded-full border border-border/70 bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
+            >
+              View all workspaces
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
@@ -123,13 +229,15 @@ export const OrgWorkspacePage: React.FC = () => {
         <aside className="rounded-2xl border border-border/70 bg-card/70 p-3 sm:p-4 shadow-sm">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-sm font-medium text-foreground">Event workspaces</h2>
+              <h2 className="text-sm font-medium text-foreground">
+                {eventIdFilter ? 'Event workspaces' : 'All workspaces'}
+              </h2>
               <p className="text-xs text-muted-foreground">
                 {isLoading
                   ? 'Loading workspaces…'
                   : workspaces && workspaces.length > 0
-                    ? `${workspaces.length} workspace${workspaces.length === 1 ? '' : 's'} linked to events`
-                    : 'No event workspaces have been created yet'}
+                    ? `${workspaces.length} workspace${workspaces.length === 1 ? '' : 's'}`
+                    : 'No workspaces found'}
               </p>
             </div>
             <div className="flex w-full sm:w-auto flex-wrap items-center gap-2 justify-between sm:justify-end">
@@ -159,12 +267,6 @@ export const OrgWorkspacePage: React.FC = () => {
               >
                 Sort: {sortOrder === 'recent' ? 'Newest first' : 'Oldest first'}
               </button>
-              <a
-                href={`${baseWorkspacePath}/create`}
-                className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-              >
-                Create workspace
-              </a>
             </div>
           </div>
 
@@ -180,9 +282,9 @@ export const OrgWorkspacePage: React.FC = () => {
           ) : !filteredWorkspaces || filteredWorkspaces.length === 0 ? (
             <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border/80 bg-muted/40 px-3 py-4 text-xs text-muted-foreground">
               <span>No workspaces match the current filters.</span>
-              <span>
-                Try adjusting the status filter or create a workspace from an event detail page.
-              </span>
+              {eventIdFilter && canManageWorkspaces && (
+                <span>Create a new workspace to get started.</span>
+              )}
             </div>
           ) : (
             <ul className="space-y-1">
@@ -190,11 +292,17 @@ export const OrgWorkspacePage: React.FC = () => {
                 <li key={workspace.id}>
                   <button
                     type="button"
-                    onClick={() => handleOpenWorkspace(workspace)}
-                    className="group flex w-full flex-col rounded-xl border border-transparent bg-muted/40 px-3 py-2 text-left transition-colors hover:border-border/70 hover:bg-muted/60"
+                    onClick={() => handleWorkspaceSelect(workspace)}
+                    className={`group flex w-full flex-col rounded-xl border px-3 py-2 text-left transition-colors ${
+                      workspace.id === selectedWorkspaceId
+                        ? 'border-primary bg-primary/10'
+                        : 'border-transparent bg-muted/40 hover:border-border/70 hover:bg-muted/60'
+                    }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium text-foreground">
+                      <span className={`truncate text-sm font-medium ${
+                        workspace.id === selectedWorkspaceId ? 'text-primary' : 'text-foreground'
+                      }`}>
                         {workspace.name}
                       </span>
                       <span
@@ -209,7 +317,7 @@ export const OrgWorkspacePage: React.FC = () => {
                       <span>
                         Updated {new Date(workspace.updatedAt ?? workspace.createdAt).toLocaleDateString()}
                       </span>
-                      {workspace.event && (
+                      {!eventIdFilter && workspace.event && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                           <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                           {workspace.event.name}
@@ -221,20 +329,71 @@ export const OrgWorkspacePage: React.FC = () => {
               ))}
             </ul>
           )}
+
+          {/* Create workspace buttons when filtering by event */}
+          {eventIdFilter && canManageWorkspaces && (
+            <div className="mt-4 pt-3 border-t border-border/60 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Create workspace</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => createWorkspaceMutation.mutate('Operations')}
+                  className="inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                  disabled={createWorkspaceMutation.isPending}
+                >
+                  <PlusIcon className="h-3 w-3" />
+                  Operations
+                </button>
+                <button
+                  type="button"
+                  onClick={() => createWorkspaceMutation.mutate('Judging')}
+                  className="inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-60"
+                  disabled={createWorkspaceMutation.isPending}
+                >
+                  <PlusIcon className="h-3 w-3" />
+                  Judging
+                </button>
+                <button
+                  type="button"
+                  onClick={() => createWorkspaceMutation.mutate('Volunteers')}
+                  className="inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-xs font-medium bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
+                  disabled={createWorkspaceMutation.isPending}
+                >
+                  <PlusIcon className="h-3 w-3" />
+                  Volunteers
+                </button>
+                <button
+                  type="button"
+                  onClick={() => createWorkspaceMutation.mutate('Sponsors')}
+                  className="inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-md text-xs font-medium bg-muted text-foreground hover:bg-muted/80 disabled:opacity-60"
+                  disabled={createWorkspaceMutation.isPending}
+                >
+                  <PlusIcon className="h-3 w-3" />
+                  Sponsors
+                </button>
+              </div>
+              {createWorkspaceMutation.error && (
+                <p className="mt-1 text-xs text-destructive">
+                  {(createWorkspaceMutation.error as Error).message}
+                </p>
+              )}
+            </div>
+          )}
         </aside>
 
-        {/* General workspace overview */}
-        <main className="min-h-[260px] rounded-2xl border border-border/70 bg-card/80 p-4 lg:p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-foreground mb-2">Workspace service overview</h2>
-          <p className="text-sm text-muted-foreground mb-4 max-w-2xl">
-            Workspaces are collaboration hubs tied to your events. Each workspace centralizes tasks,
-            team members, communication, and reports for a single event.
-          </p>
-          <ul className="mt-2 space-y-2 text-sm text-muted-foreground list-disc list-inside">
-            <li>Create a workspace directly from an event detail page.</li>
-            <li>Track preparation progress with tasks and health metrics.</li>
-            <li>Coordinate your organizing team and volunteers in one place.</li>
-          </ul>
+        {/* Workspace dashboard */}
+        <main className="min-h-[400px]">
+          {selectedWorkspaceId ? (
+            <WorkspaceDashboard workspaceId={selectedWorkspaceId} />
+          ) : (
+            <div className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+              <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
+              <p className="text-sm text-muted-foreground text-center max-w-md">
+                Choose a workspace from the list to view tasks, team members, and communication.
+                {canManageWorkspaces && eventIdFilter && ' Or create a new one to get started.'}
+              </p>
+            </div>
+          )}
         </main>
       </div>
     </div>
