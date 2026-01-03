@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { AttendanceReport } from '../../types';
 import { Link } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip';
+import { Search, RefreshCw, UserPlus, X } from 'lucide-react';
+
 interface AttendanceListProps {
   eventId: string;
   sessionId?: string;
@@ -78,14 +80,12 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded mb-4"></div>
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+      <div className="animate-pulse">
+        <div className="h-6 bg-muted rounded mb-4"></div>
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 bg-muted rounded"></div>
+          ))}
         </div>
       </div>
     );
@@ -93,81 +93,83 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
 
   if (!attendanceReport) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Attendance Data</h3>
-          <p className="text-gray-600">Unable to load attendance information.</p>
-        </div>
+      <div className="text-center py-8">
+        <svg className="mx-auto h-12 w-12 text-muted-foreground mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <h3 className="text-lg font-medium text-foreground mb-2">No Attendance Data</h3>
+        <p className="text-muted-foreground">Unable to load attendance information.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md">
+    <div>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="pb-4 border-b border-border mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">Attendance List</h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground">Attendance List</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {attendanceReport.attendedCount} of {attendanceReport.totalRegistrations} participants checked in
               ({attendanceReport.checkInRate.toFixed(1)}% attendance rate)
             </p>
           </div>
-          <div className="mt-4 sm:mt-0 flex gap-2">
+          <div className="flex gap-2">
             <button
               onClick={() => refetch()}
-              className="bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-sm font-medium transition-colors"
             >
-              <svg className="h-4 w-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Refresh
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
             <button
               onClick={() => setShowManualCheckIn(true)}
-              className="bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium transition-colors"
             >
-              Manual Check-in
+              <UserPlus className="h-4 w-4" />
+              <span className="hidden sm:inline">Manual Check-in</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
-              <option value="all">All Participants</option>
-              <option value="attended">Checked In</option>
-              <option value="not_attended">Not Checked In</option>
-            </select>
-          </div>
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as any)}
+          className="px-3 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        >
+          <option value="all">All Participants</option>
+          <option value="attended">Checked In</option>
+          <option value="not_attended">Not Checked In</option>
+        </select>
       </div>
 
       {/* Attendance List */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
         {filteredRecords.length === 0 ? (
-          <div className="px-6 py-8 text-center">
-            <p className="text-gray-500">No participants match your search criteria.</p>
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground">No participants match your search criteria.</p>
           </div>
           ) : (
             filteredRecords.map((record) => {
@@ -178,7 +180,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                 .join('');
 
               return (
-                <div key={record.registrationId} className="px-6 py-4 hover:bg-gray-50">
+                <div key={record.registrationId} className="px-4 py-3 hover:bg-muted/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 flex items-center">
                       <TooltipProvider>
@@ -207,16 +209,16 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                         </Tooltip>
                       </TooltipProvider>
 
-                      <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-900">{record.userName}</h4>
-                        <p className="text-sm text-gray-600">{record.userEmail}</p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-foreground truncate">{record.userName}</h4>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{record.userEmail}</p>
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-4 hidden sm:block">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             record.attended
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-muted text-muted-foreground'
                           }`}
                         >
                           {record.attended ? 'Checked In' : 'Not Checked In'}
@@ -245,7 +247,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                             setSelectedRegistration(record.registrationId);
                             setShowManualCheckIn(true);
                           }}
-                          className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                          className="text-primary hover:text-primary/80 text-sm font-medium"
                         >
                           Check In
                         </button>
@@ -254,7 +256,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                   </div>
 
                   {record.attended && record.checkInTime && (
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-muted-foreground">
                       <div className="flex items-center space-x-4">
                         <span>
                           Check-in: {new Date(record.checkInTime).toLocaleString()}
@@ -273,58 +275,67 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
 
       {/* Manual Check-in Modal */}
       {showManualCheckIn && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
-          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto p-5">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Manual Check-in</h3>
-              
-              <div className="mb-4">
-                <label htmlFor="registration-select" className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Participant
-                </label>
-                <select
-                  id="registration-select"
-                  value={selectedRegistration}
-                  onChange={(e) => setSelectedRegistration(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Choose a participant...</option>
-                  {attendanceReport.attendanceRecords
-                    .filter(record => !record.attended)
-                    .map((record) => (
-                      <option key={record.registrationId} value={record.registrationId}>
-                        {record.userName} ({record.userEmail})
-                      </option>
-                    ))}
-                </select>
-              </div>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 z-50">
+          <div className="bg-card w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-xl border border-border p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Manual Check-in</h3>
+              <button
+                onClick={() => {
+                  setShowManualCheckIn(false);
+                  setSelectedRegistration('');
+                }}
+                className="p-1.5 rounded-md hover:bg-muted transition-colors"
+              >
+                <X className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <label htmlFor="registration-select" className="block text-sm font-medium text-foreground mb-2">
+                Select Participant
+              </label>
+              <select
+                id="registration-select"
+                value={selectedRegistration}
+                onChange={(e) => setSelectedRegistration(e.target.value)}
+                className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="">Choose a participant...</option>
+                {attendanceReport.attendanceRecords
+                  .filter(record => !record.attended)
+                  .map((record) => (
+                    <option key={record.registrationId} value={record.registrationId}>
+                      {record.userName} ({record.userEmail})
+                    </option>
+                  ))}
+              </select>
+            </div>
 
-              {manualCheckInMutation.isError && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
-                  <p className="text-sm text-red-800">
-                    {(manualCheckInMutation.error as any)?.response?.data?.error?.message || 'Check-in failed'}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleManualCheckIn}
-                  disabled={!selectedRegistration || manualCheckInMutation.isPending}
-                  className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {manualCheckInMutation.isPending ? 'Checking In...' : 'Check In'}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowManualCheckIn(false);
-                    setSelectedRegistration('');
-                  }}
-                  className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                >
-                  Cancel
-                </button>
+            {manualCheckInMutation.isError && (
+              <div className="mb-4 bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                <p className="text-sm text-destructive">
+                  {(manualCheckInMutation.error as any)?.response?.data?.error?.message || 'Check-in failed'}
+                </p>
               </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleManualCheckIn}
+                disabled={!selectedRegistration || manualCheckInMutation.isPending}
+                className="flex-1 bg-primary text-primary-foreground px-4 py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {manualCheckInMutation.isPending ? 'Checking In...' : 'Check In'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowManualCheckIn(false);
+                  setSelectedRegistration('');
+                }}
+                className="flex-1 bg-muted text-foreground px-4 py-2.5 rounded-lg font-medium hover:bg-muted/80 transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

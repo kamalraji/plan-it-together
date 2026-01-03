@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { QRCodeScanner } from './QRCodeScanner';
 import { AttendanceList } from './AttendanceList';
+import { AttendanceStats } from './AttendanceStats';
 import { CheckInSkeleton } from './CheckInSkeleton';
 import { Event, AttendanceRecord } from '../../types';
 
@@ -153,6 +154,11 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Real-time Attendance Stats */}
+        <div className="mb-4 sm:mb-6">
+          <AttendanceStats eventId={eventId} sessionId={selectedSession || undefined} />
         </div>
 
         {/* Session Selection */}
