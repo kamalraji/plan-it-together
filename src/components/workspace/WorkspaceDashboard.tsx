@@ -10,7 +10,7 @@ import { WorkspaceAnalyticsDashboard } from './WorkspaceAnalyticsDashboard';
 import { WorkspaceReportExport } from './WorkspaceReportExport';
 import { WorkspaceTemplateManagement } from './WorkspaceTemplateManagement';
 import { EventMarketplaceIntegration } from '../marketplace';
-import { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
+
 import { TaskManagementInterface } from './TaskManagementInterface';
 import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
@@ -142,17 +142,12 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
             <TaskSummaryCards workspace={workspace} onViewTasks={actions.handleViewTasks} />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 items-start">
-              <div className="lg:col-span-2 space-y-4 sm:space-y-8 order-2 lg:order-1">
-                <WorkspaceCollaborationTimeline workspace={workspace} />
-              </div>
-              <div className="space-y-4 sm:space-y-8 order-1 lg:order-2">
-                {workspace.eventId && (
-                  <WorkspaceHierarchyStats eventId={workspace.eventId} />
-                )}
-                <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
-                <WorkspaceHealthMetrics workspace={workspace} />
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 items-start">
+              {workspace.eventId && (
+                <WorkspaceHierarchyStats eventId={workspace.eventId} />
+              )}
+              <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+              <WorkspaceHealthMetrics workspace={workspace} />
             </div>
           </div>
         )}
