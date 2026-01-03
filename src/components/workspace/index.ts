@@ -19,6 +19,8 @@ export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
 export { TaskDetailView } from './TaskDetailView';
 export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
+export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
+export { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
 
 // Mobile Components
 export * from './mobile';

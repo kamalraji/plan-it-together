@@ -1,5 +1,12 @@
 import { Workspace, WorkspaceStatus } from '../../types';
-import { Layers } from 'lucide-react';
+import { Layers, GitBranch } from 'lucide-react';
+import { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
+import { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface WorkspaceHeaderProps {
   workspace: Workspace;
@@ -19,15 +26,15 @@ export function WorkspaceHeader({
   const getStatusColor = (status: WorkspaceStatus) => {
     switch (status) {
       case WorkspaceStatus.ACTIVE:
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case WorkspaceStatus.PROVISIONING:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
       case WorkspaceStatus.DISSOLVED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     }
   };
 
@@ -43,6 +50,42 @@ export function WorkspaceHeader({
     <div className="bg-card shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-6">
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-3 mb-4">
+            <WorkspaceBreadcrumbs
+              workspaceId={workspace.id}
+              eventId={workspace.eventId}
+            />
+            
+            {/* Hierarchy Tree Popover */}
+            {workspace.eventId && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                    title="View workspace hierarchy"
+                  >
+                    <GitBranch className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Hierarchy</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-80 max-h-[400px] overflow-auto p-0" 
+                  align="start"
+                >
+                  <div className="px-3 py-2 border-b border-border">
+                    <h4 className="text-sm font-medium">Workspace Hierarchy</h4>
+                    <p className="text-xs text-muted-foreground">Click to navigate</p>
+                  </div>
+                  <WorkspaceHierarchyTree
+                    eventId={workspace.eventId}
+                    currentWorkspaceId={workspace.id}
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+
           {/* Workspace Title and Status */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
