@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { useEventCreatePath } from '@/hooks/useEventCreatePath';
 import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
-import { useEventManagementMetrics } from '@/hooks/useEventManagementMetrics';
+
 import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 interface Event {
@@ -48,8 +48,7 @@ export function OrganizerDashboard() {
   // Check if profile completion is needed (Requirements 2.4, 2.5)
   const isProfileIncomplete = !user?.profileCompleted || !user?.bio || !user?.organization;
   const {
-    data: events,
-    isLoading
+    data: events
   } = useQuery<Event[]>({
     queryKey: ['organizer-events', organization.id],
     queryFn: async () => {
@@ -157,11 +156,7 @@ export function OrganizerDashboard() {
       };
     }
   });
-  const supabaseMetrics = useEventManagementMetrics(organization.id);
-  const totalEvents = supabaseMetrics.metrics.totalEvents ?? events?.length ?? 0;
-  const activeEvents = supabaseMetrics.metrics.activeEvents ?? 0;
-  const totalRegistrations = supabaseMetrics.metrics.totalRegistrations ?? 0;
-  const isSummaryLoading = isLoading && isHealthy !== false;
+  
   return <OrgPageWrapper>
             {/* Breadcrumb */}
             <OrganizerBreadcrumbs current="dashboard" />
@@ -224,36 +219,6 @@ export function OrganizerDashboard() {
                 </div>
             </section>
 
-            {/* Summary metrics */}
-            <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-4 sm:mt-6">
-                <div className="-mx-1 flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 lg:gap-6 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
-                    {isSummaryLoading ? [...Array(3)].map((_, index) => <div key={index} className="min-w-[70%] xs:min-w-[220px] sm:min-w-0 bg-muted border border-border/60 rounded-2xl shadow-sm px-3 py-2.5 sm:px-5 sm:py-4 animate-pulse h-24 sm:h-28" />) : <>
-                            <div className="min-w-[70%] xs:min-w-[220px] sm:min-w-0 bg-card border border-border/60 rounded-2xl shadow-sm px-3 py-2.5 sm:px-5 sm:py-4 flex flex-col justify-between">
-                                <div className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-0.5 sm:mb-1">Total events</div>
-                                <div className="flex items-end justify-between gap-2">
-                                    <div className="text-xl sm:text-3xl font-semibold text-foreground">{totalEvents}</div>
-                                    <span className="text-[10px] sm:text-xs text-muted-foreground">Across all time</span>
-                                </div>
-                            </div>
-
-                            <div className="min-w-[70%] xs:min-w-[220px] sm:min-w-0 bg-card border border-border/60 rounded-2xl shadow-sm px-3 py-2.5 sm:px-5 sm:py-4 flex flex-col justify-between">
-                                <div className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-0.5 sm:mb-1">Active events</div>
-                                <div className="flex items-end justify-between gap-2">
-                                    <div className="text-xl sm:text-3xl font-semibold text-foreground">{activeEvents}</div>
-                                    <span className="text-[10px] sm:text-xs text-muted-foreground">Published or ongoing</span>
-                                </div>
-                            </div>
-
-                            <div className="min-w-[70%] xs:min-w-[220px] sm:min-w-0 bg-card border border-border/60 rounded-2xl shadow-sm px-3 py-2.5 sm:px-5 sm:py-4 flex flex-col justify-between">
-                                <div className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-0.5 sm:mb-1">Total registrations</div>
-                                <div className="flex items-end justify-between gap-2">
-                                    <div className="text-xl sm:text-3xl font-semibold text-foreground">{totalRegistrations}</div>
-                                    <span className="text-[10px] sm:text-xs text-muted-foreground">All events combined</span>
-                                </div>
-                            </div>
-                        </>}
-                </div>
-            </section>
 
             {/* Navigation Tabs */}
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-8 sm:mt-10">
