@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UserCog, ChevronDown, Shield, Crown, Briefcase, Users } from 'lucide-react';
+import { UserCog, ChevronDown, Shield, Crown, Briefcase, Users, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { TeamMember, WorkspaceRole } from '@/types';
 import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
 import { 
@@ -25,6 +35,7 @@ import { cn } from '@/lib/utils';
 interface MemberRoleManagementProps {
   teamMembers: TeamMember[];
   currentUserRole: WorkspaceRole | null;
+  currentUserId?: string;
   workspaceId?: string;
   onMemberUpdated?: () => void;
 }
@@ -32,9 +43,12 @@ interface MemberRoleManagementProps {
 export function MemberRoleManagement({
   teamMembers,
   currentUserRole,
+  currentUserId,
   onMemberUpdated,
 }: MemberRoleManagementProps) {
   const [updatingMemberId, setUpdatingMemberId] = useState<string | null>(null);
+  const [removingMember, setRemovingMember] = useState<TeamMember | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
   const rbac = useWorkspaceRBAC(currentUserRole);
 
   const handleRoleChange = async (memberId: string, newRole: WorkspaceRole) => {
@@ -53,6 +67,28 @@ export function MemberRoleManagement({
       toast.error('Failed to update member role');
     } finally {
       setUpdatingMemberId(null);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!removingMember) return;
+    
+    setIsRemoving(true);
+    try {
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .delete()
+        .eq('id', removingMember.id);
+
+      if (error) throw error;
+      toast.success(`${removingMember.user.name} removed from workspace`);
+      onMemberUpdated?.();
+    } catch (error) {
+      console.error('Failed to remove member:', error);
+      toast.error('Failed to remove member');
+    } finally {
+      setIsRemoving(false);
+      setRemovingMember(null);
     }
   };
 
@@ -183,53 +219,67 @@ export function MemberRoleManagement({
 
                     <div className="flex items-center gap-2">
                       {canEditThisMember ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5 text-xs h-8"
-                              disabled={isUpdating}
-                            >
-                              {isUpdating ? (
-                                <span className="animate-pulse">Updating...</span>
-                              ) : (
-                                <>
-                                  {getWorkspaceRoleLabel(member.role)}
-                                  <ChevronDown className="h-3 w-3" />
-                                </>
-                              )}
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56">
-                            {sortedLevels.map(roleLevel => {
-                              const rolesInLevel = assignableByLevel[roleLevel];
-                              if (rolesInLevel.length === 0) return null;
+                        <>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5 text-xs h-8"
+                                disabled={isUpdating}
+                              >
+                                {isUpdating ? (
+                                  <span className="animate-pulse">Updating...</span>
+                                ) : (
+                                  <>
+                                    {getWorkspaceRoleLabel(member.role)}
+                                    <ChevronDown className="h-3 w-3" />
+                                  </>
+                                )}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              {sortedLevels.map(roleLevel => {
+                                const rolesInLevel = assignableByLevel[roleLevel];
+                                if (rolesInLevel.length === 0) return null;
 
-                              return (
-                                <div key={roleLevel}>
-                                  <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                    {getLevelIcon(roleLevel)}
-                                    {getLevelLabel(roleLevel)} Roles
-                                  </DropdownMenuLabel>
-                                  {rolesInLevel.map(role => (
-                                    <DropdownMenuItem
-                                      key={role}
-                                      onClick={() => handleRoleChange(member.id, role)}
-                                      className={cn(
-                                        'cursor-pointer',
-                                        member.role === role && 'bg-accent'
-                                      )}
-                                    >
-                                      {getWorkspaceRoleLabel(role)}
-                                    </DropdownMenuItem>
-                                  ))}
-                                  <DropdownMenuSeparator />
-                                </div>
-                              );
-                            })}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                                return (
+                                  <div key={roleLevel}>
+                                    <DropdownMenuLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                      {getLevelIcon(roleLevel)}
+                                      {getLevelLabel(roleLevel)} Roles
+                                    </DropdownMenuLabel>
+                                    {rolesInLevel.map(role => (
+                                      <DropdownMenuItem
+                                        key={role}
+                                        onClick={() => handleRoleChange(member.id, role)}
+                                        className={cn(
+                                          'cursor-pointer',
+                                          member.role === role && 'bg-accent'
+                                        )}
+                                      >
+                                        {getWorkspaceRoleLabel(role)}
+                                      </DropdownMenuItem>
+                                    ))}
+                                    <DropdownMenuSeparator />
+                                  </div>
+                                );
+                              })}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          
+                          {/* Remove button - only show if not self */}
+                          {member.userId !== currentUserId && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => setRemovingMember(member)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </>
                       ) : (
                         <Badge
                           variant="outline"
@@ -253,6 +303,29 @@ export function MemberRoleManagement({
           <p>No team members yet</p>
         </div>
       )}
+
+      {/* Remove Member Confirmation Dialog */}
+      <AlertDialog open={!!removingMember} onOpenChange={() => setRemovingMember(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove <strong>{removingMember?.user.name}</strong> from this workspace? 
+              They will lose access to all workspace tasks and resources.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRemoveMember}
+              disabled={isRemoving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isRemoving ? 'Removing...' : 'Remove Member'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

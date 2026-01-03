@@ -975,6 +975,56 @@ export type Database = {
           },
         ]
       }
+      workspace_settings: {
+        Row: {
+          allow_member_invites: boolean
+          allow_task_creation: boolean
+          created_at: string
+          id: string
+          notify_messages: boolean
+          notify_new_members: boolean
+          notify_task_updates: boolean
+          notify_weekly_digest: boolean
+          public_visibility: boolean
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_member_invites?: boolean
+          allow_task_creation?: boolean
+          created_at?: string
+          id?: string
+          notify_messages?: boolean
+          notify_new_members?: boolean
+          notify_task_updates?: boolean
+          notify_weekly_digest?: boolean
+          public_visibility?: boolean
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_member_invites?: boolean
+          allow_task_creation?: boolean
+          created_at?: string
+          id?: string
+          notify_messages?: boolean
+          notify_new_members?: boolean
+          notify_task_updates?: boolean
+          notify_weekly_digest?: boolean
+          public_visibility?: boolean
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_settings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_tasks: {
         Row: {
           assigned_to: string | null

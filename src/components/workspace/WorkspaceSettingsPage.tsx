@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2, Bell, Shield, Palette, Users } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { useWorkspacePermissions } from '@/hooks/useWorkspacePermissions';
+import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ export function WorkspaceSettingsPage() {
   const navigate = useNavigate();
   const { workspace, isLoading, teamMembers } = useWorkspaceData(workspaceId);
   const permissions = useWorkspacePermissions({ teamMembers, eventId: workspace?.eventId });
+  const { settings, updateSetting } = useWorkspaceSettings(workspaceId);
   
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   const [isSaving, setIsSaving] = useState(false);
@@ -30,14 +32,14 @@ export function WorkspaceSettingsPage() {
   });
 
   // Sync form data when workspace loads
-  useState(() => {
+  useEffect(() => {
     if (workspace) {
       setFormData({
         name: workspace.name,
         description: workspace.description || '',
       });
     }
-  });
+  }, [workspace]);
 
   const handleSaveGeneral = async () => {
     if (!workspaceId) return;
@@ -247,7 +249,10 @@ export function WorkspaceSettingsPage() {
                       <p className="font-medium text-foreground">Task Updates</p>
                       <p className="text-sm text-muted-foreground">Receive notifications when tasks are updated</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={settings?.notify_task_updates ?? true}
+                      onCheckedChange={(checked) => updateSetting('notify_task_updates', checked)}
+                    />
                   </div>
                   
                   <div className="flex items-center justify-between py-3 border-b border-border">
@@ -255,7 +260,10 @@ export function WorkspaceSettingsPage() {
                       <p className="font-medium text-foreground">New Team Members</p>
                       <p className="text-sm text-muted-foreground">Get notified when new members join</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={settings?.notify_new_members ?? true}
+                      onCheckedChange={(checked) => updateSetting('notify_new_members', checked)}
+                    />
                   </div>
                   
                   <div className="flex items-center justify-between py-3 border-b border-border">
@@ -263,7 +271,10 @@ export function WorkspaceSettingsPage() {
                       <p className="font-medium text-foreground">Messages</p>
                       <p className="text-sm text-muted-foreground">Receive notifications for new messages</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={settings?.notify_messages ?? true}
+                      onCheckedChange={(checked) => updateSetting('notify_messages', checked)}
+                    />
                   </div>
                   
                   <div className="flex items-center justify-between py-3">
@@ -271,7 +282,10 @@ export function WorkspaceSettingsPage() {
                       <p className="font-medium text-foreground">Weekly Digest</p>
                       <p className="text-sm text-muted-foreground">Get a weekly summary of workspace activity</p>
                     </div>
-                    <Switch />
+                    <Switch 
+                      checked={settings?.notify_weekly_digest ?? false}
+                      onCheckedChange={(checked) => updateSetting('notify_weekly_digest', checked)}
+                    />
                   </div>
                 </div>
               </div>
@@ -294,6 +308,7 @@ export function WorkspaceSettingsPage() {
                     currentUserRole={
                       teamMembers?.find(m => m.userId === permissions.user?.id)?.role as WorkspaceRole || null
                     }
+                    currentUserId={permissions.user?.id}
                     workspaceId={workspaceId!}
                   />
                 </div>
@@ -308,7 +323,10 @@ export function WorkspaceSettingsPage() {
                         <p className="font-medium text-foreground">Allow Member Invites</p>
                         <p className="text-sm text-muted-foreground">Let team leads invite new members</p>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch 
+                        checked={settings?.allow_member_invites ?? true}
+                        onCheckedChange={(checked) => updateSetting('allow_member_invites', checked)}
+                      />
                     </div>
                     
                     <div className="flex items-center justify-between py-3 border-b border-border">
@@ -316,7 +334,10 @@ export function WorkspaceSettingsPage() {
                         <p className="font-medium text-foreground">Task Creation</p>
                         <p className="text-sm text-muted-foreground">Allow all members to create tasks</p>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch 
+                        checked={settings?.allow_task_creation ?? true}
+                        onCheckedChange={(checked) => updateSetting('allow_task_creation', checked)}
+                      />
                     </div>
                     
                     <div className="flex items-center justify-between py-3">
@@ -324,7 +345,10 @@ export function WorkspaceSettingsPage() {
                         <p className="font-medium text-foreground">Public Visibility</p>
                         <p className="text-sm text-muted-foreground">Make workspace visible to organization</p>
                       </div>
-                      <Switch />
+                      <Switch 
+                        checked={settings?.public_visibility ?? false}
+                        onCheckedChange={(checked) => updateSetting('public_visibility', checked)}
+                      />
                     </div>
                   </div>
                 </div>
