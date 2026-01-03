@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Badge } from '@/components/ui/badge';
-
+import { MobileActionsDropdown } from './MobileActionsDropdown';
 interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -127,23 +127,29 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
             {/* Actions */}
             {actions && actions.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {actions.map((action, index) => (
-                  <button
-                    key={index}
-                    onClick={action.action}
-                    disabled={action.disabled || action.loading}
-                    className={getButtonClasses(action.variant, action.disabled, action.loading)}
-                  >
-                    {action.loading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                    ) : (
-                      action.icon && <action.icon className="h-4 w-4 mr-1.5 sm:mr-2" />
-                    )}
-                    <span className="text-xs sm:text-sm whitespace-nowrap">{action.label}</span>
-                  </button>
-                ))}
-              </div>
+              <>
+                {/* Mobile: Dropdown Menu */}
+                <MobileActionsDropdown actions={actions} />
+                
+                {/* Desktop: Full Button List */}
+                <div className="hidden sm:flex flex-wrap gap-2">
+                  {actions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={action.action}
+                      disabled={action.disabled || action.loading}
+                      className={getButtonClasses(action.variant, action.disabled, action.loading)}
+                    >
+                      {action.loading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                      ) : (
+                        action.icon && <action.icon className="h-4 w-4 mr-1.5 sm:mr-2" />
+                      )}
+                      <span className="text-xs sm:text-sm whitespace-nowrap">{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
+import { EventDetailSkeleton } from '../EventDetailSkeleton';
 import { Event, EventStatus, EventMode, UserRole, WorkspaceStatus, WorkspaceRole } from '../../../types';
 import { WorkspacePermissionsBanner } from '@/components/workspace/WorkspacePermissionsBanner';
 import { WorkspaceRolePermissionsTable } from '@/components/workspace/WorkspaceRolePermissionsTable';
@@ -67,11 +68,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   const isLoading = accessLoading || eventLoading;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-      </div>
-    );
+    return <EventDetailSkeleton />;
   }
 
   if (error || !event || !canView) {
