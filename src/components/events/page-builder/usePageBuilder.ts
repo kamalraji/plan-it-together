@@ -18,6 +18,7 @@ import {
 } from './pageBuilderBlocks';
 import { getCanvasStyles } from './pageBuilderStyles';
 import { slugify, extractTitleFromHtml, extractDescriptionFromHtml } from './pageBuilderUtils';
+import { initializePlugins } from './grapesjsPlugins';
 
 interface LandingPageDataMeta {
   title?: string;
@@ -128,6 +129,9 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     });
 
     editorRef.current = editor;
+
+    // Initialize custom plugins for animations and advanced styling
+    initializePlugins(editor);
 
     // Add device commands
     editor.Commands.add('set-device-desktop', {
