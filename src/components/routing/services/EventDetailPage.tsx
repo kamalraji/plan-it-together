@@ -120,7 +120,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   };
 
   const { orgSlug } = useParams<{ orgSlug?: string }>();
-  const workspacePath = orgSlug ? `/${orgSlug}/workspaces` : '/console/workspaces';
+  const workspacePath = orgSlug ? `/${orgSlug}/workspaces/${eventId}` : `/dashboard/workspaces?eventId=${eventId}`;
 
   const pageActions = [
     ...(canManage
@@ -138,8 +138,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
           variant: 'secondary' as const,
         },
         {
-          label: 'Open Workspace',
-          action: () => (window.location.href = `${workspacePath}?eventId=${eventId}`),
+          label: 'View Workspaces',
+          action: () => (window.location.href = workspacePath),
           icon: Squares2X2Icon,
           variant: 'secondary' as const,
         },
