@@ -1,125 +1,205 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  PlusIcon,
-  FunnelIcon,
-  MagnifyingGlassIcon,
-  Squares2X2Icon,
-  ListBulletIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExclamationCircleIcon,
-  UserIcon,
-  CalendarIcon,
-  ChevronRightIcon,
+  XMarkIcon,
   MapPinIcon,
   PhotoIcon,
-  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
-import { WorkspaceTask, TaskStatus, TaskPriority, TeamMember } from '../../../types';
-import api from '../../../lib/api';
+import { WorkspaceTask, TaskStatus, TeamMember } from '../../../types';
+import { MobileTaskList } from './MobileTaskList';
+import { TaskFormModal } from '../TaskFormModal';
+import { TaskFormData } from '../TaskForm';
 import { supabase } from '@/integrations/supabase/client';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface MobileTaskManagementProps {
   workspaceId: string;
-  onCreateTask: () => void;
-  onTaskClick: (task: WorkspaceTask) => void;
+  onCreateTask?: () => void;
+  onTaskClick?: (task: WorkspaceTask) => void;
 }
-
-type ViewMode = 'list' | 'kanban';
-type FilterStatus = 'all' | TaskStatus;
-type FilterPriority = 'all' | TaskPriority;
 
 export function MobileTaskManagement({
   workspaceId,
   onCreateTask,
-  onTaskClick
+  onTaskClick,
 }: MobileTaskManagementProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
-  const [priorityFilter, setFilterPriority] = useState<FilterPriority>('all');
-  const [showFilters, setShowFilters] = useState(false);
+  const queryClient = useQueryClient();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
+  const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
 
-  // Fetch tasks
-  const { data: tasks, isLoading } = useQuery({
+  // Fetch tasks from Supabase
+  const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/tasks`);
-      return response.data.tasks as WorkspaceTask[];
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Transform to WorkspaceTask format
+      return (data || []).map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description || '',
+        status: task.status as TaskStatus,
+        priority: task.priority,
+        dueDate: task.due_date,
+        assignee: task.assigned_to ? { 
+          id: task.assigned_to, 
+          userId: task.assigned_to,
+          user: { id: task.assigned_to, name: 'Team Member', email: '' }
+        } : undefined,
+        createdAt: task.created_at,
+        updatedAt: task.updated_at,
+        tags: [],
+        category: 'GENERAL',
+      })) as unknown as WorkspaceTask[];
     },
   });
 
-  // Fetch team members for assignee info
-  const { data: teamMembers } = useQuery({
+  // Fetch team members
+  const { data: teamMembers = [] } = useQuery({
     queryKey: ['workspace-team-members', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('*')
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+      
+      // Fetch user profiles separately
+      const userIds = (data || []).map(m => m.user_id);
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      
+      return (data || []).map(member => ({
+        id: member.id,
+        userId: member.user_id,
+        role: member.role,
+        user: {
+          id: member.user_id,
+          name: profileMap.get(member.user_id)?.full_name || 'Unknown',
+          email: '',
+        }
+      })) as TeamMember[];
     },
   });
 
-  const filteredTasks = tasks?.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+  // Task mutations
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ taskId, updates }: { taskId: string; updates: Partial<WorkspaceTask> }) => {
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .update({
+          title: updates.title,
+          description: updates.description,
+          status: updates.status,
+          priority: updates.priority,
+          due_date: updates.dueDate,
+          assigned_to: updates.assignee?.userId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', taskId);
 
-    return matchesSearch && matchesStatus && matchesPriority;
-  }) || [];
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast.success('Task updated');
+    },
+    onError: () => {
+      toast.error('Failed to update task');
+    },
+  });
 
-  const getStatusIcon = (status: TaskStatus) => {
-    switch (status) {
-      case 'COMPLETED':
-        return <CheckCircleIcon className="w-4 h-4 text-green-500" />;
-      case 'IN_PROGRESS':
-        return <ClockIcon className="w-4 h-4 text-blue-500" />;
-      case 'BLOCKED':
-        return <ExclamationCircleIcon className="w-4 h-4 text-red-500" />;
-      default:
-        return <div className="w-4 h-4 rounded-full border-2 border-gray-300" />;
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: TaskFormData) => {
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .insert({
+          workspace_id: workspaceId,
+          title: taskData.title,
+          description: taskData.description,
+          status: 'TODO',
+          priority: taskData.priority || 'MEDIUM',
+          due_date: taskData.dueDate,
+          assigned_to: taskData.assigneeId,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast.success('Task created');
+      setShowCreateModal(false);
+    },
+    onError: () => {
+      toast.error('Failed to create task');
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast.success('Task deleted');
+      setSelectedTask(null);
+    },
+    onError: () => {
+      toast.error('Failed to delete task');
+    },
+  });
+
+  const handleTaskStatusChange = (taskId: string, status: TaskStatus) => {
+    updateTaskMutation.mutate({ taskId, updates: { status } });
+  };
+
+  const handleTaskTitleUpdate = (taskId: string, title: string) => {
+    updateTaskMutation.mutate({ taskId, updates: { title } });
+  };
+
+  const handleTaskDelete = (taskId: string) => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      deleteTaskMutation.mutate(taskId);
     }
   };
 
-  const getStatusColor = (status: TaskStatus) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800';
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800';
-      case 'BLOCKED':
-        return 'bg-red-100 text-red-800';
-      case 'REVIEW_REQUIRED':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleTaskClick = (task: WorkspaceTask) => {
+    if (onTaskClick) {
+      onTaskClick(task);
+    } else {
+      setSelectedTask(task);
     }
   };
 
-  const getPriorityColor = (priority: TaskPriority) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-100 text-red-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'LOW':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleFormSubmit = (taskData: TaskFormData) => {
+    if (editingTask) {
+      updateTaskMutation.mutate({ 
+        taskId: editingTask.id, 
+        updates: taskData as Partial<WorkspaceTask>
+      });
+      setEditingTask(null);
+    } else {
+      createTaskMutation.mutate(taskData);
     }
-  };
-
-  const getAssigneeName = (task: WorkspaceTask) => {
-    if (task.assignee) {
-      return task.assignee.user.name;
-    }
-    const member = teamMembers?.find(m => m.id === task.assignee?.id);
-    return member?.user.name || 'Unassigned';
-  };
-
-  const isOverdue = (dueDate: string | undefined, status: TaskStatus) => {
-    if (status === 'COMPLETED' || !dueDate) return false;
-    return new Date(dueDate) < new Date();
   };
 
   const handleLocationCheckIn = async (taskId: string) => {
@@ -129,20 +209,13 @@ export function MobileTaskManagement({
           navigator.geolocation.getCurrentPosition(resolve, reject, {
             enableHighAccuracy: true,
             timeout: 10000,
-            maximumAge: 300000 // 5 minutes
+            maximumAge: 300000,
           });
         });
 
         const { latitude, longitude } = position.coords;
         const timestamp = new Date().toISOString();
 
-        // Update task with location check-in
-        await api.patch(`/workspaces/${workspaceId}/tasks/${taskId}/checkin`, {
-          location: { latitude, longitude },
-          timestamp,
-        });
-
-        // Log workspace activity for mobile location check-ins
         await supabase.from('workspace_activities').insert({
           workspace_id: workspaceId,
           type: 'task',
@@ -151,44 +224,13 @@ export function MobileTaskManagement({
           metadata: { taskId, latitude, longitude, timestamp, source: 'mobile', action: 'location_checkin' },
         });
 
-        // Show success message
-        alert('Location check-in successful!');
+        toast.success('Location check-in successful!');
       } catch (error) {
         console.error('Location check-in failed:', error);
-        alert('Failed to get location. Please ensure location services are enabled.');
+        toast.error('Failed to get location. Please ensure location services are enabled.');
       }
     } else {
-      alert('Location services not supported on this device.');
-    }
-  };
-
-  const handlePhotoUpload = async (taskId: string, file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('photo', file);
-      formData.append('taskId', taskId);
-
-      await api.post(`/workspaces/${workspaceId}/tasks/${taskId}/photos`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // Log workspace activity for mobile task photos
-      await supabase.from('workspace_activities').insert({
-        workspace_id: workspaceId,
-        type: 'task',
-        title: 'Mobile task photo uploaded',
-        description: 'A photo was uploaded to a task from mobile.',
-        metadata: { taskId, source: 'mobile', action: 'photo_upload' },
-      });
-
-      // Refresh task data
-      // queryClient.invalidateQueries(['workspace-tasks', workspaceId]);
-      alert('Photo uploaded successfully!');
-    } catch (error) {
-      console.error('Photo upload failed:', error);
-      alert('Failed to upload photo. Please try again.');
+      toast.error('Location services not supported on this device.');
     }
   };
 
@@ -196,240 +238,200 @@ export function MobileTaskManagement({
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment'; // Use rear camera on mobile
-    input.onchange = (e) => {
+    input.capture = 'environment';
+    input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        handlePhotoUpload(taskId, file);
+        try {
+          const fileName = `${taskId}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          await supabase.from('workspace_activities').insert({
+            workspace_id: workspaceId,
+            type: 'task',
+            title: 'Mobile task photo uploaded',
+            description: 'A photo was uploaded to a task from mobile.',
+            metadata: { taskId, source: 'mobile', action: 'photo_upload', fileName },
+          });
+
+          toast.success('Photo uploaded successfully!');
+        } catch (error) {
+          console.error('Photo upload failed:', error);
+          toast.error('Failed to upload photo. Please try again.');
+        }
       }
     };
     input.click();
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Tasks</h2>
-        <button
-          onClick={onCreateTask}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />
-          New Task
-        </button>
-      </div>
+    <div className="h-full flex flex-col bg-background">
+      <MobileTaskList
+        tasks={tasks}
+        onTaskStatusChange={handleTaskStatusChange}
+        onTaskDelete={handleTaskDelete}
+        onTaskTitleUpdate={handleTaskTitleUpdate}
+        onTaskClick={handleTaskClick}
+        onCreateTask={() => onCreateTask ? onCreateTask() : setShowCreateModal(true)}
+        isLoading={isLoading}
+      />
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-3">
-        {/* Search */}
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search tasks..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
+      {/* Create/Edit Modal */}
+      <TaskFormModal
+        isOpen={showCreateModal || !!editingTask}
+        task={editingTask ?? undefined}
+        teamMembers={teamMembers}
+        availableTasks={tasks}
+        onSubmit={handleFormSubmit}
+        onClose={() => {
+          setShowCreateModal(false);
+          setEditingTask(null);
+        }}
+      />
 
-        {/* Filter Toggle */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-          >
-            <FunnelIcon className="w-4 h-4 mr-2" />
-            Filters
-          </button>
-
-          {/* View Mode Toggle */}
-          <div className="flex rounded-md shadow-sm">
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1 text-xs font-medium rounded-l-md border ${viewMode === 'list'
-                  ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                  : 'bg-white border-gray-300 text-gray-700'
-                }`}
+      {/* Task detail sheet */}
+      <AnimatePresence>
+        {selectedTask && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-background z-40"
+              onClick={() => setSelectedTask(null)}
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border rounded-t-2xl max-h-[80vh] overflow-hidden"
             >
-              <ListBulletIcon className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('kanban')}
-              className={`px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b ${viewMode === 'kanban'
-                  ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                  : 'bg-white border-gray-300 text-gray-700'
-                }`}
-            >
-              <Squares2X2Icon className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+              {/* Handle bar */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+              </div>
 
-        {/* Filter Options */}
-        {showFilters && (
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as FilterStatus)}
-                className="w-full text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="all">All Status</option>
-                <option value="NOT_STARTED">Not Started</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="REVIEW_REQUIRED">Review Required</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="BLOCKED">Blocked</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
-              <select
-                value={priorityFilter}
-                onChange={(e) => setFilterPriority(e.target.value as FilterPriority)}
-                className="w-full text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="all">All Priority</option>
-                <option value="HIGH">High</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="LOW">Low</option>
-              </select>
-            </div>
-          </div>
-        )}
-      </div>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 pb-3 border-b border-border">
+                <h2 className="text-lg font-semibold text-foreground">Task Details</h2>
+                <button
+                  onClick={() => setSelectedTask(null)}
+                  className="p-2 hover:bg-muted rounded-lg"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              </div>
 
-      {/* Task List */}
-      <div className="space-y-3">
-        {filteredTasks.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <ClipboardDocumentListIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No tasks found</h3>
-            <p className="text-xs text-gray-500 mb-4">
-              {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all'
-                ? 'Try adjusting your search or filters'
-                : 'Create your first task to get started'
-              }
-            </p>
-            {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
-              <button
-                onClick={onCreateTask}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Create Task
-              </button>
-            )}
-          </div>
-        ) : (
-          filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              onClick={() => onTaskClick(task)}
-              className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <div className="flex items-start space-x-3">
-                {/* Status Icon */}
-                <div className="flex-shrink-0 mt-1">
-                  {getStatusIcon(task.status)}
-                </div>
+              {/* Content */}
+              <div className="p-4 overflow-y-auto max-h-[calc(80vh-100px)]">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  {selectedTask.title}
+                </h3>
+                
+                {selectedTask.description && (
+                  <p className="text-muted-foreground mb-4">
+                    {selectedTask.description}
+                  </p>
+                )}
 
-                {/* Task Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-sm font-medium text-gray-900 truncate pr-2">
-                      {task.title}
-                    </h3>
-                    <ChevronRightIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <div className="space-y-3">
+                  {/* Status */}
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className={cn(
+                      "px-2 py-1 text-xs font-medium rounded-full",
+                      selectedTask.status === TaskStatus.COMPLETED 
+                        ? "bg-chart-3/10 text-chart-3"
+                        : selectedTask.status === TaskStatus.IN_PROGRESS
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground"
+                    )}>
+                      {selectedTask.status.replace('_', ' ')}
+                    </span>
                   </div>
 
-                  {task.description && (
-                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                      {task.description}
-                    </p>
+                  {/* Priority */}
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Priority</span>
+                    <span className="text-sm font-medium text-foreground">
+                      {selectedTask.priority}
+                    </span>
+                  </div>
+
+                  {/* Due Date */}
+                  {selectedTask.dueDate && (
+                    <div className="flex items-center justify-between py-2 border-b border-border">
+                      <span className="text-sm text-muted-foreground">Due Date</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {new Date(selectedTask.dueDate).toLocaleDateString()}
+                      </span>
+                    </div>
                   )}
 
-                  {/* Task Meta */}
-                  <div className="flex items-center space-x-4 mt-3">
-                    {/* Assignee */}
-                    <div className="flex items-center text-xs text-gray-500">
-                      <UserIcon className="w-3 h-3 mr-1" />
-                      <span className="truncate">{getAssigneeName(task)}</span>
-                    </div>
-
-                    {/* Due Date */}
-                    {task.dueDate && (
-                      <div className={`flex items-center text-xs ${isOverdue(task.dueDate, task.status) ? 'text-red-600' : 'text-gray-500'
-                        }`}>
-                        <CalendarIcon className="w-3 h-3 mr-1" />
-                        <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+                  {/* Assignee */}
+                  {selectedTask.assignee && (
+                    <div className="flex items-center justify-between py-2 border-b border-border">
+                      <span className="text-sm text-muted-foreground">Assignee</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-xs font-medium text-primary">
+                            {selectedTask.assignee.user.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedTask.assignee.user.name}
+                        </span>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Status and Priority Badges */}
-                  <div className="flex items-center space-x-2 mt-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                      {task.status.replace('_', ' ').toLowerCase()}
-                    </span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                      {task.priority}
-                    </span>
-                    {isOverdue(task.dueDate, task.status) && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Overdue
-                      </span>
-                    )}
-                  </div>
+                {/* Mobile Actions */}
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => handleLocationCheckIn(selectedTask.id)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2 bg-accent/10 text-accent rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors"
+                  >
+                    <MapPinIcon className="w-4 h-4" />
+                    Check-in
+                  </button>
+                  <button
+                    onClick={() => triggerPhotoUpload(selectedTask.id)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2 bg-chart-3/10 text-chart-3 rounded-lg text-sm font-medium hover:bg-chart-3/20 transition-colors"
+                  >
+                    <PhotoIcon className="w-4 h-4" />
+                    Add Photo
+                  </button>
+                </div>
 
-                  {/* Mobile-specific Actions */}
-                  <div className="flex items-center space-x-2 mt-3">
-                    {/* Location Check-in */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLocationCheckIn(task.id);
-                      }}
-                      className="flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium hover:bg-blue-100"
-                    >
-                      <MapPinIcon className="w-3 h-3 mr-1" />
-                      Check-in
-                    </button>
-
-                    {/* Photo Upload */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        triggerPhotoUpload(task.id);
-                      }}
-                      className="flex items-center px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs font-medium hover:bg-green-100"
-                    >
-                      <PhotoIcon className="w-3 h-3 mr-1" />
-                      Photo
-                    </button>
-                  </div>
+                {/* Actions */}
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => {
+                      setEditingTask(selectedTask);
+                      setSelectedTask(null);
+                    }}
+                    className="flex-1 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Edit Task
+                  </button>
+                  <button
+                    onClick={() => handleTaskDelete(selectedTask.id)}
+                    className="flex-1 py-2.5 bg-destructive/10 text-destructive rounded-lg text-sm font-medium hover:bg-destructive/20 transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            </div>
-          ))
+            </motion.div>
+          </>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
