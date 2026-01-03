@@ -21,6 +21,7 @@ export { TaskDetailView } from './TaskDetailView';
 export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
 export { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
+export { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
 
 // Mobile Components
 export * from './mobile';

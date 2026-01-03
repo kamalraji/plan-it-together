@@ -29,6 +29,7 @@ import { TaskManagementInterface } from './TaskManagementInterface';
 import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
 import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
+import { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
 import { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
@@ -517,6 +518,9 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
                 <WorkspaceCollaborationTimeline workspace={workspace} />
               </div>
               <div className="space-y-8">
+                {workspace.eventId && (
+                  <WorkspaceHierarchyStats eventId={workspace.eventId} />
+                )}
                 <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
                 <WorkspaceHealthMetrics workspace={workspace} />
               </div>
