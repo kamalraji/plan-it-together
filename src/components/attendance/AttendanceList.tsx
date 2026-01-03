@@ -4,8 +4,40 @@ import { supabase } from '@/integrations/supabase/client';
 import { AttendanceReport } from '../../types';
 import { Link } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip';
-import { Search, RefreshCw, UserPlus, X } from 'lucide-react';
+import { Search, RefreshCw, UserPlus, X, Download } from 'lucide-react';
+import { toast } from 'sonner';
 
+// Utility function to export attendance records as CSV
+const exportAttendanceToCSV = (attendanceReport: AttendanceReport, eventName?: string) => {
+  const headers = ['Name', 'Email', 'Status', 'Check-in Time', 'Check-in Method', 'Registration ID'];
+  
+  const rows = attendanceReport.attendanceRecords.map(record => [
+    record.userName || 'Unknown',
+    record.userEmail || '',
+    record.attended ? 'Checked In' : 'Not Checked In',
+    record.checkInTime ? new Date(record.checkInTime).toLocaleString() : '',
+    record.checkInMethod === 'QR_SCAN' ? 'QR Code' : record.checkInMethod === 'MANUAL' ? 'Manual' : '',
+    record.registrationId || '',
+  ]);
+  
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  const fileName = `attendance_${eventName ? eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'export'}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  
+  toast.success(`Exported ${attendanceReport.attendanceRecords.length} attendance records`);
+};
 interface AttendanceListProps {
   eventId: string;
   sessionId?: string;
@@ -116,6 +148,14 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
             </p>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={() => exportAttendanceToCSV(attendanceReport)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-sm font-medium transition-colors"
+              title="Export to CSV"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export</span>
+            </button>
             <button
               onClick={() => refetch()}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-sm font-medium transition-colors"
