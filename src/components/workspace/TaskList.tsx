@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember } from '../../types';
+import { cn } from '@/lib/utils';
+import { Plus, LayoutList, LayoutGrid, ClipboardList, ChevronUp, ChevronDown, ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TaskListProps {
   tasks: WorkspaceTask[];
@@ -60,35 +63,17 @@ export function TaskList({
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
-  // Filter and sort tasks
   const filteredAndSortedTasks = useMemo(() => {
     let filtered = tasks.filter(task => {
-      // Status filter
-      if (filters.status !== 'ALL' && task.status !== filters.status) {
-        return false;
-      }
+      if (filters.status !== 'ALL' && task.status !== filters.status) return false;
+      if (filters.priority !== 'ALL' && task.priority !== filters.priority) return false;
+      if (filters.category !== 'ALL' && task.category !== filters.category) return false;
 
-      // Priority filter
-      if (filters.priority !== 'ALL' && task.priority !== filters.priority) {
-        return false;
-      }
-
-      // Category filter
-      if (filters.category !== 'ALL' && task.category !== filters.category) {
-        return false;
-      }
-
-      // Assignee filter
       if (filters.assignee !== 'ALL') {
-        if (filters.assignee === 'UNASSIGNED' && task.assignee) {
-          return false;
-        }
-        if (filters.assignee !== 'UNASSIGNED' && task.assignee?.userId !== filters.assignee) {
-          return false;
-        }
+        if (filters.assignee === 'UNASSIGNED' && task.assignee) return false;
+        if (filters.assignee !== 'UNASSIGNED' && task.assignee?.userId !== filters.assignee) return false;
       }
 
-      // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         return (
@@ -101,7 +86,6 @@ export function TaskList({
       return true;
     });
 
-    // Sort tasks
     filtered.sort((a, b) => {
       let comparison = 0;
 
@@ -155,35 +139,52 @@ export function TaskList({
     });
   };
 
-  const getStatusColor = (status: TaskStatus) => {
+  const getStatusStyles = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.NOT_STARTED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
       case TaskStatus.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
       case TaskStatus.REVIEW_REQUIRED:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
       case TaskStatus.COMPLETED:
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
       case TaskStatus.BLOCKED:
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/10 text-destructive';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
-  const getPriorityColor = (priority: TaskPriority) => {
+  const getPriorityStyles = (priority: TaskPriority) => {
     switch (priority) {
       case TaskPriority.LOW:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
       case TaskPriority.MEDIUM:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
       case TaskPriority.HIGH:
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-500/10 text-orange-600 dark:text-orange-400';
       case TaskPriority.URGENT:
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/10 text-destructive';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getCategoryStyles = (category: TaskCategory) => {
+    switch (category) {
+      case TaskCategory.SETUP:
+        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400';
+      case TaskCategory.MARKETING:
+        return 'bg-pink-500/10 text-pink-600 dark:text-pink-400';
+      case TaskCategory.LOGISTICS:
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+      case TaskCategory.TECHNICAL:
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+      case TaskCategory.REGISTRATION:
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -202,32 +203,21 @@ export function TaskList({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return (
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      );
+      return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />;
     }
-
-    return sortDirection === 'asc' ? (
-      <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-      </svg>
-    ) : (
-      <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-      </svg>
-    );
+    return sortDirection === 'asc' 
+      ? <ChevronUp className="h-3.5 w-3.5 text-primary" />
+      : <ChevronDown className="h-3.5 w-3.5 text-primary" />;
   };
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="rounded-xl border border-border bg-card p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-4 bg-muted rounded w-1/4"></div>
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+              <div key={i} className="h-16 bg-muted rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -236,155 +226,139 @@ export function TaskList({
   }
 
   return (
-    <div className="bg-white shadow rounded-lg">
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
+      <div className="px-4 sm:px-6 py-4 border-b border-border bg-card">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-lg font-medium text-gray-900">Tasks</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-base font-semibold text-foreground">Tasks</h3>
+            <p className="text-sm text-muted-foreground">
               {filteredAndSortedTasks.length} of {tasks.length} tasks
             </p>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-2">
             {/* View Mode Toggle */}
-            <div className="flex rounded-md shadow-sm">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-2 text-sm font-medium rounded-l-md border ${viewMode === 'list'
-                    ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
+                className={cn(
+                  'flex items-center justify-center p-1.5 rounded-md transition-all',
+                  viewMode === 'list'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                aria-label="List view"
               >
-                List
+                <LayoutList className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${viewMode === 'grid'
-                    ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
+                className={cn(
+                  'flex items-center justify-center p-1.5 rounded-md transition-all',
+                  viewMode === 'grid'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                aria-label="Grid view"
               >
-                Grid
+                <LayoutGrid className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Create Task Button (hidden on mobile, shown on larger screens) */}
             {onCreateTask && (
-              <button
-                onClick={onCreateTask}
-                className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
+              <Button onClick={onCreateTask} size="sm" className="hidden sm:flex">
+                <Plus className="h-4 w-4 mr-1.5" />
                 Create Task
-              </button>
+              </Button>
             )}
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="px-4 sm:px-6 py-4 border-b border-border bg-muted/30">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Search */}
-          <div className="lg:col-span-2">
+          <div className="sm:col-span-2">
             <input
               type="text"
               placeholder="Search tasks..."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
 
           {/* Status Filter */}
-          <div>
-            <select
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="ALL">All Status</option>
-              {Object.values(TaskStatus).map(status => (
-                <option key={status} value={status}>
-                  {status.replace('_', ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={filters.status}
+            onChange={(e) => handleFilterChange('status', e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          >
+            <option value="ALL">All Status</option>
+            {Object.values(TaskStatus).map(status => (
+              <option key={status} value={status}>{status.replace('_', ' ')}</option>
+            ))}
+          </select>
 
           {/* Priority Filter */}
-          <div>
-            <select
-              value={filters.priority}
-              onChange={(e) => handleFilterChange('priority', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="ALL">All Priority</option>
-              {Object.values(TaskPriority).map(priority => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={filters.priority}
+            onChange={(e) => handleFilterChange('priority', e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          >
+            <option value="ALL">All Priority</option>
+            {Object.values(TaskPriority).map(priority => (
+              <option key={priority} value={priority}>{priority}</option>
+            ))}
+          </select>
 
           {/* Category Filter */}
-          <div>
-            <select
-              value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="ALL">All Categories</option>
-              {Object.values(TaskCategory).map(category => (
-                <option key={category} value={category}>
-                  {category.replace('_', ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={filters.category}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          >
+            <option value="ALL">All Categories</option>
+            {Object.values(TaskCategory).map(category => (
+              <option key={category} value={category}>{category.replace('_', ' ')}</option>
+            ))}
+          </select>
 
           {/* Assignee Filter */}
-          <div>
-            <select
-              value={filters.assignee}
-              onChange={(e) => handleFilterChange('assignee', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="ALL">All Assignees</option>
-              <option value="UNASSIGNED">Unassigned</option>
-              {teamMembers.map(member => (
-                <option key={member.id} value={member.userId}>
-                  {member.user.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={filters.assignee}
+            onChange={(e) => handleFilterChange('assignee', e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          >
+            <option value="ALL">All Assignees</option>
+            <option value="UNASSIGNED">Unassigned</option>
+            {teamMembers.map(member => (
+              <option key={member.id} value={member.userId}>{member.user.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Clear Filters */}
         <div className="mt-3 flex justify-end">
           <button
             onClick={clearFilters}
-            className="text-sm text-indigo-600 hover:text-indigo-500"
+            className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
           >
             Clear all filters
           </button>
         </div>
       </div>
 
-      {/* Task List */}
-      <div className="divide-y divide-gray-200">
+      {/* Task List / Grid */}
+      <div>
         {filteredAndSortedTasks.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="px-6 py-16 text-center">
+            <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+              <ClipboardList className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="mt-4 text-sm font-semibold text-foreground">No tasks found</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               {tasks.length === 0
                 ? "Get started by creating your first task."
                 : "Try adjusting your filters to see more tasks."
@@ -392,154 +366,156 @@ export function TaskList({
             </p>
             {onCreateTask && tasks.length === 0 && (
               <div className="mt-6">
-                <button
-                  onClick={onCreateTask}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                <Button onClick={onCreateTask}>
+                  <Plus className="h-4 w-4 mr-1.5" />
                   Create your first task
-                </button>
+                </Button>
               </div>
             )}
           </div>
         ) : viewMode === 'list' ? (
-          // List View
+          /* List View */
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border bg-muted/40">
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-muted/60 transition-colors"
                     onClick={() => handleSort('title')}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Task</span>
                       <SortIcon field="title" />
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-muted/60 transition-colors"
                     onClick={() => handleSort('status')}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Status</span>
                       <SortIcon field="status" />
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-muted/60 transition-colors hidden md:table-cell"
                     onClick={() => handleSort('priority')}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Priority</span>
                       <SortIcon field="priority" />
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                     Assignee
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-muted/60 transition-colors hidden sm:table-cell"
                     onClick={() => handleSort('dueDate')}
                   >
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Due Date</span>
                       <SortIcon field="dueDate" />
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {filteredAndSortedTasks.map((task) => (
                   <tr
                     key={task.id}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="bg-card hover:bg-muted/30 cursor-pointer transition-colors"
                     onClick={() => onTaskClick?.(task)}
                   >
-                    <td className="px-6 py-4">
-                      <div className="flex items-start space-x-3">
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="flex items-start gap-3">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium text-gray-900 truncate">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {task.title}
                             </p>
                             {isOverdue(task) && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-destructive/10 text-destructive">
                                 Overdue
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-500 truncate mt-1">
+                          <p className="text-sm text-muted-foreground truncate mt-0.5">
                             {task.description}
                           </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
-                                task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
-                                  task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
-                                    task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
-                                      task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-gray-100 text-gray-800'
-                              }`}>
+                          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                            <span className={cn(
+                              'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                              getCategoryStyles(task.category)
+                            )}>
                               {task.category.replace('_', ' ')}
                             </span>
-                            {task.tags.map(tag => (
+                            {task.tags.slice(0, 2).map(tag => (
                               <span
                                 key={tag}
-                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground"
                               >
                                 {tag}
                               </span>
                             ))}
+                            {task.tags.length > 2 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{task.tags.length - 2}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                      <span className={cn(
+                        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
+                        getStatusStyles(task.status)
+                      )}>
                         {task.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                      <span className={cn(
+                        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
+                        getPriorityStyles(task.priority)
+                      )}>
                         {task.priority}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden lg:table-cell">
                       {task.assignee ? (
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-8 w-8">
-                            <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center">
-                              <span className="text-sm font-medium text-white">
-                                {task.assignee.user.name.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
+                        <div className="flex items-center gap-2">
+                          <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-xs font-medium text-primary">
+                              {task.assignee.user.name.charAt(0).toUpperCase()}
+                            </span>
                           </div>
-                          <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">
-                              {task.assignee.user.name}
-                            </p>
-                          </div>
+                          <span className="text-sm text-foreground">
+                            {task.assignee.user.name}
+                          </span>
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-500">Unassigned</span>
+                        <span className="text-sm text-muted-foreground">Unassigned</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm hidden sm:table-cell">
                       {task.dueDate ? (
-                        <span className={isOverdue(task) ? 'text-red-600 font-medium' : ''}>
+                        <span className={cn(
+                          'text-foreground',
+                          isOverdue(task) && 'text-destructive font-medium'
+                        )}>
                           {formatDate(task.dueDate)}
                         </span>
                       ) : (
-                        <span className="text-gray-500">No due date</span>
+                        <span className="text-muted-foreground">No due date</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1">
                         {onTaskStatusChange && (
                           <select
                             value={task.status}
@@ -547,38 +523,41 @@ export function TaskList({
                               e.stopPropagation();
                               onTaskStatusChange(task.id, e.target.value as TaskStatus);
                             }}
-                            className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs border border-border rounded-md px-2 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
                           >
                             {Object.values(TaskStatus).map(status => (
-                              <option key={status} value={status}>
-                                {status.replace('_', ' ')}
-                              </option>
+                              <option key={status} value={status}>{status.replace('_', ' ')}</option>
                             ))}
                           </select>
                         )}
                         {onTaskEdit && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
                             onClick={(e) => {
                               e.stopPropagation();
                               onTaskEdit(task);
                             }}
-                            className="text-indigo-600 hover:text-indigo-900"
                           >
-                            Edit
-                          </button>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                         )}
                         {onTaskDelete && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
                             onClick={(e) => {
                               e.stopPropagation();
                               if (window.confirm('Are you sure you want to delete this task?')) {
                                 onTaskDelete(task.id);
                               }
                             }}
-                            className="text-red-600 hover:text-red-900"
                           >
-                            Delete
-                          </button>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
                     </td>
@@ -588,67 +567,71 @@ export function TaskList({
             </table>
           </div>
         ) : (
-          // Grid View
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          /* Grid View */
+          <div className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredAndSortedTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-card border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer group"
                   onClick={() => onTaskClick?.(task)}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
+                      <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
                         {task.title}
                       </h4>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {task.description}
                       </p>
                     </div>
                     {isOverdue(task) && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 ml-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-destructive/10 text-destructive shrink-0">
                         Overdue
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                      getStatusStyles(task.status)
+                    )}>
                       {task.status.replace('_', ' ')}
                     </span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                    <span className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                      getPriorityStyles(task.priority)
+                    )}>
                       {task.priority}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
-                        task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
-                          task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
-                            task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
-                              task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
-                      }`}>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                      getCategoryStyles(task.category)
+                    )}>
                       {task.category.replace('_', ' ')}
                     </span>
                     {task.dueDate && (
-                      <span className={`text-xs ${isOverdue(task) ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                      <span className={cn(
+                        'text-xs',
+                        isOverdue(task) ? 'text-destructive font-medium' : 'text-muted-foreground'
+                      )}>
                         {formatDate(task.dueDate)}
                       </span>
                     )}
                   </div>
 
                   {task.assignee && (
-                    <div className="flex items-center mb-3">
-                      <div className="flex-shrink-0 h-6 w-6">
-                        <div className="h-6 w-6 rounded-full bg-indigo-500 flex items-center justify-center">
-                          <span className="text-xs font-medium text-white">
-                            {task.assignee.user.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-xs font-medium text-primary">
+                          {task.assignee.user.name.charAt(0).toUpperCase()}
+                        </span>
                       </div>
-                      <span className="ml-2 text-xs text-gray-700">
+                      <span className="text-xs text-muted-foreground">
                         {task.assignee.user.name}
                       </span>
                     </div>
@@ -659,20 +642,20 @@ export function TaskList({
                       {task.tags.slice(0, 3).map(tag => (
                         <span
                           key={tag}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground"
                         >
                           {tag}
                         </span>
                       ))}
                       {task.tags.length > 3 && (
-                        <span className="text-xs text-gray-500">
-                          +{task.tags.length - 3} more
+                        <span className="text-xs text-muted-foreground">
+                          +{task.tags.length - 3}
                         </span>
                       )}
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between pt-3 border-t border-border">
                     {onTaskStatusChange && (
                       <select
                         value={task.status}
@@ -680,39 +663,42 @@ export function TaskList({
                           e.stopPropagation();
                           onTaskStatusChange(task.id, e.target.value as TaskStatus);
                         }}
-                        className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs border border-border rounded-md px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                       >
                         {Object.values(TaskStatus).map(status => (
-                          <option key={status} value={status}>
-                            {status.replace('_', ' ')}
-                          </option>
+                          <option key={status} value={status}>{status.replace('_', ' ')}</option>
                         ))}
                       </select>
                     )}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-1">
                       {onTaskEdit && (
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
                           onClick={(e) => {
                             e.stopPropagation();
                             onTaskEdit(task);
                           }}
-                          className="text-indigo-600 hover:text-indigo-900 text-xs"
                         >
-                          Edit
-                        </button>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
                       )}
                       {onTaskDelete && (
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive hover:text-destructive"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (window.confirm('Are you sure you want to delete this task?')) {
                               onTaskDelete(task.id);
                             }
                           }}
-                          className="text-red-600 hover:text-red-900 text-xs"
                         >
-                          Delete
-                        </button>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       )}
                     </div>
                   </div>
