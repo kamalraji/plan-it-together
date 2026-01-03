@@ -167,6 +167,14 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         description: 'Manage your profile',
         roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
       },
+      {
+        id: 'settings',
+        label: 'Settings',
+        path: '/dashboard/settings',
+        icon: '⚙️',
+        description: 'Account and app settings',
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+      },
     ],
   },
   {
