@@ -215,11 +215,11 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   ];
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full overflow-hidden">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         <PageHeader
           title={event.name}
-          subtitle={`Event ID: ${eventId}`}
+          subtitle={`Event ID: ${eventId?.slice(0, 8)}...`}
           breadcrumbs={breadcrumbs}
           actions={pageActions}
           tabs={tabs.map((tab) => ({
@@ -232,58 +232,72 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         />
 
         {!canManage && (
-          <div className="mt-4 bg-blue-50 border border-blue-100 rounded-md p-3 text-xs sm:text-sm text-blue-800">
-            You’re viewing this event as a participant or viewer. Editing, attendance, and ops tools are
+          <div className="mt-4 rounded-lg bg-primary/5 border border-primary/10 p-3 sm:p-4 text-xs sm:text-sm text-primary">
+            You're viewing this event as a participant or viewer. Editing, attendance, and ops tools are
             available only to organizers and admins of the hosting organization.
           </div>
         )}
 
         {/* Event Status and Quick Info */}
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
+        <div className="mt-4 sm:mt-6 rounded-xl bg-card border border-border p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+            <div className="flex flex-wrap items-center gap-2">
               {getStatusBadge(event.status)}
               {getModeBadge(event.mode)}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               Last updated: {new Date(event.updatedAt).toLocaleDateString()}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="flex items-center space-x-3">
-              <CalendarIcon className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">Start Date</p>
-                <p className="text-sm text-gray-600">
-                  {new Date(event.startDate).toLocaleString()}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="flex items-start sm:items-center gap-3 p-3 rounded-lg bg-muted/30">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Start Date</p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {new Date(event.startDate).toLocaleString(undefined, { 
+                    dateStyle: 'medium', 
+                    timeStyle: 'short' 
+                  })}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <CalendarIcon className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">End Date</p>
-                <p className="text-sm text-gray-600">
-                  {new Date(event.endDate).toLocaleString()}
+            <div className="flex items-start sm:items-center gap-3 p-3 rounded-lg bg-muted/30">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">End Date</p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {new Date(event.endDate).toLocaleString(undefined, { 
+                    dateStyle: 'medium', 
+                    timeStyle: 'short' 
+                  })}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <UsersIcon className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">Capacity</p>
-                <p className="text-sm text-gray-600">{event.capacity || 'Unlimited'}</p>
+            <div className="flex items-start sm:items-center gap-3 p-3 rounded-lg bg-muted/30">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                <UsersIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Capacity</p>
+                <p className="text-sm font-medium text-foreground">{event.capacity || 'Unlimited'}</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <CogIcon className="h-5 w-5 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-900">Registration</p>
-                <p className="text-sm text-gray-600">
+            <div className="flex items-start sm:items-center gap-3 p-3 rounded-lg bg-muted/30">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                <CogIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Registration</p>
+                <p className="text-sm font-medium text-foreground">
                   {event.registrationDeadline
                     ? `Until ${new Date(event.registrationDeadline).toLocaleDateString()}`
                     : 'Open'}
@@ -294,7 +308,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         </div>
 
         {/* Tab Content */}
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           {tabs.map(
             (tab) =>
               activeTab === tab.id && (
@@ -311,48 +325,48 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
 
 // Tab Components
 const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Event Description</h3>
-    <p className="text-gray-700 mb-6">{event.description}</p>
+  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Description</h3>
+    <p className="text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed">{event.description || 'No description provided.'}</p>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Event Details</h4>
-        <dl className="space-y-2">
-          <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Event ID:</dt>
-            <dd className="text-sm text-gray-900">{event.id}</dd>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="rounded-lg bg-muted/30 p-4">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Event Details</h4>
+        <dl className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <dt className="text-xs sm:text-sm text-muted-foreground">Event ID:</dt>
+            <dd className="text-xs sm:text-sm font-mono text-foreground break-all">{event.id}</dd>
           </div>
-          <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Created:</dt>
-            <dd className="text-sm text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <dt className="text-xs sm:text-sm text-muted-foreground">Created:</dt>
+            <dd className="text-xs sm:text-sm text-foreground">
               {new Date(event.createdAt).toLocaleDateString()}
             </dd>
           </div>
-          <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Visibility:</dt>
-            <dd className="text-sm text-gray-900">{event.visibility}</dd>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <dt className="text-xs sm:text-sm text-muted-foreground">Visibility:</dt>
+            <dd className="text-xs sm:text-sm text-foreground capitalize">{event.visibility?.toLowerCase()}</dd>
           </div>
         </dl>
       </div>
 
-      <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Branding & workspace template</h4>
-        <dl className="space-y-2">
-          <div className="flex justify-between">
-            <dt className="text-sm text-gray-500">Primary Color:</dt>
-            <dd className="flex items-center space-x-2">
+      <div className="rounded-lg bg-muted/30 p-4">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Branding & Workspace Template</h4>
+        <dl className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+            <dt className="text-xs sm:text-sm text-muted-foreground">Primary Color:</dt>
+            <dd className="flex items-center gap-2">
               <div
-                className="w-4 h-4 rounded border border-gray-300"
-                style={{ backgroundColor: event.branding?.primaryColor }}
+                className="w-5 h-5 rounded-md border border-border shadow-sm"
+                style={{ backgroundColor: event.branding?.primaryColor || '#6366f1' }}
               />
-              <span className="text-sm text-gray-900">{event.branding?.primaryColor}</span>
+              <span className="text-xs sm:text-sm font-mono text-foreground">{event.branding?.primaryColor || 'Default'}</span>
             </dd>
           </div>
           {event.branding?.logoUrl && (
-            <div className="flex justify-between">
-              <dt className="text-sm text-gray-500">Logo:</dt>
-              <dd className="text-sm text-blue-600">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+              <dt className="text-xs sm:text-sm text-muted-foreground">Logo:</dt>
+              <dd className="text-xs sm:text-sm text-primary hover:underline">
                 <a href={event.branding.logoUrl} target="_blank" rel="noopener noreferrer">
                   View Logo
                 </a>
@@ -362,13 +376,13 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
         </dl>
 
         {event.branding?.workspaceTemplateId && (
-          <div className="mt-4 border-t border-gray-200 pt-3">
-            <p className="text-sm font-medium text-gray-900">Workspace template</p>
-            <p className="mt-1 text-sm text-gray-700">
+          <div className="mt-4 pt-3 border-t border-border">
+            <p className="text-sm font-medium text-foreground">Workspace template</p>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               This event will provision a workspace using template
-              <span className="font-semibold"> {event.branding.workspaceTemplateId}</span>.
+              <span className="font-semibold text-foreground"> {event.branding.workspaceTemplateId}</span>.
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground/80">
               The template preconfigures team roles, task categories, communication channels, and milestone
               timeline for your organizers.
             </p>
@@ -380,10 +394,10 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
 );
 
 const RegistrationsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Registration Management</h3>
-    <p className="text-gray-600">Registration management functionality will be implemented in future iterations.</p>
-    <p className="text-sm text-gray-500 mt-2">Event: {event.name}</p>
+  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Registration Management</h3>
+    <p className="text-sm text-muted-foreground">Registration management functionality will be implemented in future iterations.</p>
+    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
   </div>
 );
 
@@ -719,10 +733,10 @@ const WorkspaceTab: React.FC<{ event: Event }> = ({ event }) => {
 };
 
 const AnalyticsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Event Analytics</h3>
-    <p className="text-gray-600">Event analytics and reporting will be implemented in future iterations.</p>
-    <p className="text-sm text-gray-500 mt-2">Event: {event.name}</p>
+  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Analytics</h3>
+    <p className="text-sm text-muted-foreground">Event analytics and reporting will be implemented in future iterations.</p>
+    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
   </div>
 );
 
@@ -782,10 +796,10 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
 };
 
 const SettingsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Event Settings</h3>
-    <p className="text-gray-600">Event settings and configuration will be implemented in future iterations.</p>
-    <p className="text-sm text-gray-500 mt-2">Event: {event.name}</p>
+  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Settings</h3>
+    <p className="text-sm text-muted-foreground">Event settings and configuration will be implemented in future iterations.</p>
+    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
   </div>
 );
 

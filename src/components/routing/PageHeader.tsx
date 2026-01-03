@@ -63,52 +63,50 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   children,
 }) => {
   const getButtonClasses = (variant: string, disabled?: boolean, loading?: boolean) => {
-    const baseClasses = 'inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
+    const baseClasses = 'inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border text-xs sm:text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all';
 
     if (disabled || loading) {
-      return `${baseClasses} opacity-50 cursor-not-allowed bg-gray-100 border-gray-300 text-gray-500`;
+      return `${baseClasses} opacity-50 cursor-not-allowed bg-muted border-border text-muted-foreground`;
     }
 
     switch (variant) {
       case 'primary':
-        return `${baseClasses} border-transparent text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500`;
+        return `${baseClasses} border-transparent text-primary-foreground bg-primary hover:bg-primary/90 focus:ring-primary shadow-sm`;
       case 'danger':
-        return `${baseClasses} border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500`;
+        return `${baseClasses} border-transparent text-destructive-foreground bg-destructive hover:bg-destructive/90 focus:ring-destructive`;
       case 'secondary':
       default:
-        return `${baseClasses} border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500`;
+        return `${baseClasses} border-border text-foreground bg-background hover:bg-muted focus:ring-primary`;
     }
   };
 
   return (
-    <div className="bg-white border-b border-gray-200">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <div className="rounded-xl bg-card border border-border overflow-hidden">
+      <div className="px-4 sm:px-6">
         {/* Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav className="flex py-3" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-4">
+          <nav className="flex py-3 overflow-x-auto" aria-label="Breadcrumb">
+            <ol className="flex items-center gap-2 sm:gap-4">
               {breadcrumbs.map((item, index) => (
-                <li key={index}>
-                  <div className="flex items-center">
-                    {index > 0 && (
-                      <ChevronRightIcon className="flex-shrink-0 h-4 w-4 text-gray-400 mr-4" />
-                    )}
-                    {item.href && !item.current ? (
-                      <a
-                        href={item.href}
-                        className="text-sm font-medium text-gray-500 hover:text-gray-700"
-                      >
-                        {item.label}
-                      </a>
-                    ) : (
-                      <span
-                        className={`text-sm font-medium ${item.current ? 'text-gray-900' : 'text-gray-500'
-                          }`}
-                      >
-                        {item.label}
-                      </span>
-                    )}
-                  </div>
+                <li key={index} className="flex items-center">
+                  {index > 0 && (
+                    <ChevronRightIcon className="flex-shrink-0 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground mr-2 sm:mr-4" />
+                  )}
+                  {item.href && !item.current ? (
+                    <a
+                      href={item.href}
+                      className="text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span
+                      className={`text-xs sm:text-sm font-medium whitespace-nowrap ${item.current ? 'text-foreground' : 'text-muted-foreground'
+                        }`}
+                    >
+                      {item.label}
+                    </span>
+                  )}
                 </li>
               ))}
             </ol>
@@ -116,20 +114,20 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         )}
 
         {/* Title and Actions */}
-        <div className="py-6">
-          <div className="flex items-center justify-between">
+        <div className="py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight text-foreground truncate">
                 {title}
               </h1>
               {subtitle && (
-                <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+                <p className="mt-1 text-xs sm:text-sm text-muted-foreground truncate">{subtitle}</p>
               )}
             </div>
 
             {/* Actions */}
             {actions && actions.length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-end sm:justify-start">
+              <div className="flex flex-wrap gap-2">
                 {actions.map((action, index) => (
                   <button
                     key={index}
@@ -138,11 +136,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                     className={getButtonClasses(action.variant, action.disabled, action.loading)}
                   >
                     {action.loading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
                     ) : (
-                      action.icon && <action.icon className="h-4 w-4 mr-2" />
+                      action.icon && <action.icon className="h-4 w-4 mr-1.5 sm:mr-2" />
                     )}
-                    {action.label}
+                    <span className="text-xs sm:text-sm whitespace-nowrap">{action.label}</span>
                   </button>
                 ))}
               </div>
@@ -160,14 +158,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         {/* Tabs */}
         {
           tabs && tabs.length > 0 && (
-            <div className="border-b border-border">
-              <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            <div className="border-t border-border -mx-4 sm:-mx-6 px-4 sm:px-6">
+              <nav className="-mb-px flex gap-1 sm:gap-2 overflow-x-auto py-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={tab.onClick}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${tab.current
-                      ? 'border-primary text-primary'
+                    className={`py-2.5 px-3 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${tab.current
+                      ? 'border-primary text-primary bg-primary/5 rounded-t-lg'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                       }`}
                   >
@@ -175,7 +173,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                     {tab.badge && (
                       <Badge
                         variant={tab.current ? 'default' : 'outline'}
-                        className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium"
+                        className="ml-1.5 sm:ml-2 rounded-full px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium"
                       >
                         {tab.badge}
                       </Badge>
@@ -258,8 +256,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </div>
           )
         }
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 
