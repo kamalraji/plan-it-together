@@ -3,10 +3,10 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
-import { Workspace, WorkspaceStatus } from '../../../types';
-import api from '../../../lib/api';
+import { WorkspaceStatus } from '../../../types';
 import { UserRole } from '@/types';
-import { useApiHealth } from '@/hooks/useApiHealth';
+import { supabase } from '@/integrations/supabase/client';
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 
 
 /**
@@ -21,6 +21,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const organization = useCurrentOrganization();
  
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
@@ -30,26 +31,85 @@ export const WorkspaceServiceDashboard: React.FC = () => {
   const baseWorkspacePath = isOrgContext && orgSlugCandidate
     ? `/${orgSlugCandidate}/workspaces`
     : '/dashboard/workspaces';
- 
-  const { isHealthy } = useApiHealth();
- 
-  // Fetch user's workspaces (scoped by org/event via query params when available)
-  const { data: workspaces, isLoading } = useQuery<Workspace[]>({
-    queryKey: ['user-workspaces', orgSlugCandidate, eventId],
+
+  // Fetch user's workspaces directly from Supabase (grouped by user/org)
+  const { data: workspacesData, isLoading } = useQuery({
+    queryKey: ['user-workspaces-supabase', organization?.id, eventId, user?.id],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: {
-          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
-          eventId: eventId || undefined,
-        },
-      });
-      return response.data.workspaces as Workspace[];
+      if (!user?.id) return { myWorkspaces: [], orgWorkspaces: [], allFlat: [] };
+
+      // Build query based on context
+      let query = supabase
+        .from('workspaces')
+        .select(`
+          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id,
+          events!inner(id, name, organization_id),
+          workspace_team_members(user_id)
+        `)
+        .order('created_at', { ascending: false });
+
+      // If in org context, filter by organization
+      if (organization?.id) {
+        query = query.eq('events.organization_id', organization.id);
+      }
+
+      // If eventId is provided, filter by event
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const allWorkspaces = (data || []).map((row: any) => ({
+        id: row.id,
+        eventId: row.event_id,
+        name: row.name,
+        status: row.status as WorkspaceStatus,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        organizerId: row.organizer_id,
+        parentWorkspaceId: row.parent_workspace_id,
+        isOwner: row.organizer_id === user?.id,
+        isMember: row.workspace_team_members?.some((m: any) => m.user_id === user?.id),
+        event: row.events
+          ? {
+            id: row.events.id,
+            name: row.events.name,
+          }
+          : undefined,
+        teamMembers: row.workspace_team_members || [],
+        channels: [],
+        taskSummary: undefined,
+        description: undefined,
+      }));
+
+      // Separate into my workspaces (created or member) and organization workspaces
+      const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
+      const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
+
+      // Build hierarchy for display (root workspaces with their children)
+      const buildHierarchy = (workspaces: typeof allWorkspaces) => {
+        const roots = workspaces.filter((w) => !w.parentWorkspaceId);
+        const children = workspaces.filter((w) => w.parentWorkspaceId);
+        
+        return roots.map((root) => ({
+          ...root,
+          subWorkspaces: children.filter((c) => c.parentWorkspaceId === root.id),
+        }));
+      };
+
+      return {
+        myWorkspaces: buildHierarchy(myWorkspaces),
+        orgWorkspaces: buildHierarchy(orgWorkspaces),
+        allFlat: allWorkspaces,
+      };
     },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
+    enabled: !!user?.id,
   });
+
+  const workspaces = workspacesData?.allFlat || [];
 
   // Calculate dashboard metrics, optionally scoped by event
   const dashboardData = React.useMemo(() => {
@@ -78,8 +138,8 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     const provisioningWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.PROVISIONING);
     const windingDownWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.WINDING_DOWN);
  
-    const totalTasks = scopedWorkspaces.reduce((sum, w) => sum + (w.taskSummary?.total || 0), 0);
-    const totalTeamMembers = scopedWorkspaces.reduce((sum, w) => sum + (w.teamMembers?.length || 0), 0);
+    const totalTasks = scopedWorkspaces.reduce((sum, w: any) => sum + (w.taskSummary?.total || 0), 0);
+    const totalTeamMembers = scopedWorkspaces.reduce((sum, w: any) => sum + (w.teamMembers?.length || 0), 0);
  
     return {
       metrics: {
@@ -162,7 +222,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     }
   };
 
-  const isWorkspacesLoading = isLoading && isHealthy !== false;
+  const isWorkspacesLoading = isLoading;
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
