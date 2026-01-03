@@ -1,12 +1,11 @@
 import React from 'react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+  SimpleDropdown,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+  SimpleDropdownTrigger,
+} from '@/components/ui/simple-dropdown';
 import { PageAction } from './PageHeader';
 
 interface MobileActionsDropdownProps {
@@ -17,24 +16,18 @@ export const MobileActionsDropdown: React.FC<MobileActionsDropdownProps> = ({ ac
   if (actions.length === 0) return null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="sm:hidden h-9 w-9 border-border"
-        >
-          <EllipsisVerticalIcon className="h-5 w-5" />
-          <span className="sr-only">Actions</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-popover border border-border shadow-lg z-50">
+    <SimpleDropdown>
+      <SimpleDropdownTrigger className="sm:hidden flex items-center justify-center h-9 w-9 rounded-md border border-border bg-background hover:bg-accent transition-colors">
+        <EllipsisVerticalIcon className="h-5 w-5" />
+        <span className="sr-only">Actions</span>
+      </SimpleDropdownTrigger>
+      <SimpleDropdownContent align="end" className="w-56">
         {actions.map((action, index) => (
-          <DropdownMenuItem
+          <SimpleDropdownItem
             key={index}
             onClick={action.action}
             disabled={action.disabled || action.loading}
-            className="flex items-center gap-3 cursor-pointer py-2.5 px-3"
+            className="flex items-center gap-3 py-2.5 px-3"
           >
             {action.loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
@@ -42,9 +35,9 @@ export const MobileActionsDropdown: React.FC<MobileActionsDropdownProps> = ({ ac
               action.icon && <action.icon className="h-4 w-4 text-muted-foreground" />
             )}
             <span className="text-sm">{action.label}</span>
-          </DropdownMenuItem>
+          </SimpleDropdownItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </SimpleDropdownContent>
+    </SimpleDropdown>
   );
 };
