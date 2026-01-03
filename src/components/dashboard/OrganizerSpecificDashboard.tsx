@@ -149,3 +149,5 @@ export function OrganizerSpecificDashboard() {
     </div>
   );
 }
+
+export default OrganizerSpecificDashboard;
