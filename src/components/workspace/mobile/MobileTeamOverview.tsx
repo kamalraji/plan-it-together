@@ -40,8 +40,9 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
   const totalMembers = teamMembers?.length || 0;
 
   const getRoleColor = (role: WorkspaceRole) => {
-    const colors = {
+    const colors: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
+      [WorkspaceRole.DEPARTMENT_MANAGER]: 'bg-violet-100 text-violet-800',
       [WorkspaceRole.TEAM_LEAD]: 'bg-blue-100 text-blue-800',
       [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
       [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-green-100 text-green-800',
@@ -49,12 +50,17 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
       [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-gray-100 text-gray-800',
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    // Fallback based on role pattern
+    if (colors[role]) return colors[role];
+    if (role.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
+    if (role.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
+    return 'bg-gray-100 text-gray-800';
   };
 
   const getRoleLabel = (role: WorkspaceRole) => {
-    const labels = {
+    const labels: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
+      [WorkspaceRole.DEPARTMENT_MANAGER]: 'Manager',
       [WorkspaceRole.TEAM_LEAD]: 'Lead',
       [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
       [WorkspaceRole.VOLUNTEER_MANAGER]: 'Vol. Manager',
@@ -62,7 +68,11 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
       [WorkspaceRole.MARKETING_LEAD]: 'Marketing',
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
     };
-    return labels[role] || role;
+    // Fallback based on role pattern
+    if (labels[role]) return labels[role];
+    if (role.endsWith('_LEAD')) return role.replace(/_LEAD$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    if (role.endsWith('_COORDINATOR')) return role.replace(/_COORDINATOR$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    return role.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
   };
 
   const getInitials = (name: string) => {

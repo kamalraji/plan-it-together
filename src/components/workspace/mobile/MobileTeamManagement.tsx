@@ -99,8 +99,9 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   };
 
   const getRoleBadge = (role: WorkspaceRole) => {
-    const roleColors = {
+    const roleColors: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
+      [WorkspaceRole.DEPARTMENT_MANAGER]: 'bg-violet-100 text-violet-800',
       [WorkspaceRole.TEAM_LEAD]: 'bg-blue-100 text-blue-800',
       [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
       [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-green-100 text-green-800',
@@ -109,8 +110,9 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-gray-100 text-gray-800',
     };
 
-    const roleLabels = {
+    const roleLabels: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
+      [WorkspaceRole.DEPARTMENT_MANAGER]: 'Manager',
       [WorkspaceRole.TEAM_LEAD]: 'Team Lead',
       [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
       [WorkspaceRole.VOLUNTEER_MANAGER]: 'Vol. Manager',
@@ -119,9 +121,26 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
     };
 
+    // Get label with fallback - handle lead roles and coordinator roles
+    const getLabel = (r: WorkspaceRole): string => {
+      if (roleLabels[r]) return roleLabels[r];
+      if (r.endsWith('_LEAD')) return r.replace(/_LEAD$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ') + ' Lead';
+      if (r.endsWith('_COORDINATOR')) return r.replace(/_COORDINATOR$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ') + ' Coord';
+      return r.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    };
+
+    // Get color with fallback based on role hierarchy
+    const getColor = (r: WorkspaceRole): string => {
+      if (roleColors[r]) return roleColors[r];
+      if (r === WorkspaceRole.DEPARTMENT_MANAGER) return 'bg-violet-100 text-violet-800';
+      if (r.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
+      if (r.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
+      return 'bg-gray-100 text-gray-800';
+    };
+
     return (
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${roleColors[role]}`}>
-        {roleLabels[role]}
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getColor(role)}`}>
+        {getLabel(role)}
       </span>
     );
   };

@@ -172,12 +172,49 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
   };
 
   const roleOptions = [
-    { value: WorkspaceRole.TEAM_LEAD, label: 'Team Lead' },
-    { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinator' },
-    { value: WorkspaceRole.VOLUNTEER_MANAGER, label: 'Volunteer Manager' },
-    { value: WorkspaceRole.TECHNICAL_SPECIALIST, label: 'Technical Specialist' },
-    { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Lead' },
-    { value: WorkspaceRole.GENERAL_VOLUNTEER, label: 'General Volunteer' },
+    // Level 2 - Managers
+    { value: WorkspaceRole.DEPARTMENT_MANAGER, label: 'Department Manager', group: 'Managers' },
+    // Level 3 - Leads
+    { value: WorkspaceRole.TEAM_LEAD, label: 'Team Lead', group: 'Leads' },
+    { value: WorkspaceRole.EVENT_LEAD, label: 'Event Lead', group: 'Leads' },
+    { value: WorkspaceRole.CATERING_LEAD, label: 'Catering Lead', group: 'Leads' },
+    { value: WorkspaceRole.LOGISTICS_LEAD, label: 'Logistics Lead', group: 'Leads' },
+    { value: WorkspaceRole.FACILITY_LEAD, label: 'Facility Lead', group: 'Leads' },
+    { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Lead', group: 'Leads' },
+    { value: WorkspaceRole.COMMUNICATION_LEAD, label: 'Communication Lead', group: 'Leads' },
+    { value: WorkspaceRole.SPONSORSHIP_LEAD, label: 'Sponsorship Lead', group: 'Leads' },
+    { value: WorkspaceRole.SOCIAL_MEDIA_LEAD, label: 'Social Media Lead', group: 'Leads' },
+    { value: WorkspaceRole.CONTENT_LEAD, label: 'Content Lead', group: 'Leads' },
+    { value: WorkspaceRole.SPEAKER_LIAISON_LEAD, label: 'Speaker Liaison Lead', group: 'Leads' },
+    { value: WorkspaceRole.JUDGE_LEAD, label: 'Judge Lead', group: 'Leads' },
+    { value: WorkspaceRole.MEDIA_LEAD, label: 'Media Lead', group: 'Leads' },
+    { value: WorkspaceRole.FINANCE_LEAD, label: 'Finance Lead', group: 'Leads' },
+    { value: WorkspaceRole.REGISTRATION_LEAD, label: 'Registration Lead', group: 'Leads' },
+    { value: WorkspaceRole.TECHNICAL_LEAD, label: 'Technical Lead', group: 'Leads' },
+    { value: WorkspaceRole.IT_LEAD, label: 'IT Lead', group: 'Leads' },
+    { value: WorkspaceRole.VOLUNTEERS_LEAD, label: 'Volunteers Lead', group: 'Leads' },
+    // Level 4 - Coordinators
+    { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.CATERING_COORDINATOR, label: 'Catering Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.LOGISTICS_COORDINATOR, label: 'Logistics Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.FACILITY_COORDINATOR, label: 'Facility Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.MARKETING_COORDINATOR, label: 'Marketing Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.COMMUNICATION_COORDINATOR, label: 'Communication Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.SPONSORSHIP_COORDINATOR, label: 'Sponsorship Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.SOCIAL_MEDIA_COORDINATOR, label: 'Social Media Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.CONTENT_COORDINATOR, label: 'Content Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.SPEAKER_LIAISON_COORDINATOR, label: 'Speaker Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.JUDGE_COORDINATOR, label: 'Judge Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.MEDIA_COORDINATOR, label: 'Media Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.FINANCE_COORDINATOR, label: 'Finance Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.REGISTRATION_COORDINATOR, label: 'Registration Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.TECHNICAL_COORDINATOR, label: 'Technical Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.IT_COORDINATOR, label: 'IT Coordinator', group: 'Coordinators' },
+    { value: WorkspaceRole.VOLUNTEER_COORDINATOR, label: 'Volunteer Coordinator', group: 'Coordinators' },
+    // Legacy
+    { value: WorkspaceRole.VOLUNTEER_MANAGER, label: 'Volunteer Manager', group: 'Legacy' },
+    { value: WorkspaceRole.TECHNICAL_SPECIALIST, label: 'Technical Specialist', group: 'Legacy' },
+    { value: WorkspaceRole.GENERAL_VOLUNTEER, label: 'General Volunteer', group: 'Coordinators' },
   ];
 
   const getInvitationStatusBadge = (status: string) => {

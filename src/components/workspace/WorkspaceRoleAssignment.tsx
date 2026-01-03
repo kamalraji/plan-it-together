@@ -13,14 +13,56 @@ interface WorkspaceRoleAssignmentProps {
   isGlobalManager: boolean;
 }
 
-const ROLE_DESCRIPTIONS: Record<WorkspaceRole, string> = {
+const ROLE_DESCRIPTIONS: Partial<Record<WorkspaceRole, string>> = {
+  // Level 1
   [WorkspaceRole.WORKSPACE_OWNER]: 'Full control over workspace settings, team, tasks, and permissions',
+  // Level 2
+  [WorkspaceRole.DEPARTMENT_MANAGER]: 'Manage department strategy, oversee leads, and create sub-workspaces',
+  // Level 3 - Leads
   [WorkspaceRole.TEAM_LEAD]: 'Manage tasks, invite members, broadcast, and export reports',
+  [WorkspaceRole.EVENT_LEAD]: 'Lead event planning, coordinate vendors, and manage event timeline',
+  [WorkspaceRole.CATERING_LEAD]: 'Lead catering operations and vendor coordination',
+  [WorkspaceRole.LOGISTICS_LEAD]: 'Lead logistics planning and transport coordination',
+  [WorkspaceRole.FACILITY_LEAD]: 'Lead facility operations and venue management',
+  [WorkspaceRole.MARKETING_LEAD]: 'Manage marketing tasks, post updates, view analytics',
+  [WorkspaceRole.COMMUNICATION_LEAD]: 'Lead communications and announcement coordination',
+  [WorkspaceRole.SPONSORSHIP_LEAD]: 'Lead sponsorship relations and deliverables tracking',
+  [WorkspaceRole.SOCIAL_MEDIA_LEAD]: 'Lead social media strategy and content creation',
+  [WorkspaceRole.CONTENT_LEAD]: 'Lead content creation and pipeline management',
+  [WorkspaceRole.SPEAKER_LIAISON_LEAD]: 'Lead speaker relations and session coordination',
+  [WorkspaceRole.JUDGE_LEAD]: 'Lead judging process and scoring coordination',
+  [WorkspaceRole.MEDIA_LEAD]: 'Lead media coverage and asset management',
+  [WorkspaceRole.FINANCE_LEAD]: 'Lead financial planning and budget tracking',
+  [WorkspaceRole.REGISTRATION_LEAD]: 'Lead registration process and attendance tracking',
+  [WorkspaceRole.TECHNICAL_LEAD]: 'Lead technical setup and support coordination',
+  [WorkspaceRole.IT_LEAD]: 'Lead IT infrastructure and systems management',
+  [WorkspaceRole.VOLUNTEERS_LEAD]: 'Lead volunteer program and assignment coordination',
+  // Level 4 - Coordinators
   [WorkspaceRole.EVENT_COORDINATOR]: 'Manage tasks, coordinate activities, broadcast, and export reports',
+  [WorkspaceRole.CATERING_COORDINATOR]: 'Coordinate catering tasks and vendor communications',
+  [WorkspaceRole.LOGISTICS_COORDINATOR]: 'Coordinate logistics tasks and transport scheduling',
+  [WorkspaceRole.FACILITY_COORDINATOR]: 'Coordinate facility setup and venue preparations',
+  [WorkspaceRole.MARKETING_COORDINATOR]: 'Coordinate marketing tasks and content distribution',
+  [WorkspaceRole.COMMUNICATION_COORDINATOR]: 'Coordinate communications and messaging tasks',
+  [WorkspaceRole.SPONSORSHIP_COORDINATOR]: 'Coordinate sponsor communications and deliverables',
+  [WorkspaceRole.SOCIAL_MEDIA_COORDINATOR]: 'Coordinate social media posts and engagement',
+  [WorkspaceRole.CONTENT_COORDINATOR]: 'Coordinate content creation tasks',
+  [WorkspaceRole.SPEAKER_LIAISON_COORDINATOR]: 'Coordinate speaker communications and logistics',
+  [WorkspaceRole.JUDGE_COORDINATOR]: 'Coordinate judge assignments and scoring',
+  [WorkspaceRole.MEDIA_COORDINATOR]: 'Coordinate media coverage and photography',
+  [WorkspaceRole.FINANCE_COORDINATOR]: 'Coordinate financial tasks and expense tracking',
+  [WorkspaceRole.REGISTRATION_COORDINATOR]: 'Coordinate registration and check-in operations',
+  [WorkspaceRole.TECHNICAL_COORDINATOR]: 'Coordinate technical setup and issue resolution',
+  [WorkspaceRole.IT_COORDINATOR]: 'Coordinate IT support and systems maintenance',
+  [WorkspaceRole.VOLUNTEER_COORDINATOR]: 'Coordinate volunteer tasks and scheduling',
+  // Legacy
   [WorkspaceRole.VOLUNTEER_MANAGER]: 'Assign tasks, manage volunteers, post messages',
   [WorkspaceRole.TECHNICAL_SPECIALIST]: 'Handle technical tasks, post updates, view analytics',
-  [WorkspaceRole.MARKETING_LEAD]: 'Manage marketing tasks, post updates, view analytics',
   [WorkspaceRole.GENERAL_VOLUNTEER]: 'View content, post messages, complete assigned tasks',
+};
+
+const getRoleDescription = (role: WorkspaceRole): string => {
+  return ROLE_DESCRIPTIONS[role] || 'Perform assigned tasks and participate in team activities';
 };
 
 export function WorkspaceRoleAssignment({
@@ -161,7 +203,7 @@ export function WorkspaceRoleAssignment({
                         </select>
                         {selectedRole && (
                           <p className="text-xs text-muted-foreground">
-                            {ROLE_DESCRIPTIONS[selectedRole]}
+                            {getRoleDescription(selectedRole)}
                           </p>
                         )}
                       </div>
@@ -171,7 +213,7 @@ export function WorkspaceRoleAssignment({
                           {formatRoleName(member.role as WorkspaceRole)}
                         </span>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {ROLE_DESCRIPTIONS[member.role as WorkspaceRole]}
+                          {getRoleDescription(member.role as WorkspaceRole)}
                         </p>
                       </div>
                     )}

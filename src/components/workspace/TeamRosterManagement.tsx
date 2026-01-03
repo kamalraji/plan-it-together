@@ -137,17 +137,39 @@ export function TeamRosterManagement({
   };
 
   const getPermissionPreview = (role: WorkspaceRole) => {
-    const permissions = {
+    const permissions: Record<string, string[]> = {
+      // Level 1 - Owner
       [WorkspaceRole.WORKSPACE_OWNER]: ['Full workspace access', 'Manage all team members', 'Delete workspace'],
+      // Level 2 - Manager
+      [WorkspaceRole.DEPARTMENT_MANAGER]: ['Manage department', 'Oversee leads', 'View all department data', 'Create sub-workspaces'],
+      // Level 3 - Leads
       [WorkspaceRole.TEAM_LEAD]: ['Manage team members', 'Create and assign tasks', 'View all workspace data'],
+      [WorkspaceRole.EVENT_LEAD]: ['Manage event planning', 'Coordinate with vendors', 'Access participant data'],
+      [WorkspaceRole.CATERING_LEAD]: ['Manage catering operations', 'Coordinate vendors', 'Track catering budget'],
+      [WorkspaceRole.LOGISTICS_LEAD]: ['Manage logistics', 'Coordinate transport', 'Track logistics timeline'],
+      [WorkspaceRole.FACILITY_LEAD]: ['Manage facility operations', 'Coordinate venues', 'Track setup requirements'],
+      [WorkspaceRole.MARKETING_LEAD]: ['Manage marketing campaigns', 'Create promotional content', 'Access marketing tools'],
+      [WorkspaceRole.COMMUNICATION_LEAD]: ['Manage communications', 'Coordinate announcements', 'Track messaging'],
+      [WorkspaceRole.SPONSORSHIP_LEAD]: ['Manage sponsorships', 'Coordinate sponsors', 'Track sponsorship deliverables'],
+      [WorkspaceRole.SOCIAL_MEDIA_LEAD]: ['Manage social media', 'Create content', 'Track engagement'],
+      [WorkspaceRole.CONTENT_LEAD]: ['Manage content creation', 'Coordinate creators', 'Track content pipeline'],
+      [WorkspaceRole.SPEAKER_LIAISON_LEAD]: ['Manage speaker relations', 'Coordinate sessions', 'Track speaker needs'],
+      [WorkspaceRole.JUDGE_LEAD]: ['Manage judging process', 'Coordinate judges', 'Track scoring'],
+      [WorkspaceRole.MEDIA_LEAD]: ['Manage media coverage', 'Coordinate photographers', 'Track media assets'],
+      [WorkspaceRole.FINANCE_LEAD]: ['Manage finances', 'Track budgets', 'Approve expenses'],
+      [WorkspaceRole.REGISTRATION_LEAD]: ['Manage registrations', 'Coordinate check-in', 'Track attendance'],
+      [WorkspaceRole.TECHNICAL_LEAD]: ['Manage technical setup', 'Coordinate tech support', 'Track technical requirements'],
+      [WorkspaceRole.IT_LEAD]: ['Manage IT infrastructure', 'Coordinate systems', 'Track IT issues'],
+      [WorkspaceRole.VOLUNTEERS_LEAD]: ['Manage volunteer program', 'Coordinate assignments', 'Track volunteer hours'],
+      // Level 4 - Coordinators (default permissions)
       [WorkspaceRole.EVENT_COORDINATOR]: ['Manage event details', 'Coordinate with vendors', 'Access participant data'],
       [WorkspaceRole.VOLUNTEER_MANAGER]: ['Manage volunteers', 'Assign volunteer tasks', 'Track volunteer hours'],
       [WorkspaceRole.TECHNICAL_SPECIALIST]: ['Manage technical setup', 'Handle technical issues', 'Access technical resources'],
-      [WorkspaceRole.MARKETING_LEAD]: ['Manage marketing campaigns', 'Create promotional content', 'Access marketing tools'],
       [WorkspaceRole.GENERAL_VOLUNTEER]: ['View assigned tasks', 'Update task progress', 'Participate in discussions'],
     };
 
-    return permissions[role] || [];
+    // Return permissions for the role, or default coordinator permissions
+    return permissions[role] || ['View assigned tasks', 'Update task progress', 'Participate in discussions'];
   };
 
   return (
@@ -513,7 +535,7 @@ export function TeamRosterManagement({
                   <label className="block text-sm font-medium text-gray-700">Permissions</label>
                   <div className="mt-2">
                     <ul className="text-sm text-gray-600 space-y-1">
-                      {getPermissionPreview(selectedMember.role).map((permission, index) => (
+                      {getPermissionPreview(selectedMember.role).map((permission: string, index: number) => (
                         <li key={index} className="flex items-center">
                           <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
                           {permission}
