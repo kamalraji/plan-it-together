@@ -11,40 +11,33 @@ import { useAuth } from '@/hooks/useAuth';
 /**
  * OrgWorkspacePage
  *
- * Organization-scoped workspace portal for the route `/:orgSlug/workspaces`.
+ * Organization-scoped workspace portal for the route `/:orgSlug/workspaces/:eventId`.
  * Shows workspace list and full workspace dashboard when one is selected.
- * Supports filtering by eventId via query param.
+ * The eventId is now a required URL parameter, not a query param.
  */
 export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
-  const { orgSlug } = useParams<{ orgSlug: string }>();
+  const { orgSlug, eventId } = useParams<{ orgSlug: string; eventId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 
-  const eventIdFilter = searchParams.get('eventId') || undefined;
   const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
 
-  const baseWorkspacePath = `/${orgSlug}/workspaces`;
 
-  // Load workspaces the current user can access
+  // Load workspaces for this specific event
   const { data: workspaces } = useQuery<Workspace[]>({
-    queryKey: ['org-workspaces', organization?.id, eventIdFilter],
+    queryKey: ['org-workspaces', organization?.id, eventId],
     queryFn: async () => {
-      if (!organization?.id) return [] as Workspace[];
+      if (!organization?.id || !eventId) return [] as Workspace[];
 
-      let query = supabase
+      const { data, error } = await supabase
         .from('workspaces')
         .select(
           'id, name, status, created_at, updated_at, event_id, events!inner(id, name, organization_id)'
         )
         .eq('events.organization_id', organization.id)
+        .eq('event_id', eventId)
         .order('created_at', { ascending: false });
-
-      if (eventIdFilter) {
-        query = query.eq('event_id', eventIdFilter);
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -67,23 +60,23 @@ export const OrgWorkspacePage: React.FC = () => {
         channels: [],
       })) as unknown) as Workspace[];
     },
-    enabled: !!organization?.id,
+    enabled: !!organization?.id && !!eventId,
   });
 
-  // Get event name if filtering by event
-  const { data: filteredEvent } = useQuery({
-    queryKey: ['event-name', eventIdFilter],
+  // Get event details
+  const { data: event } = useQuery({
+    queryKey: ['event-name', eventId],
     queryFn: async () => {
-      if (!eventIdFilter) return null;
+      if (!eventId) return null;
       const { data, error } = await supabase
         .from('events')
         .select('id, name')
-        .eq('id', eventIdFilter)
+        .eq('id', eventId)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!eventIdFilter,
+    enabled: !!eventId,
   });
 
   // Auto-select first workspace if none selected and workspaces exist
@@ -100,15 +93,6 @@ export const OrgWorkspacePage: React.FC = () => {
   const canManageWorkspaces =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
-  const handleClearEventFilter = () => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.delete('eventId');
-      next.delete('workspaceId');
-      return next;
-    });
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <header className="space-y-2">
@@ -119,38 +103,29 @@ export const OrgWorkspacePage: React.FC = () => {
               href: orgSlug ? `/${orgSlug}` : undefined,
             },
             {
-              label: 'Workspaces',
-              isCurrent: !eventIdFilter,
-              href: eventIdFilter ? baseWorkspacePath : undefined,
+              label: 'Events',
+              href: `/${orgSlug}/eventmanagement`,
             },
-            ...(eventIdFilter && filteredEvent
-              ? [{ label: filteredEvent.name, isCurrent: true }]
-              : []),
+            {
+              label: event?.name ?? 'Event',
+              href: `/${orgSlug}/eventmanagement/${eventId}`,
+            },
+            {
+              label: 'Workspaces',
+              isCurrent: true,
+            },
           ]}
           className="text-xs"
         />
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {eventIdFilter && filteredEvent
-                ? `${filteredEvent.name} Workspaces`
-                : 'Organization Workspaces'}
+              {event?.name ? `${event.name} Workspaces` : 'Event Workspaces'}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {eventIdFilter
-                ? 'Manage workspaces for this event with tasks, team, and communication.'
-                : 'Use workspaces to organize collaboration around your events.'}
+              Manage workspaces for this event with tasks, team, and communication.
             </p>
           </div>
-          {eventIdFilter && (
-            <button
-              type="button"
-              onClick={handleClearEventFilter}
-              className="inline-flex items-center rounded-full border border-border/70 bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
-            >
-              View all workspaces
-            </button>
-          )}
         </div>
       </header>
 
@@ -163,7 +138,7 @@ export const OrgWorkspacePage: React.FC = () => {
             <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
             <p className="text-sm text-muted-foreground text-center max-w-md">
               Choose a workspace from the list to view tasks, team members, and communication.
-              {canManageWorkspaces && eventIdFilter && ' Or create a new one to get started.'}
+              {canManageWorkspaces && ' Or create a new one to get started.'}
             </p>
           </div>
         )}
