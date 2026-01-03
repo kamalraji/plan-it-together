@@ -19,6 +19,8 @@ import {
 import { getCanvasStyles } from './pageBuilderStyles';
 import { slugify, extractTitleFromHtml, extractDescriptionFromHtml } from './pageBuilderUtils';
 import { initializePlugins } from './grapesjsPlugins';
+import { templatesPlugin } from './grapesjsTemplatesPlugin';
+import { assetUploadPlugin } from './grapesjsAssetPlugin';
 
 interface LandingPageDataMeta {
   title?: string;
@@ -440,6 +442,8 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     // 9. INITIALIZE CUSTOM PLUGINS
     // =============================================
     initializePlugins(editor);
+    templatesPlugin(editor);
+    assetUploadPlugin(editor, { eventId });
 
     // =============================================
     // 10. LOAD EXISTING CONTENT
