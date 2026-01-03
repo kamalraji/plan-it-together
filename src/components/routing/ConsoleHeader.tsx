@@ -203,13 +203,13 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
        <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
          {/* Left Section */}
          <div className="flex items-center gap-3 sm:gap-4">
-           {/* Mobile Menu Button */}
-           <button
-             onClick={onToggleMobileMenu}
-             className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
-           >
-             <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
-           </button>
+            {/* Sidebar Toggle Button */}
+            <button
+              onClick={onToggleMobileMenu}
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+            >
+              <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
  
            {/* Logo */}
            <Link to={getServicePath('dashboard')} className="flex items-center gap-2">
