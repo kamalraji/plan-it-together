@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
@@ -13,6 +13,7 @@ import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { OrgSettingsDashboard } from './OrgSettingsDashboard';
 import { OrgStorySettingsPage } from './OrgStorySettingsPage';
 import { OrgMarketplacePage } from '@/components/routing/services/OrgMarketplacePage';
+import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -42,6 +43,7 @@ const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> =
 
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
+  const location = useLocation();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { data: memberOrganizations, isLoading: orgsLoading } = useMyMemberOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
@@ -51,6 +53,9 @@ export const OrgScopedLayout: React.FC = () => {
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
+
+  // Check if current route is the page builder (needs fullscreen)
+  const isPageBuilder = location.pathname.includes('/page-builder');
 
   if (isLoadingAny) {
     return (
@@ -72,6 +77,17 @@ export const OrgScopedLayout: React.FC = () => {
   if (!isMemberOfOrg) {
     // User is authenticated but not a member of this organization; send them to generic dashboard
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Render page builder fullscreen without sidebar/header
+  if (isPageBuilder) {
+    return (
+      <OrganizationProvider value={{ organization }}>
+        <Routes>
+          <Route path="eventmanagement/:eventId/page-builder" element={<EventPageBuilder />} />
+        </Routes>
+      </OrganizationProvider>
+    );
   }
 
   return (
