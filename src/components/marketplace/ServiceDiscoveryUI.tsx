@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Search, MapPin, Star, Clock, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-react';
 
 // Types for marketplace services
 interface ServiceListing {
@@ -131,217 +139,227 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search Query */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search Services
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., wedding photography, catering..."
-              value={filters.query || ''}
-              onChange={(e) => handleSearch({ query: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      <Card className="border-border/60">
+        <CardContent className="p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search Query */}
+            <div className="space-y-2">
+              <Label htmlFor="search" className="text-sm font-medium text-foreground">
+                Search Services
+              </Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  type="text"
+                  placeholder="e.g., wedding photography..."
+                  value={filters.query || ''}
+                  onChange={(e) => handleSearch({ query: e.target.value })}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">Category</Label>
+              <Select
+                value={filters.category || 'all'}
+                onValueChange={(value) => handleSearch({ category: value === 'all' ? undefined : value as ServiceCategory })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {Object.values(ServiceCategory).map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Location Filter */}
+            <div className="space-y-2">
+              <Label htmlFor="location" className="text-sm font-medium text-foreground">
+                Location
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="location"
+                  type="text"
+                  placeholder="City, State"
+                  value={filters.location || ''}
+                  onChange={(e) => handleSearch({ location: e.target.value })}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            {/* Sort By */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">Sort By</Label>
+              <Select
+                value={filters.sortBy}
+                onValueChange={(value) => handleSearch({ sortBy: value as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                  <SelectItem value="price">Price</SelectItem>
+                  <SelectItem value="rating">Rating</SelectItem>
+                  <SelectItem value="distance">Distance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Category Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              value={filters.category || ''}
-              onChange={(e) => handleSearch({ category: e.target.value as ServiceCategory || undefined })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Categories</option>
-              {Object.values(ServiceCategory).map((category) => (
-                <option key={category} value={category}>
-                  {category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Location Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Location
-            </label>
-            <input
-              type="text"
-              placeholder="City, State"
-              value={filters.location || ''}
-              onChange={(e) => handleSearch({ location: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Sort By */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sort By
-            </label>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => handleSearch({ sortBy: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="relevance">Relevance</option>
-              <option value="price">Price</option>
-              <option value="rating">Rating</option>
-              <option value="distance">Distance</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Additional Filters */}
-        <div className="mt-4 flex items-center space-x-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
+          {/* Additional Filters */}
+          <div className="mt-4 flex items-center space-x-2">
+            <Checkbox
+              id="verified"
               checked={filters.verifiedOnly}
-              onChange={(e) => handleSearch({ verifiedOnly: e.target.checked })}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              onCheckedChange={(checked) => handleSearch({ verifiedOnly: checked === true })}
             />
-            <span className="ml-2 text-sm text-gray-700">Verified vendors only</span>
-          </label>
-        </div>
-      </div>
+            <Label htmlFor="verified" className="text-sm text-muted-foreground cursor-pointer">
+              Verified vendors only
+            </Label>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Service Listings */}
       <div className="space-y-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : services && services.length > 0 ? (
           services.map((service) => (
-            <div key={service.id} className="bg-white rounded-lg shadow p-6">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-6">
-                {/* Service Image */}
-                <div className="flex-shrink-0 mb-4 lg:mb-0">
-                  {service.media.length > 0 && service.media[0].type === 'IMAGE' ? (
-                    <img
-                      src={service.media[0].url}
-                      alt={service.title}
-                      className="w-full lg:w-48 h-32 object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="w-full lg:w-48 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-400">No image</span>
-                    </div>
-                  )}
-                </div>
+            <Card key={service.id} className="border-border/60 overflow-hidden">
+              <CardContent className="p-0">
+                <div className="flex flex-col lg:flex-row">
+                  {/* Service Image */}
+                  <div className="flex-shrink-0 lg:w-52">
+                    {service.media.length > 0 && service.media[0].type === 'IMAGE' ? (
+                      <img
+                        src={service.media[0].url}
+                        alt={service.title}
+                        className="w-full h-40 lg:h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-40 lg:h-full bg-muted flex items-center justify-center">
+                        <ImageIcon className="h-10 w-10 text-muted-foreground/40" />
+                      </div>
+                    )}
+                  </div>
 
-                {/* Service Details */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        {service.title}
-                        {service.featured && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Featured
-                          </span>
-                        )}
-                      </h3>
-                      <p className="text-gray-600 mb-3 line-clamp-2">{service.description}</p>
-                      
-                      {/* Vendor Info */}
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium text-gray-900">
-                            {service.vendor.businessName}
-                          </span>
-                          {service.vendor.verificationStatus === 'VERIFIED' && (
-                            <svg className="ml-1 w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
+                  {/* Service Details */}
+                  <div className="flex-1 p-5">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-lg font-semibold text-foreground truncate">
+                            {service.title}
+                          </h3>
+                          {service.featured && (
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 shrink-0">
+                              <Star className="h-3 w-3 mr-1 fill-current" /> Featured
+                            </Badge>
                           )}
                         </div>
+                        <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{service.description}</p>
                         
-                        <div className="flex items-center">
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <svg
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < Math.floor(service.vendor.rating)
-                                    ? 'text-yellow-400'
-                                    : 'text-gray-300'
-                                }`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
-                            ))}
+                        {/* Vendor Info */}
+                        <div className="flex flex-wrap items-center gap-3 mb-3 text-sm">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-foreground">
+                              {service.vendor.businessName}
+                            </span>
+                            {service.vendor.verificationStatus === 'VERIFIED' && (
+                              <CheckCircle className="h-4 w-4 text-emerald-500" />
+                            )}
                           </div>
-                          <span className="ml-1 text-sm text-gray-600">
-                            {service.vendor.rating.toFixed(1)} ({service.vendor.reviewCount} reviews)
+                          
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <div className="flex items-center">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3.5 w-3.5 ${
+                                    i < Math.floor(service.vendor.rating)
+                                      ? 'text-amber-400 fill-amber-400'
+                                      : 'text-muted-foreground/30'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="ml-1">
+                              {service.vendor.rating.toFixed(1)} ({service.vendor.reviewCount})
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Clock className="h-3.5 w-3.5" />
+                            <span>~{service.vendor.responseTime}h</span>
+                          </div>
+                        </div>
+
+                        {/* Service Category and Location */}
+                        <div className="flex flex-wrap items-center gap-2 text-sm mb-3">
+                          <Badge variant="outline" className="text-xs">
+                            {service.category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                          </Badge>
+                          <span className="text-muted-foreground">
+                            <MapPin className="h-3.5 w-3.5 inline mr-1" />
+                            {service.serviceArea.join(', ')}
                           </span>
                         </div>
-                        
-                        <span className="text-sm text-gray-500">
-                          Responds in ~{service.vendor.responseTime}h
-                        </span>
-                      </div>
 
-                      {/* Service Category and Location */}
-                      <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {service.category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
-                        </span>
-                        <span>Serves: {service.serviceArea.join(', ')}</span>
-                      </div>
-
-                      {/* Inclusions */}
-                      {service.inclusions.length > 0 && (
-                        <div className="mb-3">
-                          <span className="text-sm font-medium text-gray-700">Includes: </span>
-                          <span className="text-sm text-gray-600">
+                        {/* Inclusions */}
+                        {service.inclusions.length > 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground">Includes:</span>{' '}
                             {service.inclusions.slice(0, 3).join(', ')}
                             {service.inclusions.length > 3 && ` +${service.inclusions.length - 3} more`}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Pricing and Actions */}
-                    <div className="text-right ml-4">
-                      <div className="text-lg font-semibold text-gray-900 mb-2">
-                        {formatPrice(service.pricing)}
+                          </p>
+                        )}
                       </div>
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => handleBookService(service)}
-                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
-                        >
-                          Request Quote
-                        </button>
-                        <button className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm">
-                          View Details
-                        </button>
+
+                      {/* Pricing and Actions */}
+                      <div className="lg:text-right shrink-0">
+                        <div className="text-lg font-semibold text-foreground mb-3">
+                          {formatPrice(service.pricing)}
+                        </div>
+                        <div className="flex lg:flex-col gap-2">
+                          <Button
+                            onClick={() => handleBookService(service)}
+                            size="sm"
+                            className="flex-1 lg:w-full"
+                          >
+                            Request Quote
+                          </Button>
+                          <Button variant="outline" size="sm" className="flex-1 lg:w-full">
+                            View Details
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))
         ) : (
           <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-600">Try adjusting your search criteria or browse all categories.</p>
+            <Search className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No services found</h3>
+            <p className="text-muted-foreground">Try adjusting your search criteria or browse all categories.</p>
           </div>
         )}
       </div>
