@@ -85,10 +85,9 @@ export default defineConfig(({ mode }) => {
   optimizeDeps: {
     // Pre-bundle design system dependencies for faster dev startup
     include: [
-      'react', 
-      'react-dom', 
-      'tailwind-merge', 
-      'class-variance-authority',
+      'react',
+      'react-dom',
+      'tailwind-merge',
       'clsx',
       'lucide-react',
       '@radix-ui/react-slot',
