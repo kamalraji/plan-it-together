@@ -227,10 +227,58 @@ export const VendorRegistrationPage: React.FC = () => {
     enabled: !!vendor?.id,
   });
 
+  // Upload file to storage bucket
+  const uploadFile = async (file: File, bucket: string, path: string): Promise<string | null> => {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, { upsert: true });
+    
+    if (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+    
+    const { data: urlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+    
+    return urlData.publicUrl;
+  };
+
   // Create vendor mutation
   const createVendorMutation = useMutation({
     mutationFn: async () => {
       if (!currentUserId) throw new Error('Must be logged in');
+      
+      // Upload documents to vendor-documents bucket
+      const uploadedDocuments: { type: string; url: string; name: string }[] = [];
+      
+      if (documents.businessLicense) {
+        const docPath = `${currentUserId}/business-license-${Date.now()}.${documents.businessLicense.name.split('.').pop()}`;
+        const url = await uploadFile(documents.businessLicense, 'vendor-documents', docPath);
+        if (url) {
+          uploadedDocuments.push({ type: 'business_license', url, name: documents.businessLicense.name });
+        }
+      }
+      
+      if (documents.insurance) {
+        const docPath = `${currentUserId}/insurance-${Date.now()}.${documents.insurance.name.split('.').pop()}`;
+        const url = await uploadFile(documents.insurance, 'vendor-documents', docPath);
+        if (url) {
+          uploadedDocuments.push({ type: 'insurance', url, name: documents.insurance.name });
+        }
+      }
+      
+      // Upload portfolio files to vendor-portfolios bucket
+      const uploadedPortfolio: string[] = [];
+      
+      for (const file of portfolioFiles) {
+        const portfolioPath = `${currentUserId}/portfolio-${Date.now()}-${file.name}`;
+        const url = await uploadFile(file, 'vendor-portfolios', portfolioPath);
+        if (url) {
+          uploadedPortfolio.push(url);
+        }
+      }
       
       const { data, error } = await supabase
         .from('vendors')
@@ -247,8 +295,8 @@ export const VendorRegistrationPage: React.FC = () => {
           state: businessInfo.state,
           country: businessInfo.country,
           categories: selectedCategories,
-          documents: [],
-          portfolio_urls: [],
+          documents: uploadedDocuments,
+          portfolio_urls: uploadedPortfolio,
           verification_status: 'PENDING',
         })
         .select()

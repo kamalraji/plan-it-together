@@ -8,10 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { useMyOrganizations } from '@/hooks/useOrganization';
+import { VendorApprovalPanel } from './VendorApprovalPanel';
 
 // Use untyped Supabase client here because generated types are empty until DB introspection runs
 const supabaseAny = supabase as any;
@@ -339,11 +341,10 @@ export const AdminUserRolesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent">
-            Application Role Management
+            Admin Console
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            SUPER_ADMIN users can manage entries in the secure <code className="font-mono text-xs">user_roles</code> table
-            to promote or demote organizers, judges, volunteers, and other roles. Every change requires an audit note.
+            Manage user roles, vendor applications, and other administrative tasks.
           </p>
         </div>
 
@@ -362,6 +363,13 @@ export const AdminUserRolesPage: React.FC = () => {
           </div>
         </div>
 
+        <Tabs defaultValue="roles" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="roles">User Roles</TabsTrigger>
+            <TabsTrigger value="vendors">Vendor Applications</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="roles" className="space-y-6">
         <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">
           <CardHeader className="flex flex-col gap-4">
             <CardTitle className="text-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -569,6 +577,12 @@ export const AdminUserRolesPage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="vendors" className="space-y-6">
+            <VendorApprovalPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
