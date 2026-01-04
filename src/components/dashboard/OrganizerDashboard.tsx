@@ -230,63 +230,52 @@ export function OrganizerDashboard() {
             {/* Breadcrumb */}
             <OrganizerBreadcrumbs current="dashboard" />
 
-            {/* Hero with glassmorphic organization summary */}
-            <section className="mt-4">
-                <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[150px] sm:min-h-[200px]">
-                    {/* Themed gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-primary/5" />
+            {/* Compact Hero Section */}
+            <section className="mt-3">
+                <div className="relative overflow-hidden rounded-xl border border-border/40 bg-card/50 backdrop-blur-sm">
+                    {/* Subtle accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-                    {/* Glassmorphic overlay */}
-                    <div className="relative px-4 sm:px-10 py-4 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="max-w-xl rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 sm:px-6 py-3 sm:py-4 shadow-2xl">
-                            <p className="text-xs sm:text-sm text-muted-foreground mb-1">/ Organizer view</p>
-                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
-                                Organizer Dashboard
+                    <div className="relative px-4 sm:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dashboard</span>
+                                <span className="h-1 w-1 rounded-full bg-primary/60" />
+                                <span className="text-[10px] text-muted-foreground">{organization.name}</span>
+                            </div>
+                            <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-foreground">
+                                Welcome back{user?.name ? `, ${user.name}` : ''}
                             </h1>
-                            <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-                                Welcome back{user?.name ? `, ${user.name}` : ''}. Manage your organization's events and insights in one
-                                focused workspace.
+                            <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground">
+                                Manage your events and insights
                             </p>
                         </div>
 
-                        <div className="flex flex-col items-stretch xs:items-end gap-2 sm:gap-3 w-full sm:w-auto">
-                            <div className="rounded-2xl border border-border/60 bg-background/75 backdrop-blur-xl px-4 py-3 shadow-xl min-w-[220px] max-w-xs self-stretch sm:self-auto">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                                    Active organization
-                                </p>
-                                <p className="text-sm sm:text-base font-semibold text-foreground truncate">
-                                    {organization.name}
-                                </p>
-                                <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
-                                    {organization.slug}
-                                </p>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
-                                <Link to={eventCreatePath} className="w-full sm:flex-1 min-w-0 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-sm">
-                                    Create Event
-                                </Link>
-                                <button onClick={logout} className="w-full sm:flex-1 min-w-0 inline-flex items-center justify-center rounded-full border-2 border-border/70 bg-background/80 backdrop-blur px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-foreground hover:bg-muted/80 transition-all">
-                                    Logout
-                                </button>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-2 justify-center xs:justify-end text-[11px] sm:text-xs text-muted-foreground">
-                                <span className="hidden sm:inline">Shortcuts:</span>
-                                <Link to={`/${organization.slug}/eventmanagement`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Event Management
-                                </Link>
-                                <Link to={`/${organization.slug}/workspaces`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Workspaces
-                                </Link>
-                                <Link to={`/${organization.slug}/organizations`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Organizations
-                                </Link>
-                            </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <Link to={eventCreatePath} className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:bg-primary/90 transition-colors">
+                                + New Event
+                            </Link>
+                            <button onClick={logout} className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
+                                Logout
+                            </button>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* Quick Links */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Quick:</span>
+                <Link to={`/${organization.slug}/eventmanagement`} className="inline-flex items-center rounded-md px-2.5 py-1 bg-muted/50 border border-border/40 text-foreground hover:bg-muted text-[11px] font-medium transition-colors">
+                    Events
+                </Link>
+                <Link to={`/${organization.slug}/workspaces`} className="inline-flex items-center rounded-md px-2.5 py-1 bg-muted/50 border border-border/40 text-foreground hover:bg-muted text-[11px] font-medium transition-colors">
+                    Workspaces
+                </Link>
+                <Link to={`/${organization.slug}/organizations`} className="inline-flex items-center rounded-md px-2.5 py-1 bg-muted/50 border border-border/40 text-foreground hover:bg-muted text-[11px] font-medium transition-colors">
+                    Organizations
+                </Link>
+            </div>
 
 
             {/* Navigation Tabs */}
