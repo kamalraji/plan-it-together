@@ -91,11 +91,6 @@ export default defineConfig(({ mode }) => ({
   // CSS preprocessing
   css: {
     devSourcemap: mode === 'development',
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@import "@/styles/tokens.css";`,
-      },
-    },
   },
   // Enhanced error handling for design system development
   define: {
