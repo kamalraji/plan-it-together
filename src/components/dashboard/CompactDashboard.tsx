@@ -29,17 +29,17 @@ interface WorkspaceSummary {
 }
 
 /**
- * Mobile-optimized home view for the Organizer Dashboard.
- * This component is displayed inside the MobileAppShell which provides
- * the header, bottom navigation, and FAB. It only renders the content area.
+ * Compact dashboard view that works for both mobile and desktop narrow views.
+ * On mobile: displayed inside MobileAppShell with bottom navigation
+ * On desktop: can be used as a compact sidebar or narrow dashboard view
  */
-export function MobileOrganizerDashboard() {
+export function CompactDashboard() {
   const { user } = useAuth();
   const organization = useCurrentOrganization();
 
   // Fetch events
   const { data: events, isLoading: eventsLoading } = useQuery<Event[]>({
-    queryKey: ['mobile-organizer-events', organization.id],
+    queryKey: ['compact-dashboard-events', organization.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
@@ -60,7 +60,7 @@ export function MobileOrganizerDashboard() {
 
   // Fetch workspaces
   const { data: workspaces, isLoading: workspacesLoading } = useQuery<WorkspaceSummary[]>({
-    queryKey: ['mobile-organizer-workspaces', organization.id, user?.id],
+    queryKey: ['compact-dashboard-workspaces', organization.id, user?.id],
     queryFn: async () => {
       const { data: orgEvents } = await supabase
         .from('events')
@@ -90,31 +90,31 @@ export function MobileOrganizerDashboard() {
     enabled: !!user?.id
   });
 
-  // Quick action grid items (2x2 layout)
+  // Quick action grid items
   const quickActionCards = [
     { 
       icon: CalendarDays, 
       label: 'Events', 
       path: `/${organization.slug}/eventmanagement`,
-      color: 'bg-blue-500/10 text-blue-600'
+      color: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
     },
     { 
       icon: SlidersHorizontal, 
       label: 'Analytics', 
       path: `/${organization.slug}/analytics`,
-      color: 'bg-orange-500/10 text-orange-600'
+      color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
     },
     { 
       icon: Briefcase, 
       label: 'Workspaces', 
       path: `/${organization.slug}/workspaces`,
-      color: 'bg-green-500/10 text-green-600'
+      color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400'
     },
     { 
       icon: Users, 
       label: 'Team', 
       path: `/${organization.slug}/team`,
-      color: 'bg-purple-500/10 text-purple-600'
+      color: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400'
     },
   ];
 
@@ -122,9 +122,9 @@ export function MobileOrganizerDashboard() {
 
   // Skeleton component
   const CardSkeleton = () => (
-    <div className="bg-card border border-border rounded-xl p-4 animate-pulse">
+    <div className="bg-card border border-border rounded-xl p-3 sm:p-4 animate-pulse">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-muted" />
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-muted" />
         <div className="flex-1 space-y-2">
           <div className="h-4 bg-muted rounded w-3/4" />
           <div className="h-3 bg-muted rounded w-1/2" />
@@ -134,51 +134,51 @@ export function MobileOrganizerDashboard() {
   );
 
   return (
-    <div className="px-4 py-4 space-y-6">
+    <div className="px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6 max-w-2xl mx-auto">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">
           Welcome{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Here's what's happening in {organization.name}
         </p>
       </div>
 
-      {/* 2x2 Quick Action Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Quick Action Grid - 2x2 on mobile, 4 cols on larger screens */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {quickActionCards.map((card, index) => (
           <Link
             key={index}
             to={card.path}
-            className="flex flex-col items-center justify-center gap-2 p-5 rounded-2xl bg-card border border-border hover:bg-muted/50 active:scale-[0.98] transition-all shadow-sm"
+            className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-card border border-border hover:bg-muted/50 active:scale-[0.98] transition-all shadow-sm"
           >
-            <div className={`p-3 rounded-xl ${card.color}`}>
-              <card.icon className="w-6 h-6" />
+            <div className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl ${card.color}`}>
+              <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-sm font-medium text-foreground">{card.label}</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground">{card.label}</span>
           </Link>
         ))}
       </div>
 
       {/* Tasks Section */}
-      <section className="space-y-3">
+      <section className="space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Tasks</h2>
-          <Link to={`/${organization.slug}/workspaces`} className="text-xs font-medium text-primary flex items-center gap-1">
+          <h2 className="text-sm sm:text-base font-semibold text-foreground">Tasks</h2>
+          <Link to={`/${organization.slug}/workspaces`} className="text-xs font-medium text-primary flex items-center gap-1 hover:underline">
             View all <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-sm text-muted-foreground text-center py-2">No pending tasks</p>
+        <div className="bg-card border border-border rounded-xl p-3 sm:p-4">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center py-2">No pending tasks</p>
         </div>
       </section>
 
       {/* Upcoming Events Section */}
-      <section className="space-y-3">
+      <section className="space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Upcoming Events</h2>
-          <Link to={`/${organization.slug}/eventmanagement`} className="text-xs font-medium text-primary flex items-center gap-1">
+          <h2 className="text-sm sm:text-base font-semibold text-foreground">Upcoming Events</h2>
+          <Link to={`/${organization.slug}/eventmanagement`} className="text-xs font-medium text-primary flex items-center gap-1 hover:underline">
             View all <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
@@ -194,34 +194,34 @@ export function MobileOrganizerDashboard() {
               <Link
                 key={event.id}
                 to={`/${organization.slug}/eventmanagement/${event.id}`}
-                className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
+                className="flex items-center gap-3 p-2.5 sm:p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
               >
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <CalendarDays className="h-5 w-5 text-primary" />
+                <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                  <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{event.name}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
+                  <p className="text-xs sm:text-sm font-medium text-foreground truncate">{event.name}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     {format(new Date(event.startDate), 'MMM d, yyyy')}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </Link>
             ))}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-sm text-muted-foreground text-center py-2">No upcoming events</p>
+          <div className="bg-card border border-border rounded-xl p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center py-2">No upcoming events</p>
           </div>
         )}
       </section>
 
       {/* Recent Workspaces Section */}
-      <section className="space-y-3">
+      <section className="space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">Recent Workspaces</h2>
-          <Link to={`/${organization.slug}/workspaces`} className="text-xs font-medium text-primary flex items-center gap-1">
+          <h2 className="text-sm sm:text-base font-semibold text-foreground">Recent Workspaces</h2>
+          <Link to={`/${organization.slug}/workspaces`} className="text-xs font-medium text-primary flex items-center gap-1 hover:underline">
             View all <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
@@ -237,18 +237,18 @@ export function MobileOrganizerDashboard() {
               <Link
                 key={ws.id}
                 to={`/${organization.slug}/workspaces/${ws.eventId}/${ws.id}`}
-                className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
+                className="flex items-center gap-3 p-2.5 sm:p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
               >
-                <div className="p-2 rounded-lg bg-green-500/10">
-                  <Briefcase className="h-5 w-5 text-green-600" />
+                <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{ws.name}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs sm:text-sm font-medium text-foreground truncate">{ws.name}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
                     Updated {format(new Date(ws.updatedAt), 'MMM d')}
                   </p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${
                   ws.status === 'active' 
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
                     : 'bg-muted text-muted-foreground'
@@ -259,11 +259,14 @@ export function MobileOrganizerDashboard() {
             ))}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-sm text-muted-foreground text-center py-2">No workspaces yet</p>
+          <div className="bg-card border border-border rounded-xl p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center py-2">No workspaces yet</p>
           </div>
         )}
       </section>
     </div>
   );
 }
+
+// Keep the old export name for backward compatibility
+export { CompactDashboard as MobileOrganizerDashboard };
