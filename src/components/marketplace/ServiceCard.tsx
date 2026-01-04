@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Clock, CheckCircle, MapPin, Image as ImageIcon } from 'lucide-react';
+import { Star, Clock, CheckCircle, MapPin, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { ServiceListing, formatPrice, formatCategory } from './types';
 
 interface ServiceCardProps {
@@ -48,14 +49,18 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onBookService
                 
                 {/* Vendor Info */}
                 <div className="flex flex-wrap items-center gap-3 mb-3 text-sm">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium text-foreground">
+                  <Link 
+                    to={`/vendor/${service.vendor.id}`}
+                    className="flex items-center gap-1 hover:text-primary transition-colors group"
+                  >
+                    <span className="font-medium text-foreground group-hover:text-primary">
                       {service.vendor.businessName}
                     </span>
                     {service.vendor.verificationStatus === 'VERIFIED' && (
                       <CheckCircle className="h-4 w-4 text-emerald-500" />
                     )}
-                  </div>
+                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
                   
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <div className="flex items-center">

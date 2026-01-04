@@ -37,6 +37,7 @@ import { ParticipantPortfolioPage } from '../portfolio/ParticipantPortfolioPage'
 import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
+import { VendorPublicProfilePage } from './services/VendorPublicProfilePage';
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import PricingPage from '@/pages/PricingPage';
 
@@ -600,6 +601,9 @@ export const AppRouter: React.FC = () => {
             {/* Public participant portfolio */}
             <Route path="/portfolio/:userId" element={<ParticipantPortfolioPage />} />
             <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
+
+            {/* Public vendor profile */}
+            <Route path="/vendor/:vendorId" element={<VendorPublicProfilePage />} />
 
             {/* Public organization landing by slug */}
             <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
