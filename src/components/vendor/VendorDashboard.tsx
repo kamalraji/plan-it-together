@@ -17,13 +17,15 @@ import {
   BarChart3,
   MessageSquare,
   CalendarCheck,
-  Settings
+  Settings,
+  Images
 } from 'lucide-react';
 import VendorRegistration from './VendorRegistration';
 import VendorServiceManager from './VendorServiceManager';
 import VendorReviewsManager from './VendorReviewsManager';
 import VendorBookingManager from './VendorBookingManager';
 import VendorProfileEditor from './VendorProfileEditor';
+import VendorPortfolioGallery from './VendorPortfolioGallery';
 
 interface VendorDashboardProps {
   userId?: string;
@@ -353,7 +355,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
           <TabsTrigger value="overview" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Overview</span>
@@ -365,6 +367,10 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
           <TabsTrigger value="services" className="gap-2">
             <Package className="h-4 w-4" />
             <span className="hidden sm:inline">Services</span>
+          </TabsTrigger>
+          <TabsTrigger value="portfolio" className="gap-2">
+            <Images className="h-4 w-4" />
+            <span className="hidden sm:inline">Portfolio</span>
           </TabsTrigger>
           <TabsTrigger value="reviews" className="gap-2">
             <Star className="h-4 w-4" />
@@ -386,6 +392,10 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
 
         <TabsContent value="services" className="mt-6">
           <VendorServiceManager vendorId={vendor.id} />
+        </TabsContent>
+
+        <TabsContent value="portfolio" className="mt-6">
+          <VendorPortfolioGallery vendorId={vendor.id} />
         </TabsContent>
 
         <TabsContent value="reviews" className="mt-6">

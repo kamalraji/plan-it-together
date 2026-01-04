@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MagnifyingGlassIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
-import BookingManagementUI from '../../marketplace/BookingManagementUI';
+import OrganizerBookingsManager from '../../organizer/OrganizerBookingsManager';
 
 /**
  * BookingListPage provides AWS-style booking management interface for the marketplace.
@@ -125,8 +125,8 @@ export const BookingListPage: React.FC = () => {
         )}
 
         {/* Booking Management Interface */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <BookingManagementUI eventId={undefined} />
+        <div className="rounded-lg">
+          <OrganizerBookingsManager />
         </div>
 
         {/* Help Section */}

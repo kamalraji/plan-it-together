@@ -6,3 +6,4 @@ export { default as VendorServiceManager } from './VendorServiceManager';
 export { default as VendorReviewsManager } from './VendorReviewsManager';
 export { default as VendorBookingManager } from './VendorBookingManager';
 export { default as VendorProfileEditor } from './VendorProfileEditor';
+export { default as VendorPortfolioGallery } from './VendorPortfolioGallery';
