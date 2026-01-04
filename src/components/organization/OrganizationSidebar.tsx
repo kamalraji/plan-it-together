@@ -982,22 +982,22 @@ export const OrganizationSidebar: React.FC = () => {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={currentPath.startsWith('/dashboard/admin/users')}
+                    isActive={currentPath.startsWith(`/${orgSlug}/admin/users`)}
                     tooltip="User Roles"
                     className={cn(
                       'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
                       'hover:bg-muted/70 hover:text-foreground',
-                      currentPath.startsWith('/dashboard/admin/users') && 'bg-primary/15 text-primary font-medium'
+                      currentPath.startsWith(`/${orgSlug}/admin/users`) && 'bg-primary/15 text-primary font-medium'
                     )}
                   >
                     <NavLink
-                      to="/dashboard/admin/users"
+                      to={`/${orgSlug}/admin/users`}
                       className="flex w-full items-center gap-3"
                     >
                       <span
                         className={cn(
                           'flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200',
-                          currentPath.startsWith('/dashboard/admin/users')
+                          currentPath.startsWith(`/${orgSlug}/admin/users`)
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-primary/10 text-primary group-hover:bg-primary/20'
                         )}
@@ -1018,22 +1018,22 @@ export const OrganizationSidebar: React.FC = () => {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    isActive={currentPath.startsWith('/dashboard/admin/organizers')}
-                    tooltip="Pending Organizers"
+                    isActive={currentPath.startsWith(`/${orgSlug}/admin/activity`)}
+                    tooltip="Activity Logs"
                     className={cn(
                       'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
                       'hover:bg-muted/70 hover:text-foreground',
-                      currentPath.startsWith('/dashboard/admin/organizers') && 'bg-primary/15 text-primary font-medium'
+                      currentPath.startsWith(`/${orgSlug}/admin/activity`) && 'bg-primary/15 text-primary font-medium'
                     )}
                   >
                     <NavLink
-                      to="/dashboard/admin/organizers"
+                      to={`/${orgSlug}/admin/activity`}
                       className="flex w-full items-center gap-3"
                     >
                       <span
                         className={cn(
                           'flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200',
-                          currentPath.startsWith('/dashboard/admin/organizers')
+                          currentPath.startsWith(`/${orgSlug}/admin/activity`)
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-primary/10 text-primary group-hover:bg-primary/20'
                         )}
@@ -1042,9 +1042,9 @@ export const OrganizationSidebar: React.FC = () => {
                       </span>
                       {!isCollapsed && (
                         <span className="flex flex-col items-start animate-fade-in">
-                          <span>Pending Organizers</span>
+                          <span>Activity Logs</span>
                           <span className="text-[10px] font-normal text-muted-foreground">
-                            Review requests
+                            Admin audit trail
                           </span>
                         </span>
                       )}

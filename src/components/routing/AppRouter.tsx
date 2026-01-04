@@ -24,11 +24,6 @@ import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
 import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
 import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
-import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
-
-import { RolesDiagramPage } from '../admin/RolesDiagramPage';
-import { AdminActivityDashboard } from '../admin/AdminActivityDashboard';
-import { AdminLayout } from '../admin/AdminLayout';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
@@ -717,19 +712,8 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-              {/* Admin routes - wrapped in AdminLayout for server-side verification */}
-              <Route
-                path="admin"
-                element={
-                  <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
-                    <AdminLayout />
-                  </ConsoleRoute>
-                }
-              >
-                <Route path="users" element={<AdminUserRolesPage />} />
-                <Route path="roles-diagram" element={<RolesDiagramPage />} />
-                <Route path="activity" element={<AdminActivityDashboard />} />
-              </Route>
+              {/* Admin routes moved to /:orgSlug/admin - redirect legacy paths */}
+              <Route path="admin/*" element={<Navigate to="/dashboard" replace />} />
               <Route
                 path="profile/*"
                 element={

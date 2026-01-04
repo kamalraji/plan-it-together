@@ -15,6 +15,11 @@ import { OrgStorySettingsPage } from './OrgStorySettingsPage';
 import { OrgMarketplacePage } from '@/components/routing/services/OrgMarketplacePage';
 import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 import { OrgScopedBreadcrumbs } from './OrgScopedBreadcrumbs';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminUserRolesPage } from '@/components/admin/AdminUserRolesPage';
+import { RolesDiagramPage } from '@/components/admin/RolesDiagramPage';
+import { AdminActivityDashboard } from '@/components/admin/AdminActivityDashboard';
+import { UserRole } from '@/types';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -58,11 +63,15 @@ export const OrgScopedLayout: React.FC = () => {
   // Check if current route is the page builder (needs fullscreen)
   const isPageBuilder = location.pathname.includes('/page-builder');
   
-  // Check if current route needs narrower content (settings, team, event details, etc.)
+  // Check if current route needs narrower content (settings, team, event details, admin, etc.)
   const isNarrowPage = location.pathname.includes('/settings') || 
                        location.pathname.includes('/team') ||
                        location.pathname.includes('/analytics') ||
-                       location.pathname.includes('/eventmanagement');
+                       location.pathname.includes('/eventmanagement') ||
+                       location.pathname.includes('/admin');
+  
+  // Check if user has SUPER_ADMIN role (for admin routes)
+  const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   if (isLoadingAny) {
     return (
@@ -123,6 +132,14 @@ export const OrgScopedLayout: React.FC = () => {
                   <Route path="organizations/*" element={<OrganizationService />} />
                   <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
                   <Route path="team" element={<OrganizationTeamManagement />} />
+                  {/* Admin routes - only for SUPER_ADMIN */}
+                  {isSuperAdmin && (
+                    <Route path="admin" element={<AdminLayout />}>
+                      <Route path="users" element={<AdminUserRolesPage />} />
+                      <Route path="roles-diagram" element={<RolesDiagramPage />} />
+                      <Route path="activity" element={<AdminActivityDashboard />} />
+                    </Route>
+                  )}
                   <Route path="*" element={<Navigate to="dashboard" replace />} />
                 </Routes>
               </div>

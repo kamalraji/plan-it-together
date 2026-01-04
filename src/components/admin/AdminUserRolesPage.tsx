@@ -77,7 +77,7 @@ export const AdminUserRolesPage: React.FC = () => {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', window.location.origin + '/dashboard/admin/users');
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
   }, []);
 
   useEffect(() => {

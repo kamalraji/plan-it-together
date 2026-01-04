@@ -219,7 +219,7 @@ export const RolesDiagramPage: React.FC = () => {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', window.location.origin + '/dashboard/admin/roles-diagram');
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
   }, []);
 
   return (
