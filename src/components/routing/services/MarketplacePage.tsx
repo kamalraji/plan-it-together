@@ -6,6 +6,7 @@ import { Search, Building2 } from 'lucide-react';
 
 // Import existing marketplace components
 import ServiceDiscoveryUI from '../../marketplace/ServiceDiscoveryUI';
+import FeaturedServices from '../../marketplace/FeaturedServices';
 
 /**
  * MarketplacePage provides a customer-facing marketplace interface for browsing and booking services.
@@ -122,6 +123,9 @@ export const MarketplacePage: React.FC = () => {
           </div>
         </div>
         
+        {/* Featured Services Section */}
+        <FeaturedServices />
+
         {/* Main Content */}
         <div className="bg-card rounded-lg border p-6">
           <ServiceDiscoveryUI eventId={eventId || undefined} />
