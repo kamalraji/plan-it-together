@@ -108,65 +108,6 @@ const wizardSteps = [
   },
 ] as const;
 
-const EventPreviewCard: React.FC<{ values: EventFormValues }> = ({ values }) => {
-  const primaryColor = values.primaryColor || '#2563eb';
-  const logoUrl = values.logoUrl;
-  const name = values.name || 'Your event name';
-  const heroSubtitle = values.heroSubtitle;
-  const primaryCtaLabel = values.primaryCtaLabel || 'Register now';
-
-  return (
-    <div
-      className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-card shadow-sm"
-      style={{ borderColor: primaryColor }}
-      aria-label="Event landing preview"
-    >
-      <div
-        className="p-4 text-white"
-        style={{
-          backgroundColor: primaryColor,
-        }}
-      >
-        <p className="text-xs font-medium opacity-80">Live landing preview</p>
-        <div className="mt-3 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/10 overflow-hidden">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt="Event logo preview"
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-xs font-semibold opacity-80">Logo</span>
-            )}
-          </div>
-          <div>
-            <p className="text-base font-semibold">{name}</p>
-            <p className="text-xs opacity-90">
-              {heroSubtitle || 'Add a short subtitle to describe your event at a glance.'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4 flex items-center justify-between bg-card">
-        <div className="space-y-1">
-          <div className="h-2 w-24 rounded-full bg-muted" />
-          <div className="h-2 w-32 rounded-full bg-muted" />
-        </div>
-        <div
-          className="rounded-full px-3 py-1 text-xs font-medium text-primary-foreground"
-          style={{ backgroundColor: primaryColor }}
-        >
-          {primaryCtaLabel}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 /**
  * EventFormPage provides a 3-step wizard layout for creating and editing events
@@ -1060,9 +1001,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </form>
               </Form>
 
-              <div className="mt-4 lg:mt-0">
-                <EventPreviewCard values={watchedValues as EventFormValues} />
-              </div>
             </div>
           )}
         </AfCard>
