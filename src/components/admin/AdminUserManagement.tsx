@@ -22,12 +22,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+  SimpleDropdownTrigger,
+} from '@/components/ui/simple-dropdown';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
@@ -304,41 +303,39 @@ export const AdminUserManagement: React.FC = () => {
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openUserDetails(user)}>
+                        <SimpleDropdown>
+                          <SimpleDropdownTrigger className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent hover:text-accent-foreground">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </SimpleDropdownTrigger>
+                          <SimpleDropdownContent align="end" className="w-48">
+                            <SimpleDropdownItem onClick={() => openUserDetails(user)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            {user.roles.includes('admin') ? null : (
+                            </SimpleDropdownItem>
+                            {!user.roles.includes('admin') && (
                               <>
+                                <div className="-mx-1 my-1 h-px bg-muted" />
                                 {user.roles.length > 1 ? (
-                                  <DropdownMenuItem
+                                  <SimpleDropdownItem
                                     onClick={() => openSuspendDialog(user)}
                                     className="text-amber-600"
                                   >
                                     <UserX className="h-4 w-4 mr-2" />
                                     Suspend User
-                                  </DropdownMenuItem>
+                                  </SimpleDropdownItem>
                                 ) : (
-                                  <DropdownMenuItem
+                                  <SimpleDropdownItem
                                     onClick={() => restoreMutation.mutate(user.id)}
                                     className="text-emerald-600"
                                   >
                                     <UserCheck className="h-4 w-4 mr-2" />
                                     Restore User
-                                  </DropdownMenuItem>
+                                  </SimpleDropdownItem>
                                 )}
                               </>
                             )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          </SimpleDropdownContent>
+                        </SimpleDropdown>
                       </TableCell>
                     </TableRow>
                   ))}
