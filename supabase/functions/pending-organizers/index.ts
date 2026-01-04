@@ -18,6 +18,69 @@ type PendingOrganizer = {
   requestedAt: string | null;
 };
 
+// ============= Rate Limiting (inline for edge function) =============
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+}
+
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowSeconds: number;
+}
+
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+  retryAfter?: number;
+}
+
+function checkRateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
+  const now = Date.now();
+  const windowMs = config.windowSeconds * 1000;
+  
+  // Cleanup expired entries occasionally
+  if (Math.random() < 0.1) {
+    for (const [key, entry] of rateLimitStore.entries()) {
+      if (now > entry.resetAt) rateLimitStore.delete(key);
+    }
+  }
+
+  const existing = rateLimitStore.get(identifier);
+  
+  if (!existing || now > existing.resetAt) {
+    const resetAt = now + windowMs;
+    rateLimitStore.set(identifier, { count: 1, resetAt });
+    return { allowed: true, remaining: config.maxRequests - 1, resetAt };
+  }
+
+  if (existing.count >= config.maxRequests) {
+    const retryAfter = Math.ceil((existing.resetAt - now) / 1000);
+    return { allowed: false, remaining: 0, resetAt: existing.resetAt, retryAfter };
+  }
+
+  existing.count++;
+  rateLimitStore.set(identifier, existing);
+  return { allowed: true, remaining: config.maxRequests - existing.count, resetAt: existing.resetAt };
+}
+
+function getClientIP(req: Request): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    req.headers.get('cf-connecting-ip') ||
+    'unknown'
+  );
+}
+
+// Rate limit: 20 requests per minute per IP
+const RATE_LIMIT_CONFIG: RateLimitConfig = { maxRequests: 20, windowSeconds: 60 };
+
+// ============= End Rate Limiting =============
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -25,6 +88,26 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Apply rate limiting
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(`pending-organizers:${clientIP}`, RATE_LIMIT_CONFIG);
+  
+  if (!rateLimitResult.allowed) {
+    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ error: "Too many requests", retryAfter: rateLimitResult.retryAfter }),
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "Retry-After": String(rateLimitResult.retryAfter || 60),
+          "X-RateLimit-Remaining": "0",
+        },
+      }
+    );
   }
 
   try {
@@ -175,8 +258,6 @@ serve(async (req) => {
         requestedAt: basic.requestedAt,
       });
     }
-
-    // Optionally join organizations to get names if your schema has it, but we skip to avoid guessing
 
     return new Response(JSON.stringify({ organizers }), {
       status: 200,
