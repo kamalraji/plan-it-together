@@ -2,11 +2,11 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketplaceServiceDashboard } from './MarketplaceServiceDashboard';
 import { VendorDashboardPage } from './VendorDashboardPage';
+import { VendorRegistrationPage } from './VendorRegistrationPage';
 import { BookingListPage } from './BookingListPage';
 import { MarketplacePage } from './MarketplacePage';
 import { VendorPage } from './VendorPage';
 import { ServiceDetailPage, ServiceDiscoveryEnhanced } from '../../marketplace';
-import VendorRegistration from '../../vendor/VendorRegistration';
 
 /**
  * MarketplaceService component provides the main routing structure for the Marketplace Service.
@@ -32,12 +32,8 @@ export const MarketplaceService: React.FC = () => {
       <Route path="services/:category" element={<ServiceDiscoveryEnhanced />} />
       <Route path="services/detail/:serviceId" element={<ServiceDetailPage />} />
       
-      {/* Enhanced Vendor Page - comprehensive vendor management */}
-      <Route path="vendor/register" element={
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <VendorRegistration userId="temp" onRegistrationComplete={() => window.location.href = '/marketplace/vendor'} />
-        </div>
-      } />
+      {/* Vendor Registration and Dashboard */}
+      <Route path="vendor/register" element={<VendorRegistrationPage />} />
       <Route path="vendor" element={<VendorPage />} />
       <Route path="vendor/:vendorId" element={<VendorPage />} />
       
