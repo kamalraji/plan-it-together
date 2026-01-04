@@ -40,6 +40,7 @@ import {
   ClipboardList,
   ExternalLink,
   Shield,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
@@ -418,7 +419,8 @@ export const OrganizationSidebar: React.FC = () => {
                 const isActive = currentPath === action.path;
                 const ActionIcon = action.primary ? PlusCircle : 
                   action.title.includes('Template') ? LayoutTemplate :
-                  action.title.includes('View') ? List : ClipboardList;
+                  action.title.includes('View') ? List :
+                  action.title.includes('Analytics') ? BarChart3 : ClipboardList;
                 
                 return (
                   <button
