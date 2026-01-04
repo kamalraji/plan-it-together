@@ -898,6 +898,69 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_reviews: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          helpful_count: number | null
+          id: string
+          is_verified_booking: boolean | null
+          rating: number
+          response_at: string | null
+          response_text: string | null
+          review_text: string | null
+          reviewer_id: string
+          title: string | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_verified_booking?: boolean | null
+          rating: number
+          response_at?: string | null
+          response_text?: string | null
+          review_text?: string | null
+          reviewer_id: string
+          title?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_verified_booking?: boolean | null
+          rating?: number
+          response_at?: string | null
+          response_text?: string | null
+          review_text?: string | null
+          reviewer_id?: string
+          title?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_reviews_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_services: {
         Row: {
           availability: Json | null

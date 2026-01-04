@@ -115,9 +115,27 @@ export const VendorApprovalPanel: React.FC = () => {
     },
   });
 
+  // Helper to send status email
+  const sendStatusEmail = async (vendor: Vendor, status: 'VERIFIED' | 'REJECTED' | 'SUSPENDED', rejectionReason?: string) => {
+    try {
+      await supabase.functions.invoke('send-vendor-status-email', {
+        body: {
+          vendorEmail: vendor.contact_email,
+          vendorName: vendor.business_name,
+          status,
+          rejectionReason,
+        },
+      });
+      console.log(`Status email sent to ${vendor.contact_email}`);
+    } catch (error) {
+      console.error('Failed to send status email:', error);
+      // Don't throw - email failure shouldn't block the status update
+    }
+  };
+
   // Approve vendor mutation
   const approveMutation = useMutation({
-    mutationFn: async (vendorId: string) => {
+    mutationFn: async (vendor: Vendor) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       const { error } = await supabase
@@ -128,13 +146,18 @@ export const VendorApprovalPanel: React.FC = () => {
           verified_by: user?.id,
           rejection_reason: null,
         })
-        .eq('id', vendorId);
+        .eq('id', vendor.id);
       
       if (error) throw error;
+      
+      // Send approval email
+      await sendStatusEmail(vendor, 'VERIFIED');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-vendors'] });
-      toast.success('Vendor approved successfully');
+      toast.success('Vendor approved successfully', {
+        description: 'An email notification has been sent to the vendor.',
+      });
       setShowDetailsDialog(false);
     },
     onError: (error: any) => {
@@ -144,7 +167,7 @@ export const VendorApprovalPanel: React.FC = () => {
 
   // Reject vendor mutation
   const rejectMutation = useMutation({
-    mutationFn: async ({ vendorId, reason }: { vendorId: string; reason: string }) => {
+    mutationFn: async ({ vendor, reason }: { vendor: Vendor; reason: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       const { error } = await supabase
@@ -155,13 +178,18 @@ export const VendorApprovalPanel: React.FC = () => {
           verified_by: user?.id,
           rejection_reason: reason,
         })
-        .eq('id', vendorId);
+        .eq('id', vendor.id);
       
       if (error) throw error;
+      
+      // Send rejection email
+      await sendStatusEmail(vendor, 'REJECTED', reason);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-vendors'] });
-      toast.success('Vendor rejected');
+      toast.success('Vendor rejected', {
+        description: 'An email notification has been sent to the vendor.',
+      });
       setShowRejectDialog(false);
       setShowDetailsDialog(false);
       setRejectionReason('');
@@ -208,8 +236,8 @@ export const VendorApprovalPanel: React.FC = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const handleApprove = (vendorId: string) => {
-    approveMutation.mutate(vendorId);
+  const handleApprove = (vendor: Vendor) => {
+    approveMutation.mutate(vendor);
   };
 
   const handleReject = () => {
@@ -217,7 +245,7 @@ export const VendorApprovalPanel: React.FC = () => {
       toast.error('Please provide a rejection reason');
       return;
     }
-    rejectMutation.mutate({ vendorId: selectedVendor.id, reason: rejectionReason });
+    rejectMutation.mutate({ vendor: selectedVendor, reason: rejectionReason });
   };
 
   const handleSuspend = (vendorId: string) => {
@@ -340,7 +368,7 @@ export const VendorApprovalPanel: React.FC = () => {
                           <>
                             <Button
                               size="sm"
-                              onClick={() => handleApprove(vendor.id)}
+                              onClick={() => handleApprove(vendor)}
                               disabled={approveMutation.isPending}
                             >
                               {approveMutation.isPending ? (
@@ -475,7 +503,7 @@ export const VendorApprovalPanel: React.FC = () => {
                   Reject
                 </Button>
                 <Button
-                  onClick={() => handleApprove(selectedVendor.id)}
+                  onClick={() => handleApprove(selectedVendor)}
                   disabled={approveMutation.isPending}
                 >
                   {approveMutation.isPending ? (

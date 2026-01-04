@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RequestQuoteForm } from '@/components/marketplace/RequestQuoteForm';
+import { VendorReviews } from '@/components/marketplace/VendorReviews';
 import { 
   Building2, 
   MapPin, 
@@ -379,6 +380,11 @@ export const VendorPublicProfilePage: React.FC = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-8">
+          <VendorReviews vendorId={vendor.id} vendorName={vendor.business_name} />
         </div>
 
         {/* Verified Since */}
