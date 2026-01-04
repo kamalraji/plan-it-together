@@ -28,6 +28,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
@@ -40,8 +47,23 @@ import {
   Eye,
   Loader2,
   Users,
+  Plus,
+  X,
+  Shield,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+
+// Available roles from the app_role enum
+const AVAILABLE_ROLES: readonly string[] = [
+  'admin',
+  'moderator',
+  'user',
+  'organizer',
+  'participant',
+  'judge',
+  'volunteer',
+  'speaker',
+];
 
 interface UserProfile {
   id: string;
@@ -68,7 +90,9 @@ export const AdminUserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [suspendReason, setSuspendReason] = useState('');
+  const [selectedRoleToAdd, setSelectedRoleToAdd] = useState<string>('');
 
   // Fetch user profiles
   const { data: profiles = [], isLoading: profilesLoading } = useQuery<UserProfile[]>({
@@ -180,6 +204,83 @@ export const AdminUserManagement: React.FC = () => {
     },
   });
 
+  // Add role mutation
+  const addRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      // Log the action
+      await (supabase as any).from('admin_audit_logs').insert({
+        admin_id: currentUser?.id,
+        admin_email: currentUser?.email,
+        action: 'ROLE_GRANTED',
+        target_type: 'user',
+        target_id: userId,
+        details: { role },
+      });
+
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: role as any });
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-user-roles-list'] });
+      toast.success(`Role "${variables.role}" granted successfully`);
+      setSelectedRoleToAdd('');
+      // Update selectedUser's roles locally
+      if (selectedUser) {
+        setSelectedUser({
+          ...selectedUser,
+          roles: [...selectedUser.roles, variables.role],
+        });
+      }
+    },
+    onError: (error: any) => {
+      if (error.code === '23505') {
+        toast.error('User already has this role');
+      } else {
+        toast.error(error.message || 'Failed to grant role');
+      }
+    },
+  });
+
+  // Remove role mutation
+  const removeRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      // Log the action
+      await (supabase as any).from('admin_audit_logs').insert({
+        admin_id: currentUser?.id,
+        admin_email: currentUser?.email,
+        action: 'ROLE_REVOKED',
+        target_type: 'user',
+        target_id: userId,
+        details: { role },
+      });
+
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .eq('role', role as any);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-user-roles-list'] });
+      toast.success(`Role "${variables.role}" revoked successfully`);
+      // Update selectedUser's roles locally
+      if (selectedUser) {
+        setSelectedUser({
+          ...selectedUser,
+          roles: selectedUser.roles.filter(r => r !== variables.role),
+        });
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to revoke role');
+    },
+  });
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin':
@@ -203,6 +304,12 @@ export const AdminUserManagement: React.FC = () => {
     setShowSuspendDialog(true);
   };
 
+  const openRoleDialog = (user: UserWithRoles) => {
+    setSelectedUser(user);
+    setSelectedRoleToAdd('');
+    setShowRoleDialog(true);
+  };
+
   const handleSuspend = () => {
     if (!selectedUser || !suspendReason.trim()) {
       toast.error('Please provide a reason for suspension');
@@ -210,6 +317,32 @@ export const AdminUserManagement: React.FC = () => {
     }
     suspendMutation.mutate({ userId: selectedUser.id, reason: suspendReason });
   };
+
+  const handleAddRole = () => {
+    if (!selectedUser || !selectedRoleToAdd) {
+      toast.error('Please select a role to add');
+      return;
+    }
+    addRoleMutation.mutate({ userId: selectedUser.id, role: selectedRoleToAdd });
+  };
+
+  const handleRemoveRole = (role: string) => {
+    if (!selectedUser) return;
+    
+    // Prevent removing the last role
+    if (selectedUser.roles.length === 1) {
+      toast.error('Cannot remove the last role. User must have at least one role.');
+      return;
+    }
+    
+    removeRoleMutation.mutate({ userId: selectedUser.id, role });
+  };
+
+  // Get available roles that the user doesn't already have
+  const availableRolesToAdd = useMemo(() => {
+    if (!selectedUser) return AVAILABLE_ROLES;
+    return AVAILABLE_ROLES.filter(role => !selectedUser.roles.includes(role));
+  }, [selectedUser]);
 
   const isLoading = profilesLoading || rolesLoading;
 
@@ -314,6 +447,10 @@ export const AdminUserManagement: React.FC = () => {
                             <DropdownMenuItem onClick={() => openUserDetails(user)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openRoleDialog(user)}>
+                              <Shield className="h-4 w-4 mr-2" />
+                              Manage Roles
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {user.roles.includes('admin') ? null : (
@@ -440,6 +577,100 @@ export const AdminUserManagement: React.FC = () => {
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : null}
               Suspend User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage Roles Dialog */}
+      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Manage Roles
+            </DialogTitle>
+            <DialogDescription>
+              Grant or revoke roles for {selectedUser?.full_name || 'this user'}.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-6">
+              {/* Current Roles */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Current Roles
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {selectedUser.roles.length > 0 ? (
+                    selectedUser.roles.map((role) => (
+                      <Badge
+                        key={role}
+                        variant={getRoleBadgeVariant(role)}
+                        className="flex items-center gap-1 pr-1"
+                      >
+                        {role}
+                        <button
+                          onClick={() => handleRemoveRole(role)}
+                          disabled={removeRoleMutation.isPending || selectedUser.roles.length === 1}
+                          className="ml-1 rounded-full p-0.5 hover:bg-destructive/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={selectedUser.roles.length === 1 ? 'Cannot remove last role' : `Remove ${role}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-muted-foreground text-sm">No roles assigned</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Add New Role */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Add New Role
+                </label>
+                <div className="flex gap-2">
+                  <Select
+                    value={selectedRoleToAdd}
+                    onValueChange={setSelectedRoleToAdd}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select a role..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableRolesToAdd.length > 0 ? (
+                        availableRolesToAdd.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                          User has all available roles
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={handleAddRole}
+                    disabled={!selectedRoleToAdd || addRoleMutation.isPending}
+                    size="icon"
+                  >
+                    {addRoleMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRoleDialog(false)}>
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
