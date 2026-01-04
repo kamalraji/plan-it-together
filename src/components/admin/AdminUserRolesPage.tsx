@@ -381,7 +381,7 @@ export const AdminUserRolesPage: React.FC = () => {
                   onChange={(e) => setNewUserId(e.target.value)}
                   className="sm:max-w-xs font-mono text-xs"
                 />
-                <Select value={newRole} onValueChange={(value: AppRole) => setNewRole(value)}>
+                <Select value={newRole} onValueChange={(value) => setNewRole(value as AppRole)}>
                   <SelectTrigger className="w-full sm:w-40">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
@@ -496,13 +496,13 @@ export const AdminUserRolesPage: React.FC = () => {
                     {groupedUsers.map(({ userId, roles }) => {
                       const primaryRole = roles[0] ?? 'participant';
 
-                      const handlePrimaryChange = (value: AppRole) => {
+                      const handlePrimaryChange = (value: string) => {
                         const note = requireAuditNoteOrWarn();
                         if (!note) return;
 
                         updatePrimaryRoleMutation.mutate({
                           userId,
-                          primaryRole: value,
+                          primaryRole: value as AppRole,
                           currentRoles: roles,
                           note,
                           actorId: user?.id,

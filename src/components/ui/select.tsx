@@ -12,7 +12,7 @@ type SelectContextValue = {
   value: string | undefined;
   setValue: (next: string, label?: string) => void;
   disabled?: boolean;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   labelByValue: Map<string, string>;
   registerLabel: (value: string, label: string) => void;
   selectedLabel: string | undefined;
