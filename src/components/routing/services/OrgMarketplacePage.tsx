@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
@@ -24,6 +24,9 @@ import ReviewRatingUI from '@/components/marketplace/ReviewRatingUI';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+const VALID_TABS = ['overview', 'discover', 'bookings', 'reviews'] as const;
+type TabValue = typeof VALID_TABS[number];
+
 /**
  * OrgMarketplacePage - Organization-scoped marketplace dashboard
  * 
@@ -35,7 +38,14 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const OrgMarketplacePage: React.FC = () => {
   const organization = useCurrentOrganization();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const tabFromUrl = searchParams.get('tab') as TabValue | null;
+  const activeTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'overview';
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value }, { replace: true });
+  };
 
   // Fetch organization products
   const { data: products = [] } = useQuery({
@@ -129,7 +139,7 @@ export const OrgMarketplacePage: React.FC = () => {
 
 
         {/* Tabbed Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="discover">Discover</TabsTrigger>
