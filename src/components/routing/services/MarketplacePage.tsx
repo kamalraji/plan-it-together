@@ -113,7 +113,7 @@ export const MarketplacePage: React.FC = () => {
                 </p>
                 <Button 
                   variant="secondary"
-                  onClick={() => navigate('/marketplace/vendor/register')}
+                  onClick={() => navigate('/dashboard/marketplace/vendor')}
                   className="w-full sm:w-auto"
                 >
                   Vendor Dashboard
