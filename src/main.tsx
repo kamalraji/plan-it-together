@@ -4,8 +4,11 @@ import App from './App';
 import { logging } from '@/lib/logging';
 
 console.log('🚀 Starting Thittam1Hub frontend...');
-logging.init();
-
+try {
+  logging.init();
+} catch (err) {
+  console.warn('[logging] init failed; continuing without Sentry:', err);
+}
 try {
   const rootElement = document.getElementById('root');
   console.log('Root element:', rootElement);

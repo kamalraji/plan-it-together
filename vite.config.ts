@@ -4,12 +4,22 @@ import path from 'path';
 import { componentTagger } from 'lovable-tagger';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  plugins: [
-    react(), // Using SWC for better performance
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
-  resolve: {
+export default defineConfig(({ mode }) => {
+  const plugins: import('vite').PluginOption[] = [react()];
+
+  // The lovable component tagger is helpful but should never block the dev server.
+  // In some environments it can throw during initialization; fall back gracefully.
+  if (mode === 'development') {
+    try {
+      plugins.push(componentTagger() as any);
+    } catch (err) {
+      console.warn('[vite] componentTagger disabled due to init error:', err);
+    }
+  }
+
+  return {
+    plugins,
+    resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@/components': path.resolve(__dirname, './src/components'),
@@ -97,4 +107,5 @@ export default defineConfig(({ mode }) => ({
     __DEV__: mode === 'development',
     __DESIGN_SYSTEM_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
   },
-}));
+  };
+});
