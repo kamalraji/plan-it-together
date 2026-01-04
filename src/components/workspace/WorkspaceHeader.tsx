@@ -1,8 +1,9 @@
-import { Workspace, WorkspaceStatus } from '../../types';
-import { Layers, GitBranch, ArrowLeft, Calendar, Settings, ClipboardList, UserPlus, EllipsisVertical } from 'lucide-react';
+import { Workspace, WorkspaceStatus, WorkspaceType } from '../../types';
+import { Layers, GitBranch, ArrowLeft, Calendar, Settings, ClipboardList, UserPlus, EllipsisVertical, Building2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
 import { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
+import { getCreateButtonLabel, canHaveChildren } from '@/lib/workspaceHierarchy';
 import {
   Popover,
   PopoverContent,
@@ -59,6 +60,24 @@ export function WorkspaceHeader({
     });
   };
 
+  // Get the creation button label based on workspace type
+  const workspaceType = workspace.workspaceType || WorkspaceType.ROOT;
+  const createButtonLabel = getCreateButtonLabel(workspaceType);
+  const showCreateButton = canHaveChildren(workspaceType) && onCreateSubWorkspace;
+
+  // Get appropriate icon for create button
+  const getCreateIcon = () => {
+    switch (workspaceType) {
+      case WorkspaceType.ROOT:
+        return Building2;
+      case WorkspaceType.DEPARTMENT:
+        return Users;
+      default:
+        return Layers;
+    }
+  };
+  const CreateIcon = getCreateIcon();
+
   // Collect all available actions for mobile dropdown
   const actions = [
     onInviteTeamMember && {
@@ -72,9 +91,9 @@ export function WorkspaceHeader({
       icon: ClipboardList,
       action: onCreateTask,
     },
-    onCreateSubWorkspace && {
-      label: 'Sub-Workspace',
-      icon: Layers,
+    showCreateButton && {
+      label: createButtonLabel,
+      icon: CreateIcon,
       action: onCreateSubWorkspace,
     },
     onManageSettings && {
@@ -152,13 +171,13 @@ export function WorkspaceHeader({
                 </Popover>
               )}
 
-              {onCreateSubWorkspace && (
+              {showCreateButton && (
                 <button
                   onClick={onCreateSubWorkspace}
                   className="inline-flex items-center px-3 py-2 border border-border text-sm leading-4 font-medium rounded-md text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
                 >
-                  <Layers className="w-4 h-4 mr-2" />
-                  Sub-Workspace
+                  <CreateIcon className="w-4 h-4 mr-2" />
+                  {createButtonLabel}
                 </button>
               )}
 

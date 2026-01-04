@@ -1,12 +1,12 @@
-import { WorkspaceRole } from '@/types';
+import { WorkspaceRole, WorkspaceType } from '@/types';
 
 /**
  * Workspace Hierarchy Level Definitions
  * 
- * Level 1: Workspace Owner - Full control & oversight
- * Level 2: Department Managers - Department strategy, KPIs, manages all sub-levels
- * Level 3: Team Leads - Committee execution, manages coordinators
- * Level 4: Coordinators - Task execution, limited to assigned tasks
+ * Level 1: Workspace Owner - Full control & oversight (ROOT)
+ * Level 2: Department Managers - Department strategy, KPIs (DEPARTMENT)
+ * Level 3: Team Leads - Committee execution (COMMITTEE)
+ * Level 4: Coordinators - Task execution (TEAM)
  */
 export enum WorkspaceHierarchyLevel {
   OWNER = 1,
@@ -25,6 +25,8 @@ export const WORKSPACE_DEPARTMENTS = [
   { id: 'tech_finance', name: 'Tech & Finance', description: 'Technical, IT, finance, registration' },
   { id: 'volunteers', name: 'Volunteers', description: 'Volunteer coordination and management' },
 ] as const;
+
+export type DepartmentId = typeof WORKSPACE_DEPARTMENTS[number]['id'];
 
 /**
  * Committee definitions mapped to departments
@@ -58,6 +60,114 @@ export const DEPARTMENT_COMMITTEES: Record<string, { id: string; name: string; l
     { id: 'volunteers', name: 'Volunteers', leadRole: WorkspaceRole.VOLUNTEERS_LEAD, coordinatorRole: WorkspaceRole.VOLUNTEER_COORDINATOR },
   ],
 };
+
+/**
+ * Get the next workspace type based on current type
+ */
+export function getNextWorkspaceType(currentType: WorkspaceType | undefined): WorkspaceType | null {
+  switch (currentType) {
+    case WorkspaceType.ROOT:
+      return WorkspaceType.DEPARTMENT;
+    case WorkspaceType.DEPARTMENT:
+      return WorkspaceType.COMMITTEE;
+    case WorkspaceType.COMMITTEE:
+      return WorkspaceType.TEAM;
+    case WorkspaceType.TEAM:
+      return null; // Cannot create below TEAM
+    default:
+      return WorkspaceType.DEPARTMENT; // Default for undefined/legacy
+  }
+}
+
+/**
+ * Get workspace type label for display
+ */
+export function getWorkspaceTypeLabel(type: WorkspaceType | undefined): string {
+  switch (type) {
+    case WorkspaceType.ROOT:
+      return 'Workspace';
+    case WorkspaceType.DEPARTMENT:
+      return 'Department';
+    case WorkspaceType.COMMITTEE:
+      return 'Committee';
+    case WorkspaceType.TEAM:
+      return 'Team';
+    default:
+      return 'Workspace';
+  }
+}
+
+/**
+ * Get creation button label based on parent workspace type
+ */
+export function getCreateButtonLabel(parentType: WorkspaceType | undefined): string {
+  const nextType = getNextWorkspaceType(parentType);
+  if (!nextType) return '';
+  
+  switch (nextType) {
+    case WorkspaceType.DEPARTMENT:
+      return 'Add Department';
+    case WorkspaceType.COMMITTEE:
+      return 'Add Committee';
+    case WorkspaceType.TEAM:
+      return 'Add Team';
+    default:
+      return 'Add Sub-Workspace';
+  }
+}
+
+/**
+ * Check if workspace can have children
+ */
+export function canHaveChildren(type: WorkspaceType | undefined): boolean {
+  return type !== WorkspaceType.TEAM;
+}
+
+/**
+ * Get available creation options based on parent workspace type and department
+ */
+export function getCreationOptions(
+  parentType: WorkspaceType | undefined,
+  parentDepartmentId?: string
+): {
+  nextType: WorkspaceType | null;
+  options: { id: string; name: string; description?: string }[] | null;
+  allowCustomName: boolean;
+} {
+  const nextType = getNextWorkspaceType(parentType);
+  
+  if (!nextType) {
+    return { nextType: null, options: null, allowCustomName: false };
+  }
+  
+  switch (nextType) {
+    case WorkspaceType.DEPARTMENT:
+      return {
+        nextType,
+        options: WORKSPACE_DEPARTMENTS.map(d => ({
+          id: d.id,
+          name: d.name,
+          description: d.description,
+        })),
+        allowCustomName: false,
+      };
+    case WorkspaceType.COMMITTEE:
+      const committees = parentDepartmentId ? DEPARTMENT_COMMITTEES[parentDepartmentId] : [];
+      return {
+        nextType,
+        options: committees?.map(c => ({ id: c.id, name: c.name })) || [],
+        allowCustomName: false,
+      };
+    case WorkspaceType.TEAM:
+      return {
+        nextType,
+        options: null, // Free-form naming
+        allowCustomName: true,
+      };
+    default:
+      return { nextType: null, options: null, allowCustomName: false };
+  }
+}
 
 /**
  * Map roles to their hierarchy level

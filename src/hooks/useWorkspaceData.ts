@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Workspace,
   WorkspaceStatus,
+  WorkspaceType,
   WorkspaceTask,
   TeamMember,
   TaskCategory,
@@ -22,7 +23,7 @@ export function useWorkspaceData(workspaceId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id, workspace_type, department_id')
         .eq('id', workspaceId as string)
         .maybeSingle();
 
@@ -42,6 +43,8 @@ export function useWorkspaceData(workspaceId: string | undefined) {
         taskSummary: undefined,
         channels: [],
         parentWorkspaceId: data.parent_workspace_id,
+        workspaceType: data.workspace_type as WorkspaceType | undefined,
+        departmentId: data.department_id || undefined,
       } as unknown as Workspace;
     },
     enabled: !!workspaceId,
@@ -65,7 +68,7 @@ export function useWorkspaceData(workspaceId: string | undefined) {
 
       let query = supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id, workspace_type, department_id')
         .order('created_at', { ascending: false });
 
       if (eventId) {
@@ -88,6 +91,8 @@ export function useWorkspaceData(workspaceId: string | undefined) {
         taskSummary: undefined,
         channels: [],
         parentWorkspaceId: row.parent_workspace_id,
+        workspaceType: row.workspace_type as WorkspaceType | undefined,
+        departmentId: row.department_id || undefined,
       })) as unknown as Workspace[];
     },
     enabled: !!workspaceId,

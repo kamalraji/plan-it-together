@@ -1464,6 +1464,7 @@ export type Database = {
       workspaces: {
         Row: {
           created_at: string
+          department_id: string | null
           event_id: string
           id: string
           name: string
@@ -1471,9 +1472,11 @@ export type Database = {
           parent_workspace_id: string | null
           status: string
           updated_at: string
+          workspace_type: string | null
         }
         Insert: {
           created_at?: string
+          department_id?: string | null
           event_id: string
           id?: string
           name: string
@@ -1481,9 +1484,11 @@ export type Database = {
           parent_workspace_id?: string | null
           status?: string
           updated_at?: string
+          workspace_type?: string | null
         }
         Update: {
           created_at?: string
+          department_id?: string | null
           event_id?: string
           id?: string
           name?: string
@@ -1491,6 +1496,7 @@ export type Database = {
           parent_workspace_id?: string | null
           status?: string
           updated_at?: string
+          workspace_type?: string | null
         }
         Relationships: [
           {

@@ -620,6 +620,16 @@ export interface WorkspaceSettings {
   allowExternalMembers: boolean;
 }
 
+/**
+ * Workspace hierarchy types for the 4-level structure
+ */
+export enum WorkspaceType {
+  ROOT = 'ROOT',           // Level 1 - Main workspace
+  DEPARTMENT = 'DEPARTMENT', // Level 2 - Department sub-workspace
+  COMMITTEE = 'COMMITTEE',  // Level 3 - Committee under department
+  TEAM = 'TEAM',           // Level 4 - Team under committee
+}
+
 export enum WorkspaceStatus {
   PROVISIONING = 'PROVISIONING',
   ACTIVE = 'ACTIVE',
@@ -716,6 +726,10 @@ export interface Workspace {
   status: WorkspaceStatus;
   settings?: WorkspaceSettings;
   templateId?: string;
+  /** Workspace hierarchy type: ROOT, DEPARTMENT, COMMITTEE, or TEAM */
+  workspaceType?: WorkspaceType;
+  /** Department identifier for committees and teams (e.g., 'operations', 'growth') */
+  departmentId?: string;
   event?: {
     id: string;
     name: string;

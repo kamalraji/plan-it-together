@@ -1,16 +1,19 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Folder, FolderOpen, Users } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, FolderOpen, Users, Building2, Layers } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { MAX_WORKSPACE_DEPTH } from '@/lib/workspaceHierarchy';
+import { MAX_WORKSPACE_DEPTH, getWorkspaceTypeLabel } from '@/lib/workspaceHierarchy';
+import { WorkspaceType } from '@/types';
 
 interface WorkspaceNode {
   id: string;
   name: string;
   parentWorkspaceId: string | null;
   status: string;
+  workspaceType: WorkspaceType | null;
+  departmentId: string | null;
   children: WorkspaceNode[];
   depth: number;
 }
@@ -34,7 +37,7 @@ export function WorkspaceHierarchyTree({
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, parent_workspace_id, status')
+        .select('id, name, parent_workspace_id, status, workspace_type, department_id')
         .eq('event_id', eventId)
         .order('created_at', { ascending: true });
 
@@ -58,6 +61,8 @@ export function WorkspaceHierarchyTree({
         name: ws.name,
         parentWorkspaceId: ws.parent_workspace_id,
         status: ws.status,
+        workspaceType: ws.workspace_type as WorkspaceType | null,
+        departmentId: ws.department_id,
         children: [],
         depth: 1,
       });
@@ -116,8 +121,12 @@ export function WorkspaceHierarchyTree({
     }
   };
 
-  const getLevelLabel = (depth: number): string => {
-    switch (depth) {
+  const getLevelLabel = (node: WorkspaceNode): string => {
+    if (node.workspaceType) {
+      return getWorkspaceTypeLabel(node.workspaceType);
+    }
+    // Fallback based on depth
+    switch (node.depth) {
       case 1:
         return 'Root';
       case 2:
@@ -131,18 +140,73 @@ export function WorkspaceHierarchyTree({
     }
   };
 
-  const getLevelColor = (depth: number): string => {
-    switch (depth) {
-      case 1:
+  const getLevelColor = (node: WorkspaceNode): string => {
+    const type = node.workspaceType;
+    switch (type) {
+      case WorkspaceType.ROOT:
         return 'text-primary';
-      case 2:
+      case WorkspaceType.DEPARTMENT:
         return 'text-blue-600 dark:text-blue-400';
-      case 3:
+      case WorkspaceType.COMMITTEE:
         return 'text-amber-600 dark:text-amber-400';
-      case 4:
+      case WorkspaceType.TEAM:
         return 'text-emerald-600 dark:text-emerald-400';
       default:
-        return 'text-muted-foreground';
+        // Fallback based on depth
+        switch (node.depth) {
+          case 1:
+            return 'text-primary';
+          case 2:
+            return 'text-blue-600 dark:text-blue-400';
+          case 3:
+            return 'text-amber-600 dark:text-amber-400';
+          case 4:
+            return 'text-emerald-600 dark:text-emerald-400';
+          default:
+            return 'text-muted-foreground';
+        }
+    }
+  };
+
+  const getTypeIcon = (node: WorkspaceNode) => {
+    const type = node.workspaceType;
+    switch (type) {
+      case WorkspaceType.DEPARTMENT:
+        return Building2;
+      case WorkspaceType.COMMITTEE:
+        return Users;
+      case WorkspaceType.TEAM:
+        return Layers;
+      default:
+        return Folder;
+    }
+  };
+
+  const getLevelBadgeStyle = (node: WorkspaceNode): string => {
+    const type = node.workspaceType;
+    switch (type) {
+      case WorkspaceType.ROOT:
+        return 'bg-primary/10 text-primary';
+      case WorkspaceType.DEPARTMENT:
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+      case WorkspaceType.COMMITTEE:
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+      case WorkspaceType.TEAM:
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+      default:
+        // Fallback based on depth
+        switch (node.depth) {
+          case 1:
+            return 'bg-primary/10 text-primary';
+          case 2:
+            return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+          case 3:
+            return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+          case 4:
+            return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+          default:
+            return 'bg-muted text-muted-foreground';
+        }
     }
   };
 
@@ -150,6 +214,7 @@ export function WorkspaceHierarchyTree({
     const isExpanded = expandedNodes.has(node.id);
     const isCurrent = node.id === currentWorkspaceId;
     const hasChildren = node.children.length > 0;
+    const TypeIcon = getTypeIcon(node);
 
     return (
       <div key={node.id} className="select-none">
@@ -181,11 +246,11 @@ export function WorkspaceHierarchyTree({
             )}
           </button>
 
-          {/* Folder Icon */}
+          {/* Type Icon */}
           {isExpanded && hasChildren ? (
-            <FolderOpen className={cn('h-4 w-4', getLevelColor(node.depth))} />
+            <FolderOpen className={cn('h-4 w-4', getLevelColor(node))} />
           ) : (
-            <Folder className={cn('h-4 w-4', getLevelColor(node.depth))} />
+            <TypeIcon className={cn('h-4 w-4', getLevelColor(node))} />
           )}
 
           {/* Name and Level Badge */}
@@ -201,13 +266,10 @@ export function WorkspaceHierarchyTree({
             <span
               className={cn(
                 'text-[10px] px-1.5 py-0.5 rounded-full font-medium uppercase tracking-wide',
-                node.depth === 1 && 'bg-primary/10 text-primary',
-                node.depth === 2 && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-                node.depth === 3 && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-                node.depth === 4 && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+                getLevelBadgeStyle(node),
               )}
             >
-              {getLevelLabel(node.depth)}
+              {getLevelLabel(node)}
             </span>
           </div>
 
