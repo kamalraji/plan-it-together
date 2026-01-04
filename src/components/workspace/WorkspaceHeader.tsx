@@ -96,20 +96,6 @@ export function WorkspaceHeader({
           {/* Top Navigation Row */}
           <div className="flex items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              {/* Back to Event Management */}
-              {eventManagementLink && (
-                <Link
-                  to={eventManagementLink}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-lg transition-colors shrink-0"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Event Management</span>
-                  <span className="sm:hidden">Back</span>
-                </Link>
-              )}
-              
-              <div className="h-4 w-px bg-border hidden sm:block" />
-              
               {/* Breadcrumbs - hidden on very small screens */}
               <div className="hidden xs:block min-w-0 flex-1">
                 <WorkspaceBreadcrumbs
