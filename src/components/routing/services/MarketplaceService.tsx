@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketplaceServiceDashboard } from './MarketplaceServiceDashboard';
 import { VendorDashboardPage } from './VendorDashboardPage';
 import { VendorRegistrationPage } from './VendorRegistrationPage';
+import { VendorListingPage } from './VendorListingPage';
 import { BookingListPage } from './BookingListPage';
 import { MarketplacePage } from './MarketplacePage';
 import { VendorPage } from './VendorPage';
@@ -34,6 +35,7 @@ export const MarketplaceService: React.FC = () => {
       
       {/* Vendor Registration and Dashboard */}
       <Route path="vendor/register" element={<VendorRegistrationPage />} />
+      <Route path="vendor/browse" element={<VendorListingPage />} />
       <Route path="vendor" element={<VendorPage />} />
       <Route path="vendor/:vendorId" element={<VendorPage />} />
       
