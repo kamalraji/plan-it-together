@@ -195,15 +195,6 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Optional custom designed hero canvas */}
-      {event.canvasState && (
-        <section className="border-b border-border bg-background/40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-            <EventCanvasHero snapshot={event.canvasState} />
-          </div>
-        </section>
-      )}
-
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
       <div
         className="relative text-primary-foreground bg-gradient-to-r from-primary to-accent overflow-hidden"
@@ -368,10 +359,17 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
-                <p className="text-gray-700 leading-relaxed">{event.description}</p>
+              <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">About This Event</h2>
+                <p className="text-muted-foreground leading-relaxed">{event.description}</p>
               </div>
+
+              {/* Canvas Hero - Custom designed visual */}
+              {event.canvasState && (
+                <div className="mb-6">
+                  <EventCanvasHero snapshot={event.canvasState} />
+                </div>
+              )}
 
               {/* Event Details */}
               <div className="bg-white rounded-lg shadow p-6">
