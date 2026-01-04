@@ -26,7 +26,6 @@ import {
   CalendarDays,
   Briefcase,
   Store,
-  
   Users,
   Building2,
   ChevronDown,
@@ -49,6 +48,10 @@ import {
   Download,
   Calendar,
   TrendingUp,
+  UserPlus,
+  UserCog,
+  Clock,
+  UserCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
@@ -66,7 +69,43 @@ const orgServices: OrgMenuItem[] = [
   // Workspace is now a separate expandable section
   // Marketplace is now a separate expandable section
   // Analytics is now a separate expandable section
-  { title: 'Team', icon: Users, path: 'team', description: 'Members & roles' },
+  // Team is now a separate expandable section
+];
+
+interface TeamQuickAction {
+  title: string;
+  description: string;
+  path: string;
+  icon: React.ElementType;
+  primary?: boolean;
+}
+
+const getTeamQuickActions = (base: string): TeamQuickAction[] => [
+  {
+    title: 'Invite Members',
+    description: 'Add new team members',
+    path: `${base}/team?tab=invite`,
+    icon: UserPlus,
+    primary: true,
+  },
+  {
+    title: 'View Roles',
+    description: 'Manage member roles',
+    path: `${base}/team?tab=roles`,
+    icon: UserCog,
+  },
+  {
+    title: 'Pending Approvals',
+    description: 'Review requests',
+    path: `${base}/team?tab=pending`,
+    icon: Clock,
+  },
+  {
+    title: 'Active Members',
+    description: 'All team members',
+    path: `${base}/team?tab=members`,
+    icon: UserCheck,
+  },
 ];
 
 interface AnalyticsQuickAction {
@@ -191,6 +230,7 @@ export const OrganizationSidebar: React.FC = () => {
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
   const [marketplaceExpanded, setMarketplaceExpanded] = useState(true);
   const [analyticsExpanded, setAnalyticsExpanded] = useState(true);
+  const [teamExpanded, setTeamExpanded] = useState(true);
   const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
@@ -201,11 +241,13 @@ export const OrganizationSidebar: React.FC = () => {
   const isWorkspacesActive = currentPath.includes('/workspaces');
   const isMarketplaceActive = currentPath.includes('/marketplace');
   const isAnalyticsActive = currentPath.includes('/analytics');
+  const isTeamActive = currentPath.includes('/team');
   const selectedWorkspaceId = searchParams.get('workspaceId');
   
   const eventQuickActions = getEventQuickActions(base);
   const marketplaceQuickActions = getMarketplaceQuickActions(base);
   const analyticsQuickActions = getAnalyticsQuickActions(base);
+  const teamQuickActions = getTeamQuickActions(base);
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -787,6 +829,87 @@ export const OrganizationSidebar: React.FC = () => {
             <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
               {analyticsQuickActions.map((action, index) => {
                 const isActive = currentPath.includes('/analytics') && 
+                  (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => navigate(action.path)}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
+                      action.primary && "text-primary font-medium"
+                    )}
+                  >
+                    <action.icon className={cn(
+                      "h-3.5 w-3.5 flex-shrink-0",
+                      action.primary ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <span className="truncate flex-1">{action.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </SidebarGroup>
+
+        {/* Team Section */}
+        <SidebarGroup>
+          <button
+            onClick={() => setTeamExpanded(!teamExpanded)}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
+              'hover:bg-primary/10',
+              isTeamActive && 'bg-primary/15'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                  isTeamActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/60 text-muted-foreground'
+                )}
+              >
+                <Users className="h-4 w-4" />
+              </span>
+              {!isCollapsed && (
+                <span className="flex flex-col items-start">
+                  <span className={cn("text-sm font-medium", isTeamActive && "text-primary")}>
+                    Team
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Members & roles
+                  </span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`${base}/team?tab=invite`);
+                  }}
+                  className="p-1 hover:bg-muted rounded"
+                  title="Invite member"
+                >
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                {teamExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            )}
+          </button>
+
+          {teamExpanded && !isCollapsed && (
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
+              {teamQuickActions.map((action, index) => {
+                const isActive = currentPath.includes('/team') && 
                   (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
                 
                 return (
