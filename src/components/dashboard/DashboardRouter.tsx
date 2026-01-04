@@ -123,6 +123,11 @@ export const DashboardRouter: React.FC = () => {
     return <Navigate to="/dashboard/onboarding/organizer" replace />;
   }
 
+  // Route based on user role
+  if (user.role === UserRole.SUPER_ADMIN) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   if (user.role === UserRole.ORGANIZER) {
     return <Navigate to="/organizer/dashboard" replace />;
   }
