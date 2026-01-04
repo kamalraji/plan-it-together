@@ -5,6 +5,7 @@ import { WorkspaceListPage } from './WorkspaceListPage';
 import { WorkspaceDetailPage } from './WorkspaceDetailPage';
 import { WorkspaceCreatePage } from './WorkspaceCreatePage';
 import { OrgWorkspacePage } from '@/components/organization/OrgWorkspacePage';
+import { OrgWorkspaceListPage } from '@/components/organization/OrgWorkspaceListPage';
 import { WorkspaceSettingsPage } from '@/components/workspace/WorkspaceSettingsPage';
 
 /**
@@ -16,6 +17,7 @@ import { WorkspaceSettingsPage } from '@/components/workspace/WorkspaceSettingsP
  * - Workspace context switching and navigation
  * 
  * Routes:
+ * - /:orgSlug/workspaces - Organization workspace list (grouped by ownership)
  * - /:orgSlug/workspaces/:eventId - Event-specific workspace portal
  * - /:orgSlug/workspaces/:eventId/:workspaceId/* - Workspace detail views
  */
@@ -25,11 +27,17 @@ const WorkspaceIndexRoute: React.FC = () => {
 
   // When under an organization route with eventId (/:orgSlug/workspaces/:eventId), 
   // render the organization-scoped workspace portal for that event.
-  // For global dashboard routes (/dashboard/workspaces) keep using the generic service dashboard.
   if (orgSlug && eventId) {
     return <OrgWorkspacePage />;
   }
 
+  // When under an organization route without eventId (/:orgSlug/workspaces),
+  // show the organization workspace list grouped by ownership.
+  if (orgSlug) {
+    return <OrgWorkspaceListPage />;
+  }
+
+  // For global dashboard routes (/dashboard/workspaces) use the generic service dashboard.
   return <WorkspaceServiceDashboard />;
 };
 
