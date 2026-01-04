@@ -20,6 +20,8 @@ export const DashboardRouter: React.FC = () => {
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false);
   const [rolesRefreshed, setRolesRefreshed] = useState(false);
+  const [primaryOrgSlug, setPrimaryOrgSlug] = useState<string | null>(null);
+  const [fetchingOrg, setFetchingOrg] = useState(true);
  
   // Refresh roles once when the dashboard mounts so any server-side
   // changes (like new organizer approvals) are reflected in the client.
@@ -38,6 +40,40 @@ export const DashboardRouter: React.FC = () => {
       setRolesRefreshed(true);
     });
   }, [isAuthenticated, refreshUserRoles, user?.id]);
+
+  // Fetch the user's primary organization for super admin/organizer redirect
+  useEffect(() => {
+    const fetchPrimaryOrg = async () => {
+      if (!isAuthenticated || !user) {
+        setFetchingOrg(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('organization_memberships')
+          .select('organization_id, organizations!inner(slug)')
+          .eq('user_id', user.id)
+          .eq('status', 'ACTIVE')
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.warn('[DashboardRouter] Failed to fetch primary org:', error);
+        } else if (data?.organizations) {
+          const org = data.organizations as { slug: string };
+          setPrimaryOrgSlug(org.slug);
+        }
+      } catch (err) {
+        console.warn('[DashboardRouter] Unexpected error fetching primary org:', err);
+      } finally {
+        setFetchingOrg(false);
+      }
+    };
+
+    void fetchPrimaryOrg();
+  }, [isAuthenticated, user?.id]);
  
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -107,7 +143,7 @@ export const DashboardRouter: React.FC = () => {
     void checkOnboarding();
   }, [isAuthenticated, rolesRefreshed, user?.id]);
 
-  if (isLoading || checkingOnboarding) {
+  if (isLoading || checkingOnboarding || fetchingOrg) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
@@ -125,11 +161,13 @@ export const DashboardRouter: React.FC = () => {
 
   // Route based on user role
   if (user.role === UserRole.SUPER_ADMIN) {
-    return <Navigate to="/thittam1hub/dashboard" replace />;
+    const targetPath = primaryOrgSlug ? `/${primaryOrgSlug}/dashboard` : '/dashboard';
+    return <Navigate to={targetPath} replace />;
   }
 
   if (user.role === UserRole.ORGANIZER) {
-    return <Navigate to="/organizer/dashboard" replace />;
+    const targetPath = primaryOrgSlug ? `/${primaryOrgSlug}/dashboard` : '/organizer/dashboard';
+    return <Navigate to={targetPath} replace />;
   }
 
   return <ParticipantDashboard />;
