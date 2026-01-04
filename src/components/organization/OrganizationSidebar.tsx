@@ -41,6 +41,10 @@ import {
   ExternalLink,
   Shield,
   BarChart3,
+  Package,
+  ShoppingCart,
+  Star,
+  Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
@@ -56,9 +60,45 @@ const orgServices: OrgMenuItem[] = [
   { title: 'Dashboard', icon: LayoutDashboard, path: 'dashboard', description: 'Overview & metrics' },
   // Event Management is now a separate expandable section
   // Workspace is now a separate expandable section
-  { title: 'Marketplace', icon: Store, path: 'marketplace', description: 'Products & services' },
+  // Marketplace is now a separate expandable section
   { title: 'Analytics', icon: LineChart, path: 'analytics', description: 'Performance insights' },
   { title: 'Team', icon: Users, path: 'team', description: 'Members & roles' },
+];
+
+interface MarketplaceQuickAction {
+  title: string;
+  description: string;
+  path: string;
+  icon: React.ElementType;
+  primary?: boolean;
+}
+
+const getMarketplaceQuickActions = (base: string): MarketplaceQuickAction[] => [
+  {
+    title: 'Manage Products',
+    description: 'Add or edit your products',
+    path: `${base}/settings/story`,
+    icon: Package,
+    primary: true,
+  },
+  {
+    title: 'Browse Services',
+    description: 'Find vendors for events',
+    path: `${base}/marketplace?tab=discover`,
+    icon: Search,
+  },
+  {
+    title: 'My Bookings',
+    description: 'View service bookings',
+    path: `${base}/marketplace?tab=bookings`,
+    icon: ShoppingCart,
+  },
+  {
+    title: 'Reviews',
+    description: 'Rate your experiences',
+    path: `${base}/marketplace?tab=reviews`,
+    icon: Star,
+  },
 ];
 
 interface EventQuickAction {
@@ -109,6 +149,7 @@ export const OrganizationSidebar: React.FC = () => {
 
   const [eventManagementExpanded, setEventManagementExpanded] = useState(true);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
+  const [marketplaceExpanded, setMarketplaceExpanded] = useState(true);
   const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
@@ -117,9 +158,11 @@ export const OrganizationSidebar: React.FC = () => {
   const isThittamHubOrg = orgSlug === 'thittam1hub';
   const isEventManagementActive = currentPath.includes('/eventmanagement');
   const isWorkspacesActive = currentPath.includes('/workspaces');
+  const isMarketplaceActive = currentPath.includes('/marketplace');
   const selectedWorkspaceId = searchParams.get('workspaceId');
   
   const eventQuickActions = getEventQuickActions(base);
+  const marketplaceQuickActions = getMarketplaceQuickActions(base);
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -570,6 +613,86 @@ export const OrganizationSidebar: React.FC = () => {
                   </ScrollArea>
                 )}
               </div>
+            </div>
+          )}
+        </SidebarGroup>
+
+        {/* Marketplace Section */}
+        <SidebarGroup>
+          <button
+            onClick={() => setMarketplaceExpanded(!marketplaceExpanded)}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
+              'hover:bg-primary/10',
+              isMarketplaceActive && 'bg-primary/15'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                  isMarketplaceActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/60 text-muted-foreground'
+                )}
+              >
+                <Store className="h-4 w-4" />
+              </span>
+              {!isCollapsed && (
+                <span className="flex flex-col items-start">
+                  <span className={cn("text-sm font-medium", isMarketplaceActive && "text-primary")}>
+                    Marketplace
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Products & services
+                  </span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`${base}/settings/story`);
+                  }}
+                  className="p-1 hover:bg-muted rounded"
+                  title="Add product"
+                >
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                {marketplaceExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            )}
+          </button>
+
+          {marketplaceExpanded && !isCollapsed && (
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
+              {marketplaceQuickActions.map((action, index) => {
+                const isActive = currentPath === action.path || currentPath.includes(action.path.split('?')[0]);
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => navigate(action.path)}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
+                      action.primary && "text-primary font-medium"
+                    )}
+                  >
+                    <action.icon className={cn(
+                      "h-3.5 w-3.5 flex-shrink-0",
+                      action.primary ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <span className="truncate flex-1">{action.title}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </SidebarGroup>
