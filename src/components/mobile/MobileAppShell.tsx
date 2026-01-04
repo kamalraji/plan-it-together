@@ -4,6 +4,7 @@ import { MobileHeader } from './MobileHeader';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileFAB } from './MobileFAB';
 import { MobileQuickActionsSheet } from './MobileQuickActionsSheet';
+import { MobileSearchOverlay } from './MobileSearchOverlay';
 import { PullToRefresh } from './shared/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -35,6 +36,7 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<MobileTab>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Determine if we're on a specific route that should show its content directly
   const isOnSpecificRoute = () => {
@@ -60,6 +62,10 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
   }
 
   const handleTabChange = (tab: MobileTab) => {
+    if (tab === 'search') {
+      setIsSearchOpen(true);
+      return;
+    }
     setActiveTab(tab);
     // Navigate to corresponding route when tab changes
     switch (tab) {
@@ -74,9 +80,6 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
         break;
       case 'analytics':
         navigate(`/${organization.slug}/analytics`);
-        break;
-      case 'search':
-        // Stay on current page, show search UI
         break;
     }
   };
@@ -165,6 +168,14 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
         onClose={() => setIsQuickActionsOpen(false)}
         onAction={handleQuickAction}
         organization={organization}
+      />
+
+      {/* Search Overlay */}
+      <MobileSearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        organizationId={organization.id}
+        organizationSlug={organization.slug}
       />
     </div>
   );

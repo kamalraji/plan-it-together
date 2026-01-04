@@ -4,5 +4,6 @@ export { MobileHeader } from './MobileHeader';
 export { MobileBottomNav } from './MobileBottomNav';
 export { MobileFAB } from './MobileFAB';
 export { MobileQuickActionsSheet } from './MobileQuickActionsSheet';
+export { MobileSearchOverlay } from './MobileSearchOverlay';
 export { PullToRefresh } from './shared/PullToRefresh';
 export { CardSkeleton, ListSkeleton, GridSkeleton, TaskSkeleton, TaskListSkeleton } from './shared/MobileSkeleton';
