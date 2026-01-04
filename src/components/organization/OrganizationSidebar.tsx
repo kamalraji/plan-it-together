@@ -187,6 +187,42 @@ interface EventQuickAction {
   primary?: boolean;
 }
 
+interface WorkspaceQuickAction {
+  title: string;
+  description: string;
+  path: string;
+  icon: React.ElementType;
+  primary?: boolean;
+}
+
+const getWorkspaceQuickActions = (base: string): WorkspaceQuickAction[] => [
+  {
+    title: 'Create Workspace',
+    description: 'Start a new collaborative workspace',
+    path: `${base}/workspaces`,
+    icon: PlusCircle,
+    primary: true,
+  },
+  {
+    title: 'Browse Templates',
+    description: 'Use pre-built workspace templates',
+    path: `${base}/workspaces?tab=templates`,
+    icon: LayoutTemplate,
+  },
+  {
+    title: 'View All Workspaces',
+    description: 'Manage your existing workspaces',
+    path: `${base}/workspaces?tab=list`,
+    icon: List,
+  },
+  {
+    title: 'Team Analytics',
+    description: 'View team performance metrics',
+    path: `${base}/workspaces?tab=analytics`,
+    icon: BarChart3,
+  },
+];
+
 const getEventQuickActions = (base: string): EventQuickAction[] => [
   {
     title: 'Create New Event',
@@ -248,6 +284,7 @@ export const OrganizationSidebar: React.FC = () => {
   const marketplaceQuickActions = getMarketplaceQuickActions(base);
   const analyticsQuickActions = getAnalyticsQuickActions(base);
   const teamQuickActions = getTeamQuickActions(base);
+  const workspaceQuickActions = getWorkspaceQuickActions(base);
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -626,7 +663,34 @@ export const OrganizationSidebar: React.FC = () => {
           </button>
 
           {workspacesExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2">
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-2">
+              {/* Quick Actions */}
+              <div className="space-y-0.5">
+                {workspaceQuickActions.map((action, index) => {
+                  const isActive = currentPath.includes('/workspaces') && 
+                    (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
+                  
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => navigate(action.path)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+                        isActive ? "bg-primary/10 text-primary" : "text-foreground",
+                        action.primary && "text-primary font-medium"
+                      )}
+                    >
+                      <action.icon className={cn(
+                        "h-3.5 w-3.5 flex-shrink-0",
+                        action.primary ? "text-primary" : "text-muted-foreground"
+                      )} />
+                      <span className="truncate flex-1">{action.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="h-px bg-border/50" />
               {/* My Workspaces */}
               <div className="mb-2">
                 <button
