@@ -26,7 +26,7 @@ import {
   CalendarDays,
   Briefcase,
   Store,
-  LineChart,
+  
   Users,
   Building2,
   ChevronDown,
@@ -45,6 +45,10 @@ import {
   ShoppingCart,
   Star,
   Search,
+  FileText,
+  Download,
+  Calendar,
+  TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
@@ -61,8 +65,44 @@ const orgServices: OrgMenuItem[] = [
   // Event Management is now a separate expandable section
   // Workspace is now a separate expandable section
   // Marketplace is now a separate expandable section
-  { title: 'Analytics', icon: LineChart, path: 'analytics', description: 'Performance insights' },
+  // Analytics is now a separate expandable section
   { title: 'Team', icon: Users, path: 'team', description: 'Members & roles' },
+];
+
+interface AnalyticsQuickAction {
+  title: string;
+  description: string;
+  path: string;
+  icon: React.ElementType;
+  primary?: boolean;
+}
+
+const getAnalyticsQuickActions = (base: string): AnalyticsQuickAction[] => [
+  {
+    title: 'View Reports',
+    description: 'Performance dashboards',
+    path: `${base}/analytics?tab=reports`,
+    icon: FileText,
+    primary: true,
+  },
+  {
+    title: 'Export Data',
+    description: 'Download analytics data',
+    path: `${base}/analytics?tab=export`,
+    icon: Download,
+  },
+  {
+    title: 'Date Range',
+    description: 'Filter by time period',
+    path: `${base}/analytics?tab=daterange`,
+    icon: Calendar,
+  },
+  {
+    title: 'Trends',
+    description: 'Growth & engagement',
+    path: `${base}/analytics?tab=trends`,
+    icon: TrendingUp,
+  },
 ];
 
 interface MarketplaceQuickAction {
@@ -150,6 +190,7 @@ export const OrganizationSidebar: React.FC = () => {
   const [eventManagementExpanded, setEventManagementExpanded] = useState(true);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
   const [marketplaceExpanded, setMarketplaceExpanded] = useState(true);
+  const [analyticsExpanded, setAnalyticsExpanded] = useState(true);
   const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
@@ -159,10 +200,12 @@ export const OrganizationSidebar: React.FC = () => {
   const isEventManagementActive = currentPath.includes('/eventmanagement');
   const isWorkspacesActive = currentPath.includes('/workspaces');
   const isMarketplaceActive = currentPath.includes('/marketplace');
+  const isAnalyticsActive = currentPath.includes('/analytics');
   const selectedWorkspaceId = searchParams.get('workspaceId');
   
   const eventQuickActions = getEventQuickActions(base);
   const marketplaceQuickActions = getMarketplaceQuickActions(base);
+  const analyticsQuickActions = getAnalyticsQuickActions(base);
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -674,6 +717,77 @@ export const OrganizationSidebar: React.FC = () => {
             <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
               {marketplaceQuickActions.map((action, index) => {
                 const isActive = currentPath === action.path || currentPath.includes(action.path.split('?')[0]);
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => navigate(action.path)}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
+                      action.primary && "text-primary font-medium"
+                    )}
+                  >
+                    <action.icon className={cn(
+                      "h-3.5 w-3.5 flex-shrink-0",
+                      action.primary ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <span className="truncate flex-1">{action.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </SidebarGroup>
+
+        {/* Analytics Section */}
+        <SidebarGroup>
+          <button
+            onClick={() => setAnalyticsExpanded(!analyticsExpanded)}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
+              'hover:bg-primary/10',
+              isAnalyticsActive && 'bg-primary/15'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                  isAnalyticsActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/60 text-muted-foreground'
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+              </span>
+              {!isCollapsed && (
+                <span className="flex flex-col items-start">
+                  <span className={cn("text-sm font-medium", isAnalyticsActive && "text-primary")}>
+                    Analytics
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Performance insights
+                  </span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5">
+                {analyticsExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            )}
+          </button>
+
+          {analyticsExpanded && !isCollapsed && (
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
+              {analyticsQuickActions.map((action, index) => {
+                const isActive = currentPath.includes('/analytics') && 
+                  (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
                 
                 return (
                   <button
