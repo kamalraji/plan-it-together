@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { RequestQuoteForm } from '@/components/marketplace/RequestQuoteForm';
 import { 
   Building2, 
   MapPin, 
@@ -242,10 +243,11 @@ export const VendorPublicProfilePage: React.FC = () => {
                   </div>
                 )}
                 <Separator className="my-3" />
-                <Button className="w-full">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Request Quote
-                </Button>
+                <RequestQuoteForm
+                  vendorName={vendor.business_name}
+                  vendorEmail={vendor.contact_email}
+                  services={services.map(s => ({ id: s.id, name: s.name }))}
+                />
               </CardContent>
             </Card>
           </div>
