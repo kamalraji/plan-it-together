@@ -18,6 +18,8 @@ import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
 import { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
 import { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 import { DepartmentDashboard } from './department';
+import { CommitteeDashboard } from './committee';
+import { TeamDashboard } from './team';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -110,8 +112,17 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
                 orgSlug={orgSlug}
                 onViewTasks={actions.handleViewTasks} 
               />
+            ) : workspace.workspaceType === WorkspaceType.COMMITTEE ? (
+              <CommitteeDashboard 
+                workspace={workspace} 
+                onViewTasks={actions.handleViewTasks} 
+              />
+            ) : workspace.workspaceType === WorkspaceType.TEAM ? (
+              <TeamDashboard 
+                workspace={workspace} 
+                onViewTasks={actions.handleViewTasks} 
+              />
             ) : (
-              /* Default overview for ROOT, COMMITTEE, TEAM */
               <div className="space-y-4 sm:space-y-8">
                 {permissions.canPublishEvent && (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-muted p-3 sm:p-4">

@@ -1,37 +1,42 @@
 import { DollarSign, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
+interface BudgetCategory {
+  id?: string;
+  name: string;
+  allocated: number;
+  used: number;
+}
+
 interface BudgetTrackerProps {
   allocated: number;
   used: number;
   currency?: string;
   showBreakdown?: boolean;
-}
-
-interface BudgetCategory {
-  name: string;
-  allocated: number;
-  used: number;
+  categories?: BudgetCategory[];
 }
 
 export function BudgetTracker({ 
   allocated, 
   used, 
   currency = '₹',
-  showBreakdown = true 
+  showBreakdown = true,
+  categories: propCategories,
 }: BudgetTrackerProps) {
   const remaining = allocated - used;
   const usagePercent = allocated > 0 ? Math.min((used / allocated) * 100, 100) : 0;
   const isOverBudget = used > allocated;
   const isNearLimit = usagePercent >= 80 && !isOverBudget;
 
-  // Mock breakdown categories - in production, this would come from props
-  const categories: BudgetCategory[] = [
-    { name: 'Vendors', allocated: allocated * 0.4, used: used * 0.35 },
-    { name: 'Equipment', allocated: allocated * 0.25, used: used * 0.3 },
-    { name: 'Marketing', allocated: allocated * 0.2, used: used * 0.25 },
-    { name: 'Miscellaneous', allocated: allocated * 0.15, used: used * 0.1 },
-  ];
+  // Use provided categories or generate mock ones
+  const categories: BudgetCategory[] = propCategories && propCategories.length > 0 
+    ? propCategories 
+    : [
+        { name: 'Vendors', allocated: allocated * 0.4, used: used * 0.35 },
+        { name: 'Equipment', allocated: allocated * 0.25, used: used * 0.3 },
+        { name: 'Marketing', allocated: allocated * 0.2, used: used * 0.25 },
+        { name: 'Miscellaneous', allocated: allocated * 0.15, used: used * 0.1 },
+      ];
 
   const formatCurrency = (amount: number) => {
     return `${currency}${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;

@@ -1282,6 +1282,343 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_budget_categories: {
+        Row: {
+          allocated: number
+          budget_id: string
+          created_at: string
+          id: string
+          name: string
+          used: number
+        }
+        Insert: {
+          allocated?: number
+          budget_id: string
+          created_at?: string
+          id?: string
+          name: string
+          used?: number
+        }
+        Update: {
+          allocated?: number
+          budget_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          used?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_budget_categories_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_budget_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          requested_amount: number
+          requested_by: string
+          requesting_workspace_id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_workspace_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          requested_amount: number
+          requested_by: string
+          requesting_workspace_id: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_workspace_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          requested_amount?: number
+          requested_by?: string
+          requesting_workspace_id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_workspace_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_budget_requests_requesting_workspace_id_fkey"
+            columns: ["requesting_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_budget_requests_target_workspace_id_fkey"
+            columns: ["target_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_budgets: {
+        Row: {
+          allocated: number
+          created_at: string
+          currency: string
+          fiscal_year: string | null
+          id: string
+          updated_at: string
+          used: number
+          workspace_id: string
+        }
+        Insert: {
+          allocated?: number
+          created_at?: string
+          currency?: string
+          fiscal_year?: string | null
+          id?: string
+          updated_at?: string
+          used?: number
+          workspace_id: string
+        }
+        Update: {
+          allocated?: number
+          created_at?: string
+          currency?: string
+          fiscal_year?: string | null
+          id?: string
+          updated_at?: string
+          used?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_budgets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_checklists: {
+        Row: {
+          committee_type: string | null
+          created_at: string
+          id: string
+          is_template: boolean | null
+          items: Json
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          committee_type?: string | null
+          created_at?: string
+          id?: string
+          is_template?: boolean | null
+          items?: Json
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          committee_type?: string | null
+          created_at?: string
+          id?: string
+          is_template?: boolean | null
+          items?: Json
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_checklists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_goals: {
+        Row: {
+          category: string | null
+          created_at: string
+          current_value: number | null
+          description: string | null
+          due_date: string | null
+          id: string
+          status: string
+          target_value: number | null
+          title: string
+          unit: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          target_value?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          status?: string
+          target_value?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_goals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_milestones: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          sort_order: number | null
+          status: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          sort_order?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          sort_order?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_milestones_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_resources: {
+        Row: {
+          assigned_to_name: string | null
+          assigned_to_workspace_id: string | null
+          available: number
+          created_at: string
+          id: string
+          metadata: Json | null
+          name: string
+          quantity: number
+          status: string
+          type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to_name?: string | null
+          assigned_to_workspace_id?: string | null
+          available?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          quantity?: number
+          status?: string
+          type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_to_name?: string | null
+          assigned_to_workspace_id?: string | null
+          available?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          quantity?: number
+          status?: string
+          type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_resources_assigned_to_workspace_id_fkey"
+            columns: ["assigned_to_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_resources_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_role_views: {
         Row: {
           created_at: string
@@ -1416,6 +1753,57 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_team_assignments: {
+        Row: {
+          created_at: string
+          hours_allocated: number | null
+          hours_logged: number | null
+          id: string
+          status: string
+          task_id: string | null
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          hours_allocated?: number | null
+          hours_logged?: number | null
+          id?: string
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          hours_allocated?: number | null
+          hours_logged?: number | null
+          id?: string
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_team_assignments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_team_assignments_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
