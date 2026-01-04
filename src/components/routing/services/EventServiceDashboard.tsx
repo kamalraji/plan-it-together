@@ -47,7 +47,7 @@ export const EventServiceDashboard: React.FC = () => {
     canonical.setAttribute('href', window.location.href);
   }, []);
 
-  const { events, registrationsByEvent, metrics } = useEventManagementMetrics(organization?.id, onlyMine);
+  const { events, registrationsByEvent } = useEventManagementMetrics(organization?.id, onlyMine);
 
 
   const pageActions = [
@@ -94,84 +94,6 @@ export const EventServiceDashboard: React.FC = () => {
               </Label>
             </div>
           )}
-
-          {/* Service Overview Metrics */}
-          <section aria-labelledby="event-service-metrics-heading">
-            <h2 id="event-service-metrics-heading" className="sr-only">
-              Event metrics
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs sm:text-sm font-semibold">
-                      EV
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Events</p>
-                    <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.totalEvents}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs sm:text-sm font-semibold">
-                      AC
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Events</p>
-                    <p className="text-xl sm:text-2xl font-bold text-emerald-500">{metrics.activeEvents}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs sm:text-sm font-semibold">
-                      DR
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Draft Events</p>
-                    <p className="text-xl sm:text-2xl font-bold text-amber-500">{metrics.draftEvents}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs sm:text-sm font-semibold">
-                      RG
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Registrations</p>
-                    <p className="text-xl sm:text-2xl font-bold text-primary">{metrics.totalRegistrations}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-xs sm:text-sm font-semibold">
-                      UP
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Upcoming Events</p>
-                    <p className="text-xl sm:text-2xl font-bold text-violet-500">{metrics.upcomingEvents}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* Recent Events */}
           <section aria-labelledby="event-service-recent-events-heading" className="space-y-3 sm:space-y-4">

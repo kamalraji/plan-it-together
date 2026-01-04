@@ -10,7 +10,7 @@ import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationB
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 import { FileText, Download, Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 
-const VALID_TABS = ['reports', 'export', 'daterange', 'trends'] as const;
+const VALID_TABS = ['events', 'reports', 'export', 'daterange', 'trends'] as const;
 type TabValue = typeof VALID_TABS[number];
 
 interface OrganizationAnalyticsDashboardProps {
@@ -24,7 +24,19 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
   const { data: events } = useOrganizationEvents(organization?.id);
 
   const tabFromUrl = searchParams.get('tab') as TabValue | null;
-  const activeTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'reports';
+  const activeTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'events';
+
+  // Calculate detailed event metrics
+  const eventMetrics = {
+    totalEvents: events?.length || 0,
+    activeEvents: events?.filter((e: any) => e.status === 'PUBLISHED').length || 0,
+    draftEvents: events?.filter((e: any) => e.status === 'DRAFT').length || 0,
+    totalRegistrations: analytics?.totalRegistrations || 0,
+    upcomingEvents: events?.filter((e: any) => {
+      const startDate = new Date(e.start_date);
+      return startDate > new Date() && e.status === 'PUBLISHED';
+    }).length || 0,
+  };
 
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value }, { replace: true });
@@ -87,7 +99,11 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
 
       {/* Tabbed Content */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+          <TabsTrigger value="events" className="gap-1.5">
+            <CalendarIcon className="h-3.5 w-3.5 hidden sm:inline" />
+            Events
+          </TabsTrigger>
           <TabsTrigger value="reports" className="gap-1.5">
             <FileText className="h-3.5 w-3.5 hidden sm:inline" />
             Reports
@@ -105,6 +121,91 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
             Trends
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="events">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5" />
+                Event Metrics
+              </CardTitle>
+              <CardDescription>Detailed breakdown of your event statistics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-card rounded-lg border border-border p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                        EV
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-muted-foreground">Total Events</p>
+                      <p className="text-2xl font-bold text-foreground">{eventMetrics.totalEvents}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-lg border border-border p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-semibold">
+                        AC
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-muted-foreground">Active Events</p>
+                      <p className="text-2xl font-bold text-emerald-500">{eventMetrics.activeEvents}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-lg border border-border p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-semibold">
+                        DR
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-muted-foreground">Draft Events</p>
+                      <p className="text-2xl font-bold text-amber-500">{eventMetrics.draftEvents}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-lg border border-border p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                        RG
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-muted-foreground">Total Registrations</p>
+                      <p className="text-2xl font-bold text-primary">{eventMetrics.totalRegistrations}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-card rounded-lg border border-border p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-sm font-semibold">
+                        UP
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-muted-foreground">Upcoming Events</p>
+                      <p className="text-2xl font-bold text-violet-500">{eventMetrics.upcomingEvents}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="reports">
           <Card>
