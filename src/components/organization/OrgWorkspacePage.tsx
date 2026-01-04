@@ -436,49 +436,52 @@ export const OrgWorkspacePage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="space-y-2">
-        <OrganizationBreadcrumbs
-          items={[
-            {
-              label: organization?.name ?? 'Organization',
-              href: orgSlug ? `/${orgSlug}` : undefined,
-            },
-            {
-              label: 'Events',
-              href: `/${orgSlug}/eventmanagement`,
-            },
-            {
-              label: event?.name ?? 'Event',
-              href: `/${orgSlug}/eventmanagement/${eventId}`,
-            },
-            {
-              label: 'Workspaces',
-              isCurrent: true,
-            },
-          ]}
-          className="text-xs"
-        />
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {event?.name ? `${event.name} Workspaces` : 'Event Workspaces'}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Manage workspaces for this event with tasks, team, and communication.
-            </p>
+      {/* Only show page header when no workspace is selected */}
+      {!selectedWorkspaceId && (
+        <header className="space-y-2">
+          <OrganizationBreadcrumbs
+            items={[
+              {
+                label: organization?.name ?? 'Organization',
+                href: orgSlug ? `/${orgSlug}` : undefined,
+              },
+              {
+                label: 'Events',
+                href: `/${orgSlug}/eventmanagement`,
+              },
+              {
+                label: event?.name ?? 'Event',
+                href: `/${orgSlug}/eventmanagement/${eventId}`,
+              },
+              {
+                label: 'Workspaces',
+                isCurrent: true,
+              },
+            ]}
+            className="text-xs"
+          />
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                {event?.name ? `${event.name} Workspaces` : 'Event Workspaces'}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Manage workspaces for this event with tasks, team, and communication.
+              </p>
+            </div>
+            {canManageWorkspaces && (
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                size="sm"
+                className="gap-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">New Workspace</span>
+              </Button>
+            )}
           </div>
-          {canManageWorkspaces && (
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              size="sm"
-              className="gap-2"
-            >
-              <PlusIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">New Workspace</span>
-            </Button>
-          )}
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main content - workspace dashboard */}
       <main className="min-h-[500px]">
