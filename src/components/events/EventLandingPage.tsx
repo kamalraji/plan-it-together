@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import DOMPurify from 'dompurify';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { EventCanvasHero } from './EventCanvasHero';
-
 interface EventLandingPageProps {
   eventId?: string;
 }
@@ -175,18 +175,61 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     });
   };
 
-  // Prefer GrapesJS-built landing page when available
-  if (event.landingPageData && (event.landingPageData as any).html) {
+  // Sanitize HTML content using DOMPurify to prevent XSS attacks
+  const sanitizedLandingPage = useMemo(() => {
+    if (!event?.landingPageData || !(event.landingPageData as any).html) {
+      return null;
+    }
+    
     const lp = event.landingPageData as any as { html: string; css?: string | null; meta?: { title?: string; description?: string } };
+    
+    // Sanitize HTML with allowed tags for landing page content
+    const sanitizedHtml = DOMPurify.sanitize(lp.html, {
+      ALLOWED_TAGS: [
+        'div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+        'img', 'a', 'ul', 'ol', 'li', 'strong', 'em', 'br', 
+        'section', 'article', 'header', 'footer', 'nav', 'main',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'button', 'form', 'input', 'label', 'textarea', 'select', 'option',
+        'video', 'audio', 'source', 'iframe'
+      ],
+      ALLOWED_ATTR: [
+        'class', 'style', 'href', 'src', 'alt', 'id', 'title',
+        'width', 'height', 'target', 'rel', 'type', 'name', 'value',
+        'placeholder', 'disabled', 'readonly', 'controls', 'autoplay', 'loop', 'muted',
+        'frameborder', 'allowfullscreen', 'loading'
+      ],
+      ALLOW_DATA_ATTR: true,
+      ADD_ATTR: ['target'],
+      FORBID_TAGS: ['script', 'object', 'embed'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
+    });
+    
+    // Sanitize CSS - strip any potentially dangerous content
+    let sanitizedCss = '';
+    if (lp.css) {
+      // Remove any javascript: URLs and expression() calls from CSS
+      sanitizedCss = lp.css
+        .replace(/javascript:/gi, '')
+        .replace(/expression\s*\(/gi, '')
+        .replace(/@import/gi, '')
+        .replace(/behavior\s*:/gi, '')
+        .replace(/-moz-binding/gi, '');
+    }
+    
+    return { html: sanitizedHtml, css: sanitizedCss, meta: lp.meta };
+  }, [event?.landingPageData]);
 
+  // Prefer GrapesJS-built landing page when available
+  if (sanitizedLandingPage) {
     return (
       <div className="min-h-screen bg-background">
         <section className="border-b border-border bg-background">
-          {/* Inject GrapesJS CSS into the page scope */}
-          {lp.css && <style dangerouslySetInnerHTML={{ __html: lp.css }} />}
+          {/* Inject sanitized GrapesJS CSS into the page scope */}
+          {sanitizedLandingPage.css && <style dangerouslySetInnerHTML={{ __html: sanitizedLandingPage.css }} />}
           <div
             className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-            dangerouslySetInnerHTML={{ __html: lp.html }}
+            dangerouslySetInnerHTML={{ __html: sanitizedLandingPage.html }}
           />
         </section>
       </div>
