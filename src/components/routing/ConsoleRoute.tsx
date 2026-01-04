@@ -26,11 +26,11 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
   requireEmailVerification = true, // Console requires email verification by default
   requireActiveStatus = true, // Console requires active user status by default
 }) => {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isRolesLoading, isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Show console-style loading indicator while checking authentication
-  if (isLoading) {
+  // Show console-style loading indicator while checking authentication or loading roles
+  if (isLoading || (isAuthenticated && isRolesLoading && requiredRoles.length > 0)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

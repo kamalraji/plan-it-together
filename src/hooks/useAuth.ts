@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  isRolesLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
   register: (data: RegisterData) => Promise<{ error: Error | null }>;
@@ -89,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRolesLoading, setIsRolesLoading] = useState(true);
 
   // Initialize auth state and listen for changes
   useEffect(() => {
@@ -101,20 +103,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const sbUser = newSession?.user ?? null;
       if (!sbUser) {
         setUser(null);
+        setIsRolesLoading(false);
         return;
       }
 
       // Set a fast base user immediately for snappy UI
       const baseUser = mapSupabaseUserToAppUserBase(sbUser);
       setUser(baseUser);
+      setIsRolesLoading(true);
 
       // Defer any Supabase queries (roles lookup) to avoid deadlocks inside the callback
       setTimeout(() => {
         mapSupabaseUserToAppUserWithRoles(sbUser)
-          .then(setUser)
+          .then((u) => {
+            setUser(u);
+            setIsRolesLoading(false);
+          })
           .catch(() => {
             // On failure, keep the base user; do not throw from callback
             setUser(baseUser);
+            setIsRolesLoading(false);
           });
       }, 0);
     });
@@ -144,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           mapSupabaseUserToAppUserWithRoles(currentSession.user)
             .then((u) => {
               setUser(u);
+              setIsRolesLoading(false);
               logging.setUserContext(
                 {
                   id: u.id,
@@ -158,7 +167,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 },
               );
             })
-            .catch(() => setUser(mapSupabaseUserToAppUserBase(currentSession.user)));
+            .catch(() => {
+              setUser(mapSupabaseUserToAppUserBase(currentSession.user));
+              setIsRolesLoading(false);
+            });
+        } else {
+          setIsRolesLoading(false);
         }
       })
       .finally(() => {
@@ -273,6 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     session,
     isLoading,
+    isRolesLoading,
     isAuthenticated: !!user,
     login,
     register,
