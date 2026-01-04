@@ -9,9 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Store,
   Package,
-  ShoppingCart,
   Star,
   Plus,
   ExternalLink,
@@ -92,33 +90,6 @@ export const OrgMarketplacePage: React.FC = () => {
     },
   ];
 
-  const quickActions = [
-    {
-      title: 'Manage Products',
-      description: 'Add or edit your organization products',
-      href: `/${organization?.slug}/settings/story`,
-      icon: Package,
-      primary: true,
-    },
-    {
-      title: 'Browse Services',
-      description: 'Find vendors for your events',
-      icon: Store,
-      onClick: () => setActiveTab('discover'),
-    },
-    {
-      title: 'My Bookings',
-      description: 'View and manage service bookings',
-      icon: ShoppingCart,
-      onClick: () => setActiveTab('bookings'),
-    },
-    {
-      title: 'Reviews',
-      description: 'Rate your experiences',
-      icon: Star,
-      onClick: () => setActiveTab('reviews'),
-    },
-  ];
 
   return (
     <OrgPageWrapper>
@@ -156,47 +127,6 @@ export const OrgMarketplacePage: React.FC = () => {
           ))}
         </section>
 
-        {/* Quick Actions */}
-        <section>
-          <h2 className="text-lg font-medium text-foreground mb-3">Quick Actions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action, idx) => (
-              action.href ? (
-                <Link
-                  key={idx}
-                  to={action.href}
-                  className={`block p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                    action.primary
-                      ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                      : 'border-border bg-card hover:bg-muted'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <action.icon className={`h-5 w-5 ${action.primary ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <h3 className={`font-medium ${action.primary ? 'text-primary' : 'text-foreground'}`}>
-                      {action.title}
-                    </h3>
-                  </div>
-                  <p className={`text-sm ${action.primary ? 'text-primary/80' : 'text-muted-foreground'}`}>
-                    {action.description}
-                  </p>
-                </Link>
-              ) : (
-                <button
-                  key={idx}
-                  onClick={action.onClick}
-                  className="text-left p-4 rounded-lg border border-border bg-card hover:bg-muted transition-all duration-200 hover:shadow-md"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <action.icon className="h-5 w-5 text-muted-foreground" />
-                    <h3 className="font-medium text-foreground">{action.title}</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{action.description}</p>
-                </button>
-              )
-            ))}
-          </div>
-        </section>
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
