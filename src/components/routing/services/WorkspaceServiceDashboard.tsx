@@ -35,11 +35,11 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     ? `/${orgSlugCandidate}/workspaces`
     : '/dashboard/workspaces';
 
-  // Fetch user's workspaces directly from Supabase (grouped by user/org/invited)
+  // Fetch user's workspaces directly from Supabase (grouped by user/org)
   const { data: workspacesData, isLoading } = useQuery({
     queryKey: ['user-workspaces-supabase', organization?.id, eventId, user?.id],
     queryFn: async () => {
-      if (!user?.id) return { myWorkspaces: [], orgWorkspaces: [], invitedWorkspaces: [], allFlat: [] };
+      if (!user?.id) return { myWorkspaces: [], orgWorkspaces: [], allFlat: [] };
 
       // Build query based on context
       let query = supabase
@@ -88,9 +88,8 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         description: undefined,
       }));
 
-      // Separate into: my workspaces (created by me), invited (member but not owner), org (neither)
-      const myWorkspaces = allWorkspaces.filter((w) => w.isOwner);
-      const invitedWorkspaces = allWorkspaces.filter((w) => !w.isOwner && w.isMember);
+      // Separate into my workspaces (created or member) and organization workspaces
+      const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
       const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
 
       // Build hierarchy for display (root workspaces with their children)
@@ -107,7 +106,6 @@ export const WorkspaceServiceDashboard: React.FC = () => {
       return {
         myWorkspaces: buildHierarchy(myWorkspaces),
         orgWorkspaces: buildHierarchy(orgWorkspaces),
-        invitedWorkspaces: buildHierarchy(invitedWorkspaces),
         allFlat: allWorkspaces,
       };
     },
@@ -217,7 +215,6 @@ export const WorkspaceServiceDashboard: React.FC = () => {
 
   // Sidebar state
   const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
-  const [invitedWorkspacesExpanded, setInvitedWorkspacesExpanded] = useState(true);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(true);
   const navigate = useNavigate();
 
@@ -312,40 +309,6 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                   <p className="px-3 py-2 text-xs text-muted-foreground">No workspaces yet</p>
                 ) : (
                   workspacesData?.myWorkspaces?.map((workspace: any) => (
-                    <WorkspaceSidebarItem key={workspace.id} workspace={workspace} />
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Invited Workspaces Section */}
-          <div className="px-3 mb-4">
-            <button
-              onClick={() => setInvitedWorkspacesExpanded(!invitedWorkspacesExpanded)}
-              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-emerald-500" />
-                <span>Invited Workspaces</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                  {workspacesData?.invitedWorkspaces?.length || 0}
-                </span>
-                {invitedWorkspacesExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            </button>
-            {invitedWorkspacesExpanded && (
-              <div className="mt-1 space-y-0.5">
-                {workspacesData?.invitedWorkspaces?.length === 0 ? (
-                  <p className="px-3 py-2 text-xs text-muted-foreground">No invitations</p>
-                ) : (
-                  workspacesData?.invitedWorkspaces?.map((workspace: any) => (
                     <WorkspaceSidebarItem key={workspace.id} workspace={workspace} />
                   ))
                 )}
