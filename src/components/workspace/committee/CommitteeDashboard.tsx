@@ -27,6 +27,7 @@ import { EventDashboard } from '../event';
 import { CateringDashboard } from '../catering';
 import { LogisticsDashboard } from '../logistics';
 import { FacilityDashboard } from '../facility';
+import { MarketingDashboard } from '../marketing';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -137,6 +138,13 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes('facilities') ||
     workspace.name.toLowerCase().includes('venue management') ||
     workspace.name.toLowerCase().includes('building');
+
+  // Check if this is a marketing committee
+  const isMarketingCommittee = committeeType === 'marketing' ||
+    workspace.name.toLowerCase().includes('marketing') ||
+    workspace.name.toLowerCase().includes('promotion') ||
+    workspace.name.toLowerCase().includes('advertising') ||
+    workspace.name.toLowerCase().includes('branding');
 
   if (isVolunteersCommittee) {
     return (
@@ -321,6 +329,21 @@ export function CommitteeDashboard({
   if (isFacilityCommittee) {
     return (
       <FacilityDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isMarketingCommittee) {
+    return (
+      <MarketingDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
