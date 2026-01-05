@@ -88,6 +88,24 @@ export const WorkspaceCreatePage: React.FC = () => {
 
     setSubmitting(true);
     try {
+      // Check if a root workspace already exists for this event
+      const { data: existingRoot, error: checkError } = await supabase
+        .from('workspaces')
+        .select('id, name')
+        .eq('event_id', parseResult.data.eventId)
+        .is('parent_workspace_id', null)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existingRoot) {
+        setFormErrors({
+          eventId: `This event already has a root workspace "${existingRoot.name}". Each event can only have one root workspace.`,
+        });
+        setSubmitting(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('workspaces')
         .insert({

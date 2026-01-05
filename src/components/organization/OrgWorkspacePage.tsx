@@ -317,6 +317,20 @@ export const OrgWorkspacePage: React.FC = () => {
     mutationFn: async ({ name, template }: { name: string; template: typeof WORKSPACE_TEMPLATES[0] }) => {
       if (!eventId || !user?.id) throw new Error('Missing required data');
       
+      // Check if a root workspace already exists for this event
+      const { data: existingRoot, error: checkError } = await supabase
+        .from('workspaces')
+        .select('id, name')
+        .eq('event_id', eventId)
+        .is('parent_workspace_id', null)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (existingRoot) {
+        throw new Error(`This event already has a root workspace "${existingRoot.name}". Each event can only have one root workspace.`);
+      }
+      
       // Create workspace
       const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
