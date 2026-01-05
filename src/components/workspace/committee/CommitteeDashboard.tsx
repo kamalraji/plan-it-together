@@ -3,6 +3,8 @@ import { MilestoneTimeline } from './MilestoneTimeline';
 import { GoalTracker } from './GoalTracker';
 import { CommitteeChecklist } from './CommitteeChecklist';
 import { BudgetRequestForm } from './BudgetRequestForm';
+import { ResourceRequestForm } from './ResourceRequestForm';
+import { ResourceRequestsList } from './ResourceRequestsList';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
@@ -52,6 +54,17 @@ export function CommitteeDashboard({ workspace, onViewTasks }: CommitteeDashboar
             parentWorkspaceId={workspace.parentWorkspaceId || null}
           />
         </div>
+      </div>
+
+      {/* Resource Requests Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <ResourceRequestForm 
+            workspaceId={workspace.id} 
+            parentWorkspaceId={workspace.parentWorkspaceId || null}
+          />
+        </div>
+        <ResourceRequestsList workspaceId={workspace.id} />
       </div>
 
       {/* Team Members */}

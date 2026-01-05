@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceType, WorkspaceStatus } from '@/types';
-import { BudgetTracker } from './BudgetTracker';
+import { BudgetTrackerConnected } from './BudgetTrackerConnected';
 import { ResourceManager } from './ResourceManager';
+import { ResourceApprovalPanel } from './ResourceApprovalPanel';
 import { CommitteeGrid } from './CommitteeOverviewCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
+import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -18,6 +20,7 @@ interface DepartmentDashboardProps {
 
 export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: DepartmentDashboardProps) {
   const navigate = useNavigate();
+  const { pendingRequests } = useWorkspaceBudget(workspace.id);
 
   // Fetch child committees for this department
   const { data: committees = [] } = useQuery({
@@ -49,12 +52,6 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
 
   // Get department info
   const departmentInfo = WORKSPACE_DEPARTMENTS.find(d => d.id === workspace.departmentId);
-
-  // Mock budget data - in production, this would come from workspace_resources table
-  const budgetData = {
-    allocated: 500000,
-    used: 325000,
-  };
 
   const handleCommitteeClick = (committee: Workspace) => {
     const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/workspaces';
@@ -88,6 +85,11 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
                 <Users className="h-4 w-4" />
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
+              {pendingRequests.length > 0 && (
+                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                  {pendingRequests.length} pending requests
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -98,12 +100,16 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
 
       {/* Budget & Resources Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <BudgetTracker 
-          allocated={budgetData.allocated} 
-          used={budgetData.used} 
+        <BudgetTrackerConnected 
+          workspaceId={workspace.id}
           showBreakdown={true}
         />
-        <ResourceManager departmentId={workspace.departmentId} />
+        <ResourceManager departmentId={workspace.departmentId} workspaceId={workspace.id} />
+      </div>
+
+      {/* Approval Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ResourceApprovalPanel workspaceId={workspace.id} />
       </div>
 
       {/* Committees Section */}

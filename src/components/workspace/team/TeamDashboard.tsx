@@ -4,8 +4,11 @@ import { TeamMemberRoster } from '../TeamMemberRoster';
 import { useTeamWorkload, usePersonalProgress } from '@/hooks/useTeamDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Progress } from '@/components/ui/progress';
-import { User, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, Clock, AlertCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { TimeTracker } from './TimeTracker';
+import { TimesheetView } from './TimesheetView';
+import { WorkloadReport } from './WorkloadReport';
 
 interface TeamDashboardProps {
   workspace: Workspace;
@@ -64,7 +67,7 @@ export function TeamDashboard({ workspace, onViewTasks }: TeamDashboardProps) {
           )}
         </div>
 
-        {/* Team Workload */}
+        {/* Team Workload Summary */}
         <div className="bg-card rounded-xl border border-border shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="p-2 rounded-lg bg-secondary/50">
@@ -103,6 +106,15 @@ export function TeamDashboard({ workspace, onViewTasks }: TeamDashboardProps) {
           )}
         </div>
       </div>
+
+      {/* Time Tracking Section */}
+      <div className="space-y-4">
+        <TimeTracker workspaceId={workspace.id} />
+        <TimesheetView workspaceId={workspace.id} />
+      </div>
+
+      {/* Workload Report */}
+      <WorkloadReport workspaceId={workspace.id} />
 
       <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={10} />
     </div>

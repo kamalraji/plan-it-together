@@ -1,32 +1,16 @@
+import { useState } from 'react';
 import { Package, Users, MapPin, Laptop, Plus, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-
-type ResourceType = 'equipment' | 'personnel' | 'venue' | 'digital';
-type ResourceStatus = 'available' | 'reserved' | 'in_use' | 'depleted';
-
-interface Resource {
-  id: string;
-  name: string;
-  type: ResourceType;
-  quantity: number;
-  available: number;
-  status: ResourceStatus;
-  assignedTo?: string;
-}
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useWorkspaceResources, ResourceType, ResourceStatus } from '@/hooks/useWorkspaceResources';
 
 interface ResourceManagerProps {
   departmentId?: string;
-  resources?: Resource[];
+  workspaceId?: string;
 }
-
-const mockResources: Resource[] = [
-  { id: '1', name: 'Projectors', type: 'equipment', quantity: 5, available: 2, status: 'in_use', assignedTo: 'Event Committee' },
-  { id: '2', name: 'Volunteers', type: 'personnel', quantity: 25, available: 8, status: 'available' },
-  { id: '3', name: 'Main Hall', type: 'venue', quantity: 1, available: 0, status: 'reserved', assignedTo: 'Catering Committee' },
-  { id: '4', name: 'Laptops', type: 'equipment', quantity: 10, available: 4, status: 'available' },
-  { id: '5', name: 'Conference Room A', type: 'venue', quantity: 1, available: 1, status: 'available' },
-  { id: '6', name: 'Design Tools License', type: 'digital', quantity: 3, available: 1, status: 'in_use' },
-];
 
 const typeConfig: Record<ResourceType, { icon: React.ComponentType<any>; color: string; bgColor: string }> = {
   equipment: { icon: Package, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-500/10' },
@@ -42,7 +26,35 @@ const statusConfig: Record<ResourceStatus, { label: string; variant: 'default' |
   depleted: { label: 'Depleted', variant: 'destructive' },
 };
 
-export function ResourceManager({ resources = mockResources }: ResourceManagerProps) {
+export function ResourceManager({ workspaceId }: ResourceManagerProps) {
+  const { resources, createResource, isLoading, isCreating } = useWorkspaceResources(workspaceId);
+  const [isAdding, setIsAdding] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    type: 'equipment' as ResourceType,
+    quantity: '1',
+  });
+
+  const handleAddResource = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workspaceId || !formData.name) return;
+
+    createResource({
+      workspace_id: workspaceId,
+      name: formData.name,
+      type: formData.type,
+      quantity: parseInt(formData.quantity),
+      available: parseInt(formData.quantity),
+      status: 'available',
+      assigned_to_workspace_id: null,
+      assigned_to_name: null,
+      metadata: {},
+    });
+
+    setFormData({ name: '', type: 'equipment', quantity: '1' });
+    setIsAdding(false);
+  };
+
   const totalResources = resources.length;
   const lowAvailability = resources.filter(r => r.available === 0 && r.status !== 'depleted').length;
 
@@ -50,7 +62,22 @@ export function ResourceManager({ resources = mockResources }: ResourceManagerPr
     if (!acc[resource.type]) acc[resource.type] = [];
     acc[resource.type].push(resource);
     return acc;
-  }, {} as Record<ResourceType, Resource[]>);
+  }, {} as Record<ResourceType, typeof resources>);
+
+  if (isLoading) {
+    return (
+      <div className="bg-card rounded-xl border border-border shadow-sm p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-muted rounded w-1/3" />
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-12 bg-muted rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card rounded-xl border border-border shadow-sm">
@@ -65,11 +92,70 @@ export function ResourceManager({ resources = mockResources }: ResourceManagerPr
               <p className="text-xs text-muted-foreground">{totalResources} resources tracked</p>
             </div>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors">
-            <Plus className="h-4 w-4" />
-            Add
-          </button>
+          {!isAdding && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsAdding(true)}
+              className="gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              Add
+            </Button>
+          )}
         </div>
+
+        {/* Add Resource Form */}
+        {isAdding && (
+          <form onSubmit={handleAddResource} className="mb-4 p-4 bg-muted/50 rounded-lg space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2 space-y-1">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Resource name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label>Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as ResourceType }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="equipment">Equipment</SelectItem>
+                  <SelectItem value="personnel">Personnel</SelectItem>
+                  <SelectItem value="venue">Venue</SelectItem>
+                  <SelectItem value="digital">Digital</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" disabled={isCreating || !formData.name}>
+                Add Resource
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setIsAdding(false)}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
 
         {/* Alert for low availability */}
         {lowAvailability > 0 && (
@@ -83,7 +169,7 @@ export function ResourceManager({ resources = mockResources }: ResourceManagerPr
 
         {/* Resource list grouped by type */}
         <div className="space-y-4">
-          {(Object.entries(groupedResources) as [ResourceType, Resource[]][]).map(([type, typeResources]) => {
+          {(Object.entries(groupedResources) as [ResourceType, typeof resources][]).map(([type, typeResources]) => {
             const config = typeConfig[type];
             const Icon = config.icon;
             
@@ -120,9 +206,9 @@ export function ResourceManager({ resources = mockResources }: ResourceManagerPr
                             <span className="text-xs text-muted-foreground">
                               {resource.available}/{resource.quantity} available
                             </span>
-                            {resource.assignedTo && (
+                            {resource.assigned_to_name && (
                               <span className="text-xs text-primary">
-                                → {resource.assignedTo}
+                                → {resource.assigned_to_name}
                               </span>
                             )}
                           </div>
@@ -145,21 +231,27 @@ export function ResourceManager({ resources = mockResources }: ResourceManagerPr
           })}
         </div>
 
+        {resources.length === 0 && !isAdding && (
+          <p className="text-sm text-muted-foreground text-center py-8">No resources added yet.</p>
+        )}
+
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-border">
-          <div className="text-center">
-            <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'available').length}</p>
-            <p className="text-xs text-muted-foreground">Available</p>
+        {resources.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-border">
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'available').length}</p>
+              <p className="text-xs text-muted-foreground">Available</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'in_use').length}</p>
+              <p className="text-xs text-muted-foreground">In Use</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'reserved').length}</p>
+              <p className="text-xs text-muted-foreground">Reserved</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'in_use').length}</p>
-            <p className="text-xs text-muted-foreground">In Use</p>
-          </div>
-          <div className="text-center">
-            <p className="text-lg font-bold text-foreground">{resources.filter(r => r.status === 'reserved').length}</p>
-            <p className="text-xs text-muted-foreground">Reserved</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
