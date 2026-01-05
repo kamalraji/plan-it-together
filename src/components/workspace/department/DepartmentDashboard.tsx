@@ -14,6 +14,8 @@ import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { TechDepartmentDashboard } from './tech';
+import { FinanceDepartmentDashboard } from './finance';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -34,6 +36,47 @@ export function DepartmentDashboard({
 }: DepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Extract department type from workspace name
+  const departmentType = workspace.name.toLowerCase();
+
+  // Check if this is a tech department - render specialized dashboard
+  const isTechDepartment = departmentType.includes('tech') || 
+    departmentType.includes('it') ||
+    departmentType.includes('technology') ||
+    departmentType.includes('infrastructure');
+
+  // Check if this is a finance department - render specialized dashboard
+  const isFinanceDepartment = departmentType.includes('finance') || 
+    departmentType.includes('accounting') ||
+    departmentType.includes('budget') ||
+    departmentType.includes('treasury');
+
+  if (isTechDepartment) {
+    return (
+      <TechDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+      />
+    );
+  }
+
+  if (isFinanceDepartment) {
+    return (
+      <FinanceDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+      />
+    );
+  }
 
   // Fetch child committees for this department
   const { data: committees = [] } = useQuery({

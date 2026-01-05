@@ -4,3 +4,5 @@ export { ResourceManager } from './ResourceManager';
 export { ResourceApprovalPanel } from './ResourceApprovalPanel';
 export { CommitteeOverviewCard, CommitteeGrid } from './CommitteeOverviewCard';
 export { DepartmentDashboard } from './DepartmentDashboard';
+export * from './tech';
+export * from './finance';
