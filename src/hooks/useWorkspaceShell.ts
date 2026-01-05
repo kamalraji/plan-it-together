@@ -167,7 +167,12 @@ export function useWorkspaceShell({
 
   const handleInviteTeamMember = () => {
     if (!workspaceId) return;
-    navigate(`/workspaces/${workspaceId}/team/invite`);
+    // Use org-scoped route if available
+    if (orgSlug && workspace?.eventId) {
+      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}?tab=team`);
+    } else {
+      navigate(`/workspaces/${workspaceId}/team/invite`);
+    }
   };
 
   const handleCreateTask = () => {
@@ -177,7 +182,12 @@ export function useWorkspaceShell({
 
   const handleManageSettings = () => {
     if (!workspaceId || !permissions.isGlobalWorkspaceManager) return;
-    navigate(`/workspaces/${workspaceId}/settings`);
+    // Use org-scoped route if available, otherwise fallback
+    if (orgSlug && workspace?.eventId) {
+      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}/settings`);
+    } else {
+      navigate(`/workspaces/${workspaceId}/settings`);
+    }
   };
 
   const handleViewTasks = () => {
