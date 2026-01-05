@@ -231,7 +231,7 @@ export const OrganizerOnboardingPage: React.FC = () => {
                     registrations and run the event.
                   </p>
                   <div className="mt-2 flex items-center gap-3 flex-wrap">
-                    <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/team')}>
+                    <Button size="sm" variant="outline" onClick={() => navigate(primaryOrganization ? `/${primaryOrganization.slug}/team` : '/dashboard/organizations/join')}>
                       Manage team members
                     </Button>
                     <a

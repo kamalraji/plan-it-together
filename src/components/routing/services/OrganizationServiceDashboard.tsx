@@ -123,18 +123,22 @@ export const OrganizationServiceDashboard: React.FC = () => {
     }
   };
 
+  // Get primary organization slug for org-scoped navigation
+  const primaryOrgSlug = organizations && organizations.length > 0 ? organizations[0].slug : null;
+  const getOrgPath = (path: string) => primaryOrgSlug ? `/${primaryOrgSlug}${path}` : '/dashboard/organizations/join';
+
   const pageActions = [
     {
       label: 'Manage Organizations',
       action: () => {
-        window.location.href = '/dashboard/organizations/list';
+        window.location.href = getOrgPath('/settings');
       },
       variant: 'primary' as const,
     },
     {
       label: 'View Analytics',
       action: () => {
-        window.location.href = '/dashboard/analytics';
+        window.location.href = getOrgPath('/analytics');
       },
       variant: 'secondary' as const,
     },
@@ -144,26 +148,26 @@ export const OrganizationServiceDashboard: React.FC = () => {
     {
       title: 'Manage Members',
       description: 'Add, remove, and manage organization members',
-      href: '/dashboard/organizations/list',
+      href: getOrgPath('/team'),
       icon: '👥',
       primary: true,
     },
     {
       title: 'Organization Settings',
       description: 'Configure branding and organization settings',
-      href: '/dashboard/organizations/list',
+      href: getOrgPath('/settings'),
       icon: '⚙️',
     },
     {
       title: 'View Analytics',
       description: 'Monitor organization performance and growth',
-      href: '/dashboard/analytics',
+      href: getOrgPath('/analytics'),
       icon: '📊',
     },
     {
-      title: 'Multi-Org Management',
-      description: 'Manage multiple organizations',
-      href: '/dashboard/organizations/multi-org',
+      title: 'Create New Organization',
+      description: 'Set up a new organization',
+      href: '/organizations/create',
       icon: '🏢',
     },
   ];
@@ -447,10 +451,10 @@ export const OrganizationServiceDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
             <h3 className="text-base sm:text-lg font-medium text-foreground">Your Organizations</h3>
             <Link
-              to="/dashboard/organizations"
+              to={primaryOrgSlug ? `/${primaryOrgSlug}/settings` : '/organizations/create'}
               className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
             >
-              View all organizations →
+              Manage organization →
             </Link>
           </div>
 
@@ -483,9 +487,9 @@ export const OrganizationServiceDashboard: React.FC = () => {
                   <tbody className="bg-background divide-y divide-border">
                     {recentOrganizations.map((org) => {
                       const matchedOrg = organizations?.find((o) => o.id === org.id);
-                      const basePath = matchedOrg?.slug
-                        ? `/${matchedOrg.slug}/organizations`
-                        : '/dashboard/organizations';
+                      const orgSlug = matchedOrg?.slug;
+                      const dashboardPath = orgSlug ? `/${orgSlug}/dashboard` : '/dashboard';
+                      const teamPath = orgSlug ? `/${orgSlug}/team` : '/dashboard/organizations/join';
 
                       return (
                         <tr key={org.id} className="hover:bg-muted/60">
@@ -508,13 +512,13 @@ export const OrganizationServiceDashboard: React.FC = () => {
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                             <Link
-                              to={basePath}
+                              to={dashboardPath}
                               className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
                             >
                               View
                             </Link>
                             <Link
-                              to={`${basePath}/members`}
+                              to={teamPath}
                               className="text-muted-foreground hover:text-foreground"
                             >
                               Manage

@@ -132,13 +132,13 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
       case 'events':
         return '/events';
       case 'workspaces':
-        return '/dashboard/workspaces';
+        return '/dashboard'; // Participants don't have workspaces access
       case 'marketplace':
         return '/marketplace';
       case 'organizations':
         return '/dashboard/organizations/join';
       case 'analytics':
-        return '/dashboard';
+        return '/dashboard'; // Participants don't have analytics access
       default:
         return '/dashboard';
     }
