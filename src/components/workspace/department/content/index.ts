@@ -11,3 +11,6 @@ export { JudgingOverviewConnected } from './JudgingOverviewConnected';
 export { MediaAssetsWidget } from './MediaAssetsWidget';
 export { MediaAssetsConnected } from './MediaAssetsConnected';
 export { ContentQuickActions } from './ContentQuickActions';
+export { CreateContentItemModal } from './CreateContentItemModal';
+export { AssignJudgeModal } from './AssignJudgeModal';
+export { EnterScoreModal } from './EnterScoreModal';

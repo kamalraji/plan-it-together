@@ -5,7 +5,8 @@ import {
   Upload,
   UserPlus,
   Calendar,
-  ClipboardList
+  ClipboardList,
+  Star
 } from 'lucide-react';
 
 interface QuickAction {
@@ -33,6 +34,14 @@ const quickActions: QuickAction[] = [
     icon: Gavel,
     color: 'text-amber-500',
     bgColor: 'bg-amber-500/10 hover:bg-amber-500/20',
+  },
+  {
+    id: 'enter-score',
+    label: 'Enter Score',
+    description: 'Score a submission',
+    icon: Star,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-500/10 hover:bg-yellow-500/20',
   },
   {
     id: 'upload-media',

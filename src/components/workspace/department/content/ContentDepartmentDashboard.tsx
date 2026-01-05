@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceType, WorkspaceStatus, WorkspaceRole } from '@/types';
@@ -18,6 +19,9 @@ import { SpeakerScheduleConnected } from './SpeakerScheduleConnected';
 import { JudgingOverviewConnected } from './JudgingOverviewConnected';
 import { MediaAssetsConnected } from './MediaAssetsConnected';
 import { ContentQuickActions } from './ContentQuickActions';
+import { CreateContentItemModal } from './CreateContentItemModal';
+import { AssignJudgeModal } from './AssignJudgeModal';
+import { EnterScoreModal } from './EnterScoreModal';
 
 interface ContentDepartmentDashboardProps {
   workspace: Workspace;
@@ -38,6 +42,11 @@ export function ContentDepartmentDashboard({
 }: ContentDepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Modal states
+  const [createContentOpen, setCreateContentOpen] = useState(false);
+  const [assignJudgeOpen, setAssignJudgeOpen] = useState(false);
+  const [enterScoreOpen, setEnterScoreOpen] = useState(false);
 
   // Fetch child committees for this department
   const { data: committees = [] } = useQuery({
@@ -73,8 +82,19 @@ export function ContentDepartmentDashboard({
   };
 
   const handleQuickAction = (actionId: string) => {
-    console.log('Quick action:', actionId);
-    // Handle quick actions - can be expanded later
+    switch (actionId) {
+      case 'create-content':
+        setCreateContentOpen(true);
+        break;
+      case 'assign-judges':
+        setAssignJudgeOpen(true);
+        break;
+      case 'enter-score':
+        setEnterScoreOpen(true);
+        break;
+      default:
+        console.log('Quick action:', actionId);
+    }
   };
 
   return (
@@ -153,7 +173,11 @@ export function ContentDepartmentDashboard({
       <ContentPipelineDragDrop workspaceId={workspace.id} />
 
       {/* Judging Overview - Connected to real data */}
-      <JudgingOverviewConnected eventId={workspace.eventId} />
+      <JudgingOverviewConnected 
+        eventId={workspace.eventId} 
+        onAssignJudge={() => setAssignJudgeOpen(true)}
+        onEnterScore={() => setEnterScoreOpen(true)}
+      />
 
       {/* Speaker & Media Row - Connected to real data */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -169,6 +193,23 @@ export function ContentDepartmentDashboard({
 
       {/* Team Members */}
       <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
+
+      {/* Modals */}
+      <CreateContentItemModal
+        open={createContentOpen}
+        onOpenChange={setCreateContentOpen}
+        workspaceId={workspace.id}
+      />
+      <AssignJudgeModal
+        open={assignJudgeOpen}
+        onOpenChange={setAssignJudgeOpen}
+        eventId={workspace.eventId}
+      />
+      <EnterScoreModal
+        open={enterScoreOpen}
+        onOpenChange={setEnterScoreOpen}
+        eventId={workspace.eventId}
+      />
     </div>
   );
 }
