@@ -3,13 +3,19 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole, WorkspaceRole, WorkspaceType } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { UserRole, WorkspaceRole } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import { useOrganizationEvents } from '@/hooks/useOrganization';
 import { getWorkspaceRoleLabel } from '@/lib/workspaceHierarchy';
-import { Shield } from 'lucide-react';
+import { ENHANCED_WORKSPACE_TEMPLATES, EnhancedWorkspaceTemplate } from '@/lib/workspaceTemplates';
+import { WorkspaceTemplateSelector } from '@/components/workspace/WorkspaceTemplateSelector';
+import { useWorkspaceProvisioning } from '@/hooks/useWorkspaceProvisioning';
+import { Shield, Layers } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 const workspaceCreateSchema = z.object({
   name: z
@@ -47,7 +53,10 @@ export const WorkspaceCreatePage: React.FC = () => {
     eventId: eventIdFromQuery,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<EnhancedWorkspaceTemplate>(ENHANCED_WORKSPACE_TEMPLATES[0]);
+  const [templateSectionOpen, setTemplateSectionOpen] = useState(true);
+
+  const { provisionWorkspaceAsync, isPending } = useWorkspaceProvisioning();
 
   const selectedEvent = isOrgContext && orgEvents
     ? (orgEvents as any[]).find((event) => event.id === formValues.eventId)
@@ -64,7 +73,6 @@ export const WorkspaceCreatePage: React.FC = () => {
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const value = e.target.value;
       setFormValues((prev) => ({ ...prev, [field]: value }));
-      // Clear error when user starts typing
       if (formErrors[field]) {
         setFormErrors((prev) => ({ ...prev, [field]: '' }));
       }
@@ -88,81 +96,40 @@ export const WorkspaceCreatePage: React.FC = () => {
       return;
     }
 
-    setSubmitting(true);
     try {
-      // Check if a root workspace already exists for this event
-      const { data: existingRoot, error: checkError } = await supabase
-        .from('workspaces')
-        .select('id, name')
-        .eq('event_id', parseResult.data.eventId)
-        .is('parent_workspace_id', null)
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      if (existingRoot) {
-        setFormErrors({
-          eventId: `This event already has a root workspace "${existingRoot.name}". Each event can only have one root workspace.`,
-        });
-        setSubmitting(false);
-        return;
-      }
-
-      // Create the root workspace with workspace_type set to ROOT
-      const { data, error } = await supabase
-        .from('workspaces')
-        .insert({
-          event_id: parseResult.data.eventId,
-          name: parseResult.data.name,
-          organizer_id: user.id,
-          workspace_type: WorkspaceType.ROOT,
-        })
-        .select('id')
-        .maybeSingle();
-
-      if (error) throw error;
-
-      const createdId = data?.id as string | undefined;
-
-      // Auto-assign the creator as WORKSPACE_OWNER
-      if (createdId) {
-        const { error: memberError } = await supabase
-          .from('workspace_team_members')
-          .insert({
-            workspace_id: createdId,
-            user_id: user.id,
-            role: WorkspaceRole.WORKSPACE_OWNER,
-            status: 'ACTIVE',
-          });
-
-        if (memberError) {
-          console.error('Failed to add creator as workspace owner', memberError);
-        }
-      }
+      const result = await provisionWorkspaceAsync({
+        name: parseResult.data.name,
+        eventId: parseResult.data.eventId,
+        userId: user.id,
+        template: selectedTemplate,
+        organizationId,
+      });
 
       toast({
         title: 'Workspace created',
-        description: 'Your workspace has been created successfully. You are now the Workspace Owner.',
+        description: selectedTemplate.id !== 'blank'
+          ? `Created with "${selectedTemplate.name}" template. ${result.departments.length} departments, ${result.committees.length} committees.`
+          : 'Your workspace has been created successfully. You are now the Workspace Owner.',
       });
 
       const baseWorkspacePath = isOrgContext && orgSlugCandidate
         ? `/${orgSlugCandidate}/workspaces`
         : '/dashboard/workspaces';
 
-      if (createdId) {
-        navigate(`${baseWorkspacePath}/${createdId}`, { replace: true });
-      } else {
-        navigate(`${baseWorkspacePath}/list`, { replace: true });
-      }
+      navigate(`${baseWorkspacePath}/${result.rootWorkspace.id}`, { replace: true });
     } catch (error: any) {
       console.error('Failed to create workspace', error);
-      toast({
-        title: 'Failed to create workspace',
-        description: error?.message ?? 'Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setSubmitting(false);
+      if (error?.message?.includes('already has a root workspace')) {
+        setFormErrors({
+          eventId: error.message,
+        });
+      } else {
+        toast({
+          title: 'Failed to create workspace',
+          description: error?.message ?? 'Please try again.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
@@ -185,7 +152,7 @@ export const WorkspaceCreatePage: React.FC = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <PageHeader
           title={isOrgContext ? 'Create Organization Workspace' : 'Create Workspace'}
           subtitle={
@@ -198,11 +165,11 @@ export const WorkspaceCreatePage: React.FC = () => {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {/* Workspace Name Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="workspace-name">
+            <Label htmlFor="workspace-name" className="text-sm font-medium">
               Workspace name <span className="text-destructive">*</span>
-            </label>
+            </Label>
             <p className="text-xs text-muted-foreground mb-2">
-              Use a short, descriptive name your team will recognize (e.g., "Registration ops" or "Speaker coordination").
+              Use a short, descriptive name your team will recognize (e.g., "Tech Conference 2026" or "Annual Gala").
             </p>
             <input
               id="workspace-name"
@@ -210,7 +177,7 @@ export const WorkspaceCreatePage: React.FC = () => {
               value={formValues.name}
               onChange={handleChange('name')}
               className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
-              placeholder="Backstage crew, Registration ops..."
+              placeholder="Tech Conference 2026, Annual Fundraiser..."
             />
             {formErrors.name && (
               <p className="mt-1 text-xs text-destructive">{formErrors.name}</p>
@@ -219,9 +186,9 @@ export const WorkspaceCreatePage: React.FC = () => {
 
           {/* Event Selection Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="event-id">
+            <Label htmlFor="event-id" className="text-sm font-medium">
               Associated event <span className="text-destructive">*</span>
-            </label>
+            </Label>
             <p className="text-xs text-muted-foreground mb-2">
               Every workspace belongs to a single event so tasks, team members, and reports stay in sync.
             </p>
@@ -255,13 +222,15 @@ export const WorkspaceCreatePage: React.FC = () => {
                     <span>
                       No events found for this organization. Create an event before creating a workspace.
                     </span>
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigate(eventCreatePath)}
-                      className="ml-3 inline-flex items-center rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-amber-700"
+                      className="ml-3 h-7 text-xs"
                     >
                       Create event
-                    </button>
+                    </Button>
                   </div>
                 )}
               </>
@@ -288,16 +257,62 @@ export const WorkspaceCreatePage: React.FC = () => {
             {formErrors.eventId && (
               <div className="mt-1 flex items-center justify-between gap-2">
                 <p className="text-xs text-destructive">{formErrors.eventId}</p>
-                <button
+                <Button
                   type="button"
+                  variant="destructive"
+                  size="sm"
                   onClick={() => navigate(eventCreatePath)}
-                  className="inline-flex items-center rounded-md bg-destructive px-2.5 py-1 text-[11px] font-semibold text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                  className="h-7 text-xs"
                 >
                   Create event
-                </button>
+                </Button>
               </div>
             )}
           </div>
+
+          {/* Template Selection Section */}
+          <Collapsible open={templateSectionOpen} onOpenChange={setTemplateSectionOpen}>
+            <div className="rounded-lg border border-border bg-card">
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-t-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                      <Layers className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Workspace Template</p>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedTemplate.id === 'blank'
+                          ? 'Starting from scratch'
+                          : `${selectedTemplate.name} - ${selectedTemplate.structure.departments.length} departments`}
+                      </p>
+                    </div>
+                  </div>
+                  {templateSectionOpen ? (
+                    <ChevronUpIcon className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDownIcon className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="border-t border-border px-4 py-4">
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Choose a template to automatically create departments, committees, tasks, and milestones. 
+                    You can customize everything after creation.
+                  </p>
+                  <WorkspaceTemplateSelector
+                    selectedTemplate={selectedTemplate}
+                    onSelectTemplate={setSelectedTemplate}
+                    isApplying={isPending}
+                  />
+                </div>
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
 
           {/* Role Assignment Preview */}
           <div className="rounded-md border border-border bg-muted/50 px-4 py-3">
@@ -314,29 +329,29 @@ export const WorkspaceCreatePage: React.FC = () => {
 
           {/* Info Card */}
           <div className="rounded-md border border-primary/20 bg-primary/5 px-4 py-3 text-xs text-foreground">
-            <p className="font-semibold mb-1">Next: manage your team and tasks</p>
+            <p className="font-semibold mb-1">What happens next?</p>
             <p className="text-muted-foreground">
-              Once this workspace is created, you can invite collaborators, assign roles, and track tasks
-              directly from the workspace dashboard.
+              {selectedTemplate.id === 'blank'
+                ? 'After creation, you can manually add departments, committees, and invite team members from the workspace dashboard.'
+                : `We'll automatically create ${selectedTemplate.structure.departments.length} departments, their committees, ${selectedTemplate.structure.tasks.length} starter tasks, and ${selectedTemplate.structure.milestones.length} milestones. You can then invite team members and customize everything.`}
             </p>
           </div>
 
           {/* Form Actions */}
           <div className="flex items-center justify-between pt-4 border-t border-border">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-accent"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={submitting}
-              className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={isPending}
             >
-              {submitting ? 'Creating…' : 'Create workspace'}
-            </button>
+              {isPending ? 'Creating workspace…' : 'Create workspace'}
+            </Button>
           </div>
         </form>
       </div>
