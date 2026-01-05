@@ -18,6 +18,7 @@ import { TechDepartmentDashboard } from './tech';
 import { FinanceDepartmentDashboard } from './finance';
 import { ContentDepartmentDashboard } from './content';
 import { OperationsDepartmentDashboard } from './operations';
+import { GrowthDepartmentDashboard } from './growth';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -66,6 +67,11 @@ export function DepartmentDashboard({
     departmentType.includes('execution') ||
     departmentType.includes('coordination');
 
+  // Check if this is a growth department - render specialized dashboard
+  const isGrowthDepartment = departmentType.includes('growth') || 
+    departmentType.includes('outreach') ||
+    (departmentType.includes('marketing') && departmentType.includes('comm'));
+
   if (isTechDepartment) {
     return (
       <TechDepartmentDashboard
@@ -108,6 +114,19 @@ export function DepartmentDashboard({
   if (isOperationsDepartment) {
     return (
       <OperationsDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+      />
+    );
+  }
+
+  if (isGrowthDepartment) {
+    return (
+      <GrowthDepartmentDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
