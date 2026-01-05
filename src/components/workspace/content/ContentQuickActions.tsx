@@ -8,7 +8,8 @@ import {
   Share2, 
   FileText,
   Image,
-  Video
+  Video,
+  UserPlus
 } from 'lucide-react';
 
 interface ContentQuickActionsProps {
@@ -16,6 +17,7 @@ interface ContentQuickActionsProps {
   onUploadMedia?: () => void;
   onScheduleContent?: () => void;
   onWriteArticle?: () => void;
+  onRegisterSpeaker?: () => void;
 }
 
 export function ContentQuickActions({
@@ -23,6 +25,7 @@ export function ContentQuickActions({
   onUploadMedia,
   onScheduleContent,
   onWriteArticle,
+  onRegisterSpeaker,
 }: ContentQuickActionsProps) {
   const actions = [
     {
@@ -56,6 +59,14 @@ export function ContentQuickActions({
       color: 'text-orange-500',
       bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
       onClick: onWriteArticle,
+    },
+    {
+      label: 'Add Speaker',
+      description: 'Register a new speaker',
+      icon: UserPlus,
+      color: 'text-cyan-500',
+      bgColor: 'bg-cyan-500/10 hover:bg-cyan-500/20',
+      onClick: onRegisterSpeaker,
     },
   ];
 
