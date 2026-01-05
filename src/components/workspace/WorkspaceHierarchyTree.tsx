@@ -11,13 +11,16 @@ import {
   WORKSPACE_DEPARTMENTS,
   DEPARTMENT_COMMITTEES,
 } from '@/lib/workspaceHierarchy';
-import { WorkspaceType, WorkspaceRole } from '@/types';
+import { WorkspaceType, WorkspaceRole, TeamMember } from '@/types';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+
+import { RoleDelegationModal } from './RoleDelegationModal';
+import { useAuth } from '@/hooks/useAuth';
 
 interface WorkspaceNode {
   id: string;
@@ -28,6 +31,7 @@ interface WorkspaceNode {
   departmentId: string | null;
   children: WorkspaceNode[];
   depth: number;
+  teamMembers?: TeamMember[];
 }
 
 interface WorkspaceHierarchyTreeProps {
@@ -42,9 +46,18 @@ export function WorkspaceHierarchyTree({
   onWorkspaceSelect,
 }: WorkspaceHierarchyTreeProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [delegationModal, setDelegationModal] = useState<{
+    open: boolean;
+    workspaceId: string;
+    workspaceName: string;
+    responsibleRole: WorkspaceRole;
+    currentHolder?: TeamMember;
+    teamMembers: TeamMember[];
+  } | null>(null);
 
-  const { data: workspaces, isLoading } = useQuery({
+  const { data: workspaces, isLoading, refetch } = useQuery({
     queryKey: ['workspace-hierarchy', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -59,6 +72,57 @@ export function WorkspaceHierarchyTree({
     enabled: !!eventId,
   });
 
+  // Fetch team members for all workspaces
+  const { data: allTeamMembers } = useQuery({
+    queryKey: ['workspace-hierarchy-members', eventId],
+    queryFn: async () => {
+      if (!workspaces || workspaces.length === 0) return {};
+
+      const workspaceIds = workspaces.map(ws => ws.id);
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('id, user_id, role, status, joined_at, workspace_id')
+        .in('workspace_id', workspaceIds)
+        .eq('status', 'active');
+
+      if (error) throw error;
+
+      // Fetch user profiles
+      const userIds = [...new Set((data || []).map(m => m.user_id))];
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Group by workspace_id
+      const grouped: Record<string, TeamMember[]> = {};
+      (data || []).forEach(member => {
+        const profile = profileMap.get(member.user_id);
+        const teamMember: TeamMember = {
+          id: member.id,
+          userId: member.user_id,
+          role: member.role as WorkspaceRole,
+          status: member.status,
+          joinedAt: member.joined_at,
+          user: {
+            id: member.user_id,
+            name: profile?.full_name || 'Unknown User',
+            email: '',
+          },
+        };
+        if (!grouped[member.workspace_id]) {
+          grouped[member.workspace_id] = [];
+        }
+        grouped[member.workspace_id].push(teamMember);
+      });
+
+      return grouped;
+    },
+    enabled: !!workspaces && workspaces.length > 0,
+  });
+
   // Build tree structure from flat list
   const tree = useMemo(() => {
     if (!workspaces) return [];
@@ -66,7 +130,7 @@ export function WorkspaceHierarchyTree({
     const nodeMap = new Map<string, WorkspaceNode>();
     const roots: WorkspaceNode[] = [];
 
-    // First pass: create all nodes
+    // First pass: create all nodes with team members
     workspaces.forEach((ws) => {
       nodeMap.set(ws.id, {
         id: ws.id,
@@ -77,6 +141,7 @@ export function WorkspaceHierarchyTree({
         departmentId: ws.department_id,
         children: [],
         depth: 1,
+        teamMembers: allTeamMembers?.[ws.id] || [],
       });
     });
 
@@ -111,7 +176,7 @@ export function WorkspaceHierarchyTree({
     }
 
     return roots;
-  }, [workspaces, currentWorkspaceId]);
+  }, [workspaces, currentWorkspaceId, allTeamMembers]);
 
   const toggleExpand = (nodeId: string) => {
     setExpandedNodes((prev) => {
@@ -280,6 +345,25 @@ export function WorkspaceHierarchyTree({
     const hasChildren = node.children.length > 0;
     const TypeIcon = getTypeIcon(node);
     const responsibleRole = getNodeResponsibleRole(node);
+    
+    // Find who holds the responsible role
+    const roleHolder = responsibleRole
+      ? node.teamMembers?.find((m) => m.role === responsibleRole)
+      : undefined;
+
+    const handleDelegateClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (responsibleRole) {
+        setDelegationModal({
+          open: true,
+          workspaceId: node.id,
+          workspaceName: node.name,
+          responsibleRole,
+          currentHolder: roleHolder,
+          teamMembers: node.teamMembers || [],
+        });
+      }
+    };
 
     return (
       <div key={node.id} className="select-none">
@@ -339,38 +423,52 @@ export function WorkspaceHierarchyTree({
               {getLevelLabel(node)}
             </span>
 
-            {/* Responsible Role Badge */}
+            {/* Responsible Role Badge with Holder */}
             {responsibleRole && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span
+                    <button
+                      onClick={handleDelegateClick}
                       className={cn(
-                        'text-[9px] px-1.5 py-0.5 rounded-full font-medium tracking-wide shrink-0 flex items-center gap-1',
+                        'text-[9px] px-1.5 py-0.5 rounded-full font-medium tracking-wide shrink-0 flex items-center gap-1 hover:ring-1 hover:ring-primary/30 transition-all',
                         getRoleBadgeStyle(node.depth),
                       )}
                     >
                       <Shield className="h-2.5 w-2.5" />
                       <span className="hidden sm:inline">
-                        {getWorkspaceRoleLabel(responsibleRole).split(' ').slice(-1)[0]}
+                        {roleHolder ? roleHolder.user.name.split(' ')[0] : 'Vacant'}
                       </span>
-                    </span>
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     <p className="font-medium">{getWorkspaceRoleLabel(responsibleRole)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Responsible role for this {getLevelLabel(node).toLowerCase()}
-                    </p>
+                    {roleHolder ? (
+                      <p className="text-xs text-muted-foreground">
+                        Held by: {roleHolder.user.name}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Position vacant - click to assign</p>
+                    )}
+                    <p className="text-xs text-primary mt-1">Click to delegate</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
           </div>
 
-          {/* Children count */}
-          {hasChildren && (
+          {/* Team member count */}
+          {(node.teamMembers?.length || 0) > 0 && (
             <span className="text-xs text-muted-foreground flex items-center gap-1">
               <Users className="h-3 w-3" />
+              {node.teamMembers?.length}
+            </span>
+          )}
+
+          {/* Children count */}
+          {hasChildren && (
+            <span className="text-xs text-muted-foreground flex items-center gap-1 ml-1">
+              <Folder className="h-3 w-3" />
               {node.children.length}
             </span>
           )}
@@ -408,56 +506,78 @@ export function WorkspaceHierarchyTree({
   }
 
   return (
-    <div className="py-2">
-      {/* Legend */}
-      <div className="px-3 pb-2 mb-2 border-b border-border">
-        <div className="flex flex-wrap gap-3 text-[10px] mb-2">
-          <span className="text-muted-foreground font-medium">Levels:</span>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">L1 Root</span>
+    <>
+      <div className="py-2">
+        {/* Legend */}
+        <div className="px-3 pb-2 mb-2 border-b border-border">
+          <div className="flex flex-wrap gap-3 text-[10px] mb-2">
+            <span className="text-muted-foreground font-medium">Levels:</span>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-muted-foreground">L1 Root</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-muted-foreground">L2 Department</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="text-muted-foreground">L3 Committee</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-muted-foreground">L4 Team</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
-            <span className="text-muted-foreground">L2 Department</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <span className="text-muted-foreground">L3 Committee</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-muted-foreground">L4 Team</span>
+          <div className="flex flex-wrap gap-3 text-[10px]">
+            <span className="text-muted-foreground font-medium">Roles:</span>
+            <div className="flex items-center gap-1">
+              <Shield className="h-2.5 w-2.5 text-purple-500" />
+              <span className="text-muted-foreground">Owner</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Shield className="h-2.5 w-2.5 text-indigo-500" />
+              <span className="text-muted-foreground">Manager</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Shield className="h-2.5 w-2.5 text-orange-500" />
+              <span className="text-muted-foreground">Lead</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Shield className="h-2.5 w-2.5 text-teal-500" />
+              <span className="text-muted-foreground">Coordinator</span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3 text-[10px]">
-          <span className="text-muted-foreground font-medium">Roles:</span>
-          <div className="flex items-center gap-1">
-            <Shield className="h-2.5 w-2.5 text-purple-500" />
-            <span className="text-muted-foreground">Owner</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Shield className="h-2.5 w-2.5 text-indigo-500" />
-            <span className="text-muted-foreground">Manager</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Shield className="h-2.5 w-2.5 text-orange-500" />
-            <span className="text-muted-foreground">Lead</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Shield className="h-2.5 w-2.5 text-teal-500" />
-            <span className="text-muted-foreground">Coordinator</span>
-          </div>
+
+        {/* Tree */}
+        <div className="space-y-0.5">{tree.map(renderNode)}</div>
+
+        {/* Depth info */}
+        <div className="px-3 pt-3 mt-2 border-t border-border text-[10px] text-muted-foreground">
+          Max hierarchy depth: {MAX_WORKSPACE_DEPTH} levels
         </div>
       </div>
 
-      {/* Tree */}
-      <div className="space-y-0.5">{tree.map(renderNode)}</div>
-
-      {/* Depth info */}
-      <div className="px-3 pt-3 mt-2 border-t border-border text-[10px] text-muted-foreground">
-        Max hierarchy depth: {MAX_WORKSPACE_DEPTH} levels
-      </div>
-    </div>
+      {/* Role Delegation Modal */}
+      {delegationModal && (
+        <RoleDelegationModal
+          open={delegationModal.open}
+          onOpenChange={(open) => {
+            if (!open) setDelegationModal(null);
+          }}
+          workspaceId={delegationModal.workspaceId}
+          workspaceName={delegationModal.workspaceName}
+          responsibleRole={delegationModal.responsibleRole}
+          currentHolder={delegationModal.currentHolder}
+          teamMembers={delegationModal.teamMembers}
+          currentUserId={user?.id}
+          onDelegated={() => {
+            refetch();
+            setDelegationModal(null);
+          }}
+        />
+      )}
+    </>
   );
 }
