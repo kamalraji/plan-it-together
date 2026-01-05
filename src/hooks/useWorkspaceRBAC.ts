@@ -7,6 +7,15 @@ import {
   WorkspaceHierarchyLevel,
 } from '@/lib/workspaceHierarchy';
 
+// Re-export workspace-role mapping utilities for convenience
+export {
+  HIERARCHY_LEVEL_TO_TYPE,
+  TYPE_TO_HIERARCHY_LEVEL,
+  getResponsibleRoleForWorkspace,
+  getWorkspaceTypeToRoleMapping,
+  getAvailableRolesForWorkspaceType,
+} from '@/lib/workspaceHierarchy';
+
 export interface WorkspaceRBACResult {
   /** Current user's hierarchy level */
   userLevel: WorkspaceHierarchyLevel;

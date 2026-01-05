@@ -342,3 +342,152 @@ export function canCreateSubWorkspace(parentWorkspaceId: string | null, workspac
   const depth = calculateWorkspaceDepth(parentWorkspaceId, workspaceParentMap);
   return depth <= MAX_WORKSPACE_DEPTH;
 }
+
+/**
+ * Maps workspace type (level) to the corresponding role category
+ * 
+ * Workspace Level → Role Mapping:
+ * - ROOT (L1) → WORKSPACE_OWNER
+ * - DEPARTMENT (L2) → Department-specific Managers
+ * - COMMITTEE (L3) → Committee-specific Leads
+ * - TEAM (L4) → Committee-specific Coordinators
+ */
+export function getWorkspaceTypeToRoleMapping(workspaceType: WorkspaceType): {
+  level: WorkspaceHierarchyLevel;
+  primaryRole: WorkspaceRole | null;
+  roleCategory: string;
+  description: string;
+} {
+  switch (workspaceType) {
+    case WorkspaceType.ROOT:
+      return {
+        level: WorkspaceHierarchyLevel.OWNER,
+        primaryRole: WorkspaceRole.WORKSPACE_OWNER,
+        roleCategory: 'Owner',
+        description: 'Full control & oversight of the entire event workspace',
+      };
+    case WorkspaceType.DEPARTMENT:
+      return {
+        level: WorkspaceHierarchyLevel.MANAGER,
+        primaryRole: null, // Depends on department type
+        roleCategory: 'Department Manager',
+        description: 'Department strategy, KPIs, and committee oversight',
+      };
+    case WorkspaceType.COMMITTEE:
+      return {
+        level: WorkspaceHierarchyLevel.LEAD,
+        primaryRole: null, // Depends on committee type
+        roleCategory: 'Committee Lead',
+        description: 'Committee execution and coordinator management',
+      };
+    case WorkspaceType.TEAM:
+      return {
+        level: WorkspaceHierarchyLevel.COORDINATOR,
+        primaryRole: null, // Depends on parent committee
+        roleCategory: 'Coordinator',
+        description: 'Task execution and delivery',
+      };
+    default:
+      return {
+        level: WorkspaceHierarchyLevel.COORDINATOR,
+        primaryRole: null,
+        roleCategory: 'Member',
+        description: 'Workspace member',
+      };
+  }
+}
+
+/**
+ * Get the responsible role for a workspace based on its type and context
+ */
+export function getResponsibleRoleForWorkspace(
+  workspaceType: WorkspaceType,
+  departmentId?: string,
+  committeeId?: string
+): WorkspaceRole | null {
+  switch (workspaceType) {
+    case WorkspaceType.ROOT:
+      return WorkspaceRole.WORKSPACE_OWNER;
+      
+    case WorkspaceType.DEPARTMENT:
+      // Return department-specific manager role
+      const department = WORKSPACE_DEPARTMENTS.find(d => d.id === departmentId);
+      return department?.managerRole || null;
+      
+    case WorkspaceType.COMMITTEE:
+      // Return committee-specific lead role
+      if (departmentId && committeeId) {
+        const committees = DEPARTMENT_COMMITTEES[departmentId];
+        const committee = committees?.find(c => c.id === committeeId);
+        return committee?.leadRole || null;
+      }
+      return null;
+      
+    case WorkspaceType.TEAM:
+      // Return committee-specific coordinator role
+      if (departmentId && committeeId) {
+        const committees = DEPARTMENT_COMMITTEES[departmentId];
+        const committee = committees?.find(c => c.id === committeeId);
+        return committee?.coordinatorRole || null;
+      }
+      return null;
+      
+    default:
+      return null;
+  }
+}
+
+/**
+ * Get roles available for a specific workspace type
+ */
+export function getAvailableRolesForWorkspaceType(
+  workspaceType: WorkspaceType,
+  departmentId?: string
+): WorkspaceRole[] {
+  switch (workspaceType) {
+    case WorkspaceType.ROOT:
+      return [WorkspaceRole.WORKSPACE_OWNER];
+      
+    case WorkspaceType.DEPARTMENT:
+      return WORKSPACE_DEPARTMENTS.map(d => d.managerRole);
+      
+    case WorkspaceType.COMMITTEE:
+      if (departmentId) {
+        const committees = DEPARTMENT_COMMITTEES[departmentId];
+        return committees?.map(c => c.leadRole) || [];
+      }
+      // Return all lead roles if no department specified
+      return Object.values(DEPARTMENT_COMMITTEES).flat().map(c => c.leadRole);
+      
+    case WorkspaceType.TEAM:
+      if (departmentId) {
+        const committees = DEPARTMENT_COMMITTEES[departmentId];
+        return committees?.map(c => c.coordinatorRole) || [];
+      }
+      // Return all coordinator roles if no department specified
+      return Object.values(DEPARTMENT_COMMITTEES).flat().map(c => c.coordinatorRole);
+      
+    default:
+      return [];
+  }
+}
+
+/**
+ * Mapping of workspace hierarchy level to workspace type
+ */
+export const HIERARCHY_LEVEL_TO_TYPE: Record<WorkspaceHierarchyLevel, WorkspaceType> = {
+  [WorkspaceHierarchyLevel.OWNER]: WorkspaceType.ROOT,
+  [WorkspaceHierarchyLevel.MANAGER]: WorkspaceType.DEPARTMENT,
+  [WorkspaceHierarchyLevel.LEAD]: WorkspaceType.COMMITTEE,
+  [WorkspaceHierarchyLevel.COORDINATOR]: WorkspaceType.TEAM,
+};
+
+/**
+ * Mapping of workspace type to hierarchy level
+ */
+export const TYPE_TO_HIERARCHY_LEVEL: Record<WorkspaceType, WorkspaceHierarchyLevel> = {
+  [WorkspaceType.ROOT]: WorkspaceHierarchyLevel.OWNER,
+  [WorkspaceType.DEPARTMENT]: WorkspaceHierarchyLevel.MANAGER,
+  [WorkspaceType.COMMITTEE]: WorkspaceHierarchyLevel.LEAD,
+  [WorkspaceType.TEAM]: WorkspaceHierarchyLevel.COORDINATOR,
+};
