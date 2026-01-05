@@ -16,6 +16,7 @@ import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 import { VolunteersDashboard } from '../volunteers';
 import { FinanceDashboard } from '../finance';
+import { RegistrationDashboard } from '../registration';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -54,6 +55,10 @@ export function CommitteeDashboard({
   const isFinanceCommittee = committeeType === 'finance' || 
     workspace.name.toLowerCase().includes('finance');
 
+  // Check if this is a registration committee - render specialized dashboard
+  const isRegistrationCommittee = committeeType === 'registration' || 
+    workspace.name.toLowerCase().includes('registration');
+
   if (isVolunteersCommittee) {
     return (
       <VolunteersDashboard
@@ -72,6 +77,21 @@ export function CommitteeDashboard({
   if (isFinanceCommittee) {
     return (
       <FinanceDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isRegistrationCommittee) {
+    return (
+      <RegistrationDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
