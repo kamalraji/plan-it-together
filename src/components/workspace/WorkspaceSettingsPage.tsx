@@ -86,7 +86,7 @@ export function WorkspaceSettingsPage() {
       const { error } = await supabase
         .from('workspaces')
         .update({
-          status: 'archived',
+          status: 'ARCHIVED',
           updated_at: new Date().toISOString(),
         })
         .eq('id', workspaceId);
@@ -97,6 +97,26 @@ export function WorkspaceSettingsPage() {
     } catch (error) {
       console.error('Failed to archive workspace:', error);
       toast.error('Failed to archive workspace');
+    }
+  };
+
+  const handleRestoreWorkspace = async () => {
+    if (!workspaceId) return;
+
+    try {
+      const { error } = await supabase
+        .from('workspaces')
+        .update({
+          status: 'ACTIVE',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', workspaceId);
+
+      if (error) throw error;
+      toast.success('Workspace restored');
+    } catch (error) {
+      console.error('Failed to restore workspace:', error);
+      toast.error('Failed to restore workspace');
     }
   };
 
@@ -117,6 +137,8 @@ export function WorkspaceSettingsPage() {
       toast.error('Failed to delete workspace');
     }
   };
+
+  const isArchived = workspace?.status === 'ARCHIVED';
 
   const tabs = [
     { id: 'general' as const, label: 'General', icon: Palette },
@@ -462,63 +484,103 @@ export function WorkspaceSettingsPage() {
             )}
 
             {activeTab === 'danger' && (
-              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
-                <h2 className="text-lg font-semibold text-destructive mb-2">Danger Zone</h2>
-                <p className="text-sm text-muted-foreground mb-6">
-                  These actions are irreversible. Please proceed with caution.
-                </p>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
-                    <div>
-                      <p className="font-medium text-foreground">Archive Workspace</p>
-                      <p className="text-sm text-muted-foreground">
-                        Archive this workspace and hide it from the list
-                      </p>
+              <div className="space-y-6">
+                {/* Status Indicator */}
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <h2 className="text-lg font-semibold text-foreground mb-4">Workspace Status</h2>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-3 h-3 rounded-full",
+                        isArchived ? "bg-slate-400" : "bg-emerald-500"
+                      )} />
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {isArchived ? 'Archived' : 'Active'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {isArchived 
+                            ? 'This workspace is archived and hidden from active lists'
+                            : 'This workspace is active and visible to team members'
+                          }
+                        </p>
+                      </div>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleArchiveWorkspace}
-                    >
-                      <Archive className="h-4 w-4 mr-1.5" />
-                      Archive
-                    </Button>
+                    {isArchived && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleRestoreWorkspace}
+                        className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-950"
+                      >
+                        <Archive className="h-4 w-4 mr-1.5" />
+                        Restore
+                      </Button>
+                    )}
                   </div>
+                </div>
+
+                {/* Danger Actions */}
+                <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
+                  <h2 className="text-lg font-semibold text-destructive mb-2">Danger Zone</h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    These actions are irreversible. Please proceed with caution.
+                  </p>
                   
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/30 bg-card">
-                    <div>
-                      <p className="font-medium text-destructive">Delete Workspace</p>
-                      <p className="text-sm text-muted-foreground">
-                        Permanently delete this workspace and all its data
-                      </p>
-                    </div>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="h-4 w-4 mr-1.5" />
-                          Delete
+                  <div className="space-y-4">
+                    {!isArchived && (
+                      <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
+                        <div>
+                          <p className="font-medium text-foreground">Archive Workspace</p>
+                          <p className="text-sm text-muted-foreground">
+                            Archive this workspace and hide it from the list
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleArchiveWorkspace}
+                        >
+                          <Archive className="h-4 w-4 mr-1.5" />
+                          Archive
                         </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Workspace</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{workspace.name}"? This action cannot be undone. 
-                            All tasks, team members, settings, and associated data will be permanently removed.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleDeleteWorkspace}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Delete Workspace
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/30 bg-card">
+                      <div>
+                        <p className="font-medium text-destructive">Delete Workspace</p>
+                        <p className="text-sm text-muted-foreground">
+                          Permanently delete this workspace and all its data
+                        </p>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm">
+                            <Trash2 className="h-4 w-4 mr-1.5" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Workspace</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{workspace.name}"? This action cannot be undone. 
+                              All tasks, team members, settings, and associated data will be permanently removed.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteWorkspace}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Workspace
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
               </div>
