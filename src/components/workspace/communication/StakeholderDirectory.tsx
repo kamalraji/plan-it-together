@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Mail, Phone, Building2, Star, MoreHorizontal } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownTrigger,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+} from '@/components/ui/simple-dropdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -144,25 +144,23 @@ export function StakeholderDirectory() {
                       </Badge>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                  <SimpleDropdown>
+                    <SimpleDropdownTrigger className="inline-flex items-center justify-center rounded-md h-8 w-8 shrink-0 hover:bg-accent hover:text-accent-foreground">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </SimpleDropdownTrigger>
+                    <SimpleDropdownContent align="end">
+                      <SimpleDropdownItem>
                         <Mail className="h-4 w-4 mr-2" />
                         Send Email
-                      </DropdownMenuItem>
+                      </SimpleDropdownItem>
                       {stakeholder.phone && (
-                        <DropdownMenuItem>
+                        <SimpleDropdownItem>
                           <Phone className="h-4 w-4 mr-2" />
                           Call
-                        </DropdownMenuItem>
+                        </SimpleDropdownItem>
                       )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </SimpleDropdownContent>
+                  </SimpleDropdown>
                 </div>
               );
             })}

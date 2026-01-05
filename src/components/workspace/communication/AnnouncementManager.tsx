@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Megaphone, Clock, CheckCircle2, Send, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownTrigger,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+} from '@/components/ui/simple-dropdown';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Announcement {
@@ -116,23 +116,21 @@ export function AnnouncementManager() {
                     <Badge variant="outline" className={`text-xs ${config.bgColor} ${config.color} border-0`}>
                       {config.label}
                     </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                    <SimpleDropdown>
+                      <SimpleDropdownTrigger className="inline-flex items-center justify-center rounded-md h-8 w-8 hover:bg-accent hover:text-accent-foreground">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </SimpleDropdownTrigger>
+                      <SimpleDropdownContent align="end">
+                        <SimpleDropdownItem>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        </SimpleDropdownItem>
+                        <SimpleDropdownItem className="text-destructive">
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </SimpleDropdownItem>
+                      </SimpleDropdownContent>
+                    </SimpleDropdown>
                   </div>
                 </div>
               );

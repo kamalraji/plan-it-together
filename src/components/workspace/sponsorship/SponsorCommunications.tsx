@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Mail, Phone, Calendar, MoreHorizontal, Reply, ArrowUpRight } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  SimpleDropdown,
+  SimpleDropdownTrigger,
+  SimpleDropdownContent,
+  SimpleDropdownItem,
+} from '@/components/ui/simple-dropdown';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Communication {
@@ -140,23 +140,21 @@ export function SponsorCommunications() {
                       </p>
                     )}
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                  <SimpleDropdown>
+                    <SimpleDropdownTrigger className="inline-flex items-center justify-center rounded-md h-8 w-8 shrink-0 hover:bg-accent hover:text-accent-foreground">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </SimpleDropdownTrigger>
+                    <SimpleDropdownContent align="end">
+                      <SimpleDropdownItem>
                         <Reply className="h-4 w-4 mr-2" />
                         Reply
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      </SimpleDropdownItem>
+                      <SimpleDropdownItem>
                         <ArrowUpRight className="h-4 w-4 mr-2" />
                         Open
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      </SimpleDropdownItem>
+                    </SimpleDropdownContent>
+                  </SimpleDropdown>
                 </div>
               );
             })}
