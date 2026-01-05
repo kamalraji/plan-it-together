@@ -3,10 +3,11 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { CheckIcon, UsersIcon, ClipboardDocumentListIcon, CalendarDaysIcon, FolderIcon, EyeIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, UsersIcon, ClipboardDocumentListIcon, CalendarDaysIcon, FolderIcon, EyeIcon, AdjustmentsHorizontalIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { ENHANCED_WORKSPACE_TEMPLATES, EnhancedWorkspaceTemplate, COMMITTEE_DEFINITIONS } from '@/lib/workspaceTemplates';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 import { TemplateCustomizationModal } from './TemplateCustomizationModal';
+import { CustomTemplateBuilder } from './CustomTemplateBuilder';
 
 interface WorkspaceTemplateSelectorProps {
   selectedTemplate: EnhancedWorkspaceTemplate;
@@ -23,9 +24,10 @@ export function WorkspaceTemplateSelector({
   isApplying = false,
   showCustomization = true,
 }: WorkspaceTemplateSelectorProps) {
-  const [activeTab, setActiveTab] = useState<'SIMPLE' | 'MODERATE' | 'COMPLEX'>('SIMPLE');
+  const [activeTab, setActiveTab] = useState<'CUSTOM' | 'SIMPLE' | 'MODERATE' | 'COMPLEX'>('CUSTOM');
   const [previewTemplate, setPreviewTemplate] = useState<EnhancedWorkspaceTemplate | null>(null);
   const [customizeTemplate, setCustomizeTemplate] = useState<EnhancedWorkspaceTemplate | null>(null);
+  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
@@ -68,7 +70,11 @@ export function WorkspaceTemplateSelector({
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="CUSTOM" className="text-xs sm:text-sm">
+            <PlusCircleIcon className="h-3.5 w-3.5 mr-1 hidden sm:block" />
+            <span>Custom</span>
+          </TabsTrigger>
           <TabsTrigger value="SIMPLE" className="text-xs sm:text-sm">
             <span className="hidden sm:inline">Simple</span>
             <span className="sm:hidden">Simple</span>
@@ -91,6 +97,23 @@ export function WorkspaceTemplateSelector({
             </Badge>
           </TabsTrigger>
         </TabsList>
+
+        {/* Custom Template Tab */}
+        <TabsContent value="CUSTOM" className="mt-4">
+          <div className="flex flex-col items-center justify-center py-8 px-4 border-2 border-dashed border-border rounded-xl bg-muted/30">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <PlusCircleIcon className="h-7 w-7 text-primary" />
+            </div>
+            <h3 className="text-base font-semibold mb-1">Build Your Own Template</h3>
+            <p className="text-sm text-muted-foreground text-center max-w-md mb-4">
+              Create a custom workspace hierarchy by selecting departments, committees, and teams that fit your event's needs.
+            </p>
+            <Button onClick={() => setShowCustomBuilder(true)}>
+              <PlusCircleIcon className="h-4 w-4 mr-2" />
+              Start Building
+            </Button>
+          </div>
+        </TabsContent>
 
         {(['SIMPLE', 'MODERATE', 'COMPLEX'] as const).map((complexity) => (
           <TabsContent key={complexity} value={complexity} className="mt-4">
@@ -348,6 +371,16 @@ export function WorkspaceTemplateSelector({
           isApplying={isApplying}
         />
       )}
+
+      {/* Custom Template Builder */}
+      <CustomTemplateBuilder
+        open={showCustomBuilder}
+        onOpenChange={setShowCustomBuilder}
+        onApply={(template) => {
+          onSelectTemplate(template);
+          setShowCustomBuilder(false);
+        }}
+      />
     </div>
   );
 }
