@@ -20,6 +20,7 @@ import { RegistrationDashboard } from '../registration';
 import { TechnicalDashboard } from '../technical';
 import { ITDashboard } from '../it';
 import { ContentDashboard } from '../content';
+import { SpeakerLiaisonDashboard } from '../speaker-liaison';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -80,6 +81,12 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes('social media') ||
     workspace.name.toLowerCase().includes('communications') ||
     workspace.name.toLowerCase().includes('media');
+
+  // Check if this is a speaker liaison committee
+  const isSpeakerLiaisonCommittee = committeeType === 'speaker liaison' ||
+    workspace.name.toLowerCase().includes('speaker') ||
+    workspace.name.toLowerCase().includes('presenter') ||
+    workspace.name.toLowerCase().includes('panelist');
 
   if (isVolunteersCommittee) {
     return (
@@ -159,6 +166,21 @@ export function CommitteeDashboard({
   if (isContentCommittee) {
     return (
       <ContentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isSpeakerLiaisonCommittee) {
+    return (
+      <SpeakerLiaisonDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
