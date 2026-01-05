@@ -136,9 +136,26 @@ export function useWorkspaceBudget(workspaceId: string | undefined) {
     },
   });
 
+  // Get pending requests for this workspace (as approver)
+  const pendingRequestsQuery = useQuery({
+    queryKey: ['budget-pending-requests', workspaceId],
+    queryFn: async () => {
+      if (!workspaceId) return [];
+      const { data, error } = await supabase
+        .from('workspace_budget_requests')
+        .select('*')
+        .eq('target_workspace_id', workspaceId)
+        .eq('status', 'pending');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!workspaceId,
+  });
+
   return {
     budget: budgetQuery.data,
     categories: categoriesQuery.data ?? [],
+    pendingRequests: pendingRequestsQuery.data ?? [],
     isLoading: budgetQuery.isLoading,
     createBudget: createBudgetMutation.mutate,
     updateBudget: updateBudgetMutation.mutate,
