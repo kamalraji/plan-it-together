@@ -25,6 +25,7 @@ import { JudgeDashboard } from '../judge';
 import { MediaDashboard } from '../media';
 import { EventDashboard } from '../event';
 import { CateringDashboard } from '../catering';
+import { LogisticsDashboard } from '../logistics';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -122,6 +123,12 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes('catering') ||
     workspace.name.toLowerCase().includes('food') ||
     workspace.name.toLowerCase().includes('beverage');
+
+  // Check if this is a logistics committee
+  const isLogisticsCommittee = committeeType === 'logistics' ||
+    workspace.name.toLowerCase().includes('logistics') ||
+    workspace.name.toLowerCase().includes('transport') ||
+    workspace.name.toLowerCase().includes('shipping');
 
   if (isVolunteersCommittee) {
     return (
@@ -276,6 +283,21 @@ export function CommitteeDashboard({
   if (isCateringCommittee) {
     return (
       <CateringDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isLogisticsCommittee) {
+    return (
+      <LogisticsDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
