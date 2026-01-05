@@ -1,11 +1,23 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Folder, FolderOpen, Users, Building2, Layers } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, FolderOpen, Users, Building2, Layers, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { MAX_WORKSPACE_DEPTH, getWorkspaceTypeLabel } from '@/lib/workspaceHierarchy';
-import { WorkspaceType } from '@/types';
+import { 
+  MAX_WORKSPACE_DEPTH, 
+  getWorkspaceTypeLabel,
+  getWorkspaceRoleLabel,
+  WORKSPACE_DEPARTMENTS,
+  DEPARTMENT_COMMITTEES,
+} from '@/lib/workspaceHierarchy';
+import { WorkspaceType, WorkspaceRole } from '@/types';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface WorkspaceNode {
   id: string;
@@ -210,11 +222,64 @@ export function WorkspaceHierarchyTree({
     }
   };
 
+  // Get the responsible role for a workspace node
+  const getNodeResponsibleRole = (node: WorkspaceNode): WorkspaceRole | null => {
+    if (!node.workspaceType) return null;
+
+    // For ROOT, always return WORKSPACE_OWNER
+    if (node.workspaceType === WorkspaceType.ROOT) {
+      return WorkspaceRole.WORKSPACE_OWNER;
+    }
+
+    // For DEPARTMENT, find the manager role based on department_id
+    if (node.workspaceType === WorkspaceType.DEPARTMENT && node.departmentId) {
+      const dept = WORKSPACE_DEPARTMENTS.find(d => d.id === node.departmentId);
+      return dept?.managerRole || null;
+    }
+
+    // For COMMITTEE, we need to derive the committee ID from the name
+    if (node.workspaceType === WorkspaceType.COMMITTEE && node.departmentId) {
+      const committees = DEPARTMENT_COMMITTEES[node.departmentId];
+      // Try to match by name (case-insensitive)
+      const committee = committees?.find(
+        c => c.name.toLowerCase() === node.name.toLowerCase()
+      );
+      return committee?.leadRole || null;
+    }
+
+    // For TEAM, return coordinator role based on parent committee
+    if (node.workspaceType === WorkspaceType.TEAM && node.departmentId) {
+      const committees = DEPARTMENT_COMMITTEES[node.departmentId];
+      // For teams, we'd need parent context - return first coordinator as fallback
+      if (committees && committees.length > 0) {
+        return committees[0].coordinatorRole;
+      }
+    }
+
+    return null;
+  };
+
+  const getRoleBadgeStyle = (level: number): string => {
+    switch (level) {
+      case 1:
+        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+      case 2:
+        return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300';
+      case 3:
+        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
+      case 4:
+        return 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
   const renderNode = (node: WorkspaceNode) => {
     const isExpanded = expandedNodes.has(node.id);
     const isCurrent = node.id === currentWorkspaceId;
     const hasChildren = node.children.length > 0;
     const TypeIcon = getTypeIcon(node);
+    const responsibleRole = getNodeResponsibleRole(node);
 
     return (
       <div key={node.id} className="select-none">
@@ -253,7 +318,7 @@ export function WorkspaceHierarchyTree({
             <TypeIcon className={cn('h-4 w-4', getLevelColor(node))} />
           )}
 
-          {/* Name and Level Badge */}
+          {/* Name and Badges */}
           <div className="flex-1 flex items-center gap-2 min-w-0">
             <span
               className={cn(
@@ -263,14 +328,43 @@ export function WorkspaceHierarchyTree({
             >
               {node.name}
             </span>
+            
+            {/* Level Badge */}
             <span
               className={cn(
-                'text-[10px] px-1.5 py-0.5 rounded-full font-medium uppercase tracking-wide',
+                'text-[10px] px-1.5 py-0.5 rounded-full font-medium uppercase tracking-wide shrink-0',
                 getLevelBadgeStyle(node),
               )}
             >
               {getLevelLabel(node)}
             </span>
+
+            {/* Responsible Role Badge */}
+            {responsibleRole && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className={cn(
+                        'text-[9px] px-1.5 py-0.5 rounded-full font-medium tracking-wide shrink-0 flex items-center gap-1',
+                        getRoleBadgeStyle(node.depth),
+                      )}
+                    >
+                      <Shield className="h-2.5 w-2.5" />
+                      <span className="hidden sm:inline">
+                        {getWorkspaceRoleLabel(responsibleRole).split(' ').slice(-1)[0]}
+                      </span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p className="font-medium">{getWorkspaceRoleLabel(responsibleRole)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Responsible role for this {getLevelLabel(node).toLowerCase()}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
 
           {/* Children count */}
@@ -316,22 +410,44 @@ export function WorkspaceHierarchyTree({
   return (
     <div className="py-2">
       {/* Legend */}
-      <div className="px-3 pb-2 mb-2 border-b border-border flex flex-wrap gap-3 text-[10px]">
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <span className="text-muted-foreground">L1 Root</span>
+      <div className="px-3 pb-2 mb-2 border-b border-border">
+        <div className="flex flex-wrap gap-3 text-[10px] mb-2">
+          <span className="text-muted-foreground font-medium">Levels:</span>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">L1 Root</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="text-muted-foreground">L2 Department</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-muted-foreground">L3 Committee</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-muted-foreground">L4 Team</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-blue-500" />
-          <span className="text-muted-foreground">L2 Department</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-amber-500" />
-          <span className="text-muted-foreground">L3 Committee</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-muted-foreground">L4 Team</span>
+        <div className="flex flex-wrap gap-3 text-[10px]">
+          <span className="text-muted-foreground font-medium">Roles:</span>
+          <div className="flex items-center gap-1">
+            <Shield className="h-2.5 w-2.5 text-purple-500" />
+            <span className="text-muted-foreground">Owner</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Shield className="h-2.5 w-2.5 text-indigo-500" />
+            <span className="text-muted-foreground">Manager</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Shield className="h-2.5 w-2.5 text-orange-500" />
+            <span className="text-muted-foreground">Lead</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Shield className="h-2.5 w-2.5 text-teal-500" />
+            <span className="text-muted-foreground">Coordinator</span>
+          </div>
         </div>
       </div>
 

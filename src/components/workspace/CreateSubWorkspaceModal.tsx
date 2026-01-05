@@ -21,14 +21,16 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { WorkspaceType } from '@/types';
+import { WorkspaceType, WorkspaceRole } from '@/types';
 import {
   MAX_WORKSPACE_DEPTH,
   getWorkspaceTypeLabel,
   getCreationOptions,
   canHaveChildren,
+  getResponsibleRoleForWorkspace,
+  getWorkspaceRoleLabel,
 } from '@/lib/workspaceHierarchy';
-import { AlertTriangle, Building2, Users, Layers } from 'lucide-react';
+import { AlertTriangle, Building2, Users, Layers, Shield } from 'lucide-react';
 
 interface CreateSubWorkspaceModalProps {
   open: boolean;
@@ -110,6 +112,21 @@ export function CreateSubWorkspaceModal({
     return parentWorkspace?.department_id || null;
   };
 
+  // Get the responsible role for the workspace being created
+  const responsibleRole = useMemo((): WorkspaceRole | null => {
+    if (!nextType) return null;
+    
+    const departmentId = nextType === WorkspaceType.DEPARTMENT 
+      ? selectedOption 
+      : parentWorkspace?.department_id || undefined;
+    
+    const committeeId = nextType === WorkspaceType.COMMITTEE 
+      ? selectedOption 
+      : undefined;
+    
+    return getResponsibleRoleForWorkspace(nextType, departmentId, committeeId);
+  }, [nextType, selectedOption, parentWorkspace?.department_id]);
+
   const createSubWorkspaceMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('Must be authenticated');
@@ -118,7 +135,8 @@ export function CreateSubWorkspaceModal({
       const name = getFinalName();
       if (!name.trim()) throw new Error('Name is required');
 
-      const { data, error } = await supabase
+      // Step 1: Create the workspace
+      const { data: workspace, error: wsError } = await supabase
         .from('workspaces')
         .insert({
           name: name.trim(),
@@ -132,18 +150,41 @@ export function CreateSubWorkspaceModal({
         .select('id, name')
         .single();
 
-      if (error) throw error;
-      return data;
+      if (wsError) throw wsError;
+
+      // Step 2: Auto-assign the creator with the responsible role
+      if (responsibleRole) {
+        const { error: memberError } = await supabase
+          .from('workspace_team_members')
+          .insert({
+            workspace_id: workspace.id,
+            user_id: user.id,
+            role: responsibleRole,
+            status: 'active',
+          });
+
+        if (memberError) {
+          console.error('Failed to auto-assign role:', memberError);
+          // Don't fail the whole operation if role assignment fails
+        }
+      }
+
+      return { ...workspace, assignedRole: responsibleRole };
     },
     onSuccess: (data) => {
+      const roleMessage = data.assignedRole 
+        ? ` You've been assigned as ${getWorkspaceRoleLabel(data.assignedRole)}.`
+        : '';
+      
       toast({
         title: `${getWorkspaceTypeLabel(nextType || undefined)} created`,
-        description: `"${data.name}" has been created successfully.`,
+        description: `"${data.name}" has been created successfully.${roleMessage}`,
       });
       queryClient.invalidateQueries({ queryKey: ['event-workspaces', eventId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-hierarchy', eventId] });
       queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
       queryClient.invalidateQueries({ queryKey: ['workspace', parentWorkspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-team-members'] });
       onOpenChange(false);
       resetForm();
     },
@@ -289,6 +330,21 @@ export function CreateSubWorkspaceModal({
             ) : (
               <div className="text-center py-4 text-muted-foreground">
                 No options available for this level.
+              </div>
+            )}
+
+            {/* Role assignment preview */}
+            {responsibleRole && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <Shield className="h-4 w-4 text-primary" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    You'll be assigned as: {getWorkspaceRoleLabel(responsibleRole)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    As the creator, you'll automatically receive the responsible role for this {getWorkspaceTypeLabel(nextType || undefined).toLowerCase()}.
+                  </p>
+                </div>
               </div>
             )}
 
