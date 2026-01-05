@@ -107,32 +107,51 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
               <RootDashboard 
                 workspace={workspace} 
                 orgSlug={orgSlug}
-                onViewTasks={actions.handleViewTasks} 
+                userRole={permissions.currentMember?.role as WorkspaceRole}
+                onViewTasks={actions.handleViewTasks}
+                onDelegateRole={() => actions.setActiveTab('role-management')}
+                onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
+                onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
               />
             ) : workspace.workspaceType === WorkspaceType.DEPARTMENT ? (
               <DepartmentDashboard 
                 workspace={workspace} 
                 orgSlug={orgSlug}
-                onViewTasks={actions.handleViewTasks} 
+                userRole={permissions.currentMember?.role as WorkspaceRole}
+                onViewTasks={actions.handleViewTasks}
+                onDelegateRole={() => actions.setActiveTab('role-management')}
+                onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
               />
             ) : workspace.workspaceType === WorkspaceType.COMMITTEE ? (
               <CommitteeDashboard 
                 workspace={workspace} 
                 orgSlug={orgSlug}
-                onViewTasks={actions.handleViewTasks} 
+                userRole={permissions.currentMember?.role as WorkspaceRole}
+                onViewTasks={actions.handleViewTasks}
+                onDelegateRole={() => actions.setActiveTab('role-management')}
+                onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
+                onRequestBudget={() => {}}
+                onRequestResource={() => {}}
               />
             ) : workspace.workspaceType === WorkspaceType.TEAM ? (
               <TeamDashboard 
                 workspace={workspace} 
                 orgSlug={orgSlug}
-                onViewTasks={actions.handleViewTasks} 
+                userRole={permissions.currentMember?.role as WorkspaceRole}
+                onViewTasks={actions.handleViewTasks}
+                onLogHours={() => {}}
+                onSubmitForApproval={() => {}}
               />
             ) : (
               /* Fallback for legacy workspaces without workspace_type */
               <RootDashboard 
                 workspace={workspace} 
                 orgSlug={orgSlug}
-                onViewTasks={actions.handleViewTasks} 
+                userRole={permissions.currentMember?.role as WorkspaceRole}
+                onViewTasks={actions.handleViewTasks}
+                onDelegateRole={() => actions.setActiveTab('role-management')}
+                onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
+                onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
               />
             )}
           </>

@@ -1,9 +1,10 @@
-import { Workspace } from '@/types';
+import { Workspace, WorkspaceRole } from '@/types';
 import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { HierarchyTreeCard } from '../HierarchyTreeCard';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { Progress } from '@/components/ui/progress';
 import { 
   Crown, 
@@ -23,10 +24,22 @@ import { formatDistanceToNow } from 'date-fns';
 interface RootDashboardProps {
   workspace: Workspace;
   orgSlug?: string;
+  userRole?: WorkspaceRole | null;
   onViewTasks?: () => void;
+  onDelegateRole?: () => void;
+  onInviteMember?: () => void;
+  onManageSettings?: () => void;
 }
 
-export function RootDashboard({ workspace, orgSlug, onViewTasks }: RootDashboardProps) {
+export function RootDashboard({ 
+  workspace, 
+  orgSlug, 
+  userRole,
+  onViewTasks,
+  onDelegateRole,
+  onInviteMember,
+  onManageSettings,
+}: RootDashboardProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRootDashboard(workspace.eventId);
 
@@ -132,6 +145,16 @@ export function RootDashboard({ workspace, orgSlug, onViewTasks }: RootDashboard
           <p className="text-xs text-muted-foreground">utilized</p>
         </div>
       </div>
+
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onManageSettings={onManageSettings}
+        onViewReport={() => navigate(`/${orgSlug}/analytics`)}
+      />
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

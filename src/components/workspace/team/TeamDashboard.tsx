@@ -1,7 +1,8 @@
-import { Workspace } from '@/types';
+import { Workspace, WorkspaceRole } from '@/types';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { useTeamWorkload, usePersonalProgress } from '@/hooks/useTeamDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Progress } from '@/components/ui/progress';
@@ -14,16 +15,35 @@ import { WorkloadReport } from './WorkloadReport';
 interface TeamDashboardProps {
   workspace: Workspace;
   orgSlug?: string;
+  userRole?: WorkspaceRole | null;
   onViewTasks: () => void;
+  onLogHours?: () => void;
+  onSubmitForApproval?: () => void;
 }
 
-export function TeamDashboard({ workspace, orgSlug, onViewTasks }: TeamDashboardProps) {
+export function TeamDashboard({ 
+  workspace, 
+  orgSlug, 
+  userRole,
+  onViewTasks,
+  onLogHours,
+  onSubmitForApproval,
+}: TeamDashboardProps) {
   const { user } = useAuth();
   const { workload, isLoading: isWorkloadLoading } = useTeamWorkload(workspace.id);
   const { progress, isLoading: isProgressLoading } = usePersonalProgress(workspace.id, user?.id);
 
   return (
     <div className="space-y-6">
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onLogHours={onLogHours}
+        onSubmitForApproval={onSubmitForApproval}
+        onCreateTask={onViewTasks}
+      />
+
       {/* Mini-Map - Shows position in hierarchy */}
       <WorkspaceHierarchyMiniMap
         workspaceId={workspace.id}

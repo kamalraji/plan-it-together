@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace } from '@/types';
+import { Workspace, WorkspaceRole } from '@/types';
 import { MilestoneTimeline } from './MilestoneTimeline';
 import { GoalTracker } from './GoalTracker';
 import { CommitteeChecklist } from './CommitteeChecklist';
@@ -11,16 +11,31 @@ import { ResourceRequestsList } from './ResourceRequestsList';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
   orgSlug?: string;
+  userRole?: WorkspaceRole | null;
   onViewTasks: () => void;
+  onDelegateRole?: () => void;
+  onInviteMember?: () => void;
+  onRequestBudget?: () => void;
+  onRequestResource?: () => void;
 }
 
-export function CommitteeDashboard({ workspace, orgSlug, onViewTasks }: CommitteeDashboardProps) {
+export function CommitteeDashboard({ 
+  workspace, 
+  orgSlug, 
+  userRole,
+  onViewTasks,
+  onDelegateRole,
+  onInviteMember,
+  onRequestBudget,
+  onRequestResource,
+}: CommitteeDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
 
   // Extract committee type from workspace name
@@ -81,6 +96,16 @@ export function CommitteeDashboard({ workspace, orgSlug, onViewTasks }: Committe
         tasksCompleted={tasksCompleted}
         tasksTotal={tasks.length}
         teamsCount={teams.length}
+      />
+
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
       />
 
       {/* Task Summary with Mini-Map */}

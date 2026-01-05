@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace, WorkspaceType, WorkspaceStatus } from '@/types';
+import { Workspace, WorkspaceType, WorkspaceStatus, WorkspaceRole } from '@/types';
 import { BudgetTrackerConnected } from './BudgetTrackerConnected';
 import { ResourceManager } from './ResourceManager';
 import { ResourceApprovalPanel } from './ResourceApprovalPanel';
@@ -9,6 +9,7 @@ import { DepartmentKPICard } from './DepartmentKPICard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
@@ -17,10 +18,20 @@ import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 interface DepartmentDashboardProps {
   workspace: Workspace;
   orgSlug?: string;
+  userRole?: WorkspaceRole | null;
   onViewTasks?: () => void;
+  onDelegateRole?: () => void;
+  onInviteMember?: () => void;
 }
 
-export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: DepartmentDashboardProps) {
+export function DepartmentDashboard({ 
+  workspace, 
+  orgSlug, 
+  userRole,
+  onViewTasks,
+  onDelegateRole,
+  onInviteMember,
+}: DepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
 
@@ -96,6 +107,15 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
           </div>
         </div>
       </div>
+
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onViewReport={() => {}}
+      />
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
