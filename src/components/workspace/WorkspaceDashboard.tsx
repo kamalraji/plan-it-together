@@ -16,6 +16,7 @@ import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
 import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
 import { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
+import { HierarchyTreeCard } from './HierarchyTreeCard';
 import { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 import { DepartmentDashboard } from './department';
 import { CommitteeDashboard } from './committee';
@@ -145,12 +146,26 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
                 <TaskSummaryCards workspace={workspace} onViewTasks={actions.handleViewTasks} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 items-start">
-                  {workspace.eventId && (
-                    <WorkspaceHierarchyStats eventId={workspace.eventId} />
-                  )}
-                  <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
-                  <WorkspaceHealthMetrics workspace={workspace} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
+                  {/* Left column: Hierarchy Tree + Stats */}
+                  <div className="lg:col-span-1 space-y-4">
+                    {workspace.eventId && (
+                      <HierarchyTreeCard
+                        eventId={workspace.eventId}
+                        currentWorkspaceId={workspace.id}
+                        onWorkspaceSelect={(id) => actions.handleWorkspaceSwitch(id)}
+                      />
+                    )}
+                    {workspace.eventId && (
+                      <WorkspaceHierarchyStats eventId={workspace.eventId} />
+                    )}
+                  </div>
+                  
+                  {/* Right column: Team + Health */}
+                  <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+                    <WorkspaceHealthMetrics workspace={workspace} />
+                  </div>
                 </div>
               </div>
             )}

@@ -1,20 +1,27 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { CheckIcon, UsersIcon, ClipboardDocumentListIcon, CalendarDaysIcon, FolderIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, UsersIcon, ClipboardDocumentListIcon, CalendarDaysIcon, FolderIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { ENHANCED_WORKSPACE_TEMPLATES, EnhancedWorkspaceTemplate, COMMITTEE_DEFINITIONS } from '@/lib/workspaceTemplates';
+import { TemplatePreviewModal } from './TemplatePreviewModal';
 
 interface WorkspaceTemplateSelectorProps {
   selectedTemplate: EnhancedWorkspaceTemplate;
   onSelectTemplate: (template: EnhancedWorkspaceTemplate) => void;
+  onApplyTemplate?: (template: EnhancedWorkspaceTemplate) => void;
+  isApplying?: boolean;
 }
 
 export function WorkspaceTemplateSelector({
   selectedTemplate,
   onSelectTemplate,
+  onApplyTemplate,
+  isApplying = false,
 }: WorkspaceTemplateSelectorProps) {
   const [activeTab, setActiveTab] = useState<'SIMPLE' | 'MODERATE' | 'COMPLEX'>('SIMPLE');
+  const [previewTemplate, setPreviewTemplate] = useState<EnhancedWorkspaceTemplate | null>(null);
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
@@ -187,14 +194,29 @@ export function WorkspaceTemplateSelector({
         ))}
       </Tabs>
 
-      {/* Template Preview */}
+      {/* Template Preview Summary with View Full Details button */}
       {selectedTemplate.id !== 'blank' && (
         <div className="rounded-lg border border-border/70 bg-muted/30 p-4 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium text-foreground">What You'll Get</h4>
-            <Badge variant="outline" className={cn("text-xs", getComplexityColor(selectedTemplate.complexity))}>
-              {selectedTemplate.complexity}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={cn("text-xs", getComplexityColor(selectedTemplate.complexity))}>
+                {selectedTemplate.complexity}
+              </Badge>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPreviewTemplate(selectedTemplate);
+                }}
+              >
+                <EyeIcon className="h-3.5 w-3.5 mr-1" />
+                Full Preview
+              </Button>
+            </div>
           </div>
 
           {/* Departments & Committees */}
@@ -279,6 +301,20 @@ export function WorkspaceTemplateSelector({
           </div>
         </div>
       )}
+
+      {/* Template Preview Modal */}
+      <TemplatePreviewModal
+        template={previewTemplate}
+        open={!!previewTemplate}
+        onOpenChange={(open) => !open && setPreviewTemplate(null)}
+        onApplyTemplate={(template) => {
+          if (onApplyTemplate) {
+            onApplyTemplate(template);
+          }
+          setPreviewTemplate(null);
+        }}
+        isApplying={isApplying}
+      />
     </div>
   );
 }
