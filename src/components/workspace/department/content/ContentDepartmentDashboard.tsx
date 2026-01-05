@@ -22,6 +22,8 @@ import { ContentQuickActions } from './ContentQuickActions';
 import { CreateContentItemModal } from './CreateContentItemModal';
 import { AssignJudgeModal } from './AssignJudgeModal';
 import { EnterScoreModal } from './EnterScoreModal';
+import { UploadMediaAssetModal } from './UploadMediaAssetModal';
+import { RegisterSpeakerModal } from './RegisterSpeakerModal';
 
 interface ContentDepartmentDashboardProps {
   workspace: Workspace;
@@ -47,6 +49,8 @@ export function ContentDepartmentDashboard({
   const [createContentOpen, setCreateContentOpen] = useState(false);
   const [assignJudgeOpen, setAssignJudgeOpen] = useState(false);
   const [enterScoreOpen, setEnterScoreOpen] = useState(false);
+  const [uploadMediaOpen, setUploadMediaOpen] = useState(false);
+  const [registerSpeakerOpen, setRegisterSpeakerOpen] = useState(false);
 
   // Fetch child committees for this department
   const { data: committees = [] } = useQuery({
@@ -91,6 +95,12 @@ export function ContentDepartmentDashboard({
         break;
       case 'enter-score':
         setEnterScoreOpen(true);
+        break;
+      case 'upload-media':
+        setUploadMediaOpen(true);
+        break;
+      case 'add-speaker':
+        setRegisterSpeakerOpen(true);
         break;
       default:
         console.log('Quick action:', actionId);
@@ -209,6 +219,16 @@ export function ContentDepartmentDashboard({
         open={enterScoreOpen}
         onOpenChange={setEnterScoreOpen}
         eventId={workspace.eventId}
+      />
+      <UploadMediaAssetModal
+        open={uploadMediaOpen}
+        onOpenChange={setUploadMediaOpen}
+        workspaceId={workspace.id}
+      />
+      <RegisterSpeakerModal
+        open={registerSpeakerOpen}
+        onOpenChange={setRegisterSpeakerOpen}
+        workspaceId={workspace.id}
       />
     </div>
   );
