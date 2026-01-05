@@ -22,6 +22,7 @@ import { ITDashboard } from '../it';
 import { ContentDashboard } from '../content';
 import { SpeakerLiaisonDashboard } from '../speaker-liaison';
 import { JudgeDashboard } from '../judge';
+import { MediaDashboard } from '../media';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -76,12 +77,22 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().startsWith('it ') ||
     workspace.name.toLowerCase().endsWith(' it');
 
-  // Check if this is a content/social media committee
+  // Check if this is a content/social media committee (but NOT photography/videography media)
   const isContentCommittee = committeeType === 'content' ||
     workspace.name.toLowerCase().includes('content') ||
     workspace.name.toLowerCase().includes('social media') ||
-    workspace.name.toLowerCase().includes('communications') ||
-    workspace.name.toLowerCase().includes('media');
+    workspace.name.toLowerCase().includes('communications');
+
+  // Check if this is a media/photography/video committee
+  const isMediaCommittee = committeeType === 'media' ||
+    committeeType === 'photography' ||
+    committeeType === 'videography' ||
+    workspace.name.toLowerCase().includes('photography') ||
+    workspace.name.toLowerCase().includes('videography') ||
+    workspace.name.toLowerCase().includes('photo') ||
+    workspace.name.toLowerCase().includes('video') ||
+    (workspace.name.toLowerCase().includes('media') && 
+      !workspace.name.toLowerCase().includes('social media'));
 
   // Check if this is a speaker liaison committee
   const isSpeakerLiaisonCommittee = committeeType === 'speaker liaison' ||
@@ -204,6 +215,21 @@ export function CommitteeDashboard({
   if (isJudgeCommittee) {
     return (
       <JudgeDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isMediaCommittee) {
+    return (
+      <MediaDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
