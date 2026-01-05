@@ -16,6 +16,7 @@ import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { TechDepartmentDashboard } from './tech';
 import { FinanceDepartmentDashboard } from './finance';
+import { ContentDepartmentDashboard } from './content';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -52,6 +53,12 @@ export function DepartmentDashboard({
     departmentType.includes('budget') ||
     departmentType.includes('treasury');
 
+  // Check if this is a content department - render specialized dashboard
+  const isContentDepartment = departmentType.includes('content') || 
+    departmentType.includes('editorial') ||
+    departmentType.includes('programming') ||
+    departmentType.includes('creative');
+
   if (isTechDepartment) {
     return (
       <TechDepartmentDashboard
@@ -68,6 +75,19 @@ export function DepartmentDashboard({
   if (isFinanceDepartment) {
     return (
       <FinanceDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+      />
+    );
+  }
+
+  if (isContentDepartment) {
+    return (
+      <ContentDepartmentDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
