@@ -21,6 +21,7 @@ import { TechnicalDashboard } from '../technical';
 import { ITDashboard } from '../it';
 import { ContentDashboard } from '../content';
 import { SpeakerLiaisonDashboard } from '../speaker-liaison';
+import { JudgeDashboard } from '../judge';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -87,6 +88,13 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes('speaker') ||
     workspace.name.toLowerCase().includes('presenter') ||
     workspace.name.toLowerCase().includes('panelist');
+
+  // Check if this is a judge/judging committee
+  const isJudgeCommittee = committeeType === 'judge' ||
+    committeeType === 'judging' ||
+    workspace.name.toLowerCase().includes('judge') ||
+    workspace.name.toLowerCase().includes('judging') ||
+    workspace.name.toLowerCase().includes('evaluation');
 
   if (isVolunteersCommittee) {
     return (
@@ -181,6 +189,21 @@ export function CommitteeDashboard({
   if (isSpeakerLiaisonCommittee) {
     return (
       <SpeakerLiaisonDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isJudgeCommittee) {
+    return (
+      <JudgeDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
