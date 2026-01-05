@@ -7,9 +7,11 @@ import { useJudgingStats } from '@/hooks/useJudgingData';
 
 interface JudgingOverviewConnectedProps {
   eventId?: string;
+  onAssignJudge?: () => void;
+  onEnterScore?: () => void;
 }
 
-export function JudgingOverviewConnected({ eventId }: JudgingOverviewConnectedProps) {
+export function JudgingOverviewConnected({ eventId, onAssignJudge, onEnterScore }: JudgingOverviewConnectedProps) {
   const { data: stats, isLoading, refetch, isFetching } = useJudgingStats(eventId);
 
   const evaluationProgress = stats && stats.totalSubmissions > 0
@@ -126,10 +128,16 @@ export function JudgingOverviewConnected({ eventId }: JudgingOverviewConnectedPr
 
             {/* Quick Actions */}
             <div className="flex gap-2">
-              <button className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-                View All Judges
+              <button 
+                onClick={onEnterScore}
+                className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              >
+                Enter Score
               </button>
-              <button className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors">
+              <button 
+                onClick={onAssignJudge}
+                className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+              >
                 Assign Submissions
               </button>
             </div>
