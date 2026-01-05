@@ -10,15 +10,17 @@ import { ResourceRequestForm } from './ResourceRequestForm';
 import { ResourceRequestsList } from './ResourceRequestsList';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
+import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
+  orgSlug?: string;
   onViewTasks: () => void;
 }
 
-export function CommitteeDashboard({ workspace, onViewTasks }: CommitteeDashboardProps) {
+export function CommitteeDashboard({ workspace, orgSlug, onViewTasks }: CommitteeDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
 
   // Extract committee type from workspace name
@@ -81,8 +83,19 @@ export function CommitteeDashboard({ workspace, onViewTasks }: CommitteeDashboar
         teamsCount={teams.length}
       />
 
-      {/* Task Summary */}
-      <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+      {/* Task Summary with Mini-Map */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-3">
+          <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+        </div>
+        <WorkspaceHierarchyMiniMap
+          workspaceId={workspace.id}
+          eventId={workspace.eventId}
+          orgSlug={orgSlug}
+          orientation="vertical"
+          showLabels={false}
+        />
+      </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -118,11 +118,13 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
             ) : workspace.workspaceType === WorkspaceType.COMMITTEE ? (
               <CommitteeDashboard 
                 workspace={workspace} 
+                orgSlug={orgSlug}
                 onViewTasks={actions.handleViewTasks} 
               />
             ) : workspace.workspaceType === WorkspaceType.TEAM ? (
               <TeamDashboard 
                 workspace={workspace} 
+                orgSlug={orgSlug}
                 onViewTasks={actions.handleViewTasks} 
               />
             ) : (

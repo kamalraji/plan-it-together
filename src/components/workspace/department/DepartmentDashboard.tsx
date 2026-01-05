@@ -8,6 +8,7 @@ import { CommitteeGrid } from './CommitteeOverviewCard';
 import { DepartmentKPICard } from './DepartmentKPICard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
+import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
@@ -99,14 +100,25 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
 
-      {/* KPIs & Budget Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DepartmentKPICard workspaceId={workspace.id} departmentId={workspace.departmentId} />
-        <BudgetTrackerConnected 
+      {/* Mini-Map & KPIs Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <WorkspaceHierarchyMiniMap
           workspaceId={workspace.id}
-          showBreakdown={true}
+          eventId={workspace.eventId}
+          orgSlug={orgSlug}
+          orientation="horizontal"
+          showLabels={false}
         />
+        <div className="lg:col-span-2">
+          <DepartmentKPICard workspaceId={workspace.id} departmentId={workspace.departmentId} />
+        </div>
       </div>
+
+      {/* Budget Section */}
+      <BudgetTrackerConnected 
+        workspaceId={workspace.id}
+        showBreakdown={true}
+      />
 
       {/* Resources Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

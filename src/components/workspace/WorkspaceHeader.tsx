@@ -2,6 +2,7 @@ import { Workspace, WorkspaceStatus, WorkspaceType } from '../../types';
 import { Layers, GitBranch, ArrowLeft, Calendar, Settings, ClipboardList, UserPlus, EllipsisVertical, Building2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
+import { WorkspaceBreadcrumbsMobile } from './WorkspaceBreadcrumbsMobile';
 import { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
 import { getCreateButtonLabel, canHaveChildren } from '@/lib/workspaceHierarchy';
 import {
@@ -117,7 +118,15 @@ export function WorkspaceHeader({
           {/* Top Navigation Row */}
           <div className="flex items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              {/* Breadcrumbs - hidden on very small screens */}
+              {/* Mobile Breadcrumbs - Collapsible dropdown */}
+              <div className="xs:hidden">
+                <WorkspaceBreadcrumbsMobile
+                  workspaceId={workspace.id}
+                  eventId={workspace.eventId}
+                  orgSlug={orgSlug}
+                />
+              </div>
+              {/* Desktop Breadcrumbs - Full path */}
               <div className="hidden xs:block min-w-0 flex-1">
                 <WorkspaceBreadcrumbs
                   workspaceId={workspace.id}

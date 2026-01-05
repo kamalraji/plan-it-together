@@ -3,6 +3,7 @@ import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { HierarchyTreeCard } from '../HierarchyTreeCard';
+import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { Progress } from '@/components/ui/progress';
 import { 
   Crown, 
@@ -274,6 +275,15 @@ export function RootDashboard({ workspace, orgSlug, onViewTasks }: RootDashboard
               <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
             )}
           </div>
+
+          {/* Mini-Map - Quick Position Indicator */}
+          <WorkspaceHierarchyMiniMap
+            workspaceId={workspace.id}
+            eventId={workspace.eventId}
+            orgSlug={orgSlug}
+            orientation="vertical"
+            showLabels={true}
+          />
 
           {/* Hierarchy Tree */}
           {workspace.eventId && (

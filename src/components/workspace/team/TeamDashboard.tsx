@@ -1,6 +1,7 @@
 import { Workspace } from '@/types';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
+import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { useTeamWorkload, usePersonalProgress } from '@/hooks/useTeamDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Progress } from '@/components/ui/progress';
@@ -12,16 +13,27 @@ import { WorkloadReport } from './WorkloadReport';
 
 interface TeamDashboardProps {
   workspace: Workspace;
+  orgSlug?: string;
   onViewTasks: () => void;
 }
 
-export function TeamDashboard({ workspace, onViewTasks }: TeamDashboardProps) {
+export function TeamDashboard({ workspace, orgSlug, onViewTasks }: TeamDashboardProps) {
   const { user } = useAuth();
   const { workload, isLoading: isWorkloadLoading } = useTeamWorkload(workspace.id);
   const { progress, isLoading: isProgressLoading } = usePersonalProgress(workspace.id, user?.id);
 
   return (
     <div className="space-y-6">
+      {/* Mini-Map - Shows position in hierarchy */}
+      <WorkspaceHierarchyMiniMap
+        workspaceId={workspace.id}
+        eventId={workspace.eventId}
+        orgSlug={orgSlug}
+        orientation="horizontal"
+        showLabels={true}
+        className="lg:hidden"
+      />
+      
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
