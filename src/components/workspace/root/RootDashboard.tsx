@@ -5,6 +5,7 @@ import { TeamMemberRoster } from '../TeamMemberRoster';
 import { HierarchyTreeCard } from '../HierarchyTreeCard';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { RoleBasedActions } from '../RoleBasedActions';
+import { ChildWorkspacesManager } from './ChildWorkspacesManager';
 import { Progress } from '@/components/ui/progress';
 import { 
   Crown, 
@@ -239,8 +240,15 @@ export function RootDashboard({
           </div>
         </div>
 
-        {/* Right Column: Activity & Milestones */}
+        {/* Right Column: Workspace Management, Activity & Milestones */}
         <div className="space-y-4">
+          {/* Child Workspaces Manager */}
+          <ChildWorkspacesManager
+            workspace={workspace}
+            orgSlug={orgSlug}
+            onWorkspaceSelect={handleDepartmentClick}
+          />
+
           {/* Upcoming Milestones */}
           <div className="bg-card rounded-xl border border-border p-4">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
