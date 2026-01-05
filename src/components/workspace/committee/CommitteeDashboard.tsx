@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Workspace } from '@/types';
 import { MilestoneTimeline } from './MilestoneTimeline';
 import { GoalTracker } from './GoalTracker';
 import { CommitteeChecklist } from './CommitteeChecklist';
+import { CommitteeHeaderCard } from './CommitteeHeaderCard';
 import { BudgetRequestForm } from './BudgetRequestForm';
 import { ResourceRequestForm } from './ResourceRequestForm';
 import { ResourceRequestsList } from './ResourceRequestsList';
@@ -24,8 +27,60 @@ export function CommitteeDashboard({ workspace, onViewTasks }: CommitteeDashboar
     .replace(/\s+committee$/i, '')
     .trim();
 
+  // Fetch team members count
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ['committee-team-members', workspace.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('id')
+        .eq('workspace_id', workspace.id)
+        .eq('status', 'ACTIVE');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch tasks for progress
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['committee-tasks', workspace.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .select('id, status')
+        .eq('workspace_id', workspace.id);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch child teams count
+  const { data: teams = [] } = useQuery({
+    queryKey: ['committee-teams', workspace.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('id')
+        .eq('parent_workspace_id', workspace.id)
+        .eq('workspace_type', 'TEAM');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const tasksCompleted = tasks.filter(t => t.status === 'DONE').length;
+
   return (
     <div className="space-y-6">
+      {/* Committee Header */}
+      <CommitteeHeaderCard
+        workspaceName={workspace.name}
+        memberCount={teamMembers.length}
+        tasksCompleted={tasksCompleted}
+        tasksTotal={tasks.length}
+        teamsCount={teams.length}
+      />
+
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
 
