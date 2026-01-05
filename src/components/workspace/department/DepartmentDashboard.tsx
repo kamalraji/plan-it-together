@@ -5,6 +5,7 @@ import { BudgetTrackerConnected } from './BudgetTrackerConnected';
 import { ResourceManager } from './ResourceManager';
 import { ResourceApprovalPanel } from './ResourceApprovalPanel';
 import { CommitteeGrid } from './CommitteeOverviewCard';
+import { DepartmentKPICard } from './DepartmentKPICard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { Building2, Users, LayoutGrid } from 'lucide-react';
@@ -98,13 +99,19 @@ export function DepartmentDashboard({ workspace, orgSlug, onViewTasks }: Departm
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
 
-      {/* Budget & Resources Row */}
+      {/* KPIs & Budget Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DepartmentKPICard workspaceId={workspace.id} departmentId={workspace.departmentId} />
         <BudgetTrackerConnected 
           workspaceId={workspace.id}
           showBreakdown={true}
         />
+      </div>
+
+      {/* Resources Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ResourceManager departmentId={workspace.departmentId} workspaceId={workspace.id} />
+        <ResourceApprovalPanel workspaceId={workspace.id} />
       </div>
 
       {/* Approval Panels */}
