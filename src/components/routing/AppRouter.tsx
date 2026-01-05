@@ -8,7 +8,7 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
@@ -35,6 +35,7 @@ import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import { VendorPublicProfilePage } from './services/VendorPublicProfilePage';
+import { OrgScopedRedirect } from './OrgScopedRedirect';
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import PricingPage from '@/pages/PricingPage';
 
@@ -391,84 +392,7 @@ export const ConsoleDashboard = () => {
   );
 };
 
-const WorkspaceService = () => {
-  return (
-    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal/5 to-mint/10 min-h-screen">
-      <div className="max-w-7xl mx-auto py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal to-mint bg-clip-text text-transparent mb-4">
-            Workspace Service
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Collaborate, create, and achieve amazing things together.
-          </p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 shadow-soft">
-          <div className="flex items-center space-x-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Coming Soon!</h2>
-              <p className="text-gray-600">Workspace functionality will be implemented in later tasks.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-4 bg-teal/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Team Collaboration</h3>
-              <p className="text-sm text-gray-600">Work together seamlessly.</p>
-            </div>
-            <div className="text-center p-4 bg-mint/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Project Management</h3>
-              <p className="text-sm text-gray-600">Organize your projects.</p>
-            </div>
-            <div className="text-center p-4 bg-teal/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Real-time Updates</h3>
-              <p className="text-sm text-gray-600">Stay in sync with your team.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AnalyticsService = () => {
-  return (
-    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-sunny/5 to-coral/10 min-h-screen">
-      <div className="max-w-7xl mx-auto py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-sunny to-coral bg-clip-text text-transparent mb-4">
-            Analytics Service
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover insights and track your success with analytics.
-          </p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-soft">
-          <div className="flex items-center space-x-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Powerful Analytics Coming Soon!</h2>
-              <p className="text-gray-600">Analytics functionality will be implemented in later tasks.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-4 bg-sunny/5 rounded-xl">
-              <h3 className="font-semibold text-sunny mb-2">Event Metrics</h3>
-              <p className="text-sm text-gray-600">Track event performance.</p>
-            </div>
-            <div className="text-center p-4 bg-coral/5 rounded-xl">
-              <h3 className="font-semibold text-coral mb-2">User Insights</h3>
-              <p className="text-sm text-gray-600">Understand your audience.</p>
-            </div>
-            <div className="text-center p-4 bg-sunny/5 rounded-xl">
-              <h3 className="font-semibold text-sunny mb-2">Revenue Reports</h3>
-              <p className="text-sm text-gray-600">Monitor your earnings.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
+// Profile service routes
 const ProfileService = () => {
   return (
     <Routes>
@@ -672,19 +596,20 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
+              {/* Redirect organizer routes to org-scoped equivalents */}
               <Route
                 path="eventmanagement/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <EventService />
+                    <OrgScopedRedirect servicePath="eventmanagement" fallbackPath="/dashboard" />
                   </ConsoleRoute>
                 }
               />
               <Route
                 path="workspaces/*"
                 element={
-                  <ConsoleRoute>
-                    <WorkspaceService />
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                    <OrgScopedRedirect servicePath="workspaces" fallbackPath="/dashboard" />
                   </ConsoleRoute>
                 }
               />
@@ -692,7 +617,7 @@ export const AppRouter: React.FC = () => {
                 path="marketplace/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <MarketplaceService />
+                    <OrgScopedRedirect servicePath="marketplace" fallbackPath="/marketplace" />
                   </ConsoleRoute>
                 }
               />
@@ -707,8 +632,8 @@ export const AppRouter: React.FC = () => {
               <Route
                 path="analytics/*"
                 element={
-                  <ConsoleRoute>
-                    <AnalyticsService />
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                    <OrgScopedRedirect servicePath="analytics" fallbackPath="/dashboard" />
                   </ConsoleRoute>
                 }
               />
