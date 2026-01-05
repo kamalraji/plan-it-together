@@ -19,6 +19,7 @@ import { FinanceDashboard } from '../finance';
 import { RegistrationDashboard } from '../registration';
 import { TechnicalDashboard } from '../technical';
 import { ITDashboard } from '../it';
+import { ContentDashboard } from '../content';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -72,6 +73,13 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes(' it ') ||
     workspace.name.toLowerCase().startsWith('it ') ||
     workspace.name.toLowerCase().endsWith(' it');
+
+  // Check if this is a content/social media committee
+  const isContentCommittee = committeeType === 'content' ||
+    workspace.name.toLowerCase().includes('content') ||
+    workspace.name.toLowerCase().includes('social media') ||
+    workspace.name.toLowerCase().includes('communications') ||
+    workspace.name.toLowerCase().includes('media');
 
   if (isVolunteersCommittee) {
     return (
@@ -136,6 +144,21 @@ export function CommitteeDashboard({
   if (isITCommittee) {
     return (
       <ITDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isContentCommittee) {
+    return (
+      <ContentDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
