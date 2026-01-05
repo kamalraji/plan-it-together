@@ -29,6 +29,7 @@ import { LogisticsDashboard } from '../logistics';
 import { FacilityDashboard } from '../facility';
 import { MarketingDashboard } from '../marketing';
 import { SponsorshipDashboard } from '../sponsorship';
+import { CommunicationDashboard } from '../communication';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -83,11 +84,11 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().startsWith('it ') ||
     workspace.name.toLowerCase().endsWith(' it');
 
-  // Check if this is a content/social media committee (but NOT photography/videography media)
-  const isContentCommittee = committeeType === 'content' ||
+  // Check if this is a content/social media committee (but NOT photography/videography media, NOT communications)
+  const isContentCommittee = (committeeType === 'content' ||
     workspace.name.toLowerCase().includes('content') ||
-    workspace.name.toLowerCase().includes('social media') ||
-    workspace.name.toLowerCase().includes('communications');
+    workspace.name.toLowerCase().includes('social media')) &&
+    !workspace.name.toLowerCase().includes('communication');
 
   // Check if this is a media/photography/video committee
   const isMediaCommittee = committeeType === 'media' ||
@@ -152,6 +153,13 @@ export function CommitteeDashboard({
     workspace.name.toLowerCase().includes('sponsorship') ||
     workspace.name.toLowerCase().includes('sponsor') ||
     workspace.name.toLowerCase().includes('partnership');
+
+  // Check if this is a communication committee
+  const isCommunicationCommittee = committeeType === 'communication' ||
+    committeeType === 'communications' ||
+    workspace.name.toLowerCase().includes('communication') ||
+    workspace.name.toLowerCase().includes('pr ') ||
+    workspace.name.toLowerCase().includes('public relations');
 
   if (isVolunteersCommittee) {
     return (
@@ -366,6 +374,21 @@ export function CommitteeDashboard({
   if (isSponsorshipCommittee) {
     return (
       <SponsorshipDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isCommunicationCommittee) {
+    return (
+      <CommunicationDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
