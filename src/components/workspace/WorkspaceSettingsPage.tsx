@@ -18,10 +18,13 @@ import { cn } from '@/lib/utils';
 type SettingsTab = 'general' | 'notifications' | 'permissions' | 'danger';
 
 export function WorkspaceSettingsPage() {
-  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId, eventId } = useParams<{ 
+    workspaceId: string; 
+    eventId?: string; 
+  }>();
   const navigate = useNavigate();
   const { workspace, isLoading, teamMembers } = useWorkspaceData(workspaceId);
-  const permissions = useWorkspacePermissions({ teamMembers, eventId: workspace?.eventId });
+  const permissions = useWorkspacePermissions({ teamMembers, eventId: workspace?.eventId || eventId });
   const { settings, updateSetting } = useWorkspaceSettings(workspaceId);
   
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
