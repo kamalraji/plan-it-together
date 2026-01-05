@@ -308,6 +308,29 @@ export function useChecklists(workspaceId: string | undefined) {
 
 // Pre-built checklist templates for different committee types
 export const COMMITTEE_CHECKLIST_TEMPLATES: Record<string, { title: string; items: string[] }[]> = {
+  // ===== OPERATIONS DEPARTMENT =====
+  event: [
+    {
+      title: 'Event Coordination',
+      items: [
+        'Finalize event schedule',
+        'Brief all committee leads',
+        'Prepare backup plans',
+        'Setup communication channels',
+        'Confirm VIP arrangements',
+      ],
+    },
+    {
+      title: 'Day-of Execution',
+      items: [
+        'Morning team briefing',
+        'Verify all stations staffed',
+        'Coordinate opening ceremony',
+        'Monitor event timeline',
+        'Conduct closing procedures',
+      ],
+    },
+  ],
   catering: [
     {
       title: 'Vendor Setup',
@@ -327,28 +350,6 @@ export const COMMITTEE_CHECKLIST_TEMPLATES: Record<string, { title: string; item
         'Arrange refreshment stations',
         'Prepare waste disposal',
         'Brief serving staff',
-      ],
-    },
-  ],
-  marketing: [
-    {
-      title: 'Pre-Event Marketing',
-      items: [
-        'Design promotional materials',
-        'Schedule social media posts',
-        'Send email invitations',
-        'Create event landing page',
-        'Prepare press release',
-      ],
-    },
-    {
-      title: 'Event Coverage',
-      items: [
-        'Arrange photographer/videographer',
-        'Setup live streaming',
-        'Prepare social media templates',
-        'Coordinate speaker interviews',
-        'Collect attendee testimonials',
       ],
     },
   ],
@@ -374,18 +375,6 @@ export const COMMITTEE_CHECKLIST_TEMPLATES: Record<string, { title: string; item
       ],
     },
   ],
-  event: [
-    {
-      title: 'Event Coordination',
-      items: [
-        'Finalize event schedule',
-        'Brief all committee leads',
-        'Prepare backup plans',
-        'Setup communication channels',
-        'Confirm VIP arrangements',
-      ],
-    },
-  ],
   facility: [
     {
       title: 'Facility Management',
@@ -395,6 +384,276 @@ export const COMMITTEE_CHECKLIST_TEMPLATES: Record<string, { title: string; item
         'Check emergency exits',
         'Verify fire safety equipment',
         'Setup first aid station',
+      ],
+    },
+    {
+      title: 'Safety & Compliance',
+      items: [
+        'Review safety protocols',
+        'Brief security team',
+        'Post emergency signage',
+        'Check accessibility routes',
+        'Verify insurance coverage',
+      ],
+    },
+  ],
+
+  // ===== GROWTH DEPARTMENT =====
+  marketing: [
+    {
+      title: 'Pre-Event Marketing',
+      items: [
+        'Design promotional materials',
+        'Schedule social media posts',
+        'Send email invitations',
+        'Create event landing page',
+        'Prepare press release',
+      ],
+    },
+    {
+      title: 'Event Coverage',
+      items: [
+        'Arrange photographer/videographer',
+        'Setup live streaming',
+        'Prepare social media templates',
+        'Coordinate speaker interviews',
+        'Collect attendee testimonials',
+      ],
+    },
+  ],
+  sponsorship: [
+    {
+      title: 'Sponsor Acquisition',
+      items: [
+        'Create sponsorship tiers document',
+        'Identify target sponsors',
+        'Send sponsorship proposals',
+        'Schedule sponsor meetings',
+        'Finalize sponsor agreements',
+      ],
+    },
+    {
+      title: 'Sponsor Deliverables',
+      items: [
+        'Collect sponsor logos and assets',
+        'Setup sponsor booths/displays',
+        'Prepare sponsor recognition slides',
+        'Coordinate sponsor speaking slots',
+        'Send post-event sponsor reports',
+      ],
+    },
+  ],
+  registration: [
+    {
+      title: 'Pre-Event Setup',
+      items: [
+        'Configure registration platform',
+        'Setup ticket types and pricing',
+        'Create registration forms',
+        'Test payment processing',
+        'Prepare confirmation emails',
+      ],
+    },
+    {
+      title: 'Check-in Operations',
+      items: [
+        'Print attendee badges',
+        'Setup check-in stations',
+        'Train check-in volunteers',
+        'Prepare walk-in registration',
+        'Handle waitlist management',
+      ],
+    },
+  ],
+  social_media: [
+    {
+      title: 'Content Planning',
+      items: [
+        'Create content calendar',
+        'Design post templates',
+        'Prepare event hashtags',
+        'Schedule pre-event posts',
+        'Setup social listening',
+      ],
+    },
+    {
+      title: 'Live Coverage',
+      items: [
+        'Assign live posting shifts',
+        'Capture behind-the-scenes content',
+        'Engage with attendee posts',
+        'Monitor mentions and hashtags',
+        'Create real-time stories/reels',
+      ],
+    },
+  ],
+
+  // ===== CONTENT DEPARTMENT =====
+  content: [
+    {
+      title: 'Content Development',
+      items: [
+        'Define session topics and tracks',
+        'Create presentation templates',
+        'Gather speaker materials',
+        'Review and edit presentations',
+        'Prepare handout materials',
+      ],
+    },
+    {
+      title: 'Session Management',
+      items: [
+        'Create session schedule',
+        'Assign rooms and timeslots',
+        'Prepare session signage',
+        'Brief session moderators',
+        'Collect session recordings',
+      ],
+    },
+  ],
+  speaker_liaison: [
+    {
+      title: 'Speaker Coordination',
+      items: [
+        'Send speaker invitations',
+        'Collect speaker bios and headshots',
+        'Confirm speaker availability',
+        'Arrange speaker travel and accommodation',
+        'Schedule speaker rehearsals',
+      ],
+    },
+    {
+      title: 'Day-of Support',
+      items: [
+        'Setup speaker green room',
+        'Prepare speaker gifts',
+        'Brief speakers on logistics',
+        'Coordinate speaker introductions',
+        'Handle speaker Q&A logistics',
+      ],
+    },
+  ],
+  media: [
+    {
+      title: 'Pre-Production',
+      items: [
+        'Book photographers/videographers',
+        'Create shot list',
+        'Scout venue for angles',
+        'Prepare media release forms',
+        'Setup photo backdrop',
+      ],
+    },
+    {
+      title: 'Coverage & Post-Production',
+      items: [
+        'Capture keynote sessions',
+        'Document networking moments',
+        'Take VIP photos',
+        'Edit and deliver highlight reel',
+        'Archive all media assets',
+      ],
+    },
+  ],
+  judge: [
+    {
+      title: 'Judging Preparation',
+      items: [
+        'Recruit qualified judges',
+        'Create judging criteria and rubric',
+        'Prepare scoring sheets',
+        'Brief judges on process',
+        'Schedule judging sessions',
+      ],
+    },
+    {
+      title: 'Judging Execution',
+      items: [
+        'Distribute submissions to judges',
+        'Coordinate judging rounds',
+        'Collect and tally scores',
+        'Resolve ties and disputes',
+        'Prepare winner announcements',
+      ],
+    },
+  ],
+
+  // ===== TECH & FINANCE DEPARTMENT =====
+  technical: [
+    {
+      title: 'Technical Setup',
+      items: [
+        'Setup WiFi and networking',
+        'Configure AV equipment',
+        'Test microphones and projectors',
+        'Setup livestream infrastructure',
+        'Prepare backup equipment',
+      ],
+    },
+    {
+      title: 'Technical Support',
+      items: [
+        'Create tech support schedule',
+        'Setup help desk station',
+        'Prepare troubleshooting guides',
+        'Monitor stream quality',
+        'Handle technical emergencies',
+      ],
+    },
+  ],
+  finance: [
+    {
+      title: 'Budget Management',
+      items: [
+        'Create detailed budget spreadsheet',
+        'Track all expenses',
+        'Process vendor invoices',
+        'Manage reimbursement requests',
+        'Monitor budget vs actuals',
+      ],
+    },
+    {
+      title: 'Financial Reporting',
+      items: [
+        'Collect all receipts',
+        'Reconcile payment accounts',
+        'Prepare financial summary',
+        'Document sponsor payments',
+        'Create post-event financial report',
+      ],
+    },
+  ],
+
+  // ===== VOLUNTEER DEPARTMENT =====
+  volunteers: [
+    {
+      title: 'Volunteer Recruitment',
+      items: [
+        'Create volunteer roles and descriptions',
+        'Post volunteer opportunities',
+        'Screen and select volunteers',
+        'Send volunteer confirmations',
+        'Collect volunteer agreements',
+      ],
+    },
+    {
+      title: 'Volunteer Management',
+      items: [
+        'Create shift schedule',
+        'Conduct volunteer training',
+        'Prepare volunteer handbook',
+        'Assign volunteer stations',
+        'Distribute volunteer t-shirts/badges',
+      ],
+    },
+    {
+      title: 'Day-of Coordination',
+      items: [
+        'Check-in volunteers',
+        'Brief team leads',
+        'Monitor shift coverage',
+        'Handle volunteer issues',
+        'Thank and recognize volunteers',
       ],
     },
   ],
