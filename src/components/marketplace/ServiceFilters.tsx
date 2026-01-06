@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent } from '@/components/ui/card';
-import { Search, MapPin, X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Search, MapPin, X, SlidersHorizontal } from 'lucide-react';
 import { SearchFilters } from './ServiceDiscoveryUI';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const SERVICE_CATEGORIES = [
   'VENUE',
@@ -34,9 +39,14 @@ const formatCategory = (category: string) => {
 interface ServiceFiltersProps {
   filters: SearchFilters;
   onFilterChange: (newFilters: Partial<SearchFilters>) => void;
+  compact?: boolean;
 }
 
-export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilterChange }) => {
+export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ 
+  filters, 
+  onFilterChange,
+  compact = false 
+}) => {
   const [locationInput, setLocationInput] = useState(filters.location || '');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,7 +64,6 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
 
       if (error) throw error;
 
-      // Create unique location combinations
       const locationSet = new Set<string>();
       const citySet = new Set<string>();
       const stateSet = new Set<string>();
@@ -79,41 +88,36 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
         states: Array.from(stateSet).sort(),
       };
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Filter suggestions based on input
   const filteredSuggestions = React.useMemo(() => {
     if (!locationInput.trim() || !locations) return [];
 
     const input = locationInput.toLowerCase();
     const suggestions: string[] = [];
 
-    // Add combined locations
     locations.combined.forEach((loc) => {
       if (loc.toLowerCase().includes(input)) {
         suggestions.push(loc);
       }
     });
 
-    // Add cities not already in combined
     locations.cities.forEach((city) => {
       if (city.toLowerCase().includes(input) && !suggestions.some(s => s.startsWith(city))) {
         suggestions.push(city);
       }
     });
 
-    // Add states
     locations.states.forEach((state) => {
       if (state.toLowerCase().includes(input) && !suggestions.includes(state)) {
         suggestions.push(state);
       }
     });
 
-    return suggestions.slice(0, 8);
+    return suggestions.slice(0, 6);
   }, [locationInput, locations]);
 
-  // Handle click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -139,7 +143,6 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
   const handleLocationInputChange = (value: string) => {
     setLocationInput(value);
     setShowSuggestions(true);
-    // Debounce the filter change
     onFilterChange({ location: value || undefined });
   };
 
@@ -149,131 +152,140 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
     setShowSuggestions(false);
   };
 
+  const activeFiltersCount = [
+    filters.category,
+    filters.location,
+    filters.verifiedOnly,
+  ].filter(Boolean).length;
+
   return (
-    <Card className="border-border/60">
-      <CardContent className="p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search Query */}
-          <div className="space-y-2">
-            <Label htmlFor="search" className="text-sm font-medium text-foreground">
-              Search Services
-            </Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="search"
-                type="text"
-                placeholder="e.g., wedding photography..."
-                value={filters.query || ''}
-                onChange={(e) => onFilterChange({ query: e.target.value })}
-                className="pl-9"
-              />
-            </div>
-          </div>
+    <div className={cn(
+      "flex flex-wrap items-center gap-2",
+      compact ? "p-0" : "p-3 bg-card/50 backdrop-blur-sm rounded-lg border border-border/40"
+    )}>
+      {/* Search Input */}
+      <div className="relative flex-1 min-w-[180px] max-w-xs">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Search..."
+          value={filters.query || ''}
+          onChange={(e) => onFilterChange({ query: e.target.value })}
+          className="h-8 pl-8 pr-3 text-sm bg-background/80 border-border/50 focus:border-primary/50"
+        />
+      </div>
 
-          {/* Category Filter */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground">Category</Label>
-            <Select
-              value={filters.category || 'all'}
-              onValueChange={(value) => onFilterChange({ category: value === 'all' ? undefined : value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {SERVICE_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {formatCategory(category)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Category Select */}
+      <Select
+        value={filters.category || 'all'}
+        onValueChange={(value) => onFilterChange({ category: value === 'all' ? undefined : value })}
+      >
+        <SelectTrigger className="h-8 w-auto min-w-[120px] text-sm bg-background/80 border-border/50">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All</SelectItem>
+          {SERVICE_CATEGORIES.map((category) => (
+            <SelectItem key={category} value={category} className="text-sm">
+              {formatCategory(category)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-          {/* Location Filter with Autocomplete */}
-          <div className="space-y-2 relative">
-            <Label htmlFor="location" className="text-sm font-medium text-foreground">
-              Location
-            </Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <Input
-                ref={inputRef}
-                id="location"
-                type="text"
-                placeholder="City or State"
-                value={locationInput}
-                onChange={(e) => handleLocationInputChange(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-                className="pl-9 pr-8"
-              />
-              {locationInput && (
-                <button
-                  type="button"
-                  onClick={clearLocation}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-            
-            {/* Location Suggestions Dropdown */}
-            {showSuggestions && filteredSuggestions.length > 0 && (
-              <div
-                ref={suggestionsRef}
-                className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto"
-              >
-                {filteredSuggestions.map((suggestion, index) => (
-                  <button
-                    key={`${suggestion}-${index}`}
-                    type="button"
-                    onClick={() => handleLocationSelect(suggestion)}
-                    className={cn(
-                      "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors",
-                      "flex items-center gap-2"
-                    )}
-                  >
-                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Sort By */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground">Sort By</Label>
-            <Select
-              value={filters.sortBy}
-              onValueChange={(value) => onFilterChange({ sortBy: value as SearchFilters['sortBy'] })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="relevance">Newest First</SelectItem>
-                <SelectItem value="price">Price: Low to High</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Additional Filters */}
-        <div className="mt-4 flex items-center space-x-2">
-          <Checkbox
-            id="verified"
-            checked={filters.verifiedOnly}
-            onCheckedChange={(checked) => onFilterChange({ verifiedOnly: checked === true })}
+      {/* Location with autocomplete */}
+      <div className="relative">
+        <div className="relative">
+          <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground z-10" />
+          <Input
+            ref={inputRef}
+            type="text"
+            placeholder="Location"
+            value={locationInput}
+            onChange={(e) => handleLocationInputChange(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            className="h-8 w-[140px] pl-8 pr-7 text-sm bg-background/80 border-border/50"
           />
-          <Label htmlFor="verified" className="text-sm text-muted-foreground cursor-pointer">
-            Verified vendors only
-          </Label>
+          {locationInput && (
+            <button
+              type="button"
+              onClick={clearLocation}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        
+        {showSuggestions && filteredSuggestions.length > 0 && (
+          <div
+            ref={suggestionsRef}
+            className="absolute z-50 w-48 mt-1 bg-popover border border-border rounded-md shadow-lg max-h-48 overflow-auto"
+          >
+            {filteredSuggestions.map((suggestion, index) => (
+              <button
+                key={`${suggestion}-${index}`}
+                type="button"
+                onClick={() => handleLocationSelect(suggestion)}
+                className="w-full px-3 py-1.5 text-left text-xs hover:bg-accent flex items-center gap-2"
+              >
+                <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
+                <span className="truncate">{suggestion}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Sort */}
+      <Select
+        value={filters.sortBy}
+        onValueChange={(value) => onFilterChange({ sortBy: value as SearchFilters['sortBy'] })}
+      >
+        <SelectTrigger className="h-8 w-auto min-w-[100px] text-sm bg-background/80 border-border/50">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="relevance" className="text-sm">Newest</SelectItem>
+          <SelectItem value="price" className="text-sm">Price ↑</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {/* More Filters Popover */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={cn(
+              "h-8 gap-1.5 text-sm border-border/50 bg-background/80",
+              activeFiltersCount > 0 && "border-primary/50 text-primary"
+            )}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="ml-1 h-4 w-4 rounded-full bg-primary text-[10px] text-primary-foreground flex items-center justify-center">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-3" align="end">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="verified"
+                checked={filters.verifiedOnly}
+                onCheckedChange={(checked) => onFilterChange({ verifiedOnly: checked === true })}
+              />
+              <Label htmlFor="verified" className="text-sm cursor-pointer">
+                Verified only
+              </Label>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 };
