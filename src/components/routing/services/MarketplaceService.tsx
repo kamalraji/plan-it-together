@@ -22,11 +22,11 @@ import { ServiceDetailPage, ServiceDiscoveryEnhanced } from '../../marketplace';
 export const MarketplaceService: React.FC = () => {
   return (
     <Routes>
-      {/* Service Dashboard - default route */}
-      <Route index element={<MarketplaceServiceDashboard />} />
+      {/* Enhanced Marketplace Page - default route */}
+      <Route index element={<MarketplacePage />} />
       
-      {/* Enhanced Marketplace Page - comprehensive marketplace interface */}
-      <Route path="marketplace" element={<MarketplacePage />} />
+      {/* Service Dashboard */}
+      <Route path="dashboard" element={<MarketplaceServiceDashboard />} />
       
       {/* Service Discovery - marketplace service listings */}
       <Route path="services" element={<ServiceDiscoveryEnhanced />} />
