@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useEventManagementMetrics, DashboardEventRow } from '@/hooks/useEventManagementMetrics';
-import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
+
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 import { useOptionalOrganization } from '@/components/organization/OrganizationContext';
 import { Switch } from '@/components/ui/switch';
@@ -60,7 +60,6 @@ export const EventServiceDashboard: React.FC = () => {
 
   return (
     <OrgPageWrapper>
-      <OrganizerBreadcrumbs current="event-management" />
       <div className="space-y-6 sm:space-y-8">
           {/* Page Header */}
           <PageHeader

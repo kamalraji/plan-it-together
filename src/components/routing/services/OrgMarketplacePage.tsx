@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
-import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
+
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 import { PageHeader } from '../PageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -103,8 +103,6 @@ export const OrgMarketplacePage: React.FC = () => {
 
   return (
     <OrgPageWrapper>
-      <OrganizerBreadcrumbs current="marketplace" />
-      
       <div className="space-y-6 sm:space-y-8">
         <PageHeader
           title="Marketplace"

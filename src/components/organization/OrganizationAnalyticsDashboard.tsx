@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon, UsersIcon, TrophyIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 import { FileText, Download, Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 
@@ -60,24 +60,6 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
   return (
     <OrgPageWrapper className="space-y-5 sm:space-y-6">
       <div className="space-y-2">
-        <OrganizationBreadcrumbs
-          items={[
-            {
-              label: organization?.name ?? 'Organization',
-              href: organization?.slug ? `/${organization.slug}` : undefined,
-              icon: (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
-                  {organization?.name?.charAt(0).toUpperCase()}
-                </span>
-              ),
-            },
-            {
-              label: 'Analytics',
-              isCurrent: true,
-            },
-          ]}
-          className="text-xs"
-        />
         <h2 className="text-xl sm:text-2xl font-bold">Organization Analytics</h2>
         <p className="text-sm text-muted-foreground">Performance metrics for {organization?.name}</p>
       </div>

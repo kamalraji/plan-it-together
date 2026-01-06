@@ -20,7 +20,7 @@ import {
 import { UserPlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
-import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+
 import { Users, UserPlus, UserCog, Clock, UserCheck } from 'lucide-react';
 
 const VALID_TABS = ['members', 'invite', 'roles', 'pending'] as const;
@@ -85,24 +85,6 @@ export const OrganizationTeamManagement: React.FC = () => {
   return (
     <OrgPageWrapper className="space-y-6">
       <div className="space-y-2">
-        <OrganizationBreadcrumbs
-          items={[
-            {
-              label: organization?.name ?? 'Organization',
-              href: organization?.slug ? `/${organization.slug}` : undefined,
-              icon: (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
-                  {organization?.name?.charAt(0).toUpperCase()}
-                </span>
-              ),
-            },
-            {
-              label: 'Team',
-              isCurrent: true,
-            },
-          ]}
-          className="text-xs"
-        />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-foreground">Team Management</h2>
