@@ -1,16 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
-import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope } from '../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
 import { TaskFilterBar, TaskFilters } from './TaskFilterBar';
+import { TaskFormModal } from './TaskFormModal';
+import { TaskFormData } from './TaskForm';
 import { LayoutList, Columns3, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
   teamMembers: TeamMember[];
+  workspaceId?: string;
   roleScope?: WorkspaceRoleScope;
   onTaskEdit?: (task: WorkspaceTask) => void;
   onTaskDelete?: (taskId: string) => void;
@@ -25,6 +31,7 @@ type ViewMode = 'list' | 'kanban';
 export function TaskManagementInterface({
   tasks,
   teamMembers,
+  workspaceId,
   roleScope,
   onTaskEdit,
   onTaskDelete,
@@ -35,12 +42,85 @@ export function TaskManagementInterface({
 }: TaskManagementInterfaceProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'ALL',
     assigneeId: 'ALL',
     sortKey: 'dueDate',
     sortDirection: 'asc',
+  });
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: TaskFormData) => {
+      if (!workspaceId) throw new Error('Workspace ID is required');
+      
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .insert({
+          workspace_id: workspaceId,
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority || TaskPriority.MEDIUM,
+          status: TaskStatus.NOT_STARTED,
+          due_date: taskData.dueDate || null,
+          role_scope: taskData.roleScope || (roleScope === 'ALL' ? null : roleScope),
+          assigned_to: taskData.assigneeId || null,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast({ title: 'Task created', description: 'Your new task has been created successfully.' });
+      setShowCreateModal(false);
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Failed to create task', 
+        description: error?.message || 'Please try again.',
+        variant: 'destructive' 
+      });
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ taskId, taskData }: { taskId: string; taskData: TaskFormData }) => {
+      if (!workspaceId) throw new Error('Workspace ID is required');
+      
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .update({
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority,
+          due_date: taskData.dueDate || null,
+          role_scope: taskData.roleScope || null,
+          assigned_to: taskData.assigneeId || null,
+        })
+        .eq('id', taskId)
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast({ title: 'Task updated', description: 'Your task has been updated successfully.' });
+      setEditingTask(null);
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Failed to update task', 
+        description: error?.message || 'Please try again.',
+        variant: 'destructive' 
+      });
+    },
   });
 
   useEffect(() => {
@@ -57,6 +137,37 @@ export function TaskManagementInterface({
 
   const handleTaskDetailClose = () => {
     setSelectedTask(null);
+  };
+
+  const handleCreateClick = () => {
+    // If workspaceId is available, use the built-in modal
+    if (workspaceId) {
+      setShowCreateModal(true);
+    } else if (onCreateTask) {
+      // Fallback to parent handler if no workspaceId
+      onCreateTask();
+    }
+  };
+
+  const handleEditClick = (task: WorkspaceTask) => {
+    if (workspaceId) {
+      setEditingTask(task);
+    } else if (onTaskEdit) {
+      onTaskEdit(task);
+    }
+  };
+
+  const handleFormSubmit = (taskData: TaskFormData) => {
+    if (editingTask) {
+      updateTaskMutation.mutate({ taskId: editingTask.id, taskData });
+    } else {
+      createTaskMutation.mutate(taskData);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    setEditingTask(null);
   };
 
   const filteredTasks = useMemo(() => {
@@ -114,10 +225,10 @@ export function TaskManagementInterface({
     tasks: filteredTasks,
     teamMembers,
     onTaskClick: handleTaskClick,
-    onTaskEdit,
+    onTaskEdit: handleEditClick,
     onTaskDelete,
     onTaskStatusChange,
-    onCreateTask,
+    onCreateTask: handleCreateClick,
     isLoading,
   };
 
@@ -166,17 +277,13 @@ export function TaskManagementInterface({
           </div>
 
           {/* Create Task Button */}
-          {onCreateTask && (
-            <Button onClick={onCreateTask} size="sm" className="hidden sm:flex">
-              <Plus className="h-4 w-4 mr-1.5" />
-              New Task
-            </Button>
-          )}
-          {onCreateTask && (
-            <Button onClick={onCreateTask} size="icon" className="sm:hidden h-9 w-9">
-              <Plus className="h-4 w-4" />
-            </Button>
-          )}
+          <Button onClick={handleCreateClick} size="sm" className="hidden sm:flex">
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Task
+          </Button>
+          <Button onClick={handleCreateClick} size="icon" className="sm:hidden h-9 w-9">
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -220,6 +327,17 @@ export function TaskManagementInterface({
           onClose={handleTaskDetailClose}
         />
       )}
+
+      {/* Create/Edit Task Modal */}
+      <TaskFormModal
+        isOpen={showCreateModal || !!editingTask}
+        task={editingTask ?? undefined}
+        teamMembers={teamMembers}
+        availableTasks={tasks}
+        onSubmit={handleFormSubmit}
+        onClose={handleModalClose}
+        isLoading={createTaskMutation.isPending || updateTaskMutation.isPending}
+      />
     </div>
   );
 }

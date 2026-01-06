@@ -160,6 +160,7 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
             <TaskManagementInterface
               tasks={tasks}
               teamMembers={teamMembers}
+              workspaceId={workspace.id}
               roleScope={activeRoleSpace}
               onTaskEdit={(task) => {
                 if (!permissions.canManageTasks) return;
@@ -167,7 +168,6 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
               }}
               onTaskDelete={actions.handleTaskDelete}
               onTaskStatusChange={actions.handleTaskStatusChange}
-              onCreateTask={actions.handleCreateTask}
               isLoading={isTasksLoading}
               initialTaskId={taskIdFromUrl}
             />
