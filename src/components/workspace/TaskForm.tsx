@@ -1,6 +1,27 @@
 import { useState } from 'react';
 import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope, TaskStatus } from '../../types';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { 
+  X, 
+  Plus, 
+  Sparkles, 
+  FileText, 
+  Tag, 
+  Calendar,
+  Users,
+  Flag,
+  Layers,
+  Link2,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
+
 interface TaskFormProps {
   task?: WorkspaceTask;
   teamMembers: TeamMember[];
@@ -10,6 +31,7 @@ interface TaskFormProps {
   onCancel: () => void;
   isLoading?: boolean;
 }
+
 export interface TaskFormData {
   title: string;
   description: string;
@@ -27,6 +49,7 @@ const TASK_TEMPLATES = [
   {
     id: 'event-setup',
     name: 'Event Setup',
+    icon: '🎪',
     category: TaskCategory.SETUP,
     priority: TaskPriority.HIGH,
     description: 'Set up event infrastructure and basic requirements',
@@ -35,6 +58,7 @@ const TASK_TEMPLATES = [
   {
     id: 'marketing-campaign',
     name: 'Marketing Campaign',
+    icon: '📢',
     category: TaskCategory.MARKETING,
     priority: TaskPriority.MEDIUM,
     description: 'Create and execute marketing campaign for the event',
@@ -43,6 +67,7 @@ const TASK_TEMPLATES = [
   {
     id: 'venue-logistics',
     name: 'Venue Logistics',
+    icon: '🏢',
     category: TaskCategory.LOGISTICS,
     priority: TaskPriority.HIGH,
     description: 'Coordinate venue arrangements and logistics',
@@ -51,6 +76,7 @@ const TASK_TEMPLATES = [
   {
     id: 'technical-setup',
     name: 'Technical Setup',
+    icon: '⚙️',
     category: TaskCategory.TECHNICAL,
     priority: TaskPriority.HIGH,
     description: 'Set up technical infrastructure and equipment',
@@ -58,13 +84,20 @@ const TASK_TEMPLATES = [
   },
   {
     id: 'registration-management',
-    name: 'Registration Management',
+    name: 'Registration',
+    icon: '📋',
     category: TaskCategory.REGISTRATION,
     priority: TaskPriority.MEDIUM,
     description: 'Manage participant registration and communication',
     tags: ['registration', 'participants']
   }
 ];
+
+const PRIORITY_CONFIG = {
+  [TaskPriority.LOW]: { label: 'Low', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
+  [TaskPriority.MEDIUM]: { label: 'Medium', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  [TaskPriority.HIGH]: { label: 'High', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
+};
 
 export function TaskForm({
   task,
@@ -92,12 +125,10 @@ export function TaskForm({
   const [selectedDependencies, setSelectedDependencies] = useState<string[]>(task?.dependencies || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Filter out current task from available dependencies to prevent self-reference
   const availableDependencies = availableTasks.filter(t => t.id !== task?.id);
 
   const handleInputChange = (field: keyof TaskFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -144,7 +175,6 @@ export function TaskForm({
     setFormData(prev => ({ ...prev, dependencies: newDependencies }));
   };
 
-  // Check for circular dependencies
   const wouldCreateCircularDependency = (taskId: string): boolean => {
     if (!task?.id) return false;
 
@@ -196,7 +226,6 @@ export function TaskForm({
       return;
     }
 
-    // Persist to Supabase workspace_tasks when a workspaceId is provided
     if (workspaceId) {
       const payload: any = {
         id: task?.id,
@@ -217,81 +246,116 @@ export function TaskForm({
 
     onSubmit?.(formData);
   };
+
   return (
-    <div className="bg-white shadow-lg rounded-lg">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">
-          {task ? 'Edit Task' : 'Create New Task'}
-        </h3>
+    <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <FileText className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">
+              {task ? 'Edit Task' : 'Create New Task'}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {task ? 'Update task details and configuration' : 'Define a new task for your workspace'}
+            </p>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        {/* Template Selection (only for new tasks) */}
+        {/* Quick Templates */}
         {!task && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start from Template (Optional)
-            </label>
-            <select
-              value={formData.templateId}
-              onChange={(e) => handleTemplateSelect(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="">Select a template...</option>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <Label className="text-sm font-medium text-foreground">Quick Start Templates</Label>
+            </div>
+            <div className="flex flex-wrap gap-2">
               {TASK_TEMPLATES.map(template => (
-                <option key={template.id} value={template.id}>
-                  {template.name}
-                </option>
+                <button
+                  key={template.id}
+                  type="button"
+                  onClick={() => handleTemplateSelect(template.id)}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200",
+                    formData.templateId === template.id
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "bg-muted/50 border-border text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/50"
+                  )}
+                >
+                  <span>{template.icon}</span>
+                  <span>{template.name}</span>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         )}
 
         {/* Title */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-            Title *
-          </label>
-          <input
-            type="text"
+        <div className="space-y-2">
+          <Label htmlFor="title" className="text-sm font-medium text-foreground flex items-center gap-2">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            Task Title <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="title"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-              }`}
-            placeholder="Enter task title"
+            placeholder="Enter a clear, actionable title"
+            className={cn(
+              "h-11",
+              errors.title && "border-destructive focus-visible:ring-destructive"
+            )}
           />
-          {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+          {errors.title && (
+            <p className="text-sm text-destructive flex items-center gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5" />
+              {errors.title}
+            </p>
+          )}
         </div>
 
         {/* Description */}
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description *
-          </label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="description" className="text-sm font-medium text-foreground flex items-center gap-2">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            Description <span className="text-destructive">*</span>
+          </Label>
+          <Textarea
             id="description"
-            rows={4}
+            rows={3}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-              }`}
-            placeholder="Describe the task in detail"
+            placeholder="Describe what needs to be done, expected outcomes, and any important details..."
+            className={cn(
+              "resize-none",
+              errors.description && "border-destructive focus-visible:ring-destructive"
+            )}
           />
-          {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
+          {errors.description && (
+            <p className="text-sm text-destructive flex items-center gap-1.5">
+              <AlertCircle className="h-3.5 w-3.5" />
+              {errors.description}
+            </p>
+          )}
         </div>
 
         {/* Category and Priority */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Layers className="h-4 w-4 text-muted-foreground" />
               Category
-            </label>
+            </Label>
             <select
               id="category"
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value as TaskCategory)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full h-11 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             >
               {Object.values(TaskCategory).map(category => (
                 <option key={category} value={category}>
@@ -301,74 +365,90 @@ export function TaskForm({
             </select>
           </div>
 
-          <div>
-            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Flag className="h-4 w-4 text-muted-foreground" />
               Priority
-            </label>
-            <select
-              id="priority"
-              value={formData.priority}
-              onChange={(e) => handleInputChange('priority', e.target.value as TaskPriority)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              {Object.values(TaskPriority).map(priority => (
-                <option key={priority} value={priority}>
-                  {priority}
-                </option>
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleInputChange('priority', key as TaskPriority)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200",
+                    formData.priority === key
+                      ? config.color + " ring-2 ring-offset-2 ring-offset-background ring-primary/30"
+                      : "bg-muted/50 border-border text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  {config.label}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         </div>
 
-        {/* Assignee and Due Date */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="assignee" className="block text-sm font-medium text-gray-700 mb-1">
+        {/* Assignee, Due Date, Role Scope */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="assignee" className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
               Assignee
-            </label>
+            </Label>
             <select
               id="assignee"
               value={formData.assigneeId}
               onChange={(e) => handleInputChange('assigneeId', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full h-11 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             >
               <option value="">Unassigned</option>
               {teamMembers.map((member) => (
                 <option key={member.id} value={member.userId}>
-                  {member.user.name} ({member.role.replace('_', ' ')})
+                  {member.user.name}
                 </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="dueDate" className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               Due Date
-            </label>
-            <input
+            </Label>
+            <Input
               type="date"
               id="dueDate"
               value={formData.dueDate}
               onChange={(e) => handleInputChange('dueDate', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.dueDate ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-                }`}
+              className={cn(
+                "h-11",
+                errors.dueDate && "border-destructive focus-visible:ring-destructive"
+              )}
             />
-            {errors.dueDate && <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>}
+            {errors.dueDate && (
+              <p className="text-sm text-destructive flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5" />
+                {errors.dueDate}
+              </p>
+            )}
           </div>
 
-          <div>
-            <label htmlFor="roleScope" className="block text-sm font-medium text-gray-700 mb-1">
-              Role Space (sub workspace)
-            </label>
+          <div className="space-y-2">
+            <Label htmlFor="roleScope" className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Layers className="h-4 w-4 text-muted-foreground" />
+              Team Scope
+            </Label>
             <select
               id="roleScope"
               value={formData.roleScope || ''}
               onChange={(e) =>
                 handleInputChange('roleScope', (e.target.value || undefined) as WorkspaceRoleScope | undefined)
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full h-11 px-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             >
-              <option value="">All teams (no specific role)</option>
+              <option value="">All teams</option>
               {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
                 <option key={role} value={role}>
                   {role.replace('_', ' ')}
@@ -380,32 +460,45 @@ export function TaskForm({
 
         {/* Dependencies */}
         {availableDependencies.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Link2 className="h-4 w-4 text-muted-foreground" />
               Dependencies
-            </label>
-            <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto">
+            </Label>
+            <div className="bg-muted/30 rounded-lg border border-border p-3 max-h-36 overflow-y-auto space-y-1">
               {availableDependencies.map(availableTask => {
                 const wouldCreateCircular = wouldCreateCircularDependency(availableTask.id);
+                const isSelected = selectedDependencies.includes(availableTask.id);
                 return (
                   <label
                     key={availableTask.id}
-                    className={`flex items-center space-x-2 py-1 ${wouldCreateCircular ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                      }`}
+                    className={cn(
+                      "flex items-center gap-3 p-2 rounded-lg transition-colors cursor-pointer",
+                      wouldCreateCircular 
+                        ? "opacity-50 cursor-not-allowed" 
+                        : isSelected 
+                          ? "bg-primary/10" 
+                          : "hover:bg-muted"
+                    )}
                   >
                     <input
                       type="checkbox"
-                      checked={selectedDependencies.includes(availableTask.id)}
+                      checked={isSelected}
                       onChange={() => !wouldCreateCircular && handleDependencyToggle(availableTask.id)}
                       disabled={wouldCreateCircular}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-foreground flex-1">
                       {availableTask.title}
-                      {wouldCreateCircular && (
-                        <span className="text-xs text-red-500 ml-1">(would create circular dependency)</span>
-                      )}
                     </span>
+                    {wouldCreateCircular && (
+                      <span className="text-xs text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
+                        Circular
+                      </span>
+                    )}
+                    {isSelected && !wouldCreateCircular && (
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                    )}
                   </label>
                 );
               })}
@@ -414,62 +507,79 @@ export function TaskForm({
         )}
 
         {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="space-y-3">
+          <Label className="text-sm font-medium text-foreground flex items-center gap-2">
+            <Tag className="h-4 w-4 text-muted-foreground" />
             Tags
-          </label>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {formData.tags.map(tag => (
-              <span
-                key={tag}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="ml-1 text-indigo-600 hover:text-indigo-800"
+          </Label>
+          {formData.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {formData.tags.map(tag => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="pl-2.5 pr-1.5 py-1 gap-1.5 text-xs"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex space-x-2">
-            <input
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="p-0.5 rounded-full hover:bg-foreground/10 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
               type="text"
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Add a tag"
+              placeholder="Type a tag and press Enter"
+              className="h-10 flex-1"
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={handleAddTag}
-              className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="h-10 px-3"
             >
-              Add
-            </button>
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* Form Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-          <button
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <Button
             type="button"
+            variant="outline"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={isLoading}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-w-[120px]"
           >
-            {isLoading ? 'Saving...' : (task ? 'Update Task' : 'Create Task')}
-          </button>
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                {task ? 'Update Task' : 'Create Task'}
+              </span>
+            )}
+          </Button>
         </div>
       </form>
     </div>
