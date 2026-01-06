@@ -1,6 +1,5 @@
 import { Workspace, WorkspaceRole } from '@/types';
 import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
-import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { HierarchyTreeCard } from '../HierarchyTreeCard';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
@@ -12,10 +11,7 @@ import {
   Building2, 
   Users, 
   CheckCircle2, 
-  Clock, 
-  AlertTriangle,
   TrendingUp,
-  Wallet,
   Calendar,
   Activity,
 } from 'lucide-react';
@@ -26,7 +22,6 @@ interface RootDashboardProps {
   workspace: Workspace;
   orgSlug?: string;
   userRole?: WorkspaceRole | null;
-  onViewTasks?: () => void;
   onDelegateRole?: () => void;
   onInviteMember?: () => void;
   onManageSettings?: () => void;
@@ -36,7 +31,6 @@ export function RootDashboard({
   workspace, 
   orgSlug, 
   userRole,
-  onViewTasks,
   onDelegateRole,
   onInviteMember,
   onManageSettings,
@@ -100,53 +94,6 @@ export function RootDashboard({
         </div>
       </div>
 
-      {/* Event Health Overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-green-500/10">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-            </div>
-            <span className="text-xs text-muted-foreground">Completed</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{eventHealth.tasksCompleted}</p>
-          <p className="text-xs text-muted-foreground">of {eventHealth.totalTasks} tasks</p>
-        </div>
-
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-blue-500/10">
-              <Clock className="h-4 w-4 text-blue-500" />
-            </div>
-            <span className="text-xs text-muted-foreground">In Progress</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{eventHealth.tasksInProgress}</p>
-          <p className="text-xs text-muted-foreground">active tasks</p>
-        </div>
-
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-orange-500/10">
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-            </div>
-            <span className="text-xs text-muted-foreground">Blocked</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{eventHealth.tasksBlocked}</p>
-          <p className="text-xs text-muted-foreground">need attention</p>
-        </div>
-
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <Wallet className="h-4 w-4 text-purple-500" />
-            </div>
-            <span className="text-xs text-muted-foreground">Budget</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{eventHealth.budgetUtilization.toFixed(0)}%</p>
-          <p className="text-xs text-muted-foreground">utilized</p>
-        </div>
-      </div>
-
       {/* Role-Based Actions */}
       <RoleBasedActions
         workspace={workspace}
@@ -156,9 +103,6 @@ export function RootDashboard({
         onManageSettings={onManageSettings}
         onViewReport={() => navigate(`/${orgSlug}/analytics`)}
       />
-
-      {/* Task Summary */}
-      <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -108,7 +108,6 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
                 workspace={workspace} 
                 orgSlug={orgSlug}
                 userRole={permissions.currentMember?.role as WorkspaceRole}
-                onViewTasks={actions.handleViewTasks}
                 onDelegateRole={() => actions.setActiveTab('role-management')}
                 onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
                 onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
@@ -148,7 +147,6 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
                 workspace={workspace} 
                 orgSlug={orgSlug}
                 userRole={permissions.currentMember?.role as WorkspaceRole}
-                onViewTasks={actions.handleViewTasks}
                 onDelegateRole={() => actions.setActiveTab('role-management')}
                 onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
                 onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
