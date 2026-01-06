@@ -3,14 +3,6 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
 
-interface QuickAction {
-  title: string;
-  description: string;
-  href: string;
-  icon: string;
-  primary?: boolean;
-}
-
 /**
  * OrganizationServiceDashboard provides the AWS-style service landing page for Organization Management.
  * It uses shared organizer-aware Supabase hooks for the current organizer's organizations and metrics.
@@ -42,34 +34,6 @@ export const OrganizationServiceDashboard: React.FC = () => {
         window.location.href = getOrgPath('/analytics');
       },
       variant: 'secondary' as const,
-    },
-  ];
-
-  const quickActions: QuickAction[] = [
-    {
-      title: 'Manage Members',
-      description: 'Add, remove, and manage organization members',
-      href: getOrgPath('/team'),
-      icon: '👥',
-      primary: true,
-    },
-    {
-      title: 'Organization Settings',
-      description: 'Configure branding and organization settings',
-      href: getOrgPath('/settings'),
-      icon: '⚙️',
-    },
-    {
-      title: 'View Analytics',
-      description: 'Monitor organization performance and growth',
-      href: getOrgPath('/analytics'),
-      icon: '📊',
-    },
-    {
-      title: 'Create New Organization',
-      description: 'Set up a new organization',
-      href: '/organizations/create',
-      icon: '🏢',
     },
   ];
 
@@ -107,42 +71,6 @@ export const OrganizationServiceDashboard: React.FC = () => {
           subtitle="Manage your organizations, members, and settings"
           actions={pageActions}
         />
-
-        {/* Quick Actions */}
-        <div className="space-y-3 sm:space-y-4">
-          <h3 className="text-base sm:text-lg font-medium text-foreground">Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {quickActions.map((action, index) => (
-              <Link
-                key={index}
-                to={action.href}
-                className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                  action.primary
-                    ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                    : 'border-border bg-card hover:bg-muted'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-3">
-                  <span className="text-xl sm:text-2xl">{action.icon}</span>
-                  <h4
-                    className={`text-sm sm:text-base font-medium ${
-                      action.primary ? 'text-primary' : 'text-foreground'
-                    }`}
-                  >
-                    {action.title}
-                  </h4>
-                </div>
-                <p
-                  className={`text-xs sm:text-sm ${
-                    action.primary ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                >
-                  {action.description}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
 
         {/* Recent Organizations */}
         <div className="space-y-3 sm:space-y-4">

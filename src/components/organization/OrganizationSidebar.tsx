@@ -52,6 +52,7 @@ import {
   UserCog,
   Clock,
   UserCheck,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
@@ -252,6 +253,42 @@ const getEventQuickActions = (base: string): EventQuickAction[] => [
   },
 ];
 
+interface OrganizationQuickAction {
+  title: string;
+  description: string;
+  path: string;
+  icon: React.ElementType;
+  primary?: boolean;
+}
+
+const getOrganizationQuickActions = (base: string): OrganizationQuickAction[] => [
+  {
+    title: 'Manage Members',
+    description: 'Add, remove, and manage members',
+    path: `${base}/team`,
+    icon: Users,
+    primary: true,
+  },
+  {
+    title: 'Organization Settings',
+    description: 'Configure branding & settings',
+    path: `${base}/settings`,
+    icon: Settings,
+  },
+  {
+    title: 'View Analytics',
+    description: 'Monitor performance & growth',
+    path: `${base}/analytics`,
+    icon: BarChart3,
+  },
+  {
+    title: 'Create New Organization',
+    description: 'Set up a new organization',
+    path: '/organizations/create',
+    icon: PlusCircle,
+  },
+];
+
 export const OrganizationSidebar: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const location = useLocation();
@@ -267,6 +304,7 @@ export const OrganizationSidebar: React.FC = () => {
   const [marketplaceExpanded, setMarketplaceExpanded] = useState(true);
   const [analyticsExpanded, setAnalyticsExpanded] = useState(true);
   const [teamExpanded, setTeamExpanded] = useState(true);
+  const [organizationsExpanded, setOrganizationsExpanded] = useState(true);
   const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
@@ -278,6 +316,7 @@ export const OrganizationSidebar: React.FC = () => {
   const isMarketplaceActive = currentPath.includes('/marketplace');
   const isAnalyticsActive = currentPath.includes('/analytics');
   const isTeamActive = currentPath.includes('/team');
+  const isOrganizationsActive = currentPath.includes('/organizations');
   const selectedWorkspaceId = searchParams.get('workspaceId');
   
   const eventQuickActions = getEventQuickActions(base);
@@ -285,6 +324,7 @@ export const OrganizationSidebar: React.FC = () => {
   const analyticsQuickActions = getAnalyticsQuickActions(base);
   const teamQuickActions = getTeamQuickActions(base);
   const workspaceQuickActions = getWorkspaceQuickActions(base);
+  const organizationQuickActions = getOrganizationQuickActions(base);
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -975,6 +1015,86 @@ export const OrganizationSidebar: React.FC = () => {
               {teamQuickActions.map((action, index) => {
                 const isActive = currentPath.includes('/team') && 
                   (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => navigate(action.path)}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
+                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
+                      action.primary && "text-primary font-medium"
+                    )}
+                  >
+                    <action.icon className={cn(
+                      "h-3.5 w-3.5 flex-shrink-0",
+                      action.primary ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <span className="truncate flex-1">{action.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </SidebarGroup>
+
+        {/* Organizations Section */}
+        <SidebarGroup>
+          <button
+            onClick={() => setOrganizationsExpanded(!organizationsExpanded)}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
+              'hover:bg-primary/10',
+              isOrganizationsActive && 'bg-primary/15'
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
+                  isOrganizationsActive
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/60 text-muted-foreground'
+                )}
+              >
+                <Building2 className="h-4 w-4" />
+              </span>
+              {!isCollapsed && (
+                <span className="flex flex-col items-start">
+                  <span className={cn("text-sm font-medium", isOrganizationsActive && "text-primary")}>
+                    Organizations
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Manage orgs
+                  </span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/organizations/create');
+                  }}
+                  className="p-1 hover:bg-muted rounded"
+                  title="Create organization"
+                >
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                {organizationsExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            )}
+          </button>
+
+          {organizationsExpanded && !isCollapsed && (
+            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
+              {organizationQuickActions.map((action, index) => {
+                const isActive = currentPath === action.path;
                 
                 return (
                   <button
