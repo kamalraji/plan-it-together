@@ -1,43 +1,32 @@
 import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { PageHeader } from '../PageHeader';
 import { Button } from '@/components/ui/button';
-import { Search, Building2, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { Search, Building2, ShoppingBag } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
-// Import existing and new marketplace components
+// Import marketplace components
 import ServiceDiscoveryUI, { ServiceListingData } from '../../marketplace/ServiceDiscoveryUI';
-import FeaturedServices from '../../marketplace/FeaturedServices';
-import TrendingCategories from '../../marketplace/TrendingCategories';
+import { PromoBanner } from '../../marketplace/PromoBanner';
+import { CategoryStrip } from '../../marketplace/CategoryStrip';
 import QuickComparePanel from '../../marketplace/QuickComparePanel';
 
 /**
- * MarketplacePage provides a customer-facing marketplace interface for browsing and booking services.
- * 
- * Features:
- * - Service discovery with real Supabase data
- * - Browse verified vendors and their services
- * - Request quotes from vendors
- * - Quick compare functionality
- * - Trending categories
- * - AI recommendations (future)
+ * MarketplacePage - Flipkart/Amazon style marketplace
  */
 export const MarketplacePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeView, setActiveView] = useState<'discover' | 'vendors'>('discover');
   const [compareServices, setCompareServices] = useState<ServiceListingData[]>([]);
   const [showComparePanel, setShowComparePanel] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
 
-  // Extract eventId from URL params if present
   const urlParams = new URLSearchParams(location.search);
   const eventId = urlParams.get('eventId');
-  const eventName = urlParams.get('eventName');
 
-  // Handle compare toggle - will be passed to ServiceDiscoveryUI when it supports comparison
   const handleCompareToggle = useCallback((service: ServiceListingData, isSelected: boolean) => {
     setCompareServices(prev => {
       if (isSelected) {
-        // Max 4 services for comparison
         if (prev.length >= 4) return prev;
         return [...prev, service];
       } else {
@@ -46,7 +35,6 @@ export const MarketplacePage: React.FC = () => {
     });
   }, []);
 
-  // Keep handleCompareToggle for future integration with ServiceDiscoveryUI
   void handleCompareToggle;
 
   const handleRemoveFromCompare = useCallback((serviceId: string) => {
@@ -58,174 +46,133 @@ export const MarketplacePage: React.FC = () => {
     setShowComparePanel(false);
   }, []);
 
-  const pageActions = [
-    {
-      label: 'Browse Services',
-      action: () => setActiveView('discover'),
-      variant: 'primary' as const,
-    },
-    {
-      label: 'View Vendors',
-      action: () => navigate('/marketplace/vendor/browse'),
-      variant: 'secondary' as const,
-    },
-  ];
-
-  const tabs = [
-    { id: 'discover', label: 'Discover Services' },
-    { id: 'vendors', label: 'Browse Vendors' },
-  ];
-
-  const breadcrumbs = [
-    { label: 'Home', href: '/' },
-    { label: 'Marketplace', href: '/marketplace' },
-  ];
-
-  const handleTabChange = (tabId: string) => {
-    if (tabId === 'vendors') {
-      navigate('/marketplace/vendor/browse');
-    } else {
-      setActiveView(tabId as 'discover');
-    }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled via the ServiceDiscoveryUI component
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 pb-24">
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <PageHeader
-          title={eventId ? `Marketplace - ${eventName || 'Event'}` : 'Service Marketplace'}
-          subtitle={eventId 
-            ? `Discover and book services for ${eventName || 'your event'} from verified vendors`
-            : 'Discover and book services from verified vendors'
-          }
-          breadcrumbs={breadcrumbs}
-          actions={pageActions}
-          tabs={tabs.map(tab => ({
-            id: tab.id,
-            label: tab.label,
-            current: activeView === tab.id,
-            onClick: () => handleTabChange(tab.id),
-          }))}
-        />
-
-        {/* Hero CTA Section */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Organizer CTA */}
-          <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 rounded-xl p-6 border border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all group">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                <Search className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-foreground mb-2">Find Services for Your Event</h2>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Discover verified vendors offering venues, catering, photography, and more for your next event.
-                </p>
-                <Button 
-                  onClick={() => setActiveView('discover')}
-                  className="w-full sm:w-auto"
-                >
-                  Browse Services
-                </Button>
-              </div>
+    <div className="min-h-screen bg-muted/30">
+      {/* Sticky Header with Search */}
+      <div className="sticky top-0 z-40 bg-primary shadow-md">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex items-center gap-3 sm:gap-4 h-14 sm:h-16">
+            {/* Logo/Brand */}
+            <div 
+              className="flex items-center gap-2 cursor-pointer shrink-0" 
+              onClick={() => navigate('/marketplace')}
+            >
+              <ShoppingBag className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
+              <span className="text-lg sm:text-xl font-bold text-primary-foreground hidden sm:inline">
+                Marketplace
+              </span>
             </div>
-          </div>
 
-          {/* Vendor CTA */}
-          <div className="bg-gradient-to-br from-secondary/15 via-secondary/10 to-secondary/5 rounded-xl p-6 border border-secondary/20 hover:shadow-lg hover:border-secondary/40 transition-all group">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-secondary/10 rounded-lg group-hover:bg-secondary/20 transition-colors">
-                <Building2 className="w-6 h-6 text-secondary-foreground" />
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search for services, vendors, categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-9 sm:h-10 pl-10 pr-4 bg-white border-0 rounded-sm text-sm focus-visible:ring-2 focus-visible:ring-primary-foreground/20"
+                />
               </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-foreground mb-2">List Your Services & Products</h2>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Join our marketplace as a vendor and connect with event organizers looking for quality services.
-                </p>
+            </form>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 shrink-0">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/marketplace/vendor')}
+                className="text-primary-foreground hover:bg-primary-foreground/10 hidden sm:flex gap-1.5"
+              >
+                <Building2 className="w-4 h-4" />
+                <span className="hidden md:inline">Become a Seller</span>
+              </Button>
+              {compareServices.length > 0 && (
                 <Button 
+                  size="sm"
                   variant="secondary"
-                  onClick={() => navigate('/marketplace/vendor')}
-                  className="w-full sm:w-auto"
+                  onClick={() => setShowComparePanel(true)}
+                  className="gap-1.5"
                 >
-                  Vendor Dashboard
+                  Compare ({compareServices.length})
                 </Button>
-              </div>
+              )}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Trending Categories */}
-        <TrendingCategories />
-        
-        {/* Featured Services Section */}
-        <FeaturedServices />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 space-y-4">
+        {/* Promo Banner Carousel */}
+        <PromoBanner />
 
-        {/* Main Content */}
-        <div className="bg-card rounded-xl border p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">All Services</h2>
-              <p className="text-sm text-muted-foreground">Browse and compare services from verified vendors</p>
-            </div>
-            {compareServices.length > 0 && (
-              <Button 
-                variant="outline" 
-                onClick={() => setShowComparePanel(true)}
-                className="gap-2"
-              >
-                Compare ({compareServices.length}/4)
-              </Button>
-            )}
-          </div>
-          <ServiceDiscoveryUI 
-            eventId={eventId || undefined}
+        {/* Category Strip */}
+        <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50">
+          <CategoryStrip 
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
           />
         </div>
 
-        {/* Help and Information */}
-        <div className="mt-8 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl p-8 border border-border">
-          <h3 className="text-xl font-semibold text-foreground mb-3">Discover Professional Services for Your Events</h3>
-          <p className="text-muted-foreground mb-6">
-            Browse our curated marketplace of verified vendors offering everything you need to make your events successful.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-card/80 rounded-lg p-4 border border-border/50 hover:shadow-md transition-shadow">
-              <div className="text-2xl mb-2">🔍</div>
-              <h4 className="font-semibold text-foreground mb-2">Smart Search</h4>
-              <p className="text-sm text-muted-foreground">Find exactly what you need with intelligent filters for category, location, and budget.</p>
-            </div>
-            <div className="bg-card/80 rounded-lg p-4 border border-border/50 hover:shadow-md transition-shadow">
-              <div className="text-2xl mb-2">✅</div>
-              <h4 className="font-semibold text-foreground mb-2">Verified Vendors</h4>
-              <p className="text-sm text-muted-foreground">All vendors are verified and rated by previous customers for quality assurance.</p>
-            </div>
-            <div className="bg-card/80 rounded-lg p-4 border border-border/50 hover:shadow-md transition-shadow">
-              <div className="text-2xl mb-2">💬</div>
-              <h4 className="font-semibold text-foreground mb-2">Direct Communication</h4>
-              <p className="text-sm text-muted-foreground">Connect directly with vendors, request quotes, and coordinate service delivery.</p>
-            </div>
-          </div>
-        </div>
+        {/* Main Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Filters Sidebar - Desktop Only */}
+          <aside className="hidden lg:block">
+            <div className="bg-card rounded-lg p-4 shadow-sm border border-border/50 sticky top-20">
+              <h3 className="font-semibold text-foreground mb-4">Filters</h3>
+              
+              {/* Price Range */}
+              <div className="mb-4 pb-4 border-b border-border">
+                <h4 className="text-sm font-medium text-foreground mb-2">Price Range</h4>
+                <div className="space-y-2">
+                  {['Under ₹5,000', '₹5,000 - ₹15,000', '₹15,000 - ₹50,000', 'Above ₹50,000'].map((range) => (
+                    <label key={range} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground">
+                      <input type="checkbox" className="rounded border-border" />
+                      {range}
+                    </label>
+                  ))}
+                </div>
+              </div>
 
-        {/* Stats Row - Compact */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5 text-primary" />
-            <span><strong className="text-foreground">150+</strong> Vendors</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span><strong className="text-foreground">500+</strong> Services</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
-            <span><strong className="text-foreground">98%</strong> Satisfaction</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-violet-600" />
-            <span><strong className="text-foreground">2.5K+</strong> Events</span>
-          </div>
+              {/* Verified Only */}
+              <div className="mb-4 pb-4 border-b border-border">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" defaultChecked className="rounded border-border" />
+                  <span className="text-foreground font-medium">Verified Vendors Only</span>
+                </label>
+              </div>
+
+              {/* Rating */}
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-2">Rating</h4>
+                <div className="space-y-2">
+                  {['4★ & above', '3★ & above', '2★ & above'].map((rating) => (
+                    <label key={rating} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground">
+                      <input type="radio" name="rating" className="border-border" />
+                      {rating}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Products Grid */}
+          <main className="lg:col-span-3">
+            <ServiceDiscoveryUI 
+              eventId={eventId || undefined}
+              searchQuery={searchQuery}
+              categoryFilter={selectedCategory}
+              displayMode="grid"
+            />
+          </main>
         </div>
       </div>
 
