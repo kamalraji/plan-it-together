@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,7 +21,7 @@ import {
   Settings,
   Images
 } from 'lucide-react';
-import VendorRegistration from './VendorRegistration';
+
 import VendorServiceManager from './VendorServiceManager';
 import VendorReviewsManager from './VendorReviewsManager';
 import VendorBookingManager from './VendorBookingManager';
@@ -140,14 +141,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
   }
 
   if (!vendor) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <VendorRegistration 
-          userId={currentUserId || ''} 
-          onRegistrationComplete={() => refetchVendor()} 
-        />
-      </div>
-    );
+    return <Navigate to="/marketplace/vendor/register" replace />;
   }
 
   const getStatusBadge = (status: string | null) => {
