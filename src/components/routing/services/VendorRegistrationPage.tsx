@@ -228,7 +228,7 @@ export const VendorRegistrationPage: React.FC = () => {
   });
 
   // Upload file to storage bucket
-  const uploadFile = async (file: File, bucket: string, path: string): Promise<string | null> => {
+  const uploadFile = async (file: File, bucket: string, path: string, isPublic: boolean = true): Promise<string | null> => {
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(path, file, { upsert: true });
@@ -236,6 +236,11 @@ export const VendorRegistrationPage: React.FC = () => {
     if (error) {
       console.error('Upload error:', error);
       return null;
+    }
+    
+    // For private buckets, return the storage path instead of public URL
+    if (!isPublic) {
+      return data.path;
     }
     
     const { data: urlData } = supabase.storage
@@ -255,17 +260,17 @@ export const VendorRegistrationPage: React.FC = () => {
       
       if (documents.businessLicense) {
         const docPath = `${currentUserId}/business-license-${Date.now()}.${documents.businessLicense.name.split('.').pop()}`;
-        const url = await uploadFile(documents.businessLicense, 'vendor-documents', docPath);
-        if (url) {
-          uploadedDocuments.push({ type: 'business_license', url, name: documents.businessLicense.name });
+        const path = await uploadFile(documents.businessLicense, 'vendor-documents', docPath, false);
+        if (path) {
+          uploadedDocuments.push({ type: 'business_license', url: path, name: documents.businessLicense.name });
         }
       }
       
       if (documents.insurance) {
         const docPath = `${currentUserId}/insurance-${Date.now()}.${documents.insurance.name.split('.').pop()}`;
-        const url = await uploadFile(documents.insurance, 'vendor-documents', docPath);
-        if (url) {
-          uploadedDocuments.push({ type: 'insurance', url, name: documents.insurance.name });
+        const path = await uploadFile(documents.insurance, 'vendor-documents', docPath, false);
+        if (path) {
+          uploadedDocuments.push({ type: 'insurance', url: path, name: documents.insurance.name });
         }
       }
       
