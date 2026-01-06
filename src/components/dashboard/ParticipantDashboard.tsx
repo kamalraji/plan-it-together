@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
+import { Home, ChevronRight, LayoutDashboard } from 'lucide-react';
 import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
@@ -279,11 +280,28 @@ export function ParticipantDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
-        <span className="text-muted-foreground/70">Home</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Participant Dashboard</span>
-      </div>
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <ol className="flex items-center gap-2 text-sm">
+          <li>
+            <Link 
+              to="/dashboard"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </li>
+          <li>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+          </li>
+          <li>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
 
       {/* Hero with glassmorphic profile summary */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

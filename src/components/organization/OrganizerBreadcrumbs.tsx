@@ -1,31 +1,26 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Home, ChevronRight, LayoutDashboard, Calendar, Store, BarChart3, Layers, Users } from 'lucide-react';
 
 interface OrganizerBreadcrumbsProps {
   current: 'dashboard' | 'event-management' | 'marketplace' | 'analytics' | 'workspace' | 'team';
 }
 
-const breadcrumbLabels: Record<OrganizerBreadcrumbsProps['current'], string> = {
-  'dashboard': 'Organizer Dashboard',
-  'event-management': 'Event Management',
-  'marketplace': 'Marketplace',
-  'analytics': 'Analytics',
-  'workspace': 'Workspace',
-  'team': 'Team',
+const breadcrumbConfig: Record<OrganizerBreadcrumbsProps['current'], { label: string; icon: React.ElementType }> = {
+  'dashboard': { label: 'Dashboard', icon: LayoutDashboard },
+  'event-management': { label: 'Events', icon: Calendar },
+  'marketplace': { label: 'Marketplace', icon: Store },
+  'analytics': { label: 'Analytics', icon: BarChart3 },
+  'workspace': { label: 'Workspace', icon: Layers },
+  'team': { label: 'Team', icon: Users },
 };
 
 /**
  * Shared breadcrumbs for organizer-scoped console views.
- *
- * Keeps the navigation trail consistent between:
- * - /:orgSlug/dashboard (OrganizerDashboard)
- * - /:orgSlug/eventmanagement (EventServiceDashboard)
- * - /dashboard/eventmanagement (global organizer console)
  */
 export const OrganizerBreadcrumbs: React.FC<OrganizerBreadcrumbsProps> = ({ current }) => {
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
 
-  // Detect whether we're in global "/dashboard/..." or org-scoped "/:orgSlug/..." context
   const isGlobalDashboardContext = segments[0] === 'dashboard';
 
   const dashboardPath = isGlobalDashboardContext
@@ -34,24 +29,34 @@ export const OrganizerBreadcrumbs: React.FC<OrganizerBreadcrumbsProps> = ({ curr
       ? `/${segments[0]}/dashboard`
       : '/dashboard';
 
+  const CurrentIcon = breadcrumbConfig[current].icon;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
-      <span className="text-muted-foreground/70">Home</span>
-      <span>/</span>
-      {current === 'dashboard' ? (
-        <span className="text-foreground font-medium">Organizer Dashboard</span>
-      ) : (
-        <>
-          <Link
+    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol className="flex items-center gap-2 text-sm">
+        {/* Home */}
+        <li>
+          <Link 
             to={dashboardPath}
-            className="text-foreground/80 hover:text-foreground font-medium transition-colors"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
           >
-            Organizer Dashboard
+            <Home className="h-4 w-4" />
+            <span className="hidden sm:inline">Home</span>
           </Link>
-          <span>/</span>
-          <span className="text-foreground font-medium">{breadcrumbLabels[current]}</span>
-        </>
-      )}
-    </div>
+        </li>
+
+        <li>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+        </li>
+
+        {/* Current Page */}
+        <li>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">
+            <CurrentIcon className="h-4 w-4" />
+            <span>{breadcrumbConfig[current].label}</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
   );
 };
