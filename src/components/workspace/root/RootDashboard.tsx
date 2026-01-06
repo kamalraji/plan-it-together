@@ -7,10 +7,7 @@ import { RoleBasedActions } from '../RoleBasedActions';
 import { ChildWorkspacesManager } from './ChildWorkspacesManager';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Crown, 
   Building2, 
-  Users, 
-  CheckCircle2, 
   TrendingUp,
   Calendar,
   Activity,
@@ -56,43 +53,10 @@ export function RootDashboard({
     );
   }
 
-  const { departments, eventHealth, recentActivity, upcomingMilestones } = data;
+  const { departments, recentActivity, upcomingMilestones } = data;
 
   return (
     <div className="space-y-6">
-      {/* Root Header Card */}
-      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-xl border border-primary/20 shadow-sm p-4 sm:p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-primary/20">
-            <Crown className="h-6 w-6 text-primary" />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-lg font-semibold text-foreground">{workspace.name}</h2>
-              <span className="px-2 py-0.5 text-xs font-medium bg-primary/20 text-primary rounded-full">
-                Event Workspace
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Complete oversight of all departments, committees, and teams
-            </p>
-            <div className="flex flex-wrap items-center gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Building2 className="h-4 w-4" />
-                <span>{departments.length} Departments</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>{eventHealth.totalMembers} Team Members</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4" />
-                <span>{eventHealth.overallProgress.toFixed(0)}% Complete</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Role-Based Actions */}
       <RoleBasedActions
