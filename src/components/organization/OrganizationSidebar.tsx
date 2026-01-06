@@ -263,28 +263,28 @@ interface OrganizationQuickAction {
 
 const getOrganizationQuickActions = (base: string): OrganizationQuickAction[] => [
   {
-    title: 'Manage Members',
-    description: 'Add, remove, and manage members',
-    path: `${base}/team`,
-    icon: Users,
+    title: 'All Organizations',
+    description: 'View and manage all organizations',
+    path: `${base}/organizations/list`,
+    icon: Building2,
     primary: true,
   },
   {
+    title: 'Manage Members',
+    description: 'View organization members',
+    path: `${base}/organizations`,
+    icon: Users,
+  },
+  {
     title: 'Organization Settings',
-    description: 'Configure branding & settings',
+    description: 'Configure current organization',
     path: `${base}/settings`,
     icon: Settings,
   },
   {
-    title: 'View Analytics',
-    description: 'Monitor performance & growth',
-    path: `${base}/analytics`,
-    icon: BarChart3,
-  },
-  {
     title: 'Create New Organization',
     description: 'Set up a new organization',
-    path: '/organizations/create',
+    path: `${base}/organizations/list?action=create`,
     icon: PlusCircle,
   },
 ];
@@ -1075,7 +1075,7 @@ export const OrganizationSidebar: React.FC = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate('/organizations/create');
+                    navigate(`${base}/organizations/list?action=create`);
                   }}
                   className="p-1 hover:bg-muted rounded"
                   title="Create organization"
