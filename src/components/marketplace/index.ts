@@ -8,3 +8,8 @@ export { default as ServiceRecommendations } from './ServiceRecommendations';
 export { default as VendorShortlist } from './VendorShortlist';
 export { default as VendorCoordination } from './VendorCoordination';
 export { default as EventMarketplaceIntegration } from './EventMarketplaceIntegration';
+export { default as TrendingCategories } from './TrendingCategories';
+export { default as VendorTrustScore } from './VendorTrustScore';
+export { default as QuickComparePanel } from './QuickComparePanel';
+export { default as FeaturedServices } from './FeaturedServices';
+export { ServiceCard } from './ServiceCard';
