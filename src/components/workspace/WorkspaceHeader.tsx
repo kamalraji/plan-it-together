@@ -193,26 +193,6 @@ export function WorkspaceHeader({
                 </button>
               )}
 
-              {onInviteTeamMember && (
-                <button
-                  onClick={onInviteTeamMember}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Invite Member
-                </button>
-              )}
-
-              {onCreateTask && (
-                <button
-                  onClick={onCreateTask}
-                  className="inline-flex items-center px-3 py-2 border border-border text-sm leading-4 font-medium rounded-md text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-                >
-                  <ClipboardList className="w-4 h-4 mr-2" />
-                  Create Task
-                </button>
-              )}
-
               {onManageSettings && (
                 <button
                   onClick={onManageSettings}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Workspace, WorkspaceStatus } from '../../types';
+import { Workspace } from '../../types';
 import { 
   LayoutDashboard, 
   ClipboardList, 
@@ -61,13 +61,9 @@ const tabGroups = {
 };
 
 export function WorkspaceNavigation({
-  workspace,
-  userWorkspaces,
   activeTab,
   onTabChange,
-  onWorkspaceSwitch,
 }: WorkspaceNavigationProps) {
-  const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   const tabs: Tab[] = [
@@ -82,21 +78,6 @@ export function WorkspaceNavigation({
     { id: 'reports', name: 'Reports', icon: <Download className="w-4 h-4" />, group: 'analysis' },
     { id: 'audit', name: 'Audit Log', icon: <Clock className="w-4 h-4" />, group: 'analysis' },
   ];
-
-  const getStatusColor = (status: WorkspaceStatus) => {
-    switch (status) {
-      case WorkspaceStatus.ACTIVE:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      case WorkspaceStatus.PROVISIONING:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
-      case WorkspaceStatus.DISSOLVED:
-        return 'bg-muted text-muted-foreground';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
-  };
 
   const toggleGroup = (group: string) => {
     setCollapsedGroups(prev => ({ ...prev, [group]: !prev[group] }));
@@ -115,58 +96,6 @@ export function WorkspaceNavigation({
   return (
     <div className="bg-card shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end py-2 sm:py-3">
-          {/* Workspace Switcher */}
-          {userWorkspaces.length > 1 && (
-            <div className="relative self-start sm:self-auto">
-              <button
-                onClick={() => setShowWorkspaceSwitcher(!showWorkspaceSwitcher)}
-                className="flex items-center space-x-2 px-3 py-2 text-xs sm:text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-              >
-                <span className="hidden sm:inline">Switch Workspace</span>
-                <span className="inline sm:hidden">Switch</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-
-              {showWorkspaceSwitcher && (
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-card rounded-md shadow-lg ring-1 ring-border z-50">
-                  <div className="py-1 max-h-80 overflow-y-auto">
-                    <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Your Workspaces
-                    </div>
-                    {userWorkspaces.map((ws) => (
-                      <button
-                        key={ws.id}
-                        onClick={() => {
-                          onWorkspaceSwitch(ws.id);
-                          setShowWorkspaceSwitcher(false);
-                        }}
-                        className={`w-full text-left px-4 py-3 hover:bg-muted ${ws.id === workspace.id ? 'bg-primary/10 border-r-2 border-primary' : ''
-                          }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{ws.name}</p>
-                            {!!ws.event?.name && (
-                              <p className="text-xs text-muted-foreground truncate">{ws.event?.name}</p>
-                            )}
-                          </div>
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                              ws.status,
-                            )}`}
-                          >
-                            {ws.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Tab Navigation - Desktop: horizontal, Mobile: grouped */}
         <div className="border-b border-border">
