@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
@@ -37,7 +37,7 @@ export function OrganizerDashboard() {
     user
   } = useAuth();
   const organization = useCurrentOrganization();
-  const [activeTab, setActiveTab] = useState<'events' | 'analytics'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'workspaces' | 'analytics'>('events');
   const [isChecklistOpen, setIsChecklistOpen] = useState(true);
   const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
   const {
@@ -167,10 +167,7 @@ export function OrganizerDashboard() {
     enabled: isHealthy !== false
   });
   const eventCreatePath = useEventCreatePath();
-  const topWorkspaces = useMemo(() => {
-    if (!workspaces) return [];
-    return [...workspaces].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 3);
-  }, [workspaces]);
+  
   
   
   return <OrgPageWrapper>
@@ -235,9 +232,12 @@ export function OrganizerDashboard() {
             key: 'events',
             label: 'My Events'
           }, {
+            key: 'workspaces',
+            label: 'My Workspaces'
+          }, {
             key: 'analytics',
             label: 'Analytics'
-          }].map(tab => <button key={tab.key} onClick={() => setActiveTab(tab.key as 'events' | 'analytics')} className={`px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.key ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+          }].map(tab => <button key={tab.key} onClick={() => setActiveTab(tab.key as 'events' | 'workspaces' | 'analytics')} className={`px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.key ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
                                 {tab.label}
                             </button>)}
                     </nav>
@@ -261,24 +261,38 @@ export function OrganizerDashboard() {
                         </div>
                     </section>}
 
-                {/* Organizer overview widgets */}
-                <div className="order-2 mb-5 sm:mb-8 grid gap-3 sm:gap-6 lg:grid-cols-2 lg:items-start">
-                    <div className="bg-card rounded-lg shadow p-3 sm:p-6">
-                        <h2 className="text-sm sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Top Workspaces</h2>
-                        {topWorkspaces.length > 0 ? <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
-                                {topWorkspaces.map(ws => <li key={ws.id} className="flex items-center justify-between">
-                                        <div>
-                                            <div className="font-medium text-foreground text-sm sm:text-base">{ws.name}</div>
-                                            {ws.event && <div className="text-[11px] sm:text-xs text-muted-foreground">Event: {ws.event.name}</div>}
-                                        </div>
-                                        <Link to={`/${organization.slug}/workspaces/${ws.id}`} className="text-primary hover:text-primary/80 text-xs font-medium">
-                                            Open
-                                        </Link>
-                                    </li>)}
-                            </ul> : <p className="text-xs sm:text-sm text-muted-foreground">No workspaces yet for this organization.</p>}
+                {/* My Workspaces Tab Content */}
+                {activeTab === 'workspaces' && <div className="order-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+                        <h2 className="text-lg sm:text-2xl font-bold text-foreground">My Workspaces</h2>
+                        <Link to={`/${organization.slug}/workspaces`} className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-primary/90 transition-colors">
+                            View All Workspaces
+                        </Link>
                     </div>
-
-                </div>
+                    {workspaces && workspaces.length > 0 ? (
+                        <div className="grid gap-3 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+                            {workspaces.map(ws => (
+                                <div key={ws.id} className="bg-card rounded-lg shadow p-3 sm:p-6 border border-border/60">
+                                    <h3 className="text-sm sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">{ws.name}</h3>
+                                    {ws.event && <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">Event: {ws.event.name}</p>}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-muted-foreground capitalize">{ws.status}</span>
+                                        <Link to={`/${organization.slug}/workspaces/${ws.id}`} className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium">
+                                            Open Workspace
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-card rounded-lg shadow p-6 text-center border border-border/60">
+                            <p className="text-muted-foreground text-sm">No workspaces yet for this organization.</p>
+                            <Link to={`/${organization.slug}/workspaces`} className="text-primary hover:text-primary/80 text-sm font-medium mt-2 inline-block">
+                                Create your first workspace
+                            </Link>
+                        </div>
+                    )}
+                </div>}
 
                 {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
                 {isProfileIncomplete}
