@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ActionButton } from '@/components/ui/action-button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -25,7 +26,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Mail, Send, Loader2 } from 'lucide-react';
+import { Mail, Send } from 'lucide-react';
 
 const quoteFormSchema = z.object({
   senderName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -297,19 +298,15 @@ export const RequestQuoteForm: React.FC<RequestQuoteFormProps> = ({
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4 mr-2" />
-                Send Quote Request
-              </>
-            )}
-          </Button>
+          <ActionButton 
+            type="submit" 
+            className="w-full" 
+            isLoading={isSubmitting}
+            loadingText="Sending..."
+            icon={<Send className="w-4 h-4" />}
+          >
+            Send Quote Request
+          </ActionButton>
         </form>
       </DialogContent>
     </Dialog>

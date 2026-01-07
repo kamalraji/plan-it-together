@@ -156,9 +156,9 @@ export const PerformanceIntegrationExample: React.FC = () => {
       component: () => (
         <div className="space-y-2">
           <LoadingButton
-            loading={loading}
+            isLoading={loading}
             onClick={handleRefresh}
-            className="w-full px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            className="w-full"
           >
             Refresh Data
           </LoadingButton>

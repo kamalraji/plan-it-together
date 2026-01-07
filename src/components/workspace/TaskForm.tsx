@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope, TaskStatus } from '../../types';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { ActionButton } from '@/components/ui/action-button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -411,13 +412,15 @@ export function TaskForm({
           <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" size="sm" disabled={isLoading} className="min-w-[90px]">
-            {isLoading ? (
-              <span className="h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>{task ? 'Update' : 'Create'}</>
-            )}
-          </Button>
+          <ActionButton 
+            type="submit" 
+            size="sm" 
+            isLoading={isLoading}
+            loadingText={task ? 'Updating...' : 'Creating...'}
+            className="min-w-[90px]"
+          >
+            {task ? 'Update' : 'Create'}
+          </ActionButton>
         </div>
       </form>
     </div>

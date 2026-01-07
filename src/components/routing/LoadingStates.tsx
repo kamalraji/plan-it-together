@@ -145,8 +145,11 @@ export const ProgressBar: React.FC<{
   );
 };
 
-// Button loading state
-export const LoadingButton: React.FC<{
+// Button loading state - Re-export ActionButton for backwards compatibility
+export { ActionButton as LoadingButton } from '@/components/ui/action-button';
+
+// Legacy LoadingButton for existing usage (will be deprecated)
+export const LegacyLoadingButton: React.FC<{
   loading: boolean;
   children: React.ReactNode;
   className?: string;

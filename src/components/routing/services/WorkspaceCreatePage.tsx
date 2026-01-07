@@ -15,6 +15,7 @@ import { Shield, Layers } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { ActionButton } from '@/components/ui/action-button';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 const workspaceCreateSchema = z.object({
@@ -346,12 +347,13 @@ export const WorkspaceCreatePage: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button
+            <ActionButton
               type="submit"
-              disabled={isPending}
+              isLoading={isPending}
+              loadingText="Creating workspace…"
             >
-              {isPending ? 'Creating workspace…' : 'Create workspace'}
-            </Button>
+              Create workspace
+            </ActionButton>
           </div>
         </form>
       </div>
