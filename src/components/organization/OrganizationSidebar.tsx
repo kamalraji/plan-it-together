@@ -34,7 +34,7 @@ import {
   ChevronRight,
   Folder,
   FolderOpen,
-  PlusCircle,
+  Plus,
   LayoutTemplate,
   List,
   ClipboardList,
@@ -59,7 +59,7 @@ import { WorkspaceStatus } from '@/types';
 
 // Quick action definitions
 const getEventQuickActions = (base: string) => [
-  { title: 'Create New Event', path: `${base}/eventmanagement/create`, icon: PlusCircle, primary: true },
+  { title: 'Create New Event', path: `${base}/eventmanagement/create`, icon: Plus, primary: true },
   { title: 'Browse Templates', path: `${base}/eventmanagement/templates`, icon: LayoutTemplate },
   { title: 'View All Events', path: `${base}/eventmanagement`, icon: List },
   { title: 'Registrations', path: `${base}/eventmanagement/registrations`, icon: ClipboardList },
@@ -67,7 +67,7 @@ const getEventQuickActions = (base: string) => [
 ];
 
 const getWorkspaceQuickActions = (base: string) => [
-  { title: 'Create Workspace', path: `${base}/workspaces`, icon: PlusCircle, primary: true },
+  { title: 'Create Workspace', path: `${base}/workspaces`, icon: Plus, primary: true },
   { title: 'Browse Templates', path: `${base}/templates`, icon: LayoutTemplate },
   { title: 'View All Workspaces', path: `${base}/workspaces?tab=list`, icon: List },
   { title: 'Team Analytics', path: `${base}/workspaces?tab=analytics`, icon: BarChart3 },
@@ -98,7 +98,7 @@ const getOrganizationQuickActions = (base: string) => [
   { title: 'All Organizations', path: `${base}/organizations/list`, icon: Building2, primary: true },
   { title: 'Manage Members', path: `${base}/organizations`, icon: Users },
   { title: 'Organization Settings', path: `${base}/settings`, icon: Settings },
-  { title: 'Create New', path: `${base}/organizations/list?action=create`, icon: PlusCircle },
+  { title: 'Create New', path: `${base}/organizations/list?action=create`, icon: Plus },
 ];
 
 export const OrganizationSidebar: React.FC = () => {
