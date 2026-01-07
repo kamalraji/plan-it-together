@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useSeo } from "@/hooks/useSeo";
+import { HeroCarousel } from "@/components/landing/HeroCarousel";
+import { PlatformStatsBanner } from "@/components/landing/PlatformStatsBanner";
+import { LogoMarquee } from "@/components/landing/LogoMarquee";
 const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#workflow", label: "Workflow" },
@@ -18,7 +19,7 @@ const scrollToId = (id: string) => {
 
 const AttendflowLanding = () => {
   const navigate = useNavigate();
-  const [logoOrgs, setLogoOrgs] = useState<{ id: string; name: string; logo_url: string | null }[]>([]);
+  
 
   useSeo({
     title: "Event marketing workspace | Thittam1Hub",
@@ -54,20 +55,6 @@ const AttendflowLanding = () => {
     }),
   });
 
-  useEffect(() => {
-    supabase
-      .from("organizations")
-      .select("id, name, logo_url")
-      .eq("verification_status", "VERIFIED")
-      .not("logo_url", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(6)
-      .then(({ data, error }) => {
-        if (!error && data) {
-          setLogoOrgs(data);
-        }
-      });
-  }, []);
   return (
     <div className="min-h-screen bg-background text-foreground af-grid-bg">
       {/* Top nav */}
@@ -114,172 +101,14 @@ const AttendflowLanding = () => {
       </header>
 
       <main>
-        {/* Hero */}
-        <section className="container relative py-16 md:py-24 lg:py-32">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
-            <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/20 px-3 py-1 text-[11px] font-medium text-accent-foreground shadow-sm mb-6">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                Event workspaces that ship proof · Thittam1Hub
-              </p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
-                One rail from event idea
-                <br />
-                to verified outcomes
-              </h1>
-              <p className="mt-5 max-w-xl text-sm md:text-base text-muted-foreground">
-                Attendflow by Thittam1Hub turns every event into a temporary workspace—unifying registrations, QR-based
-                attendance, judging, and certificate-backed proof so organizers, teams, and sponsors see the same live
-                reality.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button
-                  className="rounded-full px-6 py-2.5 text-sm font-semibold bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:from-primary hover:to-primary/80"
-                  onClick={() => navigate("/help?intent=demo")}
-                >
-                  Book a demo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-full px-6 py-2.5 text-sm font-semibold border-border/70 bg-background/80 text-foreground hover:bg-muted/70"
-                  onClick={() => navigate("/register")}
-                >
-                  Start free
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="rounded-full px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                  onClick={() => {
-                    const el = document.getElementById("features");
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }
-                  }}
-                >
-                  Explore features
-                </Button>
-              </div>
-              <div className="mt-3 flex items-center gap-2 text-xs">
-                <span className="text-muted-foreground">Already have an account?</span>
-                <button
-                  type="button"
-                  onClick={() => navigate("/login")}
-                  className="font-semibold text-primary hover:text-primary/80 underline-offset-4 hover:underline"
-                >
-                  Sign in
-                </button>
-              </div>
-              <p className="mt-4 text-[11px] text-muted-foreground">
-                No credit card required · Built for campuses, communities, and organizations running recurring events.
-              </p>
-            </div>
+        {/* Hero Carousel */}
+        <HeroCarousel />
 
-            {/* Hero visual: unified event flow */}
-            <motion.div
-              className="relative h-[260px] md:h-[320px] lg:h-[360px] rounded-3xl border border-border/60 bg-card/80 shadow-2xl overflow-hidden af-hero-panel af-floating"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/40 to-accent/20" />
-              <div className="relative h-full px-4 py-4 md:px-6 md:py-6 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-background/80 border border-border/60 px-2 py-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live event flow
-                  </span>
-                  <span className="hidden sm:inline-flex rounded-full bg-background/70 border border-border/60 px-2 py-1">
-                    Registration → certificate
-                  </span>
-                </div>
+        {/* Platform Statistics Banner */}
+        <PlatformStatsBanner />
 
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 items-stretch af-hero-orbit-row">
-                  {[
-                    { key: "registration", label: "Registration", meta: "Forms & roles" },
-                    { key: "attendance", label: "Attendance", meta: "QR check-in" },
-                    { key: "judging", label: "Judging", meta: "Scores & notes" },
-                    { key: "certificates", label: "Certificates", meta: "QR verification" },
-                  ].map((step, index) => (
-                    <motion.div
-                      key={step.key}
-                      className="relative rounded-2xl border border-border/60 bg-background/90 px-3 py-3 flex flex-col justify-between overflow-hidden hover-scale hover-glow"
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.08 * index, ease: "easeOut" }}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary">
-                          {index + 1}
-                        </div>
-                        <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Stage</span>
-                      </div>
-                      <div className="mt-3">
-                        <p className="text-xs font-semibold leading-tight">{step.label}</p>
-                        <p className="mt-1 text-[11px] text-muted-foreground">{step.meta}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="mt-4 flex items-center justify-between text-[10px] text-muted-foreground">
-                  <p className="hidden sm:inline-flex items-center gap-1">
-                    <span className="h-1 w-1 rounded-full bg-primary" />
-                    One rail from signup to verification
-                  </p>
-                  <p className="sm:text-right flex-1 sm:flex-none text-right">
-                    No exports · no broken handoffs
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="mt-14 space-y-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center md:text-left">
-              Used across events that need real verification
-            </p>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-muted-foreground/70 text-xs md:text-sm">
-              <span>University fests</span>
-              <span>Community hackathons</span>
-              <span>Corporate programs</span>
-              <span>Industry meetups</span>
-            </div>
-            {logoOrgs.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground text-center md:text-left">
-                  Teams running events on Attendflow
-                </p>
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-6 text-[11px] text-muted-foreground/80">
-                  {logoOrgs.map((org) => (
-                    <div key={org.id} className="flex items-center gap-2 max-w-[160px]">
-                      {org.logo_url && (
-                        <img
-                          src={org.logo_url}
-                          alt={`${org.name} logo`}
-                          loading="lazy"
-                          className="h-6 w-auto rounded-sm border border-border/60 bg-background object-contain"
-                        />
-                      )}
-                      <span className="truncate">{org.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-4 text-[11px] text-muted-foreground/85">
-              <div className="inline-flex flex-col md:flex-row md:items-center gap-1 md:gap-2 rounded-full border border-border/60 bg-background/80 px-3 py-1.5 shadow-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/80" />
-                <span className="font-medium">"Check-in to certificates in one trackable rail."</span>
-                <span className="opacity-80">— Asha R., Fest Convenor</span>
-              </div>
-              <div className="inline-flex flex-col md:flex-row md:items-center gap-1 md:gap-2 rounded-full border border-border/60 bg-background/80 px-3 py-1.5 shadow-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent/80" />
-                <span className="font-medium">"We stopped juggling forms, sheets, and PDFs for every program."</span>
-                <span className="opacity-80">— Karthik S., Community Lead</span>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Logo Marquee */}
+        <LogoMarquee />
 
         {/* Feature strips */}
         <motion.section
