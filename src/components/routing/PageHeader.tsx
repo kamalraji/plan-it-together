@@ -114,8 +114,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         )}
 
         {/* Title and Actions */}
-        <div className="py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="py-4 sm:py-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight text-foreground truncate">
                 {title}
@@ -151,7 +150,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                 </div>
               </>
             )}
-          </div>
 
           {/* Custom Content */}
           {children && (
