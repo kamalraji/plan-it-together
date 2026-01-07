@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkspaceStatus, UserRole } from '@/types';
@@ -8,6 +8,7 @@ import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationB
 import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { WorkspaceTypePath } from '@/hooks/useWorkspaceQueryParams';
 import { 
   PlusIcon, 
   Squares2X2Icon, 
@@ -105,10 +106,20 @@ export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { orgSlug, eventId } = useParams<{ orgSlug: string; eventId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  // Extract workspace type from URL path (e.g., /department, /committee, /team, /root)
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const workspaceTypeFromPath = pathParts.find(part => 
+    ['root', 'department', 'committee', 'team'].includes(part)
+  ) as WorkspaceTypePath | undefined;
+  
+  // Get workspace name from query params for new URL structure
+  const workspaceName = searchParams.get('name') || undefined;
   const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
+  
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<EnhancedWorkspaceTemplate>(ENHANCED_WORKSPACE_TEMPLATES[0]);
@@ -124,7 +135,7 @@ export const OrgWorkspacePage: React.FC = () => {
       let query = supabase
         .from('workspaces')
         .select(`
-          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id,
+          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id, workspace_type,
           events!inner(id, name, organization_id),
           workspace_team_members(user_id)
         `)
@@ -143,6 +154,7 @@ export const OrgWorkspacePage: React.FC = () => {
         eventId: row.event_id,
         name: row.name,
         status: row.status as WorkspaceStatus,
+        workspaceType: row.workspace_type, // Include workspace_type
         createdAt: row.created_at,
         updatedAt: row.updated_at,
         organizerId: row.organizer_id,
@@ -244,13 +256,39 @@ export const OrgWorkspacePage: React.FC = () => {
     }
   };
 
-  const handleSelectWorkspace = (workspaceId: string) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set('workspaceId', workspaceId);
-      return next;
-    });
+  const handleSelectWorkspace = (workspaceId: string, workspace?: any) => {
+    // If workspace data is provided, use new URL structure with type path
+    if (workspace && orgSlug && eventId) {
+      const typePathMap: Record<string, WorkspaceTypePath> = {
+        'ROOT': 'root',
+        'DEPARTMENT': 'department', 
+        'COMMITTEE': 'committee',
+        'TEAM': 'team',
+      };
+      const typePath = typePathMap[workspace.workspaceType] || 'root';
+      const nameSlug = workspace.name.toLowerCase().replace(/\s+/g, '-');
+      
+      // Navigate to new URL structure: /:orgSlug/workspaces/:eventId/:type?name=xxx&workspaceId=xxx
+      const params = new URLSearchParams();
+      params.set('name', nameSlug);
+      params.set('workspaceId', workspaceId);
+      
+      window.history.replaceState(null, '', `/${orgSlug}/workspaces/${eventId}/${typePath}?${params.toString()}`);
+      setSearchParams(params, { replace: true });
+    } else {
+      // Fallback to legacy query param approach
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaceId);
+        return next;
+      });
+    }
   };
+
+  // Log current URL context for debugging (uses the extracted variables)
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[OrgWorkspacePage] URL context:', { workspaceTypeFromPath, workspaceName, selectedWorkspaceId });
+  }
 
   return (
     <div className="flex flex-col gap-4">

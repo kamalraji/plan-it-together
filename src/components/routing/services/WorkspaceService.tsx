@@ -19,7 +19,11 @@ import { WorkspaceSettingsPage } from '@/components/workspace/WorkspaceSettingsP
  * Routes:
  * - /:orgSlug/workspaces - Organization workspace list (grouped by ownership)
  * - /:orgSlug/workspaces/:eventId - Event-specific workspace portal
- * - /:orgSlug/workspaces/:eventId/:workspaceId/* - Workspace detail views
+ * - /:orgSlug/workspaces/:eventId/root - Root workspace (L1)
+ * - /:orgSlug/workspaces/:eventId/department?name=xxx - Department workspace (L2)
+ * - /:orgSlug/workspaces/:eventId/committee?name=xxx - Committee workspace (L3)
+ * - /:orgSlug/workspaces/:eventId/team?name=xxx - Team workspace (L4)
+ * - /:orgSlug/workspaces/:eventId/:workspaceType/:workspaceId/* - Workspace detail views
  */
 
 const WorkspaceIndexRoute: React.FC = () => {
@@ -64,7 +68,31 @@ export const WorkspaceService: React.FC = () => {
       {/* Event-specific workspace portal - /:orgSlug/workspaces/:eventId */}
       <Route path=":eventId" element={<WorkspaceIndexRoute />} />
 
-      {/* Workspace Settings Page under event context - MUST come before general :workspaceId route */}
+      {/* ============================================
+          NEW: Type-based workspace routes (L1-L4)
+          URL pattern: /:orgSlug/workspaces/:eventId/:workspaceType?name=xxx&workspaceId=xxx
+          ============================================ */}
+      
+      {/* Root workspace (L1) - /:orgSlug/workspaces/:eventId/root */}
+      <Route path=":eventId/root" element={<OrgWorkspacePage />} />
+      
+      {/* Department workspace (L2) - /:orgSlug/workspaces/:eventId/department?name=operations */}
+      <Route path=":eventId/department" element={<OrgWorkspacePage />} />
+      <Route path=":eventId/department/settings" element={<WorkspaceSettingsPage />} />
+      
+      {/* Committee workspace (L3) - /:orgSlug/workspaces/:eventId/committee?name=marketing */}
+      <Route path=":eventId/committee" element={<OrgWorkspacePage />} />
+      <Route path=":eventId/committee/settings" element={<WorkspaceSettingsPage />} />
+      
+      {/* Team workspace (L4) - /:orgSlug/workspaces/:eventId/team?name=design-team */}
+      <Route path=":eventId/team" element={<OrgWorkspacePage />} />
+      <Route path=":eventId/team/settings" element={<WorkspaceSettingsPage />} />
+
+      {/* ============================================
+          LEGACY: ID-based workspace routes (backward compatibility)
+          ============================================ */}
+      
+      {/* Workspace Settings Page under event context */}
       <Route path=":eventId/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
 
       {/* Workspace Detail with tabs under event context */}
