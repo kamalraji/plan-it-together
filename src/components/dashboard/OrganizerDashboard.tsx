@@ -8,13 +8,13 @@ import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardin
 import { supabase } from '@/integrations/supabase/client';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { useEventCreatePath } from '@/hooks/useEventCreatePath';
-import { Calendar, Plus } from 'lucide-react';
+import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
+import { Calendar, Users, Clock, ArrowRight, Plus, Zap, Eye, Pencil, FolderOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { ModernEventCard } from '@/components/events/ModernEventCard';
 
 import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
-import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 interface Event {
   id: string;
@@ -324,22 +324,111 @@ export function OrganizerDashboard() {
 
                     {events && events.length > 0 ? (
                         <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                            {events.map((event, index) => (
-                                <ModernEventCard
-                                    key={event.id}
-                                    id={event.id}
-                                    name={event.name}
-                                    description={event.description}
-                                    startDate={event.startDate}
-                                    endDate={event.endDate}
-                                    status={event.status}
-                                    registrationCount={event.registrationCount}
-                                    capacity={event.capacity}
-                                    organizationSlug={organization.slug}
-                                    variant="organizer"
-                                    index={index}
-                                />
-                            ))}
+                            {events.map((event, index) => {
+                                const startDate = new Date(event.startDate);
+                                const endDate = new Date(event.endDate);
+                                const isLive = event.status === 'ONGOING';
+                                const isDraft = event.status === 'DRAFT';
+                                const isPublished = event.status === 'PUBLISHED';
+                                
+                                return (
+                                    <motion.div
+                                        key={event.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                                        className="group relative bg-card rounded-2xl border-2 border-border/50 overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
+                                    >
+                                        {/* Live indicator bar */}
+                                        {isLive && (
+                                            <div className="h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 animate-pulse" />
+                                        )}
+                                        
+                                        <div className="p-4 sm:p-5">
+                                            {/* Header with date badge */}
+                                            <div className="flex items-start gap-4 mb-4">
+                                                <div className={`flex-shrink-0 w-14 text-center rounded-xl p-2.5 transition-colors ${
+                                                    isLive 
+                                                        ? 'bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30' 
+                                                        : 'bg-primary/10 group-hover:bg-primary/15'
+                                                }`}>
+                                                    <span className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                                                        {startDate.toLocaleDateString('en-US', { month: 'short' })}
+                                                    </span>
+                                                    <span className={`block text-xl font-bold ${isLive ? 'text-red-500' : 'text-primary'}`}>
+                                                        {startDate.getDate()}
+                                                    </span>
+                                                </div>
+                                                
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 line-clamp-1 group-hover:text-primary transition-colors">
+                                                        {event.name}
+                                                    </h3>
+                                                    <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
+                                                        {event.description || 'No description provided'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Status & Stats */}
+                                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                                                <Badge 
+                                                    variant={isLive ? 'default' : isDraft ? 'secondary' : 'outline'}
+                                                    className={`text-xs ${
+                                                        isLive 
+                                                            ? 'bg-red-500/10 text-red-600 border-red-500/30 animate-pulse' 
+                                                            : isDraft 
+                                                                ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                                                                : isPublished
+                                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
+                                                                    : ''
+                                                    }`}
+                                                >
+                                                    {isLive && <Zap className="h-3 w-3 mr-1" />}
+                                                    {event.status}
+                                                </Badge>
+                                                
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Users className="h-3.5 w-3.5" />
+                                                    <span className="font-medium text-foreground">{event.registrationCount}</span>
+                                                    {event.capacity && <span>/ {event.capacity}</span>}
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Clock className="h-3.5 w-3.5" />
+                                                    <span>{startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-2 pt-3 border-t border-border/50">
+                                                <Link 
+                                                    to={`/events/${event.id}`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5" />
+                                                    View
+                                                </Link>
+                                                <Link 
+                                                    to={`/events/${event.id}/edit`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-lg transition-colors"
+                                                >
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                    Edit
+                                                </Link>
+                                                <Link 
+                                                    to={`/${organization.slug}/workspaces?eventId=${event.id}`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-colors ml-auto"
+                                                >
+                                                    <FolderOpen className="h-3.5 w-3.5" />
+                                                    Workspace
+                                                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     ) : (
                         <motion.div 
