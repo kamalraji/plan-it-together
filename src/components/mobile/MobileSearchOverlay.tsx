@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -158,9 +159,16 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
     navigate(`/${organizationSlug}/eventmanagement/${eventId}`);
   };
 
-  const handleWorkspaceClick = (workspace: { id: string; event_id: string }) => {
+  const handleWorkspaceClick = (workspace: { id: string; event_id: string; name: string; workspace_type?: string }) => {
     onClose();
-    navigate(`/${organizationSlug}/workspaces/${workspace.event_id}/${workspace.id}`);
+    const url = buildWorkspaceUrl({
+      orgSlug: organizationSlug,
+      eventId: workspace.event_id,
+      workspaceId: workspace.id,
+      workspaceType: workspace.workspace_type || 'ROOT',
+      workspaceName: workspace.name,
+    });
+    navigate(url);
   };
 
   const handleMemberClick = () => {

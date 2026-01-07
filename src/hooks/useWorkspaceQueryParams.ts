@@ -1,8 +1,16 @@
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { WorkspaceTab } from './useWorkspaceShell';
+import { 
+  buildWorkspaceUrl as buildUrl, 
+  buildWorkspaceSettingsUrl,
+  buildWorkspaceListUrl,
+  getWorkspaceTypePath as getTypePath,
+  toNameSlug,
+  type WorkspaceTypePath,
+  type WorkspaceUrlOptions,
+} from '@/lib/workspaceNavigation';
 
-// Workspace type path segments
-export type WorkspaceTypePath = 'root' | 'department' | 'committee' | 'team';
+export type { WorkspaceTypePath, WorkspaceUrlOptions };
 
 export interface WorkspaceQueryParams {
   workspaceId?: string;
@@ -72,31 +80,9 @@ export function useWorkspaceQueryParams() {
 
   /**
    * Build a workspace URL with type-based path structure
-   * Example: /thittamonehub/workspaces/eventId/department?name=content&workspaceId=xxx
+   * Re-exported from workspaceNavigation for convenience
    */
-  const buildWorkspaceUrl = (
-    options: {
-      orgSlug: string;
-      eventId: string;
-      workspaceType: WorkspaceTypePath;
-      workspaceName?: string;
-      workspaceId: string;
-      tab?: WorkspaceTab;
-      taskId?: string;
-      sectionId?: string;
-    }
-  ): string => {
-    const basePath = `/${options.orgSlug}/workspaces/${options.eventId}/${options.workspaceType}`;
-    
-    const queryParams = new URLSearchParams();
-    if (options.workspaceName) queryParams.set('name', options.workspaceName.toLowerCase().replace(/\s+/g, '-'));
-    queryParams.set('workspaceId', options.workspaceId);
-    if (options.tab && options.tab !== 'overview') queryParams.set('tab', options.tab);
-    if (options.taskId) queryParams.set('taskId', options.taskId);
-    if (options.sectionId) queryParams.set('sectionid', options.sectionId);
-    
-    return `${basePath}?${queryParams.toString()}`;
-  };
+  const buildWorkspaceUrl = buildUrl;
 
   /**
    * Navigate to a workspace with the new URL structure
@@ -104,27 +90,23 @@ export function useWorkspaceQueryParams() {
   const navigateToWorkspace = (options: {
     orgSlug: string;
     eventId: string;
-    workspaceType: WorkspaceTypePath;
-    workspaceName?: string;
     workspaceId: string;
+    workspaceType: string;
+    workspaceName?: string;
     tab?: WorkspaceTab;
   }) => {
-    const url = buildWorkspaceUrl(options);
+    const url = buildUrl({
+      ...options,
+      tab: options.tab,
+    });
     navigate(url);
   };
 
   /**
    * Map database workspace_type to URL path segment
+   * Re-exported from workspaceNavigation for convenience
    */
-  const getWorkspaceTypePath = (dbType: string): WorkspaceTypePath => {
-    const typeMap: Record<string, WorkspaceTypePath> = {
-      'ROOT': 'root',
-      'DEPARTMENT': 'department',
-      'COMMITTEE': 'committee',
-      'TEAM': 'team',
-    };
-    return typeMap[dbType] || 'root';
-  };
+  const getWorkspaceTypePath = getTypePath;
 
   /**
    * Legacy URL builder for backward compatibility
@@ -138,13 +120,13 @@ export function useWorkspaceQueryParams() {
       sectionId?: string;
     }
   ): string => {
-    const params = new URLSearchParams();
-    if (options.workspaceId) params.set('workspaceId', options.workspaceId);
-    if (options.tab && options.tab !== 'overview') params.set('tab', options.tab);
-    if (options.taskId) params.set('taskId', options.taskId);
-    if (options.sectionId) params.set('sectionid', options.sectionId);
+    const urlParams = new URLSearchParams();
+    if (options.workspaceId) urlParams.set('workspaceId', options.workspaceId);
+    if (options.tab && options.tab !== 'overview') urlParams.set('tab', options.tab);
+    if (options.taskId) urlParams.set('taskId', options.taskId);
+    if (options.sectionId) urlParams.set('sectionid', options.sectionId);
     
-    const queryString = params.toString();
+    const queryString = urlParams.toString();
     return queryString ? `${baseUrl}?${queryString}` : baseUrl;
   };
 
@@ -158,6 +140,9 @@ export function useWorkspaceQueryParams() {
     buildLegacyWorkspaceUrl,
     navigateToWorkspace,
     getWorkspaceTypePath,
+    buildWorkspaceSettingsUrl,
+    buildWorkspaceListUrl,
+    toNameSlug,
     searchParams,
     setSearchParams,
   };

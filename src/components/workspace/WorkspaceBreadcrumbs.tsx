@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Home, ChevronRight, Building2, Users, Briefcase, UsersRound } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { buildWorkspaceUrl, buildWorkspaceListUrl } from '@/lib/workspaceNavigation';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -121,16 +122,22 @@ export function WorkspaceBreadcrumbs({
     return path;
   }, [workspaces, workspaceId]);
 
-  const getWorkspaceLink = (wsId: string) => {
+  const getWorkspaceLink = (ws: BreadcrumbWorkspace) => {
     if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}/${wsId}`;
+      return buildWorkspaceUrl({
+        orgSlug,
+        eventId: resolvedEventId,
+        workspaceId: ws.id,
+        workspaceType: ws.workspaceType || 'ROOT',
+        workspaceName: ws.name,
+      });
     }
-    return `/workspaces/${wsId}`;
+    return `/workspaces/${ws.id}`;
   };
 
   const getWorkspacesListLink = () => {
-    if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}`;
+    if (orgSlug) {
+      return buildWorkspaceListUrl(orgSlug, resolvedEventId);
     }
     return '/dashboard';
   };
@@ -180,7 +187,7 @@ export function WorkspaceBreadcrumbs({
                 <>
                   <BreadcrumbLink asChild>
                     <Link
-                      to={getWorkspaceLink(ws.id)}
+                      to={getWorkspaceLink(ws)}
                       className="flex items-center gap-1.5 max-w-[100px] sm:max-w-[160px] group"
                     >
                       <Icon className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" />

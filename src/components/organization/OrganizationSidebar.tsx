@@ -4,6 +4,7 @@ import { useCurrentOrganization } from './OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import {
   Sidebar,
   SidebarContent,
@@ -184,7 +185,14 @@ export const OrganizationSidebar: React.FC = () => {
   });
 
   const handleWorkspaceClick = (workspace: any) => {
-    navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+    const url = buildWorkspaceUrl({
+      orgSlug: organization?.slug || '',
+      eventId: workspace.eventId,
+      workspaceId: workspace.id,
+      workspaceType: workspace.workspaceType || 'ROOT',
+      workspaceName: workspace.name,
+    });
+    navigate(url);
   };
 
   // Workspace item component

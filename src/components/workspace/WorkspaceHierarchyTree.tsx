@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, Users, Building2, Layers, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import { 
   MAX_WORKSPACE_DEPTH, 
   getWorkspaceTypeLabel,
@@ -38,14 +39,18 @@ interface WorkspaceHierarchyTreeProps {
   eventId: string;
   currentWorkspaceId?: string;
   onWorkspaceSelect?: (workspaceId: string) => void;
+  orgSlug?: string;
 }
 
 export function WorkspaceHierarchyTree({
   eventId,
   currentWorkspaceId,
   onWorkspaceSelect,
+  orgSlug: propOrgSlug,
 }: WorkspaceHierarchyTreeProps) {
   const navigate = useNavigate();
+  const routeParams = useParams<{ orgSlug?: string }>();
+  const orgSlug = propOrgSlug || routeParams.orgSlug;
   const { user } = useAuth();
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [delegationModal, setDelegationModal] = useState<{
@@ -190,11 +195,20 @@ export function WorkspaceHierarchyTree({
     });
   };
 
-  const handleSelect = (workspaceId: string) => {
+  const handleSelect = (node: WorkspaceNode) => {
     if (onWorkspaceSelect) {
-      onWorkspaceSelect(workspaceId);
+      onWorkspaceSelect(node.id);
+    } else if (orgSlug && eventId) {
+      const url = buildWorkspaceUrl({
+        orgSlug,
+        eventId,
+        workspaceId: node.id,
+        workspaceType: node.workspaceType || 'ROOT',
+        workspaceName: node.name,
+      });
+      navigate(url);
     } else {
-      navigate(`/workspaces/${workspaceId}`);
+      navigate(`/workspaces/${node.id}`);
     }
   };
 
@@ -375,7 +389,7 @@ export function WorkspaceHierarchyTree({
               : 'hover:bg-muted',
           )}
           style={{ paddingLeft: `${(node.depth - 1) * 16 + 8}px` }}
-          onClick={() => handleSelect(node.id)}
+          onClick={() => handleSelect(node)}
         >
           {/* Expand/Collapse Toggle */}
           <button

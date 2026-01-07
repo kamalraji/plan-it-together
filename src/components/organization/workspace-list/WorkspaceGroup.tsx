@@ -6,6 +6,7 @@ import {
   FolderIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
+import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import { WorkspaceCard, WorkspaceItem } from './WorkspaceCard';
 
 interface WorkspaceGroupProps {
@@ -30,7 +31,14 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
 
   const handleWorkspaceClick = (workspace: WorkspaceItem) => {
     if (workspace.eventId && orgSlug) {
-      navigate(`/${orgSlug}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+      const url = buildWorkspaceUrl({
+        orgSlug,
+        eventId: workspace.eventId,
+        workspaceId: workspace.id,
+        workspaceType: workspace.workspaceType || 'ROOT',
+        workspaceName: workspace.name,
+      });
+      navigate(url);
     }
   };
 
