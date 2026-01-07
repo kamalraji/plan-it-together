@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -97,16 +97,6 @@ export const SidebarServiceItem: React.FC<SidebarServiceItemProps> = ({
                 <Plus className="h-3.5 w-3.5" />
               </button>
             )}
-            <div className={cn(
-              "p-1 rounded-lg transition-all duration-200",
-              isExpanded && "bg-primary/10"
-            )}>
-              {isExpanded ? (
-                <ChevronDown className={cn("h-4 w-4 transition-colors", isActive ? "text-primary" : "text-muted-foreground")} />
-              ) : (
-                <ChevronRight className={cn("h-4 w-4 transition-colors", isActive ? "text-primary" : "text-muted-foreground")} />
-              )}
-            </div>
           </div>
         )}
       </button>
