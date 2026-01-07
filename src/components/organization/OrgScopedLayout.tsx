@@ -67,12 +67,13 @@ export const OrgScopedLayout: React.FC = () => {
   // Check if current route is the page builder (needs fullscreen)
   const isPageBuilder = location.pathname.includes('/page-builder');
   
-  // Check if current route needs narrower content (settings, team, event details, admin, etc.)
+  // Check if current route needs narrower content (settings, team, event details, admin, members, etc.)
   const isNarrowPage = location.pathname.includes('/settings') || 
                        location.pathname.includes('/team') ||
                        location.pathname.includes('/analytics') ||
                        location.pathname.includes('/eventmanagement') ||
-                       location.pathname.includes('/admin');
+                       location.pathname.includes('/admin') ||
+                       location.pathname.includes('/organizations/members');
   
   // Check if user has SUPER_ADMIN role (for admin routes)
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
