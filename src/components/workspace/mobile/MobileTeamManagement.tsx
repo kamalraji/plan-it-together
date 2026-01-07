@@ -17,6 +17,7 @@ import api from '../../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
+import { TeamListSkeleton } from '@/components/ui/page-skeletons';
 import { Users } from 'lucide-react';
 
 interface MobileTeamManagementProps {
@@ -176,21 +177,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   // };
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm p-4 animate-pulse">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <TeamListSkeleton itemCount={5} />;
   }
 
   return (

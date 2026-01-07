@@ -8,6 +8,7 @@ import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
 import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { TeamListSkeleton } from '@/components/ui/page-skeletons';
 
 interface TeamManagementProps {
   workspace: Workspace;
@@ -187,11 +188,7 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+    return <TeamListSkeleton itemCount={6} />;
   }
 
   return (
