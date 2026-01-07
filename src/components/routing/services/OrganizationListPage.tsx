@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader } from '../PageHeader';
+
 import { ResourceListPage } from '../ResourceListPage';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
 import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
@@ -283,20 +283,6 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
     },
   ];
 
-  const pageActions = [
-    {
-      label: 'View Analytics',
-      action: () => {
-        window.location.href = '/console/analytics';
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      label: 'Export All',
-      action: () => console.log('Export all organizations'),
-      variant: 'secondary' as const,
-    },
-  ];
 
   const getPageTitle = () => {
     switch (filterBy) {
@@ -323,12 +309,6 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <PageHeader
-          title={getPageTitle()}
-          subtitle={getPageSubtitle()}
-          actions={pageActions}
-        />
-
         <ResourceListPage
           title={getPageTitle()}
           subtitle={getPageSubtitle()}
