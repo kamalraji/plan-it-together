@@ -111,13 +111,13 @@ const SelectTrigger = React.forwardRef<
 });
 SelectTrigger.displayName = "SelectTrigger";
 
-const SelectContent = React.forwardRef<
-  HTMLDivElement,
+const SelectContent: React.FC<
   React.HTMLAttributes<HTMLDivElement> & {
     align?: Align;
     sideOffset?: number;
+    position?: "item-aligned" | "popper";
   }
->(({ className, children, align = "start", sideOffset = 6, ...props }, ref) => {
+> = ({ className, children, align = "start", sideOffset = 6, ...props }) => {
   const { open, setOpen, triggerRef } = useSelectCtx("SelectContent");
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [pos, setPos] = React.useState<{ top: number; left: number } | null>(null);
@@ -167,11 +167,7 @@ const SelectContent = React.forwardRef<
 
   return createPortal(
     <div
-      ref={(node) => {
-        contentRef.current = node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      }}
+      ref={contentRef}
       role="listbox"
       style={{ position: "fixed", top: pos.top, left: pos.left }}
       className={cn(
@@ -185,7 +181,7 @@ const SelectContent = React.forwardRef<
     </div>,
     document.body,
   );
-});
+};
 SelectContent.displayName = "SelectContent";
 
 const SelectItem = React.forwardRef<
