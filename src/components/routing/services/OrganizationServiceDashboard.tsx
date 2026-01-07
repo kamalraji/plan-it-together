@@ -1,13 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { PageHeader } from '../PageHeader';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
+import { Button } from '@/components/ui/button';
+import { 
+  Building2, 
+  Users, 
+  Settings, 
+  BarChart3, 
+  Plus, 
+  ArrowRight, 
+  Sparkles,
+  TrendingUp,
+  Calendar,
+  ChevronRight,
+  Eye
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 
 /**
- * OrganizationServiceDashboard provides the AWS-style service landing page for Organization Management.
- * It uses shared organizer-aware Supabase hooks for the current organizer's organizations and metrics.
+ * OrganizationServiceDashboard - Modern, stylish organization management hub
  */
 export const OrganizationServiceDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const {
     organizations,
     managedOrganizations,
@@ -16,45 +31,31 @@ export const OrganizationServiceDashboard: React.FC = () => {
     isLoadingOrganizations,
   } = useOrganizerOrganizations();
 
-  // Get primary organization slug for org-scoped navigation
-  const primaryOrgSlug = organizations && organizations.length > 0 ? organizations[0].slug : null;
-  const getOrgPath = (path: string) => primaryOrgSlug ? `/${primaryOrgSlug}${path}` : '/dashboard/organizations/join';
+  // Use URL param org slug or fallback to first organization
+  const currentOrgSlug = orgSlug || (organizations && organizations.length > 0 ? organizations[0].slug : null);
+  
+  const getOrgPath = (path: string) => currentOrgSlug ? `/${currentOrgSlug}${path}` : '/dashboard';
 
-  const pageActions = [
-    {
-      label: 'Manage Organizations',
-      action: () => {
-        window.location.href = getOrgPath('/settings');
-      },
-      variant: 'primary' as const,
-    },
-    {
-      label: 'View Analytics',
-      action: () => {
-        window.location.href = getOrgPath('/analytics');
-      },
-      variant: 'secondary' as const,
-    },
-  ];
+  // Calculate totals
+  const totalEvents = Object.values(perOrgAnalytics).reduce((acc, a) => acc + (a.totalEvents || 0), 0);
+  const totalMembers = recentOrganizations.reduce((acc, o) => acc + (o.memberCount || 0), 0);
 
   if (isLoadingOrganizations && !organizations) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-          <PageHeader
-            title="Organization Management"
-            subtitle="Manage your organizations, members, and settings"
-            actions={pageActions}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-card rounded-lg border border-border p-4 sm:p-6 animate-pulse space-y-3"
-              >
-                <div className="h-4 bg-muted rounded w-2/3" />
-                <div className="h-6 bg-muted rounded w-1/2" />
-              </div>
+      <div className="min-h-screen p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Skeleton Hero */}
+          <div className="h-48 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl animate-pulse" />
+          {/* Skeleton Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-24 bg-card rounded-2xl border border-border animate-pulse" />
+            ))}
+          </div>
+          {/* Skeleton Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-40 bg-card rounded-2xl border border-border animate-pulse" />
             ))}
           </div>
         </div>
@@ -63,204 +64,276 @@ export const OrganizationServiceDashboard: React.FC = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-        {/* Page Header */}
-        <PageHeader
-          title="Organization Management"
-          subtitle="Manage your organizations, members, and settings"
-          actions={pageActions}
-        />
-
-        {/* Recent Organizations */}
-        <div className="space-y-3 sm:space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
-            <h3 className="text-base sm:text-lg font-medium text-foreground">Your Organizations</h3>
-            <Link
-              to={primaryOrgSlug ? `/${primaryOrgSlug}/settings` : '/organizations/create'}
-              className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
-            >
-              Manage organization →
-            </Link>
+    <div className="min-h-screen p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Hero Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-secondary/10 p-8 md:p-10"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-primary">
+                <Building2 className="h-5 w-5" />
+                <span className="text-sm font-medium uppercase tracking-wider">Organization Hub</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                Manage Your Organizations
+              </h1>
+              <p className="text-muted-foreground max-w-xl">
+                Oversee teams, track analytics, and configure settings across all your organizations from one central dashboard.
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                variant="default" 
+                size="lg"
+                onClick={() => navigate(getOrgPath('/organizations/list'))}
+                className="gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                View All
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => navigate('/organizations/create')}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Create New
+              </Button>
+            </div>
           </div>
+        </motion.div>
 
-          {recentOrganizations.length > 0 ? (
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Organization Name
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Your Role
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Members
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Events
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Followers
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-background divide-y divide-border">
-                    {recentOrganizations.map((org) => {
-                      const matchedOrg = organizations?.find((o) => o.id === org.id);
-                      const orgSlug = matchedOrg?.slug;
-                          const dashboardPath = orgSlug ? `/${orgSlug}/dashboard` : '/dashboard';
-                          const settingsPath = orgSlug ? `/${orgSlug}/settings` : '/dashboard/organizations/join';
-
-                      return (
-                        <tr key={org.id} className="hover:bg-muted/60">
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-foreground">{org.name}</div>
-                          </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                            <span className="inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                              {org.role}
-                            </span>
-                          </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                            {org.memberCount}
-                          </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                            {org.eventCount}
-                          </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                            {org.followerCount}
-                          </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                            <Link
-                              to={dashboardPath}
-                              className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
-                            >
-                              View
-                            </Link>
-                            <Link
-                              to={settingsPath}
-                              className="text-muted-foreground hover:text-foreground"
-                            >
-                              Manage
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+        {/* Quick Stats */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
+          {[
+            { label: 'Organizations', value: organizations?.length || 0, icon: Building2, color: 'text-primary' },
+            { label: 'Total Events', value: totalEvents, icon: Calendar, color: 'text-secondary-foreground' },
+            { label: 'Team Members', value: totalMembers, icon: Users, color: 'text-accent-foreground' },
+            { label: 'Active Now', value: managedOrganizations.length, icon: TrendingUp, color: 'text-primary' },
+          ].map((stat) => (
+            <div 
+              key={stat.label}
+              className="group relative bg-card hover:bg-card/80 rounded-2xl border border-border p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground mt-1">{stat.value}</p>
+                </div>
+                <div className={`p-2 rounded-xl bg-primary/10 ${stat.color}`}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-card rounded-lg border border-border p-4 sm:p-6 text-xs sm:text-sm text-muted-foreground">
-              You don't own any organizations yet. Use the inline creation tool above to create your
-              first organization.
-            </div>
-          )}
-        </div>
+          ))}
+        </motion.div>
 
-        {/* Per-organization analytics panels */}
-        {managedOrganizations.length > 0 && (
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-medium text-foreground">Organization analytics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {managedOrganizations.map((org) => {
-                const analytics = perOrgAnalytics[org.id] ?? {
-                  totalEvents: 0,
-                  draftEvents: 0,
-                  publishedEvents: 0,
-                  ongoingEvents: 0,
-                  completedEvents: 0,
-                };
+        {/* Quick Actions Grid */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          {[
+            {
+              title: 'Team Management',
+              description: 'Invite members, assign roles, and manage permissions',
+              icon: Users,
+              path: getOrgPath('/team'),
+              gradient: 'from-blue-500/10 to-cyan-500/10',
+              iconBg: 'bg-blue-500/10 text-blue-600'
+            },
+            {
+              title: 'Organization Settings',
+              description: 'Configure branding, policies, and preferences',
+              icon: Settings,
+              path: getOrgPath('/settings'),
+              gradient: 'from-purple-500/10 to-pink-500/10',
+              iconBg: 'bg-purple-500/10 text-purple-600'
+            },
+            {
+              title: 'Analytics & Insights',
+              description: 'Track growth, engagement, and performance metrics',
+              icon: BarChart3,
+              path: getOrgPath('/analytics'),
+              gradient: 'from-emerald-500/10 to-teal-500/10',
+              iconBg: 'bg-emerald-500/10 text-emerald-600'
+            },
+          ].map((action) => (
+            <Link
+              key={action.title}
+              to={action.path}
+              className="group relative overflow-hidden bg-card hover:bg-card/80 rounded-2xl border border-border p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+              <div className="relative z-10">
+                <div className={`inline-flex p-3 rounded-xl ${action.iconBg} mb-4`}>
+                  <action.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
+                  {action.title}
+                  <ChevronRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                </h3>
+                <p className="text-sm text-muted-foreground">{action.description}</p>
+              </div>
+            </Link>
+          ))}
+        </motion.div>
+
+        {/* Organizations List */}
+        {recentOrganizations.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-foreground">Your Organizations</h2>
+              <Link 
+                to={getOrgPath('/organizations/list')}
+                className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+              >
+                View all <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recentOrganizations.slice(0, 6).map((org) => {
+                const matchedOrg = organizations?.find((o) => o.id === org.id);
+                const orgSlugForNav = matchedOrg?.slug;
+                const analytics = perOrgAnalytics[org.id] ?? { totalEvents: 0, draftEvents: 0, publishedEvents: 0, ongoingEvents: 0, completedEvents: 0 };
 
                 return (
                   <div
                     key={org.id}
-                    className="bg-card rounded-lg border border-border p-4 sm:p-6 flex flex-col gap-2 sm:gap-3"
+                    className="group bg-card hover:bg-card/80 rounded-2xl border border-border p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-sm sm:text-base font-medium text-foreground">
-                          {org.name}
-                        </h4>
-                        <p className="text-[11px] sm:text-xs text-muted-foreground">
-                          {org.slug} · {org.category}
-                        </p>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                        <span className="text-lg font-bold text-primary">
+                          {org.name.charAt(0).toUpperCase()}
+                        </span>
                       </div>
-                      <span className="text-xs sm:text-sm font-semibold text-primary">
-                        {analytics.totalEvents} events
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-foreground truncate">{org.name}</h3>
+                        <p className="text-sm text-muted-foreground capitalize">{org.role?.toLowerCase()}</p>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-[11px] sm:text-xs text-muted-foreground">
-                      <div className="flex items-center justify-between">
-                        <span>Draft</span>
-                        <span className="text-foreground font-medium">
-                          {analytics.draftEvents}
-                        </span>
+
+                    <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <p className="text-lg font-semibold text-foreground">{analytics.totalEvents}</p>
+                        <p className="text-xs text-muted-foreground">Events</p>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Published</span>
-                        <span className="text-foreground font-medium">
-                          {analytics.publishedEvents}
-                        </span>
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <p className="text-lg font-semibold text-foreground">{org.memberCount}</p>
+                        <p className="text-xs text-muted-foreground">Members</p>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Ongoing</span>
-                        <span className="text-foreground font-medium">
-                          {analytics.ongoingEvents}
-                        </span>
+                      <div className="p-2 rounded-lg bg-muted/50">
+                        <p className="text-lg font-semibold text-foreground">{org.followerCount}</p>
+                        <p className="text-xs text-muted-foreground">Followers</p>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Completed</span>
-                        <span className="text-foreground font-medium">
-                          {analytics.completedEvents}
-                        </span>
-                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => navigate(orgSlugForNav ? `/${orgSlugForNav}/dashboard` : '/dashboard')}
+                      >
+                        Dashboard
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => navigate(orgSlugForNav ? `/${orgSlugForNav}/settings` : '/dashboard')}
+                      >
+                        Settings
+                      </Button>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Service Information */}
-        <div className="bg-primary/5 rounded-lg p-4 sm:p-6">
-          <h3 className="text-base sm:text-lg font-medium text-primary mb-2">
-            About Organization Management Service
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-            The Organization Management Service provides comprehensive tools for managing your organizations,
-            members, and organizational settings. Oversee multiple organizations, track analytics, and
-            configure branding and policies from one centralized location.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
-            <div>
-              <h4 className="font-medium text-foreground mb-1">Member Management</h4>
-              <p className="text-muted-foreground">
-                Invite, manage, and assign roles to organization members with granular permissions.
-              </p>
+        {/* Empty State */}
+        {recentOrganizations.length === 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-center py-16 px-6 bg-card rounded-3xl border border-border"
+          >
+            <div className="inline-flex p-4 rounded-2xl bg-primary/10 mb-4">
+              <Sparkles className="h-8 w-8 text-primary" />
             </div>
-            <div>
-              <h4 className="font-medium text-foreground mb-1">Organization Settings</h4>
-              <p className="text-muted-foreground">
-                Configure branding, policies, and organizational preferences.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-foreground mb-1">Analytics &amp; Insights</h4>
-              <p className="text-muted-foreground">
-                Track organization growth, member activity, and event performance.
-              </p>
-            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Organizations Yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Create your first organization to start managing teams, events, and more.
+            </p>
+            <Button onClick={() => navigate('/organizations/create')} size="lg" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Organization
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Feature Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gradient-to-br from-muted/50 to-muted/30 rounded-3xl p-6 md:p-8"
+        >
+          <div className="flex items-center gap-2 text-primary mb-4">
+            <Sparkles className="h-5 w-5" />
+            <span className="text-sm font-medium uppercase tracking-wider">Features</span>
           </div>
-        </div>
+          <h2 className="text-xl font-semibold text-foreground mb-6">Everything You Need</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'Member Management',
+                description: 'Invite, manage, and assign roles with granular permissions control.',
+              },
+              {
+                title: 'Branding & Settings',
+                description: 'Customize your organization\'s appearance and configure policies.',
+              },
+              {
+                title: 'Analytics & Reports',
+                description: 'Track growth, member activity, and event performance metrics.',
+              },
+            ].map((feature) => (
+              <div key={feature.title} className="space-y-2">
+                <h4 className="font-medium text-foreground">{feature.title}</h4>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
