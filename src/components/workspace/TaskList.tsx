@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember } from '../../types';
 import { cn } from '@/lib/utils';
 import { Plus, ClipboardList, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface TaskListProps {
   tasks: WorkspaceTask[];
@@ -23,6 +25,7 @@ export function TaskList({
   onCreateTask,
   isLoading = false
 }: TaskListProps) {
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const getStatusStyles = (status: TaskStatus) => {
     switch (status) {
@@ -280,9 +283,7 @@ export function TaskList({
                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (window.confirm('Are you sure you want to delete this task?')) {
-                            onTaskDelete(task.id);
-                          }
+                          setTaskToDelete(task.id);
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -308,6 +309,21 @@ export function TaskList({
           </Button>
         )}
       </div>
+
+      <ConfirmationDialog
+        open={!!taskToDelete}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        title="Delete task"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => {
+          if (taskToDelete && onTaskDelete) {
+            onTaskDelete(taskToDelete);
+            setTaskToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

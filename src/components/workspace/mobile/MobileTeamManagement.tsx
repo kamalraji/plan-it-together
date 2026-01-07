@@ -15,6 +15,7 @@ import {
 import { Workspace, TeamMember, WorkspaceRole } from '../../../types';
 import api from '../../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface MobileTeamManagementProps {
   workspace: Workspace;
@@ -27,6 +28,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'inactive'>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch team members
@@ -155,9 +157,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       .slice(0, 2);
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    if (window.confirm('Are you sure you want to remove this team member?')) {
-      await removeTeamMemberMutation.mutateAsync(memberId);
+  const handleRemoveMember = (memberId: string) => {
+    setMemberToRemove(memberId);
+  };
+
+  const confirmRemoveMember = async () => {
+    if (memberToRemove) {
+      await removeTeamMemberMutation.mutateAsync(memberToRemove);
+      setMemberToRemove(null);
     }
   };
 
@@ -361,6 +368,17 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
           ))
         )}
       </div>
+
+      <ConfirmationDialog
+        open={!!memberToRemove}
+        onOpenChange={(open) => !open && setMemberToRemove(null)}
+        title="Remove team member"
+        description="Are you sure you want to remove this team member? They will lose access to the workspace."
+        confirmLabel="Remove"
+        variant="danger"
+        onConfirm={confirmRemoveMember}
+        isLoading={removeTeamMemberMutation.isPending}
+      />
     </div>
   );
 }

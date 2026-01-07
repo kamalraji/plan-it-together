@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory } from '../../types';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface TaskKanbanBoardProps {
   tasks: WorkspaceTask[];
@@ -62,6 +63,7 @@ export function TaskKanbanBoard({
 }: TaskKanbanBoardProps) {
   const [draggedTask, setDraggedTask] = useState<WorkspaceTask | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const tasksByStatus = React.useMemo(() => {
     const grouped: Record<TaskStatus, WorkspaceTask[]> = {
@@ -386,9 +388,7 @@ export function TaskKanbanBoard({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (window.confirm('Are you sure you want to delete this task?')) {
-                                  onTaskDelete(task.id);
-                                }
+                                setTaskToDelete(task.id);
                               }}
                               className="text-red-600 hover:text-red-900 text-xs p-1"
                               title="Delete task"
@@ -408,6 +408,21 @@ export function TaskKanbanBoard({
           ))}
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={!!taskToDelete}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        title="Delete task"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => {
+          if (taskToDelete && onTaskDelete) {
+            onTaskDelete(taskToDelete);
+            setTaskToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }
