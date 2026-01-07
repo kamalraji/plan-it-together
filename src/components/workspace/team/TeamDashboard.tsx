@@ -36,27 +36,33 @@ export function TeamDashboard({
   return (
     <div className="space-y-6">
       {/* Role-Based Actions */}
-      <RoleBasedActions
-        workspace={workspace}
-        userRole={userRole || null}
-        onLogHours={onLogHours}
-        onSubmitForApproval={onSubmitForApproval}
-        onCreateTask={onViewTasks}
-      />
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onLogHours={onLogHours}
+          onSubmitForApproval={onSubmitForApproval}
+          onCreateTask={onViewTasks}
+        />
+      </section>
 
       {/* Mini-Map - Shows position in hierarchy */}
-      <WorkspaceHierarchyMiniMap
-        workspaceId={workspace.id}
-        eventId={workspace.eventId}
-        orgSlug={orgSlug}
-        orientation="horizontal"
-        showLabels={true}
-        className="lg:hidden"
-      />
+      <section id="hierarchy">
+        <WorkspaceHierarchyMiniMap
+          workspaceId={workspace.id}
+          eventId={workspace.eventId}
+          orgSlug={orgSlug}
+          orientation="horizontal"
+          showLabels={true}
+          className="lg:hidden"
+        />
+      </section>
       
-      <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+      <section id="tasks">
+        <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section id="progress" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Personal Progress */}
         <div className="bg-card rounded-xl border border-border shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -137,18 +143,22 @@ export function TeamDashboard({
             <p className="text-sm text-muted-foreground text-center py-8">No team members yet.</p>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Time Tracking Section */}
-      <div className="space-y-4">
+      <section id="time-tracking" className="space-y-4">
         <TimeTracker workspaceId={workspace.id} />
         <TimesheetView workspaceId={workspace.id} />
-      </div>
+      </section>
 
       {/* Workload Report */}
-      <WorkloadReport workspaceId={workspace.id} />
+      <section id="workload">
+        <WorkloadReport workspaceId={workspace.id} />
+      </section>
 
-      <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={10} />
+      <section id="team-stats">
+        <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={10} />
+      </section>
     </div>
   );
 }

@@ -176,7 +176,7 @@ export function DepartmentDashboard({
   return (
     <div className="space-y-6">
       {/* Department Header Card */}
-      <div className="bg-card rounded-xl border border-border shadow-sm p-4 sm:p-6">
+      <section id="header" className="bg-card rounded-xl border border-border shadow-sm p-4 sm:p-6">
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-primary/10">
             <Building2 className="h-6 w-6 text-primary" />
@@ -208,22 +208,26 @@ export function DepartmentDashboard({
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Role-Based Actions */}
-      <RoleBasedActions
-        workspace={workspace}
-        userRole={userRole || null}
-        onDelegateRole={onDelegateRole}
-        onInviteMember={onInviteMember}
-        onViewReport={() => {}}
-      />
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onDelegateRole={onDelegateRole}
+          onInviteMember={onInviteMember}
+          onViewReport={() => {}}
+        />
+      </section>
 
       {/* Task Summary */}
-      <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+      <section id="tasks">
+        <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
+      </section>
 
       {/* Mini-Map & KPIs Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section id="hierarchy" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <WorkspaceHierarchyMiniMap
           workspaceId={workspace.id}
           eventId={workspace.eventId}
@@ -234,27 +238,29 @@ export function DepartmentDashboard({
         <div className="lg:col-span-2">
           <DepartmentKPICard workspaceId={workspace.id} departmentId={workspace.departmentId} />
         </div>
-      </div>
+      </section>
 
       {/* Budget Section */}
-      <BudgetTrackerConnected 
-        workspaceId={workspace.id}
-        showBreakdown={true}
-      />
+      <section id="budget">
+        <BudgetTrackerConnected 
+          workspaceId={workspace.id}
+          showBreakdown={true}
+        />
+      </section>
 
       {/* Resources Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section id="resources" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ResourceManager departmentId={workspace.departmentId} workspaceId={workspace.id} />
         <ResourceApprovalPanel workspaceId={workspace.id} />
-      </div>
+      </section>
 
       {/* Approval Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section id="approvals" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ResourceApprovalPanel workspaceId={workspace.id} />
-      </div>
+      </section>
 
       {/* Committees Section */}
-      <div className="space-y-4">
+      <section id="committees" className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-foreground">Committees Overview</h3>
           <span className="text-sm text-muted-foreground">
@@ -266,10 +272,12 @@ export function DepartmentDashboard({
           onCommitteeClick={handleCommitteeClick}
           emptyMessage="No committees created yet"
         />
-      </div>
+      </section>
 
       {/* Team Members */}
-      <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
+      <section id="team-stats">
+        <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
+      </section>
     </div>
   );
 }

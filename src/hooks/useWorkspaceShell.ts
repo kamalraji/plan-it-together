@@ -91,10 +91,18 @@ export function useWorkspaceShell({
   const { user } = useAuth();
   
   const taskIdFromUrl = searchParams.get('taskId') || undefined;
+  const tabFromUrl = searchParams.get('tab') as WorkspaceTab | null;
   const initialRoleScopeParam = searchParams.get('roleSpace') as WorkspaceRoleScope | null;
 
+  // Determine initial tab: taskId takes priority, then URL tab, then default 'overview'
+  const getInitialTab = (): WorkspaceTab => {
+    if (taskIdFromUrl) return 'tasks';
+    if (tabFromUrl) return tabFromUrl;
+    return 'overview';
+  };
+
   // State
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>(taskIdFromUrl ? 'tasks' : 'overview');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(getInitialTab);
   const [activeRoleSpace, setActiveRoleSpace] = useState<WorkspaceRoleScope>(initialRoleScopeParam || 'ALL');
   const [showSubWorkspaceModal, setShowSubWorkspaceModal] = useState(false);
 
@@ -150,6 +158,22 @@ export function useWorkspaceShell({
   // Actions
   const handleSetActiveTab = (tab: WorkspaceTab) => {
     setActiveTab(tab);
+    
+    // Sync tab to URL query params
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (tab === 'overview') {
+        next.delete('tab'); // Default doesn't need to be in URL
+      } else {
+        next.set('tab', tab);
+      }
+      // Clear taskId when switching tabs (unless going to tasks)
+      if (tab !== 'tasks') {
+        next.delete('taskId');
+      }
+      return next;
+    }, { replace: true });
+    
     mutations.upsertRoleView(activeRoleSpace, tab);
   };
 

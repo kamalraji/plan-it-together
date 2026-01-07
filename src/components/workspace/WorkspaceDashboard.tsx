@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { WorkspaceStatus, WorkspaceRole, WorkspaceType } from '../../types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { WorkspaceNavigation } from './WorkspaceNavigation';
@@ -26,6 +28,7 @@ interface WorkspaceDashboardProps {
 
 export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardProps) {
   const { state, actions, permissions } = useWorkspaceShell({ workspaceId, orgSlug });
+  const [searchParams] = useSearchParams();
 
   const {
     workspace,
@@ -40,6 +43,22 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
     showSubWorkspaceModal,
     taskIdFromUrl,
   } = state;
+
+  // Section deep-linking: auto-scroll to section when sectionid param is present
+  useEffect(() => {
+    const sectionId = searchParams.get('sectionid');
+    if (!sectionId || !workspace) return;
+
+    // Small delay to ensure content is rendered
+    const timer = setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchParams, workspace]);
 
   if (isLoading) {
     return (

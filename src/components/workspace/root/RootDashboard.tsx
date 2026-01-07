@@ -59,19 +59,21 @@ export function RootDashboard({
     <div className="space-y-6">
 
       {/* Role-Based Actions */}
-      <RoleBasedActions
-        workspace={workspace}
-        userRole={userRole || null}
-        onDelegateRole={onDelegateRole}
-        onInviteMember={onInviteMember}
-        onManageSettings={onManageSettings}
-        onViewReport={() => navigate(`/${orgSlug}/analytics`)}
-      />
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onDelegateRole={onDelegateRole}
+          onInviteMember={onInviteMember}
+          onManageSettings={onManageSettings}
+          onViewReport={() => navigate(`/${orgSlug}/analytics`)}
+        />
+      </section>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Departments Performance */}
-        <div className="lg:col-span-2 space-y-4">
+        <section id="departments" className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" />
@@ -146,19 +148,20 @@ export function RootDashboard({
               </div>
             )}
           </div>
-        </div>
-
+        </section>
         {/* Right Column: Workspace Management, Activity & Milestones */}
         <div className="space-y-4">
           {/* Child Workspaces Manager */}
-          <ChildWorkspacesManager
-            workspace={workspace}
-            orgSlug={orgSlug}
-            onWorkspaceSelect={handleDepartmentClick}
-          />
+          <section id="workspaces">
+            <ChildWorkspacesManager
+              workspace={workspace}
+              orgSlug={orgSlug}
+              onWorkspaceSelect={handleDepartmentClick}
+            />
+          </section>
 
           {/* Upcoming Milestones */}
-          <div className="bg-card rounded-xl border border-border p-4">
+          <section id="milestones" className="bg-card rounded-xl border border-border p-4">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Calendar className="h-4 w-4 text-primary" />
               Upcoming Milestones
@@ -187,10 +190,10 @@ export function RootDashboard({
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">No upcoming milestones</p>
             )}
-          </div>
+          </section>
 
           {/* Recent Activity */}
-          <div className="bg-card rounded-xl border border-border p-4">
+          <section id="activity" className="bg-card rounded-xl border border-border p-4">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Activity className="h-4 w-4 text-primary" />
               Recent Activity
@@ -213,30 +216,34 @@ export function RootDashboard({
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
             )}
-          </div>
+          </section>
 
           {/* Mini-Map - Quick Position Indicator */}
-          <WorkspaceHierarchyMiniMap
-            workspaceId={workspace.id}
-            eventId={workspace.eventId}
-            orgSlug={orgSlug}
-            orientation="vertical"
-            showLabels={true}
-          />
-
-          {/* Hierarchy Tree */}
-          {workspace.eventId && (
-            <HierarchyTreeCard
+          <section id="hierarchy">
+            <WorkspaceHierarchyMiniMap
+              workspaceId={workspace.id}
               eventId={workspace.eventId}
-              currentWorkspaceId={workspace.id}
-              onWorkspaceSelect={handleDepartmentClick}
+              orgSlug={orgSlug}
+              orientation="vertical"
+              showLabels={true}
             />
-          )}
+
+            {/* Hierarchy Tree */}
+            {workspace.eventId && (
+              <HierarchyTreeCard
+                eventId={workspace.eventId}
+                currentWorkspaceId={workspace.id}
+                onWorkspaceSelect={handleDepartmentClick}
+              />
+            )}
+          </section>
         </div>
       </div>
 
       {/* Team Members */}
-      <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
+      <section id="team-stats">
+        <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
+      </section>
     </div>
   );
 }

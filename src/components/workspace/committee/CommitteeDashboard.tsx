@@ -472,26 +472,30 @@ export function CommitteeDashboard({
   return (
     <div className="space-y-6">
       {/* Committee Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <section id="header">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+      </section>
 
       {/* Role-Based Actions */}
-      <RoleBasedActions
-        workspace={workspace}
-        userRole={userRole || null}
-        onDelegateRole={onDelegateRole}
-        onInviteMember={onInviteMember}
-        onRequestBudget={onRequestBudget}
-        onRequestResource={onRequestResource}
-      />
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onDelegateRole={onDelegateRole}
+          onInviteMember={onInviteMember}
+          onRequestBudget={onRequestBudget}
+          onRequestResource={onRequestResource}
+        />
+      </section>
 
       {/* Task Summary with Mini-Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <section id="tasks" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
           <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
         </div>
@@ -502,10 +506,10 @@ export function CommitteeDashboard({
           orientation="vertical"
           showLabels={false}
         />
-      </div>
+      </section>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section id="milestones" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
           <MilestoneTimeline workspaceId={workspace.id} />
@@ -529,10 +533,10 @@ export function CommitteeDashboard({
             parentWorkspaceId={workspace.parentWorkspaceId || null}
           />
         </div>
-      </div>
+      </section>
 
       {/* Resource Requests Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section id="resources" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <ResourceRequestForm 
             workspaceId={workspace.id} 
@@ -540,10 +544,12 @@ export function CommitteeDashboard({
           />
         </div>
         <ResourceRequestsList workspaceId={workspace.id} />
-      </div>
+      </section>
 
       {/* Team Members */}
-      <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+      <section id="team-stats">
+        <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+      </section>
     </div>
   );
 }
