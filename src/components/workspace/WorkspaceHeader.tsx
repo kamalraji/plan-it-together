@@ -6,10 +6,10 @@ import { WorkspaceBreadcrumbsMobile } from './WorkspaceBreadcrumbsMobile';
 import { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
 import { getCreateButtonLabel, canHaveChildren } from '@/lib/workspaceHierarchy';
 import {
-  SimplePopover as Popover,
-  SimplePopoverContent as PopoverContent,
-  SimplePopoverTrigger as PopoverTrigger,
-} from '@/components/ui/simple-popover';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   SimpleDropdown,
   SimpleDropdownContent,

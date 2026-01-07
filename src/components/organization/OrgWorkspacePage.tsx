@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkspaceStatus, UserRole } from '@/types';
@@ -8,7 +8,7 @@ import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationB
 import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
+import { WorkspaceTypePath } from '@/hooks/useWorkspaceQueryParams';
 import { 
   PlusIcon, 
   Squares2X2Icon, 
@@ -107,7 +107,6 @@ export const OrgWorkspacePage: React.FC = () => {
   const { orgSlug, eventId } = useParams<{ orgSlug: string; eventId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -115,7 +114,7 @@ export const OrgWorkspacePage: React.FC = () => {
   const pathParts = location.pathname.split('/').filter(Boolean);
   const workspaceTypeFromPath = pathParts.find(part => 
     ['root', 'department', 'committee', 'team'].includes(part)
-  ) as 'root' | 'department' | 'committee' | 'team' | undefined;
+  ) as WorkspaceTypePath | undefined;
   
   // Get workspace name from query params for new URL structure
   const workspaceName = searchParams.get('name') || undefined;
@@ -246,35 +245,43 @@ export const OrgWorkspacePage: React.FC = () => {
       setNewWorkspaceName('');
       setSelectedTemplate(ENHANCED_WORKSPACE_TEMPLATES[0]);
       
-      // Navigate to the newly created workspace using the new type-based URL
-      if (orgSlug) {
-        const url = buildWorkspaceUrl({
-          orgSlug,
-          eventId,
-          workspaceId: result.rootWorkspace.id,
-          workspaceType: 'ROOT',
-          workspaceName: result.rootWorkspace.name,
-        });
-        navigate(url);
-      }
+      // Select the newly created workspace
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', result.rootWorkspace.id);
+        return next;
+      });
     } catch (error) {
       // Error already handled by the hook
     }
   };
 
   const handleSelectWorkspace = (workspaceId: string, workspace?: any) => {
+    // If workspace data is provided, use new URL structure with type path
     if (workspace && orgSlug && eventId) {
-      const url = buildWorkspaceUrl({
-        orgSlug,
-        eventId,
-        workspaceId,
-        workspaceType: workspace.workspaceType || 'ROOT',
-        workspaceName: workspace.name,
+      const typePathMap: Record<string, WorkspaceTypePath> = {
+        'ROOT': 'root',
+        'DEPARTMENT': 'department', 
+        'COMMITTEE': 'committee',
+        'TEAM': 'team',
+      };
+      const typePath = typePathMap[workspace.workspaceType] || 'root';
+      const nameSlug = workspace.name.toLowerCase().replace(/\s+/g, '-');
+      
+      // Navigate to new URL structure: /:orgSlug/workspaces/:eventId/:type?name=xxx&workspaceId=xxx
+      const params = new URLSearchParams();
+      params.set('name', nameSlug);
+      params.set('workspaceId', workspaceId);
+      
+      window.history.replaceState(null, '', `/${orgSlug}/workspaces/${eventId}/${typePath}?${params.toString()}`);
+      setSearchParams(params, { replace: true });
+    } else {
+      // Fallback to legacy query param approach
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaceId);
+        return next;
       });
-      navigate(url);
-    } else if (orgSlug && eventId) {
-      // Fallback: navigate with just workspaceId
-      navigate(`/${orgSlug}/workspaces/${eventId}/root?workspaceId=${workspaceId}`);
     }
   };
 

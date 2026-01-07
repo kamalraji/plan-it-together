@@ -1,10 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, Users, Building2, Layers, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import { 
   MAX_WORKSPACE_DEPTH, 
   getWorkspaceTypeLabel,
@@ -14,11 +13,11 @@ import {
 } from '@/lib/workspaceHierarchy';
 import { WorkspaceType, WorkspaceRole, TeamMember } from '@/types';
 import {
-  SimpleTooltip as Tooltip,
-  SimpleTooltipContent as TooltipContent,
-  SimpleTooltipProvider as TooltipProvider,
-  SimpleTooltipTrigger as TooltipTrigger,
-} from '@/components/ui/simple-tooltip';
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { RoleDelegationModal } from './RoleDelegationModal';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,18 +38,14 @@ interface WorkspaceHierarchyTreeProps {
   eventId: string;
   currentWorkspaceId?: string;
   onWorkspaceSelect?: (workspaceId: string) => void;
-  orgSlug?: string;
 }
 
 export function WorkspaceHierarchyTree({
   eventId,
   currentWorkspaceId,
   onWorkspaceSelect,
-  orgSlug: propOrgSlug,
 }: WorkspaceHierarchyTreeProps) {
   const navigate = useNavigate();
-  const routeParams = useParams<{ orgSlug?: string }>();
-  const orgSlug = propOrgSlug || routeParams.orgSlug;
   const { user } = useAuth();
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [delegationModal, setDelegationModal] = useState<{
@@ -195,20 +190,11 @@ export function WorkspaceHierarchyTree({
     });
   };
 
-  const handleSelect = (node: WorkspaceNode) => {
+  const handleSelect = (workspaceId: string) => {
     if (onWorkspaceSelect) {
-      onWorkspaceSelect(node.id);
-    } else if (orgSlug && eventId) {
-      const url = buildWorkspaceUrl({
-        orgSlug,
-        eventId,
-        workspaceId: node.id,
-        workspaceType: node.workspaceType || 'ROOT',
-        workspaceName: node.name,
-      });
-      navigate(url);
+      onWorkspaceSelect(workspaceId);
     } else {
-      navigate(`/workspaces/${node.id}`);
+      navigate(`/workspaces/${workspaceId}`);
     }
   };
 
@@ -389,7 +375,7 @@ export function WorkspaceHierarchyTree({
               : 'hover:bg-muted',
           )}
           style={{ paddingLeft: `${(node.depth - 1) * 16 + 8}px` }}
-          onClick={() => handleSelect(node)}
+          onClick={() => handleSelect(node.id)}
         >
           {/* Expand/Collapse Toggle */}
           <button

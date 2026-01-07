@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
-import { SimplePopover as Popover, SimplePopoverContent as PopoverContent, SimplePopoverTrigger as PopoverTrigger } from '@/components/ui/simple-popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';

@@ -6,7 +6,6 @@ import { useWorkspaceMutations } from '@/hooks/useWorkspaceMutations';
 import { useWorkspacePermissions } from '@/hooks/useWorkspacePermissions';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { buildWorkspaceUrl, buildWorkspaceSettingsUrl } from '@/lib/workspaceNavigation';
 
 export type WorkspaceTab =
   | 'overview'
@@ -84,14 +83,12 @@ export function useWorkspaceShell({
   orgSlug: propOrgSlug 
 }: UseWorkspaceShellProps = {}): WorkspaceShellResult {
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const workspaceId = propWorkspaceId || paramWorkspaceId;
+  const orgSlug = propOrgSlug;
+  
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
-  
-  // Support both legacy URL path params AND new type-based query params
-  const queryWorkspaceId = searchParams.get('workspaceId') || undefined;
-  const workspaceId = propWorkspaceId || queryWorkspaceId || paramWorkspaceId;
-  const orgSlug = propOrgSlug;
   
   const taskIdFromUrl = searchParams.get('taskId') || undefined;
   const tabFromUrl = searchParams.get('tab') as WorkspaceTab | null;
@@ -193,17 +190,10 @@ export function useWorkspaceShell({
   };
 
   const handleInviteTeamMember = () => {
-    if (!workspaceId || !workspace) return;
-    if (orgSlug && workspace.eventId) {
-      const url = buildWorkspaceUrl({
-        orgSlug,
-        eventId: workspace.eventId,
-        workspaceId,
-        workspaceType: workspace.workspaceType || 'ROOT',
-        workspaceName: workspace.name,
-        tab: 'team',
-      });
-      navigate(url);
+    if (!workspaceId) return;
+    // Use org-scoped route if available
+    if (orgSlug && workspace?.eventId) {
+      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}?tab=team`);
     } else {
       navigate(`/workspaces/${workspaceId}/team/invite`);
     }
@@ -215,16 +205,10 @@ export function useWorkspaceShell({
   };
 
   const handleManageSettings = () => {
-    if (!workspaceId || !permissions.isGlobalWorkspaceManager || !workspace) return;
-    if (orgSlug && workspace.eventId) {
-      const url = buildWorkspaceSettingsUrl({
-        orgSlug,
-        eventId: workspace.eventId,
-        workspaceId,
-        workspaceType: workspace.workspaceType || 'ROOT',
-        workspaceName: workspace.name,
-      });
-      navigate(url);
+    if (!workspaceId || !permissions.isGlobalWorkspaceManager) return;
+    // Use org-scoped route if available, otherwise fallback
+    if (orgSlug && workspace?.eventId) {
+      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}/settings`);
     } else {
       navigate(`/workspaces/${workspaceId}/settings`);
     }

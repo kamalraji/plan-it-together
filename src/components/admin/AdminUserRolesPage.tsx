@@ -381,7 +381,7 @@ export const AdminUserRolesPage: React.FC = () => {
                   onChange={(e) => setNewUserId(e.target.value)}
                   className="sm:max-w-xs font-mono text-xs"
                 />
-                <Select value={newRole} onValueChange={(value) => setNewRole(value as AppRole)}>
+                <Select value={newRole} onValueChange={(value: AppRole) => setNewRole(value)}>
                   <SelectTrigger className="w-full sm:w-40">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
@@ -539,7 +539,7 @@ export const AdminUserRolesPage: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Select defaultValue={primaryRole} onValueChange={(v) => handlePrimaryChange(v as AppRole)}>
+                            <Select defaultValue={primaryRole} onValueChange={handlePrimaryChange}>
                               <SelectTrigger className="w-40">
                                 <SelectValue placeholder="Select primary" />
                               </SelectTrigger>

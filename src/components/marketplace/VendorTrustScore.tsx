@@ -7,7 +7,7 @@ import {
   Award,
   Zap
 } from 'lucide-react';
-import { SimpleTooltip as Tooltip, SimpleTooltipContent as TooltipContent, SimpleTooltipProvider as TooltipProvider, SimpleTooltipTrigger as TooltipTrigger } from '@/components/ui/simple-tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface TrustMetrics {

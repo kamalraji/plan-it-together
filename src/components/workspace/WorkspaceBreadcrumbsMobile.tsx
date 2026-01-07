@@ -4,7 +4,6 @@ import { Link, useParams } from 'react-router-dom';
 import { ChevronDown, Building2, Users, Briefcase, UsersRound, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { buildWorkspaceUrl, buildWorkspaceListUrl } from '@/lib/workspaceNavigation';
 import {
   SimpleDropdown,
   SimpleDropdownTrigger,
@@ -118,22 +117,16 @@ export function WorkspaceBreadcrumbsMobile({
     return path;
   }, [workspaces, workspaceId]);
 
-  const getWorkspaceLink = (ws: BreadcrumbWorkspace) => {
+  const getWorkspaceLink = (wsId: string) => {
     if (orgSlug && resolvedEventId) {
-      return buildWorkspaceUrl({
-        orgSlug,
-        eventId: resolvedEventId,
-        workspaceId: ws.id,
-        workspaceType: ws.workspaceType || 'ROOT',
-        workspaceName: ws.name,
-      });
+      return `/${orgSlug}/workspaces/${resolvedEventId}/${wsId}`;
     }
-    return `/workspaces/${ws.id}`;
+    return `/workspaces/${wsId}`;
   };
 
   const getWorkspacesListLink = () => {
-    if (orgSlug) {
-      return buildWorkspaceListUrl(orgSlug, resolvedEventId);
+    if (orgSlug && resolvedEventId) {
+      return `/${orgSlug}/workspaces/${resolvedEventId}`;
     }
     return '/dashboard';
   };
@@ -209,7 +202,7 @@ export function WorkspaceBreadcrumbsMobile({
             const Icon = config.icon;
 
             return (
-              <Link key={ws.id} to={getWorkspaceLink(ws)}>
+              <Link key={ws.id} to={getWorkspaceLink(ws.id)}>
                 <SimpleDropdownItem className="flex items-center gap-3 py-2.5">
                   <div
                     className={cn(

@@ -10,10 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
-  SimplePopover as Popover,
-  SimplePopoverContent as PopoverContent,
-  SimplePopoverTrigger as PopoverTrigger,
-} from '@/components/ui/simple-popover';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const SERVICE_CATEGORIES = [
   'VENUE',

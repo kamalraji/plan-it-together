@@ -15,7 +15,6 @@ export interface WorkspaceItem {
   eventId: string;
   name: string;
   status: WorkspaceStatus;
-  workspaceType?: string;
   createdAt: string;
   updatedAt: string;
   organizerId: string;

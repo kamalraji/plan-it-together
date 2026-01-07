@@ -6,7 +6,7 @@ import { AttendanceList } from '@/components/attendance';
 import { QRCodeScanner } from '@/components/attendance/QRCodeScanner';
 import { supabase } from '@/integrations/supabase/client';
 import type { AttendanceReport } from '@/types';
-import { SimpleTooltip as Tooltip, SimpleTooltipContent as TooltipContent, SimpleTooltipTrigger as TooltipTrigger, SimpleTooltipProvider as TooltipProvider } from '@/components/ui/simple-tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 export const EventOpsConsole: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();

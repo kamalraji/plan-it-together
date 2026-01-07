@@ -5,7 +5,7 @@ import { ProfileForm } from './ProfileForm';
 import type { ProfileFormData } from './profileSchema';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SimpleTooltip as Tooltip, SimpleTooltipContent as TooltipContent, SimpleTooltipTrigger as TooltipTrigger, SimpleTooltipProvider as TooltipProvider } from '@/components/ui/simple-tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 async function compressImageToTarget(file: File, maxBytes: number): Promise<Blob> {
   const imageBitmap = await createImageBitmap(file);
   const canvas = document.createElement('canvas');

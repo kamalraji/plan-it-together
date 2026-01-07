@@ -2,11 +2,11 @@ import { Shield, UserPlus, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  SimpleTooltip as Tooltip,
-  SimpleTooltipContent as TooltipContent,
-  SimpleTooltipProvider as TooltipProvider,
-  SimpleTooltipTrigger as TooltipTrigger,
-} from '@/components/ui/simple-tooltip';
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { TeamMember, WorkspaceRole } from '@/types';
 import { getWorkspaceRoleLabel, getWorkspaceRoleLevel, WorkspaceHierarchyLevel } from '@/lib/workspaceHierarchy';
 import { cn } from '@/lib/utils';

@@ -1,32 +1,37 @@
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { handleApiError } from '@/lib/api';
 import { logging } from '@/lib/logging';
+import { useAuth } from '@/hooks/useAuth';
 
-interface ErrorBoundaryState {
+interface ErrorBoundaryInnerProps {
+  children: ReactNode;
+  onError?: (error: unknown, info?: React.ErrorInfo) => void;
+}
+
+interface ErrorBoundaryInnerState {
   hasError: boolean;
 }
 
-/**
- * GlobalErrorBoundary - A simple, resilient error boundary that doesn't depend on any hooks or context.
- * This ensures it can catch errors even during early app initialization.
- */
-export class GlobalErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
-  override state: ErrorBoundaryState = { hasError: false };
+class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundaryInnerState> {
+  override state: ErrorBoundaryInnerState = { hasError: false };
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryInnerState {
+    // Ensure a consistent fallback UI is shown after an error is thrown
     console.error('GlobalErrorBoundary getDerivedStateFromError:', error);
     return { hasError: true };
   }
 
   override componentDidCatch(error: Error, info: React.ErrorInfo) {
+    // Log the error for debugging and send it to any external handler
     console.error('GlobalErrorBoundary caught an error:', error, info);
-    
-    // Log to external service
-    try {
-      logging.captureError(error, {
-        react_component_stack: info?.componentStack,
-      });
-    } catch {
-      // Logging failed, ignore
+
+    if (this.props.onError) {
+      try {
+        this.props.onError(error, info);
+      } catch (handlerError) {
+        console.error('Error in GlobalErrorBoundary onError handler:', handlerError);
+      }
     }
   }
 
@@ -54,3 +59,31 @@ export class GlobalErrorBoundary extends Component<{ children: ReactNode }, Erro
     return this.props.children;
   }
 }
+
+export const GlobalErrorBoundary: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { toast } = useToast();
+  const { user, session } = useAuth();
+
+  const handleError = useCallback(
+    (error: unknown, info?: React.ErrorInfo) => {
+      logging.captureError(error, {
+        react_component_stack: info?.componentStack,
+        user_id: user?.id,
+        user_role: user?.role,
+        session_expires_at: session?.expires_at
+          ? new Date(session.expires_at * 1000).toISOString()
+          : undefined,
+      });
+
+      const message = handleApiError(error as any);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+        description: message,
+      });
+    },
+    [toast, user, session],
+  );
+
+  return <ErrorBoundaryInner onError={handleError}>{children}</ErrorBoundaryInner>;
+};

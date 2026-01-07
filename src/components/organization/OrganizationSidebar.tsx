@@ -4,7 +4,6 @@ import { useCurrentOrganization } from './OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 import {
   Sidebar,
   SidebarContent,
@@ -34,7 +33,7 @@ import {
   ChevronRight,
   Folder,
   FolderOpen,
-  Plus,
+  PlusCircle,
   LayoutTemplate,
   List,
   ClipboardList,
@@ -59,7 +58,7 @@ import { WorkspaceStatus } from '@/types';
 
 // Quick action definitions
 const getEventQuickActions = (base: string) => [
-  { title: 'Create New Event', path: `${base}/eventmanagement/create`, icon: Plus, primary: true },
+  { title: 'Create New Event', path: `${base}/eventmanagement/create`, icon: PlusCircle, primary: true },
   { title: 'Browse Templates', path: `${base}/eventmanagement/templates`, icon: LayoutTemplate },
   { title: 'View All Events', path: `${base}/eventmanagement`, icon: List },
   { title: 'Registrations', path: `${base}/eventmanagement/registrations`, icon: ClipboardList },
@@ -67,7 +66,7 @@ const getEventQuickActions = (base: string) => [
 ];
 
 const getWorkspaceQuickActions = (base: string) => [
-  { title: 'Create Workspace', path: `${base}/workspaces`, icon: Plus, primary: true },
+  { title: 'Create Workspace', path: `${base}/workspaces`, icon: PlusCircle, primary: true },
   { title: 'Browse Templates', path: `${base}/templates`, icon: LayoutTemplate },
   { title: 'View All Workspaces', path: `${base}/workspaces?tab=list`, icon: List },
   { title: 'Team Analytics', path: `${base}/workspaces?tab=analytics`, icon: BarChart3 },
@@ -98,7 +97,7 @@ const getOrganizationQuickActions = (base: string) => [
   { title: 'All Organizations', path: `${base}/organizations/list`, icon: Building2, primary: true },
   { title: 'Manage Members', path: `${base}/organizations`, icon: Users },
   { title: 'Organization Settings', path: `${base}/settings`, icon: Settings },
-  { title: 'Create New', path: `${base}/organizations/list?action=create`, icon: Plus },
+  { title: 'Create New', path: `${base}/organizations/list?action=create`, icon: PlusCircle },
 ];
 
 export const OrganizationSidebar: React.FC = () => {
@@ -185,14 +184,7 @@ export const OrganizationSidebar: React.FC = () => {
   });
 
   const handleWorkspaceClick = (workspace: any) => {
-    const url = buildWorkspaceUrl({
-      orgSlug: organization?.slug || '',
-      eventId: workspace.eventId,
-      workspaceId: workspace.id,
-      workspaceType: workspace.workspaceType || 'ROOT',
-      workspaceName: workspace.name,
-    });
-    navigate(url);
+    navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
   };
 
   // Workspace item component
