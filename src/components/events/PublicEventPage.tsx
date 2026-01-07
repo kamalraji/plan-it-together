@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { EventScrollSpy } from './EventScrollSpy';
 
 /**
  * Public Event Page - accessible via /event/:slug
@@ -63,23 +64,35 @@ export function PublicEventPage() {
     ogType: 'website',
   });
 
-  // UTM tracking - log for analytics
+  // UTM tracking - store in Supabase for marketing analytics
   useEffect(() => {
-    if (event && !hasTrackedRef.current && (utmSource || utmMedium || utmCampaign)) {
+    const trackPageView = async () => {
+      if (!event || hasTrackedRef.current) return;
       hasTrackedRef.current = true;
-      console.log('[Analytics] Event page view with UTM:', {
-        eventId: event.id,
-        eventSlug: slug,
-        utm_source: utmSource,
-        utm_medium: utmMedium,
-        utm_campaign: utmCampaign,
-        referrer: document.referrer,
-        timestamp: new Date().toISOString(),
-      });
-      // Future: Store in Supabase for marketing analytics
-      // supabase.from('event_page_views').insert({ event_id: event.id, utm_source: utmSource, ... })
-    }
-  }, [event, slug, utmSource, utmMedium, utmCampaign]);
+      
+      // Generate anonymous session ID for this visit
+      const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      
+      // Store page view in Supabase
+      const { error } = await supabase
+        .from('event_page_views')
+        .insert({
+          event_id: event.id,
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent,
+          session_id: sessionId,
+        });
+      
+      if (error) {
+        console.warn('[Analytics] Failed to record page view:', error.message);
+      }
+    };
+    
+    trackPageView();
+  }, [event, utmSource, utmMedium, utmCampaign]);
 
   // Section deep-linking - auto-scroll to section
   useEffect(() => {
@@ -179,6 +192,8 @@ export function PublicEventPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Scroll-spy navigation */}
+      <EventScrollSpy />
       {/* Hero Section */}
       <section
         id="hero"
