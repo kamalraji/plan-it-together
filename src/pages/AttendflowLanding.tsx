@@ -5,6 +5,7 @@ import { useSeo } from "@/hooks/useSeo";
 import { HeroCarousel } from "@/components/landing/HeroCarousel";
 import { PlatformStatsBanner } from "@/components/landing/PlatformStatsBanner";
 import { LogoMarquee } from "@/components/landing/LogoMarquee";
+import { FlagshipEventsCarousel } from "@/components/landing/FlagshipEventsCarousel";
 const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#workflow", label: "Workflow" },
@@ -109,6 +110,9 @@ const AttendflowLanding = () => {
 
         {/* Logo Marquee */}
         <LogoMarquee />
+
+        {/* Flagship Events Carousel */}
+        <FlagshipEventsCarousel />
 
         {/* Feature strips */}
         <motion.section
