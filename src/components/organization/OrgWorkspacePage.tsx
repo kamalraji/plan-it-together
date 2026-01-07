@@ -246,12 +246,17 @@ export const OrgWorkspacePage: React.FC = () => {
       setNewWorkspaceName('');
       setSelectedTemplate(ENHANCED_WORKSPACE_TEMPLATES[0]);
       
-      // Select the newly created workspace
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set('workspaceId', result.rootWorkspace.id);
-        return next;
-      });
+      // Navigate to the newly created workspace using the new type-based URL
+      if (orgSlug) {
+        const url = buildWorkspaceUrl({
+          orgSlug,
+          eventId,
+          workspaceId: result.rootWorkspace.id,
+          workspaceType: 'ROOT',
+          workspaceName: result.rootWorkspace.name,
+        });
+        navigate(url);
+      }
     } catch (error) {
       // Error already handled by the hook
     }
