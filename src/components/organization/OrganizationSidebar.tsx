@@ -299,13 +299,13 @@ export const OrganizationSidebar: React.FC = () => {
   const organization = useCurrentOrganization();
   const { user } = useAuth();
 
-  const [eventManagementExpanded, setEventManagementExpanded] = useState(true);
-  const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
-  const [marketplaceExpanded, setMarketplaceExpanded] = useState(true);
-  const [analyticsExpanded, setAnalyticsExpanded] = useState(true);
-  const [teamExpanded, setTeamExpanded] = useState(true);
-  const [organizationsExpanded, setOrganizationsExpanded] = useState(true);
-  const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
+  const [eventManagementExpanded, setEventManagementExpanded] = useState(false);
+  const [workspacesExpanded, setWorkspacesExpanded] = useState(false);
+  const [marketplaceExpanded, setMarketplaceExpanded] = useState(false);
+  const [analyticsExpanded, setAnalyticsExpanded] = useState(false);
+  const [teamExpanded, setTeamExpanded] = useState(false);
+  const [organizationsExpanded, setOrganizationsExpanded] = useState(false);
+  const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(false);
   const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(false);
 
   const base = `/${orgSlug ?? ''}`.replace(/\/$/, '');
