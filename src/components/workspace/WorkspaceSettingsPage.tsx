@@ -15,6 +15,7 @@ import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { SettingsPageSkeleton } from '@/components/ui/page-skeletons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -149,8 +150,10 @@ export function WorkspaceSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-5xl mx-auto">
+          <SettingsPageSkeleton />
+        </div>
       </div>
     );
   }

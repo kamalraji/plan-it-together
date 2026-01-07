@@ -15,6 +15,7 @@ import { WorkspaceReportExport } from '../../workspace/WorkspaceReportExport';
 import { EventMarketplaceIntegration } from '../../marketplace';
 import { WorkspaceTemplateManagement } from '../../workspace/WorkspaceTemplateManagement';
 import { supabase } from '@/integrations/supabase/client';
+import { WorkspaceDashboardSkeleton } from '@/components/ui/page-skeletons';
 
 interface WorkspaceDetailPageProps {
   defaultTab?: string;
@@ -461,11 +462,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
-            <div className="h-4 bg-muted rounded w-1/2 mb-8"></div>
-            <div className="bg-muted rounded-lg h-64"></div>
-          </div>
+          <WorkspaceDashboardSkeleton activeTab={activeTab} />
         </div>
       </div>
     );
