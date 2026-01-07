@@ -2502,6 +2502,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_organization: {
+        Args: { _slug: string }
+        Returns: {
+          banner_url: string
+          category: string
+          city: string
+          country: string
+          description: string
+          id: string
+          logo_url: string
+          name: string
+          primary_color: string
+          secondary_color: string
+          seo_description: string
+          seo_image_url: string
+          seo_title: string
+          slug: string
+          state: string
+          verification_status: string
+          website: string
+        }[]
+      }
       get_public_portfolio: {
         Args: { _user_id: string }
         Returns: {
@@ -2518,6 +2540,16 @@ export type Database = {
           portfolio_sections: string[]
           twitter_url: string
           website: string
+        }[]
+      }
+      get_public_profile_basic: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          full_name: string
+          id: string
+          organization: string
         }[]
       }
       has_role: {
