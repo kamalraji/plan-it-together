@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ConsoleHeader } from './ConsoleHeader';
 import { ServiceNavigation } from './ServiceNavigation';
 import { BreadcrumbBar } from './BreadcrumbBar';
 import { useAuth } from '../../hooks/useAuth';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+
+const pageTransition = {
+  duration: 0.2,
+};
 
 interface ConsoleLayoutProps {
   children?: React.ReactNode;
@@ -20,6 +31,7 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
   const [isNavigationCollapsed, setIsNavigationCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleServiceChange = (service: string) => {
     console.log('Service changed to:', service);
@@ -106,11 +118,21 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
             <BreadcrumbBar />
           )}
 
-          {/* Page Content */}
+          {/* Page Content with Animation */}
           <main className="flex-1">
-            <div className="py-6">
-              {children || <Outlet />}
-            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={location.pathname}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={pageVariants}
+                transition={pageTransition}
+                className="py-6"
+              >
+                {children || <Outlet />}
+              </motion.div>
+            </AnimatePresence>
           </main>
         </div>
       </div>
