@@ -2,7 +2,6 @@ import React, { Component, ReactNode, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { handleApiError } from '@/lib/api';
 import { logging } from '@/lib/logging';
-import { useAuth } from '@/hooks/useAuth';
 
 interface ErrorBoundaryInnerProps {
   children: ReactNode;
@@ -60,29 +59,43 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundar
   }
 }
 
+/**
+ * GlobalErrorBoundary wrapper that safely uses hooks.
+ * If hooks fail (e.g., AuthProvider not yet mounted), we still catch and log the error.
+ */
 export const GlobalErrorBoundary: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { toast } = useToast();
-  const { user, session } = useAuth();
+  // Use try-catch pattern for hooks that might not be available during initial load
+  let toast: ReturnType<typeof useToast>['toast'] | undefined;
+  
+  try {
+    const toastContext = useToast();
+    toast = toastContext.toast;
+  } catch {
+    // Toast not available, will fall back to console logging only
+  }
 
   const handleError = useCallback(
     (error: unknown, info?: React.ErrorInfo) => {
+      // Always log to console and logging service
       logging.captureError(error, {
         react_component_stack: info?.componentStack,
-        user_id: user?.id,
-        user_role: user?.role,
-        session_expires_at: session?.expires_at
-          ? new Date(session.expires_at * 1000).toISOString()
-          : undefined,
       });
 
-      const message = handleApiError(error as any);
-      toast({
-        variant: 'destructive',
-        title: 'Something went wrong',
-        description: message,
-      });
+      // Only show toast if available
+      if (toast) {
+        try {
+          const message = handleApiError(error as any);
+          toast({
+            variant: 'destructive',
+            title: 'Something went wrong',
+            description: message,
+          });
+        } catch {
+          // Toast failed, ignore
+        }
+      }
     },
-    [toast, user, session],
+    [toast],
   );
 
   return <ErrorBoundaryInner onError={handleError}>{children}</ErrorBoundaryInner>;
