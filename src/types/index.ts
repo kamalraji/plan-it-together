@@ -26,6 +26,7 @@ export enum UserRole {
   JUDGE = 'JUDGE',
   VOLUNTEER = 'VOLUNTEER',
   SPEAKER = 'SPEAKER',
+  VENDOR = 'VENDOR',
 }
 
 export enum UserStatus {

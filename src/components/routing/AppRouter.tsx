@@ -698,7 +698,7 @@ export const AppRouter: React.FC = () => {
             <Route
               path="/marketplace/*"
               element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN, UserRole.VENDOR]}>
                   <Suspense fallback={<RouteLoadingFallback />}>
                     <MarketplaceService />
                   </Suspense>
