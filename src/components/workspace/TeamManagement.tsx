@@ -7,6 +7,7 @@ import { Workspace, TeamMember, WorkspaceRole, WorkspaceRoleScope } from '../../
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
 import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface TeamManagementProps {
   workspace: Workspace;
@@ -18,6 +19,7 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<WorkspaceRole | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'inactive'>('all');
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -142,13 +144,14 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
     },
   });
 
-  const handleRemoveTeamMember = async (memberId: string) => {
-    if (
-      window.confirm(
-        'Are you sure you want to remove this team member? They will lose access to the workspace immediately.',
-      )
-    ) {
-      await removeTeamMemberMutation.mutateAsync(memberId);
+  const handleRemoveTeamMember = (memberId: string) => {
+    setMemberToRemove(memberId);
+  };
+
+  const confirmRemoveMember = async () => {
+    if (memberToRemove) {
+      await removeTeamMemberMutation.mutateAsync(memberToRemove);
+      setMemberToRemove(null);
     }
   };
 
@@ -285,6 +288,17 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
           }}
         />
       )}
+
+      <ConfirmationDialog
+        open={!!memberToRemove}
+        onOpenChange={(open) => !open && setMemberToRemove(null)}
+        title="Remove team member"
+        description="Are you sure you want to remove this team member? They will lose access to the workspace immediately."
+        confirmLabel="Remove"
+        variant="danger"
+        onConfirm={confirmRemoveMember}
+        isLoading={removeTeamMemberMutation.isPending}
+      />
     </div>
   );
 }

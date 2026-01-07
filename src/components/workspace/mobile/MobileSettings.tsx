@@ -11,10 +11,12 @@ import {
 import { useNotifications } from '../../../hooks/useNotifications';
 import { useOffline } from '../../../hooks/useOffline';
 import { useAuth } from '../../../hooks/useAuth';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 export function MobileSettings() {
   const [showStorageInfo, setShowStorageInfo] = useState(false);
   const [storageUsage, setStorageUsage] = useState<{ used: number; quota: number } | null>(null);
+  const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   
   const { user } = useAuth();
 
@@ -61,10 +63,13 @@ export function MobileSettings() {
     }
   };
 
-  const handleClearOfflineData = async () => {
-    if (window.confirm('Are you sure you want to clear all offline data? This cannot be undone.')) {
-      await clearOfflineData();
-    }
+  const handleClearOfflineData = () => {
+    setShowClearDataConfirm(true);
+  };
+
+  const confirmClearOfflineData = async () => {
+    await clearOfflineData();
+    setShowClearDataConfirm(false);
   };
 
   const handleShowStorageInfo = async () => {
@@ -381,6 +386,16 @@ export function MobileSettings() {
           </div>
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={showClearDataConfirm}
+        onOpenChange={setShowClearDataConfirm}
+        title="Clear offline data"
+        description="Are you sure you want to clear all offline data? This will remove all cached data and pending updates. This action cannot be undone."
+        confirmLabel="Clear data"
+        variant="warning"
+        onConfirm={confirmClearOfflineData}
+      />
     </div>
   );
 }
