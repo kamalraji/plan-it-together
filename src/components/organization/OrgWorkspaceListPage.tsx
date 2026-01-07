@@ -5,12 +5,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { WorkspaceStatus, UserRole } from '@/types';
 import { useCurrentOrganization } from './OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   UserIcon,
   BuildingOfficeIcon,
   EnvelopeIcon,
 } from '@heroicons/react/24/outline';
-
+import { cn } from '@/lib/utils';
 
 // Refactored components
 import { WorkspaceItem } from './workspace-list/WorkspaceCard';
@@ -105,7 +106,10 @@ export const OrgWorkspaceListPage: React.FC = () => {
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-background via-background to-muted/20">
+    <div className={cn(
+      "min-h-[calc(100vh-4rem)]",
+      "bg-gradient-to-br from-background via-background to-muted/20"
+    )}>
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
         {/* Header */}
         <WorkspaceListHeader
@@ -120,37 +124,39 @@ export const OrgWorkspaceListPage: React.FC = () => {
 
         {/* Workspace groups */}
         {!isLoading && (
-          <div className="space-y-6 sm:space-y-8 pb-8">
-            {/* My Workspaces */}
-            <WorkspaceGroup
-              title="My Workspaces"
-              icon={<UserIcon className="h-5 w-5 text-primary" />}
-              workspaces={workspacesData?.myWorkspaces || []}
-              emptyMessage="You haven't created any workspaces yet"
-              defaultExpanded={true}
-              orgSlug={orgSlug}
-            />
+          <ScrollArea className="h-[calc(100vh-16rem)] sm:h-[calc(100vh-14rem)]">
+            <div className="space-y-6 sm:space-y-8 pb-8 pr-2">
+              {/* My Workspaces */}
+              <WorkspaceGroup
+                title="My Workspaces"
+                icon={<UserIcon className="h-5 w-5 text-primary" />}
+                workspaces={workspacesData?.myWorkspaces || []}
+                emptyMessage="You haven't created any workspaces yet"
+                defaultExpanded={true}
+                orgSlug={orgSlug}
+              />
 
-            {/* Invited Workspaces */}
-            <WorkspaceGroup
-              title="Invited Workspaces"
-              icon={<EnvelopeIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
-              workspaces={workspacesData?.invitedWorkspaces || []}
-              emptyMessage="No workspace invitations"
-              defaultExpanded={true}
-              orgSlug={orgSlug}
-            />
+              {/* Invited Workspaces */}
+              <WorkspaceGroup
+                title="Invited Workspaces"
+                icon={<EnvelopeIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
+                workspaces={workspacesData?.invitedWorkspaces || []}
+                emptyMessage="No workspace invitations"
+                defaultExpanded={true}
+                orgSlug={orgSlug}
+              />
 
-            {/* Organization Workspaces */}
-            <WorkspaceGroup
-              title="Organization Workspaces"
-              icon={<BuildingOfficeIcon className="h-5 w-5 text-muted-foreground" />}
-              workspaces={workspacesData?.orgWorkspaces || []}
-              emptyMessage="No other workspaces in this organization"
-              defaultExpanded={true}
-              orgSlug={orgSlug}
-            />
-          </div>
+              {/* Organization Workspaces */}
+              <WorkspaceGroup
+                title="Organization Workspaces"
+                icon={<BuildingOfficeIcon className="h-5 w-5 text-muted-foreground" />}
+                workspaces={workspacesData?.orgWorkspaces || []}
+                emptyMessage="No other workspaces in this organization"
+                defaultExpanded={true}
+                orgSlug={orgSlug}
+              />
+            </div>
+          </ScrollArea>
         )}
       </div>
     </div>
