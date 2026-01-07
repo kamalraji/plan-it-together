@@ -8,7 +8,6 @@ import {
   Settings, 
   BarChart3, 
   Plus, 
-  ArrowRight, 
   Sparkles,
   TrendingUp,
   Calendar,
@@ -195,87 +194,6 @@ export const OrganizationServiceDashboard: React.FC = () => {
             </Link>
           ))}
         </motion.div>
-
-        {/* Organizations List */}
-        {recentOrganizations.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-foreground">Your Organizations</h2>
-              <Link 
-                to={getOrgPath('/organizations/list')}
-                className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1"
-              >
-                View all <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recentOrganizations.slice(0, 6).map((org) => {
-                const matchedOrg = organizations?.find((o) => o.id === org.id);
-                const orgSlugForNav = matchedOrg?.slug;
-                const analytics = perOrgAnalytics[org.id] ?? { totalEvents: 0, draftEvents: 0, publishedEvents: 0, ongoingEvents: 0, completedEvents: 0 };
-
-                return (
-                  <div
-                    key={org.id}
-                    className="group bg-card hover:bg-card/80 rounded-2xl border border-border p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                        <span className="text-lg font-bold text-primary">
-                          {org.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-foreground truncate">{org.name}</h3>
-                        <p className="text-sm text-muted-foreground capitalize">{org.role?.toLowerCase()}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                      <div className="p-2 rounded-lg bg-muted/50">
-                        <p className="text-lg font-semibold text-foreground">{analytics.totalEvents}</p>
-                        <p className="text-xs text-muted-foreground">Events</p>
-                      </div>
-                      <div className="p-2 rounded-lg bg-muted/50">
-                        <p className="text-lg font-semibold text-foreground">{org.memberCount}</p>
-                        <p className="text-xs text-muted-foreground">Members</p>
-                      </div>
-                      <div className="p-2 rounded-lg bg-muted/50">
-                        <p className="text-lg font-semibold text-foreground">{org.followerCount}</p>
-                        <p className="text-xs text-muted-foreground">Followers</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => navigate(orgSlugForNav ? `/${orgSlugForNav}/dashboard` : '/dashboard')}
-                      >
-                        Dashboard
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => navigate(orgSlugForNav ? `/${orgSlugForNav}/settings` : '/dashboard')}
-                      >
-                        Settings
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
 
         {/* Empty State */}
         {recentOrganizations.length === 0 && (
