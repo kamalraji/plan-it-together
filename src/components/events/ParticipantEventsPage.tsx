@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
-import { Event, EventMode, EventStatus } from '@/types';
-import { Calendar, MapPin, Globe, Users, ArrowRight, Search, Sparkles, Filter, X, Clock, Zap, Building2 } from 'lucide-react';
+import { Event, EventMode, EventStatus, EventCategory } from '@/types';
+import { Calendar, MapPin, Globe, Users, ArrowRight, Search, Sparkles, Filter, X, Clock, Zap, Building2, Code, GraduationCap, Presentation, Mic, Briefcase, Trophy, Video, Award, LayoutGrid } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ interface SupabaseEventRow {
   name: string;
   description?: string | null;
   mode: string;
+  category?: string | null;
   start_date: string | null;
   end_date: string | null;
   capacity?: number | null;
@@ -31,6 +32,7 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
     name: row.name,
     description: row.description || '',
     mode: (row.mode as EventMode) || EventMode.OFFLINE,
+    category: (row.category as EventCategory) || EventCategory.OTHER,
     startDate: row.start_date,
     endDate: row.end_date,
     capacity: row.capacity ?? undefined,
@@ -57,6 +59,19 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
 type DateFilter = 'ALL' | 'PAST';
 type ListType = 'events' | 'organizations';
 
+const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; color: string }> = {
+  [EventCategory.HACKATHON]: { icon: Code, label: 'Hackathon', color: 'bg-violet-500/10 text-violet-600 border-violet-500/20' },
+  [EventCategory.BOOTCAMP]: { icon: GraduationCap, label: 'Bootcamp', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
+  [EventCategory.WORKSHOP]: { icon: Presentation, label: 'Workshop', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  [EventCategory.CONFERENCE]: { icon: Mic, label: 'Conference', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
+  [EventCategory.MEETUP]: { icon: Users, label: 'Meetup', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
+  [EventCategory.STARTUP_PITCH]: { icon: Briefcase, label: 'Startup Pitch', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
+  [EventCategory.HIRING_CHALLENGE]: { icon: Trophy, label: 'Hiring Challenge', color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20' },
+  [EventCategory.WEBINAR]: { icon: Video, label: 'Webinar', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
+  [EventCategory.COMPETITION]: { icon: Award, label: 'Competition', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' },
+  [EventCategory.OTHER]: { icon: LayoutGrid, label: 'Other', color: 'bg-gray-500/10 text-gray-600 border-gray-500/20' },
+};
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -79,6 +94,7 @@ export function ParticipantEventsPage() {
   const listType = (searchParams.get('list') as ListType) || 'events';
   
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'ALL'>('ALL');
   const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -92,7 +108,7 @@ export function ParticipantEventsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
-        .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, landing_page_slug')
+        .select('id, name, description, mode, category, start_date, end_date, capacity, visibility, status, landing_page_slug')
         .eq('visibility', 'PUBLIC')
         .eq('status', 'PUBLISHED')
         .order('start_date', { ascending: false });
@@ -136,15 +152,17 @@ export function ParticipantEventsPage() {
       (dateFilter === 'PAST' && startTime < now);
 
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
+    const matchesCategory = categoryFilter === 'ALL' || event.category === categoryFilter;
     const matchesSearch = !searchQuery || 
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesDate && matchesMode && matchesSearch;
+    return matchesDate && matchesMode && matchesCategory && matchesSearch;
   });
 
   const activeFiltersCount = [
     modeFilter !== 'ALL',
+    categoryFilter !== 'ALL',
     dateFilter !== 'ALL'
   ].filter(Boolean).length;
 
@@ -192,6 +210,7 @@ export function ParticipantEventsPage() {
   const clearFilters = () => {
     setDateFilter('ALL');
     setModeFilter('ALL');
+    setCategoryFilter('ALL');
     setSearchQuery('');
   };
 
@@ -212,6 +231,22 @@ export function ParticipantEventsPage() {
             {filter === 'ALL' ? 'All Events' : 'Past Events'}
           </button>
         ))}
+      </div>
+
+      <div className="hidden sm:block h-6 w-px bg-border/60" />
+
+      {/* Category Filter Dropdown */}
+      <div className="hidden sm:flex flex-wrap gap-2">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value as EventCategory | 'ALL')}
+          className="px-3 py-2 text-sm rounded-xl border-2 border-border/50 bg-background/80 text-foreground hover:border-primary/40 transition-all cursor-pointer"
+        >
+          <option value="ALL">All Categories</option>
+          {Object.entries(categoryConfig).map(([key, config]) => (
+            <option key={key} value={key}>{config.label}</option>
+          ))}
+        </select>
       </div>
 
       <div className="hidden sm:block h-6 w-px bg-border/60" />
@@ -418,23 +453,41 @@ export function ParticipantEventsPage() {
                 exit={{ opacity: 0, height: 0 }}
                 className="sm:hidden w-full overflow-hidden"
               >
-                <div className="p-4 bg-muted/30 rounded-xl border border-border/50 space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Type</p>
-                  <div className="flex flex-wrap gap-2">
-                    {([EventMode.ONLINE, EventMode.OFFLINE, EventMode.HYBRID] as EventMode[]).map((mode) => (
-                      <button
-                        key={mode}
-                        onClick={() => setModeFilter(modeFilter === mode ? 'ALL' : mode)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-all ${
-                          modeFilter === mode
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background text-muted-foreground border-border'
-                        }`}
-                      >
-                        {getModeIcon(mode)}
-                        {getModeLabel(mode)}
-                      </button>
-                    ))}
+                <div className="p-4 bg-muted/30 rounded-xl border border-border/50 space-y-4">
+                  {/* Category Filter */}
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Category</p>
+                    <select
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value as EventCategory | 'ALL')}
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    >
+                      <option value="ALL">All Categories</option>
+                      {Object.entries(categoryConfig).map(([key, config]) => (
+                        <option key={key} value={key}>{config.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Event Type */}
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Event Type</p>
+                    <div className="flex flex-wrap gap-2">
+                      {([EventMode.ONLINE, EventMode.OFFLINE, EventMode.HYBRID] as EventMode[]).map((mode) => (
+                        <button
+                          key={mode}
+                          onClick={() => setModeFilter(modeFilter === mode ? 'ALL' : mode)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border transition-all ${
+                            modeFilter === mode
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-muted-foreground border-border'
+                          }`}
+                        >
+                          {getModeIcon(mode)}
+                          {getModeLabel(mode)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -555,6 +608,18 @@ export function ParticipantEventsPage() {
                             <span className="text-border">•</span>
                             <span>{startDate.time}</span>
                           </div>
+                          {/* Category Badge */}
+                          {event.category && event.category !== EventCategory.OTHER && (
+                            <div className="mt-2">
+                              <Badge variant="outline" className={`text-xs ${categoryConfig[event.category].color}`}>
+                                {(() => {
+                                  const CategoryIcon = categoryConfig[event.category].icon;
+                                  return <CategoryIcon className="h-3 w-3 mr-1" />;
+                                })()}
+                                {categoryConfig[event.category].label}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
                       </div>
 
