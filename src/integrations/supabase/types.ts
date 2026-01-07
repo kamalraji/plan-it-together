@@ -507,6 +507,7 @@ export type Database = {
           branding: Json | null
           canvas_state: Json | null
           capacity: number | null
+          category: Database["public"]["Enums"]["event_category"] | null
           created_at: string
           description: string | null
           end_date: string
@@ -526,6 +527,7 @@ export type Database = {
           branding?: Json | null
           canvas_state?: Json | null
           capacity?: number | null
+          category?: Database["public"]["Enums"]["event_category"] | null
           created_at?: string
           description?: string | null
           end_date: string
@@ -545,6 +547,7 @@ export type Database = {
           branding?: Json | null
           canvas_state?: Json | null
           capacity?: number | null
+          category?: Database["public"]["Enums"]["event_category"] | null
           created_at?: string
           description?: string | null
           end_date?: string
@@ -2628,6 +2631,17 @@ export type Database = {
         | "judge"
         | "volunteer"
         | "speaker"
+      event_category:
+        | "HACKATHON"
+        | "BOOTCAMP"
+        | "WORKSHOP"
+        | "CONFERENCE"
+        | "MEETUP"
+        | "STARTUP_PITCH"
+        | "HIRING_CHALLENGE"
+        | "WEBINAR"
+        | "COMPETITION"
+        | "OTHER"
       event_mode: "OFFLINE" | "ONLINE" | "HYBRID"
       event_status:
         | "DRAFT"
@@ -2792,6 +2806,18 @@ export const Constants = {
         "judge",
         "volunteer",
         "speaker",
+      ],
+      event_category: [
+        "HACKATHON",
+        "BOOTCAMP",
+        "WORKSHOP",
+        "CONFERENCE",
+        "MEETUP",
+        "STARTUP_PITCH",
+        "HIRING_CHALLENGE",
+        "WEBINAR",
+        "COMPETITION",
+        "OTHER",
       ],
       event_mode: ["OFFLINE", "ONLINE", "HYBRID"],
       event_status: ["DRAFT", "PUBLISHED", "ONGOING", "COMPLETED", "CANCELLED"],

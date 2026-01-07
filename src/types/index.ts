@@ -53,6 +53,7 @@ export interface Event {
   name: string;
   description: string;
   mode: EventMode;
+  category?: EventCategory;
   startDate: string;
   endDate: string;
   capacity?: number;
@@ -107,6 +108,19 @@ export enum EventVisibility {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
   UNLISTED = 'UNLISTED'
+}
+
+export enum EventCategory {
+  HACKATHON = 'HACKATHON',
+  BOOTCAMP = 'BOOTCAMP',
+  WORKSHOP = 'WORKSHOP',
+  CONFERENCE = 'CONFERENCE',
+  MEETUP = 'MEETUP',
+  STARTUP_PITCH = 'STARTUP_PITCH',
+  HIRING_CHALLENGE = 'HIRING_CHALLENGE',
+  WEBINAR = 'WEBINAR',
+  COMPETITION = 'COMPETITION',
+  OTHER = 'OTHER'
 }
 
 export interface BrandingConfig {
