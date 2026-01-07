@@ -26,15 +26,7 @@ export { Separator } from '../ui/separator';
 export { Skeleton } from '../ui/skeleton';
 export { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
-// Navigation components
-export { 
-  NavigationMenu, 
-  NavigationMenuContent, 
-  NavigationMenuItem, 
-  NavigationMenuLink, 
-  NavigationMenuList, 
-  NavigationMenuTrigger 
-} from '../ui/navigation-menu';
+// Navigation components (removed unused navigation-menu)
 
 // Overlay components
 export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
