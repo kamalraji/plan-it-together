@@ -11,13 +11,14 @@ import {
   TaskStatus,
   WorkspaceRoleScope,
 } from '@/types';
+import { queryPresets } from '@/lib/query-config';
 
 /**
  * Shared hook for fetching workspace data
  * Used by both desktop and mobile workspace dashboards
  */
 export function useWorkspaceData(workspaceId: string | undefined) {
-  // Fetch workspace
+  // Fetch workspace - uses standard preset (5 min stale, 30 min gc)
   const workspaceQuery = useQuery({
     queryKey: ['workspace', workspaceId],
     queryFn: async () => {
@@ -48,6 +49,8 @@ export function useWorkspaceData(workspaceId: string | undefined) {
       } as unknown as Workspace;
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.standard.staleTime,
+    gcTime: queryPresets.standard.gcTime,
   });
 
   // Fetch user workspaces for switching (scoped to the same event)
@@ -96,15 +99,17 @@ export function useWorkspaceData(workspaceId: string | undefined) {
       })) as unknown as Workspace[];
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.standard.staleTime,
+    gcTime: queryPresets.standard.gcTime,
   });
 
-  // Fetch tasks
+  // Fetch tasks - uses dynamic preset (1 min stale, 5 min gc) since tasks change frequently
   const tasksQuery = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_tasks')
-        .select('*')
+        .select('id, workspace_id, title, description, priority, status, due_date, assigned_to, role_scope')
         .eq('workspace_id', workspaceId as string)
         .order('created_at', { ascending: true });
 
@@ -127,15 +132,17 @@ export function useWorkspaceData(workspaceId: string | undefined) {
       })) as unknown as WorkspaceTask[];
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.dynamic.staleTime,
+    gcTime: queryPresets.dynamic.gcTime,
   });
 
-  // Fetch team members
+  // Fetch team members - uses standard preset (team membership doesn't change often)
   const teamMembersQuery = useQuery({
     queryKey: ['workspace-team-members', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_team_members')
-        .select('*')
+        .select('id, user_id, role, status, joined_at, left_at')
         .eq('workspace_id', workspaceId as string)
         .order('joined_at', { ascending: true });
 
@@ -156,6 +163,8 @@ export function useWorkspaceData(workspaceId: string | undefined) {
       })) as TeamMember[];
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.standard.staleTime,
+    gcTime: queryPresets.standard.gcTime,
   });
 
   return {

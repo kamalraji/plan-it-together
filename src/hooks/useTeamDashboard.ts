@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { optimisticHelpers } from './useOptimisticMutation';
+import { queryPresets } from '@/lib/query-config';
 
 export interface TeamAssignment {
   id: string;
@@ -46,7 +47,7 @@ export function useTeamAssignments(workspaceId: string | undefined) {
       const { data, error } = await supabase
         .from('workspace_team_assignments')
         .select(`
-          *,
+          id, workspace_id, user_id, task_id, hours_allocated, hours_logged, status, created_at, updated_at,
           task:workspace_tasks(id, title, status, priority, due_date)
         `)
         .eq('workspace_id', workspaceId)
@@ -55,6 +56,8 @@ export function useTeamAssignments(workspaceId: string | undefined) {
       return data as TeamAssignment[];
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.dynamic.staleTime,
+    gcTime: queryPresets.dynamic.gcTime,
   });
 
   const createAssignmentMutation = useMutation({
@@ -225,7 +228,7 @@ export function useTeamWorkload(workspaceId: string | undefined) {
       // Get assignments for these users in this workspace
       const { data: assignments, error: assignmentsError } = await supabase
         .from('workspace_team_assignments')
-        .select('*')
+        .select('user_id, hours_allocated, hours_logged, status')
         .eq('workspace_id', workspaceId)
         .in('user_id', userIds);
       if (assignmentsError) throw assignmentsError;
@@ -261,6 +264,8 @@ export function useTeamWorkload(workspaceId: string | undefined) {
       return Object.values(workloadMap);
     },
     enabled: !!workspaceId,
+    staleTime: queryPresets.dynamic.staleTime,
+    gcTime: queryPresets.dynamic.gcTime,
   });
 
   return {
@@ -278,7 +283,7 @@ export function usePersonalProgress(workspaceId: string | undefined, userId: str
       // Get user's tasks
       const { data: tasks, error: tasksError } = await supabase
         .from('workspace_tasks')
-        .select('*')
+        .select('id, title, status, priority, due_date')
         .eq('workspace_id', workspaceId)
         .eq('assigned_to', userId);
       if (tasksError) throw tasksError;
@@ -286,7 +291,7 @@ export function usePersonalProgress(workspaceId: string | undefined, userId: str
       // Get user's assignments
       const { data: assignments, error: assignmentsError } = await supabase
         .from('workspace_team_assignments')
-        .select('*')
+        .select('hours_allocated, hours_logged')
         .eq('workspace_id', workspaceId)
         .eq('user_id', userId);
       if (assignmentsError) throw assignmentsError;
@@ -314,6 +319,8 @@ export function usePersonalProgress(workspaceId: string | undefined, userId: str
       };
     },
     enabled: !!workspaceId && !!userId,
+    staleTime: queryPresets.dynamic.staleTime,
+    gcTime: queryPresets.dynamic.gcTime,
   });
 
   return {
