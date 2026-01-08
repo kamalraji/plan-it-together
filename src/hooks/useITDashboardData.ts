@@ -84,29 +84,30 @@ const mapAccessStatus = (status: string): ITAccessRequest['status'] => {
 
 // Format relative time
 const formatRelativeTime = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  } catch {
+    return 'Recently';
+  }
 };
 
 export function useITDashboardData(workspaceId: string) {
-  // Fetch helpdesk tickets (from workspace_tasks with IT-related scope)
+  // Fetch helpdesk tickets (from workspace_tasks)
   const ticketsQuery = useQuery({
     queryKey: ['it-tickets', workspaceId],
     queryFn: async (): Promise<ITTicket[]> => {
       const { data, error } = await supabase
         .from('workspace_tasks')
-        .select(`
-          id, title, description, priority, status, created_at, assigned_to, role_scope,
-          assignee:user_profiles!workspace_tasks_assigned_to_fkey(full_name)
-        `)
+        .select('id, title, description, priority, status, created_at, assigned_to, role_scope')
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -116,14 +117,14 @@ export function useITDashboardData(workspaceId: string) {
         return [];
       }
 
-      return (data || []).map((task: any, index: number) => ({
+      return (data || []).map((task, index) => ({
         id: `HD-${100 + index}`,
         title: task.title || 'Untitled ticket',
         requester: 'Team Member',
-        category: (task.role_scope?.toLowerCase() as ITTicket['category']) || 'other',
+        category: mapCategory(task.role_scope),
         priority: mapPriority(task.priority),
         status: mapTicketStatus(task.status),
-        assignedTo: task.assignee?.full_name || undefined,
+        assignedTo: task.assigned_to ? 'Assigned' : undefined,
         createdAt: formatRelativeTime(task.created_at),
       }));
     },
@@ -136,10 +137,7 @@ export function useITDashboardData(workspaceId: string) {
     queryFn: async (): Promise<ITAccessRequest[]> => {
       const { data, error } = await supabase
         .from('workspace_access_requests')
-        .select(`
-          id, user_id, requested_role, status, message, created_at,
-          user:user_profiles!workspace_access_requests_user_id_fkey(full_name)
-        `)
+        .select('id, user_id, requested_role, status, message, created_at')
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -149,19 +147,19 @@ export function useITDashboardData(workspaceId: string) {
         return [];
       }
 
-      return (data || []).map((request: any) => ({
+      return (data || []).map((request) => ({
         id: request.id,
-        user: request.user?.full_name || 'Unknown User',
+        user: 'User',
         requestType: 'new_access' as const,
         resource: request.requested_role || 'Workspace Access',
-        status: mapAccessStatus(request.status),
+        status: mapAccessStatus(request.status || 'pending'),
         requestedAt: formatRelativeTime(request.created_at),
       }));
     },
     enabled: !!workspaceId,
   });
 
-  // Fetch workspace resources for system health (simulated from resources)
+  // Fetch workspace resources for system health
   const systemHealthQuery = useQuery({
     queryKey: ['it-system-health', workspaceId],
     queryFn: async (): Promise<ITSystemStatus[]> => {
@@ -180,12 +178,12 @@ export function useITDashboardData(workspaceId: string) {
         return getDefaultSystems();
       }
 
-      return data.map((resource: any) => ({
+      return data.map((resource) => ({
         id: resource.id,
         name: resource.name,
         type: mapResourceType(resource.type),
-        status: resource.status === 'available' ? 'online' : resource.status === 'in_use' ? 'degraded' : 'offline',
-        load: resource.quantity > 0 ? Math.round((1 - resource.available / resource.quantity) * 100) : 0,
+        status: mapResourceStatus(resource.status),
+        load: resource.quantity > 0 ? Math.round((1 - (resource.available || 0) / resource.quantity) * 100) : 0,
         uptime: '99.9%',
       }));
     },
@@ -208,7 +206,7 @@ export function useITDashboardData(workspaceId: string) {
         return [];
       }
 
-      return (data || []).map((activity: any) => ({
+      return (data || []).map((activity) => ({
         id: activity.id,
         title: activity.title || 'Activity',
         description: activity.description || '',
@@ -220,21 +218,21 @@ export function useITDashboardData(workspaceId: string) {
     enabled: !!workspaceId,
   });
 
-  // Compute stats
+  // Compute stats with safe defaults
   const stats = {
-    systemsOnline: systemHealthQuery.data?.filter(s => s.status === 'online').length || 0,
-    totalSystems: systemHealthQuery.data?.length || 0,
-    openTickets: ticketsQuery.data?.filter(t => t.status !== 'resolved').length || 0,
-    pendingTickets: ticketsQuery.data?.filter(t => t.status === 'new').length || 0,
-    activeAlerts: securityAlertsQuery.data?.filter(a => a.status === 'active').length || 0,
-    pendingAccessRequests: accessRequestsQuery.data?.filter(r => r.status === 'pending').length || 0,
+    systemsOnline: systemHealthQuery.data?.filter(s => s.status === 'online').length ?? 0,
+    totalSystems: systemHealthQuery.data?.length ?? 0,
+    openTickets: ticketsQuery.data?.filter(t => t.status !== 'resolved').length ?? 0,
+    pendingTickets: ticketsQuery.data?.filter(t => t.status === 'new').length ?? 0,
+    activeAlerts: securityAlertsQuery.data?.filter(a => a.status === 'active').length ?? 0,
+    pendingAccessRequests: accessRequestsQuery.data?.filter(r => r.status === 'pending').length ?? 0,
   };
 
   return {
-    tickets: ticketsQuery.data || [],
-    accessRequests: accessRequestsQuery.data || [],
-    systems: systemHealthQuery.data || getDefaultSystems(),
-    securityAlerts: securityAlertsQuery.data || [],
+    tickets: ticketsQuery.data ?? [],
+    accessRequests: accessRequestsQuery.data ?? [],
+    systems: systemHealthQuery.data ?? getDefaultSystems(),
+    securityAlerts: securityAlertsQuery.data ?? [],
     stats,
     isLoading: ticketsQuery.isLoading || accessRequestsQuery.isLoading || systemHealthQuery.isLoading || securityAlertsQuery.isLoading,
   };
@@ -250,6 +248,16 @@ function getDefaultSystems(): ITSystemStatus[] {
   ];
 }
 
+function mapCategory(roleScope: string | null): ITTicket['category'] {
+  if (!roleScope) return 'other';
+  const scope = roleScope.toLowerCase();
+  if (scope.includes('software') || scope.includes('app')) return 'software';
+  if (scope.includes('hardware') || scope.includes('device')) return 'hardware';
+  if (scope.includes('access') || scope.includes('permission')) return 'access';
+  if (scope.includes('network') || scope.includes('wifi')) return 'network';
+  return 'other';
+}
+
 function mapResourceType(type: string): ITSystemStatus['type'] {
   const typeMap: Record<string, ITSystemStatus['type']> = {
     equipment: 'server',
@@ -259,6 +267,12 @@ function mapResourceType(type: string): ITSystemStatus['type'] {
     database: 'database',
   };
   return typeMap[type?.toLowerCase()] || 'server';
+}
+
+function mapResourceStatus(status: string): ITSystemStatus['status'] {
+  if (status === 'available') return 'online';
+  if (status === 'in_use') return 'degraded';
+  return 'offline';
 }
 
 function mapActivityToSeverity(type: string): ITSecurityAlert['severity'] {
