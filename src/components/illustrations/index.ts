@@ -40,3 +40,13 @@ export { ConnectionOffline } from './scenes/ConnectionOffline';
 export { WelcomeUser } from './scenes/WelcomeUser';
 export { DocumentFile } from './scenes/DocumentFile';
 export { NotificationEmpty } from './scenes/NotificationEmpty';
+
+// Character Types
+export { AdminPerson } from './scenes/AdminPerson';
+export { CreativePerson } from './scenes/CreativePerson';
+export { StudentLearner } from './scenes/StudentLearner';
+export { RunnerActive } from './scenes/RunnerActive';
+export { MeditatingPerson } from './scenes/MeditatingPerson';
+export { BuilderPerson } from './scenes/BuilderPerson';
+export { DetectiveSearch } from './scenes/DetectiveSearch';
+export { ExplorerAstronaut } from './scenes/ExplorerAstronaut';
