@@ -132,13 +132,22 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Get requester's profile for the notification
+    const { data: requesterProfile } = await supabase
+      .from('user_profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single();
+
+    const requesterName = requesterProfile?.full_name || user.email || 'A user';
+
     // Notify the workspace owner
     await supabase
       .from('notifications')
       .insert({
         user_id: workspace.organizer_id,
         title: 'New Access Request',
-        message: `Someone has requested to join your workspace "${workspace.name}"`,
+        message: `${requesterName} has requested to join your workspace "${workspace.name}"`,
         type: 'workspace',
         category: 'workspace',
         action_url: `/console/workspaces/${workspace_id}/team`,

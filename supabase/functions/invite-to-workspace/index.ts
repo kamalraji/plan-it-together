@@ -210,6 +210,10 @@ Deno.serve(async (req) => {
 
     console.log(`Invitation created for ${email} to workspace ${workspace_id}:`, invitation.id);
 
+    // If the invited user exists but wasn't added directly (edge case), 
+    // or for future: send email notification for external invites
+    // For now, we've handled the direct add case above with a notification
+
     return new Response(
       JSON.stringify({ 
         success: true, 
