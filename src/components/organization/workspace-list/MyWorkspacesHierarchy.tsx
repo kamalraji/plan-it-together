@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ChevronRightIcon,
   FolderIcon,
-  Squares2X2Icon,
   CalendarIcon,
   SparklesIcon,
+  BuildingOffice2Icon,
+  UserGroupIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -20,13 +22,63 @@ interface MyWorkspacesHierarchyProps {
   orgSlug?: string;
 }
 
-interface TreeNodeProps {
-  workspace: WorkspaceItem;
-  allWorkspaces: WorkspaceItem[];
-  orgSlug?: string;
-  depth?: number;
-  index?: number;
-}
+// Level configuration
+const LEVEL_CONFIG = {
+  ROOT: {
+    label: 'Root',
+    shortLabel: 'L1',
+    color: 'from-violet-500/20 to-violet-500/5',
+    borderColor: 'border-violet-500/30',
+    textColor: 'text-violet-600 dark:text-violet-400',
+    bgColor: 'bg-violet-500/10',
+    icon: FolderIcon,
+  },
+  DEPARTMENT: {
+    label: 'Department',
+    shortLabel: 'L2',
+    color: 'from-blue-500/20 to-blue-500/5',
+    borderColor: 'border-blue-500/30',
+    textColor: 'text-blue-600 dark:text-blue-400',
+    bgColor: 'bg-blue-500/10',
+    icon: BuildingOffice2Icon,
+  },
+  COMMITTEE: {
+    label: 'Committee',
+    shortLabel: 'L3',
+    color: 'from-emerald-500/20 to-emerald-500/5',
+    borderColor: 'border-emerald-500/30',
+    textColor: 'text-emerald-600 dark:text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+    icon: UserGroupIcon,
+  },
+  TEAM: {
+    label: 'Team',
+    shortLabel: 'L4',
+    color: 'from-amber-500/20 to-amber-500/5',
+    borderColor: 'border-amber-500/30',
+    textColor: 'text-amber-600 dark:text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    icon: UsersIcon,
+  },
+};
+
+type WorkspaceLevel = keyof typeof LEVEL_CONFIG;
+
+const getWorkspaceLevel = (workspace: WorkspaceItem, depth: number): WorkspaceLevel => {
+  // Use workspaceType if available, otherwise infer from depth
+  if (workspace.workspaceType) {
+    const type = workspace.workspaceType.toUpperCase();
+    if (type in LEVEL_CONFIG) return type as WorkspaceLevel;
+  }
+  
+  // Infer from depth
+  switch (depth) {
+    case 0: return 'ROOT';
+    case 1: return 'DEPARTMENT';
+    case 2: return 'COMMITTEE';
+    default: return 'TEAM';
+  }
+};
 
 const getStatusColor = (status: WorkspaceStatus) => {
   switch (status) {
@@ -41,16 +93,28 @@ const getStatusColor = (status: WorkspaceStatus) => {
   }
 };
 
-const TreeNode: React.FC<TreeNodeProps> = ({
+interface HierarchyNodeProps {
+  workspace: WorkspaceItem;
+  allWorkspaces: WorkspaceItem[];
+  orgSlug?: string;
+  depth?: number;
+  index?: number;
+}
+
+const HierarchyNode: React.FC<HierarchyNodeProps> = ({
   workspace,
   allWorkspaces,
   orgSlug,
   depth = 0,
   index = 0,
 }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(depth < 2);
   const navigate = useNavigate();
   const hasChildren = workspace.subWorkspaces && workspace.subWorkspaces.length > 0;
+  
+  const level = getWorkspaceLevel(workspace, depth);
+  const config = LEVEL_CONFIG[level];
+  const LevelIcon = config.icon;
 
   const workspaceDataForHierarchy = useMemo(() => {
     return allWorkspaces.map(ws => ({
@@ -81,144 +145,121 @@ const TreeNode: React.FC<TreeNodeProps> = ({
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.02, duration: 0.2 }}
+      className={cn(depth > 0 && "ml-4 pl-4 border-l-2 border-border/30")}
     >
-      {/* Tree line connector */}
-      <div className="flex items-stretch">
-        {/* Vertical line and branch for children */}
-        {depth > 0 && (
-          <div className="flex items-center mr-2">
-            {Array.from({ length: depth }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "w-4 h-full border-l border-border/40",
-                  i === depth - 1 && "border-b rounded-bl"
-                )}
-              />
-            ))}
-          </div>
+      {/* Node content */}
+      <motion.div
+        whileHover={{ x: 2 }}
+        className={cn(
+          "group flex items-center gap-3 p-3 rounded-xl cursor-pointer mb-2",
+          "bg-gradient-to-r", config.color,
+          "border", config.borderColor,
+          "hover:shadow-lg hover:shadow-black/5",
+          "transition-all duration-300"
+        )}
+        onClick={handleClick}
+      >
+        {/* Expand/Collapse toggle */}
+        {hasChildren ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+            className={cn(
+              "p-1 rounded-md",
+              "hover:bg-background/50 transition-colors"
+            )}
+          >
+            <motion.div
+              animate={{ rotate: expanded ? 90 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
+            </motion.div>
+          </button>
+        ) : (
+          <div className="w-6" />
         )}
 
-        {/* Node content */}
-        <div className="flex-1">
-          <motion.div
-            whileHover={{ x: 2 }}
-            className={cn(
-              "group flex items-center gap-3 p-3 rounded-xl cursor-pointer",
-              "bg-gradient-to-r from-card/80 to-card/40",
-              "border border-border/40 hover:border-primary/30",
-              "hover:shadow-lg hover:shadow-primary/5",
-              "transition-all duration-300"
-            )}
-            onClick={handleClick}
-          >
-            {/* Expand/Collapse toggle */}
-            {hasChildren ? (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpanded(!expanded);
-                }}
-                className={cn(
-                  "p-1 rounded-md",
-                  "hover:bg-primary/10 transition-colors"
-                )}
-              >
-                <motion.div
-                  animate={{ rotate: expanded ? 90 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
-                </motion.div>
-              </button>
-            ) : (
-              <div className="w-6" />
-            )}
-
-            {/* Icon with gradient background */}
-            <div className={cn(
-              "relative p-2 rounded-lg",
-              "bg-gradient-to-br from-primary/20 to-primary/5",
-              "border border-primary/20",
-              "group-hover:from-primary/30 group-hover:to-primary/10",
-              "transition-all duration-300"
-            )}>
-              {hasChildren ? (
-                <FolderIcon className="h-4 w-4 text-primary" />
-              ) : (
-                <Squares2X2Icon className="h-4 w-4 text-primary" />
-              )}
-              {/* Status indicator */}
-              <div className={cn(
-                "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full",
-                "border-2 border-card",
-                getStatusColor(workspace.status)
-              )} />
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h4 className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
-                  {workspace.name}
-                </h4>
-                {workspace.isOwner && (
-                  <span className={cn(
-                    "text-[9px] px-1.5 py-0.5 rounded-full font-medium",
-                    "bg-gradient-to-r from-primary/20 to-primary/10",
-                    "text-primary border border-primary/20"
-                  )}>
-                    Owner
-                  </span>
-                )}
-                {hasChildren && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                    {workspace.subWorkspaces!.length} sub
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                {workspace.event && (
-                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <CalendarIcon className="h-3 w-3" />
-                    <span className="truncate max-w-[120px]">{workspace.event.name}</span>
-                  </span>
-                )}
-                <span className="text-[10px] text-muted-foreground/50">
-                  {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
-                </span>
-              </div>
-            </div>
-
-            {/* Arrow */}
-            <ChevronRightIcon className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-          </motion.div>
-
-          {/* Children */}
-          <AnimatePresence initial={false}>
-            {expanded && hasChildren && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="ml-4 mt-2 space-y-2 border-l-2 border-border/30 pl-4"
-              >
-                {workspace.subWorkspaces!.map((child, childIndex) => (
-                  <TreeNode
-                    key={child.id}
-                    workspace={child}
-                    allWorkspaces={allWorkspaces}
-                    orgSlug={orgSlug}
-                    depth={depth + 1}
-                    index={childIndex}
-                  />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Level badge */}
+        <div className={cn(
+          "flex items-center gap-1.5 px-2 py-1 rounded-lg",
+          config.bgColor,
+          "border", config.borderColor
+        )}>
+          <LevelIcon className={cn("h-4 w-4", config.textColor)} />
+          <span className={cn("text-[10px] font-bold", config.textColor)}>
+            {config.shortLabel}
+          </span>
         </div>
-      </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+              {workspace.name}
+            </h4>
+            {workspace.isOwner && (
+              <span className={cn(
+                "text-[9px] px-1.5 py-0.5 rounded-full font-medium",
+                "bg-primary/10 text-primary border border-primary/20"
+              )}>
+                Owner
+              </span>
+            )}
+            {hasChildren && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {workspace.subWorkspaces!.length}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mt-0.5">
+            {workspace.event && depth === 0 && (
+              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <CalendarIcon className="h-3 w-3" />
+                <span className="truncate max-w-[120px]">{workspace.event.name}</span>
+              </span>
+            )}
+            <span className="text-[10px] text-muted-foreground/50">
+              {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
+            </span>
+          </div>
+        </div>
+
+        {/* Status indicator */}
+        <div className={cn(
+          "w-2.5 h-2.5 rounded-full",
+          getStatusColor(workspace.status)
+        )} />
+
+        {/* Arrow */}
+        <ChevronRightIcon className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+      </motion.div>
+
+      {/* Children */}
+      <AnimatePresence initial={false}>
+        {expanded && hasChildren && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-1"
+          >
+            {workspace.subWorkspaces!.map((child, childIndex) => (
+              <HierarchyNode
+                key={child.id}
+                workspace={child}
+                allWorkspaces={allWorkspaces}
+                orgSlug={orgSlug}
+                depth={depth + 1}
+                index={childIndex}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -239,6 +280,9 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
   const [expanded, setExpanded] = useState(true);
   const navigate = useNavigate();
   const hasChildren = workspace.subWorkspaces && workspace.subWorkspaces.length > 0;
+  
+  const config = LEVEL_CONFIG.ROOT;
+  const LevelIcon = config.icon;
 
   const workspaceDataForHierarchy = useMemo(() => {
     return allWorkspaces.map(ws => ({
@@ -264,6 +308,21 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
     }
   };
 
+  // Count all descendants by level
+  const levelCounts = useMemo(() => {
+    const counts = { DEPARTMENT: 0, COMMITTEE: 0, TEAM: 0 };
+    const countChildren = (children: WorkspaceItem[] | undefined, depth: number) => {
+      if (!children) return;
+      children.forEach(child => {
+        const level = getWorkspaceLevel(child, depth);
+        if (level !== 'ROOT') counts[level]++;
+        countChildren(child.subWorkspaces, depth + 1);
+      });
+    };
+    countChildren(workspace.subWorkspaces, 1);
+    return counts;
+  }, [workspace.subWorkspaces]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -282,9 +341,9 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
       <div
         className={cn(
           "flex items-center gap-3 p-4 cursor-pointer",
-          "bg-gradient-to-r from-primary/5 via-transparent to-primary/5",
-          "border-b border-border/30",
-          "hover:from-primary/10 hover:to-primary/10",
+          "bg-gradient-to-r", config.color,
+          "border-b", config.borderColor,
+          "hover:from-violet-500/15 hover:to-violet-500/5",
           "transition-all duration-300 group"
         )}
         onClick={handleClick}
@@ -298,7 +357,7 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
             }}
             className={cn(
               "p-1.5 rounded-lg",
-              "hover:bg-primary/10 transition-colors"
+              "hover:bg-background/50 transition-colors"
             )}
           >
             <motion.div
@@ -310,20 +369,16 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
           </button>
         )}
 
-        {/* Icon */}
+        {/* Level badge */}
         <div className={cn(
-          "relative p-2.5 rounded-xl",
-          "bg-gradient-to-br from-primary/25 to-primary/10",
-          "border border-primary/20",
-          "group-hover:from-primary/35 group-hover:to-primary/15",
-          "transition-all duration-300"
+          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl",
+          config.bgColor,
+          "border", config.borderColor
         )}>
-          <FolderIcon className="h-5 w-5 text-primary" />
-          <div className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full",
-            "border-2 border-card",
-            getStatusColor(workspace.status)
-          )} />
+          <LevelIcon className={cn("h-5 w-5", config.textColor)} />
+          <span className={cn("text-xs font-bold", config.textColor)}>
+            {config.shortLabel}
+          </span>
         </div>
 
         {/* Content */}
@@ -335,8 +390,7 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
             {workspace.isOwner && (
               <span className={cn(
                 "text-[10px] px-2 py-0.5 rounded-full font-medium",
-                "bg-gradient-to-r from-primary/20 to-primary/10",
-                "text-primary border border-primary/20"
+                "bg-primary/10 text-primary border border-primary/20"
               )}>
                 Owner
               </span>
@@ -349,16 +403,47 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
                 <span className="truncate max-w-[150px]">{workspace.event.name}</span>
               </span>
             )}
-            {hasChildren && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
-                {workspace.subWorkspaces!.length} workspaces
-              </span>
-            )}
+            {/* Level counts */}
+            <div className="flex items-center gap-2">
+              {levelCounts.DEPARTMENT > 0 && (
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-medium",
+                  LEVEL_CONFIG.DEPARTMENT.bgColor,
+                  LEVEL_CONFIG.DEPARTMENT.textColor
+                )}>
+                  {levelCounts.DEPARTMENT} Dept
+                </span>
+              )}
+              {levelCounts.COMMITTEE > 0 && (
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-medium",
+                  LEVEL_CONFIG.COMMITTEE.bgColor,
+                  LEVEL_CONFIG.COMMITTEE.textColor
+                )}>
+                  {levelCounts.COMMITTEE} Comm
+                </span>
+              )}
+              {levelCounts.TEAM > 0 && (
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-medium",
+                  LEVEL_CONFIG.TEAM.bgColor,
+                  LEVEL_CONFIG.TEAM.textColor
+                )}>
+                  {levelCounts.TEAM} Team
+                </span>
+              )}
+            </div>
             <span className="text-xs text-muted-foreground/50">
               {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
             </span>
           </div>
         </div>
+
+        {/* Status indicator */}
+        <div className={cn(
+          "w-3 h-3 rounded-full",
+          getStatusColor(workspace.status)
+        )} />
 
         {/* Arrow */}
         <ChevronRightIcon className="h-5 w-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
@@ -374,14 +459,14 @@ const RootWorkspaceCard: React.FC<RootWorkspaceCardProps> = ({
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="p-3 space-y-2 bg-muted/5">
+            <div className="p-3 space-y-1 bg-muted/5">
               {workspace.subWorkspaces!.map((child, childIndex) => (
-                <TreeNode
+                <HierarchyNode
                   key={child.id}
                   workspace={child}
                   allWorkspaces={allWorkspaces}
                   orgSlug={orgSlug}
-                  depth={0}
+                  depth={1}
                   index={childIndex}
                 />
               ))}
@@ -421,12 +506,27 @@ export const MyWorkspacesHierarchy: React.FC<MyWorkspacesHierarchyProps> = ({
           </div>
           <h3 className="font-semibold text-foreground">My Workspaces</h3>
         </div>
-        <span className={cn(
-          "text-xs font-medium px-2.5 py-1 rounded-full",
-          "bg-primary/10 text-primary border border-primary/20"
-        )}>
-          {totalCount} total
-        </span>
+        
+        {/* Level legend */}
+        <div className="flex items-center gap-2">
+          {Object.entries(LEVEL_CONFIG).map(([key, cfg]) => (
+            <span
+              key={key}
+              className={cn(
+                "text-[9px] px-1.5 py-0.5 rounded-full font-medium",
+                cfg.bgColor, cfg.textColor
+              )}
+            >
+              {cfg.shortLabel}
+            </span>
+          ))}
+          <span className={cn(
+            "text-xs font-medium px-2.5 py-1 rounded-full ml-2",
+            "bg-primary/10 text-primary border border-primary/20"
+          )}>
+            {totalCount} total
+          </span>
+        </div>
       </motion.div>
 
       {/* Workspace Cards */}
