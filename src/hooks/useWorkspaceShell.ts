@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Workspace, WorkspaceRoleScope, TaskStatus } from '@/types';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { useWorkspaceMutations } from '@/hooks/useWorkspaceMutations';
 import { useWorkspacePermissions } from '@/hooks/useWorkspacePermissions';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { 
+  parseWorkspaceUrl, 
+  buildWorkspaceUrl, 
+  buildHierarchyChain, 
+  slugify,
+} from '@/lib/workspaceNavigation';
 
 export type WorkspaceTab =
   | 'overview'
@@ -77,18 +83,27 @@ interface UseWorkspaceShellProps {
 /**
  * Unified workspace shell hook
  * Provides shared state, actions, and permissions for both desktop and mobile views
+ * Supports both legacy and hierarchical URL structures
  */
 export function useWorkspaceShell({ 
   workspaceId: propWorkspaceId, 
   orgSlug: propOrgSlug 
 }: UseWorkspaceShellProps = {}): WorkspaceShellResult {
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
-  const workspaceId = propWorkspaceId || paramWorkspaceId;
-  const orgSlug = propOrgSlug;
-  
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  
+  // Parse URL for hierarchical params
+  const parsedUrl = parseWorkspaceUrl(location.pathname, location.search);
+  
+  // Get workspaceId from props, URL query params, or route params
+  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const workspaceIdFromQuery = searchParams.get('workspaceId') || undefined;
+  const workspaceId = propWorkspaceId || workspaceIdFromQuery || paramWorkspaceId;
+  
+  // Resolve orgSlug from props or parsed URL
+  const orgSlug = propOrgSlug || parsedUrl.orgSlug;
   
   const taskIdFromUrl = searchParams.get('taskId') || undefined;
   const tabFromUrl = searchParams.get('tab') as WorkspaceTab | null;
@@ -191,12 +206,7 @@ export function useWorkspaceShell({
 
   const handleInviteTeamMember = () => {
     if (!workspaceId) return;
-    // Use org-scoped route if available
-    if (orgSlug && workspace?.eventId) {
-      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}?tab=team`);
-    } else {
-      navigate(`/workspaces/${workspaceId}/team/invite`);
-    }
+    handleSetActiveTab('team');
   };
 
   const handleCreateTask = () => {
@@ -204,21 +214,88 @@ export function useWorkspaceShell({
     mutations.createTask();
   };
 
-  const handleManageSettings = () => {
+  const handleManageSettings = async () => {
     if (!workspaceId || !permissions.isGlobalWorkspaceManager) return;
-    // Use org-scoped route if available, otherwise fallback
+    
+    // Build settings URL using hierarchical structure if available
     if (orgSlug && workspace?.eventId) {
-      navigate(`/${orgSlug}/workspaces/${workspace.eventId}/${workspaceId}/settings`);
-    } else {
-      navigate(`/workspaces/${workspaceId}/settings`);
+      // Fetch event and workspace data to build proper URL
+      const { data: eventData } = await supabase
+        .from('events')
+        .select('slug, name')
+        .eq('id', workspace.eventId)
+        .single();
+      
+      const { data: workspacesData } = await supabase
+        .from('workspaces')
+        .select('id, name, slug, workspace_type, parent_workspace_id')
+        .eq('event_id', workspace.eventId);
+      
+      if (eventData && workspacesData) {
+        const eventSlug = eventData.slug || slugify(eventData.name);
+        const hierarchy = buildHierarchyChain(workspaceId, workspacesData.map(ws => ({
+          id: ws.id,
+          slug: ws.slug || slugify(ws.name),
+          name: ws.name,
+          workspaceType: ws.workspace_type,
+          parentWorkspaceId: ws.parent_workspace_id,
+        })));
+        
+        const baseUrl = buildWorkspaceUrl(
+          { orgSlug, eventSlug, eventId: workspace.eventId, hierarchy },
+        );
+        navigate(baseUrl.split('?')[0] + '/settings?' + baseUrl.split('?')[1]);
+        return;
+      }
     }
+    
+    // Fallback
+    navigate(`/workspaces/${workspaceId}/settings`);
   };
 
   const handleViewTasks = () => {
     handleSetActiveTab('tasks');
   };
 
-  const handleWorkspaceSwitch = (newWorkspaceId: string) => {
+  const handleWorkspaceSwitch = async (newWorkspaceId: string) => {
+    // Fetch workspace data to build hierarchical URL
+    const { data: newWorkspace } = await supabase
+      .from('workspaces')
+      .select('id, name, slug, workspace_type, parent_workspace_id, event_id')
+      .eq('id', newWorkspaceId)
+      .single();
+    
+    if (newWorkspace && orgSlug) {
+      const { data: eventData } = await supabase
+        .from('events')
+        .select('slug, name')
+        .eq('id', newWorkspace.event_id)
+        .single();
+      
+      const { data: workspacesData } = await supabase
+        .from('workspaces')
+        .select('id, name, slug, workspace_type, parent_workspace_id')
+        .eq('event_id', newWorkspace.event_id);
+      
+      if (eventData && workspacesData) {
+        const eventSlug = eventData.slug || slugify(eventData.name);
+        const hierarchy = buildHierarchyChain(newWorkspaceId, workspacesData.map(ws => ({
+          id: ws.id,
+          slug: ws.slug || slugify(ws.name),
+          name: ws.name,
+          workspaceType: ws.workspace_type,
+          parentWorkspaceId: ws.parent_workspace_id,
+        })));
+        
+        const newUrl = buildWorkspaceUrl(
+          { orgSlug, eventSlug, eventId: newWorkspace.event_id, hierarchy }
+        );
+        navigate(newUrl);
+        return;
+      }
+    }
+    
+    // Fallback
     navigate(`/workspaces/${newWorkspaceId}`);
   };
 

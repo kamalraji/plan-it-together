@@ -1,42 +1,93 @@
-import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { WorkspaceTab } from './useWorkspaceShell';
+import { 
+  parseWorkspaceUrl, 
+  buildWorkspaceUrl as buildHierarchicalUrl,
+  WorkspacePathSegment,
+  DeepLinkParams,
+  WorkspaceLevel,
+  slugify,
+  dbTypeToLevel,
+} from '@/lib/workspaceNavigation';
 
-// Workspace type path segments
-export type WorkspaceTypePath = 'root' | 'department' | 'committee' | 'team';
+// Re-export for backward compatibility
+export type WorkspaceTypePath = WorkspaceLevel;
 
 export interface WorkspaceQueryParams {
   workspaceId?: string;
-  name?: string; // workspace name/slug for human-readable URLs
+  eventId?: string;
+  name?: string;
   tab?: WorkspaceTab;
   taskId?: string;
   sectionId?: string;
+  roleSpace?: string;
+}
+
+export interface HierarchicalParams {
+  orgSlug?: string;
+  eventSlug?: string;
+  rootSlug?: string;
+  departmentSlug?: string;
+  committeeSlug?: string;
+  teamSlug?: string;
 }
 
 /**
- * Lightweight hook for workspace URL query parameter management
- * Supports deep-linking for tabs, tasks, sections, and workspace type paths
+ * Unified hook for workspace URL query parameter management
+ * Supports both legacy and new hierarchical URL structures
  * 
- * URL Structure:
- * - /:orgSlug/workspaces/:eventId/department?name=content&workspaceId=xxx
- * - /:orgSlug/workspaces/:eventId/committee?name=marketing&workspaceId=xxx
- * - /:orgSlug/workspaces/:eventId/team?name=design-team&workspaceId=xxx
- * - /:orgSlug/workspaces/:eventId/root?workspaceId=xxx
+ * New URL Structure:
+ * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug?eventId=xxx&workspaceId=xxx
+ * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug/department/:deptSlug?eventId=xxx&workspaceId=xxx
+ * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug/department/:deptSlug/committee/:committeeSlug?eventId=xxx&workspaceId=xxx
  */
 export function useWorkspaceQueryParams() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const routeParams = useParams<{ orgSlug?: string; eventId?: string; workspaceType?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  
+  // Parse hierarchical URL
+  const parsed = parseWorkspaceUrl(location.pathname, location.search);
+  
+  // Route params for legacy compatibility
+  const routeParams = useParams<{ 
+    orgSlug?: string; 
+    eventId?: string; 
+    eventSlug?: string;
+    workspaceType?: string;
+    rootSlug?: string;
+    deptSlug?: string;
+    committeeSlug?: string;
+    teamSlug?: string;
+  }>();
 
+  // Extract query params
   const params: WorkspaceQueryParams = {
     workspaceId: searchParams.get('workspaceId') || undefined,
+    eventId: searchParams.get('eventId') || undefined,
     name: searchParams.get('name') || undefined,
     tab: (searchParams.get('tab') as WorkspaceTab) || undefined,
     taskId: searchParams.get('taskId') || undefined,
     sectionId: searchParams.get('sectionid') || undefined,
+    roleSpace: searchParams.get('roleSpace') || undefined,
   };
 
-  // Get workspace type from URL path
-  const workspaceType = routeParams.workspaceType as WorkspaceTypePath | undefined;
+  // Hierarchical path params
+  const hierarchicalParams: HierarchicalParams = {
+    orgSlug: parsed.orgSlug || routeParams.orgSlug,
+    eventSlug: parsed.eventSlug || routeParams.eventSlug,
+    rootSlug: parsed.rootSlug || routeParams.rootSlug,
+    departmentSlug: parsed.departmentSlug || routeParams.deptSlug,
+    committeeSlug: parsed.committeeSlug || routeParams.committeeSlug,
+    teamSlug: parsed.teamSlug || routeParams.teamSlug,
+  };
+
+  // Determine current workspace level from URL
+  const currentLevel: WorkspaceLevel | undefined = 
+    hierarchicalParams.teamSlug ? 'team' :
+    hierarchicalParams.committeeSlug ? 'committee' :
+    hierarchicalParams.departmentSlug ? 'department' :
+    hierarchicalParams.rootSlug ? 'root' : undefined;
 
   const setParam = (key: string, value: string | null) => {
     setSearchParams(
@@ -71,91 +122,93 @@ export function useWorkspaceQueryParams() {
   };
 
   /**
-   * Build a workspace URL with type-based path structure
-   * Example: /thittamonehub/workspaces/eventId/department?name=content&workspaceId=xxx
+   * Build a hierarchical workspace URL
    */
-  const buildWorkspaceUrl = (
-    options: {
-      orgSlug: string;
-      eventId: string;
-      workspaceType: WorkspaceTypePath;
-      workspaceName?: string;
-      workspaceId: string;
-      tab?: WorkspaceTab;
-      taskId?: string;
-      sectionId?: string;
-    }
-  ): string => {
-    const basePath = `/${options.orgSlug}/workspaces/${options.eventId}/${options.workspaceType}`;
-    
-    const queryParams = new URLSearchParams();
-    if (options.workspaceName) queryParams.set('name', options.workspaceName.toLowerCase().replace(/\s+/g, '-'));
-    queryParams.set('workspaceId', options.workspaceId);
-    if (options.tab && options.tab !== 'overview') queryParams.set('tab', options.tab);
-    if (options.taskId) queryParams.set('taskId', options.taskId);
-    if (options.sectionId) queryParams.set('sectionid', options.sectionId);
-    
-    return `${basePath}?${queryParams.toString()}`;
+  const buildWorkspaceUrl = (options: {
+    orgSlug: string;
+    eventSlug: string;
+    eventId: string;
+    hierarchy: WorkspacePathSegment[];
+    deepLink?: DeepLinkParams;
+  }): string => {
+    return buildHierarchicalUrl(
+      {
+        orgSlug: options.orgSlug,
+        eventSlug: options.eventSlug,
+        eventId: options.eventId,
+        hierarchy: options.hierarchy,
+      },
+      options.deepLink
+    );
   };
 
   /**
-   * Navigate to a workspace with the new URL structure
+   * Navigate to a workspace with the hierarchical URL structure
    */
   const navigateToWorkspace = (options: {
     orgSlug: string;
+    eventSlug: string;
     eventId: string;
-    workspaceType: WorkspaceTypePath;
-    workspaceName?: string;
-    workspaceId: string;
-    tab?: WorkspaceTab;
+    hierarchy: WorkspacePathSegment[];
+    deepLink?: DeepLinkParams;
   }) => {
     const url = buildWorkspaceUrl(options);
     navigate(url);
   };
 
   /**
-   * Map database workspace_type to URL path segment
+   * Build workspace URL from flat workspace data (for backward compatibility)
    */
-  const getWorkspaceTypePath = (dbType: string): WorkspaceTypePath => {
-    const typeMap: Record<string, WorkspaceTypePath> = {
-      'ROOT': 'root',
-      'DEPARTMENT': 'department',
-      'COMMITTEE': 'committee',
-      'TEAM': 'team',
-    };
-    return typeMap[dbType] || 'root';
+  const buildSimpleWorkspaceUrl = (options: {
+    orgSlug: string;
+    eventSlug: string;
+    eventId: string;
+    workspaceType: string;
+    workspaceName: string;
+    workspaceId: string;
+    tab?: WorkspaceTab;
+    taskId?: string;
+    sectionId?: string;
+  }): string => {
+    const level = dbTypeToLevel(options.workspaceType);
+    const hierarchy: WorkspacePathSegment[] = [{
+      level,
+      slug: slugify(options.workspaceName),
+      workspaceId: options.workspaceId,
+    }];
+    
+    return buildHierarchicalUrl(
+      {
+        orgSlug: options.orgSlug,
+        eventSlug: options.eventSlug,
+        eventId: options.eventId,
+        hierarchy,
+      },
+      {
+        tab: options.tab,
+        taskId: options.taskId,
+        sectionId: options.sectionId,
+      }
+    );
   };
 
   /**
-   * Legacy URL builder for backward compatibility
+   * Map database workspace_type to URL path segment
    */
-  const buildLegacyWorkspaceUrl = (
-    baseUrl: string,
-    options: {
-      workspaceId?: string;
-      tab?: WorkspaceTab;
-      taskId?: string;
-      sectionId?: string;
-    }
-  ): string => {
-    const params = new URLSearchParams();
-    if (options.workspaceId) params.set('workspaceId', options.workspaceId);
-    if (options.tab && options.tab !== 'overview') params.set('tab', options.tab);
-    if (options.taskId) params.set('taskId', options.taskId);
-    if (options.sectionId) params.set('sectionid', options.sectionId);
-    
-    const queryString = params.toString();
-    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  const getWorkspaceTypePath = (dbType: string): WorkspaceTypePath => {
+    return dbTypeToLevel(dbType);
   };
 
   return {
     params,
-    workspaceType,
+    hierarchicalParams,
+    currentLevel,
+    parsed,
     routeParams,
     setParam,
     setMultipleParams,
     buildWorkspaceUrl,
-    buildLegacyWorkspaceUrl,
+    buildSimpleWorkspaceUrl,
     navigateToWorkspace,
     getWorkspaceTypePath,
     searchParams,

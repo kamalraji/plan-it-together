@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useLocation } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkspaceStatus, UserRole } from '@/types';
@@ -8,7 +8,13 @@ import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationB
 import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { WorkspaceTypePath } from '@/hooks/useWorkspaceQueryParams';
+import { 
+  parseWorkspaceUrl, 
+  buildWorkspaceUrl, 
+  buildHierarchyChain, 
+  slugify,
+  WorkspaceLevel,
+} from '@/lib/workspaceNavigation';
 import { 
   PlusIcon, 
   Squares2X2Icon, 
@@ -104,21 +110,30 @@ const WorkspaceListItem: React.FC<WorkspaceListItemProps> = ({
  */
 export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
-  const { orgSlug, eventId } = useParams<{ orgSlug: string; eventId: string }>();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Extract workspace type from URL path (e.g., /department, /committee, /team, /root)
-  const pathParts = location.pathname.split('/').filter(Boolean);
-  const workspaceTypeFromPath = pathParts.find(part => 
-    ['root', 'department', 'committee', 'team'].includes(part)
-  ) as WorkspaceTypePath | undefined;
+  // Parse hierarchical URL
+  const parsedUrl = parseWorkspaceUrl(location.pathname, location.search);
   
-  // Get workspace name from query params for new URL structure
-  const workspaceName = searchParams.get('name') || undefined;
+  // Get eventId from query params (hierarchical URL) or route params (legacy)
+  const eventIdFromQuery = searchParams.get('eventId') || undefined;
+  const { eventId: eventIdFromRoute } = useParams<{ eventId: string }>();
+  const eventId = eventIdFromQuery || eventIdFromRoute;
+  
+  // Get workspace from query params
   const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
+  
+  // Determine current workspace level from URL path
+  const currentLevel: WorkspaceLevel | undefined = 
+    parsedUrl.teamSlug ? 'team' :
+    parsedUrl.committeeSlug ? 'committee' :
+    parsedUrl.departmentSlug ? 'department' :
+    parsedUrl.rootSlug ? 'root' : undefined;
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
@@ -256,27 +271,46 @@ export const OrgWorkspacePage: React.FC = () => {
     }
   };
 
-  const handleSelectWorkspace = (workspaceId: string, workspace?: any) => {
-    // If workspace data is provided, use new URL structure with type path
-    if (workspace && orgSlug && eventId) {
-      const typePathMap: Record<string, WorkspaceTypePath> = {
-        'ROOT': 'root',
-        'DEPARTMENT': 'department', 
-        'COMMITTEE': 'committee',
-        'TEAM': 'team',
-      };
-      const typePath = typePathMap[workspace.workspaceType] || 'root';
-      const nameSlug = workspace.name.toLowerCase().replace(/\s+/g, '-');
+  const handleSelectWorkspace = async (workspaceId: string, _workspace?: any) => {
+    if (!orgSlug || !eventId) {
+      // Fallback to query param approach
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaceId);
+        return next;
+      });
+      return;
+    }
+
+    // Fetch event data for slug
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('slug, name')
+      .eq('id', eventId)
+      .single();
+    
+    // Fetch all workspaces for hierarchy building
+    const { data: workspacesData } = await supabase
+      .from('workspaces')
+      .select('id, name, slug, workspace_type, parent_workspace_id')
+      .eq('event_id', eventId);
+    
+    if (eventData && workspacesData) {
+      const eventSlug = eventData.slug || slugify(eventData.name);
+      const hierarchy = buildHierarchyChain(workspaceId, workspacesData.map(ws => ({
+        id: ws.id,
+        slug: ws.slug || slugify(ws.name),
+        name: ws.name,
+        workspaceType: ws.workspace_type,
+        parentWorkspaceId: ws.parent_workspace_id,
+      })));
       
-      // Navigate to new URL structure: /:orgSlug/workspaces/:eventId/:type?name=xxx&workspaceId=xxx
-      const params = new URLSearchParams();
-      params.set('name', nameSlug);
-      params.set('workspaceId', workspaceId);
-      
-      window.history.replaceState(null, '', `/${orgSlug}/workspaces/${eventId}/${typePath}?${params.toString()}`);
-      setSearchParams(params, { replace: true });
+      const newUrl = buildWorkspaceUrl(
+        { orgSlug, eventSlug, eventId, hierarchy }
+      );
+      navigate(newUrl);
     } else {
-      // Fallback to legacy query param approach
+      // Fallback
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
         next.set('workspaceId', workspaceId);
@@ -285,9 +319,9 @@ export const OrgWorkspacePage: React.FC = () => {
     }
   };
 
-  // Log current URL context for debugging (uses the extracted variables)
+  // Log current URL context for debugging
   if (process.env.NODE_ENV === 'development') {
-    console.debug('[OrgWorkspacePage] URL context:', { workspaceTypeFromPath, workspaceName, selectedWorkspaceId });
+    console.debug('[OrgWorkspacePage] URL context:', { parsedUrl, currentLevel, selectedWorkspaceId });
   }
 
   return (
