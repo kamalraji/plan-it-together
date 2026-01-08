@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { WorkspaceStatus, WorkspaceRole, WorkspaceType } from '../../types';
-import { WorkspaceHeader } from './WorkspaceHeader';
-import { WorkspaceNavigation } from './WorkspaceNavigation';
+import { WorkspaceLayout } from './WorkspaceLayout';
 import { TeamManagement } from './TeamManagement';
 import { WorkspaceCommunication } from './WorkspaceCommunication';
 import { WorkspaceAnalyticsDashboard } from './WorkspaceAnalyticsDashboard';
@@ -32,7 +31,6 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
   const {
     workspace,
-    userWorkspaces,
     tasks,
     teamMembers,
     isLoading,
@@ -89,16 +87,17 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
   }
 
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col">
-      <WorkspaceHeader
-        workspace={workspace}
-        orgSlug={orgSlug}
-        onInviteTeamMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
-        onCreateTask={permissions.canManageTasks ? actions.handleCreateTask : undefined}
-        onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
-        onCreateSubWorkspace={permissions.canCreateSubWorkspace ? () => actions.setShowSubWorkspaceModal(true) : undefined}
-      />
-
+    <WorkspaceLayout
+      workspace={workspace}
+      activeTab={activeTab}
+      onTabChange={actions.setActiveTab}
+      orgSlug={orgSlug || ''}
+      canCreateSubWorkspace={permissions.canCreateSubWorkspace}
+      canInviteMembers={permissions.canInviteMembers}
+      onCreateSubWorkspace={() => actions.setShowSubWorkspaceModal(true)}
+      onInviteMember={actions.handleInviteTeamMember}
+      onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
+    >
       {/* Sub-Workspace Creation Modal */}
       {workspace?.eventId && (
         <CreateSubWorkspaceModal
@@ -109,16 +108,7 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
         />
       )}
 
-
-      <WorkspaceNavigation
-        workspace={workspace}
-        userWorkspaces={userWorkspaces}
-        activeTab={activeTab}
-        onTabChange={actions.setActiveTab}
-        onWorkspaceSwitch={actions.handleWorkspaceSwitch}
-      />
-
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="w-full">
         {activeTab === 'overview' && (
           <>
             {/* Level-specific dashboards */}
@@ -236,6 +226,6 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
           </div>
         )}
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }
