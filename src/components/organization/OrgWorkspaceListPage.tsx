@@ -74,17 +74,17 @@ export const OrgWorkspaceListPage: React.FC = () => {
         };
       });
 
-      // Build deep hierarchy (L1 → L2 → L3 → L4)
-      const buildDeepHierarchy = (workspaces: WorkspaceItem[]): WorkspaceItem[] => {
+      // Build deep hierarchy using ALL workspaces, then extract trees by ownership
+      const buildFullHierarchy = (allWs: WorkspaceItem[]): Map<string, WorkspaceItem> => {
         const workspaceMap = new Map<string, WorkspaceItem>();
         
         // Create a map of all workspaces with empty subWorkspaces arrays
-        workspaces.forEach(ws => {
+        allWs.forEach(ws => {
           workspaceMap.set(ws.id, { ...ws, subWorkspaces: [] });
         });
         
         // Build parent-child relationships
-        workspaces.forEach(ws => {
+        allWs.forEach(ws => {
           if (ws.parentWorkspaceId) {
             const parent = workspaceMap.get(ws.parentWorkspaceId);
             const child = workspaceMap.get(ws.id);
@@ -95,24 +95,33 @@ export const OrgWorkspaceListPage: React.FC = () => {
           }
         });
         
-        // Return only root workspaces (no parent)
-        return Array.from(workspaceMap.values()).filter(ws => !ws.parentWorkspaceId);
+        return workspaceMap;
       };
 
-      // My Workspaces: created by user OR user is a member with owner role
-      const myOwned = allWorkspaces.filter((w) => w.isOwner);
+      // Build full hierarchy map once
+      const hierarchyMap = buildFullHierarchy(allWorkspaces);
+
+      // Extract trees rooted at workspaces matching a filter
+      // For "My Workspaces": show roots the user owns, with ALL their children
+      const getTreesForRoots = (rootFilter: (ws: WorkspaceItem) => boolean): WorkspaceItem[] => {
+        return Array.from(hierarchyMap.values())
+          .filter(ws => !ws.parentWorkspaceId && rootFilter(ws));
+      };
+
+      // My Workspaces: root workspaces created by user (includes all descendants)
+      const myRoots = getTreesForRoots(w => w.isOwner);
       
-      // Invited Workspaces: user is a member but not owner
-      const invitedWorkspaces = allWorkspaces.filter((w) => w.isMember && !w.isOwner);
+      // Invited Workspaces: roots where user is member but not owner
+      const invitedRoots = getTreesForRoots(w => w.isMember && !w.isOwner);
       
-      // Organization Workspaces: neither owner nor member
-      const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
+      // Organization Workspaces: roots neither owned nor member
+      const orgRoots = getTreesForRoots(w => !w.isOwner && !w.isMember);
 
       return {
-        myWorkspaces: buildDeepHierarchy(myOwned),
+        myWorkspaces: myRoots,
         allWorkspaces, // Pass flat list for navigation
-        invitedWorkspaces: buildDeepHierarchy(invitedWorkspaces),
-        orgWorkspaces: buildDeepHierarchy(orgWorkspaces),
+        invitedWorkspaces: invitedRoots,
+        orgWorkspaces: orgRoots,
         totalCount: allWorkspaces.length,
       };
     },
