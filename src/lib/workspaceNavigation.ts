@@ -1,6 +1,268 @@
 import { WorkspaceTab } from '@/hooks/useWorkspaceShell';
 
 // ============================================
+// URL Logging & Debugging Configuration
+// ============================================
+
+const URL_DEBUG_ENABLED = import.meta.env.DEV || localStorage.getItem('DEBUG_WORKSPACE_URLS') === 'true';
+
+interface UrlLogEntry {
+  timestamp: string;
+  component: string;
+  action: 'generate' | 'validate' | 'navigate' | 'parse';
+  url: string;
+  isValid: boolean;
+  context?: Record<string, unknown>;
+  error?: string;
+}
+
+const urlLogHistory: UrlLogEntry[] = [];
+const MAX_LOG_HISTORY = 100;
+
+/**
+ * Log URL generation/validation for debugging
+ */
+export function logWorkspaceUrl(entry: Omit<UrlLogEntry, 'timestamp'>): void {
+  const fullEntry: UrlLogEntry = {
+    ...entry,
+    timestamp: new Date().toISOString(),
+  };
+  
+  // Store in history
+  urlLogHistory.push(fullEntry);
+  if (urlLogHistory.length > MAX_LOG_HISTORY) {
+    urlLogHistory.shift();
+  }
+  
+  if (URL_DEBUG_ENABLED) {
+    const icon = entry.isValid ? '✅' : '❌';
+    
+    console.log(
+      `${icon} [WorkspaceURL:${entry.component}] ${entry.action.toUpperCase()}`,
+      {
+        url: entry.url,
+        isValid: entry.isValid,
+        ...(entry.context && { context: entry.context }),
+        ...(entry.error && { error: entry.error }),
+      }
+    );
+  }
+}
+
+/**
+ * Get URL log history for debugging
+ */
+export function getUrlLogHistory(): UrlLogEntry[] {
+  return [...urlLogHistory];
+}
+
+/**
+ * Clear URL log history
+ */
+export function clearUrlLogHistory(): void {
+  urlLogHistory.length = 0;
+}
+
+/**
+ * Enable/disable URL debugging at runtime
+ */
+export function setUrlDebugEnabled(enabled: boolean): void {
+  if (enabled) {
+    localStorage.setItem('DEBUG_WORKSPACE_URLS', 'true');
+  } else {
+    localStorage.removeItem('DEBUG_WORKSPACE_URLS');
+  }
+}
+
+// ============================================
+// URL Validation Utilities
+// ============================================
+
+export interface UrlValidationResult {
+  isValid: boolean;
+  isHierarchical: boolean;
+  isLegacy: boolean;
+  errors: string[];
+  warnings: string[];
+  parsed?: ParsedWorkspaceUrl;
+}
+
+/**
+ * Comprehensive validation of workspace URLs
+ * Checks for hierarchical format compliance and common issues
+ */
+export function validateWorkspaceUrl(url: string): UrlValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  // Parse URL
+  let pathname: string;
+  let search: string;
+  
+  try {
+    // Handle both full URLs and paths
+    if (url.startsWith('http')) {
+      const parsed = new URL(url);
+      pathname = parsed.pathname;
+      search = parsed.search;
+    } else {
+      const [path, query = ''] = url.split('?');
+      pathname = path;
+      search = query ? `?${query}` : '';
+    }
+  } catch (e) {
+    return {
+      isValid: false,
+      isHierarchical: false,
+      isLegacy: false,
+      errors: ['Invalid URL format'],
+      warnings: [],
+    };
+  }
+  
+  const segments = pathname.split('/').filter(Boolean);
+  
+  // Must have at least orgSlug/workspaces/eventSlug
+  if (segments.length < 3) {
+    errors.push('URL too short: missing org, workspaces, or event slug');
+    return { isValid: false, isHierarchical: false, isLegacy: false, errors, warnings };
+  }
+  
+  if (segments[1] !== 'workspaces') {
+    errors.push(`Expected 'workspaces' as second segment, got '${segments[1]}'`);
+    return { isValid: false, isHierarchical: false, isLegacy: false, errors, warnings };
+  }
+  
+  const eventSlugOrId = segments[2];
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const isEventUuid = uuidPattern.test(eventSlugOrId);
+  
+  // Check for legacy URL pattern
+  if (isEventUuid) {
+    warnings.push('Using legacy UUID format for event instead of slug');
+    return {
+      isValid: false,
+      isHierarchical: false,
+      isLegacy: true,
+      errors: ['Legacy URL format detected - should use hierarchical format'],
+      warnings,
+    };
+  }
+  
+  // Check for hierarchical structure
+  if (segments.length < 5) {
+    // Just the workspace list URL (/:org/workspaces/:event)
+    if (segments.length === 3) {
+      return {
+        isValid: true,
+        isHierarchical: false,
+        isLegacy: false,
+        errors: [],
+        warnings: ['URL is workspace list, not specific workspace'],
+      };
+    }
+    errors.push('Missing hierarchical path segments (root/:slug/...)');
+    return { isValid: false, isHierarchical: false, isLegacy: false, errors, warnings };
+  }
+  
+  // Validate hierarchical structure
+  const validLevels = ['root', 'department', 'committee', 'team'];
+  const levelOrder = { root: 0, department: 1, committee: 2, team: 3 };
+  let lastLevelOrder = -1;
+  
+  for (let i = 3; i < segments.length; i += 2) {
+    const level = segments[i];
+    const slug = segments[i + 1];
+    
+    if (!validLevels.includes(level)) {
+      errors.push(`Invalid level '${level}' at position ${i}. Expected one of: ${validLevels.join(', ')}`);
+      continue;
+    }
+    
+    if (!slug) {
+      errors.push(`Missing slug after level '${level}'`);
+      continue;
+    }
+    
+    // Check level order
+    const currentOrder = levelOrder[level as keyof typeof levelOrder];
+    if (currentOrder <= lastLevelOrder) {
+      errors.push(`Invalid level order: '${level}' should not follow previous level`);
+    }
+    lastLevelOrder = currentOrder;
+    
+    // Validate slug format
+    if (slug !== slugify(slug)) {
+      warnings.push(`Slug '${slug}' may not be properly formatted`);
+    }
+    
+    // Check for UUID in slug position
+    if (uuidPattern.test(slug)) {
+      errors.push(`UUID found in slug position for '${level}': should use human-readable slug`);
+    }
+  }
+  
+  // Validate query params
+  const searchParams = new URLSearchParams(search);
+  if (!searchParams.has('eventId')) {
+    warnings.push('Missing eventId query parameter');
+  }
+  if (!searchParams.has('workspaceId')) {
+    warnings.push('Missing workspaceId query parameter');
+  }
+  
+  // Parse the URL if valid enough
+  let parsed: ParsedWorkspaceUrl | undefined;
+  if (errors.length === 0) {
+    try {
+      parsed = parseWorkspaceUrl(pathname, search);
+    } catch (e) {
+      errors.push('Failed to parse URL structure');
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    isHierarchical: errors.length === 0 && segments.length >= 5,
+    isLegacy: false,
+    errors,
+    warnings,
+    parsed,
+  };
+}
+
+/**
+ * Batch validate multiple URLs
+ */
+export function validateWorkspaceUrls(urls: string[]): Map<string, UrlValidationResult> {
+  const results = new Map<string, UrlValidationResult>();
+  
+  for (const url of urls) {
+    results.set(url, validateWorkspaceUrl(url));
+  }
+  
+  // Log summary
+  const validCount = Array.from(results.values()).filter(r => r.isValid).length;
+  const hierarchicalCount = Array.from(results.values()).filter(r => r.isHierarchical).length;
+  const legacyCount = Array.from(results.values()).filter(r => r.isLegacy).length;
+  
+  logWorkspaceUrl({
+    component: 'BatchValidator',
+    action: 'validate',
+    url: `[${urls.length} URLs]`,
+    isValid: validCount === urls.length,
+    context: {
+      total: urls.length,
+      valid: validCount,
+      hierarchical: hierarchicalCount,
+      legacy: legacyCount,
+    },
+  });
+  
+  return results;
+}
+
+// ============================================
 // Types
 // ============================================
 
@@ -57,32 +319,29 @@ export function slugify(input: string): string {
 }
 
 // ============================================
-// URL Building Functions
+// URL Building Functions (with logging)
 // ============================================
 
 /**
  * Build a hierarchical workspace URL with full ancestry path
- * 
- * @example L1 Root:
- *   buildWorkspaceUrl({ orgSlug: 'acme', eventSlug: 'conference-2024', eventId: 'uuid', hierarchy: [{ level: 'root', slug: 'main-operations' }] })
- *   -> /acme/workspaces/conference-2024/root/main-operations?eventId=uuid&workspaceId=xxx
- * 
- * @example L3 Committee:
- *   buildWorkspaceUrl({ orgSlug: 'acme', eventSlug: 'conf', eventId: 'uuid', hierarchy: [
- *     { level: 'root', slug: 'symposium' },
- *     { level: 'department', slug: 'content' },
- *     { level: 'committee', slug: 'marketing' }
- *   ]})
- *   -> /acme/workspaces/conf/root/symposium/department/content/committee/marketing?eventId=uuid&workspaceId=xxx
  */
 export function buildWorkspaceUrl(
   context: WorkspaceUrlContext,
-  deepLink?: DeepLinkParams
+  deepLink?: DeepLinkParams,
+  logSource?: string
 ): string {
   const { orgSlug, eventSlug, eventId, hierarchy } = context;
   
   if (!hierarchy.length) {
-    return `/${orgSlug}/workspaces/${eventSlug}`;
+    const url = `/${orgSlug}/workspaces/${eventSlug}`;
+    logWorkspaceUrl({
+      component: logSource || 'buildWorkspaceUrl',
+      action: 'generate',
+      url,
+      isValid: true,
+      context: { type: 'workspace-list', orgSlug, eventSlug },
+    });
+    return url;
   }
 
   // Build path segments: /root/:rootSlug/department/:deptSlug/committee/:committeeSlug
@@ -115,12 +374,30 @@ export function buildWorkspaceUrl(
     }
   }
   
-  return `${basePath}?${queryParams.toString()}`;
+  const url = `${basePath}?${queryParams.toString()}`;
+  
+  // Validate and log
+  const validation = validateWorkspaceUrl(url);
+  logWorkspaceUrl({
+    component: logSource || 'buildWorkspaceUrl',
+    action: 'generate',
+    url,
+    isValid: validation.isValid,
+    context: {
+      orgSlug,
+      eventSlug,
+      hierarchyDepth: hierarchy.length,
+      targetLevel: lastSegment.level,
+      hasDeepLink: !!deepLink,
+    },
+    ...(validation.errors.length > 0 && { error: validation.errors.join('; ') }),
+  });
+  
+  return url;
 }
 
 /**
  * Build a simple workspace URL for a single workspace (when you don't have full hierarchy)
- * This creates the type-based URL with query params for context
  */
 export function buildSimpleWorkspaceUrl(options: {
   orgSlug: string;
@@ -130,11 +407,10 @@ export function buildSimpleWorkspaceUrl(options: {
   workspaceSlug: string;
   workspaceId: string;
   deepLink?: DeepLinkParams;
-}): string {
+}, logSource?: string): string {
   const { orgSlug, eventSlug, eventId, workspaceType, workspaceSlug, workspaceId, deepLink } = options;
   
   // For simple URLs, we just use the current workspace level
-  // Full hierarchy building requires fetching ancestor data
   const basePath = `/${orgSlug}/workspaces/${eventSlug}/${workspaceType}/${workspaceSlug}`;
   
   const queryParams = new URLSearchParams();
@@ -156,7 +432,23 @@ export function buildSimpleWorkspaceUrl(options: {
     }
   }
   
-  return `${basePath}?${queryParams.toString()}`;
+  const url = `${basePath}?${queryParams.toString()}`;
+  
+  logWorkspaceUrl({
+    component: logSource || 'buildSimpleWorkspaceUrl',
+    action: 'generate',
+    url,
+    isValid: true,
+    context: {
+      type: 'simple',
+      orgSlug,
+      eventSlug,
+      workspaceType,
+      note: 'Simple URL - may not include full hierarchy',
+    },
+  });
+  
+  return url;
 }
 
 // ============================================
@@ -165,14 +457,8 @@ export function buildSimpleWorkspaceUrl(options: {
 
 /**
  * Parse a hierarchical workspace URL into its components
- * 
- * Supports patterns:
- * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug
- * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug/department/:deptSlug
- * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug/department/:deptSlug/committee/:committeeSlug
- * - /:orgSlug/workspaces/:eventSlug/root/:rootSlug/department/:deptSlug/committee/:committeeSlug/team/:teamSlug
  */
-export function parseWorkspaceUrl(pathname: string, search: string): ParsedWorkspaceUrl {
+export function parseWorkspaceUrl(pathname: string, search: string, logSource?: string): ParsedWorkspaceUrl {
   const searchParams = new URLSearchParams(search);
   
   // Parse path segments
@@ -215,6 +501,21 @@ export function parseWorkspaceUrl(pathname: string, search: string): ParsedWorks
         break;
     }
   }
+  
+  logWorkspaceUrl({
+    component: logSource || 'parseWorkspaceUrl',
+    action: 'parse',
+    url: `${pathname}${search}`,
+    isValid: true,
+    context: {
+      orgSlug: result.orgSlug,
+      eventSlug: result.eventSlug,
+      hasRoot: !!result.rootSlug,
+      hasDepartment: !!result.departmentSlug,
+      hasCommittee: !!result.committeeSlug,
+      hasTeam: !!result.teamSlug,
+    },
+  });
   
   return result;
 }
@@ -268,16 +569,12 @@ export function levelToDbType(level: WorkspaceLevel): string {
 
 /**
  * Check if a URL matches the legacy format
- * Legacy: /:orgSlug/workspaces/:eventId/:workspaceType?name=xxx&workspaceId=xxx
- * Where eventId is a UUID
  */
 export function isLegacyWorkspaceUrl(pathname: string): boolean {
   const segments = pathname.split('/').filter(Boolean);
   
-  // Pattern: orgSlug/workspaces/eventId/workspaceType
   if (segments.length >= 4 && segments[1] === 'workspaces') {
     const potentialEventId = segments[2];
-    // Check if it looks like a UUID (legacy) vs a slug (new)
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     return uuidPattern.test(potentialEventId);
   }
@@ -286,17 +583,14 @@ export function isLegacyWorkspaceUrl(pathname: string): boolean {
 
 /**
  * Check if a URL matches the new hierarchical format
- * New: /:orgSlug/workspaces/:eventSlug/root/:rootSlug/...
  */
 export function isHierarchicalWorkspaceUrl(pathname: string): boolean {
   const segments = pathname.split('/').filter(Boolean);
   
-  // Must have at least: orgSlug/workspaces/eventSlug/root/rootSlug
   if (segments.length >= 5 && segments[1] === 'workspaces') {
     const potentialEventSlug = segments[2];
     const potentialLevel = segments[3];
     
-    // Check if eventSlug is NOT a UUID (new format uses slugs)
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const isSlug = !uuidPattern.test(potentialEventSlug);
     const isValidLevel = ['root', 'department', 'committee', 'team'].includes(potentialLevel);
@@ -320,7 +614,6 @@ interface WorkspaceData {
 
 /**
  * Build hierarchy chain from current workspace to root
- * Returns array ordered from root -> current
  */
 export function buildHierarchyChain(
   currentWorkspaceId: string,
@@ -348,7 +641,7 @@ export function buildHierarchyChain(
 }
 
 /**
- * Build full hierarchical URL from workspace data
+ * Build full hierarchical URL from workspace data (with logging)
  */
 export function buildFullHierarchicalUrl(options: {
   orgSlug: string;
@@ -357,13 +650,34 @@ export function buildFullHierarchicalUrl(options: {
   currentWorkspaceId: string;
   workspaces: WorkspaceData[];
   deepLink?: DeepLinkParams;
-}): string {
+}, logSource?: string): string {
   const { orgSlug, eventSlug, eventId, currentWorkspaceId, workspaces, deepLink } = options;
   
   const hierarchy = buildHierarchyChain(currentWorkspaceId, workspaces);
   
-  return buildWorkspaceUrl(
+  const url = buildWorkspaceUrl(
     { orgSlug, eventSlug, eventId, hierarchy },
-    deepLink
+    deepLink,
+    logSource || 'buildFullHierarchicalUrl'
   );
+  
+  return url;
+}
+
+// ============================================
+// Debug Utilities (expose to window in dev)
+// ============================================
+
+if (typeof window !== 'undefined' && (import.meta.env.DEV || localStorage.getItem('DEBUG_WORKSPACE_URLS') === 'true')) {
+  (window as any).__workspaceUrlDebug = {
+    getLogHistory: getUrlLogHistory,
+    clearLogHistory: clearUrlLogHistory,
+    validateUrl: validateWorkspaceUrl,
+    validateUrls: validateWorkspaceUrls,
+    setDebugEnabled: setUrlDebugEnabled,
+    isLegacy: isLegacyWorkspaceUrl,
+    isHierarchical: isHierarchicalWorkspaceUrl,
+  };
+  
+  console.log('[WorkspaceURL] Debug utilities available at window.__workspaceUrlDebug');
 }
