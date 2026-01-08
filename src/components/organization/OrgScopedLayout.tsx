@@ -79,6 +79,10 @@ export const OrgScopedLayout: React.FC = () => {
   // Check if current route is the page builder (needs fullscreen)
   const isPageBuilder = location.pathname.includes('/page-builder');
   
+  // Check if current route is a workspace dashboard (hierarchical format: /workspaces/:eventSlug/root/:rootSlug/...)
+  // These routes use WorkspaceLayout with its own sidebar/header
+  const isWorkspaceDashboard = /\/workspaces\/[^/]+\/root\//.test(location.pathname);
+  
   // Check if current route needs narrower content (settings, team, event details, admin, members, etc.)
   const isNarrowPage = location.pathname.includes('/settings') || 
                        location.pathname.includes('/team') ||
@@ -118,6 +122,18 @@ export const OrgScopedLayout: React.FC = () => {
       <OrganizationProvider value={{ organization }}>
         <Routes>
           <Route path="eventmanagement/:eventId/page-builder" element={<EventPageBuilder />} />
+        </Routes>
+      </OrganizationProvider>
+    );
+  }
+
+  // Render workspace dashboard routes without OrgScopedLayout header/sidebar
+  // WorkspaceLayout provides its own header and sidebar
+  if (isWorkspaceDashboard) {
+    return (
+      <OrganizationProvider value={{ organization }}>
+        <Routes>
+          <Route path="workspaces/*" element={<WorkspaceService />} />
         </Routes>
       </OrganizationProvider>
     );
