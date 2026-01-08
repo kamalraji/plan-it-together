@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
-import { Briefcase } from 'lucide-react';
+import { TeamCollaboration } from '@/components/illustrations';
 
 /**
  * WorkspaceListPage provides AWS-style resource list interface for workspaces.
@@ -354,7 +354,7 @@ export const WorkspaceListPage: React.FC = () => {
             </div>
           ) : !hasAnyWorkspaces ? (
             <EmptyState
-              icon={Briefcase}
+              illustration={<TeamCollaboration size="sm" />}
               title="No workspaces yet"
               description="Get started by creating your first workspace for event collaboration."
               action={

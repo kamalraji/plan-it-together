@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
+import { ThinkingPerson } from '@/components/illustrations';
 
 interface MobileSearchOverlayProps {
   isOpen: boolean;
@@ -358,8 +359,8 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
             {/* No Results */}
             {totalResults === 0 && searchQuery && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">No results found for "{searchQuery}"</p>
+                <ThinkingPerson size="sm" showBackground={false} />
+                <p className="text-muted-foreground mt-4">No results found for "{searchQuery}"</p>
                 <p className="text-sm text-muted-foreground/70 mt-1">
                   Try a different search term
                 </p>

@@ -7,6 +7,10 @@ import {
   FolderOpen,
   type LucideIcon 
 } from 'lucide-react';
+import { 
+  ThinkingPerson, 
+  SecurityCheck 
+} from '@/components/illustrations';
 
 export type EmptyStateVariant = 'default' | 'search' | 'error' | 'no-permission';
 
@@ -128,6 +132,7 @@ export function SearchEmptyState({
   return (
     <EmptyState
       variant="search"
+      illustration={<ThinkingPerson size="sm" />}
       title="No results found"
       description={
         searchTerm
@@ -172,6 +177,7 @@ export function NoPermissionEmptyState({
   return (
     <EmptyState
       variant="no-permission"
+      illustration={<SecurityCheck size="sm" />}
       title="Access denied"
       description="You don't have permission to view this content. Contact an administrator if you believe this is an error."
       action={

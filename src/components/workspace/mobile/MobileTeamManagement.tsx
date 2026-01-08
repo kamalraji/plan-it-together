@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
 import { TeamListSkeleton } from '@/components/ui/page-skeletons';
-import { Users } from 'lucide-react';
+import { TeamCollaboration } from '@/components/illustrations';
 
 interface MobileTeamManagementProps {
   workspace: Workspace;
@@ -272,7 +272,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
               />
             ) : (
               <EmptyState
-                icon={Users}
+                illustration={<TeamCollaboration size="sm" />}
                 title="No team members yet"
                 description="Start building your team by inviting members"
                 action={{

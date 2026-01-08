@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
 import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
 import MembershipBadge from '@/components/organization/MembershipBadge';
+import { NetworkingPeople, ThinkingPerson } from '@/components/illustrations';
 
 interface OrganizationListPageProps {
   filterBy?: 'all' | 'managed' | 'member';
@@ -246,10 +247,12 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       ) : filteredOrganizations.length === 0 ? (
         <Card className="border-border border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-              <Building2 className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">No organizations found</h3>
+            {searchQuery ? (
+              <ThinkingPerson size="sm" showBackground={false} />
+            ) : (
+              <NetworkingPeople size="sm" showBackground={false} />
+            )}
+            <h3 className="text-lg font-semibold text-foreground mt-4">No organizations found</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               {searchQuery
                 ? 'Try adjusting your search query'

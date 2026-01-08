@@ -1,5 +1,6 @@
 import { Workspace } from '../../types';
 import { ClipboardList, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { CalendarPlanning } from '@/components/illustrations';
 
 interface TaskSummaryCardsProps {
   workspace: Workspace;
@@ -127,7 +128,7 @@ export function TaskSummaryCards({ workspace, onViewTasks }: TaskSummaryCardsPro
             {/* Empty State */}
             {taskSummary.total === 0 && (
               <div className="text-center py-6 sm:py-8">
-                <ClipboardList className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/50" />
+                <CalendarPlanning size="sm" showBackground={false} className="mx-auto mb-2" />
                 <h3 className="mt-2 text-sm font-medium text-foreground">No tasks yet</h3>
                 <p className="text-sm text-muted-foreground mt-1">Create tasks to start tracking progress.</p>
               </div>
