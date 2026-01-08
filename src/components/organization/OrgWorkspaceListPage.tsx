@@ -17,6 +17,7 @@ import { WorkspaceItem } from './workspace-list/WorkspaceCard';
 import { WorkspaceGroup } from './workspace-list/WorkspaceGroup';
 import { WorkspaceListHeader } from './workspace-list/WorkspaceListHeader';
 import { WorkspaceListSkeleton } from './workspace-list/WorkspaceListSkeleton';
+import { MyWorkspacesHierarchy } from './workspace-list/MyWorkspacesHierarchy';
 
 /**
  * OrgWorkspaceListPage
@@ -125,6 +126,12 @@ export const OrgWorkspaceListPage: React.FC = () => {
         {!isLoading && (
           <ScrollArea className="h-[calc(100vh-16rem)] sm:h-[calc(100vh-14rem)]">
             <div className="space-y-6 sm:space-y-8 pb-8 pr-2">
+              {/* My Workspaces - Hierarchy View */}
+              <MyWorkspacesHierarchy
+                workspaces={workspacesData?.myWorkspaces || []}
+                orgSlug={orgSlug}
+              />
+
 
               {/* Invited Workspaces */}
               <WorkspaceGroup
