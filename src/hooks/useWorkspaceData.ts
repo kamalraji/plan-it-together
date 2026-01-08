@@ -140,15 +140,26 @@ export function useWorkspaceData(workspaceId: string | undefined) {
   const teamMembersQuery = useQuery({
     queryKey: ['workspace-team-members', workspaceId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: membersData, error: membersError } = await supabase
         .from('workspace_team_members')
         .select('id, user_id, role, status, joined_at, left_at')
         .eq('workspace_id', workspaceId as string)
         .order('joined_at', { ascending: true });
 
-      if (error) throw error;
+      if (membersError) throw membersError;
+      if (!membersData || membersData.length === 0) return [] as TeamMember[];
 
-      return (data || []).map((row: any) => ({
+      const userIds = [...new Set(membersData.map(m => m.user_id))];
+      const { data: profilesData } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.id, p.full_name || 'Unknown'])
+      );
+
+      return membersData.map((row: any) => ({
         id: row.id,
         userId: row.user_id,
         role: row.role,
@@ -157,7 +168,7 @@ export function useWorkspaceData(workspaceId: string | undefined) {
         leftAt: row.left_at || undefined,
         user: {
           id: row.user_id,
-          name: 'Member',
+          name: profilesMap.get(row.user_id) || 'Unknown Member',
           email: '',
         },
       })) as TeamMember[];
