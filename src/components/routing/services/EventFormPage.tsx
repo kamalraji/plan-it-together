@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/form';
 import { Progress } from '@/components/ui/progress';
 import { AfCard } from '@/components/attendflow/AfCard';
-import { EventCanvasEditor } from '@/components/events/EventCanvasEditor';
+
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -630,21 +630,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   {currentStep.id === 'schedule_branding' && (
                     <div className="space-y-6">
                       <div className="border-t border-border pt-6 space-y-6">
-                        <div>
-                          <h3 className="mb-1 text-lg font-semibold text-foreground">
-                            Design & branding
-                          </h3>
-                          <p className="mb-4 text-sm text-muted-foreground max-w-2xl">
-                            Use the canvas to sketch the hero of your event page, then fine-tune colors and imagery below.
-                          </p>
-                          <EventCanvasEditor
-                            value={watchedValues.canvasState}
-                            onChange={(snapshot) => {
-                              form.setValue('canvasState', snapshot, { shouldDirty: true });
-                            }}
-                          />
-                        </div>
-
                         <div>
                           <h4 className="mb-1 text-base font-semibold text-foreground">
                             Date & schedule
