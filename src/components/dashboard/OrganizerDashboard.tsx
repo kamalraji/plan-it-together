@@ -210,18 +210,6 @@ export function OrganizerDashboard() {
                             </div>
 
 
-                            <div className="flex flex-wrap items-center gap-2 justify-center xs:justify-end text-[11px] sm:text-xs text-muted-foreground">
-                                <span className="hidden sm:inline">Shortcuts:</span>
-                                <Link to={`/${organization.slug}/eventmanagement`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Event Management
-                                </Link>
-                                <Link to={`/${organization.slug}/workspaces`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Workspaces
-                                </Link>
-                                <Link to={`/${organization.slug}/organizations`} className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium">
-                                    Organizations
-                                </Link>
-                            </div>
                         </div>
                     </div>
                 </div>
