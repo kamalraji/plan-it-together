@@ -518,6 +518,7 @@ export type Database = {
           name: string
           organization_id: string | null
           owner_id: string | null
+          slug: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
           updated_at: string
@@ -538,6 +539,7 @@ export type Database = {
           name: string
           organization_id?: string | null
           owner_id?: string | null
+          slug?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -558,6 +560,7 @@ export type Database = {
           name?: string
           organization_id?: string | null
           owner_id?: string | null
+          slug?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -2505,6 +2508,7 @@ export type Database = {
           name: string
           organizer_id: string
           parent_workspace_id: string | null
+          slug: string | null
           status: string
           updated_at: string
           workspace_type: string | null
@@ -2517,6 +2521,7 @@ export type Database = {
           name: string
           organizer_id: string
           parent_workspace_id?: string | null
+          slug?: string | null
           status?: string
           updated_at?: string
           workspace_type?: string | null
@@ -2529,6 +2534,7 @@ export type Database = {
           name?: string
           organizer_id?: string
           parent_workspace_id?: string | null
+          slug?: string | null
           status?: string
           updated_at?: string
           workspace_type?: string | null
@@ -2555,6 +2561,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_slug: { Args: { input_text: string }; Returns: string }
       get_public_organization: {
         Args: { _slug: string }
         Returns: {
