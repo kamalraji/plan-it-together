@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2, Bell, Shield, Palette, Users, Archive, Settings2 } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { WorkspaceRole } from '@/types';
@@ -31,11 +31,21 @@ import {
 type SettingsTab = 'general' | 'notifications' | 'permissions' | 'danger';
 
 export function WorkspaceSettingsPage() {
-  const { workspaceId, eventId } = useParams<{ 
-    workspaceId: string; 
-    eventId?: string; 
+  const params = useParams<{ 
+    workspaceId?: string; 
+    eventId?: string;
+    rootSlug?: string;
+    deptSlug?: string;
+    committeeSlug?: string;
+    teamSlug?: string;
   }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  
+  // Get workspaceId from query params (hierarchical URLs) or route params (legacy)
+  const workspaceId = searchParams.get('workspaceId') || params.workspaceId;
+  const eventId = searchParams.get('eventId') || params.eventId;
+  
   const { workspace, isLoading, teamMembers } = useWorkspaceData(workspaceId);
   const permissions = useWorkspacePermissions({ teamMembers, eventId: workspace?.eventId || eventId });
   const { settings, updateSetting } = useWorkspaceSettings(workspaceId);
