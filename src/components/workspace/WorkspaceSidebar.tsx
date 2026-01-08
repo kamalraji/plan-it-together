@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { SidebarUserFooter } from '@/components/organization/SidebarUserFooter';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { Badge } from '@/components/ui/badge';
 import {
   LayoutDashboard,
@@ -235,7 +235,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-4">
-        <ScrollArea className="h-full">
+        
           {/* Core Section */}
           <SidebarGroup>
             <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
@@ -438,7 +438,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               </SidebarGroup>
             </>
           )}
-        </ScrollArea>
+        
       </SidebarContent>
 
       <SidebarFooter>
