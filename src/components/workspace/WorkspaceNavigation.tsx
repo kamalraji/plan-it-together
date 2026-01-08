@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Workspace } from '../../types';
 import { 
   LayoutDashboard, 
@@ -64,7 +65,25 @@ export function WorkspaceNavigation({
   activeTab,
   onTabChange,
 }: WorkspaceNavigationProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  // Handle tab change while preserving hierarchical URL params
+  const handleTabChange = (tabId: TabId) => {
+    // Update URL param
+    const newParams = new URLSearchParams(searchParams);
+    if (tabId === 'overview') {
+      newParams.delete('tab');
+    } else {
+      newParams.set('tab', tabId);
+    }
+    // Remove task-specific params when switching tabs
+    newParams.delete('taskId');
+    setSearchParams(newParams, { replace: true });
+    
+    // Call parent handler
+    onTabChange(tabId);
+  };
 
   const tabs: Tab[] = [
     { id: 'overview', name: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, group: 'core' },
@@ -104,7 +123,7 @@ export function WorkspaceNavigation({
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => onTabChange(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex shrink-0 items-center gap-2 py-2.5 px-3 rounded-lg font-medium text-sm transition-colors ${activeTab === tab.id
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -149,7 +168,7 @@ export function WorkspaceNavigation({
                         {groupTabs.map((tab) => (
                           <button
                             key={tab.id}
-                            onClick={() => onTabChange(tab.id)}
+                            onClick={() => handleTabChange(tab.id)}
                             className={`flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg font-medium text-xs transition-colors ${activeTab === tab.id
                                 ? 'bg-primary text-primary-foreground'
                                 : 'text-muted-foreground bg-muted/50 hover:text-foreground hover:bg-muted'

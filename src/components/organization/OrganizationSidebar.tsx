@@ -55,7 +55,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
-// Hierarchical URL utilities available: buildHierarchyChain, slugify, buildWorkspaceUrl from '@/lib/workspaceNavigation'
+import { buildHierarchyChain, slugify, buildWorkspaceUrl } from '@/lib/workspaceNavigation';
 
 // Quick action definitions
 const getEventQuickActions = (base: string) => [
@@ -134,17 +134,17 @@ export const OrganizationSidebar: React.FC = () => {
   const isOrganizationsActive = currentPath.includes('/organizations');
   const isDashboardActive = currentPath.endsWith('/dashboard');
 
-  // Fetch workspaces for sidebar
+  // Fetch workspaces for sidebar with slug and workspace_type
   const { data: workspacesData } = useQuery({
     queryKey: ['sidebar-workspaces', organization?.id, user?.id],
     queryFn: async () => {
-      if (!user?.id || !organization?.id) return { myWorkspaces: [], orgWorkspaces: [] };
+      if (!user?.id || !organization?.id) return { myWorkspaces: [], orgWorkspaces: [], allWorkspacesFlat: [] };
 
       const { data, error } = await supabase
         .from('workspaces')
         .select(`
-          id, name, status, event_id, organizer_id, parent_workspace_id,
-          events!inner(id, name, organization_id),
+          id, name, slug, status, event_id, organizer_id, parent_workspace_id, workspace_type,
+          events!inner(id, name, slug, organization_id),
           workspace_team_members(user_id)
         `)
         .eq('events.organization_id', organization.id)
@@ -156,18 +156,23 @@ export const OrganizationSidebar: React.FC = () => {
         id: row.id,
         eventId: row.event_id,
         name: row.name,
+        slug: row.slug || slugify(row.name),
+        workspaceType: row.workspace_type,
         status: row.status as WorkspaceStatus,
         organizerId: row.organizer_id,
         parentWorkspaceId: row.parent_workspace_id,
         isOwner: row.organizer_id === user?.id,
         isMember: row.workspace_team_members?.some((m: any) => m.user_id === user?.id),
-        event: row.events,
+        event: {
+          ...row.events,
+          slug: row.events.slug || slugify(row.events.name),
+        },
       }));
 
       const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
       const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
 
-      const buildHierarchy = (workspaces: typeof allWorkspaces) => {
+      const buildTreeHierarchy = (workspaces: typeof allWorkspaces) => {
         const roots = workspaces.filter((w) => !w.parentWorkspaceId);
         const children = workspaces.filter((w) => w.parentWorkspaceId);
         return roots.map((root) => ({
@@ -177,15 +182,40 @@ export const OrganizationSidebar: React.FC = () => {
       };
 
       return {
-        myWorkspaces: buildHierarchy(myWorkspaces),
-        orgWorkspaces: buildHierarchy(orgWorkspaces),
+        myWorkspaces: buildTreeHierarchy(myWorkspaces),
+        orgWorkspaces: buildTreeHierarchy(orgWorkspaces),
+        allWorkspacesFlat: allWorkspaces,
       };
     },
     enabled: !!user?.id && !!organization?.id,
   });
 
   const handleWorkspaceClick = (workspace: any) => {
-    navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+    // Build hierarchical URL for workspace navigation
+    const allFlat = workspacesData?.allWorkspacesFlat || [];
+    const workspaceDataForHierarchy = allFlat.map((w: any) => ({
+      id: w.id,
+      slug: w.slug,
+      name: w.name,
+      workspaceType: w.workspaceType,
+      parentWorkspaceId: w.parentWorkspaceId,
+    }));
+    
+    const hierarchy = buildHierarchyChain(workspace.id, workspaceDataForHierarchy);
+    
+    if (hierarchy.length > 0 && orgSlug) {
+      const eventSlug = workspace.event?.slug || slugify(workspace.event?.name || '');
+      const url = buildWorkspaceUrl({
+        orgSlug,
+        eventSlug,
+        eventId: workspace.eventId,
+        hierarchy,
+      });
+      navigate(url);
+    } else {
+      // Fallback to legacy format
+      navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+    }
   };
 
   // Workspace item component
