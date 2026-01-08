@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ChevronDown, Building2, Users, Briefcase, UsersRound, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { slugify, buildWorkspaceUrl, WorkspaceLevel, WorkspacePathSegment } from '@/lib/workspaceNavigation';
 import {
   SimpleDropdown,
   SimpleDropdownTrigger,
@@ -21,9 +22,23 @@ interface WorkspaceBreadcrumbsMobileProps {
 interface BreadcrumbWorkspace {
   id: string;
   name: string;
+  slug: string | null;
   parentWorkspaceId: string | null;
   workspaceType: string | null;
 }
+
+interface EventData {
+  id: string;
+  slug: string | null;
+  name: string;
+}
+
+const DB_TYPE_TO_LEVEL: Record<string, WorkspaceLevel> = {
+  'ROOT': 'root',
+  'DEPARTMENT': 'department',
+  'COMMITTEE': 'committee',
+  'TEAM': 'team',
+};
 
 const LEVEL_CONFIG = {
   ROOT: {
@@ -59,8 +74,25 @@ export function WorkspaceBreadcrumbsMobile({
   className,
 }: WorkspaceBreadcrumbsMobileProps) {
   const params = useParams<{ orgSlug?: string; eventId?: string }>();
+  const [searchParams] = useSearchParams();
   const orgSlug = propOrgSlug || params.orgSlug;
-  const resolvedEventId = eventId || params.eventId;
+  const resolvedEventId = eventId || params.eventId || searchParams.get('eventId') || undefined;
+
+  // Fetch event data for slug
+  const { data: event } = useQuery({
+    queryKey: ['workspace-breadcrumbs-mobile-event', resolvedEventId],
+    queryFn: async () => {
+      if (!resolvedEventId) return null;
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, slug, name')
+        .eq('id', resolvedEventId)
+        .single();
+      if (error) return null;
+      return data as EventData;
+    },
+    enabled: !!resolvedEventId,
+  });
 
   const { data: workspaces } = useQuery({
     queryKey: ['workspace-breadcrumbs-mobile', resolvedEventId, workspaceId],
@@ -81,13 +113,14 @@ export function WorkspaceBreadcrumbsMobile({
 
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, parent_workspace_id, workspace_type')
+        .select('id, name, slug, parent_workspace_id, workspace_type')
         .eq('event_id', targetEventId);
 
       if (error) throw error;
       return (data || []).map((ws) => ({
         id: ws.id,
         name: ws.name,
+        slug: ws.slug,
         parentWorkspaceId: ws.parent_workspace_id,
         workspaceType: ws.workspace_type,
       })) as BreadcrumbWorkspace[];
@@ -117,16 +150,35 @@ export function WorkspaceBreadcrumbsMobile({
     return path;
   }, [workspaces, workspaceId]);
 
-  const getWorkspaceLink = (wsId: string) => {
-    if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}/${wsId}`;
+  // Build hierarchical URL for a workspace at a given index in the path
+  const getWorkspaceLink = (targetIndex: number) => {
+    if (!orgSlug || !event || !breadcrumbPath.length) {
+      return `/workspaces/${breadcrumbPath[targetIndex]?.id || ''}`;
     }
-    return `/workspaces/${wsId}`;
+
+    const eventSlug = event.slug || slugify(event.name);
+    
+    // Build hierarchy up to and including the target index
+    const hierarchy: WorkspacePathSegment[] = breadcrumbPath
+      .slice(0, targetIndex + 1)
+      .map((ws) => ({
+        level: DB_TYPE_TO_LEVEL[ws.workspaceType || 'ROOT'] || 'root',
+        slug: ws.slug || slugify(ws.name),
+        workspaceId: ws.id,
+      }));
+
+    return buildWorkspaceUrl({
+      orgSlug,
+      eventSlug,
+      eventId: event.id,
+      hierarchy,
+    });
   };
 
   const getWorkspacesListLink = () => {
-    if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}`;
+    if (orgSlug && event) {
+      const eventSlug = event.slug || slugify(event.name);
+      return `/${orgSlug}/workspaces/${eventSlug}?eventId=${event.id}`;
     }
     return '/dashboard';
   };
@@ -202,7 +254,7 @@ export function WorkspaceBreadcrumbsMobile({
             const Icon = config.icon;
 
             return (
-              <Link key={ws.id} to={getWorkspaceLink(ws.id)}>
+              <Link key={ws.id} to={getWorkspaceLink(index)}>
                 <SimpleDropdownItem className="flex items-center gap-3 py-2.5">
                   <div
                     className={cn(

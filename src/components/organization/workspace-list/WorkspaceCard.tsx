@@ -14,6 +14,8 @@ export interface WorkspaceItem {
   id: string;
   eventId: string;
   name: string;
+  slug?: string;
+  workspaceType?: string | null;
   status: WorkspaceStatus;
   createdAt: string;
   updatedAt: string;
@@ -24,6 +26,7 @@ export interface WorkspaceItem {
   event?: {
     id: string;
     name: string;
+    slug?: string;
   };
   subWorkspaces?: WorkspaceItem[];
 }

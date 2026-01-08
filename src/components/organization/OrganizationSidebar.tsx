@@ -203,19 +203,14 @@ export const OrganizationSidebar: React.FC = () => {
     
     const hierarchy = buildHierarchyChain(workspace.id, workspaceDataForHierarchy);
     
-    if (hierarchy.length > 0 && orgSlug) {
-      const eventSlug = workspace.event?.slug || slugify(workspace.event?.name || '');
-      const url = buildWorkspaceUrl({
-        orgSlug,
-        eventSlug,
-        eventId: workspace.eventId,
-        hierarchy,
-      });
-      navigate(url);
-    } else {
-      // Fallback to legacy format
-      navigate(`${base}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
-    }
+    const eventSlug = workspace.event?.slug || slugify(workspace.event?.name || '');
+    const url = buildWorkspaceUrl({
+      orgSlug: orgSlug || '',
+      eventSlug,
+      eventId: workspace.eventId,
+      hierarchy,
+    });
+    navigate(url);
   };
 
   // Workspace item component

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,11 +7,13 @@ import {
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { WorkspaceCard, WorkspaceItem } from './WorkspaceCard';
+import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
 
 interface WorkspaceGroupProps {
   title: string;
   icon: React.ReactNode;
   workspaces: WorkspaceItem[];
+  allWorkspaces?: WorkspaceItem[]; // Flat list of all workspaces for hierarchy building
   emptyMessage: string;
   defaultExpanded?: boolean;
   orgSlug?: string;
@@ -21,6 +23,7 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
   title,
   icon,
   workspaces,
+  allWorkspaces,
   emptyMessage,
   defaultExpanded = true,
   orgSlug,
@@ -28,9 +31,29 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
   const [expanded, setExpanded] = useState(defaultExpanded);
   const navigate = useNavigate();
 
+  // Build workspace data for hierarchy chain building
+  const workspaceDataForHierarchy = useMemo(() => {
+    const source = allWorkspaces || workspaces;
+    return source.map(ws => ({
+      id: ws.id,
+      slug: ws.slug || slugify(ws.name),
+      name: ws.name,
+      workspaceType: ws.workspaceType || null,
+      parentWorkspaceId: ws.parentWorkspaceId,
+    }));
+  }, [allWorkspaces, workspaces]);
+
   const handleWorkspaceClick = (workspace: WorkspaceItem) => {
     if (workspace.eventId && orgSlug) {
-      navigate(`/${orgSlug}/workspaces/${workspace.eventId}?workspaceId=${workspace.id}`);
+      const hierarchy = buildHierarchyChain(workspace.id, workspaceDataForHierarchy);
+      const eventSlug = workspace.event?.slug || slugify(workspace.event?.name || '');
+      const url = buildWorkspaceUrl({
+        orgSlug,
+        eventSlug,
+        eventId: workspace.eventId,
+        hierarchy,
+      });
+      navigate(url);
     }
   };
 

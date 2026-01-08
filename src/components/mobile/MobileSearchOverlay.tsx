@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
 
 interface MobileSearchOverlayProps {
   isOpen: boolean;
@@ -56,26 +57,32 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
     enabled: isOpen,
   });
 
-  // Fetch workspaces
+  // Fetch workspaces with hierarchy data
   const { data: workspaces = [] } = useQuery({
     queryKey: ['search-workspaces', organizationId],
     queryFn: async () => {
       const { data: orgEvents } = await supabase
         .from('events')
-        .select('id')
+        .select('id, name, slug')
         .eq('organization_id', organizationId);
       
       if (!orgEvents?.length) return [];
       
       const eventIds = orgEvents.map(e => e.id);
+      const eventMap = new Map(orgEvents.map(e => [e.id, e]));
+      
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, event_id, created_at')
+        .select('id, name, slug, status, event_id, created_at, workspace_type, parent_workspace_id')
         .in('event_id', eventIds)
         .order('created_at', { ascending: false })
         .limit(50);
       if (error) throw error;
-      return data || [];
+      
+      return (data || []).map(ws => ({
+        ...ws,
+        event: eventMap.get(ws.event_id),
+      }));
     },
     enabled: isOpen,
   });
@@ -158,9 +165,27 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
     navigate(`/${organizationSlug}/eventmanagement/${eventId}`);
   };
 
-  const handleWorkspaceClick = (workspace: { id: string; event_id: string }) => {
+  const handleWorkspaceClick = (workspace: any) => {
     onClose();
-    navigate(`/${organizationSlug}/workspaces/${workspace.event_id}/${workspace.id}`);
+    // Build hierarchy for the workspace
+    const workspaceDataForHierarchy = workspaces.map(ws => ({
+      id: ws.id,
+      slug: ws.slug || slugify(ws.name),
+      name: ws.name,
+      workspaceType: ws.workspace_type || null,
+      parentWorkspaceId: ws.parent_workspace_id,
+    }));
+    
+    const hierarchy = buildHierarchyChain(workspace.id, workspaceDataForHierarchy);
+    const eventSlug = workspace.event?.slug || slugify(workspace.event?.name || '');
+    
+    const url = buildWorkspaceUrl({
+      orgSlug: organizationSlug,
+      eventSlug,
+      eventId: workspace.event_id,
+      hierarchy,
+    });
+    navigate(url);
   };
 
   const handleMemberClick = () => {

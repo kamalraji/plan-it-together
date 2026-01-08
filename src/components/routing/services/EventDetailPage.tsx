@@ -20,6 +20,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { AttendanceList } from '@/components/attendance';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { slugify } from '@/lib/workspaceNavigation';
+
+// Extended event type for internal use
+interface EventWithSlug extends Event {
+  slug?: string | null;
+}
 
 interface EventDetailPageProps {
   defaultTab?: string;
@@ -30,7 +36,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   const [activeTab, setActiveTab] = useState(defaultTab);
   const { canView, canManage, isLoading: accessLoading } = useEventAccess(eventId);
 
-  const { data: event, isLoading: eventLoading, error } = useQuery<Event | null>({
+  const { data: event, isLoading: eventLoading, error } = useQuery<EventWithSlug | null>({
     queryKey: ['organizer-event', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,6 +51,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       return {
         id: data.id,
         name: data.name,
+        slug: data.slug,
         description: data.description || '',
         mode: data.mode as EventMode,
         startDate: data.start_date,
@@ -58,7 +65,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         landingPageUrl: `/events/${data.id}`,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
-      } as Event;
+      } as EventWithSlug;
     },
     enabled: !!eventId,
   });
@@ -120,7 +127,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   };
 
   const { orgSlug } = useParams<{ orgSlug?: string }>();
-  const workspacePath = orgSlug ? `/${orgSlug}/workspaces/${eventId}` : `/dashboard/workspaces?eventId=${eventId}`;
+  const eventSlug = event?.slug || slugify(event?.name || '');
+  const workspacePath = orgSlug ? `/${orgSlug}/workspaces/${eventSlug}?eventId=${eventId}` : `/dashboard/workspaces?eventId=${eventId}`;
 
   const pageActions = [
     ...(canManage

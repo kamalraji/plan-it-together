@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CalendarDays,
@@ -12,6 +13,7 @@ import { useCurrentOrganization } from '../organization/OrganizationContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
 
 interface Event {
   id: string;
@@ -23,9 +25,17 @@ interface Event {
 interface WorkspaceSummary {
   id: string;
   name: string;
+  slug: string | null;
+  workspaceType: string | null;
+  parentWorkspaceId: string | null;
   status: string;
   updatedAt: string;
   eventId: string;
+  event?: {
+    id: string;
+    name: string;
+    slug: string | null;
+  };
 }
 
 /**
@@ -58,21 +68,23 @@ export function CompactDashboard() {
     }
   });
 
-  // Fetch workspaces
+  // Fetch workspaces with hierarchy data
   const { data: workspaces, isLoading: workspacesLoading } = useQuery<WorkspaceSummary[]>({
     queryKey: ['compact-dashboard-workspaces', organization.id, user?.id],
     queryFn: async () => {
       const { data: orgEvents } = await supabase
         .from('events')
-        .select('id')
+        .select('id, name, slug')
         .eq('organization_id', organization.id);
       
       const orgEventIds = (orgEvents || []).map(e => e.id);
       if (orgEventIds.length === 0) return [];
 
+      const eventMap = new Map(orgEvents!.map(e => [e.id, e]));
+
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, updated_at, event_id')
+        .select('id, name, slug, status, updated_at, event_id, workspace_type, parent_workspace_id')
         .eq('organizer_id', user!.id)
         .in('event_id', orgEventIds)
         .order('updated_at', { ascending: false })
@@ -82,13 +94,39 @@ export function CompactDashboard() {
       return (data || []).map(ws => ({
         id: ws.id,
         name: ws.name,
+        slug: ws.slug,
+        workspaceType: ws.workspace_type,
+        parentWorkspaceId: ws.parent_workspace_id,
         status: ws.status,
         updatedAt: ws.updated_at,
-        eventId: ws.event_id
+        eventId: ws.event_id,
+        event: eventMap.get(ws.event_id),
       }));
     },
     enabled: !!user?.id
   });
+
+  // Build workspace data for hierarchy chain building
+  const workspaceDataForHierarchy = useMemo(() => {
+    return (workspaces || []).map(ws => ({
+      id: ws.id,
+      slug: ws.slug || slugify(ws.name),
+      name: ws.name,
+      workspaceType: ws.workspaceType,
+      parentWorkspaceId: ws.parentWorkspaceId,
+    }));
+  }, [workspaces]);
+
+  const getWorkspaceUrl = (ws: WorkspaceSummary) => {
+    const hierarchy = buildHierarchyChain(ws.id, workspaceDataForHierarchy);
+    const eventSlug = ws.event?.slug || slugify(ws.event?.name || '');
+    return buildWorkspaceUrl({
+      orgSlug: organization.slug,
+      eventSlug,
+      eventId: ws.eventId,
+      hierarchy,
+    });
+  };
 
   // Quick action grid items
   const quickActionCards = [
@@ -236,7 +274,7 @@ export function CompactDashboard() {
             {workspaces.slice(0, 3).map(ws => (
               <Link
                 key={ws.id}
-                to={`/${organization.slug}/workspaces/${ws.eventId}/${ws.id}`}
+                to={getWorkspaceUrl(ws)}
                 className="flex items-center gap-3 p-2.5 sm:p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
               >
                 <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
