@@ -202,12 +202,12 @@ export const OrgScopedLayout: React.FC = () => {
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
         {/* Sidebar + content, padded so it sits below the fixed header */}
-        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden">
+        <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-x-hidden">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
           <div className="relative flex w-full pt-16 items-stretch">
             <OrganizationSidebar />
 
-            <SidebarInset className="flex justify-center overflow-hidden w-full">
+            <SidebarInset className="flex w-full">
               <div className={`my-4 sm:my-6 w-full ${isNarrowPage ? 'mx-auto max-w-5xl xl:max-w-6xl px-3 sm:px-4 md:px-6 lg:px-8' : 'mx-1 sm:mx-2 px-2 sm:px-3 md:px-4'} rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-x-hidden`}>
                 {isNarrowPage && <OrgScopedBreadcrumbs className="mb-4" />}
                 <Routes>
@@ -229,21 +229,30 @@ export const OrgScopedLayout: React.FC = () => {
                         <AdminLayout />
                       </Suspense>
                     }>
-                      <Route index element={
-                        <Suspense fallback={<AdminLoadingFallback />}>
-                          <AdminDashboard />
-                        </Suspense>
-                      } />
-                      <Route path="users" element={
-                        <Suspense fallback={<AdminLoadingFallback />}>
-                          <AdminUserRolesPage />
-                        </Suspense>
-                      } />
-                      <Route path="roles-diagram" element={
-                        <Suspense fallback={<AdminLoadingFallback />}>
-                          <RolesDiagramPage />
-                        </Suspense>
-                      } />
+                      <Route
+                        index
+                        element={
+                          <Suspense fallback={<AdminLoadingFallback />}>
+                            <AdminDashboard />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="users"
+                        element={
+                          <Suspense fallback={<AdminLoadingFallback />}>
+                            <AdminUserRolesPage />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="roles-diagram"
+                        element={
+                          <Suspense fallback={<AdminLoadingFallback />}>
+                            <RolesDiagramPage />
+                          </Suspense>
+                        }
+                      />
                     </Route>
                   )}
                   <Route path="*" element={<Navigate to="dashboard" replace />} />
