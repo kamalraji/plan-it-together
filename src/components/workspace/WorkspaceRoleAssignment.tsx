@@ -3,8 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TeamMember, WorkspaceRole } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CheckIcon, XMarkIcon, UserIcon } from '@heroicons/react/20/solid';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { toast } from 'sonner';
+import { TeamCollaboration } from '@/components/illustrations';
 
 interface WorkspaceRoleAssignmentProps {
   workspaceId: string;
@@ -161,9 +162,9 @@ export function WorkspaceRoleAssignment({
 
       <div className="divide-y divide-border">
         {teamMembers.length === 0 ? (
-          <div className="px-4 sm:px-6 py-8 text-center">
-            <UserIcon className="mx-auto h-8 w-8 text-muted-foreground/40" />
-            <p className="mt-2 text-sm text-muted-foreground">No team members yet</p>
+          <div className="px-4 sm:px-6 py-8 text-center flex flex-col items-center">
+            <TeamCollaboration size="xs" showBackground={false} />
+            <p className="mt-3 text-sm text-muted-foreground">No team members yet</p>
           </div>
         ) : (
           teamMembers.map((member) => {

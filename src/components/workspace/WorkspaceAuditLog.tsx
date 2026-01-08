@@ -14,6 +14,7 @@ import {
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
+import { DataAnalytics } from '@/components/illustrations';
 
 interface WorkspaceAuditLogProps {
   workspace: Workspace;
@@ -182,9 +183,9 @@ export function WorkspaceAuditLog({ workspace, teamMembers }: WorkspaceAuditLogP
             </div>
           </div>
         ) : !auditEvents || auditEvents.length === 0 ? (
-          <div className="px-4 sm:px-6 py-8 text-center">
-            <ClockIcon className="mx-auto h-8 w-8 text-muted-foreground/40" />
-            <p className="mt-2 text-sm text-muted-foreground">No audit events found</p>
+          <div className="px-4 sm:px-6 py-8 text-center flex flex-col items-center">
+            <DataAnalytics size="xs" showBackground={false} />
+            <p className="mt-3 text-sm text-muted-foreground">No audit events found</p>
           </div>
         ) : (
           auditEvents.map((event) => {

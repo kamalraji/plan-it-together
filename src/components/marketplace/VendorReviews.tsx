@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Star, MessageCircle, CheckCircle2, ThumbsUp } from 'lucide-react';
+import { Star, CheckCircle2, ThumbsUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { VendorReviewForm } from './VendorReviewForm';
+import { SupportHelpdesk } from '@/components/illustrations';
 
 interface Review {
   id: string;
@@ -93,9 +94,9 @@ export const VendorReviews: React.FC<VendorReviewsProps> = ({ vendorId, vendorNa
         </CardHeader>
         <CardContent>
           {reviews.length === 0 ? (
-            <div className="text-center py-8">
-              <MessageCircle className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">No reviews yet</p>
+            <div className="text-center py-8 flex flex-col items-center">
+              <SupportHelpdesk size="xs" showBackground={false} />
+              <p className="text-muted-foreground mt-3">No reviews yet</p>
               <p className="text-sm text-muted-foreground">Be the first to review this vendor</p>
             </div>
           ) : (

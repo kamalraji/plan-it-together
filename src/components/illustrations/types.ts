@@ -1,4 +1,4 @@
-export type IllustrationSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+export type IllustrationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 export type IllustrationVariant = 'light' | 'dark';
 export type IllustrationAnimation = 'none' | 'float' | 'subtle';
 

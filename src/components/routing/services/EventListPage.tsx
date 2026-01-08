@@ -15,6 +15,7 @@ import {
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
+import { EventHosting, ThinkingPerson } from '@/components/illustrations';
 
 interface EventListPageProps {
   filterBy?: 'templates' | 'active' | 'draft' | 'completed';
@@ -517,11 +518,13 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
 
           {/* Empty State */}
           {filterBy !== 'templates' && filteredEvents.length === 0 && (
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-muted-foreground mb-4">
-                <MagnifyingGlassIcon />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">No events found</h3>
+            <div className="text-center py-12 flex flex-col items-center">
+              {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL' ? (
+                <ThinkingPerson size="sm" showBackground={false} />
+              ) : (
+                <EventHosting size="sm" showBackground={false} />
+              )}
+              <h3 className="text-lg font-medium text-foreground mb-2 mt-4">No events found</h3>
               <p className="text-muted-foreground mb-6">
                 {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL'
                   ? 'Try adjusting your search criteria or filters.'

@@ -14,6 +14,7 @@ import {
 import { PageHeader } from './PageHeader';
 import { CommunicationHistory } from '../communication/CommunicationHistory';
 import { EmailComposer } from '../communication/EmailComposer';
+import { EmptyInbox } from '@/components/illustrations';
 
 interface CommunicationMessage {
   id: string;
@@ -350,10 +351,10 @@ export const CommunicationPage: React.FC = () => {
                 {/* Messages List */}
                 <div className="divide-y divide-gray-200">
                   {filteredMessages.length === 0 ? (
-                    <div className="p-12 text-center">
-                      <InboxIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No messages found</h3>
-                      <p className="text-gray-500">
+                    <div className="p-12 text-center flex flex-col items-center">
+                      <EmptyInbox size="sm" showBackground={false} />
+                      <h3 className="text-lg font-medium text-foreground mb-2 mt-4">No messages found</h3>
+                      <p className="text-muted-foreground">
                         {searchQuery || selectedCategory !== 'all' || showUnreadOnly
                           ? 'Try adjusting your filters or search terms.'
                           : 'Your inbox is empty. New messages will appear here.'}

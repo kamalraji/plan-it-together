@@ -17,8 +17,8 @@ import {
 } from '@/lib/workspaceNavigation';
 import { 
   PlusIcon, 
-  Squares2X2Icon, 
   CheckIcon,
+  Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import {
@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 import { ENHANCED_WORKSPACE_TEMPLATES, EnhancedWorkspaceTemplate } from '@/lib/workspaceTemplates';
 import { WorkspaceTemplateSelector } from '@/components/workspace/WorkspaceTemplateSelector';
 import { useWorkspaceProvisioning } from '@/hooks/useWorkspaceProvisioning';
+import { TeamCollaboration } from '@/components/illustrations';
 
 // Workspace list item component with sub-workspace support
 interface WorkspaceListItemProps {
@@ -363,10 +364,8 @@ export const OrgWorkspacePage: React.FC = () => {
           <WorkspaceDashboard workspaceId={selectedWorkspaceId} orgSlug={orgSlug} />
         ) : hasNoWorkspaces ? (
           <div className="rounded-2xl border border-border/70 bg-card/80 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <Squares2X2Icon className="h-8 w-8 text-primary" />
-            </div>
-            <h2 className="text-lg font-semibold text-foreground mb-2">No workspaces yet</h2>
+            <TeamCollaboration size="sm" showBackground={false} />
+            <h2 className="text-lg font-semibold text-foreground mb-2 mt-4">No workspaces yet</h2>
             <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
               Create your first workspace to start organizing tasks, managing your team, and coordinating communication for this event.
             </p>

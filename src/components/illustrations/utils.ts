@@ -2,6 +2,7 @@ import { IllustrationSize, IllustrationAnimation } from './types';
 import { cn } from '@/lib/utils';
 
 export const SIZE_DIMENSIONS: Record<IllustrationSize, { width: number; height: number }> = {
+  xs: { width: 80, height: 80 },
   sm: { width: 120, height: 120 },
   md: { width: 200, height: 200 },
   lg: { width: 320, height: 320 },
