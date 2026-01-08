@@ -114,7 +114,7 @@ const wizardSteps = [
  * with a live landing preview and workspace handoff.
  */
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId, orgSlug } = useParams<{ eventId?: string; orgSlug?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -159,6 +159,18 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const watchedValues = watch();
   const currentStep = wizardSteps[currentStepIndex];
   const isLastStep = currentStepIndex === wizardSteps.length - 1;
+
+  // Find current organization from URL slug
+  const currentOrganization = myOrganizations.find(
+    (org: any) => org.slug === orgSlug
+  );
+
+  // Auto-set organization when available
+  useEffect(() => {
+    if (mode === 'create' && currentOrganization && !form.getValues('organizationId')) {
+      form.setValue('organizationId', currentOrganization.id);
+    }
+  }, [currentOrganization, mode, form]);
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -507,41 +519,21 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         Give your event a clear name, short description, and where it lives.
                       </p>
                       <div className="grid grid-cols-1 gap-6">
-                        <FormField
-                          control={control}
-                          name="organizationId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Organization *</FormLabel>
-                              <FormDescription>
-                                We’ll use this to pull in the right branding and permissions.
-                              </FormDescription>
-                              <FormControl>
-                                <select
-                                  className="mt-1 flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                  disabled={
-                                    isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting
-                                  }
-                                  {...field}
-                                >
-                                  <option value="">
-                                    {isLoadingOrganizations
-                                      ? 'Loading organizations...'
-                                      : myOrganizations.length === 0
-                                        ? 'No organizations available'
-                                        : 'Select an organization'}
-                                  </option>
-                                  {myOrganizations.map((org: any) => (
-                                    <option key={org.id} value={org.id}>
-                                      {org.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <FormItem>
+                          <FormLabel>Organization</FormLabel>
+                          <FormDescription>
+                            Creating this event under your current organization.
+                          </FormDescription>
+                          <div className="mt-1 flex h-12 w-full items-center rounded-xl border-2 border-border bg-muted/50 px-4 py-2 text-sm">
+                            {isLoadingOrganizations ? (
+                              <span className="text-muted-foreground">Loading...</span>
+                            ) : currentOrganization ? (
+                              <span className="font-medium">{currentOrganization.name}</span>
+                            ) : (
+                              <span className="text-muted-foreground">No organization found</span>
+                            )}
+                          </div>
+                        </FormItem>
 
                         <FormField
                           control={control}
