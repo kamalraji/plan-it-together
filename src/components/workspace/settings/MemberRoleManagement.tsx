@@ -49,6 +49,27 @@ export function MemberRoleManagement({
   const [isRemoving, setIsRemoving] = useState(false);
   const rbac = useWorkspaceRBAC(currentUserRole);
 
+  // Count owners to protect the last owner
+  const ownerCount = teamMembers.filter(m => m.role === WorkspaceRole.WORKSPACE_OWNER).length;
+
+  // Check if member can be edited (includes last-owner protection)
+  const checkCanEditMember = (member: TeamMember): boolean => {
+    // Prevent editing the last owner's role
+    if (member.role === WorkspaceRole.WORKSPACE_OWNER && ownerCount <= 1) {
+      return false;
+    }
+    return rbac.canEditMember(member.role);
+  };
+
+  // Check if member can be removed (includes last-owner protection)
+  const checkCanRemoveMember = (member: TeamMember): boolean => {
+    // Prevent removing the last owner
+    if (member.role === WorkspaceRole.WORKSPACE_OWNER && ownerCount <= 1) {
+      return false;
+    }
+    return rbac.canRemoveMember(member.role);
+  };
+
   const handleRoleChange = async (memberId: string, newRole: WorkspaceRole) => {
     setUpdatingMemberId(memberId);
     try {
@@ -189,7 +210,7 @@ export function MemberRoleManagement({
 
             <div className="space-y-2">
               {members.map(member => {
-                const canEditThisMember = rbac.canEditMember(member.role);
+                const canEditThisMember = checkCanEditMember(member);
                 const isUpdating = updatingMemberId === member.id;
                 const memberLevel = getWorkspaceRoleLevel(member.role);
 
@@ -262,7 +283,7 @@ export function MemberRoleManagement({
                           </SimpleDropdown>
                           
                           {/* Remove button - only show if not self */}
-                          {member.userId !== currentUserId && (
+                          {member.userId !== currentUserId && checkCanRemoveMember(member) && (
                             <Button
                               variant="ghost"
                               size="icon"
