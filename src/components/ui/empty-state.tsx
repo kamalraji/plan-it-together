@@ -19,6 +19,7 @@ interface EmptyStateAction {
 interface EmptyStateProps {
   variant?: EmptyStateVariant;
   icon?: LucideIcon;
+  illustration?: React.ReactNode;
   title: string;
   description?: string;
   action?: EmptyStateAction;
@@ -48,6 +49,7 @@ const variantDefaults: Record<EmptyStateVariant, { icon: LucideIcon; iconColor: 
 export function EmptyState({
   variant = 'default',
   icon,
+  illustration,
   title,
   description,
   action,
@@ -64,18 +66,22 @@ export function EmptyState({
         className
       )}
     >
-      <div
-        className={cn(
-          'h-14 w-14 rounded-full bg-muted/80 flex items-center justify-center mb-4',
-          variant === 'error' && 'bg-destructive/10',
-          variant === 'no-permission' && 'bg-amber-500/10'
-        )}
-      >
-        <IconComponent
-          className={cn('h-7 w-7', defaults.iconColor)}
-          aria-hidden="true"
-        />
-      </div>
+      {illustration ? (
+        <div className="mb-6">{illustration}</div>
+      ) : (
+        <div
+          className={cn(
+            'h-14 w-14 rounded-full bg-muted/80 flex items-center justify-center mb-4',
+            variant === 'error' && 'bg-destructive/10',
+            variant === 'no-permission' && 'bg-amber-500/10'
+          )}
+        >
+          <IconComponent
+            className={cn('h-7 w-7', defaults.iconColor)}
+            aria-hidden="true"
+          />
+        </div>
+      )}
 
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
 

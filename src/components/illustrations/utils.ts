@@ -10,20 +10,37 @@ export const SIZE_DIMENSIONS: Record<IllustrationSize, { width: number; height: 
 };
 
 export const COLORS = {
-  hair: '#2D3748',
+  // People
+  hair: '#1E293B',
   skin: '#F5D0B9',
   skinShadow: '#E8B89C',
-  topBlue: '#4299E1',
-  topBlueDark: '#3182CE',
-  skirt: '#2D3748',
-  clock: '#E2E8F0',
-  clockHands: '#4299E1',
-  plant: '#48BB78',
-  plantDark: '#38A169',
+  
+  // Clothing (brand primary/accent)
+  topBlue: '#3B82F6',
+  topBlueDark: '#2563EB',
+  topAccent: '#06B6D4',
+  topAccentDark: '#0891B2',
+  skirt: '#1E293B',
+  pants: '#1E293B',
+  
+  // Elements (brand-aligned)
+  clock: '#F1F5F9',
+  clockHands: '#3B82F6',
+  plant: '#22C55E',
+  plantDark: '#16A34A',
   chartBar: '#E2E8F0',
-  chartAccent: '#4299E1',
+  chartAccent: '#3B82F6',
+  
+  // Additional colors
   white: '#FFFFFF',
-  lightGray: '#F7FAFC',
+  lightGray: '#F8FAFC',
+  ticket: '#F59E0B',
+  calendar: '#8B5CF6',
+  notification: '#EF4444',
+  megaphone: '#EC4899',
+  laptop: '#64748B',
+  coffee: '#92400E',
+  confettiColors: ['#3B82F6', '#06B6D4', '#22C55E', '#F59E0B', '#EC4899'],
 };
 
 export const ANIMATION_CLASSES: Record<IllustrationAnimation, string> = {
