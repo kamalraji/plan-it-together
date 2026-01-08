@@ -29,6 +29,13 @@ import { LegacyWorkspaceRedirect } from '@/components/workspace/LegacyWorkspaceR
  * - /:orgSlug/workspaces/:eventId/committee?name=xxx&workspaceId=xxx
  */
 
+/**
+ * Helper to detect if a path segment looks like a UUID (legacy format)
+ */
+const isUUID = (str: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+};
+
 const WorkspaceIndexRoute: React.FC = () => {
   const { eventId } = useParams<{ eventId?: string }>();
   const location = useLocation();
@@ -38,8 +45,12 @@ const WorkspaceIndexRoute: React.FC = () => {
   const isOrgContext = pathParts.length >= 1 && pathParts[0] !== 'dashboard' && pathParts[0] !== 'console';
 
   // When under an organization route with eventId (/:orgSlug/workspaces/:eventId), 
-  // render the organization-scoped workspace portal for that event.
+  // check if it's a legacy UUID format and redirect to new hierarchical format
   if (isOrgContext && eventId) {
+    // If eventId is a UUID, this is a legacy URL - redirect it
+    if (isUUID(eventId)) {
+      return <LegacyWorkspaceRedirect />;
+    }
     return <OrgWorkspacePage />;
   }
 
@@ -51,13 +62,6 @@ const WorkspaceIndexRoute: React.FC = () => {
 
   // For global dashboard routes (/dashboard/workspaces) use the generic service dashboard.
   return <WorkspaceServiceDashboard />;
-};
-
-/**
- * Helper to detect if a path segment looks like a UUID (legacy format)
- */
-const isUUID = (str: string): boolean => {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 };
 
 /**
