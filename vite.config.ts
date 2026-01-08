@@ -14,13 +14,9 @@ export default defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, './src'),
       '@/components': path.resolve(__dirname, './src/components'),
       '@/components/ui': path.resolve(__dirname, './src/components/ui'),
-      '@/components/doodles': path.resolve(__dirname, './src/components/doodles'),
-      '@/components/doodles/original': path.resolve(__dirname, './src/components/doodles/original'),
-      '@/components/doodles/ligne-claire': path.resolve(__dirname, './src/components/doodles/ligne-claire'),
-      '@/components/doodles/hand-drawn': path.resolve(__dirname, './src/components/doodles/hand-drawn'),
+      '@/components/illustrations': path.resolve(__dirname, './src/components/illustrations'),
       '@/components/enhanced': path.resolve(__dirname, './src/components/enhanced'),
       '@/lib': path.resolve(__dirname, './src/lib'),
-      '@/lib/design-system': path.resolve(__dirname, './src/lib/design-system'),
       '@/styles': path.resolve(__dirname, './src/styles'),
       '@/types': path.resolve(__dirname, './src/types'),
       '@/hooks': path.resolve(__dirname, './src/hooks'),
@@ -49,10 +45,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           // Separate chunks for better caching and performance
-          'doodle-original': ['./src/components/doodles/original'],
-          'doodle-ligne-claire': ['./src/components/doodles/ligne-claire'],
-          'doodle-hand-drawn': ['./src/components/doodles/hand-drawn'],
-          'design-system': ['./src/lib/design-system'],
+          'illustrations': ['./src/components/illustrations'],
           'ui-components': ['./src/components/ui'],
           'enhanced-components': ['./src/components/enhanced'],
           // Vendor chunks for better caching
