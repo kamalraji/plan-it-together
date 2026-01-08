@@ -69,9 +69,9 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
       <WorkspaceConsoleHeader user={user} onLogout={handleLogout} />
 
       {/* Sidebar + content */}
-      <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-background/90">
+      <div className="relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden mt-16">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
-        <div className="relative flex w-full pt-16 items-stretch">
+        <div className="relative flex w-full h-full">
           <WorkspaceSidebar
             workspace={workspace}
             activeTab={activeTab}
@@ -84,8 +84,8 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
             onManageSettings={onManageSettings}
           />
 
-          <SidebarInset className="flex w-full">
-            <div className="my-4 sm:my-6 w-full mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-x-hidden">
+          <SidebarInset className="flex w-full min-h-0 overflow-y-auto">
+            <div className="my-4 sm:my-6 w-full mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-x-hidden min-h-min">
               {children}
             </div>
           </SidebarInset>
