@@ -292,56 +292,6 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             {!isCollapsed && <span>Back to Workspaces</span>}
           </button>
 
-          {/* Breadcrumb navigation */}
-          {!isCollapsed && breadcrumbItems.length > 0 && (
-            <div className="mb-3 space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
-                Hierarchy
-              </span>
-              <nav className="flex flex-col gap-0.5">
-                {breadcrumbItems.map((item, index) => {
-                  if (!item) return null;
-                  const Icon = item.icon;
-                  const isLast = index === breadcrumbItems.length - 1;
-                  
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center"
-                      style={{ paddingLeft: `${Math.min(index * 8, 24)}px` }}
-                    >
-                      {index > 0 && (
-                        <div className="w-2 h-2 border-l border-b border-border/50 mr-1.5" />
-                      )}
-                      {item.href ? (
-                        <button
-                          onClick={() => navigate(item.href!)}
-                          className={cn(
-                            'flex items-center gap-1.5 text-[11px] py-0.5 px-1.5 rounded hover:bg-muted/50 transition-colors truncate max-w-full',
-                            'text-muted-foreground hover:text-foreground'
-                          )}
-                        >
-                          <Icon className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{item.label}</span>
-                        </button>
-                      ) : (
-                        <span
-                          className={cn(
-                            'flex items-center gap-1.5 text-[11px] py-0.5 px-1.5 truncate max-w-full',
-                            isLast ? 'text-foreground font-medium' : 'text-muted-foreground'
-                          )}
-                        >
-                          <Icon className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{item.label}</span>
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </nav>
-            </div>
-          )}
-
           {/* Workspace info */}
           {!isCollapsed && (
             <div className="space-y-2">
@@ -566,7 +516,56 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-border/30">
+        {/* Hierarchy breadcrumb navigation */}
+        {!isCollapsed && breadcrumbItems.length > 0 && (
+          <div className="px-4 py-3 space-y-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
+              Hierarchy
+            </span>
+            <nav className="flex flex-col gap-0.5">
+              {breadcrumbItems.map((item, index) => {
+                if (!item) return null;
+                const Icon = item.icon;
+                const isLast = index === breadcrumbItems.length - 1;
+                
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center"
+                    style={{ paddingLeft: `${Math.min(index * 8, 24)}px` }}
+                  >
+                    {index > 0 && (
+                      <div className="w-2 h-2 border-l border-b border-border/50 mr-1.5" />
+                    )}
+                    {item.href ? (
+                      <button
+                        onClick={() => navigate(item.href!)}
+                        className={cn(
+                          'flex items-center gap-1.5 text-[11px] py-0.5 px-1.5 rounded hover:bg-muted/50 transition-colors truncate max-w-full',
+                          'text-muted-foreground hover:text-foreground'
+                        )}
+                      >
+                        <Icon className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </button>
+                    ) : (
+                      <span
+                        className={cn(
+                          'flex items-center gap-1.5 text-[11px] py-0.5 px-1.5 truncate max-w-full',
+                          isLast ? 'text-foreground font-medium' : 'text-muted-foreground'
+                        )}
+                      >
+                        <Icon className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
+          </div>
+        )}
         <SidebarUserFooter />
       </SidebarFooter>
     </Sidebar>
