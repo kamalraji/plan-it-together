@@ -32,12 +32,14 @@ export function ITDashboard({
   onRequestResource,
 }: ITDashboardProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Stats Overview */}
       <ITStatsCards />
 
-      {/* Quick Actions */}
-      <ITQuickActions />
+      {/* Quick Actions - touch-friendly on mobile */}
+      <div className="touch-pan-x">
+        <ITQuickActions />
+      </div>
 
       {/* Role-Based Actions */}
       <RoleBasedActions
@@ -49,24 +51,25 @@ export function ITDashboard({
         onRequestResource={onRequestResource}
       />
 
-      {/* Main Grid with Mini-Map */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          {/* System Health & Security */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Main Grid with Mini-Map - improved responsive breakpoints */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
+        {/* Main content area - full width on mobile/tablet, 3 cols on xl */}
+        <div className="xl:col-span-3 space-y-4 sm:space-y-6">
+          {/* System Health & Security - stack on mobile, side-by-side on sm+ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <SystemHealthMonitor />
             <SecurityAlerts />
           </div>
 
           {/* Helpdesk & Access Management */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <HelpdeskTickets />
             <AccessManagement />
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="space-y-6">
+        {/* Right Sidebar - moves to bottom on mobile, shown as horizontal row on tablet */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 sm:gap-6">
           <WorkspaceHierarchyMiniMap
             workspaceId={workspace.id}
             eventId={workspace.eventId}
@@ -78,8 +81,12 @@ export function ITDashboard({
         </div>
       </div>
 
-      {/* Team Members */}
-      <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+      {/* Team Members - responsive max display */}
+      <TeamMemberRoster 
+        workspace={workspace} 
+        showActions={false} 
+        maxMembers={6} 
+      />
     </div>
   );
 }
