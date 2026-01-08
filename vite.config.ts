@@ -44,11 +44,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Separate chunks for better caching and performance
-          'illustrations': ['./src/components/illustrations'],
-          'ui-components': ['./src/components/ui'],
-          'enhanced-components': ['./src/components/enhanced'],
-          // Vendor chunks for better caching
+          // Vendor chunks for better caching (npm packages only)
           'react-vendor': ['react', 'react-dom'],
           'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
         },
