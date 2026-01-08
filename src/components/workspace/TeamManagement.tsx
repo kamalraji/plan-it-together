@@ -28,15 +28,36 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ['workspace-team-members', workspace.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch team members
+      const { data: membersData, error: membersError } = await supabase
         .from('workspace_team_members')
         .select('*')
         .eq('workspace_id', workspace.id)
         .order('joined_at', { ascending: true });
 
-      if (error) throw error;
+      if (membersError) throw membersError;
 
-      return (data || []).map((row) => ({
+      if (!membersData || membersData.length === 0) {
+        return [] as TeamMember[];
+      }
+
+      // Get unique user IDs
+      const userIds = [...new Set(membersData.map(m => m.user_id))];
+
+      // Fetch user profiles for all members
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user_id -> profile data
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.id, { name: p.full_name || 'Unknown', email: '' }])
+      );
+
+      return membersData.map((row) => ({
         id: row.id,
         userId: row.user_id,
         role: row.role as WorkspaceRole,
@@ -45,8 +66,8 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
         leftAt: row.left_at || undefined,
         user: {
           id: row.user_id,
-          name: 'Member',
-          email: '',
+          name: profilesMap.get(row.user_id)?.name || 'Unknown Member',
+          email: profilesMap.get(row.user_id)?.email || '',
         },
       })) as TeamMember[];
     },
