@@ -40,8 +40,8 @@ export const OrgWorkspaceListPage: React.FC = () => {
       const { data, error } = await supabase
         .from('workspaces')
         .select(`
-          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id,
-          events!inner(id, name, organization_id),
+          id, name, slug, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id, workspace_type,
+          events!inner(id, name, slug, organization_id),
           workspace_team_members(user_id, role)
         `)
         .eq('events.organization_id', organization.id)
@@ -55,6 +55,8 @@ export const OrgWorkspaceListPage: React.FC = () => {
           id: row.id,
           eventId: row.event_id,
           name: row.name,
+          slug: row.slug,
+          workspaceType: row.workspace_type,
           status: row.status as WorkspaceStatus,
           createdAt: row.created_at,
           updatedAt: row.updated_at,
@@ -66,20 +68,35 @@ export const OrgWorkspaceListPage: React.FC = () => {
             ? {
               id: row.events.id,
               name: row.events.name,
+              slug: row.events.slug,
             }
             : undefined,
         };
       });
 
-      // Build hierarchy for display
-      const buildHierarchy = (workspaces: WorkspaceItem[]) => {
-        const roots = workspaces.filter((w) => !w.parentWorkspaceId);
-        const children = workspaces.filter((w) => w.parentWorkspaceId);
+      // Build deep hierarchy (L1 → L2 → L3 → L4)
+      const buildDeepHierarchy = (workspaces: WorkspaceItem[]): WorkspaceItem[] => {
+        const workspaceMap = new Map<string, WorkspaceItem>();
         
-        return roots.map((root) => ({
-          ...root,
-          subWorkspaces: children.filter((c) => c.parentWorkspaceId === root.id),
-        }));
+        // Create a map of all workspaces with empty subWorkspaces arrays
+        workspaces.forEach(ws => {
+          workspaceMap.set(ws.id, { ...ws, subWorkspaces: [] });
+        });
+        
+        // Build parent-child relationships
+        workspaces.forEach(ws => {
+          if (ws.parentWorkspaceId) {
+            const parent = workspaceMap.get(ws.parentWorkspaceId);
+            const child = workspaceMap.get(ws.id);
+            if (parent && child) {
+              parent.subWorkspaces = parent.subWorkspaces || [];
+              parent.subWorkspaces.push(child);
+            }
+          }
+        });
+        
+        // Return only root workspaces (no parent)
+        return Array.from(workspaceMap.values()).filter(ws => !ws.parentWorkspaceId);
       };
 
       // My Workspaces: created by user OR user is a member with owner role
@@ -92,9 +109,10 @@ export const OrgWorkspaceListPage: React.FC = () => {
       const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
 
       return {
-        myWorkspaces: buildHierarchy(myOwned),
-        invitedWorkspaces: buildHierarchy(invitedWorkspaces),
-        orgWorkspaces: buildHierarchy(orgWorkspaces),
+        myWorkspaces: buildDeepHierarchy(myOwned),
+        allWorkspaces, // Pass flat list for navigation
+        invitedWorkspaces: buildDeepHierarchy(invitedWorkspaces),
+        orgWorkspaces: buildDeepHierarchy(orgWorkspaces),
         totalCount: allWorkspaces.length,
       };
     },
@@ -127,6 +145,7 @@ export const OrgWorkspaceListPage: React.FC = () => {
             {/* My Workspaces - Hierarchy View */}
             <MyWorkspacesHierarchy
               workspaces={workspacesData?.myWorkspaces || []}
+              allWorkspaces={workspacesData?.allWorkspaces || []}
               orgSlug={orgSlug}
             />
 
