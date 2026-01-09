@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useWatch } from 'react-hook-form';
@@ -17,6 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 
 import {
   Form,
@@ -28,6 +30,42 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
+// Common timezones list
+const commonTimezones = [
+  { value: 'Asia/Kolkata', label: '(UTC+05:30) India Standard Time' },
+  { value: 'Asia/Dubai', label: '(UTC+04:00) Gulf Standard Time' },
+  { value: 'Asia/Singapore', label: '(UTC+08:00) Singapore Time' },
+  { value: 'Asia/Tokyo', label: '(UTC+09:00) Japan Standard Time' },
+  { value: 'Asia/Shanghai', label: '(UTC+08:00) China Standard Time' },
+  { value: 'Europe/London', label: '(UTC+00:00) Greenwich Mean Time' },
+  { value: 'Europe/Paris', label: '(UTC+01:00) Central European Time' },
+  { value: 'Europe/Berlin', label: '(UTC+01:00) Central European Time' },
+  { value: 'America/New_York', label: '(UTC-05:00) Eastern Time' },
+  { value: 'America/Chicago', label: '(UTC-06:00) Central Time' },
+  { value: 'America/Denver', label: '(UTC-07:00) Mountain Time' },
+  { value: 'America/Los_Angeles', label: '(UTC-08:00) Pacific Time' },
+  { value: 'Australia/Sydney', label: '(UTC+11:00) Australian Eastern Time' },
+  { value: 'Pacific/Auckland', label: '(UTC+13:00) New Zealand Time' },
+];
+
+// Registration types
+const registrationTypes = [
+  { value: 'OPEN', label: '🌐 Open Registration', description: 'Anyone can register' },
+  { value: 'INVITE_ONLY', label: '🔒 Invite Only', description: 'Only invited users can register' },
+  { value: 'APPROVAL_REQUIRED', label: '✋ Approval Required', description: 'Registrations require manual approval' },
+];
+
+// Accessibility features
+const accessibilityOptions = [
+  { id: 'wheelchair', label: '♿ Wheelchair Accessible' },
+  { id: 'sign_language', label: '🤟 Sign Language Interpretation' },
+  { id: 'closed_captions', label: '📝 Closed Captioning' },
+  { id: 'parking', label: '🅿️ Parking Available' },
+  { id: 'public_transport', label: '🚇 Public Transport Access' },
+  { id: 'hearing_loop', label: '🔊 Hearing Loop' },
+  { id: 'braille', label: '⠿ Braille Materials' },
+];
 
 // Category display config
 const categoryLabels: Record<string, string> = {
@@ -151,9 +189,21 @@ const eventSchema = z
         },
         { message: 'Capacity must be a positive number' },
       ),
+    // Registration settings
+    registrationType: z.enum(['OPEN', 'INVITE_ONLY', 'APPROVAL_REQUIRED']).optional(),
+    isFreeEvent: z.boolean().optional(),
+    allowWaitlist: z.boolean().optional(),
+    tags: z.string().optional(),
+    // Schedule
     startDate: z.string().min(1, 'Start date is required'),
     endDate: z.string().min(1, 'End date is required'),
     registrationDeadline: z.string().optional(),
+    timezone: z.string().min(1, 'Timezone is required'),
+    // Organizer contact
+    contactEmail: z.string().email('Valid email required').optional().or(z.literal('')),
+    contactPhone: z.string().optional(),
+    supportUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+    eventWebsite: z.string().url('Must be a valid URL').optional().or(z.literal('')),
     // Venue fields (for OFFLINE/HYBRID)
     venueName: z.string().optional(),
     venueAddress: z.string().optional(),
@@ -162,6 +212,8 @@ const eventSchema = z
     venueCountry: z.string().optional(),
     venuePostalCode: z.string().optional(),
     venueCapacity: z.string().optional(),
+    accessibilityFeatures: z.array(z.string()).optional(),
+    accessibilityNotes: z.string().optional(),
     // Virtual fields (for ONLINE/HYBRID)
     virtualPlatform: z.string().optional(),
     virtualMeetingUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
@@ -210,11 +262,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     basic: true,
     schedule: false,
+    organizer: false,
     venue: false,
     virtual: false,
     branding: false,
     cta: false,
   });
+
+  // Detect browser timezone
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -225,9 +281,21 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       category: '',
       organizationId: '',
       capacity: '',
+      // Registration settings
+      registrationType: 'OPEN',
+      isFreeEvent: true,
+      allowWaitlist: false,
+      tags: '',
+      // Schedule
       startDate: '',
       endDate: '',
       registrationDeadline: '',
+      timezone: browserTimezone || 'Asia/Kolkata',
+      // Organizer contact
+      contactEmail: '',
+      contactPhone: '',
+      supportUrl: '',
+      eventWebsite: '',
       // Venue defaults
       venueName: '',
       venueAddress: '',
@@ -236,6 +304,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       venueCountry: '',
       venuePostalCode: '',
       venueCapacity: '',
+      accessibilityFeatures: [],
+      accessibilityNotes: '',
       // Virtual defaults
       virtualPlatform: '',
       virtualMeetingUrl: '',
@@ -306,9 +376,21 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           category: (data as any).category ?? '',
           organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
+          // Registration settings
+          registrationType: branding?.registration?.type ?? 'OPEN',
+          isFreeEvent: branding?.registration?.isFree ?? true,
+          allowWaitlist: branding?.registration?.allowWaitlist ?? false,
+          tags: branding?.tags?.join(', ') ?? '',
+          // Schedule
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
-          registrationDeadline: '',
+          registrationDeadline: branding?.registrationDeadline ?? '',
+          timezone: branding?.timezone ?? browserTimezone ?? 'Asia/Kolkata',
+          // Organizer contact
+          contactEmail: branding?.contact?.email ?? '',
+          contactPhone: branding?.contact?.phone ?? '',
+          supportUrl: branding?.contact?.supportUrl ?? '',
+          eventWebsite: branding?.contact?.eventWebsite ?? '',
           // Venue fields
           venueName: branding?.venue?.name ?? '',
           venueAddress: branding?.venue?.address ?? '',
@@ -317,6 +399,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           venueCountry: branding?.venue?.country ?? '',
           venuePostalCode: branding?.venue?.postalCode ?? '',
           venueCapacity: branding?.venue?.capacity != null ? String(branding.venue.capacity) : '',
+          accessibilityFeatures: branding?.venue?.accessibilityFeatures ?? [],
+          accessibilityNotes: branding?.venue?.accessibilityNotes ?? '',
           // Virtual fields
           virtualPlatform: branding?.virtualLinks?.platform ?? '',
           virtualMeetingUrl: branding?.virtualLinks?.meetingUrl ?? '',
@@ -394,6 +478,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             country: values.venueCountry?.trim() || '',
             postalCode: values.venuePostalCode?.trim() || '',
             capacity: values.venueCapacity ? Number(values.venueCapacity) : undefined,
+            accessibilityFeatures: values.accessibilityFeatures || [],
+            accessibilityNotes: values.accessibilityNotes?.trim() || undefined,
           }
         : undefined;
 
@@ -407,6 +493,28 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             instructions: values.virtualInstructions?.trim() || undefined,
           }
         : undefined;
+
+      // Build contact object
+      const contactData = values.contactEmail
+        ? {
+            email: values.contactEmail.trim(),
+            phone: values.contactPhone?.trim() || undefined,
+            supportUrl: values.supportUrl || undefined,
+            eventWebsite: values.eventWebsite || undefined,
+          }
+        : undefined;
+
+      // Build registration settings
+      const registrationData = {
+        type: values.registrationType || 'OPEN',
+        isFree: values.isFreeEvent ?? true,
+        allowWaitlist: values.allowWaitlist ?? false,
+      };
+
+      // Parse tags
+      const tagsArray = values.tags
+        ? values.tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
+        : [];
 
       const payload: any = {
         name: values.name.trim(),
@@ -428,6 +536,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
           venue: venueData,
           virtualLinks: virtualLinksData,
+          contact: contactData,
+          registration: registrationData,
+          tags: tagsArray.length > 0 ? tagsArray : undefined,
+          timezone: values.timezone,
+          registrationDeadline: values.registrationDeadline || undefined,
         },
         owner_id: user.id,
         canvas_state: values.canvasState ?? null,
@@ -764,7 +877,97 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={control}
+                        name="registrationType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Registration type</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                {...field}
+                              >
+                                {registrationTypes.map((type) => (
+                                  <option key={type.value} value={type.value}>{type.label}</option>
+                                ))}
+                              </select>
+                            </FormControl>
+                            <FormDescription>
+                              How attendees can register.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="isFreeEvent"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border/50 p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">Free event</FormLabel>
+                              <FormDescription>
+                                Toggle off if this is a paid event.
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="allowWaitlist"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border/50 p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">Enable waitlist</FormLabel>
+                              <FormDescription>
+                                Allow waitlist when capacity is reached.
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tags / Keywords</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="text" 
+                              placeholder="e.g. tech, hackathon, students, AI"
+                              className="h-11"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Comma-separated tags for SEO and event discovery.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -939,9 +1142,150 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
-                        );
+                          );
                       }}
                     />
+
+                    <FormField
+                      control={control}
+                      name="timezone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Timezone *</FormLabel>
+                          <FormControl>
+                            <select
+                              className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              {...field}
+                            >
+                              {commonTimezones.map((tz) => (
+                                <option key={tz.value} value={tz.value}>{tz.label}</option>
+                              ))}
+                            </select>
+                          </FormControl>
+                          <FormDescription>
+                            All event times will be displayed in this timezone.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Organizer & Contact Section */}
+              <Collapsible
+                open={openSections.organizer}
+                onOpenChange={() => toggleSection('organizer')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Organizer & Contact"
+                    description="Contact information for attendee inquiries"
+                    icon={UserCircleIcon}
+                    isOpen={openSections.organizer}
+                    stepNumber={3}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
+                    <div className="rounded-xl border border-border/50 bg-muted/30 p-4">
+                      <p className="text-sm text-muted-foreground">
+                        📧 Attendees will use this information to reach out with questions.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="contactEmail"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact email</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="organizer@example.com"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Primary contact for attendee inquiries.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="contactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact phone</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="tel"
+                                placeholder="+91 98765 43210"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional phone number for urgent queries.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="supportUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Support / FAQ URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://yoursite.com/support"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Link to help center or FAQ page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="eventWebsite"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event website</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://yourevent.com"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              External website for more information.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -1107,6 +1451,72 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                             </FormControl>
                             <FormDescription>
                               Maximum attendees the venue can accommodate.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Accessibility Features */}
+                      <div className="space-y-4">
+                        <FormLabel className="text-base font-medium">Accessibility features</FormLabel>
+                        <FormDescription className="-mt-2">
+                          Select all accessibility features available at the venue.
+                        </FormDescription>
+                        <FormField
+                          control={control}
+                          name="accessibilityFeatures"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {accessibilityOptions.map((option) => (
+                                  <div
+                                    key={option.id}
+                                    className="flex items-center space-x-3 rounded-lg border border-border/50 p-3 transition-colors hover:bg-muted/30"
+                                  >
+                                    <Checkbox
+                                      id={option.id}
+                                      checked={field.value?.includes(option.id)}
+                                      onCheckedChange={(checked) => {
+                                        const currentValue = field.value || [];
+                                        if (checked) {
+                                          field.onChange([...currentValue, option.id]);
+                                        } else {
+                                          field.onChange(currentValue.filter((v: string) => v !== option.id));
+                                        }
+                                      }}
+                                    />
+                                    <label
+                                      htmlFor={option.id}
+                                      className="text-sm font-medium leading-none cursor-pointer"
+                                    >
+                                      {option.label}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={control}
+                        name="accessibilityNotes"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Accessibility notes</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                rows={3}
+                                placeholder="Additional accessibility information, e.g., entrance location for wheelchair users..."
+                                className="resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Any additional details about venue accessibility.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
