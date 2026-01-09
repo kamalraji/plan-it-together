@@ -332,8 +332,41 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
     // Render managers to custom containers
     editor.on('load', () => {
-      // Blocks are automatically rendered via appendTo option or we use the blocks panel
-      // Style, Trait, and Layer managers need to be rendered to custom containers
+      // Render Style Manager to custom container
+      if (stylesContainerRef.current) {
+        const smEl = (editor.StyleManager as any).render?.();
+        if (smEl) {
+          stylesContainerRef.current.innerHTML = '';
+          stylesContainerRef.current.appendChild(smEl);
+        }
+      }
+
+      // Render Trait Manager to custom container  
+      if (traitsContainerRef.current) {
+        const tmEl = (editor.TraitManager as any).render?.();
+        if (tmEl) {
+          traitsContainerRef.current.innerHTML = '';
+          traitsContainerRef.current.appendChild(tmEl);
+        }
+      }
+
+      // Render Block Manager to custom container
+      if (blocksContainerRef.current) {
+        const bmEl = (editor.BlockManager as any).render?.([]);
+        if (bmEl) {
+          blocksContainerRef.current.innerHTML = '';
+          blocksContainerRef.current.appendChild(bmEl);
+        }
+      }
+
+      // Render Layer Manager to custom container
+      if (layersContainerRef.current) {
+        const lmEl = (editor.LayerManager as any).render?.();
+        if (lmEl) {
+          layersContainerRef.current.innerHTML = '';
+          layersContainerRef.current.appendChild(lmEl);
+        }
+      }
     });
 
     // Custom commands
