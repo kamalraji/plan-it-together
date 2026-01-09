@@ -220,6 +220,7 @@ export interface CreateEventDTO {
   registrationDeadline?: string;
   organizationId?: string;
   visibility: EventVisibility;
+  category?: EventCategory;
   templateId?: string;
   branding: BrandingConfig;
   venue?: VenueConfig;

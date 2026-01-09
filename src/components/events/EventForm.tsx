@@ -12,6 +12,7 @@ import {
   EventTemplate,
   CreateEventDTO,
   EventVisibility,
+  EventCategory,
   Organization,
 } from '../../types';
 import { WorkspaceTemplateLibrary } from '@/components/workspace/WorkspaceTemplateLibrary';
@@ -48,14 +49,16 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
       virtualLinks: event.virtualLinks,
       timeline: event.timeline || [],
       prizes: event.prizes || [],
-      sponsors: event.sponsors || []
+      sponsors: event.sponsors || [],
+      category: event.category,
     } : {
       mode: EventMode.OFFLINE,
       visibility: EventVisibility.PUBLIC,
       branding: {},
       timeline: [],
       prizes: [],
-      sponsors: []
+      sponsors: [],
+      category: undefined,
     }
   });
 
@@ -163,6 +166,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         registration_deadline: data.registrationDeadline,
         organization_id: data.organizationId || null,
         visibility: data.visibility,
+        category: data.category || null,
         branding: {
           ...(data.branding || {}),
           workspaceTemplateId: selectedWorkspaceTemplate?.id,
@@ -363,6 +367,30 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                     {errors.description && (
                       <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
                     )}
+                  </div>
+
+                  {/* Event Category */}
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Event Category *
+                    </label>
+                    <select
+                      {...register('category', { required: 'Event category is required' })}
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                    >
+                      <option value="">Select a category</option>
+                      {Object.values(EventCategory).map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat.replace(/_/g, ' ')}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+                    )}
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Choose the category that best describes your event type
+                    </p>
                   </div>
 
                   {/* Organization Selection (Requirements 19.1) */}
