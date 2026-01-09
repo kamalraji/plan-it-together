@@ -163,7 +163,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
       </div>
 
       {/* Canvas container */}
-      <div className="relative flex-1 overflow-auto p-6">
+      <div className="relative flex-1 overflow-auto p-2 sm:p-4 md:p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={device}
@@ -173,13 +173,16 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className={cn(
               'mx-auto h-full overflow-hidden rounded-lg bg-[hsl(220,13%,12%)] shadow-2xl ring-1 ring-[hsl(220,13%,18%)]',
-              zoom === 'fit' ? 'max-w-full' : ''
+              zoom === 'fit' ? 'w-full max-w-full' : ''
             )}
-            style={zoom !== 'fit' ? { width: `${deviceWidth * (typeof zoom === 'number' ? zoom : 1)}px` } : {}}
+            style={zoom !== 'fit' ? { 
+              width: `min(${deviceWidth * (typeof zoom === 'number' ? zoom : 1)}px, 100%)`,
+              maxWidth: '100%'
+            } : {}}
           >
             <div
               ref={containerRef}
-              className="gjs-editor-container h-full w-full"
+              className="gjs-editor-container h-full w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px]"
               style={getTransformStyle()}
             />
           </motion.div>
