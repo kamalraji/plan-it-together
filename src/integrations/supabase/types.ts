@@ -452,6 +452,88 @@ export type Database = {
           },
         ]
       }
+      channel_members: {
+        Row: {
+          channel_id: string
+          id: string
+          joined_at: string | null
+          last_read_at: string | null
+          user_id: string
+          user_name: string | null
+        }
+        Insert: {
+          channel_id: string
+          id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id: string
+          user_name?: string | null
+        }
+        Update: {
+          channel_id?: string
+          id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          user_id?: string
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_members_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_messages: {
+        Row: {
+          attachments: Json | null
+          channel_id: string
+          content: string
+          created_at: string | null
+          edited_at: string | null
+          id: string
+          is_edited: boolean | null
+          message_type: string | null
+          sender_id: string
+          sender_name: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          channel_id: string
+          content: string
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean | null
+          message_type?: string | null
+          sender_id: string
+          sender_name?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          channel_id?: string
+          content?: string
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean | null
+          message_type?: string | null
+          sender_id?: string
+          sender_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_page_views: {
         Row: {
           created_at: string
@@ -1865,6 +1947,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_budgets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_channels: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_private: boolean | null
+          metadata: Json | null
+          name: string
+          type: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          metadata?: Json | null
+          name: string
+          type?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          metadata?: Json | null
+          name?: string
+          type?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_channels_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
