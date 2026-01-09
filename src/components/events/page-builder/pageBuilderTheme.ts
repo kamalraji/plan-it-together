@@ -587,4 +587,143 @@ export const pageBuilderTheme = `
 .gjs-sm-sector {
   animation: gjsFadeIn 0.2s ease-out;
 }
+
+/* ========== Panel Containers (Custom) ========== */
+.panel-blocks,
+.gjs-styles-container,
+.gjs-traits-container {
+  --gjs-bg-primary: hsl(222, 47%, 7%);
+  --gjs-bg-secondary: hsl(222, 47%, 9%);
+  --gjs-bg-tertiary: hsl(222, 47%, 11%);
+  --gjs-bg-hover: hsl(217, 33%, 18%);
+  --gjs-border: hsl(217, 33%, 18%);
+  --gjs-text-primary: hsl(210, 40%, 98%);
+  --gjs-text-secondary: hsl(215, 20%, 75%);
+  --gjs-text-muted: hsl(215, 20%, 55%);
+  --gjs-accent: hsl(221, 83%, 66%);
+  background-color: transparent !important;
+}
+
+.panel-blocks .gjs-blocks-c,
+.gjs-styles-container .gjs-sm-sectors,
+.gjs-traits-container .gjs-trt-traits {
+  background-color: transparent !important;
+}
+
+/* Blocks in custom container */
+.panel-blocks .gjs-block {
+  background: linear-gradient(145deg, var(--gjs-bg-tertiary), var(--gjs-bg-secondary)) !important;
+  border: 1px solid var(--gjs-border) !important;
+  color: var(--gjs-text-primary) !important;
+}
+
+.panel-blocks .gjs-block:hover {
+  border-color: var(--gjs-accent) !important;
+}
+
+.panel-blocks .gjs-block-label {
+  color: var(--gjs-text-secondary) !important;
+}
+
+.panel-blocks .gjs-block svg {
+  fill: var(--gjs-text-muted) !important;
+}
+
+.panel-blocks .gjs-block:hover svg {
+  fill: var(--gjs-accent) !important;
+}
+
+.panel-blocks .gjs-block-category .gjs-title {
+  background: var(--gjs-bg-primary) !important;
+  color: var(--gjs-text-muted) !important;
+  border-bottom: 1px solid var(--gjs-border) !important;
+}
+
+.panel-blocks .gjs-block-category .gjs-title:hover {
+  color: var(--gjs-text-primary) !important;
+  background: var(--gjs-bg-tertiary) !important;
+}
+
+.panel-blocks .gjs-block-category.gjs-open .gjs-title {
+  color: var(--gjs-accent) !important;
+}
+
+/* Styles container */
+.gjs-styles-container .gjs-sm-sector-title {
+  background: var(--gjs-bg-primary) !important;
+  color: var(--gjs-text-primary) !important;
+  border-bottom: 1px solid var(--gjs-border) !important;
+}
+
+.gjs-styles-container .gjs-sm-sector-title:hover {
+  background: var(--gjs-bg-tertiary) !important;
+}
+
+.gjs-styles-container .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title {
+  color: var(--gjs-accent) !important;
+  border-left: 2px solid var(--gjs-accent) !important;
+}
+
+.gjs-styles-container .gjs-sm-properties {
+  background: var(--gjs-bg-secondary) !important;
+}
+
+.gjs-styles-container .gjs-sm-label {
+  color: var(--gjs-text-muted) !important;
+}
+
+.gjs-styles-container .gjs-field {
+  background: var(--gjs-bg-primary) !important;
+  border: 1px solid var(--gjs-border) !important;
+}
+
+.gjs-styles-container .gjs-field input,
+.gjs-styles-container .gjs-field select {
+  color: var(--gjs-text-primary) !important;
+}
+
+.gjs-styles-container .gjs-radio-item-label {
+  color: var(--gjs-text-secondary) !important;
+}
+
+.gjs-styles-container .gjs-radio-item input:checked + .gjs-radio-item-label {
+  color: var(--gjs-accent) !important;
+}
+
+/* Traits container */
+.gjs-traits-container .gjs-trt-trait {
+  border-bottom: 1px solid var(--gjs-border) !important;
+}
+
+.gjs-traits-container .gjs-trt-trait .gjs-label {
+  color: var(--gjs-text-muted) !important;
+}
+
+.gjs-traits-container .gjs-field {
+  background: var(--gjs-bg-primary) !important;
+  border: 1px solid var(--gjs-border) !important;
+}
+
+.gjs-traits-container .gjs-field input {
+  color: var(--gjs-text-primary) !important;
+}
+
+/* Selector manager in styles */
+.gjs-styles-container .gjs-clm-tags {
+  border-bottom: 1px solid var(--gjs-border) !important;
+}
+
+.gjs-styles-container .gjs-clm-tag {
+  background: var(--gjs-bg-tertiary) !important;
+  border: 1px solid var(--gjs-border) !important;
+  color: var(--gjs-text-primary) !important;
+}
+
+.gjs-styles-container .gjs-clm-tag:hover {
+  border-color: var(--gjs-accent) !important;
+}
+
+.gjs-styles-container .gjs-clm-sels-info {
+  color: var(--gjs-text-muted) !important;
+}
 `;
