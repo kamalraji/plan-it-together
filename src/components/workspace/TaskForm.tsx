@@ -22,8 +22,9 @@ import {
   CheckCircle2,
   ListTodo
 } from 'lucide-react';
-import { SubtaskSection, type Subtask, MultiAssigneeSelector, useTaskFormKeyboard } from './task-form';
+import { SubtaskSection, type Subtask, MultiAssigneeSelector, useTaskFormKeyboard, CustomTemplateManager } from './task-form';
 import { useTaskDraft } from '@/hooks/useTaskDraft';
+import { useTaskNotifications } from '@/hooks/useTaskNotifications';
 
 interface TaskFormProps {
   task?: WorkspaceTask;
@@ -106,6 +107,9 @@ export function TaskForm({
       }
     },
   });
+
+  // Task notifications
+  const { notifyTaskAssigned, notifyTaskCreated } = useTaskNotifications();
 
   // Keyboard shortcuts
   useTaskFormKeyboard({
@@ -193,6 +197,8 @@ export function TaskForm({
     e.preventDefault();
     if (!validateForm()) return;
 
+    let createdTaskId: string | undefined;
+
     if (workspaceId) {
       const payload: any = {
         id: task?.id,
@@ -204,8 +210,31 @@ export function TaskForm({
         due_date: formData.dueDate || null,
         role_scope: formData.roleScope ?? null,
       };
-      const { error } = await supabase.from('workspace_tasks').upsert(payload, { onConflict: 'id' });
-      if (error) console.error('Failed to upsert workspace task', error);
+      const { data, error } = await supabase.from('workspace_tasks').upsert(payload, { onConflict: 'id' }).select('id').single();
+      if (error) {
+        console.error('Failed to upsert workspace task', error);
+      } else {
+        createdTaskId = data?.id;
+
+        // Send notifications for new tasks
+        if (!task && createdTaskId) {
+          await notifyTaskCreated({
+            taskId: createdTaskId,
+            taskTitle: formData.title,
+            workspaceId,
+          });
+
+          // Notify assignees if any
+          if (formData.assigneeIds?.length) {
+            await notifyTaskAssigned({
+              taskId: createdTaskId,
+              taskTitle: formData.title,
+              workspaceId,
+              assigneeIds: formData.assigneeIds,
+            });
+          }
+        }
+      }
     }
     onSubmit?.(formData);
   };
@@ -222,7 +251,7 @@ export function TaskForm({
         </h3>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="p-4 space-y-4">
         {/* Quick Templates - Compact */}
         {!task && (
           <div className="space-y-2">
@@ -248,6 +277,24 @@ export function TaskForm({
                 </button>
               ))}
             </div>
+            {/* Custom Templates */}
+            {workspaceId && (
+              <CustomTemplateManager
+                workspaceId={workspaceId}
+                currentFormData={formData}
+                onTemplateSelect={(template) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    title: template.name,
+                    description: template.description,
+                    category: template.category,
+                    priority: template.priority,
+                    tags: template.tags,
+                  }));
+                }}
+                disabled={isLoading}
+              />
+            )}
           </div>
         )}
 
