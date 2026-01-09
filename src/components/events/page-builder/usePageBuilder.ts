@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import grapesjs, { Editor } from 'grapesjs';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,9 @@ import { slugify, extractTitleFromHtml, extractDescriptionFromHtml } from './pag
 import { initializePlugins } from './grapesjsPlugins';
 import { templatesPlugin } from './grapesjsTemplatesPlugin';
 import { assetUploadPlugin } from './grapesjsAssetPlugin';
+import { TemplateData } from './TemplatesGallery';
+import { LayerData } from './LeftPanel';
+import { AnimationConfig } from './RightPanel';
 
 interface LandingPageDataMeta {
   title?: string;
@@ -49,11 +52,21 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const editorRef = useRef<Editor | null>(null);
+  
+  // Container refs for GrapesJS rendering
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const blocksContainerRef = useRef<HTMLDivElement | null>(null);
+  const layersContainerRef = useRef<HTMLDivElement | null>(null);
+  const stylesContainerRef = useRef<HTMLDivElement | null>(null);
+  const traitsContainerRef = useRef<HTMLDivElement | null>(null);
+  
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [device, setDevice] = useState<'Desktop' | 'Tablet' | 'Mobile'>('Desktop');
+  const [layers, setLayers] = useState<LayerData[]>([]);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>();
 
   // Fetch event data
   useEffect(() => {
@@ -103,7 +116,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     loadEvent();
   }, [eventId, toast, navigate]);
 
-  // Initialize GrapesJS editor with full configuration
+  // Initialize GrapesJS editor
   useEffect(() => {
     if (loading || !eventData || !containerRef.current || editorRef.current) return;
 
@@ -116,44 +129,23 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       height: '100%',
       width: 'auto',
       fromElement: false,
-      
-      // =============================================
-      // 1. STORAGE MANAGER - Disable default, use custom save
-      // =============================================
       storageManager: false,
-
-      // =============================================
-      // 2. SELECTOR MANAGER - CSS class management
-      // =============================================
+      
+      // Hide default panels - we use custom ones
+      panels: { defaults: [] },
+      
       selectorManager: {
         componentFirst: true,
       },
 
-      // =============================================
-      // 3. DEVICE MANAGER - Responsive breakpoints
-      // =============================================
       deviceManager: {
         devices: [
-          {
-            name: 'Desktop',
-            width: '',
-          },
-          {
-            name: 'Tablet',
-            width: '768px',
-            widthMedia: '992px',
-          },
-          {
-            name: 'Mobile',
-            width: '375px',
-            widthMedia: '480px',
-          },
+          { name: 'Desktop', width: '' },
+          { name: 'Tablet', width: '768px', widthMedia: '992px' },
+          { name: 'Mobile', width: '375px', widthMedia: '480px' },
         ],
       },
 
-      // =============================================
-      // 4. STYLE MANAGER - CSS property editor
-      // =============================================
       styleManager: {
         sectors: [
           {
@@ -184,9 +176,6 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         ],
       },
 
-      // =============================================
-      // 5. BLOCK MANAGER - Draggable content blocks
-      // =============================================
       blockManager: {
         blocks: [
           {
@@ -238,21 +227,14 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
             id: 'columns-2',
             label: '2 Columns',
             category: 'Layout',
-            content: `<div class="gjs-row">
-              <div class="gjs-cell"></div>
-              <div class="gjs-cell"></div>
-            </div>`,
+            content: `<div class="gjs-row"><div class="gjs-cell"></div><div class="gjs-cell"></div></div>`,
             media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="16" fill="currentColor"/><rect x="13" y="4" width="9" height="16" fill="currentColor"/></svg>',
           },
           {
             id: 'columns-3',
             label: '3 Columns',
             category: 'Layout',
-            content: `<div class="gjs-row">
-              <div class="gjs-cell"></div>
-              <div class="gjs-cell"></div>
-              <div class="gjs-cell"></div>
-            </div>`,
+            content: `<div class="gjs-row"><div class="gjs-cell"></div><div class="gjs-cell"></div><div class="gjs-cell"></div></div>`,
             media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="6" height="16" fill="currentColor"/><rect x="9" y="4" width="6" height="16" fill="currentColor"/><rect x="16" y="4" width="6" height="16" fill="currentColor"/></svg>',
           },
           {
@@ -272,9 +254,6 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         ],
       },
 
-      // =============================================
-      // 6. CANVAS STYLES
-      // =============================================
       canvas: {
         styles: getCanvasStyles(primaryColor),
       },
@@ -282,81 +261,68 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
     editorRef.current = editor;
 
-    // =============================================
-    // 7. ADD EVENT-SPECIFIC BLOCKS
-    // =============================================
+    // Add event-specific blocks
     const blockManager = editor.BlockManager;
-
     blockManager.add('hero-block', {
       label: 'Hero Section',
       category: 'Event Sections',
       content: heroBlockHtml({ name, description, logoUrl }),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/></svg>',
     });
-
     blockManager.add('schedule-block', {
       label: 'Event Schedule',
       category: 'Event Sections',
       content: scheduleBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>',
     });
-
     blockManager.add('registration-block', {
       label: 'Registration Form',
       category: 'Event Sections',
       content: registrationBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
     });
-
     blockManager.add('speakers-block', {
       label: 'Speakers',
       category: 'Event Sections',
       content: speakersBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>',
     });
-
     blockManager.add('sponsors-block', {
       label: 'Sponsors',
       category: 'Event Sections',
       content: sponsorsBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="8" width="18" height="8" rx="2"/></svg>',
     });
-
     blockManager.add('faq-block', {
       label: 'FAQ',
       category: 'Event Sections',
       content: faqBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>',
     });
-
     blockManager.add('countdown-block', {
       label: 'Countdown Timer',
       category: 'Event Sections',
       content: countdownBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14" stroke="white" stroke-width="2" fill="none"/></svg>',
     });
-
     blockManager.add('video-block', {
       label: 'Event Video',
       category: 'Media',
       content: videoBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 9 15 12 10 15" fill="white"/></svg>',
     });
-
     blockManager.add('gallery-block', {
       label: 'Gallery',
       category: 'Media',
       content: galleryBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
     });
-
     blockManager.add('cta-block', {
       label: 'CTA Section',
       category: 'Event Sections',
       content: ctaBlockHtml(),
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="8" width="16" height="8" rx="2"/></svg>',
     });
-
     blockManager.add('venue-block', {
       label: 'Venue',
       category: 'Event Sections',
@@ -364,22 +330,17 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       media: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>',
     });
 
-    // =============================================
-    // 8. CUSTOM COMMANDS
-    // =============================================
-    
-    // Device commands
-    editor.Commands.add('set-device-desktop', {
-      run: (ed) => ed.setDevice('Desktop'),
-    });
-    editor.Commands.add('set-device-tablet', {
-      run: (ed) => ed.setDevice('Tablet'),
-    });
-    editor.Commands.add('set-device-mobile', {
-      run: (ed) => ed.setDevice('Mobile'),
+    // Render managers to custom containers
+    editor.on('load', () => {
+      // Blocks are automatically rendered via appendTo option or we use the blocks panel
+      // Style, Trait, and Layer managers need to be rendered to custom containers
     });
 
-    // Save command
+    // Custom commands
+    editor.Commands.add('set-device-desktop', { run: (ed) => ed.setDevice('Desktop') });
+    editor.Commands.add('set-device-tablet', { run: (ed) => ed.setDevice('Tablet') });
+    editor.Commands.add('set-device-mobile', { run: (ed) => ed.setDevice('Mobile') });
+
     editor.Commands.add('save-page', {
       run: async () => {
         const html = editor.getHtml();
@@ -394,31 +355,20 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
           setSaving(true);
           const { error } = await supabase
             .from('events')
-            .update({
-              landing_page_data: payload,
-              landing_page_slug: slug,
-            })
+            .update({ landing_page_data: payload, landing_page_slug: slug })
             .eq('id', eventId);
 
           if (error) throw error;
-          toast({
-            title: 'Landing page saved',
-            description: 'Your event page has been saved successfully.',
-          });
+          toast({ title: 'Landing page saved', description: 'Your event page has been saved successfully.' });
         } catch (err) {
           console.error('Failed to save landing page', err);
-          toast({
-            title: 'Save failed',
-            description: 'We could not save your landing page. Please try again.',
-            variant: 'destructive',
-          });
+          toast({ title: 'Save failed', description: 'We could not save your landing page. Please try again.', variant: 'destructive' });
         } finally {
           setSaving(false);
         }
       },
     });
 
-    // Preview command
     editor.Commands.add('preview-page', {
       run: () => {
         if (eventId) {
@@ -428,7 +378,6 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       },
     });
 
-    // Clear canvas command
     editor.Commands.add('clear-canvas', {
       run: () => {
         if (window.confirm('Are you sure you want to clear the canvas?')) {
@@ -438,16 +387,12 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       },
     });
 
-    // =============================================
-    // 9. INITIALIZE CUSTOM PLUGINS
-    // =============================================
+    // Initialize plugins
     initializePlugins(editor);
     templatesPlugin(editor);
     assetUploadPlugin(editor, { eventId });
 
-    // =============================================
-    // 10. LOAD EXISTING CONTENT
-    // =============================================
+    // Load existing content
     if (existingLanding?.html) {
       editor.setComponents(existingLanding.html);
       if (existingLanding.css) {
@@ -461,17 +406,12 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       `);
     }
 
-    // =============================================
-    // 11. KEYBOARD SHORTCUTS
-    // =============================================
-    editor.on('load', () => {
-      // Add keyboard shortcuts
-      document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-          e.preventDefault();
-          editor.runCommand('save-page');
-        }
-      });
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        editor.runCommand('save-page');
+      }
     });
 
     return () => {
@@ -482,10 +422,97 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     };
   }, [loading, eventData, slug, eventId, toast]);
 
+  // Device change handler
+  const handleDeviceChange = useCallback((newDevice: 'Desktop' | 'Tablet' | 'Mobile') => {
+    setDevice(newDevice);
+    editorRef.current?.setDevice(newDevice);
+  }, []);
+
+  // Save handler
+  const handleSave = useCallback(() => {
+    editorRef.current?.runCommand('save-page');
+  }, []);
+
+  // Preview handler
+  const handlePreview = useCallback(() => {
+    editorRef.current?.runCommand('preview-page');
+  }, []);
+
+  // Apply template
+  const handleSelectTemplate = useCallback((template: TemplateData) => {
+    if (editorRef.current && template.html) {
+      editorRef.current.setComponents(template.html);
+      if (template.css) {
+        editorRef.current.setStyle(template.css);
+      }
+      toast({ title: 'Template applied', description: `"${template.name}" template has been loaded.` });
+    }
+  }, [toast]);
+
+  // Apply animation
+  const handleApplyAnimation = useCallback((animationType: string, _config: AnimationConfig) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    
+    const selected = editor.getSelected();
+    if (!selected) {
+      toast({ title: 'No element selected', description: 'Select an element to apply animation.', variant: 'destructive' });
+      return;
+    }
+
+    // Apply CSS animation class
+    const animClass = `animate-${animationType}`;
+    selected.addClass(animClass);
+    
+    toast({ title: 'Animation applied', description: `${animationType} animation added to element.` });
+  }, [toast]);
+
+  // Layer handlers
+  const handleLayerSelect = useCallback((layerId: string) => {
+    setSelectedLayerId(layerId);
+  }, []);
+
+  const handleLayerVisibilityToggle = useCallback((layerId: string) => {
+    setLayers(prev => prev.map(l => l.id === layerId ? { ...l, visible: !l.visible } : l));
+  }, []);
+
+  const handleLayerLockToggle = useCallback((layerId: string) => {
+    setLayers(prev => prev.map(l => l.id === layerId ? { ...l, locked: !l.locked } : l));
+  }, []);
+
+  const handleLayerDelete = useCallback((layerId: string) => {
+    setLayers(prev => prev.filter(l => l.id !== layerId));
+  }, []);
+
+  const handleLayersReorder = useCallback((newLayers: LayerData[]) => {
+    setLayers(newLayers);
+  }, []);
+
   return {
+    // Refs
     containerRef,
+    blocksContainerRef,
+    layersContainerRef,
+    stylesContainerRef,
+    traitsContainerRef,
     editorRef,
+    // State
     loading,
     saving,
+    device,
+    layers,
+    selectedLayerId,
+    eventData,
+    // Handlers
+    handleDeviceChange,
+    handleSave,
+    handlePreview,
+    handleSelectTemplate,
+    handleApplyAnimation,
+    handleLayerSelect,
+    handleLayerVisibilityToggle,
+    handleLayerLockToggle,
+    handleLayerDelete,
+    handleLayersReorder,
   };
 }
