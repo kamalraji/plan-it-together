@@ -1646,7 +1646,10 @@ export type Database = {
       }
       volunteer_assignments: {
         Row: {
+          check_in_time: string | null
+          check_out_time: string | null
           created_at: string
+          hours_logged: number | null
           id: string
           notes: string | null
           shift_id: string
@@ -1655,7 +1658,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
           created_at?: string
+          hours_logged?: number | null
           id?: string
           notes?: string | null
           shift_id: string
@@ -1664,7 +1670,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
           created_at?: string
+          hours_logged?: number | null
           id?: string
           notes?: string | null
           shift_id?: string
