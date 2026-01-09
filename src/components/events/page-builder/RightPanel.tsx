@@ -54,7 +54,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('Design');
 
   return (
-    <div className="flex h-full w-72 flex-col border-l border-[hsl(220,13%,18%)] bg-[hsl(220,13%,10%)]">
+    <div className="flex h-full w-64 xl:w-72 flex-col border-l border-[hsl(220,13%,18%)] bg-[hsl(220,13%,10%)]">
       {/* Tabs */}
       <div className="flex h-10 items-center border-b border-[hsl(220,13%,18%)] px-3">
         {(['Design', 'Prototype'] as TabType[]).map((tab) => (

@@ -102,34 +102,40 @@ export const EventPageBuilder: React.FC = () => {
       </div>
 
       {/* Three-Panel Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel: Pages, Layers, Assets */}
-        <LeftPanel
-          blocksContainerRef={blocksContainerRef}
-          layersContainerRef={layersContainerRef}
-          layers={layers}
-          selectedLayerId={selectedLayerId}
-          onLayerSelect={handleLayerSelect}
-          onLayerVisibilityToggle={handleLayerVisibilityToggle}
-          onLayerLockToggle={handleLayerLockToggle}
-          onLayerDelete={handleLayerDelete}
-          onLayersReorder={handleLayersReorder}
-          onSelectTemplate={handleSelectTemplate}
-        />
+      <div className="flex flex-1 overflow-hidden min-w-0">
+        {/* Left Panel: Pages, Layers, Assets - hidden on small screens */}
+        <div className="hidden md:block flex-shrink-0">
+          <LeftPanel
+            blocksContainerRef={blocksContainerRef}
+            layersContainerRef={layersContainerRef}
+            layers={layers}
+            selectedLayerId={selectedLayerId}
+            onLayerSelect={handleLayerSelect}
+            onLayerVisibilityToggle={handleLayerVisibilityToggle}
+            onLayerLockToggle={handleLayerLockToggle}
+            onLayerDelete={handleLayerDelete}
+            onLayersReorder={handleLayersReorder}
+            onSelectTemplate={handleSelectTemplate}
+          />
+        </div>
 
         {/* Center: Canvas Area */}
-        <CanvasArea
-          containerRef={containerRef}
-          device={device}
-          onDeviceChange={handleDeviceChange}
-        />
+        <div className="flex-1 min-w-0">
+          <CanvasArea
+            containerRef={containerRef}
+            device={device}
+            onDeviceChange={handleDeviceChange}
+          />
+        </div>
 
-        {/* Right Panel: Design & Prototype */}
-        <RightPanel
-          stylesContainerRef={stylesContainerRef}
-          traitsContainerRef={traitsContainerRef}
-          onApplyAnimation={handleApplyAnimation}
-        />
+        {/* Right Panel: Design & Prototype - hidden on small screens */}
+        <div className="hidden lg:block flex-shrink-0">
+          <RightPanel
+            stylesContainerRef={stylesContainerRef}
+            traitsContainerRef={traitsContainerRef}
+            onApplyAnimation={handleApplyAnimation}
+          />
+        </div>
       </div>
 
       {/* GrapesJS Professional Dark Theme */}

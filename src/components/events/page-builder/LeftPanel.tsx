@@ -79,7 +79,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('Layers');
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-[hsl(220,13%,18%)] bg-[hsl(220,13%,10%)]">
+    <div className="flex h-full w-56 lg:w-64 flex-col border-r border-[hsl(220,13%,18%)] bg-[hsl(220,13%,10%)]">
       {/* Tabs */}
       <div className="flex h-10 items-center border-b border-[hsl(220,13%,18%)] px-3">
         {(['Pages', 'Layers', 'Assets'] as TabType[]).map((tab) => (
