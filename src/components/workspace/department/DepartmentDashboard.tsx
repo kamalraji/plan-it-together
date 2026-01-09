@@ -19,6 +19,7 @@ import { FinanceDepartmentDashboard } from './finance';
 import { ContentDepartmentDashboard } from './content';
 import { OperationsDepartmentDashboard } from './operations';
 import { GrowthDepartmentDashboard } from './growth';
+import { VolunteersDepartmentDashboard } from './volunteers';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -71,6 +72,10 @@ export function DepartmentDashboard({
   const isGrowthDepartment = departmentType.includes('growth') || 
     departmentType.includes('outreach') ||
     (departmentType.includes('marketing') && departmentType.includes('comm'));
+
+  // Check if this is a volunteers department - render specialized dashboard
+  const isVolunteersDepartment = departmentType.includes('volunteer') || 
+    departmentType.includes('volunteering');
 
   if (isTechDepartment) {
     return (
@@ -127,6 +132,19 @@ export function DepartmentDashboard({
   if (isGrowthDepartment) {
     return (
       <GrowthDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+      />
+    );
+  }
+
+  if (isVolunteersDepartment) {
+    return (
+      <VolunteersDepartmentDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
