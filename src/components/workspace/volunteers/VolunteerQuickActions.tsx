@@ -15,6 +15,8 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { AssignVolunteersModal } from './AssignVolunteersModal';
+import { AddVolunteerModal } from './AddVolunteerModal';
 
 interface VolunteerQuickActionsProps {
   workspaceId: string;
@@ -24,6 +26,8 @@ interface VolunteerQuickActionsProps {
 
 export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: VolunteerQuickActionsProps) {
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isAddVolunteerModalOpen, setIsAddVolunteerModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const handleOpenCheckIn = () => {
@@ -171,13 +175,11 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
   };
 
   const handleAddVolunteers = () => {
-    toast.info('Opening volunteer invitation form...');
-    // This would typically open a modal or navigate to invite page
+    setIsAddVolunteerModalOpen(true);
   };
 
   const handleAssignShifts = () => {
-    toast.info('Opening shift assignment panel...');
-    queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
+    setIsAssignModalOpen(true);
   };
 
   const checkInAvailable = !!eventId && !!orgSlug;
@@ -236,6 +238,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
   ];
 
   return (
+    <>
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -270,5 +273,9 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
         </div>
       </CardContent>
     </Card>
+    
+    <AssignVolunteersModal open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen} workspaceId={workspaceId} />
+    <AddVolunteerModal open={isAddVolunteerModalOpen} onOpenChange={setIsAddVolunteerModalOpen} workspaceId={workspaceId} />
+    </>
   );
 }

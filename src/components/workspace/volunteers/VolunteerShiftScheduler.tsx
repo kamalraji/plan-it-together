@@ -1,28 +1,22 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Users, Plus, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-
-interface Shift {
-  id: string;
-  name: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  requiredVolunteers: number;
-  assignedVolunteers: number;
-  location: string;
-}
+import { useVolunteerShifts, Shift } from '@/hooks/useVolunteerShifts';
+import { AddShiftModal } from './AddShiftModal';
+import { EditShiftModal } from './EditShiftModal';
 
 interface VolunteerShiftSchedulerProps {
   workspaceId: string;
 }
 
 export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftSchedulerProps) {
-  const { data: shifts = [], isLoading } = useQuery({
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingShift, setEditingShift] = useState<Shift | null>(null);
+  
+  const { shifts, isLoading } = useVolunteerShifts(workspaceId);
     queryKey: ['volunteer-shifts', workspaceId],
     queryFn: async (): Promise<Shift[]> => {
       // Fetch shifts with assignment counts
@@ -96,13 +90,14 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
   const fillPercentage = Math.round((totalAssigned / totalRequired) * 100);
 
   return (
+    <>
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Calendar className="h-4 w-4 text-pink-500" />
           Shift Schedule
         </CardTitle>
-        <Button size="sm" variant="outline" className="gap-1">
+        <Button size="sm" variant="outline" className="gap-1" onClick={() => setIsAddModalOpen(true)}>
           <Plus className="h-3 w-3" />
           Add Shift
         </Button>
@@ -148,8 +143,9 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
             return (
               <div
                 key={shift.id}
+                onClick={() => setEditingShift(shift)}
                 className={cn(
-                  'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/30',
+                  'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/30 cursor-pointer',
                   status === 'filled' && 'border-emerald-500/20 bg-emerald-500/5',
                   status === 'partial' && 'border-amber-500/20 bg-amber-500/5',
                   status === 'critical' && 'border-red-500/20 bg-red-500/5'
@@ -187,5 +183,9 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
         )}
       </CardContent>
     </Card>
+    
+    <AddShiftModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} workspaceId={workspaceId} />
+    <EditShiftModal open={!!editingShift} onOpenChange={(open) => !open && setEditingShift(null)} workspaceId={workspaceId} shift={editingShift} />
+    </>
   );
 }

@@ -3,3 +3,8 @@ export { VolunteerShiftScheduler } from './VolunteerShiftScheduler';
 export { VolunteerRoster } from './VolunteerRoster';
 export { VolunteerCheckInStats } from './VolunteerCheckInStats';
 export { VolunteerQuickActions } from './VolunteerQuickActions';
+export { AddShiftModal } from './AddShiftModal';
+export { EditShiftModal } from './EditShiftModal';
+export { AssignVolunteersModal } from './AssignVolunteersModal';
+export { FullVolunteerRoster } from './FullVolunteerRoster';
+export { AddVolunteerModal } from './AddVolunteerModal';
