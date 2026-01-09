@@ -17,48 +17,6 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   
   const { shifts, isLoading } = useVolunteerShifts(workspaceId);
-    queryKey: ['volunteer-shifts', workspaceId],
-    queryFn: async (): Promise<Shift[]> => {
-      // Fetch shifts with assignment counts
-      const { data: shiftsData, error: shiftsError } = await supabase
-        .from('volunteer_shifts')
-        .select('id, name, date, start_time, end_time, location, required_volunteers')
-        .eq('workspace_id', workspaceId)
-        .order('date', { ascending: true })
-        .order('start_time', { ascending: true });
-
-      if (shiftsError) throw shiftsError;
-      if (!shiftsData?.length) return [];
-
-      // Get assignment counts for each shift
-      const shiftIds = shiftsData.map(s => s.id);
-      const { data: assignmentsData, error: assignmentsError } = await supabase
-        .from('volunteer_assignments')
-        .select('shift_id')
-        .in('shift_id', shiftIds)
-        .neq('status', 'cancelled');
-
-      if (assignmentsError) throw assignmentsError;
-
-      // Count assignments per shift
-      const assignmentCounts = (assignmentsData || []).reduce((acc, a) => {
-        acc[a.shift_id] = (acc[a.shift_id] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-      return shiftsData.map(shift => ({
-        id: shift.id,
-        name: shift.name,
-        date: shift.date,
-        startTime: shift.start_time,
-        endTime: shift.end_time,
-        location: shift.location || '',
-        requiredVolunteers: shift.required_volunteers,
-        assignedVolunteers: assignmentCounts[shift.id] || 0,
-      }));
-    },
-    enabled: !!workspaceId,
-  });
 
   const getShiftStatus = (shift: Shift) => {
     const fillRate = shift.assignedVolunteers / shift.requiredVolunteers;

@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
 import { AssignVolunteersModal } from './AssignVolunteersModal';
 import { AddVolunteerModal } from './AddVolunteerModal';
 
@@ -28,7 +27,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isAddVolunteerModalOpen, setIsAddVolunteerModalOpen] = useState(false);
-  const queryClient = useQueryClient();
+  
 
   const handleOpenCheckIn = () => {
     if (!eventId || !orgSlug) {
