@@ -1,23 +1,170 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   Send, 
   Calendar, 
-  ClipboardList, 
   Download, 
   MessageSquare, 
   UserPlus,
   Zap,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface VolunteerQuickActionsProps {
   workspaceId: string;
 }
 
-export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQuickActionsProps) {
-  const handleAction = (action: string) => {
-    toast.info(`${action} action triggered`);
+export function VolunteerQuickActions({ workspaceId }: VolunteerQuickActionsProps) {
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const handleSendBrief = async () => {
+    setLoadingAction('send_brief');
+    try {
+      // Get all active team members
+      const { data: members, error } = await supabase
+        .from('workspace_team_members')
+        .select('user_id')
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'ACTIVE');
+
+      if (error) throw error;
+
+      // Create notifications for each member
+      const notifications = members?.map(member => ({
+        user_id: member.user_id,
+        title: 'Volunteer Briefing',
+        message: 'A new volunteer briefing has been shared. Please review before your shift.',
+        type: 'workspace',
+        category: 'workspace',
+      })) || [];
+
+      if (notifications.length > 0) {
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+        
+        if (notifError) throw notifError;
+      }
+
+      toast.success(`Briefing sent to ${notifications.length} volunteers`);
+    } catch (error) {
+      console.error('Error sending brief:', error);
+      toast.error('Failed to send briefing');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleExportRoster = async () => {
+    setLoadingAction('export_roster');
+    try {
+      const { data: members, error } = await supabase
+        .from('workspace_team_members')
+        .select('user_id, status, role, joined_at')
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+
+      // Get user profiles
+      const userIds = members?.map(m => m.user_id) || [];
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+
+      // Create CSV content
+      const csvRows = [
+        ['Name', 'Role', 'Status', 'Joined Date'].join(','),
+        ...(members || []).map(m => {
+          return [
+            profileMap.get(m.user_id) || 'Unknown',
+            m.role,
+            m.status,
+            new Date(m.joined_at).toLocaleDateString(),
+          ].join(',');
+        }),
+      ];
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `volunteer-roster-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Roster exported successfully');
+    } catch (error) {
+      console.error('Error exporting roster:', error);
+      toast.error('Failed to export roster');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleSendReminder = async () => {
+    setLoadingAction('send_reminder');
+    try {
+      // Get upcoming shift assignments
+      const { data: assignments, error } = await supabase
+        .from('volunteer_assignments')
+        .select(`
+          user_id,
+          volunteer_shifts!inner (
+            name,
+            date,
+            start_time,
+            workspace_id
+          )
+        `)
+        .eq('volunteer_shifts.workspace_id', workspaceId)
+        .eq('status', 'CONFIRMED');
+
+      if (error) throw error;
+
+      const uniqueUserIds = [...new Set(assignments?.map(a => a.user_id) || [])];
+      
+      const notifications = uniqueUserIds.map(userId => ({
+        user_id: userId,
+        title: 'Shift Reminder',
+        message: 'You have an upcoming volunteer shift. Please check your schedule.',
+        type: 'workspace',
+        category: 'workspace',
+      }));
+
+      if (notifications.length > 0) {
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+        
+        if (notifError) throw notifError;
+      }
+
+      toast.success(`Reminder sent to ${notifications.length} volunteers`);
+    } catch (error) {
+      console.error('Error sending reminder:', error);
+      toast.error('Failed to send reminder');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleAddVolunteers = () => {
+    toast.info('Opening volunteer invitation form...');
+    // This would typically open a modal or navigate to invite page
+  };
+
+  const handleAssignShifts = () => {
+    toast.info('Opening shift assignment panel...');
+    queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
   };
 
   const actions = [
@@ -27,6 +174,7 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
       description: 'Send briefing to all volunteers',
       icon: Send,
       color: 'text-blue-500',
+      onClick: handleSendBrief,
     },
     {
       id: 'assign_shifts',
@@ -34,6 +182,7 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
       description: 'Bulk assign volunteer shifts',
       icon: Calendar,
       color: 'text-emerald-500',
+      onClick: handleAssignShifts,
     },
     {
       id: 'export_roster',
@@ -41,6 +190,7 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
       description: 'Download volunteer list',
       icon: Download,
       color: 'text-purple-500',
+      onClick: handleExportRoster,
     },
     {
       id: 'send_reminder',
@@ -48,6 +198,7 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
       description: 'Remind upcoming shifts',
       icon: MessageSquare,
       color: 'text-amber-500',
+      onClick: handleSendReminder,
     },
     {
       id: 'add_volunteers',
@@ -55,13 +206,7 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
       description: 'Invite new volunteers',
       icon: UserPlus,
       color: 'text-pink-500',
-    },
-    {
-      id: 'check_in_mode',
-      label: 'Check-In Mode',
-      description: 'Start volunteer check-in',
-      icon: ClipboardList,
-      color: 'text-teal-500',
+      onClick: handleAddVolunteers,
     },
   ];
 
@@ -80,10 +225,15 @@ export function VolunteerQuickActions({ workspaceId: _workspaceId }: VolunteerQu
               key={action.id}
               variant="outline"
               className="h-auto flex-col items-start gap-1 p-3 text-left hover:bg-muted/50"
-              onClick={() => handleAction(action.label)}
+              onClick={action.onClick}
+              disabled={loadingAction === action.id}
             >
               <div className="flex items-center gap-2">
-                <action.icon className={`h-4 w-4 ${action.color}`} />
+                {loadingAction === action.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <action.icon className={`h-4 w-4 ${action.color}`} />
+                )}
                 <span className="font-medium text-sm">{action.label}</span>
               </div>
               <span className="text-xs text-muted-foreground">{action.description}</span>

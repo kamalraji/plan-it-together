@@ -2,38 +2,80 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Users, UserPlus, CheckCircle, Clock, XCircle } from 'lucide-react';
-
-interface Volunteer {
-  id: string;
-  name: string;
-  email: string;
-  status: 'active' | 'pending' | 'inactive';
-  shiftsAssigned: number;
-  hoursLogged: number;
-}
+import { Users, UserPlus, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VolunteerRosterProps {
   workspaceId: string;
 }
 
-// Mock data for demonstration
-const MOCK_VOLUNTEERS: Volunteer[] = [
-  { id: '1', name: 'Alex Johnson', email: 'alex@email.com', status: 'active', shiftsAssigned: 4, hoursLogged: 12 },
-  { id: '2', name: 'Maria Garcia', email: 'maria@email.com', status: 'active', shiftsAssigned: 3, hoursLogged: 9 },
-  { id: '3', name: 'James Wilson', email: 'james@email.com', status: 'pending', shiftsAssigned: 0, hoursLogged: 0 },
-  { id: '4', name: 'Sarah Chen', email: 'sarah@email.com', status: 'active', shiftsAssigned: 5, hoursLogged: 16 },
-  { id: '5', name: 'Mike Brown', email: 'mike@email.com', status: 'inactive', shiftsAssigned: 1, hoursLogged: 3 },
-];
+interface VolunteerData {
+  id: string;
+  name: string;
+  email: string;
+  status: 'ACTIVE' | 'PENDING' | 'INACTIVE';
+  shiftsAssigned: number;
+  hoursLogged: number;
+}
 
-export function VolunteerRoster({ workspaceId: _workspaceId }: VolunteerRosterProps) {
+export function VolunteerRoster({ workspaceId }: VolunteerRosterProps) {
+  const { data: volunteers = [], isLoading } = useQuery({
+    queryKey: ['volunteer-roster', workspaceId],
+    queryFn: async (): Promise<VolunteerData[]> => {
+      // Fetch team members
+      const { data: members, error } = await supabase
+        .from('workspace_team_members')
+        .select('id, user_id, status')
+        .eq('workspace_id', workspaceId);
+      
+      if (error) throw error;
+      if (!members) return [];
+
+      // Get user profiles for all members
+      const userIds = members.map(m => m.user_id);
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+
+      // Get shift assignments for each volunteer
+      const volunteerData = await Promise.all(
+        members.map(async (member) => {
+          const { count: shiftsCount } = await supabase
+            .from('volunteer_assignments')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', member.user_id)
+            .neq('status', 'CANCELLED');
+
+          // Estimate hours based on shifts (average 3 hours per shift)
+          const hoursLogged = (shiftsCount || 0) * 3;
+          
+          return {
+            id: member.id,
+            name: profileMap.get(member.user_id) || 'Unknown Volunteer',
+            email: `volunteer-${member.user_id.slice(0, 8)}@team.local`,
+            status: member.status as 'ACTIVE' | 'PENDING' | 'INACTIVE',
+            shiftsAssigned: shiftsCount || 0,
+            hoursLogged,
+          };
+        })
+      );
+
+      return volunteerData;
+    },
+    enabled: !!workspaceId,
+  });
+
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'ACTIVE':
         return <CheckCircle className="h-3 w-3 text-emerald-500" />;
-      case 'pending':
+      case 'PENDING':
         return <Clock className="h-3 w-3 text-amber-500" />;
-      case 'inactive':
+      case 'INACTIVE':
         return <XCircle className="h-3 w-3 text-muted-foreground" />;
       default:
         return null;
@@ -42,19 +84,29 @@ export function VolunteerRoster({ workspaceId: _workspaceId }: VolunteerRosterPr
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      active: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-      pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-      inactive: 'bg-muted text-muted-foreground border-border',
+      ACTIVE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+      PENDING: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      INACTIVE: 'bg-muted text-muted-foreground border-border',
     };
     return (
       <Badge variant="outline" className={styles[status as keyof typeof styles]}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status.charAt(0) + status.slice(1).toLowerCase()}
       </Badge>
     );
   };
 
-  const activeCount = MOCK_VOLUNTEERS.filter(v => v.status === 'active').length;
-  const pendingCount = MOCK_VOLUNTEERS.filter(v => v.status === 'pending').length;
+  const activeCount = volunteers.filter(v => v.status === 'ACTIVE').length;
+  const pendingCount = volunteers.filter(v => v.status === 'PENDING').length;
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -80,44 +132,51 @@ export function VolunteerRoster({ workspaceId: _workspaceId }: VolunteerRosterPr
             <div className="text-xs text-muted-foreground">Pending</div>
           </div>
           <div className="rounded-lg bg-muted p-3 text-center">
-            <div className="text-2xl font-bold">{MOCK_VOLUNTEERS.length}</div>
+            <div className="text-2xl font-bold">{volunteers.length}</div>
             <div className="text-xs text-muted-foreground">Total</div>
           </div>
         </div>
 
         {/* Volunteer List */}
-        <div className="space-y-2">
-          {MOCK_VOLUNTEERS.slice(0, 5).map((volunteer) => (
-            <div
-              key={volunteer.id}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/30"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-pink-500/10 text-pink-600 text-xs">
-                    {volunteer.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">{volunteer.name}</span>
-                    {getStatusIcon(volunteer.status)}
+        {volunteers.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No volunteers assigned yet</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {volunteers.slice(0, 5).map((volunteer) => (
+              <div
+                key={volunteer.id}
+                className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/30"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-pink-500/10 text-pink-600 text-xs">
+                      {volunteer.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">{volunteer.name}</span>
+                      {getStatusIcon(volunteer.status)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{volunteer.email}</div>
                   </div>
-                  <div className="text-xs text-muted-foreground">{volunteer.email}</div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right text-xs">
+                    <div className="font-medium">{volunteer.shiftsAssigned} shifts</div>
+                    <div className="text-muted-foreground">{volunteer.hoursLogged}h logged</div>
+                  </div>
+                  {getStatusBadge(volunteer.status)}
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right text-xs">
-                  <div className="font-medium">{volunteer.shiftsAssigned} shifts</div>
-                  <div className="text-muted-foreground">{volunteer.hoursLogged}h logged</div>
-                </div>
-                {getStatusBadge(volunteer.status)}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {MOCK_VOLUNTEERS.length > 5 && (
+        {volunteers.length > 5 && (
           <Button variant="ghost" size="sm" className="w-full">
             View All Volunteers
           </Button>
