@@ -82,5 +82,79 @@ export function getCanvasStyles(primaryColor: string): string[] {
     // Shared
     '.muted { color: #64748b; font-size: 0.9rem; }',
     '.countdown .muted, .cta-section .muted { color: rgba(255,255,255,0.7); }',
+
+    // =====================================================
+    // PublicEventPage Template Styles
+    // =====================================================
+    
+    // Hero Section - matches PublicEventPage design
+    '.public-hero { position: relative; overflow: hidden; }',
+    '.public-hero-overlay { background: linear-gradient(to bottom, rgba(37, 99, 235, 0.9), rgba(37, 99, 235, 0.7)); color: #f9fafb; }',
+    '.public-hero-container { max-width: 1200px; margin: 0 auto; padding: 3rem 1rem; }',
+    '@media (min-width: 640px) { .public-hero-container { padding: 5rem 1rem; } }',
+    
+    // Organization badge
+    '.org-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.375rem 0.75rem; border-radius: 999px; font-size: 0.875rem; margin-bottom: 1rem; }',
+    '.org-badge:hover { background: rgba(255,255,255,0.3); }',
+    '.org-badge-text { color: #f9fafb; }',
+    
+    // Hero typography
+    '.public-hero-title { font-size: 1.875rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.2; }',
+    '@media (min-width: 640px) { .public-hero-title { font-size: 2.25rem; } }',
+    '@media (min-width: 1024px) { .public-hero-title { font-size: 3rem; } }',
+    '.public-hero-description { font-size: 1.125rem; color: rgba(249, 250, 251, 0.9); max-width: 48rem; margin-bottom: 1.5rem; line-height: 1.6; }',
+    '@media (min-width: 640px) { .public-hero-description { font-size: 1.25rem; } }',
+    
+    // Info chips
+    '.info-chips { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem; }',
+    '.info-chip { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.875rem; color: #f9fafb; }',
+    '.chip-icon { font-size: 1rem; }',
+    
+    // Hero CTA
+    '.hero-cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }',
+    '.cta-primary { display: inline-block; padding: 0.75rem 1.5rem; background: #f1f5f9; color: #0f172a; font-weight: 600; border-radius: 0.5rem; font-size: 1rem; transition: opacity 0.2s; }',
+    '.cta-primary:hover { opacity: 0.9; }',
+    '.cta-secondary { display: inline-block; padding: 0.75rem 1.5rem; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #f9fafb; border-radius: 0.5rem; font-size: 1rem; transition: background 0.2s; }',
+    '.cta-secondary:hover { background: rgba(255,255,255,0.1); }',
+    
+    // Details Section
+    '.public-details { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1rem; }',
+    '.details-container { display: grid; gap: 2rem; }',
+    '@media (min-width: 1024px) { .details-container { grid-template-columns: 2fr 1fr; } }',
+    
+    // Main content
+    '.details-main { display: grid; gap: 1.5rem; }',
+    '.content-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem; }',
+    '.card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: #0f172a; }',
+    '.card-content { color: #64748b; line-height: 1.7; margin-bottom: 0.75rem; white-space: pre-line; }',
+    
+    // Highlights list
+    '.highlights-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }',
+    '.highlight-item { color: #475569; font-size: 0.95rem; padding: 0.5rem 0; }',
+    
+    // Sidebar
+    '.details-sidebar { display: grid; gap: 1.5rem; align-content: start; }',
+    '.sidebar-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; }',
+    '.sidebar-title { font-size: 1rem; font-weight: 600; padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; color: #0f172a; margin: 0; }',
+    '.sidebar-content { padding: 1rem 1.5rem; display: grid; gap: 1rem; }',
+    
+    // Detail rows
+    '.detail-row { display: flex; align-items: flex-start; gap: 0.75rem; }',
+    '.detail-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 0.125rem; color: #64748b; }',
+    '.detail-text { flex: 1; }',
+    '.detail-label { font-weight: 500; color: #0f172a; margin-bottom: 0.125rem; font-size: 0.875rem; }',
+    '.detail-value { color: #64748b; font-size: 0.875rem; }',
+    '.detail-value-muted { color: #94a3b8; font-size: 0.875rem; }',
+    
+    // Sidebar CTA
+    '.sidebar-cta { display: block; text-align: center; padding: 0.875rem 1.5rem; background: var(--th-primary); color: #f9fafb; font-weight: 500; margin: 0.5rem 1rem 1rem; border-radius: 0.5rem; transition: opacity 0.2s; }',
+    '.sidebar-cta:hover { opacity: 0.9; }',
+    
+    // Organizer info
+    '.organizer-info { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; }',
+    '.organizer-avatar { width: 3rem; height: 3rem; border-radius: 0.5rem; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 600; color: #475569; }',
+    '.organizer-details { flex: 1; }',
+    '.organizer-name { font-weight: 500; color: #0f172a; font-size: 0.95rem; margin-bottom: 0.125rem; }',
+    '.organizer-link { font-size: 0.75rem; color: #64748b; }',
   ];
 }

@@ -15,6 +15,7 @@ import {
   galleryBlockHtml,
   ctaBlockHtml,
   venueBlockHtml,
+  getInitialPublicEventTemplate,
 } from './pageBuilderBlocks';
 import { getCanvasStyles } from './pageBuilderStyles';
 import { slugify, extractTitleFromHtml, extractDescriptionFromHtml } from './pageBuilderUtils';
@@ -42,6 +43,7 @@ interface EventData {
   branding: any;
   existingLanding: LandingPageData | null;
   existingSlug: string;
+  organizationName?: string;
 }
 
 interface UsePageBuilderOptions {
@@ -76,7 +78,10 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
       try {
         const { data: eventRow, error } = await supabase
           .from('events')
-          .select('id, name, description, organization_id, branding, landing_page_data, landing_page_slug')
+          .select(`
+            id, name, description, organization_id, branding, landing_page_data, landing_page_slug,
+            organizations:organization_id ( name )
+          `)
           .eq('id', eventId)
           .maybeSingle();
 
@@ -91,12 +96,15 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
           return;
         }
 
+        const org = eventRow.organizations as { name: string } | null;
+
         const data: EventData = {
           name: eventRow.name,
           description: eventRow.description || '',
           branding: (eventRow.branding as any) || {},
           existingLanding: (eventRow as any).landing_page_data ?? null,
           existingSlug: (eventRow as any).landing_page_slug ?? '',
+          organizationName: org?.name,
         };
 
         setEventData(data);
@@ -120,7 +128,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   useEffect(() => {
     if (loading || !eventData || !containerRef.current || editorRef.current) return;
 
-    const { name, description, branding, existingLanding } = eventData;
+    const { name, description, branding, existingLanding, organizationName } = eventData;
     const primaryColor = branding?.primaryColor || '#2563eb';
     const logoUrl = branding?.logoUrl as string | undefined;
 
@@ -428,11 +436,12 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         editor.setStyle(existingLanding.css);
       }
     } else {
-      editor.setComponents(`
-        ${heroBlockHtml({ name, description, logoUrl })}
-        ${scheduleBlockHtml()}
-        ${registrationBlockHtml()}
-      `);
+      // Use PublicEventPage-style template as initial canvas
+      editor.setComponents(getInitialPublicEventTemplate({ 
+        name, 
+        description, 
+        organizationName 
+      }));
     }
 
     // Keyboard shortcuts

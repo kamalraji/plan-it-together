@@ -6,6 +6,7 @@ interface HeroBlockProps {
   name: string;
   description: string;
   logoUrl?: string;
+  organizationName?: string;
 }
 
 export function heroBlockHtml({ name, description, logoUrl }: HeroBlockProps): string {
@@ -34,6 +35,130 @@ export function heroBlockHtml({ name, description, logoUrl }: HeroBlockProps): s
       </div>
     </div>
   </header>
+  `;
+}
+
+/**
+ * Initial template that mirrors the PublicEventPage layout
+ */
+export function getInitialPublicEventTemplate({ name, description, organizationName }: Omit<HeroBlockProps, 'logoUrl'>): string {
+  const safeName = name || 'Your Event Name';
+  const safeDescription = description || 'Add a compelling description that explains what your event is about and why people should attend.';
+  const orgName = organizationName || 'Your Organization';
+
+  return `
+  <!-- Hero Section - matches PublicEventPage hero -->
+  <section id="hero" class="public-hero" data-type="hero">
+    <div class="public-hero-overlay">
+      <div class="public-hero-container">
+        <!-- Organization badge -->
+        <div class="org-badge">
+          <span class="org-badge-text">Hosted by ${orgName}</span>
+        </div>
+
+        <h1 class="public-hero-title">${safeName}</h1>
+        
+        <p class="public-hero-description">${safeDescription}</p>
+
+        <!-- Quick info chips -->
+        <div class="info-chips">
+          <div class="info-chip">
+            <span class="chip-icon">📅</span>
+            <span>Jan 15, 2026</span>
+          </div>
+          <div class="info-chip">
+            <span class="chip-icon">🕐</span>
+            <span>10:00 AM</span>
+          </div>
+          <div class="info-chip">
+            <span class="chip-icon">🌐</span>
+            <span>Virtual Event</span>
+          </div>
+          <div class="info-chip">
+            <span class="chip-icon">👥</span>
+            <span>100 spots</span>
+          </div>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="hero-cta-row">
+          <a href="#register" class="cta-primary">Register Now</a>
+          <a href="#" class="cta-secondary">Share Event</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Section - matches PublicEventPage layout -->
+  <section id="details" class="public-details">
+    <div class="details-container">
+      <!-- Main content area (2/3 width) -->
+      <div class="details-main">
+        <!-- About Card -->
+        <div id="about" class="content-card">
+          <h2 class="card-title">About This Event</h2>
+          <p class="card-content">${safeDescription}</p>
+          <p class="card-content">Join us for an incredible experience where you'll learn from industry experts, network with peers, and discover new opportunities. This event is designed to provide valuable insights and practical knowledge that you can apply immediately.</p>
+        </div>
+
+        <!-- Highlights Card -->
+        <div class="content-card">
+          <h2 class="card-title">What You'll Learn</h2>
+          <ul class="highlights-list">
+            <li class="highlight-item">✓ Industry best practices and emerging trends</li>
+            <li class="highlight-item">✓ Hands-on workshops and interactive sessions</li>
+            <li class="highlight-item">✓ Networking opportunities with peers and experts</li>
+            <li class="highlight-item">✓ Exclusive resources and takeaways</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar (1/3 width) -->
+      <aside class="details-sidebar">
+        <!-- Event Details Card -->
+        <div id="register" class="sidebar-card">
+          <h3 class="sidebar-title">Event Details</h3>
+          <div class="sidebar-content">
+            <div class="detail-row">
+              <span class="detail-icon">📅</span>
+              <div class="detail-text">
+                <p class="detail-label">Date & Time</p>
+                <p class="detail-value">Wednesday, January 15, 2026</p>
+                <p class="detail-value-muted">10:00 AM - 4:00 PM</p>
+              </div>
+            </div>
+            <div class="detail-row">
+              <span class="detail-icon">📍</span>
+              <div class="detail-text">
+                <p class="detail-label">Location</p>
+                <p class="detail-value">Online Event</p>
+              </div>
+            </div>
+            <div class="detail-row">
+              <span class="detail-icon">👥</span>
+              <div class="detail-text">
+                <p class="detail-label">Capacity</p>
+                <p class="detail-value">100 attendees</p>
+              </div>
+            </div>
+          </div>
+          <a href="#" class="sidebar-cta">View Full Details</a>
+        </div>
+
+        <!-- Organizer Card -->
+        <div id="organizer" class="sidebar-card">
+          <h3 class="sidebar-title">Organized by</h3>
+          <div class="organizer-info">
+            <div class="organizer-avatar">${orgName.charAt(0)}</div>
+            <div class="organizer-details">
+              <p class="organizer-name">${orgName}</p>
+              <p class="organizer-link">View profile →</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
   `;
 }
 
