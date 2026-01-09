@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { PageHeader } from '../PageHeader';
-import { XMarkIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
@@ -15,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import {
@@ -28,24 +27,45 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { AfCard } from '@/components/attendflow/AfCard';
 
-// Section header component for collapsible sections
+// Modern section header with icon
 const SectionHeader: React.FC<{
   title: string;
   description: string;
+  icon: React.ElementType;
   isOpen: boolean;
-}> = ({ title, description, isOpen }) => (
-  <div className="flex items-center justify-between w-full py-4">
-    <div className="flex-1">
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
+  stepNumber: number;
+}> = ({ title, description, icon: Icon, isOpen, stepNumber }) => (
+  <div className="flex items-center gap-4 w-full py-4 px-2">
+    <div className={cn(
+      "flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300",
+      isOpen 
+        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
+        : "bg-muted text-muted-foreground"
+    )}>
+      <Icon className="h-5 w-5" />
     </div>
-    {isOpen ? (
-      <ChevronDownIcon className="h-5 w-5 text-muted-foreground transition-transform" />
-    ) : (
-      <ChevronRightIcon className="h-5 w-5 text-muted-foreground transition-transform" />
-    )}
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2">
+        <span className={cn(
+          "text-xs font-medium px-2 py-0.5 rounded-full transition-colors",
+          isOpen ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+        )}>
+          Step {stepNumber}
+        </span>
+      </div>
+      <h3 className="text-base font-semibold text-foreground mt-0.5">{title}</h3>
+      <p className="text-sm text-muted-foreground truncate">{description}</p>
+    </div>
+    <div className={cn(
+      "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
+      isOpen ? "bg-primary/10 rotate-0" : "bg-transparent -rotate-90"
+    )}>
+      <ChevronDownIcon className={cn(
+        "h-5 w-5 transition-transform duration-300",
+        isOpen ? "text-primary" : "text-muted-foreground"
+      )} />
+    </div>
   </div>
 );
 
@@ -113,7 +133,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     basic: true,
-    schedule: true,
+    schedule: false,
     branding: false,
     cta: false,
   });
@@ -212,11 +232,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     loadEvent();
   }, [mode, eventId, navigate, reset, toast]);
 
-  const pageTitle = mode === 'create' ? 'Create your event' : 'Edit event details';
-  const pageSubtitle =
-    mode === 'create'
-      ? 'Fill in the details below to create your event.'
-      : 'Update your event information.';
+  const pageTitle = mode === 'create' ? 'Create Event' : 'Edit Event';
 
   const onSubmit = async (values: EventFormValues) => {
     if (isSubmitting) return;
@@ -333,48 +349,84 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     }
   };
 
-  const pageActions = [
-    {
-      label: 'Cancel',
-      action: () => navigate(listPath),
-      icon: XMarkIcon,
-      variant: 'secondary' as const,
-    },
-    {
-      label: mode === 'create' ? 'Save & continue to workspace' : 'Save changes',
-      action: () => {
-        const formEl = document.getElementById('event-form') as HTMLFormElement | null;
-        if (formEl) {
-          if (typeof formEl.requestSubmit === 'function') {
-            formEl.requestSubmit();
-          } else {
-            formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-          }
-        }
-      },
-      icon: CheckIcon,
-      variant: 'primary' as const,
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-background af-grid-bg px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <PageHeader title={pageTitle} subtitle={pageSubtitle} actions={pageActions} />
+    <div className="w-full space-y-6 pb-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-border/50 p-6 sm:p-8">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-accent/20 blur-3xl" />
+        
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+              <SparklesIcon className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{pageTitle}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {mode === 'create' 
+                  ? 'Fill in the details to create your event' 
+                  : 'Update your event information'}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => navigate(listPath)}
+              className="gap-2"
+            >
+              <XMarkIcon className="h-4 w-4" />
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                const formEl = document.getElementById('event-form') as HTMLFormElement | null;
+                if (formEl) {
+                  if (typeof formEl.requestSubmit === 'function') {
+                    formEl.requestSubmit();
+                  } else {
+                    formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                  }
+                }
+              }}
+              disabled={isSubmitting || myOrganizations.length === 0}
+              className="gap-2 shadow-lg shadow-primary/25"
+            >
+              <CheckIcon className="h-4 w-4" />
+              {isSubmitting
+                ? 'Saving...'
+                : mode === 'create'
+                  ? 'Save & Continue'
+                  : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      </div>
 
-        <AfCard className="p-5 sm:p-6">
-          {isLoadingEvent ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">Loading event...</div>
-          ) : (
-            <Form {...form}>
-              <form
-                id="event-form"
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4"
-                noValidate
-              >
-                {serverError && (
-                  <Alert variant="destructive" className="mb-4">
+      {/* Main Form */}
+      <div className="rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        {isLoadingEvent ? (
+          <div className="py-16 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
+            </div>
+            <p className="text-sm text-muted-foreground">Loading event...</p>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form
+              id="event-form"
+              onSubmit={handleSubmit(onSubmit)}
+              className="divide-y divide-border/50"
+              noValidate
+            >
+              {serverError && (
+                <div className="p-4 sm:p-6">
+                  <Alert variant="destructive">
                     <AlertTitle>Failed to save event</AlertTitle>
                     <AlertDescription>
                       <p>{serverError}</p>
@@ -414,37 +466,43 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       )}
                     </AlertDescription>
                   </Alert>
-                )}
+                </div>
+              )}
 
-                {/* Basic Information Section */}
-                <Collapsible
-                  open={openSections.basic}
-                  onOpenChange={() => toggleSection('basic')}
-                  className="border border-border rounded-xl"
-                >
-                  <CollapsibleTrigger className="w-full px-4 hover:bg-muted/50 rounded-t-xl transition-colors">
-                    <SectionHeader
-                      title="Basic Information"
-                      description="Name, organization, description, and format"
-                      isOpen={openSections.basic}
-                    />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="px-4 pb-6 space-y-6">
-                    <FormItem>
-                      <FormLabel>Organization</FormLabel>
-                      <FormDescription>
-                        Creating this event under your current organization.
-                      </FormDescription>
-                      <div className="mt-1 flex h-12 w-full items-center rounded-xl border-2 border-border bg-muted/50 px-4 py-2 text-sm">
-                        {isLoadingOrganizations ? (
-                          <span className="text-muted-foreground">Loading...</span>
-                        ) : currentOrganization ? (
-                          <span className="font-medium">{currentOrganization.name}</span>
-                        ) : (
-                          <span className="text-muted-foreground">No organization found</span>
-                        )}
+              {/* Basic Information Section */}
+              <Collapsible
+                open={openSections.basic}
+                onOpenChange={() => toggleSection('basic')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Basic Information"
+                    description="Name, organization, description, and format"
+                    icon={SparklesIcon}
+                    isOpen={openSections.basic}
+                    stepNumber={1}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
+                    {/* Organization Display */}
+                    <div className="rounded-xl border border-border/50 bg-muted/30 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <Building2 className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Creating under</p>
+                          {isLoadingOrganizations ? (
+                            <p className="text-sm text-muted-foreground">Loading...</p>
+                          ) : currentOrganization ? (
+                            <p className="font-medium text-foreground">{currentOrganization.name}</p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No organization found</p>
+                          )}
+                        </div>
                       </div>
-                    </FormItem>
+                    </div>
 
                     <FormField
                       control={control}
@@ -452,12 +510,17 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Event name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="text" 
+                              placeholder="e.g. Campus DevFest 2025" 
+                              className="h-11"
+                              {...field} 
+                            />
+                          </FormControl>
                           <FormDescription>
                             This appears on your landing page and emails — keep it short and clear.
                           </FormDescription>
-                          <FormControl>
-                            <Input type="text" placeholder="e.g. Campus DevFest 2025" {...field} />
-                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -469,16 +532,17 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Description *</FormLabel>
-                          <FormDescription>
-                            A quick overview that helps attendees understand who this event is for.
-                          </FormDescription>
                           <FormControl>
                             <Textarea
                               rows={4}
                               placeholder="Share what makes this event special"
+                              className="resize-none"
                               {...field}
                             />
                           </FormControl>
+                          <FormDescription>
+                            A quick overview that helps attendees understand who this event is for.
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -491,19 +555,19 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Event mode *</FormLabel>
-                            <FormDescription>
-                              Choose how people will join — online, in-person, or a mix of both.
-                            </FormDescription>
                             <FormControl>
                               <select
-                                className="mt-1 w-full rounded-xl border-2 border-border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 {...field}
                               >
-                                <option value="ONLINE">Online</option>
-                                <option value="OFFLINE">Offline</option>
-                                <option value="HYBRID">Hybrid</option>
+                                <option value="ONLINE">🌐 Online</option>
+                                <option value="OFFLINE">📍 In-Person</option>
+                                <option value="HYBRID">🔄 Hybrid</option>
                               </select>
                             </FormControl>
+                            <FormDescription>
+                              Choose how people will join.
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -515,34 +579,42 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Capacity</FormLabel>
-                            <FormDescription>
-                              Optional: set a soft cap to help us track registrations.
-                            </FormDescription>
                             <FormControl>
-                              <Input type="number" placeholder="e.g. 150" {...field} />
+                              <Input 
+                                type="number" 
+                                placeholder="e.g. 150" 
+                                className="h-11"
+                                {...field} 
+                              />
                             </FormControl>
+                            <FormDescription>
+                              Optional: set a soft cap.
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
 
-                {/* Schedule Section */}
-                <Collapsible
-                  open={openSections.schedule}
-                  onOpenChange={() => toggleSection('schedule')}
-                  className="border border-border rounded-xl"
-                >
-                  <CollapsibleTrigger className="w-full px-4 hover:bg-muted/50 rounded-t-xl transition-colors">
-                    <SectionHeader
-                      title="Date & Schedule"
-                      description="When your event starts and ends"
-                      isOpen={openSections.schedule}
-                    />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="px-4 pb-6 space-y-6">
+              {/* Schedule Section */}
+              <Collapsible
+                open={openSections.schedule}
+                onOpenChange={() => toggleSection('schedule')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Date & Schedule"
+                    description="When your event starts and ends"
+                    icon={CalendarDaysIcon}
+                    isOpen={openSections.schedule}
+                    stepNumber={2}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <FormField
                         control={control}
@@ -559,7 +631,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                       type="button"
                                       variant="outline"
                                       className={cn(
-                                        'w-full justify-start text-left font-normal',
+                                        'w-full h-11 justify-start text-left font-normal',
                                         !dateValue && 'text-muted-foreground',
                                       )}
                                     >
@@ -567,7 +639,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                       {dateValue ? (
                                         format(dateValue, 'PPP p')
                                       ) : (
-                                        <span>Select when your event kicks off</span>
+                                        <span>Select start date</span>
                                       )}
                                     </Button>
                                   </PopoverTrigger>
@@ -589,10 +661,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                   </PopoverContent>
                                 </Popover>
                               </FormControl>
-                              <FormDescription>
-                                We'll store this in your local timezone and display it clearly for
-                                attendees.
-                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           );
@@ -614,7 +682,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                       type="button"
                                       variant="outline"
                                       className={cn(
-                                        'w-full justify-start text-left font-normal',
+                                        'w-full h-11 justify-start text-left font-normal',
                                         !dateValue && 'text-muted-foreground',
                                       )}
                                     >
@@ -622,7 +690,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                       {dateValue ? (
                                         format(dateValue, 'PPP p')
                                       ) : (
-                                        <span>When should things wrap up?</span>
+                                        <span>Select end date</span>
                                       )}
                                     </Button>
                                   </PopoverTrigger>
@@ -644,107 +712,139 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                                   </PopoverContent>
                                 </Popover>
                               </FormControl>
-                              <FormDescription>
-                                Must be after your start time so attendees don't get confused.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
-                      />
-
-                      <FormField
-                        control={control}
-                        name="registrationDeadline"
-                        render={({ field }) => {
-                          const dateValue = field.value ? new Date(field.value) : undefined;
-                          return (
-                            <FormItem>
-                              <FormLabel>Registration deadline</FormLabel>
-                              <FormControl>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className={cn(
-                                        'w-full justify-start text-left font-normal',
-                                        !dateValue && 'text-muted-foreground',
-                                      )}
-                                    >
-                                      <CalendarIcon className="mr-2 h-4 w-4" />
-                                      {dateValue ? (
-                                        format(dateValue, 'PPP p')
-                                      ) : (
-                                        <span>Optional: last moment people can sign up</span>
-                                      )}
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                      mode="single"
-                                      selected={dateValue}
-                                      onSelect={(date) => {
-                                        if (!date) {
-                                          field.onChange('');
-                                          return;
-                                        }
-                                        const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                        field.onChange(formatted);
-                                      }}
-                                      initialFocus
-                                      className={cn('p-3 pointer-events-auto')}
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                              </FormControl>
-                              <FormDescription>
-                                If set, registrations will automatically close after this time.
-                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           );
                         }}
                       />
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
 
-                {/* Branding Section */}
-                <Collapsible
-                  open={openSections.branding}
-                  onOpenChange={() => toggleSection('branding')}
-                  className="border border-border rounded-xl"
-                >
-                  <CollapsibleTrigger className="w-full px-4 hover:bg-muted/50 rounded-t-xl transition-colors">
-                    <SectionHeader
-                      title="Branding"
-                      description="Visual identity for your event page"
-                      isOpen={openSections.branding}
-                    />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="px-4 pb-6 space-y-6">
                     <FormField
                       control={control}
-                      name="primaryColor"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Primary color</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="color"
-                              className="h-10 w-24 cursor-pointer px-2 py-1"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            We'll use this as the accent for buttons and highlights on your event
-                            page.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      name="registrationDeadline"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <FormItem>
+                            <FormLabel>Registration deadline</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full h-11 justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Optional: set registration cutoff</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>
+                              If set, registrations will automatically close after this time.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Branding Section */}
+              <Collapsible
+                open={openSections.branding}
+                onOpenChange={() => toggleSection('branding')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Branding"
+                    description="Visual identity for your event page"
+                    icon={PaintBrushIcon}
+                    isOpen={openSections.branding}
+                    stepNumber={3}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="primaryColor"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary color</FormLabel>
+                            <FormControl>
+                              <div className="flex items-center gap-3">
+                                <Input
+                                  type="color"
+                                  className="h-11 w-16 cursor-pointer p-1"
+                                  {...field}
+                                />
+                                <Input
+                                  type="text"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  placeholder="#2563eb"
+                                  className="h-11 flex-1 font-mono text-sm"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              Accent color for buttons and highlights.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="heroSubtitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero subtitle</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="A catchy tagline"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Short elevator pitch under your title.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     <FormField
                       control={control}
@@ -756,34 +856,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                             <Input
                               type="url"
                               placeholder="https://example.com/logo.png"
+                              className="h-11"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription>
-                            Optional: paste a direct image URL and we'll show it in the header of
-                            your event page.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name="heroSubtitle"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Hero subtitle</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="One line that helps people instantly get the vibe"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Short and friendly works best here — think of it as the elevator pitch
-                            under your title.
+                            Optional: paste a direct image URL for the header.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -800,34 +878,37 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                             <Input
                               type="url"
                               placeholder="https://example.com/hero-banner.jpg"
+                              className="h-11"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription>
-                            Optional: use a wide image and we'll handle the rest for the top of your
-                            landing page.
+                            Optional: wide image for the top of your landing page.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </CollapsibleContent>
-                </Collapsible>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
 
-                {/* CTA Section */}
-                <Collapsible
-                  open={openSections.cta}
-                  onOpenChange={() => toggleSection('cta')}
-                  className="border border-border rounded-xl"
-                >
-                  <CollapsibleTrigger className="w-full px-4 hover:bg-muted/50 rounded-t-xl transition-colors">
-                    <SectionHeader
-                      title="Call to Action"
-                      description="Button labels for your event page"
-                      isOpen={openSections.cta}
-                    />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="px-4 pb-6 space-y-6">
+              {/* CTA Section */}
+              <Collapsible
+                open={openSections.cta}
+                onOpenChange={() => toggleSection('cta')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Call to Action"
+                    description="Button labels for your event page"
+                    icon={CursorArrowRaysIcon}
+                    isOpen={openSections.cta}
+                    stepNumber={4}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <FormField
                         control={control}
@@ -836,10 +917,15 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           <FormItem>
                             <FormLabel>Primary button label</FormLabel>
                             <FormControl>
-                              <Input type="text" placeholder="Register now" {...field} />
+                              <Input 
+                                type="text" 
+                                placeholder="Register now" 
+                                className="h-11"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormDescription>
-                              This is the main call-to-action visitors will see on your event hero.
+                              Main call-to-action on your event hero.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -855,52 +941,52 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                             <FormControl>
                               <Input
                                 type="text"
-                                placeholder="Learn more (optional)"
+                                placeholder="Learn more"
+                                className="h-11"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription>
-                              Optional: a softer action that can point to a schedule, FAQ, or extra
-                              details.
+                              Optional: softer action for schedule, FAQ, etc.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
 
-                {/* Form Actions */}
-                <div className="flex items-center justify-end gap-3 border-t border-border pt-6 mt-4">
-                  <Button type="button" variant="ghost" onClick={() => navigate(listPath)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="default"
-                    disabled={isSubmitting || myOrganizations.length === 0}
-                  >
-                    {isSubmitting
-                      ? 'Saving...'
-                      : mode === 'create'
-                        ? 'Save & continue to workspace'
-                        : 'Save changes'}
-                  </Button>
+              {/* Form Actions - Sticky Footer */}
+              <div className="sticky bottom-0 bg-card/95 backdrop-blur-sm border-t border-border/50 p-4 sm:p-6">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm text-muted-foreground hidden sm:block">
+                    {mode === 'create' 
+                      ? 'Fill required fields to continue' 
+                      : 'Changes save immediately'}
+                  </p>
+                  <div className="flex items-center gap-3 ml-auto">
+                    <Button type="button" variant="ghost" onClick={() => navigate(listPath)}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || myOrganizations.length === 0}
+                      className="min-w-[140px] shadow-lg shadow-primary/25"
+                    >
+                      {isSubmitting
+                        ? 'Saving...'
+                        : mode === 'create'
+                          ? 'Save & Continue'
+                          : 'Save Changes'}
+                    </Button>
+                  </div>
                 </div>
-              </form>
-            </Form>
-          )}
-        </AfCard>
-
-        <div className="mt-6 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Need Help?</h4>
-          <p className="text-sm text-blue-700 dark:text-blue-300">
-            {mode === 'create'
-              ? 'Fill in the required fields to create your event. After saving, you will be guided to create a workspace before publishing.'
-              : 'Update your event information. Changes will be reflected immediately after saving.'}
-          </p>
-        </div>
+              </div>
+            </form>
+          </Form>
+        )}
       </div>
     </div>
   );
