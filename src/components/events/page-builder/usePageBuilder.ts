@@ -352,7 +352,8 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
       // Render Block Manager to custom container
       if (blocksContainerRef.current) {
-        const bmEl = (editor.BlockManager as any).render?.([]);
+        const allBlocks = editor.BlockManager.getAll();
+        const bmEl = (editor.BlockManager as any).render?.(allBlocks);
         if (bmEl) {
           blocksContainerRef.current.innerHTML = '';
           blocksContainerRef.current.appendChild(bmEl);
