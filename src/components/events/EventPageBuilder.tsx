@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePageBuilder } from './page-builder/usePageBuilder';
+import { LeftPanel } from './page-builder/LeftPanel';
 import { ArrowLeft, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -15,11 +16,13 @@ export const EventPageBuilder: React.FC = () => {
   const { eventId, orgSlug } = useParams<{ eventId: string; orgSlug: string }>();
   const navigate = useNavigate();
   const [isFullscreen, setIsFullscreen] = React.useState(true);
+  const blocksContainerRef = useRef<HTMLDivElement>(null);
+  const layersContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     containerRef,
     loading,
-  } = usePageBuilder({ eventId });
+  } = usePageBuilder({ eventId, blocksContainerRef, layersContainerRef });
 
   const handleBack = () => {
     navigate(`/${orgSlug}/eventmanagement/${eventId}`);
@@ -69,8 +72,17 @@ export const EventPageBuilder: React.FC = () => {
         </div>
       </div>
 
-      {/* GrapesJS Container */}
-      <div ref={containerRef} className="h-[calc(100%-3rem)] w-full" />
+      {/* Main Content Area with Left Panel */}
+      <div className="flex h-[calc(100%-3rem)]">
+        {/* Left Panel */}
+        <LeftPanel
+          blocksContainerRef={blocksContainerRef}
+          layersContainerRef={layersContainerRef}
+        />
+        
+        {/* GrapesJS Container */}
+        <div ref={containerRef} className="flex-1" />
+      </div>
       
       {/* GrapesJS Professional Dark Theme */}
       <style>{`
