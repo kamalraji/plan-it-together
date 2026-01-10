@@ -118,7 +118,7 @@ export function VolunteerCheckInStats({ workspaceId }: VolunteerCheckInStatsProp
     : 0;
 
   return (
-    <Card>
+    <Card id="checkin-stats">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <UserCheck className="h-4 w-4 text-pink-500" />
