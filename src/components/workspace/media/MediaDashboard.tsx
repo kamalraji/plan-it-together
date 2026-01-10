@@ -9,6 +9,7 @@ import { DeliverableTracker } from './DeliverableTracker';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 
 interface MediaDashboardProps {
   workspace: Workspace;
@@ -56,6 +57,15 @@ export function MediaDashboard({
       {/* Quick Actions */}
       <MediaQuickActions workspaceId={workspace.id} onViewTasks={onViewTasks} />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
 
       {/* Task Summary with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">

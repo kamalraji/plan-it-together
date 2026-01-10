@@ -7,6 +7,7 @@ import { SecurityAlerts } from './SecurityAlerts';
 import { AccessManagement } from './AccessManagement';
 import { SoftwareLicenses } from './SoftwareLicenses';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { useITDashboardData } from '@/hooks/useITDashboardData';
 
@@ -43,6 +44,15 @@ export function ITDashboard({
         <ITQuickActions />
       </div>
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
 
       {/* Main Grid with Mini-Map - improved responsive breakpoints */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">

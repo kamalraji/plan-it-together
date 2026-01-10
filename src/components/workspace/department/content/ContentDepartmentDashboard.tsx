@@ -9,6 +9,7 @@ import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
 import { TaskSummaryCards } from '../../TaskSummaryCards';
 import { TeamMemberRoster } from '../../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../../RoleBasedActions';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 
 import { ContentStatsConnected } from './ContentStatsConnected';
@@ -146,6 +147,14 @@ export function ContentDepartmentDashboard({
       {/* Stats Overview - Connected to real data */}
       <ContentStatsConnected workspaceId={workspace.id} />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onViewReport={() => {}}
+      />
 
       {/* Quick Actions */}
       <ContentQuickActions onAction={handleQuickAction} />

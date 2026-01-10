@@ -1,5 +1,6 @@
 import { Workspace, WorkspaceRole } from '@/types';
 import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
@@ -95,6 +96,15 @@ export function CateringDashboard({
         teamsCount={teams.length}
       />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
 
       {/* Catering Stats Overview */}
       <CateringStatsCards workspaceId={workspace.id} />

@@ -10,6 +10,7 @@ import { DepartmentKPICard } from '../DepartmentKPICard';
 import { TaskSummaryCards } from '../../TaskSummaryCards';
 import { TeamMemberRoster } from '../../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../../RoleBasedActions';
 import { Server, Users, LayoutGrid } from 'lucide-react';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { useQuery } from '@tanstack/react-query';
@@ -91,6 +92,14 @@ export function TechDepartmentDashboard({
       {/* Quick Actions */}
       <TechDepartmentQuickActions />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onViewReport={() => {}}
+      />
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

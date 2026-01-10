@@ -6,6 +6,7 @@ import { SupportTicketQueue } from './SupportTicketQueue';
 import { NetworkStatus } from './NetworkStatus';
 import { VenueSetupChecklist } from './VenueSetupChecklist';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { MilestoneTimeline } from '../committee/MilestoneTimeline';
 
@@ -38,6 +39,15 @@ export function TechnicalDashboard({
       {/* Quick Actions */}
       <TechnicalQuickActions />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
 
       {/* Main Grid with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

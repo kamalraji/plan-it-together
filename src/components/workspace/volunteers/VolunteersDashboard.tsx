@@ -1,5 +1,6 @@
 import { Workspace, WorkspaceRole } from '@/types';
 import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
@@ -100,6 +101,15 @@ export function VolunteersDashboard({
       {/* Volunteer Stats Cards */}
       <VolunteerStatsCards workspaceId={workspace.id} />
 
+      {/* Role-Based Actions */}
+      <RoleBasedActions
+        workspace={workspace}
+        userRole={userRole || null}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
 
       {/* Task Summary with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">

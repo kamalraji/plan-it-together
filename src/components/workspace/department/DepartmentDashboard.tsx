@@ -9,6 +9,7 @@ import { DepartmentKPICard } from './DepartmentKPICard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
@@ -227,6 +228,16 @@ export function DepartmentDashboard({
         </div>
       </section>
 
+      {/* Role-Based Actions */}
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onDelegateRole={onDelegateRole}
+          onInviteMember={onInviteMember}
+          onViewReport={() => {}}
+        />
+      </section>
 
       {/* Task Summary */}
       <section id="tasks">

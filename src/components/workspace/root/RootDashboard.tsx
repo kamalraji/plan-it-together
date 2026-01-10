@@ -4,6 +4,7 @@ import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { HierarchyTreeCard } from '../HierarchyTreeCard';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { RoleBasedActions } from '../RoleBasedActions';
 import { ChildWorkspacesManager } from './ChildWorkspacesManager';
 import { WorkspaceStructureOverview } from '../WorkspaceStructureOverview';
 import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
@@ -67,6 +68,17 @@ export function RootDashboard({
   return (
     <div className="space-y-6">
 
+      {/* Role-Based Actions */}
+      <section id="actions">
+        <RoleBasedActions
+          workspace={workspace}
+          userRole={userRole || null}
+          onDelegateRole={onDelegateRole}
+          onInviteMember={onInviteMember}
+          onManageSettings={onManageSettings}
+          onViewReport={() => navigate(`/${orgSlug}/analytics`)}
+        />
+      </section>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
