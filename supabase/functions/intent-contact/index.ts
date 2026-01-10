@@ -8,6 +8,63 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting configuration
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX_REQUESTS = 3; // 3 contact requests per hour per IP
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
+function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const existing = rateLimitMap.get(key);
+
+  if (!existing || now > existing.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+  }
+
+  if (existing.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  existing.count++;
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existing.count };
+}
+
+function cleanupRateLimitMap(): void {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetAt) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
+// HTML escaping to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Input validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const VALID_INTENTS = ['demo', 'pricing', 'walkthrough', 'general', null];
+
+function validateEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email) && email.length <= 255;
+}
+
 interface IntentContactPayload {
   intent: string | null;
   name: string;
@@ -27,8 +84,63 @@ serve(async (req) => {
     });
   }
 
+  // Periodic cleanup of rate limit map
+  if (Math.random() < 0.01) {
+    cleanupRateLimitMap();
+  }
+
+  // Rate limiting
+  const clientIP = getClientIP(req);
+  const { allowed, remaining } = checkRateLimit(clientIP);
+
+  if (!allowed) {
+    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please try again later." }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": "3600",
+          "X-RateLimit-Remaining": "0",
+          ...corsHeaders,
+        },
+      }
+    );
+  }
+
   try {
     const body = (await req.json()) as IntentContactPayload;
+
+    // Input validation
+    if (!body.name || body.name.length > 100) {
+      return new Response(
+        JSON.stringify({ error: "Name is required and must be less than 100 characters" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!body.email || !validateEmail(body.email)) {
+      return new Response(
+        JSON.stringify({ error: "Valid email address is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!body.message || body.message.length > 2000) {
+      return new Response(
+        JSON.stringify({ error: "Message is required and must be less than 2000 characters" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate intent is one of allowed values
+    if (body.intent !== null && !VALID_INTENTS.includes(body.intent)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid intent value" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const subjectPrefix = body.intent === "demo"
       ? "Demo request"
@@ -38,18 +150,23 @@ serve(async (req) => {
       ? "Guided walkthrough"
       : "Help request";
 
+    // Build email body with escaped content
     const emailBody = `
-      Intent: ${body.intent ?? "general"}
-      Name: ${body.name}
-      Email: ${body.email}
+      Intent: ${escapeHtml(body.intent ?? "general")}
+      Name: ${escapeHtml(body.name)}
+      Email: ${escapeHtml(body.email)}
 
       Message:
-      ${body.message}
+      ${escapeHtml(body.message)}
     `;
+
+    // Get contact email from environment or use default
+    const contactEmail = Deno.env.get("CONTACT_EMAIL") || "founder@example.com";
 
     const emailResponse = await resend.emails.send({
       from: "Thittam1Hub <onboarding@resend.dev>",
-      to: ["founder@example.com"],
+      to: [contactEmail],
+      reply_to: body.email,
       subject: `${subjectPrefix} via Thittam1Hub help form`,
       text: emailBody,
     });
@@ -58,7 +175,11 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-RateLimit-Remaining": String(remaining),
+        ...corsHeaders 
+      },
     });
   } catch (error) {
     console.error("Error in intent-contact function", error);

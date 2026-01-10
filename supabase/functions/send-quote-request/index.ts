@@ -9,6 +9,68 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting configuration
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX_REQUESTS = 5; // 5 quote requests per hour per IP
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
+function checkRateLimit(key: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const existing = rateLimitMap.get(key);
+
+  if (!existing || now > existing.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+  }
+
+  if (existing.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  existing.count++;
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existing.count };
+}
+
+function cleanupRateLimitMap(): void {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetAt) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
+// HTML escaping to prevent XSS in emails
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Input validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^[\d\s()+-]{7,20}$/;
+
+function validateEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email) && email.length <= 255;
+}
+
+function validatePhone(phone: string | undefined): boolean {
+  if (!phone) return true; // Optional field
+  return PHONE_REGEX.test(phone);
+}
+
 interface QuoteRequestPayload {
   vendorEmail: string;
   vendorName: string;
@@ -28,6 +90,31 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Periodic cleanup of rate limit map
+  if (Math.random() < 0.01) {
+    cleanupRateLimitMap();
+  }
+
+  // Rate limiting
+  const clientIP = getClientIP(req);
+  const { allowed, remaining } = checkRateLimit(clientIP);
+  
+  if (!allowed) {
+    console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please try again later." }),
+      {
+        status: 429,
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "3600",
+          "X-RateLimit-Remaining": "0",
+          ...corsHeaders 
+        },
+      }
+    );
+  }
+
   try {
     const payload: QuoteRequestPayload = await req.json();
     const {
@@ -44,7 +131,57 @@ const handler = async (req: Request): Promise<Response> => {
       serviceNames,
     } = payload;
 
-    // Build the email HTML
+    // Input validation
+    if (!vendorEmail || !validateEmail(vendorEmail)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid vendor email address" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!senderEmail || !validateEmail(senderEmail)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid sender email address" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!senderName || senderName.length > 100) {
+      return new Response(
+        JSON.stringify({ error: "Sender name is required and must be less than 100 characters" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!vendorName || vendorName.length > 100) {
+      return new Response(
+        JSON.stringify({ error: "Vendor name is required and must be less than 100 characters" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!message || message.length > 2000) {
+      return new Response(
+        JSON.stringify({ error: "Message is required and must be less than 2000 characters" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!validatePhone(senderPhone)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid phone number format" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (guestCount !== undefined && (guestCount < 0 || guestCount > 100000)) {
+      return new Response(
+        JSON.stringify({ error: "Guest count must be between 0 and 100,000" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Build the email HTML with escaped content
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -70,37 +207,37 @@ const handler = async (req: Request): Promise<Response> => {
             <h1>New Quote Request</h1>
           </div>
           <div class="content">
-            <p>Hello ${vendorName},</p>
+            <p>Hello ${escapeHtml(vendorName)},</p>
             <p>You have received a new quote request through Thittam1Hub Marketplace.</p>
             
             <div class="field">
               <div class="label">From</div>
-              <div class="value">${senderName}</div>
+              <div class="value">${escapeHtml(senderName)}</div>
             </div>
             
             <div class="field">
               <div class="label">Email</div>
-              <div class="value"><a href="mailto:${senderEmail}">${senderEmail}</a></div>
+              <div class="value"><a href="mailto:${escapeHtml(senderEmail)}">${escapeHtml(senderEmail)}</a></div>
             </div>
             
             ${senderPhone ? `
             <div class="field">
               <div class="label">Phone</div>
-              <div class="value">${senderPhone}</div>
+              <div class="value">${escapeHtml(senderPhone)}</div>
             </div>
             ` : ''}
             
             ${eventType ? `
             <div class="field">
               <div class="label">Event Type</div>
-              <div class="value">${eventType}</div>
+              <div class="value">${escapeHtml(eventType)}</div>
             </div>
             ` : ''}
             
             ${eventDate ? `
             <div class="field">
               <div class="label">Event Date</div>
-              <div class="value">${eventDate}</div>
+              <div class="value">${escapeHtml(eventDate)}</div>
             </div>
             ` : ''}
             
@@ -114,7 +251,7 @@ const handler = async (req: Request): Promise<Response> => {
             ${budget ? `
             <div class="field">
               <div class="label">Budget Range</div>
-              <div class="value">${budget}</div>
+              <div class="value">${escapeHtml(budget)}</div>
             </div>
             ` : ''}
             
@@ -122,14 +259,14 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="field">
               <div class="label">Services Interested In</div>
               <div class="services">
-                ${serviceNames.map(s => `<span class="service-tag">${s}</span>`).join('')}
+                ${serviceNames.slice(0, 10).map(s => `<span class="service-tag">${escapeHtml(s.substring(0, 50))}</span>`).join('')}
               </div>
             </div>
             ` : ''}
             
             <div class="message-box">
               <div class="label">Message</div>
-              <div class="value">${message.replace(/\n/g, '<br>')}</div>
+              <div class="value">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
             </div>
             
             <p style="margin-top: 24px;">Please respond to this inquiry at your earliest convenience.</p>
@@ -146,7 +283,7 @@ const handler = async (req: Request): Promise<Response> => {
       from: "Thittam1Hub Marketplace <onboarding@resend.dev>",
       to: [vendorEmail],
       reply_to: senderEmail,
-      subject: `Quote Request from ${senderName} - Thittam1Hub`,
+      subject: `Quote Request from ${escapeHtml(senderName)} - Thittam1Hub`,
       html: emailHtml,
     });
 
@@ -154,12 +291,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-RateLimit-Remaining": String(remaining),
+        ...corsHeaders 
+      },
     });
   } catch (error: any) {
     console.error("Error sending quote request:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "Failed to send quote request" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
