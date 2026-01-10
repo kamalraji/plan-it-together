@@ -40,7 +40,7 @@ import {
   Loader2,
   Users,
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
 
 interface UserProfile {
   id: string;
@@ -62,7 +62,7 @@ interface UserWithRoles extends UserProfile {
 
 export const AdminUserManagement: React.FC = () => {
   const queryClient = useQueryClient();
-  const { user: currentUser } = useAuth();
+  const { logAction } = useAdminAuditLog();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
@@ -127,10 +127,8 @@ export const AdminUserManagement: React.FC = () => {
   // Suspend user mutation (remove all roles except participant)
   const suspendMutation = useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason: string }) => {
-      // Log the suspension (use any to avoid type issues with generated types)
-      await (supabase as any).from('admin_audit_logs').insert({
-        admin_id: currentUser?.id,
-        admin_email: currentUser?.email,
+      // Log the suspension via secure edge function
+      await logAction({
         action: 'USER_SUSPENDED',
         target_type: 'user',
         target_id: userId,
@@ -159,9 +157,7 @@ export const AdminUserManagement: React.FC = () => {
 
   const restoreMutation = useMutation({
     mutationFn: async (userId: string) => {
-      await (supabase as any).from('admin_audit_logs').insert({
-        admin_id: currentUser?.id,
-        admin_email: currentUser?.email,
+      await logAction({
         action: 'USER_RESTORED',
         target_type: 'user',
         target_id: userId,

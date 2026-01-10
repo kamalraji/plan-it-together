@@ -18,7 +18,7 @@ import {
   Loader2,
   Save,
 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
 
 interface SystemSetting {
   id: string;
@@ -52,7 +52,7 @@ interface EmailTemplates {
 
 export const AdminSystemSettings: React.FC = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { logAction } = useAdminAuditLog();
   const [activeTab, setActiveTab] = useState('features');
 
   // Fetch settings
@@ -90,15 +90,13 @@ export const AdminSystemSettings: React.FC = () => {
     mutationFn: async ({ key, value }: { key: string; value: Record<string, any> }) => {
       const { error } = await supabase
         .from('system_settings')
-        .update({ value, updated_by: user?.id })
+        .update({ value })
         .eq('key', key);
 
       if (error) throw error;
 
-      // Log the change (use any to avoid type issues with generated types)
-      await (supabase as any).from('admin_audit_logs').insert({
-        admin_id: user?.id,
-        admin_email: user?.email,
+      // Log the change via secure edge function
+      await logAction({
         action: 'SETTINGS_UPDATED',
         target_type: 'system_settings',
         target_id: key,
