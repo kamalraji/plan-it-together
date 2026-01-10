@@ -14,7 +14,8 @@ import {
   UserCog,
   ChevronDown,
   ChevronRight,
-  Settings2
+  Settings2,
+  ClipboardCheck
 } from 'lucide-react';
 import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
 
@@ -32,7 +33,8 @@ interface WorkspaceNavigationProps {
   | 'templates'
   | 'audit'
   | 'role-management'
-  | 'event-settings';
+  | 'event-settings'
+  | 'approvals';
   onTabChange: (
     tab:
       | 'overview'
@@ -45,6 +47,7 @@ interface WorkspaceNavigationProps {
       | 'templates'
       | 'audit'
       | 'role-management'
+      | 'approvals'
       | 'event-settings'
   ) => void;
   onWorkspaceSwitch: (workspaceId: string) => void;
@@ -106,6 +109,7 @@ export function WorkspaceNavigation({
     { id: 'tasks', name: 'Tasks', icon: <ClipboardList className="w-4 h-4" />, group: 'core' },
     { id: 'team', name: 'Team', icon: <Users className="w-4 h-4" />, group: 'core' },
     { id: 'communication', name: 'Communication', icon: <MessageSquare className="w-4 h-4" />, group: 'core' },
+    { id: 'approvals', name: 'Approvals', icon: <ClipboardCheck className="w-4 h-4" />, group: 'core' },
     { id: 'event-settings', name: 'Event Settings', icon: <Settings2 className="w-4 h-4" />, group: 'core' },
     { id: 'marketplace', name: 'Marketplace', icon: <ShoppingBag className="w-4 h-4" />, group: 'management' },
     { id: 'templates', name: 'Templates', icon: <FileText className="w-4 h-4" />, group: 'management' },
@@ -120,6 +124,10 @@ export function WorkspaceNavigation({
     return baseTabs.filter(tab => {
       if (tab.id === 'event-settings') {
         return showEventSettingsTab;
+      }
+      // Hide approvals for TEAM workspaces
+      if (tab.id === 'approvals') {
+        return workspace.workspaceType !== WorkspaceType.TEAM;
       }
       return true;
     });

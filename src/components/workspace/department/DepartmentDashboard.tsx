@@ -272,11 +272,6 @@ export function DepartmentDashboard({
         <ResourceApprovalPanel workspaceId={workspace.id} />
       </section>
 
-      {/* Approval Panels */}
-      <section id="approvals" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ResourceApprovalPanel workspaceId={workspace.id} />
-      </section>
-
       {/* Committees Section */}
       <section id="committees" className="space-y-4">
         <div className="flex items-center justify-between">
