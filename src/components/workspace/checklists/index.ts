@@ -5,3 +5,6 @@ export { ChecklistPhaseView } from './ChecklistPhaseView';
 export { CreateChecklistDialog } from './CreateChecklistDialog';
 export { DelegateChecklistDialog } from './DelegateChecklistDialog';
 export { DelegatedChecklistBadge } from './DelegatedChecklistBadge';
+export { RequestDeadlineExtensionDialog } from './RequestDeadlineExtensionDialog';
+export { DeadlineExtensionReviewCard } from './DeadlineExtensionReviewCard';
+export { DelegationProgressDashboard } from './DelegationProgressDashboard';
