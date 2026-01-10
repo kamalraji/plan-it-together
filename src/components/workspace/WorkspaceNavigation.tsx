@@ -113,7 +113,7 @@ export function WorkspaceNavigation({
     { id: 'event-settings', name: 'Event Settings', icon: <Settings2 className="w-4 h-4" />, group: 'core' },
     { id: 'marketplace', name: 'Marketplace', icon: <ShoppingBag className="w-4 h-4" />, group: 'management' },
     { id: 'templates', name: 'Templates', icon: <FileText className="w-4 h-4" />, group: 'management' },
-    { id: 'role-management', name: 'Actions & Roles', icon: <UserCog className="w-4 h-4" />, group: 'management' },
+    { id: 'role-management', name: 'Actions & Roles', icon: <UserCog className="w-4 h-4" />, group: 'core' },
     { id: 'analytics', name: 'Analytics', icon: <BarChart3 className="w-4 h-4" />, group: 'analysis' },
     { id: 'reports', name: 'Reports', icon: <Download className="w-4 h-4" />, group: 'analysis' },
     { id: 'audit', name: 'Audit Log', icon: <Clock className="w-4 h-4" />, group: 'analysis' },

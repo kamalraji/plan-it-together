@@ -90,7 +90,7 @@ const baseNavItems: NavItem[] = [
   { id: 'event-settings', name: 'Event Settings', icon: Settings2, group: 'core' },
   { id: 'marketplace', name: 'Marketplace', icon: ShoppingBag, group: 'management' },
   { id: 'templates', name: 'Templates', icon: FileText, group: 'management' },
-  { id: 'role-management', name: 'Roles', icon: UserCog, group: 'management' },
+  { id: 'role-management', name: 'Actions & Roles', icon: UserCog, group: 'core' },
   { id: 'analytics', name: 'Analytics', icon: BarChart3, group: 'analysis' },
   { id: 'reports', name: 'Reports', icon: Download, group: 'analysis' },
   { id: 'audit', name: 'Audit Log', icon: Clock, group: 'analysis' },
