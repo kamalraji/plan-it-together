@@ -3,10 +3,12 @@ import type { Checklist } from '@/hooks/useCommitteeDashboard';
 
 type EventPhase = 'pre_event' | 'during_event' | 'post_event';
 
-interface ChecklistPhaseViewProps {
+export interface ChecklistPhaseViewProps {
   checklists: (Checklist & { phase?: EventPhase })[];
   onToggleItem: (checklistId: string, itemId: string, completed: boolean) => void;
   onDelete?: (checklistId: string) => void;
+  onDelegate?: (checklist: Checklist) => void;
+  canDelegate?: boolean;
   emptyMessage?: string;
 }
 
@@ -14,6 +16,8 @@ export function ChecklistPhaseView({
   checklists, 
   onToggleItem, 
   onDelete,
+  onDelegate,
+  canDelegate = false,
   emptyMessage = "No checklists in this phase yet."
 }: ChecklistPhaseViewProps) {
   if (checklists.length === 0) {
@@ -32,6 +36,8 @@ export function ChecklistPhaseView({
           checklist={checklist}
           onToggleItem={onToggleItem}
           onDelete={onDelete}
+          onDelegate={onDelegate}
+          canDelegate={canDelegate}
         />
       ))}
     </div>

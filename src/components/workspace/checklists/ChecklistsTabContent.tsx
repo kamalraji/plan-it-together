@@ -19,7 +19,7 @@ interface ChecklistsTabContentProps {
 export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
   const { user } = useAuth();
   const { checklists, isLoading, createChecklist, toggleItem } = useChecklists(workspace.id);
-  const { delegateChecklist, isDelegating } = useChecklistDelegation(workspace.id);
+  const { delegateChecklist } = useChecklistDelegation(workspace.id);
   const [activePhase, setActivePhase] = useState<EventPhase | 'all'>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showDelegateDialog, setShowDelegateDialog] = useState(false);
@@ -187,37 +187,6 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
         checklist={checklistToDelegate}
         sourceWorkspaceId={workspace.id}
         onDelegate={handleDelegate}
-      />
-    </div>
-  );
-}
-            onToggleItem={handleToggleItem}
-            emptyMessage="No pre-event checklists yet. Add planning and preparation tasks here."
-          />
-        </TabsContent>
-
-        <TabsContent value="during_event" className="mt-6">
-          <ChecklistPhaseView
-            checklists={groupedChecklists.during_event}
-            onToggleItem={handleToggleItem}
-            emptyMessage="No during-event checklists yet. Add day-of execution tasks here."
-          />
-        </TabsContent>
-
-        <TabsContent value="post_event" className="mt-6">
-          <ChecklistPhaseView
-            checklists={groupedChecklists.post_event}
-            onToggleItem={handleToggleItem}
-            emptyMessage="No post-event checklists yet. Add wrap-up and follow-up tasks here."
-          />
-        </TabsContent>
-      </Tabs>
-
-      <CreateChecklistDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-        onSubmit={handleCreateChecklist}
-        committeeType={committeeType}
       />
     </div>
   );
