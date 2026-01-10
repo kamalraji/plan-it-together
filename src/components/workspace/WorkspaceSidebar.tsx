@@ -95,7 +95,13 @@ export type WorkspaceTab =
   | 'test-equipment'
   | 'update-runsheet'
   | 'tech-check'
-  | 'issue-report';
+  | 'issue-report'
+  // Registration Committee tabs
+  | 'scan-checkin'
+  | 'add-attendee'
+  | 'export-list'
+  | 'send-reminders'
+  | 'view-waitlist';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
