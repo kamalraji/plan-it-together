@@ -6,7 +6,9 @@ import { Plus, ClipboardList, Clock, CheckCircle, Calendar } from 'lucide-react'
 import { ChecklistsSummaryCards, EventPhase } from './ChecklistsSummaryCards';
 import { ChecklistPhaseView } from './ChecklistPhaseView';
 import { CreateChecklistDialog } from './CreateChecklistDialog';
-import { useChecklists } from '@/hooks/useCommitteeDashboard';
+import { DelegateChecklistDialog } from './DelegateChecklistDialog';
+import { useChecklists, Checklist } from '@/hooks/useCommitteeDashboard';
+import { useChecklistDelegation } from '@/hooks/useChecklistDelegation';
 import { useAuth } from '@/hooks/useAuth';
 import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
 
@@ -17,10 +19,14 @@ interface ChecklistsTabContentProps {
 export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
   const { user } = useAuth();
   const { checklists, isLoading, createChecklist, toggleItem } = useChecklists(workspace.id);
+  const { delegateChecklist, isDelegating } = useChecklistDelegation(workspace.id);
   const [activePhase, setActivePhase] = useState<EventPhase | 'all'>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showDelegateDialog, setShowDelegateDialog] = useState(false);
+  const [checklistToDelegate, setChecklistToDelegate] = useState<Checklist | null>(null);
 
   const committeeType = detectCommitteeType(workspace.name);
+  const isRootWorkspace = workspace.workspaceType === 'ROOT';
 
   const checklistsWithPhase = useMemo(() => {
     return checklists.map(c => ({
@@ -65,6 +71,15 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
       items: data.items,
       is_template: false,
     } as any);
+  };
+
+  const handleOpenDelegate = (checklist: Checklist) => {
+    setChecklistToDelegate(checklist);
+    setShowDelegateDialog(true);
+  };
+
+  const handleDelegate = (data: { checklistId: string; targetWorkspaceId: string; dueDate: Date | null }) => {
+    delegateChecklist(data);
   };
 
   if (isLoading) {
@@ -123,12 +138,59 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
             checklists={checklistsWithPhase}
             onToggleItem={handleToggleItem}
             emptyMessage="No checklists yet. Create your first checklist to get started."
+            canDelegate={isRootWorkspace}
+            onDelegate={handleOpenDelegate}
           />
         </TabsContent>
 
         <TabsContent value="pre_event" className="mt-6">
           <ChecklistPhaseView
             checklists={groupedChecklists.pre_event}
+            onToggleItem={handleToggleItem}
+            emptyMessage="No pre-event checklists yet. Add planning and preparation tasks here."
+            canDelegate={isRootWorkspace}
+            onDelegate={handleOpenDelegate}
+          />
+        </TabsContent>
+
+        <TabsContent value="during_event" className="mt-6">
+          <ChecklistPhaseView
+            checklists={groupedChecklists.during_event}
+            onToggleItem={handleToggleItem}
+            emptyMessage="No during-event checklists yet. Add day-of execution tasks here."
+            canDelegate={isRootWorkspace}
+            onDelegate={handleOpenDelegate}
+          />
+        </TabsContent>
+
+        <TabsContent value="post_event" className="mt-6">
+          <ChecklistPhaseView
+            checklists={groupedChecklists.post_event}
+            onToggleItem={handleToggleItem}
+            emptyMessage="No post-event checklists yet. Add wrap-up and follow-up tasks here."
+            canDelegate={isRootWorkspace}
+            onDelegate={handleOpenDelegate}
+          />
+        </TabsContent>
+      </Tabs>
+
+      <CreateChecklistDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSubmit={handleCreateChecklist}
+        committeeType={committeeType}
+      />
+
+      <DelegateChecklistDialog
+        open={showDelegateDialog}
+        onOpenChange={setShowDelegateDialog}
+        checklist={checklistToDelegate}
+        sourceWorkspaceId={workspace.id}
+        onDelegate={handleDelegate}
+      />
+    </div>
+  );
+}
             onToggleItem={handleToggleItem}
             emptyMessage="No pre-event checklists yet. Add planning and preparation tasks here."
           />

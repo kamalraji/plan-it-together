@@ -2224,6 +2224,11 @@ export type Database = {
         Row: {
           committee_type: string | null
           created_at: string
+          delegated_at: string | null
+          delegated_by: string | null
+          delegated_from_workspace_id: string | null
+          delegation_status: string | null
+          due_date: string | null
           id: string
           is_template: boolean | null
           items: Json
@@ -2235,6 +2240,11 @@ export type Database = {
         Insert: {
           committee_type?: string | null
           created_at?: string
+          delegated_at?: string | null
+          delegated_by?: string | null
+          delegated_from_workspace_id?: string | null
+          delegation_status?: string | null
+          due_date?: string | null
           id?: string
           is_template?: boolean | null
           items?: Json
@@ -2246,6 +2256,11 @@ export type Database = {
         Update: {
           committee_type?: string | null
           created_at?: string
+          delegated_at?: string | null
+          delegated_by?: string | null
+          delegated_from_workspace_id?: string | null
+          delegation_status?: string | null
+          due_date?: string | null
           id?: string
           is_template?: boolean | null
           items?: Json
@@ -2255,6 +2270,13 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_checklists_delegated_from_workspace_id_fkey"
+            columns: ["delegated_from_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_checklists_workspace_id_fkey"
             columns: ["workspace_id"]
