@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Workspace } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { WorkspaceTab } from './WorkspaceSidebar';
 import {
   ChevronDown,
   ChevronRight,
@@ -56,11 +57,13 @@ interface DepartmentAction {
   label: string;
   icon: React.ElementType;
   color: string;
+  isTab?: boolean; // If true, triggers tab navigation instead of toast
 }
 
 interface DepartmentActionsMenuProps {
   workspace: Workspace;
   isCollapsed: boolean;
+  onTabChange?: (tab: WorkspaceTab) => void;
 }
 
 // Detect department type from workspace name
@@ -78,14 +81,14 @@ const detectDepartmentType = (workspaceName: string): string => {
 // Department-specific action sets
 const departmentActions: Record<string, DepartmentAction[]> = {
   volunteers: [
-    { id: 'view-committees', label: 'View Committees', icon: Users, color: 'text-rose-500' },
-    { id: 'shift-overview', label: 'Shift Overview', icon: Calendar, color: 'text-pink-500' },
-    { id: 'mass-announcement', label: 'Mass Announcement', icon: Megaphone, color: 'text-purple-500' },
-    { id: 'hours-report', label: 'Hours Report', icon: FileBarChart, color: 'text-blue-500' },
-    { id: 'approve-timesheets', label: 'Approve Timesheets', icon: ClipboardCheck, color: 'text-emerald-500' },
-    { id: 'training-schedule', label: 'Training Schedule', icon: GraduationCap, color: 'text-amber-500' },
-    { id: 'recognition', label: 'Recognition', icon: Award, color: 'text-yellow-500' },
-    { id: 'recruitment', label: 'Recruitment', icon: Mail, color: 'text-indigo-500' },
+    { id: 'view-committees', label: 'View Committees', icon: Users, color: 'text-rose-500', isTab: true },
+    { id: 'shift-overview', label: 'Shift Overview', icon: Calendar, color: 'text-pink-500', isTab: true },
+    { id: 'mass-announcement', label: 'Mass Announcement', icon: Megaphone, color: 'text-purple-500', isTab: true },
+    { id: 'hours-report', label: 'Hours Report', icon: FileBarChart, color: 'text-blue-500', isTab: true },
+    { id: 'approve-timesheets', label: 'Approve Timesheets', icon: ClipboardCheck, color: 'text-emerald-500', isTab: true },
+    { id: 'training-schedule', label: 'Training Schedule', icon: GraduationCap, color: 'text-amber-500', isTab: true },
+    { id: 'recognition', label: 'Recognition', icon: Award, color: 'text-yellow-500', isTab: true },
+    { id: 'recruitment', label: 'Recruitment', icon: Mail, color: 'text-indigo-500', isTab: true },
   ],
   tech: [
     { id: 'system-check', label: 'System Health Check', icon: Server, color: 'text-blue-500' },
@@ -155,15 +158,19 @@ const departmentMeta: Record<string, { name: string; color: string }> = {
   generic: { name: 'Department Actions', color: 'text-primary' },
 };
 
-export function DepartmentActionsMenu({ workspace, isCollapsed }: DepartmentActionsMenuProps) {
+export function DepartmentActionsMenu({ workspace, isCollapsed, onTabChange }: DepartmentActionsMenuProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const departmentType = detectDepartmentType(workspace.name);
   const actions = departmentActions[departmentType] || departmentActions.generic;
   const meta = departmentMeta[departmentType] || departmentMeta.generic;
 
-  const handleAction = (_actionId: string, label: string) => {
-    toast.info(`${label} action coming soon`);
+  const handleAction = (action: DepartmentAction) => {
+    if (action.isTab && onTabChange) {
+      onTabChange(action.id as WorkspaceTab);
+    } else {
+      toast.info(`${action.label} action coming soon`);
+    }
   };
 
   if (isCollapsed) {
@@ -195,7 +202,7 @@ export function DepartmentActionsMenu({ workspace, isCollapsed }: DepartmentActi
             return (
               <button
                 key={action.id}
-                onClick={() => handleAction(action.id, action.label)}
+                onClick={() => handleAction(action)}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-lg hover:bg-muted/50 transition-colors text-left group"
               >
                 <Icon className={cn('h-3.5 w-3.5 flex-shrink-0', action.color)} />
