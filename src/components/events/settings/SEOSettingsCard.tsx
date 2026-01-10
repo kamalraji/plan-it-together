@@ -4,10 +4,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, SearchIcon, X } from 'lucide-react';
+import { Loader2, SearchIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { TagInputWithAutocomplete } from '@/components/ui/tag-input-autocomplete';
 
 interface SEOSettings {
   tags: string[];
@@ -30,7 +30,6 @@ export const SEOSettingsCard: React.FC<SEOSettingsCardProps> = ({
 }) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-  const [tagInput, setTagInput] = useState('');
 
   const defaultSettings: SEOSettings = {
     tags: [],
@@ -49,25 +48,6 @@ export const SEOSettingsCard: React.FC<SEOSettingsCardProps> = ({
       ...branding?.seo,
     });
   }, [branding]);
-
-  const addTag = () => {
-    const trimmedTag = tagInput.trim().toLowerCase();
-    if (trimmedTag && !settings.tags.includes(trimmedTag) && settings.tags.length < 10) {
-      setSettings({ ...settings, tags: [...settings.tags, trimmedTag] });
-      setTagInput('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setSettings({ ...settings, tags: settings.tags.filter((tag) => tag !== tagToRemove) });
-  };
-
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTag();
-    }
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -124,47 +104,21 @@ export const SEOSettingsCard: React.FC<SEOSettingsCardProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Tags */}
-        <div className="space-y-3">
+        {/* Tags with Autocomplete */}
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="tags">Tags</Label>
+            <Label>Tags</Label>
             <span className="text-xs text-muted-foreground">{settings.tags.length}/10</span>
           </div>
-          <div className="flex gap-2">
-            <Input
-              id="tags"
-              placeholder="Add a tag and press Enter"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleTagInputKeyDown}
-              disabled={settings.tags.length >= 10}
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={addTag}
-              disabled={!tagInput.trim() || settings.tags.length >= 10}
-            >
-              Add
-            </Button>
-          </div>
-          {settings.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {settings.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="pl-2 pr-1 py-1">
-                  {tag}
-                  <button
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
+          <TagInputWithAutocomplete
+            eventId={eventId}
+            tags={settings.tags}
+            onTagsChange={(newTags) => setSettings({ ...settings, tags: newTags })}
+            maxTags={10}
+            placeholder="Type to search or add new tags..."
+          />
           <p className="text-xs text-muted-foreground">
-            Add keywords to help people discover your event
+            Add keywords to help people discover your event. Suggestions based on other events in your organization.
           </p>
         </div>
 
