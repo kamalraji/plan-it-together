@@ -201,10 +201,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'issue-report', label: 'Issue Report', icon: AlertCircle, color: 'text-red-500', tab: 'tasks' },
   ],
   it: [
-    { id: 'check-systems', label: 'Check Systems', icon: Server, color: 'text-violet-500', tab: 'checklists' },
-    { id: 'update-credentials', label: 'Update Credentials', icon: Key, color: 'text-amber-500', tab: 'tasks' },
-    { id: 'service-status', label: 'Service Status', icon: Activity, color: 'text-emerald-500', tab: 'overview' },
-    { id: 'ticket-queue', label: 'Ticket Queue', icon: Headphones, color: 'text-blue-500', tab: 'tasks' },
+    { id: 'check-systems', label: 'Check Systems', icon: Server, color: 'text-violet-500', tab: 'check-systems' },
+    { id: 'update-credentials', label: 'Update Credentials', icon: Key, color: 'text-amber-500', tab: 'update-credentials' },
+    { id: 'service-status', label: 'Service Status', icon: Activity, color: 'text-emerald-500', tab: 'service-status' },
+    { id: 'ticket-queue', label: 'Ticket Queue', icon: Headphones, color: 'text-blue-500', tab: 'ticket-queue' },
   ],
 };
 

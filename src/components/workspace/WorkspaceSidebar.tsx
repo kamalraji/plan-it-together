@@ -85,7 +85,12 @@ export type WorkspaceTab =
   | 'backup-status'
   | 'report-incident'
   | 'config-review'
-  | 'documentation';
+  | 'documentation'
+  // IT Committee tabs
+  | 'check-systems'
+  | 'update-credentials'
+  | 'service-status'
+  | 'ticket-queue';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
