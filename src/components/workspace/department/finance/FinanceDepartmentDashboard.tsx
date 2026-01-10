@@ -1,6 +1,5 @@
 import { Workspace } from '@/types';
 import { FinanceDepartmentStatsCards } from './FinanceDepartmentStatsCards';
-import { FinanceDepartmentQuickActions } from './FinanceDepartmentQuickActions';
 import { FinanceCommitteeConnectionsPanel } from './FinanceCommitteeConnectionsPanel';
 import { BudgetRequestsOverview } from './BudgetRequestsOverview';
 import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
@@ -82,10 +81,6 @@ export function FinanceDepartmentDashboard({
 
       {/* Stats Overview */}
       <FinanceDepartmentStatsCards workspaceId={workspace.id} />
-
-      {/* Quick Actions */}
-      <FinanceDepartmentQuickActions />
-
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

@@ -18,7 +18,6 @@ import { ContentPipelineDragDrop } from './ContentPipelineDragDrop';
 import { SpeakerScheduleConnected } from './SpeakerScheduleConnected';
 import { JudgingOverviewConnected } from './JudgingOverviewConnected';
 import { MediaAssetsConnected } from './MediaAssetsConnected';
-import { ContentQuickActions } from './ContentQuickActions';
 import { CreateContentItemModal } from './CreateContentItemModal';
 import { AssignJudgeModal } from './AssignJudgeModal';
 import { EnterScoreModal } from './EnterScoreModal';
@@ -79,28 +78,6 @@ export function ContentDepartmentDashboard({
     navigate(`${basePath}/${workspace.eventId}?workspaceId=${committee.id}`);
   };
 
-  const handleQuickAction = (actionId: string) => {
-    switch (actionId) {
-      case 'create-content':
-        setCreateContentOpen(true);
-        break;
-      case 'assign-judges':
-        setAssignJudgeOpen(true);
-        break;
-      case 'enter-score':
-        setEnterScoreOpen(true);
-        break;
-      case 'upload-media':
-        setUploadMediaOpen(true);
-        break;
-      case 'add-speaker':
-        setRegisterSpeakerOpen(true);
-        break;
-      default:
-        console.log('Quick action:', actionId);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Department Header Card */}
@@ -140,10 +117,6 @@ export function ContentDepartmentDashboard({
 
       {/* Stats Overview - Connected to real data */}
       <ContentStatsConnected workspaceId={workspace.id} />
-
-
-      {/* Quick Actions */}
-      <ContentQuickActions onAction={handleQuickAction} />
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

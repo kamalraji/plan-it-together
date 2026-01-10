@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceType, WorkspaceStatus } from '@/types';
 import { GrowthStatsCards } from './GrowthStatsCards';
-import { GrowthQuickActions } from './GrowthQuickActions';
 import { GrowthCommitteeOverview } from './GrowthCommitteeOverview';
 import { GrowthGoalsTracker } from './GrowthGoalsTracker';
 import { CampaignOverview } from './CampaignOverview';
@@ -120,9 +119,6 @@ export function GrowthDepartmentDashboard({
           showLabels={false}
         />
       </div>
-
-      {/* Quick Actions */}
-      <GrowthQuickActions />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

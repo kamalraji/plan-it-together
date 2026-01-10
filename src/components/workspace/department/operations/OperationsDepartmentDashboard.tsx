@@ -1,6 +1,5 @@
 import { Workspace } from '@/types';
 import { OperationsStatsCards } from './OperationsStatsCards';
-import { OperationsQuickActions } from './OperationsQuickActions';
 import { OperationsCommitteePanel } from './OperationsCommitteePanel';
 import { OperationsOverview } from './OperationsOverview';
 import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
@@ -82,10 +81,6 @@ export function OperationsDepartmentDashboard({
 
       {/* Stats Overview */}
       <OperationsStatsCards workspaceId={workspace.id} />
-
-      {/* Quick Actions */}
-      <OperationsQuickActions />
-
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

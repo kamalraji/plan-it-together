@@ -1,6 +1,5 @@
 import { Workspace } from '@/types';
 import { TechDepartmentStatsCards } from './TechDepartmentStatsCards';
-import { TechDepartmentQuickActions } from './TechDepartmentQuickActions';
 import { CommitteeConnectionsPanel } from './CommitteeConnectionsPanel';
 import { TechInfrastructureOverview } from './TechInfrastructureOverview';
 import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
@@ -82,10 +81,6 @@ export function TechDepartmentDashboard({
 
       {/* Stats Overview */}
       <TechDepartmentStatsCards workspaceId={workspace.id} />
-
-      {/* Quick Actions */}
-      <TechDepartmentQuickActions />
-
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />

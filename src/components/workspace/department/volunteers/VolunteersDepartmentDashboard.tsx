@@ -1,6 +1,5 @@
 import { Workspace } from '@/types';
 import { VolunteersDeptStatsCards } from './VolunteersDeptStatsCards';
-import { VolunteersDeptQuickActions } from './VolunteersDeptQuickActions';
 import { VolunteersDeptCommitteePanel } from './VolunteersDeptCommitteePanel';
 import { VolunteersDeptOverview } from './VolunteersDeptOverview';
 import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
@@ -82,10 +81,6 @@ export function VolunteersDepartmentDashboard({
 
       {/* Stats Overview */}
       <VolunteersDeptStatsCards workspaceId={workspace.id} />
-
-      {/* Quick Actions */}
-      <VolunteersDeptQuickActions />
-
 
       {/* Task Summary */}
       <TaskSummaryCards workspace={workspace} onViewTasks={onViewTasks} />
