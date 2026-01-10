@@ -165,10 +165,13 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'post-now', label: 'Post Now', icon: Send, color: 'text-pink-500', tab: 'tasks' },
   ],
   content: [
-    { id: 'review-content', label: 'Review Content', icon: Eye, color: 'text-purple-500', tab: 'approvals' },
-    { id: 'create-template', label: 'Create Template', icon: Layers, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'assign-reviewer', label: 'Assign Reviewer', icon: UserPlus, color: 'text-amber-500', tab: 'team' },
-    { id: 'publish', label: 'Publish', icon: Upload, color: 'text-emerald-500', tab: 'tasks' },
+    { id: 'create-content', label: 'Create Content', icon: FileText, color: 'text-blue-500', tab: 'create-content' },
+    { id: 'assign-judges', label: 'Assign Judges', icon: Scale, color: 'text-amber-500', tab: 'assign-judges' },
+    { id: 'enter-score', label: 'Enter Score', icon: Star, color: 'text-yellow-500', tab: 'enter-score' },
+    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media' },
+    { id: 'add-speaker', label: 'Add Speaker', icon: Mic, color: 'text-rose-500', tab: 'add-speaker' },
+    { id: 'schedule-session', label: 'Schedule Session', icon: Calendar, color: 'text-cyan-500', tab: 'schedule-session' },
+    { id: 'view-rubrics', label: 'View Rubrics', icon: ClipboardList, color: 'text-emerald-500', tab: 'view-rubrics' },
   ],
   speaker_liaison: [
     { id: 'invite-speaker', label: 'Invite Speaker', icon: Mic, color: 'text-rose-500', tab: 'communication' },
