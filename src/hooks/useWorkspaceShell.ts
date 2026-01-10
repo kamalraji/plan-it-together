@@ -27,7 +27,13 @@ export type WorkspaceTab =
   | 'settings'
   | 'event-settings'
   | 'approvals'
-  | 'checklists';
+  | 'checklists'
+  | 'assign-shifts'
+  | 'send-brief'
+  | 'check-in'
+  | 'create-team'
+  | 'training-status'
+  | 'performance-review';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;
