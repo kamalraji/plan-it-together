@@ -2540,6 +2540,65 @@ export type Database = {
           },
         ]
       }
+      workspace_expenses: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          notes: string | null
+          receipt_url: string | null
+          status: string | null
+          submitted_at: string | null
+          submitted_by: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          notes?: string | null
+          receipt_url?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          submitted_by: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          notes?: string | null
+          receipt_url?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          submitted_by?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_expenses_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_goals: {
         Row: {
           category: string | null
