@@ -164,12 +164,14 @@ const committeeActions: Record<string, CommitteeAction[]> = {
   ],
   content: [
     { id: 'create-content', label: 'Create Content', icon: FileText, color: 'text-blue-500', tab: 'create-content' },
+    { id: 'content-pipeline', label: 'Content Pipeline', icon: ClipboardList, color: 'text-indigo-500', tab: 'content-pipeline' },
     { id: 'assign-judges', label: 'Assign Judges', icon: Scale, color: 'text-amber-500', tab: 'assign-judges' },
     { id: 'enter-score', label: 'Enter Score', icon: Star, color: 'text-yellow-500', tab: 'enter-score' },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Award, color: 'text-purple-500', tab: 'leaderboard' },
     { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media' },
     { id: 'add-speaker', label: 'Add Speaker', icon: Mic, color: 'text-rose-500', tab: 'add-speaker' },
     { id: 'schedule-session', label: 'Schedule Session', icon: Calendar, color: 'text-cyan-500', tab: 'schedule-session' },
-    { id: 'view-rubrics', label: 'View Rubrics', icon: ClipboardList, color: 'text-emerald-500', tab: 'view-rubrics' },
+    { id: 'view-rubrics', label: 'View Rubrics', icon: ListChecks, color: 'text-emerald-500', tab: 'view-rubrics' },
   ],
   speaker_liaison: [
     { id: 'invite-speaker', label: 'Invite Speaker', icon: Mic, color: 'text-rose-500', tab: 'communication' },
@@ -184,10 +186,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'export-results', label: 'Export Results', icon: Download, color: 'text-purple-500', tab: 'reports' },
   ],
   media: [
-    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'tasks' },
-    { id: 'create-shot-list', label: 'Create Shot List', icon: Camera, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'approvals' },
-    { id: 'export-assets', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'reports' },
+    { id: 'shot-list', label: 'Shot List', icon: Camera, color: 'text-blue-500', tab: 'shot-list' },
+    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media' },
+    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'gallery-review' },
+    { id: 'asset-export', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'asset-export' },
   ],
   event: [
     { id: 'update-schedule', label: 'Update Schedule', icon: Clock, color: 'text-blue-500', tab: 'tasks' },

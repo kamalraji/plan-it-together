@@ -69,6 +69,20 @@ import {
   ApproveRequestTab,
   ViewBudgetTab,
   ExportDataTab,
+  // Content Committee tabs
+  CreateContentTab,
+  AssignJudgesTab,
+  EnterScoreTab,
+  UploadMediaTab,
+  AddSpeakerTab,
+  ScheduleSessionTab,
+  ViewRubricsTab,
+  ContentPipelineTab,
+  LeaderboardTab,
+  // Media Committee tabs
+  ShotListTab,
+  GalleryReviewTab,
+  AssetExportTab,
 } from './committee-tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
@@ -479,6 +493,56 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'export-data' && (
           <ExportDataTab workspace={workspace} />
+        )}
+
+        {/* Content Committee tabs */}
+        {activeTab === 'create-content' && (
+          <CreateContentTab workspace={workspace} />
+        )}
+
+        {activeTab === 'assign-judges' && workspace.eventId && (
+          <AssignJudgesTab workspace={workspace} />
+        )}
+
+        {activeTab === 'enter-score' && workspace.eventId && (
+          <EnterScoreTab workspace={workspace} />
+        )}
+
+        {activeTab === 'upload-media' && (
+          <UploadMediaTab workspace={workspace} />
+        )}
+
+        {activeTab === 'add-speaker' && (
+          <AddSpeakerTab workspace={workspace} />
+        )}
+
+        {activeTab === 'schedule-session' && (
+          <ScheduleSessionTab workspace={workspace} />
+        )}
+
+        {activeTab === 'view-rubrics' && workspace.eventId && (
+          <ViewRubricsTab workspace={workspace} />
+        )}
+
+        {activeTab === 'content-pipeline' && (
+          <ContentPipelineTab workspace={workspace} />
+        )}
+
+        {activeTab === 'leaderboard' && (
+          <LeaderboardTab workspace={workspace} />
+        )}
+
+        {/* Media Committee tabs */}
+        {activeTab === 'shot-list' && (
+          <ShotListTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'gallery-review' && (
+          <GalleryReviewTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'asset-export' && (
+          <AssetExportTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

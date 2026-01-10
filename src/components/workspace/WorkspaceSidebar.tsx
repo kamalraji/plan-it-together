@@ -115,7 +115,13 @@ export type WorkspaceTab =
   | 'upload-media'
   | 'add-speaker'
   | 'schedule-session'
-  | 'view-rubrics';
+  | 'view-rubrics'
+  | 'content-pipeline'
+  | 'leaderboard'
+  // Media Committee tabs
+  | 'shot-list'
+  | 'gallery-review'
+  | 'asset-export';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
