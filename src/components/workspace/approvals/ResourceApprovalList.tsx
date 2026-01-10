@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,9 @@ import { toast } from 'sonner';
 import { Package, Check, X, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ResourceApprovalRequest } from '@/hooks/useWorkspaceApprovals';
+import { PriorityBadge, getPriorityOrder } from './PriorityBadge';
+import { SortByPriorityToggle } from './SortByPriorityToggle';
+import { ApprovalCommentsThread } from './ApprovalCommentsThread';
 
 
 interface ResourceApprovalListProps {
@@ -24,6 +27,12 @@ export function ResourceApprovalList({ requests, isLoading, workspaceId }: Resou
   const queryClient = useQueryClient();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
+  const [sortByPriority, setSortByPriority] = useState(false);
+
+  const sortedRequests = useMemo(() => {
+    if (!sortByPriority) return requests;
+    return [...requests].sort((a, b) => getPriorityOrder(a.priority) - getPriorityOrder(b.priority));
+  }, [requests, sortByPriority]);
 
   const reviewMutation = useMutation({
     mutationFn: async ({ requestId, status, notes }: { requestId: string; status: 'approved' | 'rejected'; notes?: string }) => {
@@ -95,42 +104,31 @@ export function ResourceApprovalList({ requests, isLoading, workspaceId }: Resou
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
-          <Package className="h-4 w-4" />
-          Resource Requests
-          <Badge variant="secondary" className="ml-auto">
-            {requests.length} pending
-          </Badge>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Resource Requests
+            <Badge variant="secondary">{requests.length} pending</Badge>
+          </CardTitle>
+          <SortByPriorityToggle isActive={sortByPriority} onToggle={() => setSortByPriority(!sortByPriority)} />
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {requests.map((request) => {
+        {sortedRequests.map((request) => {
           const isExpanded = expandedId === request.id;
-
           return (
-            <div
-              key={request.id}
-              className="border border-border rounded-lg overflow-hidden"
-            >
-              <button
-                onClick={() => setExpandedId(isExpanded ? null : request.id)}
-                className="w-full p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors text-left"
-              >
+            <div key={request.id} className="border border-border rounded-lg overflow-hidden">
+              <button onClick={() => setExpandedId(isExpanded ? null : request.id)} className="w-full p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors text-left">
                 <div className="p-2 rounded-lg bg-blue-500/10">
                   <Package className="h-4 w-4 text-blue-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm truncate">
-                      {request.resourceName}
-                    </span>
-                    <Badge variant="outline" className="text-xs">
-                      Qty: {request.quantity}
-                    </Badge>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm truncate">{request.resourceName}</span>
+                    <Badge variant="outline" className="text-xs">Qty: {request.quantity}</Badge>
+                    <PriorityBadge priority={request.priority} />
                   </div>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">
-                    From: {request.requestingWorkspaceName}
-                  </p>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">From: {request.requestingWorkspaceName}</p>
                 </div>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
                   {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
@@ -171,20 +169,7 @@ export function ResourceApprovalList({ requests, isLoading, workspaceId }: Resou
                         <p className="text-sm">{request.purpose}</p>
                       </div>
                     )}
-                    <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">
-                        Review Notes (optional)
-                      </label>
-                      <Textarea
-                        placeholder="Add notes about your decision..."
-                        value={reviewNotes[request.id] || ''}
-                        onChange={(e) => setReviewNotes(prev => ({
-                          ...prev,
-                          [request.id]: e.target.value,
-                        }))}
-                        className="text-sm"
-                        rows={2}
-                      />
+                    <ApprovalCommentsThread requestType="resource" requestId={request.id} />
                     </div>
                     <div className="flex gap-2">
                       <Button

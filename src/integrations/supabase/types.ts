@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_request_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          request_id: string
+          request_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          request_id: string
+          request_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+          request_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       attendance_records: {
         Row: {
           check_in_method: string
@@ -1956,6 +1986,7 @@ export type Database = {
           created_at: string
           id: string
           message: string | null
+          priority: string | null
           requested_role: string | null
           review_notes: string | null
           reviewed_at: string | null
@@ -1969,6 +2000,7 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string | null
+          priority?: string | null
           requested_role?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
@@ -1982,6 +2014,7 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string | null
+          priority?: string | null
           requested_role?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
@@ -2076,6 +2109,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          priority: string | null
           reason: string
           requested_amount: number
           requested_by: string
@@ -2090,6 +2124,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          priority?: string | null
           reason: string
           requested_amount: number
           requested_by: string
@@ -2104,6 +2139,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          priority?: string | null
           reason?: string
           requested_amount?: number
           requested_by?: string
@@ -2659,6 +2695,7 @@ export type Database = {
           created_at: string
           end_date: string | null
           id: string
+          priority: string | null
           purpose: string | null
           quantity: number
           requested_by: string
@@ -2676,6 +2713,7 @@ export type Database = {
           created_at?: string
           end_date?: string | null
           id?: string
+          priority?: string | null
           purpose?: string | null
           quantity: number
           requested_by: string
@@ -2693,6 +2731,7 @@ export type Database = {
           created_at?: string
           end_date?: string | null
           id?: string
+          priority?: string | null
           purpose?: string | null
           quantity?: number
           requested_by?: string

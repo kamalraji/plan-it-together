@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkspaceType } from '@/types';
 
+export type ApprovalPriority = 'low' | 'medium' | 'high' | 'urgent';
+
 export interface BudgetApprovalRequest {
   id: string;
   requestingWorkspaceId: string;
@@ -11,6 +13,7 @@ export interface BudgetApprovalRequest {
   requestedBy: string;
   requesterName: string | null;
   status: string;
+  priority: ApprovalPriority;
   createdAt: string;
   type: 'budget';
 }
@@ -28,6 +31,7 @@ export interface ResourceApprovalRequest {
   requestedBy: string;
   requesterName: string | null;
   status: string;
+  priority: ApprovalPriority;
   createdAt: string;
   type: 'resource';
 }
@@ -41,6 +45,7 @@ export interface AccessApprovalRequest {
   requestedRole: string | null;
   message: string | null;
   status: string | null;
+  priority: ApprovalPriority;
   createdAt: string;
   type: 'access';
 }
@@ -63,6 +68,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
           reason,
           requested_by,
           status,
+          priority,
           created_at
         `)
         .eq('target_workspace_id', workspaceId)
@@ -92,6 +98,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
         requestedBy: r.requested_by,
         requesterName: profileMap.get(r.requested_by) || null,
         status: r.status,
+        priority: (r.priority || 'medium') as ApprovalPriority,
         createdAt: r.created_at,
         type: 'budget' as const,
       }));
@@ -115,6 +122,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
           end_date,
           requested_by,
           status,
+          priority,
           created_at
         `)
         .eq('owning_workspace_id', workspaceId)
@@ -151,6 +159,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
         requestedBy: r.requested_by,
         requesterName: profileMap.get(r.requested_by) || null,
         status: r.status,
+        priority: (r.priority || 'medium') as ApprovalPriority,
         createdAt: r.created_at,
         type: 'resource' as const,
       }));
@@ -170,6 +179,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
           requested_role,
           message,
           status,
+          priority,
           created_at
         `)
         .eq('workspace_id', workspaceId)
@@ -197,6 +207,7 @@ export function useWorkspaceApprovals(workspaceId: string, workspaceType?: Works
         requestedRole: r.requested_role,
         message: r.message,
         status: r.status,
+        priority: (r.priority || 'medium') as ApprovalPriority,
         createdAt: r.created_at,
         type: 'access' as const,
       }));

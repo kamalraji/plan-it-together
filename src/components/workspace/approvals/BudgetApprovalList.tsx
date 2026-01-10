@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,9 @@ import { toast } from 'sonner';
 import { DollarSign, Check, X, ChevronDown, ChevronUp, Building2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { BudgetApprovalRequest } from '@/hooks/useWorkspaceApprovals';
+import { PriorityBadge, getPriorityOrder } from './PriorityBadge';
+import { SortByPriorityToggle } from './SortByPriorityToggle';
+import { ApprovalCommentsThread } from './ApprovalCommentsThread';
 
 
 interface BudgetApprovalListProps {
@@ -24,6 +27,12 @@ export function BudgetApprovalList({ requests, isLoading, workspaceId }: BudgetA
   const queryClient = useQueryClient();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
+  const [sortByPriority, setSortByPriority] = useState(false);
+
+  const sortedRequests = useMemo(() => {
+    if (!sortByPriority) return requests;
+    return [...requests].sort((a, b) => getPriorityOrder(a.priority) - getPriorityOrder(b.priority));
+  }, [requests, sortByPriority]);
 
   const reviewMutation = useMutation({
     mutationFn: async ({ requestId, status, notes }: { requestId: string; status: 'approved' | 'rejected'; notes?: string }) => {
@@ -103,16 +112,22 @@ export function BudgetApprovalList({ requests, isLoading, workspaceId }: BudgetA
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
-          <DollarSign className="h-4 w-4" />
-          Budget Requests
-          <Badge variant="secondary" className="ml-auto">
-            {requests.length} pending
-          </Badge>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Budget Requests
+            <Badge variant="secondary">
+              {requests.length} pending
+            </Badge>
+          </CardTitle>
+          <SortByPriorityToggle
+            isActive={sortByPriority}
+            onToggle={() => setSortByPriority(!sortByPriority)}
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {requests.map((request) => {
+        {sortedRequests.map((request) => {
           const isExpanded = expandedId === request.id;
 
           return (
@@ -128,13 +143,14 @@ export function BudgetApprovalList({ requests, isLoading, workspaceId }: BudgetA
                   <Building2 className="h-4 w-4 text-emerald-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-sm truncate">
                       {request.requestingWorkspaceName}
                     </span>
                     <Badge variant="outline" className="text-xs">
                       {formatCurrency(request.requestedAmount)}
                     </Badge>
+                    <PriorityBadge priority={request.priority} />
                   </div>
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
                     {request.reason}
@@ -153,14 +169,24 @@ export function BudgetApprovalList({ requests, isLoading, workspaceId }: BudgetA
               {isExpanded && (
                 <div className="px-4 pb-4 border-t border-border/50 bg-muted/30">
                   <div className="pt-4 space-y-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Requested by</p>
-                      <p className="text-sm font-medium">{request.requesterName || 'Unknown'}</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Requested by</p>
+                        <p className="text-sm font-medium">{request.requesterName || 'Unknown'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Priority</p>
+                        <PriorityBadge priority={request.priority} />
+                      </div>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Reason</p>
                       <p className="text-sm">{request.reason}</p>
                     </div>
+                    
+                    {/* Comments Thread */}
+                    <ApprovalCommentsThread requestType="budget" requestId={request.id} />
+                    
                     <div>
                       <label className="text-sm text-muted-foreground mb-1 block">
                         Review Notes (optional)
