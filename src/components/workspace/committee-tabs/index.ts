@@ -26,3 +26,8 @@ export { BackupStatusTab } from './BackupStatusTab';
 export { ReportIncidentTab } from './ReportIncidentTab';
 export { ConfigReviewTab } from './ConfigReviewTab';
 export { DocumentationTab } from './DocumentationTab';
+// IT Committee tabs
+export { CheckSystemsTab } from './CheckSystemsTab';
+export { UpdateCredentialsTab } from './UpdateCredentialsTab';
+export { ServiceStatusTab } from './ServiceStatusTab';
+export { TicketQueueTab } from './TicketQueueTab';
