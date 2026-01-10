@@ -84,8 +84,8 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
             onManageSettings={onManageSettings}
           />
 
-          <SidebarInset className="flex w-full min-h-0 overflow-y-auto">
-            <div className="my-4 sm:my-6 w-full mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-x-hidden min-h-min">
+          <SidebarInset className="flex-1 min-w-0 overflow-y-auto">
+            <div className="my-4 sm:my-6 mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
               {children}
             </div>
           </SidebarInset>

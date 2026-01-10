@@ -220,7 +220,7 @@ export function TeamRosterManagement({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-visible">
       {/* Search and Filters */}
       <div className="bg-white shadow rounded-lg p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
