@@ -118,7 +118,7 @@ export function EnterScoreTab({ workspace }: EnterScoreTabProps) {
 
   const calculateTotalScore = () => {
     if (!rubric?.criteria) return 0;
-    const criteria = rubric.criteria as RubricCriterion[];
+    const criteria = rubric.criteria as unknown as RubricCriterion[];
     let total = 0;
     let maxTotal = 0;
     
