@@ -8,6 +8,8 @@ import { Loader2, TicketIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { TicketTierManager } from './TicketTierManager';
+import { PromoCodeManager } from './PromoCodeManager';
+import { GroupTicketSettings } from './GroupTicketSettings';
 
 interface TicketingSettings {
   isFree: boolean;
@@ -170,8 +172,14 @@ export const RegistrationSettingsCard: React.FC<RegistrationSettingsCardProps> =
 
     {/* Ticket Tier Manager - shown when event is not free */}
     {!settings.isFree && (
-      <TicketTierManager eventId={eventId} />
+      <>
+        <TicketTierManager eventId={eventId} />
+        <PromoCodeManager eventId={eventId} />
+      </>
     )}
+
+    {/* Group Ticket Settings - always shown */}
+    <GroupTicketSettings eventId={eventId} branding={branding} onUpdate={onUpdate} />
   </>
 );
 };

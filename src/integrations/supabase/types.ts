@@ -1061,34 +1061,168 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          applicable_tier_ids: string[] | null
+          code: string
+          created_at: string
+          current_uses: number
+          discount_type: string
+          discount_value: number
+          event_id: string
+          id: string
+          is_active: boolean
+          max_quantity: number | null
+          max_uses: number | null
+          min_quantity: number | null
+          name: string | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          applicable_tier_ids?: string[] | null
+          code: string
+          created_at?: string
+          current_uses?: number
+          discount_type: string
+          discount_value: number
+          event_id: string
+          id?: string
+          is_active?: boolean
+          max_quantity?: number | null
+          max_uses?: number | null
+          min_quantity?: number | null
+          name?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          applicable_tier_ids?: string[] | null
+          code?: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          max_quantity?: number | null
+          max_uses?: number | null
+          min_quantity?: number | null
+          name?: string | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registration_attendees: {
+        Row: {
+          created_at: string
+          custom_fields: Json | null
+          email: string | null
+          full_name: string | null
+          id: string
+          is_primary: boolean
+          phone: string | null
+          registration_id: string
+          ticket_tier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_fields?: Json | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_primary?: boolean
+          phone?: string | null
+          registration_id: string
+          ticket_tier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_fields?: Json | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_primary?: boolean
+          phone?: string | null
+          registration_id?: string
+          ticket_tier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_attendees_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registration_attendees_ticket_tier_id_fkey"
+            columns: ["ticket_tier_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registrations: {
         Row: {
           created_at: string
+          discount_amount: number | null
           event_id: string
           form_responses: Json
           id: string
+          promo_code_id: string | null
+          quantity: number
           status: Database["public"]["Enums"]["registration_status"]
+          subtotal: number | null
           ticket_tier_id: string | null
+          total_amount: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          discount_amount?: number | null
           event_id: string
           form_responses?: Json
           id?: string
+          promo_code_id?: string | null
+          quantity?: number
           status?: Database["public"]["Enums"]["registration_status"]
+          subtotal?: number | null
           ticket_tier_id?: string | null
+          total_amount?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          discount_amount?: number | null
           event_id?: string
           form_responses?: Json
           id?: string
+          promo_code_id?: string | null
+          quantity?: number
           status?: Database["public"]["Enums"]["registration_status"]
+          subtotal?: number | null
           ticket_tier_id?: string | null
+          total_amount?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -1098,6 +1232,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registrations_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
             referencedColumns: ["id"]
           },
           {
