@@ -99,7 +99,7 @@ const mockShipments: Shipment[] = [
   },
 ];
 
-export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProps) {
+export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsShipmentsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isAddOpen, setIsAddOpen] = useState(false);

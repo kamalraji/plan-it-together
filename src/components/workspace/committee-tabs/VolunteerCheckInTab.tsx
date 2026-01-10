@@ -34,11 +34,6 @@ interface VolunteerForCheckIn {
   status: 'pending' | 'checked-in' | 'late' | 'no-show';
   checkInTime?: string | null;
 }
-  shiftName: string;
-  shiftTime: string;
-  status: 'pending' | 'checked-in' | 'late' | 'no-show';
-  checkInTime?: string;
-}
 
 export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
