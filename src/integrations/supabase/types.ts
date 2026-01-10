@@ -564,6 +564,62 @@ export type Database = {
           },
         ]
       }
+      checklist_deadline_extensions: {
+        Row: {
+          checklist_id: string
+          created_at: string | null
+          current_due_date: string | null
+          id: string
+          justification: string
+          requested_at: string | null
+          requested_by: string
+          requested_due_date: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string | null
+          current_due_date?: string | null
+          id?: string
+          justification: string
+          requested_at?: string | null
+          requested_by: string
+          requested_due_date: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string | null
+          current_due_date?: string | null
+          id?: string
+          justification?: string
+          requested_at?: string | null
+          requested_by?: string
+          requested_due_date?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_deadline_extensions_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_page_views: {
         Row: {
           created_at: string
