@@ -107,21 +107,7 @@ export type WorkspaceTab =
   | 'generate-report'
   | 'approve-request'
   | 'view-budget'
-  | 'export-data'
-  // Content Committee tabs
-  | 'create-content'
-  | 'assign-judges'
-  | 'enter-score'
-  | 'upload-media'
-  | 'add-speaker'
-  | 'schedule-session'
-  | 'view-rubrics'
-  | 'content-pipeline'
-  | 'leaderboard'
-  // Media Committee tabs
-  | 'shot-list'
-  | 'gallery-review'
-  | 'asset-export';
+  | 'export-data';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

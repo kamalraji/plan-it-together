@@ -55,7 +55,9 @@ import {
   Hash,
   TrendingUp,
   // Content Committee
+  Layers,
   Upload,
+  Eye,
   // Speaker Liaison Committee
   Mic,
   Plane,
@@ -163,15 +165,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'post-now', label: 'Post Now', icon: Send, color: 'text-pink-500', tab: 'tasks' },
   ],
   content: [
-    { id: 'create-content', label: 'Create Content', icon: FileText, color: 'text-blue-500', tab: 'create-content' },
-    { id: 'content-pipeline', label: 'Content Pipeline', icon: ClipboardList, color: 'text-indigo-500', tab: 'content-pipeline' },
-    { id: 'assign-judges', label: 'Assign Judges', icon: Scale, color: 'text-amber-500', tab: 'assign-judges' },
-    { id: 'enter-score', label: 'Enter Score', icon: Star, color: 'text-yellow-500', tab: 'enter-score' },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Award, color: 'text-purple-500', tab: 'leaderboard' },
-    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media' },
-    { id: 'add-speaker', label: 'Add Speaker', icon: Mic, color: 'text-rose-500', tab: 'add-speaker' },
-    { id: 'schedule-session', label: 'Schedule Session', icon: Calendar, color: 'text-cyan-500', tab: 'schedule-session' },
-    { id: 'view-rubrics', label: 'View Rubrics', icon: ListChecks, color: 'text-emerald-500', tab: 'view-rubrics' },
+    { id: 'review-content', label: 'Review Content', icon: Eye, color: 'text-purple-500', tab: 'approvals' },
+    { id: 'create-template', label: 'Create Template', icon: Layers, color: 'text-blue-500', tab: 'tasks' },
+    { id: 'assign-reviewer', label: 'Assign Reviewer', icon: UserPlus, color: 'text-amber-500', tab: 'team' },
+    { id: 'publish', label: 'Publish', icon: Upload, color: 'text-emerald-500', tab: 'tasks' },
   ],
   speaker_liaison: [
     { id: 'invite-speaker', label: 'Invite Speaker', icon: Mic, color: 'text-rose-500', tab: 'communication' },
@@ -186,10 +183,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'export-results', label: 'Export Results', icon: Download, color: 'text-purple-500', tab: 'reports' },
   ],
   media: [
-    { id: 'shot-list', label: 'Shot List', icon: Camera, color: 'text-blue-500', tab: 'shot-list' },
-    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media' },
-    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'gallery-review' },
-    { id: 'asset-export', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'asset-export' },
+    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'tasks' },
+    { id: 'create-shot-list', label: 'Create Shot List', icon: Camera, color: 'text-blue-500', tab: 'tasks' },
+    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'approvals' },
+    { id: 'export-assets', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'reports' },
   ],
   event: [
     { id: 'update-schedule', label: 'Update Schedule', icon: Clock, color: 'text-blue-500', tab: 'tasks' },
@@ -226,7 +223,7 @@ function detectCommitteeType(workspaceName: string): string {
   // Direct match first
   if (committeeActions[name]) return name;
   
-  // Fuzzy matching for common variations - ORDER MATTERS (more specific first)
+  // Fuzzy matching for common variations
   if (name.includes('volunteer')) return 'volunteers';
   if (name.includes('finance') || name.includes('budget')) return 'finance';
   if (name.includes('registr') || name.includes('check-in') || name.includes('checkin')) return 'registration';
@@ -236,14 +233,11 @@ function detectCommitteeType(workspaceName: string): string {
   if (name.includes('market') || name.includes('promo')) return 'marketing';
   if (name.includes('communi') || name.includes('pr')) return 'communication';
   if (name.includes('sponsor') || name.includes('partner')) return 'sponsorship';
-  // Check social_media BEFORE media (more specific first)
-  if (name.includes('social_media') || name.includes('social media')) return 'social_media';
-  // Content detection - check before general media
+  if (name.includes('social') || name.includes('media')) return 'social_media';
   if (name.includes('content') || name.includes('editorial')) return 'content';
   if (name.includes('speaker') || name.includes('liaison')) return 'speaker_liaison';
   if (name.includes('judge') || name.includes('judging')) return 'judge';
-  // Media detection - photo/video/media (but not social_media which is already handled)
-  if (name.includes('photo') || name.includes('video') || (name.includes('media') && !name.includes('social'))) return 'media';
+  if (name.includes('media') || name.includes('photo') || name.includes('video')) return 'media';
   if (name.includes('event') || name.includes('program')) return 'event';
   if (name.includes('tech') || name.includes('av') || name.includes('audio')) return 'technical';
   if (name.includes('it') || name.includes('infra')) return 'it';

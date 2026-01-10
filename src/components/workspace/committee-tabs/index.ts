@@ -48,17 +48,3 @@ export { GenerateReportTab } from './GenerateReportTab';
 export { ApproveRequestTab } from './ApproveRequestTab';
 export { ViewBudgetTab } from './ViewBudgetTab';
 export { ExportDataTab } from './ExportDataTab';
-// Content Committee tabs
-export { CreateContentTab } from './CreateContentTab';
-export { AssignJudgesTab } from './AssignJudgesTab';
-export { EnterScoreTab } from './EnterScoreTab';
-export { UploadMediaTab } from './UploadMediaTab';
-export { AddSpeakerTab } from './AddSpeakerTab';
-export { ScheduleSessionTab } from './ScheduleSessionTab';
-export { ViewRubricsTab } from './ViewRubricsTab';
-export { ContentPipelineTab } from './ContentPipelineTab';
-export { LeaderboardTab } from './LeaderboardTab';
-// Media Committee tabs
-export { ShotListTab } from './ShotListTab';
-export { GalleryReviewTab } from './GalleryReviewTab';
-export { AssetExportTab } from './AssetExportTab';
