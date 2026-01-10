@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Workspace, WorkspaceType } from '@/types';
 import {
@@ -35,11 +35,13 @@ import {
   ChevronDown,
   ChevronRight,
   Folder,
+  Settings2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
+import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
 
 export type WorkspaceTab =
   | 'overview'
@@ -52,7 +54,8 @@ export type WorkspaceTab =
   | 'templates'
   | 'audit'
   | 'role-management'
-  | 'settings';
+  | 'settings'
+  | 'event-settings';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
@@ -73,7 +76,7 @@ interface NavItem {
   group: 'core' | 'management' | 'analysis';
 }
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   { id: 'overview', name: 'Overview', icon: LayoutDashboard, group: 'core' },
   { id: 'tasks', name: 'Tasks', icon: ClipboardList, group: 'core' },
   { id: 'team', name: 'Team', icon: Users, group: 'core' },
@@ -81,6 +84,7 @@ const navItems: NavItem[] = [
   { id: 'marketplace', name: 'Marketplace', icon: ShoppingBag, group: 'management' },
   { id: 'templates', name: 'Templates', icon: FileText, group: 'management' },
   { id: 'role-management', name: 'Roles', icon: UserCog, group: 'management' },
+  { id: 'event-settings', name: 'Event Settings', icon: Settings2, group: 'management' },
   { id: 'analytics', name: 'Analytics', icon: BarChart3, group: 'analysis' },
   { id: 'reports', name: 'Reports', icon: Download, group: 'analysis' },
   { id: 'audit', name: 'Audit Log', icon: Clock, group: 'analysis' },
@@ -117,6 +121,27 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
   const [hierarchyExpanded, setHierarchyExpanded] = useState(true);
+
+  // Determine if event-settings tab should be shown
+  const showEventSettingsTab = useMemo(() => {
+    if (!workspace.eventId) return false;
+    if (workspace.workspaceType === WorkspaceType.ROOT) return true;
+    if (workspace.workspaceType === WorkspaceType.COMMITTEE) {
+      const committeeType = detectCommitteeType(workspace.name);
+      return ['registration', 'finance', 'marketing', 'logistics', 'event'].includes(committeeType);
+    }
+    return false;
+  }, [workspace]);
+
+  // Filter nav items based on workspace type
+  const navItems = useMemo(() => {
+    return baseNavItems.filter(item => {
+      if (item.id === 'event-settings') {
+        return showEventSettingsTab;
+      }
+      return true;
+    });
+  }, [showEventSettingsTab]);
 
   // Fetch child workspaces for hierarchy (only for ROOT workspaces)
   const { data: childWorkspaces } = useQuery({

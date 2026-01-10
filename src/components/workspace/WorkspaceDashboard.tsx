@@ -19,6 +19,7 @@ import { CommitteeDashboard } from './committee';
 import { TeamDashboard } from './team';
 import { RootDashboard } from './root';
 import { WorkspaceSettingsContent } from './WorkspaceSettingsContent';
+import { EventSettingsTabContent } from './event-settings';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -233,6 +234,13 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
             teamMembers={teamMembers}
             canManageSettings={permissions.canManageSettings}
             currentUserRole={permissions.currentMember?.role as WorkspaceRole}
+          />
+        )}
+
+        {activeTab === 'event-settings' && workspace.eventId && (
+          <EventSettingsTabContent
+            workspace={workspace}
+            userRole={permissions.currentMember?.role as WorkspaceRole}
           />
         )}
       </div>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Workspace } from '../../types';
+import { Workspace, WorkspaceType } from '../../types';
 import { 
   LayoutDashboard, 
   ClipboardList, 
@@ -13,8 +13,10 @@ import {
   Clock, 
   UserCog,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Settings2
 } from 'lucide-react';
+import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
 
 interface WorkspaceNavigationProps {
   workspace: Workspace;
@@ -29,7 +31,8 @@ interface WorkspaceNavigationProps {
   | 'marketplace'
   | 'templates'
   | 'audit'
-  | 'role-management';
+  | 'role-management'
+  | 'event-settings';
   onTabChange: (
     tab:
       | 'overview'
@@ -42,6 +45,7 @@ interface WorkspaceNavigationProps {
       | 'templates'
       | 'audit'
       | 'role-management'
+      | 'event-settings'
   ) => void;
   onWorkspaceSwitch: (workspaceId: string) => void;
 }
@@ -62,11 +66,23 @@ const tabGroups = {
 };
 
 export function WorkspaceNavigation({
+  workspace,
   activeTab,
   onTabChange,
 }: WorkspaceNavigationProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  // Determine if event-settings tab should be shown
+  const showEventSettingsTab = useMemo(() => {
+    if (!workspace.eventId) return false;
+    if (workspace.workspaceType === WorkspaceType.ROOT) return true;
+    if (workspace.workspaceType === WorkspaceType.COMMITTEE) {
+      const committeeType = detectCommitteeType(workspace.name);
+      return ['registration', 'finance', 'marketing', 'logistics', 'event'].includes(committeeType);
+    }
+    return false;
+  }, [workspace]);
 
   // Handle tab change while preserving hierarchical URL params
   const handleTabChange = (tabId: TabId) => {
@@ -85,7 +101,7 @@ export function WorkspaceNavigation({
     onTabChange(tabId);
   };
 
-  const tabs: Tab[] = [
+  const baseTabs: Tab[] = [
     { id: 'overview', name: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, group: 'core' },
     { id: 'tasks', name: 'Tasks', icon: <ClipboardList className="w-4 h-4" />, group: 'core' },
     { id: 'team', name: 'Team', icon: <Users className="w-4 h-4" />, group: 'core' },
@@ -93,10 +109,21 @@ export function WorkspaceNavigation({
     { id: 'marketplace', name: 'Marketplace', icon: <ShoppingBag className="w-4 h-4" />, group: 'management' },
     { id: 'templates', name: 'Templates', icon: <FileText className="w-4 h-4" />, group: 'management' },
     { id: 'role-management', name: 'Roles', icon: <UserCog className="w-4 h-4" />, group: 'management' },
+    { id: 'event-settings', name: 'Event Settings', icon: <Settings2 className="w-4 h-4" />, group: 'management' },
     { id: 'analytics', name: 'Analytics', icon: <BarChart3 className="w-4 h-4" />, group: 'analysis' },
     { id: 'reports', name: 'Reports', icon: <Download className="w-4 h-4" />, group: 'analysis' },
     { id: 'audit', name: 'Audit Log', icon: <Clock className="w-4 h-4" />, group: 'analysis' },
   ];
+
+  // Filter tabs based on workspace type
+  const tabs = useMemo(() => {
+    return baseTabs.filter(tab => {
+      if (tab.id === 'event-settings') {
+        return showEventSettingsTab;
+      }
+      return true;
+    });
+  }, [showEventSettingsTab]);
 
   const toggleGroup = (group: string) => {
     setCollapsedGroups(prev => ({ ...prev, [group]: !prev[group] }));
