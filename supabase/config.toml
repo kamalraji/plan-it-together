@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.send-webhook-notification]
 verify_jwt = false
+
+[functions.track-page-view]
+verify_jwt = false

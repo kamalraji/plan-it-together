@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useSeo } from '@/hooks/useSeo';
+import { usePageViewTracking } from '@/hooks/usePageViewTracking';
 import { Calendar, MapPin, Users, Clock, Globe, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +21,6 @@ export function PublicEventPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const hasTrackedRef = useRef(false);
 
   // Extract UTM parameters
   const utmSource = searchParams.get('utm_source');
@@ -64,35 +64,13 @@ export function PublicEventPage() {
     ogType: 'website',
   });
 
-  // UTM tracking - store in Supabase for marketing analytics
-  useEffect(() => {
-    const trackPageView = async () => {
-      if (!event || hasTrackedRef.current) return;
-      hasTrackedRef.current = true;
-      
-      // Generate anonymous session ID for this visit
-      const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-      
-      // Store page view in Supabase
-      const { error } = await supabase
-        .from('event_page_views')
-        .insert({
-          event_id: event.id,
-          utm_source: utmSource,
-          utm_medium: utmMedium,
-          utm_campaign: utmCampaign,
-          referrer: document.referrer || null,
-          user_agent: navigator.userAgent,
-          session_id: sessionId,
-        });
-      
-      if (error) {
-        console.warn('[Analytics] Failed to record page view:', error.message);
-      }
-    };
-    
-    trackPageView();
-  }, [event, utmSource, utmMedium, utmCampaign]);
+  // Rate-limited page view tracking via edge function
+  usePageViewTracking({
+    eventId: event?.id || '',
+    utmSource,
+    utmMedium,
+    utmCampaign,
+  });
 
   // Section deep-linking - auto-scroll to section
   useEffect(() => {

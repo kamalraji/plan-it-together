@@ -8,12 +8,14 @@ import {
   Building2,
   Activity,
   Shield,
+  ShieldAlert,
 } from 'lucide-react';
 import { AdminStatisticsPanel } from './AdminStatisticsPanel';
 import { AdminUserManagement } from './AdminUserManagement';
 import { AdminSystemSettings } from './AdminSystemSettings';
 import { VendorApprovalPanel } from './VendorApprovalPanel';
 import { AdminActivityDashboard } from './AdminActivityDashboard';
+import { SecurityAuditDashboard } from './SecurityAuditDashboard';
 
 export const AdminDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,6 +61,10 @@ export const AdminDashboard: React.FC = () => {
             <Activity className="h-4 w-4" />
             <span className="hidden sm:inline">Activity</span>
           </TabsTrigger>
+          <TabsTrigger value="security" className="gap-2 data-[state=active]:bg-background">
+            <ShieldAlert className="h-4 w-4" />
+            <span className="hidden sm:inline">Security</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
@@ -79,6 +85,10 @@ export const AdminDashboard: React.FC = () => {
 
         <TabsContent value="activity" className="space-y-6 mt-6">
           <AdminActivityDashboard />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6 mt-6">
+          <SecurityAuditDashboard />
         </TabsContent>
       </Tabs>
     </div>
