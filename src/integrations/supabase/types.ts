@@ -2227,6 +2227,7 @@ export type Database = {
           id: string
           is_template: boolean | null
           items: Json
+          phase: string | null
           title: string
           updated_at: string
           workspace_id: string
@@ -2237,6 +2238,7 @@ export type Database = {
           id?: string
           is_template?: boolean | null
           items?: Json
+          phase?: string | null
           title: string
           updated_at?: string
           workspace_id: string
@@ -2247,6 +2249,7 @@ export type Database = {
           id?: string
           is_template?: boolean | null
           items?: Json
+          phase?: string | null
           title?: string
           updated_at?: string
           workspace_id?: string

@@ -26,7 +26,8 @@ export type WorkspaceTab =
   | 'role-management'
   | 'settings'
   | 'event-settings'
-  | 'approvals';
+  | 'approvals'
+  | 'checklists';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;
