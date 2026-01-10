@@ -170,6 +170,20 @@ export function ResourceApprovalList({ requests, isLoading, workspaceId }: Resou
                       </div>
                     )}
                     <ApprovalCommentsThread requestType="resource" requestId={request.id} />
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-1 block">
+                        Review Notes (optional)
+                      </label>
+                      <Textarea
+                        placeholder="Add notes about your decision..."
+                        value={reviewNotes[request.id] || ''}
+                        onChange={(e) => setReviewNotes(prev => ({
+                          ...prev,
+                          [request.id]: e.target.value,
+                        }))}
+                        className="text-sm"
+                        rows={2}
+                      />
                     </div>
                     <div className="flex gap-2">
                       <Button
