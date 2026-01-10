@@ -11,6 +11,7 @@ import { useChecklists, Checklist } from '@/hooks/useCommitteeDashboard';
 import { useChecklistDelegation } from '@/hooks/useChecklistDelegation';
 import { useAuth } from '@/hooks/useAuth';
 import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChecklistsTabContentProps {
   workspace: Workspace;
@@ -59,18 +60,45 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
     toggleItem({ checklistId, itemId, completed, userId: user.id });
   };
 
-  const handleCreateChecklist = (data: {
+  const handleCreateChecklist = async (data: {
     title: string;
     phase: EventPhase;
     items: { id: string; text: string; completed: boolean }[];
+    delegateToWorkspaceId?: string;
+    dueDate?: Date;
   }) => {
-    createChecklist({
-      workspace_id: workspace.id,
-      title: data.title,
-      committee_type: committeeType || null,
-      items: data.items,
-      is_template: false,
-    } as any);
+    if (data.delegateToWorkspaceId) {
+      // Create and delegate in one step - insert directly to target workspace
+      const { error } = await supabase
+        .from('workspace_checklists')
+        .insert({
+          workspace_id: data.delegateToWorkspaceId,
+          title: data.title,
+          phase: data.phase,
+          committee_type: committeeType || null,
+          items: data.items,
+          is_template: false,
+          delegated_from_workspace_id: workspace.id,
+          delegated_by: user?.id,
+          delegated_at: new Date().toISOString(),
+          due_date: data.dueDate?.toISOString() || null,
+          delegation_status: 'pending',
+        });
+      
+      if (error) {
+        console.error('Error creating delegated checklist:', error);
+      }
+    } else {
+      // Standard creation in current workspace
+      createChecklist({
+        workspace_id: workspace.id,
+        title: data.title,
+        phase: data.phase,
+        committee_type: committeeType || null,
+        items: data.items,
+        is_template: false,
+      } as any);
+    }
   };
 
   const handleOpenDelegate = (checklist: Checklist) => {
@@ -179,6 +207,8 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
         onOpenChange={setShowCreateDialog}
         onSubmit={handleCreateChecklist}
         committeeType={committeeType}
+        workspaceId={workspace.id}
+        canDelegate={isRootWorkspace}
       />
 
       <DelegateChecklistDialog
