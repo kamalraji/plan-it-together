@@ -49,7 +49,7 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
 
   return (
     <>
-    <Card>
+    <Card id="shift-scheduler">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Calendar className="h-4 w-4 text-pink-500" />

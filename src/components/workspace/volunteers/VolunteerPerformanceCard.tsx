@@ -136,7 +136,7 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
   const { volunteers = [], totals = { hours: 0, attendance: 0, reliability: 0 } } = performanceData || {};
 
   return (
-    <Card>
+    <Card id="performance-overview">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-amber-500" />

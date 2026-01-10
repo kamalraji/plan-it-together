@@ -165,7 +165,7 @@ export function VolunteerTrainingTracker({ workspaceId }: VolunteerTrainingTrack
   }
 
   return (
-    <Card>
+    <Card id="training-tracker">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

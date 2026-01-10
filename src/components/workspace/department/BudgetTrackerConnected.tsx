@@ -14,12 +14,14 @@ export function BudgetTrackerConnected({ workspaceId, showBreakdown = true }: Bu
   }
 
   return (
-    <BudgetTracker
-      allocated={budget?.allocated || 0}
-      used={budget?.used || 0}
-      currency={budget?.currency || '₹'}
-      showBreakdown={showBreakdown}
-      categories={categories}
-    />
+    <div id="budget-tracker">
+      <BudgetTracker
+        allocated={budget?.allocated || 0}
+        used={budget?.used || 0}
+        currency={budget?.currency || '₹'}
+        showBreakdown={showBreakdown}
+        categories={categories}
+      />
+    </div>
   );
 }
