@@ -76,7 +76,16 @@ export type WorkspaceTab =
   | 'approve-timesheets'
   | 'training-schedule'
   | 'recognition'
-  | 'recruitment';
+  | 'recruitment'
+  // Tech Department tabs
+  | 'system-check'
+  | 'network-status'
+  | 'security-audit'
+  | 'equipment-report'
+  | 'backup-status'
+  | 'report-incident'
+  | 'config-review'
+  | 'documentation';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

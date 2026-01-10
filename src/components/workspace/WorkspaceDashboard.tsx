@@ -38,6 +38,15 @@ import {
   TrainingScheduleTab,
   RecognitionTab,
   RecruitmentTab,
+  // Tech Department tabs
+  SystemHealthCheckTab,
+  NetworkStatusTab,
+  SecurityAuditTab,
+  EquipmentReportTab,
+  BackupStatusTab,
+  ReportIncidentTab,
+  ConfigReviewTab,
+  DocumentationTab,
 } from './committee-tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
@@ -339,6 +348,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'recruitment' && (
           <RecruitmentTab workspace={workspace} />
+        )}
+
+        {/* Tech Department tabs */}
+        {activeTab === 'system-check' && (
+          <SystemHealthCheckTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'network-status' && (
+          <NetworkStatusTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'security-audit' && (
+          <SecurityAuditTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'equipment-report' && (
+          <EquipmentReportTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'backup-status' && (
+          <BackupStatusTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'report-incident' && (
+          <ReportIncidentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'config-review' && (
+          <ConfigReviewTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'documentation' && (
+          <DocumentationTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>
