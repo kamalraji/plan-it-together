@@ -7,6 +7,7 @@ import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { RoleBasedActions } from '../RoleBasedActions';
 import { ChildWorkspacesManager } from './ChildWorkspacesManager';
 import { WorkspaceStructureOverview } from '../WorkspaceStructureOverview';
+import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
@@ -16,6 +17,7 @@ import {
   Activity,
   ChevronDown,
   GitBranch,
+  Send,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -41,6 +43,7 @@ export function RootDashboard({
   const navigate = useNavigate();
   const { data, isLoading } = useRootDashboard(workspace.eventId);
   const [structureOpen, setStructureOpen] = useState(true);
+  const [delegationsOpen, setDelegationsOpen] = useState(true);
 
   const handleDepartmentClick = (workspaceId: string) => {
     const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/workspaces';
@@ -188,6 +191,29 @@ export function RootDashboard({
                       parentWorkspaceId={workspace.id}
                       canManage={!!onManageSettings}
                     />
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          </section>
+
+          {/* Delegation Progress */}
+          <section id="delegations">
+            <Collapsible open={delegationsOpen} onOpenChange={setDelegationsOpen}>
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <CollapsibleTrigger className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Send className="h-4 w-4 text-primary" />
+                    Delegation Progress
+                  </h3>
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform",
+                    delegationsOpen && "rotate-180"
+                  )} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 pb-4">
+                    <DelegationProgressDashboard workspaceId={workspace.id} />
                   </div>
                 </CollapsibleContent>
               </div>

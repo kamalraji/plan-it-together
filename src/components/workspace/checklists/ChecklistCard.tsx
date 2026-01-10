@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, ClipboardList, Clock, CheckCircle, MoreVertical, Trash2, Send } from 'lucide-react';
+import { ChevronDown, ChevronUp, ClipboardList, Clock, CheckCircle, MoreVertical, Trash2, Send, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Checklist, ChecklistItem } from '@/hooks/useCommitteeDashboard';
 import { DelegatedChecklistBadge } from './DelegatedChecklistBadge';
+import { RequestDeadlineExtensionDialog } from './RequestDeadlineExtensionDialog';
+import { useDeadlineExtensions } from '@/hooks/useDeadlineExtensions';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +26,7 @@ interface ChecklistCardProps {
     due_date?: string | null;
     delegation_status?: string;
     source_workspace?: { id: string; name: string } | null;
+    workspace_id?: string;
   };
   onToggleItem: (checklistId: string, itemId: string, completed: boolean) => void;
   onDelete?: (checklistId: string) => void;
@@ -57,6 +60,10 @@ const phaseConfig = {
 
 export function ChecklistCard({ checklist, onToggleItem, onDelete, onDelegate, canDelegate }: ChecklistCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [showExtensionDialog, setShowExtensionDialog] = useState(false);
+  
+  const { createExtension, isCreating } = useDeadlineExtensions(checklist.workspace_id);
+  
   const phase = checklist.phase || 'pre_event';
   const config = phaseConfig[phase];
   const Icon = config.icon;
@@ -65,6 +72,15 @@ export function ChecklistCard({ checklist, onToggleItem, onDelete, onDelegate, c
   const completedCount = items.filter(item => item.completed).length;
   const progress = items.length > 0 ? Math.round((completedCount / items.length) * 100) : 0;
   const isDelegated = !!checklist.delegated_from_workspace_id;
+
+  const handleRequestExtension = (data: { requestedDueDate: Date; justification: string }) => {
+    createExtension({
+      checklistId: checklist.id,
+      currentDueDate: checklist.due_date || null,
+      requestedDueDate: data.requestedDueDate,
+      justification: data.justification,
+    });
+  };
 
   return (
     <Card className={cn("transition-all", config.borderColor)}>
@@ -109,7 +125,13 @@ export function ChecklistCard({ checklist, onToggleItem, onDelete, onDelegate, c
                     Delegate
                   </DropdownMenuItem>
                 )}
-                {canDelegate && onDelegate && !isDelegated && onDelete && (
+                {isDelegated && checklist.due_date && (
+                  <DropdownMenuItem onClick={() => setShowExtensionDialog(true)}>
+                    <Timer className="h-3.5 w-3.5 mr-2" />
+                    Request Extension
+                  </DropdownMenuItem>
+                )}
+                {((canDelegate && onDelegate && !isDelegated) || (isDelegated && checklist.due_date)) && onDelete && (
                   <DropdownMenuSeparator />
                 )}
                 {onDelete && (
@@ -180,6 +202,16 @@ export function ChecklistCard({ checklist, onToggleItem, onDelete, onDelegate, c
           </div>
         </CardContent>
       )}
+
+      {/* Deadline Extension Dialog */}
+      <RequestDeadlineExtensionDialog
+        open={showExtensionDialog}
+        onOpenChange={setShowExtensionDialog}
+        checklistTitle={checklist.title}
+        currentDueDate={checklist.due_date || null}
+        onSubmit={handleRequestExtension}
+        isSubmitting={isCreating}
+      />
     </Card>
   );
 }
