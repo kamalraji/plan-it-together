@@ -67,7 +67,16 @@ export type WorkspaceTab =
   | 'check-in'
   | 'create-team'
   | 'training-status'
-  | 'performance-review';
+  | 'performance-review'
+  // Volunteer Department tabs
+  | 'view-committees'
+  | 'shift-overview'
+  | 'mass-announcement'
+  | 'hours-report'
+  | 'approve-timesheets'
+  | 'training-schedule'
+  | 'recognition'
+  | 'recruitment';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

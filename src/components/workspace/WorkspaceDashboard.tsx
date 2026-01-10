@@ -29,7 +29,15 @@ import {
   CheckInVolunteerTab, 
   CreateTeamTab, 
   TrainingStatusTab, 
-  PerformanceReviewTab 
+  PerformanceReviewTab,
+  ViewCommitteesTab,
+  ShiftOverviewTab,
+  MassAnnouncementTab,
+  HoursReportTab,
+  ApproveTimesheetsTab,
+  TrainingScheduleTab,
+  RecognitionTab,
+  RecruitmentTab,
 } from './committee-tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
@@ -298,6 +306,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'performance-review' && (
           <PerformanceReviewTab workspace={workspace} />
+        )}
+
+        {/* Volunteer Department tabs */}
+        {activeTab === 'view-committees' && (
+          <ViewCommitteesTab workspace={workspace} />
+        )}
+
+        {activeTab === 'shift-overview' && (
+          <ShiftOverviewTab workspace={workspace} />
+        )}
+
+        {activeTab === 'mass-announcement' && (
+          <MassAnnouncementTab workspace={workspace} />
+        )}
+
+        {activeTab === 'hours-report' && (
+          <HoursReportTab workspace={workspace} />
+        )}
+
+        {activeTab === 'approve-timesheets' && (
+          <ApproveTimesheetsTab workspace={workspace} />
+        )}
+
+        {activeTab === 'training-schedule' && (
+          <TrainingScheduleTab workspace={workspace} />
+        )}
+
+        {activeTab === 'recognition' && (
+          <RecognitionTab workspace={workspace} />
+        )}
+
+        {activeTab === 'recruitment' && (
+          <RecruitmentTab workspace={workspace} />
         )}
       </div>
     </WorkspaceLayout>
