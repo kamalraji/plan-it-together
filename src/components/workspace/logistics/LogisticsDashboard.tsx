@@ -3,7 +3,7 @@ import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { RoleBasedActions } from '../RoleBasedActions';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
-import { MilestoneTimeline, GoalTracker, CommitteeChecklist, BudgetRequestForm, ResourceRequestForm, ResourceRequestsList } from '../committee';
+import { MilestoneTimeline, GoalTracker, BudgetRequestForm, ResourceRequestForm, ResourceRequestsList } from '../committee';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
@@ -137,13 +137,10 @@ export function LogisticsDashboard({
         <GoalTracker workspaceId={workspace.id} />
       </div>
 
-      {/* Checklist and Budget */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CommitteeChecklist workspaceId={workspace.id} committeeType="logistics" />
-        {!isBudgetLoading && (
-          <BudgetTrackerConnected workspaceId={workspace.id} showBreakdown={false} />
-        )}
-      </div>
+      {/* Budget */}
+      {!isBudgetLoading && (
+        <BudgetTrackerConnected workspaceId={workspace.id} showBreakdown={false} />
+      )}
 
       {/* Resource Requests */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceRole } from '@/types';
 import { MilestoneTimeline } from './MilestoneTimeline';
 import { GoalTracker } from './GoalTracker';
-import { CommitteeChecklist } from './CommitteeChecklist';
+
 import { CommitteeHeaderCard } from './CommitteeHeaderCard';
 import { BudgetRequestForm } from './BudgetRequestForm';
 import { ResourceRequestForm } from './ResourceRequestForm';
@@ -518,8 +518,6 @@ export function CommitteeDashboard({
 
         {/* Right Column */}
         <div className="space-y-6">
-          <CommitteeChecklist workspaceId={workspace.id} committeeType={committeeType} />
-          
           {/* Budget Section */}
           {!isBudgetLoading && (
             <BudgetTrackerConnected

@@ -8,7 +8,7 @@ import { MilestoneTimeline } from '../committee/MilestoneTimeline';
 import { GoalTracker } from '../committee/GoalTracker';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 import { BudgetRequestForm } from '../committee/BudgetRequestForm';
-import { CommitteeChecklist } from '../committee/CommitteeChecklist';
+
 import { ResourceRequestForm } from '../committee/ResourceRequestForm';
 import { VolunteerShiftScheduler } from './VolunteerShiftScheduler';
 import { VolunteerRoster } from './VolunteerRoster';
@@ -133,7 +133,7 @@ export function VolunteersDashboard({
           <VolunteerTrainingTracker workspaceId={workspace.id} />
         </div>
 
-        {/* Right Column - Check-In Stats, Quick Actions & Checklist */}
+        {/* Right Column - Check-In Stats & Quick Actions */}
         <div className="space-y-6">
           <VolunteerCheckInStats workspaceId={workspace.id} />
           <VolunteerQuickActions 
@@ -141,7 +141,6 @@ export function VolunteersDashboard({
             eventId={workspace.eventId}
             orgSlug={orgSlug}
           />
-          <CommitteeChecklist workspaceId={workspace.id} committeeType="VOLUNTEERS" />
         </div>
       </div>
 
