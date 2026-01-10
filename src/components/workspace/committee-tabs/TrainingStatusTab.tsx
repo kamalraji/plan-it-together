@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { GraduationCap, CheckCircle, Clock, AlertTriangle, Users, Plus, Search } from 'lucide-react';
+import { GraduationCap, CheckCircle, Clock, AlertTriangle, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +44,7 @@ const mockVolunteers: VolunteerTraining[] = [
   { id: '4', name: 'David Wilson', email: 'david@example.com', completedModules: 0, totalModules: 4, status: 'not_started' },
 ];
 
-export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
+export function TrainingStatusTab({ workspace: _workspace }: TrainingStatusTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'completed' | 'in_progress' | 'not_started'>('all');
 

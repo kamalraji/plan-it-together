@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Workspace, WorkspaceType } from '@/types';
+import { useState } from 'react';
+import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Users, Plus, Settings, UserPlus, Folder, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface CreateTeamTabProps {
   workspace: Workspace;
@@ -18,6 +19,8 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch existing child teams
   const { data: childTeams, isLoading } = useQuery({
@@ -61,9 +64,13 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
   const handleCreateTeam = async () => {
     if (!teamName.trim()) return;
 
+    setIsCreating(true);
     try {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
+      if (!user.user) {
+        toast.error('You must be logged in to create a team');
+        return;
+      }
 
       const slug = teamName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
@@ -75,17 +82,22 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
           description: teamDescription || null,
           workspace_type: 'TEAM',
           parent_workspace_id: workspace.id,
-          event_id: workspace.eventId,
-          owner_id: user.user.id,
+          event_id: workspace.eventId!,
+          organizer_id: user.user.id,
         });
 
       if (error) throw error;
 
+      toast.success('Team created successfully');
+      queryClient.invalidateQueries({ queryKey: ['child-teams', workspace.id] });
       setShowCreateForm(false);
       setTeamName('');
       setTeamDescription('');
     } catch (err) {
       console.error('Failed to create team:', err);
+      toast.error('Failed to create team');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -178,10 +190,10 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
               <Button 
                 className="bg-blue-500 hover:bg-blue-600"
                 onClick={handleCreateTeam}
-                disabled={!teamName.trim()}
+                disabled={!teamName.trim() || isCreating}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Create Team
+                {isCreating ? 'Creating...' : 'Create Team'}
               </Button>
             </div>
           </CardContent>

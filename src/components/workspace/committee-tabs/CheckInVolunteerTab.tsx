@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { UserCheck, Search, QrCode, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
+import { UserCheck, Search, QrCode, Clock, CheckCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useVolunteerShifts } from '@/hooks/useVolunteerShifts';
+import { useVolunteerShifts, VolunteerAssignment } from '@/hooks/useVolunteerShifts';
 import { format } from 'date-fns';
 
 interface CheckInVolunteerTabProps {
@@ -14,28 +14,38 @@ interface CheckInVolunteerTabProps {
 }
 
 export function CheckInVolunteerTab({ workspace }: CheckInVolunteerTabProps) {
-  const { shifts, assignments, checkInVolunteer, checkOutVolunteer, isLoading } = useVolunteerShifts(workspace.id);
+  const { shifts, checkInVolunteer, checkOutVolunteer, getShiftAssignments } = useVolunteerShifts(workspace.id);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedShiftId, setSelectedShiftId] = useState<string | null>(null);
+  const [shiftAssignments, setShiftAssignments] = useState<VolunteerAssignment[]>([]);
 
   // Get today's shifts
   const today = new Date().toISOString().split('T')[0];
   const todaysShifts = shifts?.filter(shift => shift.date === today) || [];
 
-  // Get assignments for selected shift
-  const shiftAssignments = selectedShiftId 
-    ? assignments?.filter(a => a.shift_id === selectedShiftId) || []
-    : [];
+  const handleShiftSelect = async (shiftId: string) => {
+    setSelectedShiftId(shiftId);
+    const assignments = await getShiftAssignments(shiftId);
+    setShiftAssignments(assignments);
+  };
 
-  const checkedInCount = shiftAssignments.filter(a => a.check_in_time).length;
-  const pendingCount = shiftAssignments.filter(a => !a.check_in_time).length;
+  const checkedInCount = shiftAssignments.filter(a => a.checkInTime).length;
+  const pendingCount = shiftAssignments.filter(a => !a.checkInTime).length;
 
   const handleCheckIn = async (assignmentId: string) => {
-    await checkInVolunteer(assignmentId);
+    await checkInVolunteer.mutateAsync({ shiftId: selectedShiftId!, userId: assignmentId });
+    if (selectedShiftId) {
+      const assignments = await getShiftAssignments(selectedShiftId);
+      setShiftAssignments(assignments);
+    }
   };
 
   const handleCheckOut = async (assignmentId: string) => {
-    await checkOutVolunteer(assignmentId);
+    await checkOutVolunteer.mutateAsync({ shiftId: selectedShiftId!, userId: assignmentId });
+    if (selectedShiftId) {
+      const assignments = await getShiftAssignments(selectedShiftId);
+      setShiftAssignments(assignments);
+    }
   };
 
   return (
@@ -104,7 +114,7 @@ export function CheckInVolunteerTab({ workspace }: CheckInVolunteerTabProps) {
               {todaysShifts.map(shift => (
                 <button
                   key={shift.id}
-                  onClick={() => setSelectedShiftId(shift.id)}
+                  onClick={() => handleShiftSelect(shift.id)}
                   className={`w-full p-4 rounded-lg border text-left transition-all ${
                     selectedShiftId === shift.id 
                       ? 'border-emerald-500 bg-emerald-500/10' 
@@ -115,11 +125,11 @@ export function CheckInVolunteerTab({ workspace }: CheckInVolunteerTabProps) {
                     <div>
                       <h4 className="font-medium">{shift.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {shift.start_time} - {shift.end_time} • {shift.location || 'No location'}
+                        {shift.startTime} - {shift.endTime} • {shift.location || 'No location'}
                       </p>
                     </div>
                     <Badge variant="secondary">
-                      {shift.required_volunteers} volunteers
+                      {shift.requiredVolunteers} volunteers
                     </Badge>
                   </div>
                 </button>
@@ -162,27 +172,27 @@ export function CheckInVolunteerTab({ workspace }: CheckInVolunteerTabProps) {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
                         <AvatarFallback className="text-xs">
-                          {assignment.user_id.slice(0, 2).toUpperCase()}
+                          {assignment.userId.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="font-medium text-sm">Volunteer</p>
                         <p className="text-xs text-muted-foreground">
-                          {assignment.check_in_time 
-                            ? `Checked in at ${format(new Date(assignment.check_in_time), 'h:mm a')}`
+                          {assignment.checkInTime 
+                            ? `Checked in at ${format(new Date(assignment.checkInTime), 'h:mm a')}`
                             : 'Not checked in'
                           }
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {assignment.check_in_time ? (
+                      {assignment.checkInTime ? (
                         <>
                           <Badge variant="outline" className="border-emerald-500/30 text-emerald-600">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Checked In
                           </Badge>
-                          {!assignment.check_out_time && (
+                          {!assignment.checkOutTime && (
                             <Button 
                               size="sm" 
                               variant="outline"

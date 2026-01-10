@@ -101,12 +101,12 @@ interface CommitteeActionsMenuProps {
 // Committee-specific action sets with navigation targets
 const committeeActions: Record<string, CommitteeAction[]> = {
   volunteers: [
-    { id: 'assign-shifts', label: 'Assign Shifts', icon: Calendar, color: 'text-pink-500', tab: 'overview', sectionId: 'shift-scheduler' },
-    { id: 'send-brief', label: 'Send Brief', icon: Send, color: 'text-rose-500', tab: 'communication' },
-    { id: 'check-in', label: 'Check-in Volunteer', icon: UserCheck, color: 'text-emerald-500', tab: 'overview', sectionId: 'checkin-stats' },
-    { id: 'create-team', label: 'Create Team', icon: Users, color: 'text-blue-500', tab: 'team' },
-    { id: 'training-status', label: 'Training Status', icon: GraduationCap, color: 'text-amber-500', tab: 'overview', sectionId: 'training-tracker' },
-    { id: 'performance-review', label: 'Performance Review', icon: Award, color: 'text-yellow-500', tab: 'overview', sectionId: 'performance-card' },
+    { id: 'assign-shifts', label: 'Assign Shifts', icon: Calendar, color: 'text-pink-500', tab: 'assign-shifts' },
+    { id: 'send-brief', label: 'Send Brief', icon: Send, color: 'text-rose-500', tab: 'send-brief' },
+    { id: 'check-in', label: 'Check-in Volunteer', icon: UserCheck, color: 'text-emerald-500', tab: 'check-in' },
+    { id: 'create-team', label: 'Create Team', icon: Users, color: 'text-blue-500', tab: 'create-team' },
+    { id: 'training-status', label: 'Training Status', icon: GraduationCap, color: 'text-amber-500', tab: 'training-status' },
+    { id: 'performance-review', label: 'Performance Review', icon: Award, color: 'text-yellow-500', tab: 'performance-review' },
   ],
   finance: [
     { id: 'record-expense', label: 'Record Expense', icon: Receipt, color: 'text-green-500', tab: 'overview', sectionId: 'budget-tracker' },

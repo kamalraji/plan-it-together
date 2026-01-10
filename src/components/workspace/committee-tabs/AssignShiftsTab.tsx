@@ -14,7 +14,7 @@ interface AssignShiftsTabProps {
 
 export function AssignShiftsTab({ workspace }: AssignShiftsTabProps) {
   const { shifts, isLoading } = useVolunteerShifts(workspace.id);
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const filteredShifts = shifts?.filter(shift => 
     shift.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,10 +37,7 @@ export function AssignShiftsTab({ workspace }: AssignShiftsTabProps) {
             Create and manage volunteer shifts for your team
           </p>
         </div>
-        <Button 
-          className="bg-pink-500 hover:bg-pink-600 text-white"
-          onClick={() => {/* TODO: Open create shift modal */}}
-        >
+        <Button className="bg-pink-500 hover:bg-pink-600 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Create Shift
         </Button>
@@ -100,10 +97,7 @@ export function AssignShiftsTab({ workspace }: AssignShiftsTabProps) {
             <p className="text-sm text-muted-foreground mb-4">
               Create your first shift to start assigning volunteers
             </p>
-            <Button 
-              variant="outline"
-              onClick={() => {/* TODO: Open create shift modal */}}
-            >
+            <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
               Create First Shift
             </Button>

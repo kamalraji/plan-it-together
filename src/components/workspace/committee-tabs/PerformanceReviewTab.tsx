@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Workspace } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Award, Star, TrendingUp, Clock, Users, Trophy, Medal, ThumbsUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Award, Star, Clock, Trophy, Medal, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -49,7 +49,7 @@ const getAttendanceBadgeColor = (rate: number) => {
   return 'border-red-500/30 text-red-600';
 };
 
-export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
+export function PerformanceReviewTab({ workspace: _workspace }: PerformanceReviewTabProps) {
   const [selectedTab, setSelectedTab] = useState('leaderboard');
 
   const totalHours = mockPerformanceData.reduce((acc, v) => acc + v.hoursLogged, 0);

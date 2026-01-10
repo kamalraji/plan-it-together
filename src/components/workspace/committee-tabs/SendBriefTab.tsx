@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Send, Users, FileText, Clock, CheckCircle, AlertCircle, Plus } from 'lucide-react';
+import { Send, Users, FileText, Clock, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,14 +29,13 @@ const mockBriefs: Brief[] = [
   { id: '3', title: 'Shift Reminder - Day 1', recipients: 'Morning Shift', status: 'draft' },
 ];
 
-export function SendBriefTab({ workspace }: SendBriefTabProps) {
+export function SendBriefTab({ workspace: _workspace }: SendBriefTabProps) {
   const [showComposer, setShowComposer] = useState(false);
   const [briefTitle, setBriefTitle] = useState('');
   const [briefContent, setBriefContent] = useState('');
   const [recipients, setRecipients] = useState('all');
 
   const handleSendBrief = () => {
-    // TODO: Implement actual send functionality
     console.log('Sending brief:', { briefTitle, briefContent, recipients });
     setShowComposer(false);
     setBriefTitle('');
