@@ -37,6 +37,7 @@ import {
   Folder,
   Settings2,
   ClipboardCheck,
+  ListChecks,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -57,7 +58,8 @@ export type WorkspaceTab =
   | 'role-management'
   | 'settings'
   | 'event-settings'
-  | 'approvals';
+  | 'approvals'
+  | 'checklists';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
@@ -84,6 +86,7 @@ const baseNavItems: NavItem[] = [
   { id: 'team', name: 'Team', icon: Users, group: 'core' },
   { id: 'communication', name: 'Communication', icon: MessageSquare, group: 'core' },
   { id: 'approvals', name: 'Approvals', icon: ClipboardCheck, group: 'core' },
+  { id: 'checklists', name: 'Checklists', icon: ListChecks, group: 'core' },
   { id: 'event-settings', name: 'Event Settings', icon: Settings2, group: 'core' },
   { id: 'marketplace', name: 'Marketplace', icon: ShoppingBag, group: 'management' },
   { id: 'templates', name: 'Templates', icon: FileText, group: 'management' },
@@ -142,8 +145,8 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
       if (item.id === 'event-settings') {
         return showEventSettingsTab;
       }
-      // Hide approvals for TEAM workspaces
-      if (item.id === 'approvals') {
+      // Hide approvals and checklists for TEAM workspaces
+      if (item.id === 'approvals' || item.id === 'checklists') {
         return workspace.workspaceType !== WorkspaceType.TEAM;
       }
       return true;

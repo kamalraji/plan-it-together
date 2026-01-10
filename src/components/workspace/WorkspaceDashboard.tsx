@@ -21,6 +21,7 @@ import { RootDashboard } from './root';
 import { WorkspaceSettingsContent } from './WorkspaceSettingsContent';
 import { EventSettingsTabContent } from './event-settings';
 import { ApprovalsTabContent } from './approvals';
+import { ChecklistsTabContent } from './checklists';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -250,6 +251,10 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
             workspace={workspace}
             userRole={permissions.currentMember?.role as WorkspaceRole}
           />
+        )}
+
+        {activeTab === 'checklists' && (
+          <ChecklistsTabContent workspace={workspace} />
         )}
       </div>
     </WorkspaceLayout>
