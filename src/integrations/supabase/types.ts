@@ -2345,6 +2345,65 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_announcements: {
+        Row: {
+          announcement_type: string
+          channels: Json | null
+          content: string
+          created_at: string
+          id: string
+          recipients_count: number | null
+          scheduled_for: string | null
+          sent_at: string | null
+          sent_by: string | null
+          status: string
+          target_audience: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          announcement_type?: string
+          channels?: Json | null
+          content: string
+          created_at?: string
+          id?: string
+          recipients_count?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          target_audience?: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          announcement_type?: string
+          channels?: Json | null
+          content?: string
+          created_at?: string
+          id?: string
+          recipients_count?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          target_audience?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_announcements_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_audit_logs: {
         Row: {
           action: string
@@ -2533,6 +2592,77 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_budgets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_campaigns: {
+        Row: {
+          budget: number | null
+          channel: string
+          clicks: number | null
+          conversions: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          impressions: number | null
+          name: string
+          spent: number | null
+          start_date: string | null
+          status: string
+          target_audience: Json | null
+          updated_at: string
+          utm_params: Json | null
+          workspace_id: string
+        }
+        Insert: {
+          budget?: number | null
+          channel?: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          impressions?: number | null
+          name: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          target_audience?: Json | null
+          updated_at?: string
+          utm_params?: Json | null
+          workspace_id: string
+        }
+        Update: {
+          budget?: number | null
+          channel?: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          impressions?: number | null
+          name?: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          target_audience?: Json | null
+          updated_at?: string
+          utm_params?: Json | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_campaigns_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -3454,6 +3584,139 @@ export type Database = {
           },
         ]
       }
+      workspace_partners: {
+        Row: {
+          commission_percentage: number | null
+          company_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          deliverables: Json | null
+          engagement_rate: number | null
+          id: string
+          name: string
+          notes: string | null
+          partner_type: string
+          partnership_value: number | null
+          reach: number | null
+          social_handles: Json | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          commission_percentage?: number | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          engagement_rate?: number | null
+          id?: string
+          name: string
+          notes?: string | null
+          partner_type?: string
+          partnership_value?: number | null
+          reach?: number | null
+          social_handles?: Json | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          commission_percentage?: number | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          engagement_rate?: number | null
+          id?: string
+          name?: string
+          notes?: string | null
+          partner_type?: string
+          partnership_value?: number | null
+          reach?: number | null
+          social_handles?: Json | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_partners_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_pr_contacts: {
+        Row: {
+          beat: string | null
+          contact_type: string
+          created_at: string
+          email: string | null
+          id: string
+          last_contacted_at: string | null
+          name: string
+          notes: string | null
+          outlet_name: string | null
+          phone: string | null
+          priority: string | null
+          response_rate: number | null
+          social_handles: Json | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          beat?: string | null
+          contact_type?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name: string
+          notes?: string | null
+          outlet_name?: string | null
+          phone?: string | null
+          priority?: string | null
+          response_rate?: number | null
+          social_handles?: Json | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          beat?: string | null
+          contact_type?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name?: string
+          notes?: string | null
+          outlet_name?: string | null
+          phone?: string | null
+          priority?: string | null
+          response_rate?: number | null
+          social_handles?: Json | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_pr_contacts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_resource_requests: {
         Row: {
           created_at: string
@@ -4106,6 +4369,80 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_speakers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_sponsors: {
+        Row: {
+          amount_paid: number | null
+          company_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          contract_signed_at: string | null
+          contract_value: number | null
+          created_at: string
+          deliverables: Json | null
+          deliverables_status: Json | null
+          id: string
+          name: string
+          notes: string | null
+          payment_status: string | null
+          proposal_sent_at: string | null
+          status: string
+          tier: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          amount_paid?: number | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          contract_signed_at?: string | null
+          contract_value?: number | null
+          created_at?: string
+          deliverables?: Json | null
+          deliverables_status?: Json | null
+          id?: string
+          name: string
+          notes?: string | null
+          payment_status?: string | null
+          proposal_sent_at?: string | null
+          status?: string
+          tier?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          amount_paid?: number | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          contract_signed_at?: string | null
+          contract_value?: number | null
+          created_at?: string
+          deliverables?: Json | null
+          deliverables_status?: Json | null
+          id?: string
+          name?: string
+          notes?: string | null
+          payment_status?: string | null
+          proposal_sent_at?: string | null
+          status?: string
+          tier?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_sponsors_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

@@ -116,6 +116,15 @@ export type WorkspaceTab =
   | 'add-speaker'
   | 'schedule-session'
   | 'view-rubrics'
+  // Growth Department tabs
+  | 'launch-campaign'
+  | 'schedule-content'
+  | 'add-sponsor'
+  | 'send-announcement'
+  | 'view-analytics'
+  | 'set-goals'
+  | 'manage-partners'
+  | 'pr-outreach'
   // Media Committee tabs (L3)
   | 'upload-media-committee'
   | 'create-shot-list'
