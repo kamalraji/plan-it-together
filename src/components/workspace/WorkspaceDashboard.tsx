@@ -153,6 +153,17 @@ import {
   CreateCampaignMarketingTab,
   ABTestingMarketingTab,
 } from './committee/marketing/tabs';
+// Operations Department tabs (L2)
+import {
+  EventBriefingTab,
+  LogisticsStatusTab,
+  CateringUpdateTab,
+  FacilityCheckTab,
+  MasterChecklistTab,
+  IncidentReportTab,
+  TeamRosterTab,
+  OpsReportTab,
+} from './department/operations/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -775,6 +786,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'ab-test-marketing' && (
           <ABTestingMarketingTab workspaceId={workspace.id} />
+        )}
+
+        {/* Operations Department tabs (L2) */}
+        {activeTab === 'event-briefing' && (
+          <EventBriefingTab workspace={workspace} />
+        )}
+
+        {activeTab === 'logistics-status' && (
+          <LogisticsStatusTab workspace={workspace} />
+        )}
+
+        {activeTab === 'catering-update' && (
+          <CateringUpdateTab workspace={workspace} />
+        )}
+
+        {activeTab === 'facility-check' && (
+          <FacilityCheckTab workspace={workspace} />
+        )}
+
+        {activeTab === 'master-checklist' && (
+          <MasterChecklistTab workspace={workspace} />
+        )}
+
+        {activeTab === 'incident-report' && (
+          <IncidentReportTab workspace={workspace} />
+        )}
+
+        {activeTab === 'team-roster' && (
+          <TeamRosterTab workspace={workspace} />
+        )}
+
+        {activeTab === 'ops-report' && (
+          <OpsReportTab workspace={workspace} />
         )}
       </div>
     </WorkspaceLayout>

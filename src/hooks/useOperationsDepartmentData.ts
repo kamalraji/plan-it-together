@@ -541,31 +541,58 @@ export function useDeleteEventBriefing(workspaceId: string | undefined) {
 
 // ============= Team Members (read from existing table) =============
 
+interface TeamMemberWithProfile {
+  id: string;
+  user_id: string;
+  role: string;
+  status: string;
+  joined_at: string;
+  member_name: string | null;
+  avatar_url: string | null;
+  department: string | null;
+}
+
 export function useOperationsTeamRoster(workspaceId: string | undefined) {
   return useQuery({
     queryKey: ['workspace-team-roster', workspaceId],
-    queryFn: async () => {
+    queryFn: async (): Promise<TeamMemberWithProfile[]> => {
       if (!workspaceId) return [];
-      const { data, error } = await supabase
+      
+      // Fetch team members
+      const { data: members, error: membersError } = await supabase
         .from('workspace_team_members')
-        .select(`
-          id,
-          user_id,
-          role,
-          status,
-          joined_at,
-          user_profiles!inner (
-            full_name,
-            avatar_url,
-            phone,
-            organization
-          )
-        `)
+        .select('id, user_id, role, status, joined_at')
         .eq('workspace_id', workspaceId)
         .eq('status', 'ACTIVE')
         .order('role', { ascending: true });
-      if (error) throw error;
-      return data;
+      
+      if (membersError) throw membersError;
+      if (!members || members.length === 0) return [];
+      
+      // Fetch user profiles for these members
+      const userIds = members.map(m => m.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, avatar_url, organization')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+      
+      // Merge data
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      return members.map(member => {
+        const profile = profileMap.get(member.user_id);
+        return {
+          id: member.id,
+          user_id: member.user_id,
+          role: member.role,
+          status: member.status,
+          joined_at: member.joined_at,
+          member_name: profile?.full_name || null,
+          avatar_url: profile?.avatar_url || null,
+          department: profile?.organization || null,
+        };
+      });
     },
     enabled: !!workspaceId,
   });

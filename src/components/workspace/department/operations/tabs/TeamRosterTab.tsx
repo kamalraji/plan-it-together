@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Users, Search, Phone, Loader2, User, Building } from 'lucide-react';
+import { Users, Search, Loader2, User, Building } from 'lucide-react';
 import { useOperationsTeamRoster } from '@/hooks/useOperationsDepartmentData';
 
 interface TeamRosterTabProps {
@@ -16,7 +16,7 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
   const { data: teamMembers, isLoading } = useOperationsTeamRoster(workspace.id);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const getInitials = (name: string | null) => {
+  const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -41,12 +41,11 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
     if (!teamMembers) return {};
     
     const filtered = teamMembers.filter(member => {
-      const profile = member.user_profiles;
       const searchLower = searchQuery.toLowerCase();
       return (
-        (profile?.full_name?.toLowerCase().includes(searchLower)) ||
+        (member.member_name?.toLowerCase().includes(searchLower)) ||
         (member.role?.toLowerCase().includes(searchLower)) ||
-        (profile?.organization?.toLowerCase().includes(searchLower))
+        (member.department?.toLowerCase().includes(searchLower))
       );
     });
 
@@ -130,7 +129,7 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search by name, role, or organization..."
+          placeholder="Search by name, role, or department..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -156,44 +155,33 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
                       </Badge>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {groupedMembers[role].map((member) => {
-                        const profile = member.user_profiles;
-                        return (
-                          <div
-                            key={member.id}
-                            className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                          >
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage src={profile?.avatar_url || undefined} />
-                              <AvatarFallback className="bg-primary/20 text-primary">
-                                {getInitials(profile?.full_name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-foreground truncate">
-                                  {profile?.full_name || 'Unknown User'}
-                                </span>
-                                {getRoleBadge(member.role)}
-                              </div>
-                              {profile?.organization && (
-                                <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                  <Building className="h-3 w-3" />
-                                  {profile.organization}
-                                </p>
-                              )}
+                      {groupedMembers[role].map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={member.avatar_url || undefined} />
+                            <AvatarFallback className="bg-primary/20 text-primary">
+                              {getInitials(member.member_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-foreground truncate">
+                                {member.member_name || 'Unknown User'}
+                              </span>
+                              {getRoleBadge(member.role)}
                             </div>
-                            {profile?.phone && (
-                              <a
-                                href={`tel:${profile.phone}`}
-                                className="p-2 rounded-full hover:bg-muted transition-colors"
-                              >
-                                <Phone className="h-4 w-4 text-muted-foreground" />
-                              </a>
+                            {member.department && (
+                              <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                                <Building className="h-3 w-3" />
+                                {member.department}
+                              </p>
                             )}
                           </div>
-                        );
-                      })}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}

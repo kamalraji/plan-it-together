@@ -1,5 +1,4 @@
 import { Workspace } from '@/types';
-import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -23,7 +22,7 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
 
   const isLoading = mealsLoading || menuLoading || dietaryLoading;
 
-  const getMealTypeIcon = () => {
+  const getMealTypeIcon = (_mealType?: string) => {
     return <UtensilsCrossed className="h-4 w-4" />;
   };
 

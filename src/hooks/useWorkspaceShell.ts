@@ -133,7 +133,16 @@ export type WorkspaceTab =
   | 'schedule-post-marketing'
   | 'view-analytics-marketing'
   | 'create-campaign-marketing'
-  | 'ab-test-marketing';
+  | 'ab-test-marketing'
+  // Operations Department tabs (L2)
+  | 'event-briefing'
+  | 'logistics-status'
+  | 'catering-update'
+  | 'facility-check'
+  | 'master-checklist'
+  | 'incident-report'
+  | 'team-roster'
+  | 'ops-report';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;
