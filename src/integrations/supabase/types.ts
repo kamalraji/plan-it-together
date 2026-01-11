@@ -3041,6 +3041,71 @@ export type Database = {
           },
         ]
       }
+      workspace_engagement_reports: {
+        Row: {
+          created_at: string | null
+          engagement_rate: number | null
+          follower_growth: number | null
+          id: string
+          platform: string
+          report_date: string
+          top_performing_post_id: string | null
+          total_comments: number | null
+          total_followers: number | null
+          total_impressions: number | null
+          total_likes: number | null
+          total_posts: number | null
+          total_reach: number | null
+          total_saves: number | null
+          total_shares: number | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          engagement_rate?: number | null
+          follower_growth?: number | null
+          id?: string
+          platform: string
+          report_date: string
+          top_performing_post_id?: string | null
+          total_comments?: number | null
+          total_followers?: number | null
+          total_impressions?: number | null
+          total_likes?: number | null
+          total_posts?: number | null
+          total_reach?: number | null
+          total_saves?: number | null
+          total_shares?: number | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          engagement_rate?: number | null
+          follower_growth?: number | null
+          id?: string
+          platform?: string
+          report_date?: string
+          top_performing_post_id?: string | null
+          total_comments?: number | null
+          total_followers?: number | null
+          total_impressions?: number | null
+          total_likes?: number | null
+          total_posts?: number | null
+          total_reach?: number | null
+          total_saves?: number | null
+          total_shares?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_engagement_reports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_expenses: {
         Row: {
           amount: number
@@ -3216,6 +3281,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_goals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_hashtags: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          engagement_rate: number | null
+          id: string
+          is_primary: boolean | null
+          last_tracked_at: string | null
+          reach: number | null
+          tag: string
+          trend: string | null
+          updated_at: string | null
+          uses_count: number | null
+          workspace_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          engagement_rate?: number | null
+          id?: string
+          is_primary?: boolean | null
+          last_tracked_at?: string | null
+          reach?: number | null
+          tag: string
+          trend?: string | null
+          updated_at?: string | null
+          uses_count?: number | null
+          workspace_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          engagement_rate?: number | null
+          id?: string
+          is_primary?: boolean | null
+          last_tracked_at?: string | null
+          reach?: number | null
+          tag?: string
+          trend?: string | null
+          updated_at?: string | null
+          uses_count?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_hashtags_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -4253,6 +4371,145 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_shot_lists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_social_platforms: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          engagement_rate: number | null
+          followers_count: number | null
+          following_count: number | null
+          handle: string
+          id: string
+          is_connected: boolean | null
+          last_synced_at: string | null
+          platform: string
+          posts_count: number | null
+          profile_url: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          engagement_rate?: number | null
+          followers_count?: number | null
+          following_count?: number | null
+          handle: string
+          id?: string
+          is_connected?: boolean | null
+          last_synced_at?: string | null
+          platform: string
+          posts_count?: number | null
+          profile_url?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          engagement_rate?: number | null
+          followers_count?: number | null
+          following_count?: number | null
+          handle?: string
+          id?: string
+          is_connected?: boolean | null
+          last_synced_at?: string | null
+          platform?: string
+          posts_count?: number | null
+          profile_url?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_social_platforms_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_social_posts: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          engagement_comments: number | null
+          engagement_likes: number | null
+          engagement_saves: number | null
+          engagement_shares: number | null
+          hashtags: string[] | null
+          id: string
+          impressions: number | null
+          media_urls: string[] | null
+          platform: string
+          post_type: string | null
+          published_at: string | null
+          reach: number | null
+          scheduled_for: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          engagement_comments?: number | null
+          engagement_likes?: number | null
+          engagement_saves?: number | null
+          engagement_shares?: number | null
+          hashtags?: string[] | null
+          id?: string
+          impressions?: number | null
+          media_urls?: string[] | null
+          platform: string
+          post_type?: string | null
+          published_at?: string | null
+          reach?: number | null
+          scheduled_for?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          engagement_comments?: number | null
+          engagement_likes?: number | null
+          engagement_saves?: number | null
+          engagement_shares?: number | null
+          hashtags?: string[] | null
+          id?: string
+          impressions?: number | null
+          media_urls?: string[] | null
+          platform?: string
+          post_type?: string | null
+          published_at?: string | null
+          reach?: number | null
+          scheduled_for?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_social_posts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
