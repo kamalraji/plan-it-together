@@ -155,7 +155,7 @@ export function SendAnnouncementTab({ workspace }: SendAnnouncementTabProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(typeConfig).map(([type, config]) => (
+                      {Object.keys(typeConfig).map((type) => (
                         <SelectItem key={type} value={type} className="capitalize">
                           {type}
                         </SelectItem>
