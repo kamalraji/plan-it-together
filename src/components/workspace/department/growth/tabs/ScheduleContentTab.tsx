@@ -57,7 +57,7 @@ export function ScheduleContentTab({ workspace }: ScheduleContentTabProps) {
 
   // For now, we'll use a local state to simulate scheduled content
   // In production, this would use workspace_scheduled_content table
-  const { data: scheduledContent = [], isLoading } = useQuery({
+  const { data: scheduledContent = [] } = useQuery({
     queryKey: ['scheduled-content', workspace.id],
     queryFn: async () => {
       // Simulated data for demonstration - replace with actual Supabase query

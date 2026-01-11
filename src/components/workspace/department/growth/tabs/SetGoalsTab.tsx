@@ -105,10 +105,6 @@ export function SetGoalsTab({ workspace }: SetGoalsTabProps) {
     updateGoal.mutate({ id: goal.id, status: 'achieved', current_value: goal.target_value });
   };
 
-  const handleUpdateProgress = (goal: Goal, newValue: number) => {
-    const trend = newValue > goal.current_value ? 'up' : newValue < goal.current_value ? 'down' : 'stable';
-    updateGoal.mutate({ id: goal.id, current_value: newValue, trend });
-  };
 
   return (
     <div className="space-y-6">
