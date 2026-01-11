@@ -86,6 +86,17 @@ import {
   ScheduleSessionTab,
   ViewRubricsTab,
 } from './department/content/tabs';
+// Growth Department tabs (L2)
+import {
+  LaunchCampaignTab,
+  ScheduleContentTab,
+  AddSponsorTab,
+  SendAnnouncementTab,
+  ViewAnalyticsTab,
+  SetGoalsTab,
+  ManagePartnersTab,
+  PROutreachTab,
+} from './department/growth/tabs';
 // Media Committee tabs (L3)
 import {
   UploadMediaTab as MediaUploadTab,
@@ -555,6 +566,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'view-rubrics' && (
           <ViewRubricsTab workspace={workspace} />
+        )}
+
+        {/* Growth Department tabs */}
+        {activeTab === 'launch-campaign' && (
+          <LaunchCampaignTab workspace={workspace} />
+        )}
+
+        {activeTab === 'schedule-content' && (
+          <ScheduleContentTab workspace={workspace} />
+        )}
+
+        {activeTab === 'add-sponsor' && (
+          <AddSponsorTab workspace={workspace} />
+        )}
+
+        {activeTab === 'send-announcement' && (
+          <SendAnnouncementTab workspace={workspace} />
+        )}
+
+        {activeTab === 'view-analytics' && (
+          <ViewAnalyticsTab workspace={workspace} />
+        )}
+
+        {activeTab === 'set-goals' && (
+          <SetGoalsTab workspace={workspace} />
+        )}
+
+        {activeTab === 'manage-partners' && (
+          <ManagePartnersTab workspace={workspace} />
+        )}
+
+        {activeTab === 'pr-outreach' && (
+          <PROutreachTab workspace={workspace} />
         )}
 
         {/* Media Committee tabs (L3) */}
