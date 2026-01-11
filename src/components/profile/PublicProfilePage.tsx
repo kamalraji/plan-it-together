@@ -5,12 +5,17 @@ import { supabase } from '@/integrations/supabase/client';
 interface PublicProfile {
   id: string;
   full_name: string | null;
+  avatar_url: string | null;
   organization: string | null;
   bio: string | null;
   website: string | null;
   linkedin_url: string | null;
   twitter_url: string | null;
   github_url: string | null;
+  portfolio_accent_color: string | null;
+  portfolio_layout: string | null;
+  portfolio_sections: string[] | null;
+  created_at: string | null;
 }
 
 export const PublicProfilePage: React.FC = () => {
@@ -28,18 +33,19 @@ export const PublicProfilePage: React.FC = () => {
       }
 
       try {
+        // Use the secure RPC function that excludes sensitive fields like phone
         const { data, error: queryError } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle();
+          .rpc('get_public_portfolio', { _user_id: userId });
 
         if (queryError) {
+          console.error('Error loading public profile:', queryError.message);
           setError('Unable to load profile.');
-        } else if (!data) {
-          setError('Profile not found.');
+        } else if (!data || (Array.isArray(data) && data.length === 0)) {
+          setError('Profile not found or is private.');
         } else {
-          setProfile(data as PublicProfile);
+          // RPC returns an array, get the first item
+          const profileData = Array.isArray(data) ? data[0] : data;
+          setProfile(profileData as PublicProfile);
         }
       } catch (err) {
         console.error('Error loading public profile', err);
@@ -99,9 +105,17 @@ export const PublicProfilePage: React.FC = () => {
       <section className="max-w-3xl mx-auto space-y-8">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
-              <span>{initial}</span>
-            </div>
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={profile.full_name || 'User avatar'}
+                className="h-12 w-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+                <span>{initial}</span>
+              </div>
+            )}
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                 {profile.full_name || 'Participant'}
