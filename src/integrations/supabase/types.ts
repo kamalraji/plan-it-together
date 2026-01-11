@@ -2479,6 +2479,90 @@ export type Database = {
           },
         ]
       }
+      workspace_ab_tests: {
+        Row: {
+          campaign_id: string | null
+          confidence_level: number | null
+          created_at: string
+          created_by: string | null
+          current_sample: number | null
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          sample_size: number | null
+          start_date: string | null
+          status: string
+          test_type: string
+          updated_at: string
+          variant_a: Json
+          variant_a_metrics: Json | null
+          variant_b: Json
+          variant_b_metrics: Json | null
+          winner: string | null
+          workspace_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_sample?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          sample_size?: number | null
+          start_date?: string | null
+          status?: string
+          test_type?: string
+          updated_at?: string
+          variant_a?: Json
+          variant_a_metrics?: Json | null
+          variant_b?: Json
+          variant_b_metrics?: Json | null
+          winner?: string | null
+          workspace_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          confidence_level?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_sample?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          sample_size?: number | null
+          start_date?: string | null
+          status?: string
+          test_type?: string
+          updated_at?: string
+          variant_a?: Json
+          variant_a_metrics?: Json | null
+          variant_b?: Json
+          variant_b_metrics?: Json | null
+          winner?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_ab_tests_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_ab_tests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_access_requests: {
         Row: {
           created_at: string
