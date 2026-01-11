@@ -7,6 +7,7 @@ import { EventService, WorkspaceService, OrganizationService } from '@/component
 import { OrgTemplatesPage } from '@/components/routing/services/OrgTemplatesPage';
 import { OrganizationProvider } from './OrganizationContext';
 import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
+import JudgePortalPage from '@/pages/JudgePortalPage';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
@@ -79,6 +80,9 @@ export const OrgScopedLayout: React.FC = () => {
   // Check if current route is the page builder (needs fullscreen)
   const isPageBuilder = location.pathname.includes('/page-builder');
   
+  // Check if current route is the judge portal (needs fullscreen without sidebar)
+  const isJudgePortal = location.pathname.includes('/judge-portal');
+  
   // Check if current route is a workspace dashboard (hierarchical format: /workspaces/:eventSlug/root/:rootSlug/...)
   // These routes use WorkspaceLayout with its own sidebar/header
   const isWorkspaceDashboard = /\/workspaces\/[^/]+\/root\//.test(location.pathname);
@@ -135,6 +139,15 @@ export const OrgScopedLayout: React.FC = () => {
         <Routes>
           <Route path="workspaces/*" element={<WorkspaceService />} />
         </Routes>
+      </OrganizationProvider>
+    );
+  }
+
+  // Render judge portal fullscreen without sidebar/header
+  if (isJudgePortal) {
+    return (
+      <OrganizationProvider value={{ organization }}>
+        <JudgePortalPage />
       </OrganizationProvider>
     );
   }
