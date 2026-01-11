@@ -298,7 +298,7 @@ export function SetupRubricsTab({ workspaceId }: SetupRubricsTabProps) {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {formData.criteria.map((criterion, index) => (
+                      {formData.criteria.map((criterion) => (
                         <Card key={criterion.id} className="p-4">
                           <div className="flex items-start gap-3">
                             <div className="mt-2 cursor-move text-muted-foreground">
