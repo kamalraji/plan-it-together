@@ -53,3 +53,9 @@ verify_jwt = false
 
 [functions.track-page-view]
 verify_jwt = false
+
+[functions.social-media-post]
+verify_jwt = false
+
+[functions.social-media-sync]
+verify_jwt = false

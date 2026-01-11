@@ -620,6 +620,115 @@ export type Database = {
           },
         ]
       }
+      content_approval_stages: {
+        Row: {
+          approval_id: string
+          created_at: string | null
+          id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          reviewer_name: string | null
+          stage: string
+          status: string
+        }
+        Insert: {
+          approval_id: string
+          created_at?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          stage: string
+          status?: string
+        }
+        Update: {
+          approval_id?: string
+          created_at?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          stage?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_approval_stages_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "content_approvals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_approvals: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          current_stage: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          priority: string | null
+          scheduled_publish_at: string | null
+          source_committee: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          target_platforms: string[] | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          current_stage?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          scheduled_publish_at?: string | null
+          source_committee?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          target_platforms?: string[] | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          current_stage?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          scheduled_publish_at?: string | null
+          source_committee?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          target_platforms?: string[] | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_approvals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_page_views: {
         Row: {
           created_at: string
@@ -1418,6 +1527,120 @@ export type Database = {
             columns: ["submission_id"]
             isOneToOne: false
             referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_analytics_sync_log: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          platform: string
+          records_synced: number | null
+          started_at: string | null
+          status: string | null
+          sync_type: string
+          workspace_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          platform: string
+          records_synced?: number | null
+          started_at?: string | null
+          status?: string | null
+          sync_type: string
+          workspace_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          records_synced?: number | null
+          started_at?: string | null
+          status?: string | null
+          sync_type?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_analytics_sync_log_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_post_queue: {
+        Row: {
+          approval_id: string | null
+          created_at: string | null
+          error_message: string | null
+          external_post_id: string | null
+          id: string
+          platform: string
+          posted_at: string | null
+          retry_count: number | null
+          scheduled_for: string | null
+          social_post_id: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          approval_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          platform: string
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          social_post_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          approval_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          platform?: string
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          social_post_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_queue_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "content_approvals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_queue_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_social_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_queue_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -4371,6 +4594,56 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_shot_lists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_social_api_credentials: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          credential_type: string
+          encrypted_credentials: Json
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          platform: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          credential_type: string
+          encrypted_credentials?: Json
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          platform: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          credential_type?: string
+          encrypted_credentials?: Json
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          platform?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_social_api_credentials_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
