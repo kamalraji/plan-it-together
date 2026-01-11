@@ -25,7 +25,7 @@ export function MaterialsTracker({ workspace }: MaterialsTrackerProps) {
   const { materials, totalItems, approvedItems, submittedItems } = useMaterialsStats(workspace?.id);
   const updateSpeaker = useUpdateSpeaker(workspace?.id);
 
-  const getStatusIcon = (status: { submitted: boolean; approved: boolean }) => {
+  const getStatusIcon = (status: { submitted: boolean | null; approved: boolean | null }) => {
     if (status.approved) return <FileCheck className="h-3 w-3 text-emerald-500" />;
     if (status.submitted) return <AlertCircle className="h-3 w-3 text-amber-500" />;
     return <AlertCircle className="h-3 w-3 text-muted-foreground" />;
