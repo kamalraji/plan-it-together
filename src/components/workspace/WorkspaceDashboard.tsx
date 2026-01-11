@@ -182,6 +182,13 @@ import {
   ReportIssueTab as LogisticsReportIssueTab,
   ViewTimelineTab,
 } from './committee/logistics/tabs';
+// Catering Committee tabs (L3)
+import {
+  UpdateMenuTab as CateringUpdateMenuTab,
+  CheckInventoryTab as CateringCheckInventoryTab,
+  DietaryReportTab as CateringDietaryReportTab,
+  ConfirmHeadcountTab as CateringConfirmHeadcountTab,
+} from './committee/catering/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -887,6 +894,23 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'view-timeline-logistics' && (
           <ViewTimelineTab workspaceId={workspace.id} />
+        )}
+
+        {/* Catering Committee tabs (L3) */}
+        {activeTab === 'update-menu-catering' && (
+          <CateringUpdateMenuTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'check-inventory-catering' && (
+          <CateringCheckInventoryTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'dietary-report-catering' && (
+          <CateringDietaryReportTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'confirm-headcount-catering' && (
+          <CateringConfirmHeadcountTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

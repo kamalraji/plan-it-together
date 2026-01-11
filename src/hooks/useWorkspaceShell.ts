@@ -156,7 +156,12 @@ export type WorkspaceTab =
   | 'create-checklist-logistics'
   | 'generate-report-logistics'
   | 'report-issue-logistics'
-  | 'view-timeline-logistics';
+  | 'view-timeline-logistics'
+  // Catering Committee tabs (L3)
+  | 'update-menu-catering'
+  | 'check-inventory-catering'
+  | 'dietary-report-catering'
+  | 'confirm-headcount-catering';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

@@ -123,10 +123,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'view-waitlist', label: 'View Waitlist', icon: ListChecks, color: 'text-cyan-500', tab: 'view-waitlist' },
   ],
   catering: [
-    { id: 'update-menu', label: 'Update Menu', icon: Utensils, color: 'text-orange-500', tab: 'overview' },
-    { id: 'check-inventory', label: 'Check Inventory', icon: Package, color: 'text-amber-500', tab: 'overview', sectionId: 'inventory' },
-    { id: 'dietary-report', label: 'Dietary Report', icon: ClipboardCheck, color: 'text-emerald-500', tab: 'reports' },
-    { id: 'confirm-headcount', label: 'Confirm Headcount', icon: Users, color: 'text-blue-500', tab: 'overview' },
+    { id: 'update-menu', label: 'Update Menu', icon: Utensils, color: 'text-orange-500', tab: 'update-menu-catering' },
+    { id: 'check-inventory', label: 'Check Inventory', icon: Package, color: 'text-amber-500', tab: 'check-inventory-catering' },
+    { id: 'dietary-report', label: 'Dietary Report', icon: ClipboardCheck, color: 'text-emerald-500', tab: 'dietary-report-catering' },
+    { id: 'confirm-headcount', label: 'Confirm Headcount', icon: Users, color: 'text-blue-500', tab: 'confirm-headcount-catering' },
   ],
   logistics: [
     { id: 'track-shipment', label: 'Track Shipment', icon: Truck, color: 'text-blue-500', tab: 'track-shipment-logistics' },
