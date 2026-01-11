@@ -93,6 +93,13 @@ import {
   GalleryReviewTab,
   ExportAssetsTab,
 } from './committee/media';
+import {
+  AssignJudgesCommitteeTab,
+  SetupRubricsTab as JudgeSetupRubricsTab,
+  ViewScoresTab as JudgeViewScoresTab,
+  ExportResultsTab as JudgeExportResultsTab,
+  JudgeScoringPortalTab,
+} from './committee/judge';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -548,6 +555,27 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'export-assets' && (
           <ExportAssetsTab workspaceId={workspace.id} />
+        )}
+
+        {/* Judge Committee tabs (L3) */}
+        {activeTab === 'assign-judges-committee' && (
+          <AssignJudgesCommitteeTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'setup-rubrics-committee' && (
+          <JudgeSetupRubricsTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'view-scores-committee' && (
+          <JudgeViewScoresTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'export-results-committee' && (
+          <JudgeExportResultsTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'judge-scoring-portal' && (
+          <JudgeScoringPortalTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

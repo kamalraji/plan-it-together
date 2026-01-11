@@ -91,7 +91,8 @@ export type WorkspaceTab =
   | 'assign-judges-committee'
   | 'setup-rubrics-committee'
   | 'view-scores-committee'
-  | 'export-results-committee';
+  | 'export-results-committee'
+  | 'judge-scoring-portal';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

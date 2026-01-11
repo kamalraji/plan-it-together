@@ -601,6 +601,200 @@ export function useLeaderboard(workspaceId: string | undefined) {
   });
 }
 
+// ============ JUDGE-SPECIFIC QUERIES ============
+
+export function useJudgeAssignmentsByJudge(workspaceId: string | undefined, judgeId: string | undefined) {
+  return useQuery({
+    queryKey: ['judge-assignments-by-judge', workspaceId, judgeId],
+    queryFn: async () => {
+      if (!workspaceId || !judgeId) return [];
+
+      const { data, error } = await supabase
+        .from('workspace_judge_assignments')
+        .select(`*, submission:workspace_submissions(*), rubric:workspace_rubrics(*)`)
+        .eq('workspace_id', workspaceId)
+        .eq('judge_id', judgeId)
+        .order('priority', { ascending: true });
+
+      if (error) throw error;
+      
+      // Map the data to handle rubric criteria type
+      return (data || []).map(item => ({
+        ...item,
+        rubric: item.rubric ? {
+          ...item.rubric,
+          criteria: (Array.isArray(item.rubric.criteria) ? item.rubric.criteria : []) as unknown as RubricCriterion[],
+        } : undefined,
+      })) as (WorkspaceJudgeAssignment & { rubric?: WorkspaceRubric })[];
+    },
+    enabled: !!workspaceId && !!judgeId,
+  });
+}
+
+export function useCurrentUserAsJudge(workspaceId: string | undefined) {
+  return useQuery({
+    queryKey: ['current-user-as-judge', workspaceId],
+    queryFn: async () => {
+      if (!workspaceId) return null;
+
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return null;
+
+      const { data, error } = await supabase
+        .from('workspace_judges')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('user_id', userData.user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data as WorkspaceJudge | null;
+    },
+    enabled: !!workspaceId,
+  });
+}
+
+export function useJudgeScore(assignmentId: string | undefined) {
+  return useQuery({
+    queryKey: ['judge-score', assignmentId],
+    queryFn: async () => {
+      if (!assignmentId) return null;
+
+      const { data, error } = await supabase
+        .from('workspace_scores')
+        .select('*')
+        .eq('assignment_id', assignmentId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data as WorkspaceScore | null;
+    },
+    enabled: !!assignmentId,
+  });
+}
+
+// ============ SCORE SUBMISSION ============
+
+export interface ScoreSubmission {
+  assignment_id: string;
+  judge_id: string;
+  submission_id: string;
+  rubric_id: string | null;
+  scores: Record<string, number>;
+  comments?: string;
+  private_notes?: string;
+}
+
+export function useSubmitScore(workspaceId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (scoreData: ScoreSubmission) => {
+      if (!workspaceId) throw new Error('Workspace ID required');
+
+      // Calculate total and weighted scores based on rubric
+      let total_score = 0;
+      let weighted_score = 0;
+
+      if (scoreData.rubric_id) {
+        const { data: rubric } = await supabase
+          .from('workspace_rubrics')
+          .select('criteria, max_total_score')
+          .eq('id', scoreData.rubric_id)
+          .single();
+
+        if (rubric?.criteria) {
+          const criteria = rubric.criteria as unknown as RubricCriterion[];
+          criteria.forEach((criterion) => {
+            const score = scoreData.scores[criterion.id] || 0;
+            total_score += score;
+            weighted_score += (score / criterion.maxScore) * criterion.weight;
+          });
+        }
+      } else {
+        total_score = Object.values(scoreData.scores).reduce((sum, s) => sum + s, 0);
+        weighted_score = total_score;
+      }
+
+      // Upsert score
+      const { data, error } = await supabase
+        .from('workspace_scores')
+        .upsert({
+          workspace_id: workspaceId,
+          assignment_id: scoreData.assignment_id,
+          judge_id: scoreData.judge_id,
+          submission_id: scoreData.submission_id,
+          rubric_id: scoreData.rubric_id,
+          scores: scoreData.scores as unknown as Json,
+          total_score,
+          weighted_score,
+          comments: scoreData.comments || null,
+          private_notes: scoreData.private_notes || null,
+          scored_at: new Date().toISOString(),
+        }, { onConflict: 'assignment_id' })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update assignment status to completed
+      await supabase
+        .from('workspace_judge_assignments')
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .eq('id', scoreData.assignment_id);
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-scores', workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-assignments', workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['judge-assignments-by-judge'] });
+      queryClient.invalidateQueries({ queryKey: ['judge-score'] });
+      queryClient.invalidateQueries({ queryKey: ['judging-progress', workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard', workspaceId] });
+      toast.success('Score submitted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to submit score: ' + error.message);
+    },
+  });
+}
+
+export function useUpdateAssignmentStatus(workspaceId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ assignmentId, status }: { assignmentId: string; status: string }) => {
+      const updateData: { status: string; started_at?: string; completed_at?: string | null } = { status };
+      
+      if (status === 'in_progress') {
+        updateData.started_at = new Date().toISOString();
+      } else if (status === 'completed') {
+        updateData.completed_at = new Date().toISOString();
+      } else if (status === 'assigned') {
+        updateData.completed_at = null;
+      }
+
+      const { data, error } = await supabase
+        .from('workspace_judge_assignments')
+        .update(updateData)
+        .eq('id', assignmentId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-assignments', workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['judge-assignments-by-judge'] });
+    },
+    onError: (error) => {
+      toast.error('Failed to update assignment: ' + error.message);
+    },
+  });
+}
+
 // Rubric templates
 export const RUBRIC_TEMPLATES = {
   hackathon: { name: 'Hackathon Standard', description: 'Standard hackathon judging rubric', category: 'overall', criteria: [{ id: '1', name: 'Innovation', description: 'How creative and original is the solution?', weight: 25, maxScore: 10 }, { id: '2', name: 'Technical Complexity', description: 'How technically challenging is the implementation?', weight: 25, maxScore: 10 }, { id: '3', name: 'Design & UX', description: 'How well-designed and user-friendly is the product?', weight: 20, maxScore: 10 }, { id: '4', name: 'Presentation', description: 'How well was the project presented?', weight: 20, maxScore: 10 }, { id: '5', name: 'Completion', description: 'How complete and functional is the demo?', weight: 10, maxScore: 10 }], max_total_score: 100 },

@@ -179,6 +179,7 @@ const committeeActions: Record<string, CommitteeAction[]> = {
   judge: [
     { id: 'assign-judges', label: 'Assign Judges', icon: Scale, color: 'text-emerald-500', tab: 'assign-judges-committee' },
     { id: 'setup-rubrics', label: 'Setup Rubrics', icon: ClipboardList, color: 'text-blue-500', tab: 'setup-rubrics-committee' },
+    { id: 'judge-portal', label: 'Judge Portal', icon: ClipboardCheck, color: 'text-primary', tab: 'judge-scoring-portal' },
     { id: 'view-scores', label: 'View Scores', icon: Star, color: 'text-amber-500', tab: 'view-scores-committee' },
     { id: 'export-results', label: 'Export Results', icon: Download, color: 'text-purple-500', tab: 'export-results-committee' },
   ],
