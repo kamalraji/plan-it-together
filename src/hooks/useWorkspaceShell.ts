@@ -128,7 +128,12 @@ export type WorkspaceTab =
   | 'draft-press-release-communication'
   | 'broadcast-message-communication'
   | 'schedule-update-communication'
-  | 'contact-stakeholders-communication';
+  | 'contact-stakeholders-communication'
+  // Marketing Committee tabs (L3)
+  | 'schedule-post-marketing'
+  | 'view-analytics-marketing'
+  | 'create-campaign-marketing'
+  | 'ab-test-marketing';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

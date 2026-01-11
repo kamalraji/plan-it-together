@@ -146,6 +146,13 @@ import {
   ScheduleUpdateTab as CommScheduleUpdateTab,
   ContactStakeholdersTab as CommContactStakeholdersTab,
 } from './committee/communication/tabs';
+// Marketing Committee tabs (L3)
+import {
+  SchedulePostMarketingTab,
+  ViewAnalyticsMarketingTab,
+  CreateCampaignMarketingTab,
+  ABTestingMarketingTab,
+} from './committee/marketing/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -751,6 +758,23 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'contact-stakeholders-communication' && (
           <CommContactStakeholdersTab workspaceId={workspace.id} />
+        )}
+
+        {/* Marketing Committee tabs (L3) */}
+        {activeTab === 'schedule-post-marketing' && (
+          <SchedulePostMarketingTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'view-analytics-marketing' && (
+          <ViewAnalyticsMarketingTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'create-campaign-marketing' && (
+          <CreateCampaignMarketingTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'ab-test-marketing' && (
+          <ABTestingMarketingTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

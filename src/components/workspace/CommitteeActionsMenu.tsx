@@ -141,10 +141,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'room-status', label: 'Room Status', icon: Map, color: 'text-blue-500', tab: 'overview' },
   ],
   marketing: [
-    { id: 'schedule-post', label: 'Schedule Post', icon: Megaphone, color: 'text-pink-500', tab: 'tasks' },
-    { id: 'view-analytics', label: 'View Analytics', icon: BarChart3, color: 'text-blue-500', tab: 'analytics' },
-    { id: 'create-campaign', label: 'Create Campaign', icon: Zap, color: 'text-amber-500', tab: 'tasks' },
-    { id: 'ab-test', label: 'A/B Test', icon: Target, color: 'text-purple-500', tab: 'analytics' },
+    { id: 'schedule-post-marketing', label: 'Schedule Post', icon: Megaphone, color: 'text-pink-500', tab: 'schedule-post-marketing' },
+    { id: 'view-analytics-marketing', label: 'View Analytics', icon: BarChart3, color: 'text-blue-500', tab: 'view-analytics-marketing' },
+    { id: 'create-campaign-marketing', label: 'Create Campaign', icon: Zap, color: 'text-amber-500', tab: 'create-campaign-marketing' },
+    { id: 'ab-test-marketing', label: 'A/B Testing', icon: Target, color: 'text-purple-500', tab: 'ab-test-marketing' },
   ],
   communication: [
     { id: 'send-announcement-communication', label: 'Send Announcement', icon: Megaphone, color: 'text-pink-500', tab: 'send-announcement-communication' },

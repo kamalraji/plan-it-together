@@ -39,8 +39,9 @@ export interface ABTest {
 export interface SocialPost {
   id: string;
   workspace_id: string;
+  title: string;
   content: string | null;
-  target_platforms: string[] | null;
+  platform: string;
   media_urls: string[] | null;
   scheduled_for: string | null;
   published_at: string | null;
@@ -54,9 +55,11 @@ export interface SocialPost {
 export interface ScheduledContent {
   id: string;
   workspace_id: string;
-  title: string | null;
+  title: string;
   status: string | null;
-  scheduled_for: string | null;
+  scheduled_date: string;
+  scheduled_time: string | null;
+  platform: string;
   created_at: string;
 }
 
@@ -181,11 +184,11 @@ export function useSocialPosts(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_social_posts')
-        .select('id, workspace_id, content, target_platforms, media_urls, scheduled_for, published_at, status, hashtags, created_by, created_at, updated_at')
+        .select('id, workspace_id, title, content, platform, media_urls, scheduled_for, published_at, status, hashtags, created_by, created_at, updated_at')
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []).map(p => ({ ...p, platforms: p.target_platforms })) as SocialPost[];
+      return (data || []) as SocialPost[];
     },
     enabled: !!workspaceId,
   });
@@ -201,8 +204,9 @@ export function useCreateSocialPost(workspaceId: string) {
         .from('workspace_social_posts')
         .insert({
           workspace_id: workspaceId,
+          title: post.title || 'Untitled Post',
           content: post.content || '',
-          target_platforms: post.target_platforms || ['twitter'],
+          platform: post.platform || 'twitter',
           media_urls: post.media_urls || [],
           scheduled_for: post.scheduled_for || null,
           status: post.status || 'draft',
@@ -276,11 +280,11 @@ export function useScheduledContent(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_scheduled_content')
-        .select('id, workspace_id, title, status, scheduled_for, created_at')
+        .select('id, workspace_id, title, status, scheduled_date, scheduled_time, platform, created_at')
         .eq('workspace_id', workspaceId)
-        .order('scheduled_for', { ascending: true });
+        .order('scheduled_date', { ascending: true });
       if (error) throw error;
-      return data as ScheduledContent[];
+      return (data || []) as ScheduledContent[];
     },
     enabled: !!workspaceId,
   });

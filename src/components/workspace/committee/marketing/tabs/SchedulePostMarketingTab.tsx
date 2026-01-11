@@ -26,14 +26,15 @@ import {
   useSocialPosts, 
   useCreateSocialPost,
   useUpdateSocialPost, 
-  useDeleteSocialPost 
+  useDeleteSocialPost,
+  SocialPost
 } from '@/hooks/useMarketingCommitteeData';
 
 interface SchedulePostMarketingTabProps {
   workspaceId: string;
 }
 
-const platforms = [
+const platformOptions = [
   { id: 'twitter', label: 'Twitter/X', icon: Twitter, color: 'text-sky-500', maxChars: 280 },
   { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', maxChars: 2200 },
   { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-600', maxChars: 3000 },
@@ -50,11 +51,12 @@ const statusColors: Record<string, string> = {
 export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingTabProps) {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showComposer, setShowComposer] = useState(false);
-  const [editingPost, setEditingPost] = useState<any>(null);
+  const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
   
   // Form state
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['twitter']);
+  const [selectedPlatform, setSelectedPlatform] = useState('twitter');
   const [scheduledFor, setScheduledFor] = useState('');
   const [scheduledTime, setScheduledTime] = useState('09:00');
   const [hashtags, setHashtags] = useState('');
@@ -64,17 +66,10 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
   const updatePost = useUpdateSocialPost(workspaceId);
   const deletePost = useDeleteSocialPost(workspaceId);
 
-  const handlePlatformToggle = (platformId: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platformId) 
-        ? prev.filter(p => p !== platformId)
-        : [...prev, platformId]
-    );
-  };
-
   const resetForm = () => {
+    setTitle('');
     setContent('');
-    setSelectedPlatforms(['twitter']);
+    setSelectedPlatform('twitter');
     setScheduledFor('');
     setScheduledTime('09:00');
     setHashtags('');
@@ -95,16 +90,18 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
     if (editingPost) {
       updatePost.mutate({
         id: editingPost.id,
+        title,
         content,
-        platforms: selectedPlatforms,
+        platform: selectedPlatform,
         scheduled_for: scheduledDateTime,
         hashtags: hashtagArray,
         status: scheduledDateTime ? 'scheduled' : 'draft',
       }, { onSuccess: resetForm });
     } else {
       createPost.mutate({
+        title,
         content,
-        platforms: selectedPlatforms,
+        platform: selectedPlatform,
         scheduled_for: scheduledDateTime,
         hashtags: hashtagArray,
         status: scheduledDateTime ? 'scheduled' : 'draft',
@@ -112,10 +109,11 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
     }
   };
 
-  const handleEdit = (post: any) => {
+  const handleEdit = (post: SocialPost) => {
     setEditingPost(post);
+    setTitle(post.title || '');
     setContent(post.content || '');
-    setSelectedPlatforms(post.platforms || ['twitter']);
+    setSelectedPlatform(post.platform || 'twitter');
     if (post.scheduled_for) {
       const date = new Date(post.scheduled_for);
       setScheduledFor(format(date, 'yyyy-MM-dd'));
@@ -131,10 +129,8 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
     }
   };
 
-  const getMinCharLimit = () => {
-    return Math.min(...selectedPlatforms.map(p => 
-      platforms.find(pl => pl.id === p)?.maxChars || 280
-    ));
+  const getCharLimit = () => {
+    return platformOptions.find(p => p.id === selectedPlatform)?.maxChars || 280;
   };
 
   const scheduledPosts = posts.filter(p => p.status === 'scheduled');
@@ -181,17 +177,27 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
             <CardDescription>Compose your social media content</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Title */}
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Post title for internal reference"
+              />
+            </div>
+
             {/* Platform Selection */}
             <div className="space-y-2">
-              <Label>Platforms</Label>
+              <Label>Platform</Label>
               <div className="flex flex-wrap gap-2">
-                {platforms.map(platform => {
+                {platformOptions.map(platform => {
                   const Icon = platform.icon;
-                  const isSelected = selectedPlatforms.includes(platform.id);
+                  const isSelected = selectedPlatform === platform.id;
                   return (
                     <button
                       key={platform.id}
-                      onClick={() => handlePlatformToggle(platform.id)}
+                      onClick={() => setSelectedPlatform(platform.id)}
                       className={cn(
                         'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all',
                         isSelected 
@@ -213,9 +219,9 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
                 <Label>Content</Label>
                 <span className={cn(
                   'text-xs',
-                  content.length > getMinCharLimit() ? 'text-red-500' : 'text-muted-foreground'
+                  content.length > getCharLimit() ? 'text-red-500' : 'text-muted-foreground'
                 )}>
-                  {content.length} / {getMinCharLimit()}
+                  {content.length} / {getCharLimit()}
                 </span>
               </div>
               <Textarea
@@ -263,7 +269,7 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
               </Button>
               <Button 
                 onClick={handleSubmit}
-                disabled={!content || selectedPlatforms.length === 0 || createPost.isPending || updatePost.isPending}
+                disabled={!title || !content || createPost.isPending || updatePost.isPending}
               >
                 {createPost.isPending || updatePost.isPending ? 'Saving...' : editingPost ? 'Update Post' : 'Schedule Post'}
               </Button>
@@ -327,9 +333,9 @@ function PostList({
   onDelete, 
   emptyMessage 
 }: { 
-  posts: any[]; 
+  posts: SocialPost[]; 
   isLoading: boolean;
-  onEdit: (post: any) => void;
+  onEdit: (post: SocialPost) => void;
   onDelete: (id: string) => void;
   emptyMessage: string;
 }) {
@@ -354,44 +360,45 @@ function PostList({
   return (
     <ScrollArea className="h-[400px]">
       <div className="space-y-3">
-        {posts.map(post => (
-          <Card key={post.id} className="hover:border-primary/30 transition-colors">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    {(post.platforms || []).map((platform: string) => {
-                      const p = platforms.find(pl => pl.id === platform);
-                      if (!p) return null;
-                      const Icon = p.icon;
-                      return <Icon key={platform} className={cn('h-4 w-4', p.color)} />;
-                    })}
-                    <Badge className={statusColors[post.status] || statusColors.draft}>
-                      {post.status}
-                    </Badge>
+        {posts.map(post => {
+          const platformConfig = platformOptions.find(p => p.id === post.platform);
+          const Icon = platformConfig?.icon || Twitter;
+          
+          return (
+            <Card key={post.id} className="hover:border-primary/30 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className={cn('h-4 w-4', platformConfig?.color || 'text-muted-foreground')} />
+                      <span className="text-sm font-medium truncate">{post.title}</span>
+                      <Badge className={statusColors[post.status || 'draft']}>
+                        {post.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
+                    {post.scheduled_for && (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {format(new Date(post.scheduled_for), 'MMM d, yyyy')}
+                        <Clock className="h-3 w-3 ml-2" />
+                        {format(new Date(post.scheduled_for), 'h:mm a')}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-sm line-clamp-2">{post.content}</p>
-                  {post.scheduled_for && (
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {format(new Date(post.scheduled_for), 'MMM d, yyyy')}
-                      <Clock className="h-3 w-3 ml-2" />
-                      {format(new Date(post.scheduled_for), 'h:mm a')}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => onEdit(post)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => onDelete(post.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => onEdit(post)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => onDelete(post.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </ScrollArea>
   );
