@@ -165,10 +165,12 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'post-now', label: 'Post Now', icon: Send, color: 'text-pink-500', tab: 'tasks' },
   ],
   content: [
-    { id: 'review-content', label: 'Review Content', icon: Eye, color: 'text-purple-500', tab: 'approvals' },
-    { id: 'create-template', label: 'Create Template', icon: Layers, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'assign-reviewer', label: 'Assign Reviewer', icon: UserPlus, color: 'text-amber-500', tab: 'team' },
-    { id: 'publish', label: 'Publish', icon: Upload, color: 'text-emerald-500', tab: 'tasks' },
+    { id: 'review-content', label: 'Review Content', icon: Eye, color: 'text-purple-500', tab: 'review-content-committee' },
+    { id: 'create-template', label: 'Create Template', icon: Layers, color: 'text-blue-500', tab: 'create-template-committee' },
+    { id: 'assign-reviewer', label: 'Assign Reviewer', icon: UserPlus, color: 'text-amber-500', tab: 'assign-reviewer-committee' },
+    { id: 'publish', label: 'Publish', icon: Upload, color: 'text-emerald-500', tab: 'publish-content-committee' },
+    { id: 'content-calendar', label: 'Content Calendar', icon: Calendar, color: 'text-cyan-500', tab: 'content-calendar-committee' },
+    { id: 'content-pipeline', label: 'Pipeline', icon: Activity, color: 'text-rose-500', tab: 'content-pipeline-committee' },
   ],
   speaker_liaison: [
     { id: 'speaker-roster', label: 'Speaker Roster', icon: Mic, color: 'text-rose-500', tab: 'speaker-roster-committee' },

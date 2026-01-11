@@ -179,7 +179,7 @@ export function useUpdateContentStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, status, workspaceId }: { id: string; status: string; workspaceId: string }) => {
+    mutationFn: async ({ id, status, workspaceId: _workspaceId }: { id: string; status: string; workspaceId: string }) => {
       const updates: Record<string, unknown> = { status };
       if (status === 'published') {
         updates.published_at = new Date().toISOString();

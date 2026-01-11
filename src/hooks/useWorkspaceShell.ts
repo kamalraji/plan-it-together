@@ -98,7 +98,14 @@ export type WorkspaceTab =
   | 'materials-collection-committee'
   | 'session-schedule-committee'
   | 'travel-coordination-committee'
-  | 'communication-log-committee';
+  | 'communication-log-committee'
+  // Content Committee tabs (L3)
+  | 'review-content-committee'
+  | 'create-template-committee'
+  | 'assign-reviewer-committee'
+  | 'publish-content-committee'
+  | 'content-calendar-committee'
+  | 'content-pipeline-committee';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

@@ -108,6 +108,15 @@ import {
   TravelCoordinationTab,
   CommunicationLogTab,
 } from './committee/speaker-liaison/tabs';
+// Content Committee tabs (L3)
+import {
+  ReviewContentTab,
+  CreateTemplateTab,
+  AssignReviewerTab,
+  PublishContentTab,
+  ContentCalendarTab,
+  ContentPipelineTab,
+} from './committee/content/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -605,6 +614,31 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'communication-log-committee' && (
           <CommunicationLogTab workspaceId={workspace.id} />
+        )}
+
+        {/* Content Committee tabs (L3) */}
+        {activeTab === 'review-content-committee' && (
+          <ReviewContentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'create-template-committee' && (
+          <CreateTemplateTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'assign-reviewer-committee' && (
+          <AssignReviewerTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'publish-content-committee' && (
+          <PublishContentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'content-calendar-committee' && (
+          <ContentCalendarTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'content-pipeline-committee' && (
+          <ContentPipelineTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>
