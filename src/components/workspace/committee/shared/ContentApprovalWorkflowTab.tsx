@@ -45,7 +45,7 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
 
   const handleReview = async (action: 'approve' | 'reject') => {
     if (!selectedApproval) return;
-    await reviewApproval({ approvalId: selectedApproval.id, stage: selectedApproval.current_stage, action, notes: reviewNotes });
+    await reviewApproval({ approval_id: selectedApproval.id, action, review_notes: reviewNotes });
     setReviewDialogOpen(false);
     setReviewNotes('');
     setSelectedApproval(null);

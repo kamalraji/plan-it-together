@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Key, Shield, RefreshCw, CheckCircle, XCircle, Loader2, Eye, EyeOff, Link2 } from 'lucide-react';
+import { Key, Shield, CheckCircle, XCircle, Loader2, Eye, EyeOff, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSocialApiCredentials, useSaveApiCredentials } from '@/hooks/useContentApprovalWorkflow';
+import { useSocialApiCredentials, useSaveSocialApiCredentials } from '@/hooks/useContentApprovalWorkflow';
 import { toast } from 'sonner';
 
 // Platform icon components (simplified)
@@ -31,14 +30,14 @@ export function SocialApiCredentialsTab({ workspaceId }: SocialApiCredentialsTab
   const [credentials, setCredentials] = useState<Record<string, string>>({});
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const { data: apiCredentials } = useSocialApiCredentials(workspaceId);
-  const { mutateAsync: saveApiCredentials, isPending: isSaving } = useSaveApiCredentials(workspaceId);
+  const { mutateAsync: saveApiCredentials, isPending: isSaving } = useSaveSocialApiCredentials(workspaceId);
 
   const getCredentialsForPlatform = (platformId: string) => apiCredentials?.find((c: { platform: string }) => c.platform === platformId);
 
   const handleSaveCredentials = async () => {
     if (!editingPlatform) return;
     try {
-      await saveApiCredentials({ platform: editingPlatform.id, credentials });
+      await saveApiCredentials({ platform: editingPlatform.id, credential_type: 'api_key', credentials });
       toast.success(`${editingPlatform.name} credentials saved`);
       setEditingPlatform(null);
       setCredentials({});
