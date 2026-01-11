@@ -4906,6 +4906,278 @@ export type Database = {
           },
         ]
       }
+      workspace_sponsor_benefits: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          quantity: number | null
+          tier: string
+          updated_at: string | null
+          value_estimate: number | null
+          workspace_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          quantity?: number | null
+          tier: string
+          updated_at?: string | null
+          value_estimate?: number | null
+          workspace_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          quantity?: number | null
+          tier?: string
+          updated_at?: string | null
+          value_estimate?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_sponsor_benefits_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_sponsor_communications: {
+        Row: {
+          attachments: string[] | null
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          direction: string | null
+          id: string
+          recipient_email: string | null
+          scheduled_for: string | null
+          sent_at: string | null
+          sponsor_id: string
+          status: string | null
+          subject: string
+          type: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          id?: string
+          recipient_email?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sponsor_id: string
+          status?: string | null
+          subject: string
+          type?: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          attachments?: string[] | null
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          id?: string
+          recipient_email?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          sponsor_id?: string
+          status?: string | null
+          subject?: string
+          type?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_sponsor_communications_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_sponsors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_sponsor_communications_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_sponsor_deliverables: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string
+          id: string
+          notes: string | null
+          priority: string | null
+          proof_url: string | null
+          sponsor_id: string
+          status: string
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date: string
+          id?: string
+          notes?: string | null
+          priority?: string | null
+          proof_url?: string | null
+          sponsor_id: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string
+          id?: string
+          notes?: string | null
+          priority?: string | null
+          proof_url?: string | null
+          sponsor_id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_sponsor_deliverables_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_sponsors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_sponsor_deliverables_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_sponsor_proposals: {
+        Row: {
+          assigned_to: string | null
+          company_name: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          next_follow_up_date: string | null
+          notes: string | null
+          proposal_document_url: string | null
+          proposed_tier: string
+          proposed_value: number | null
+          sponsor_id: string | null
+          stage: string
+          stage_entered_at: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          next_follow_up_date?: string | null
+          notes?: string | null
+          proposal_document_url?: string | null
+          proposed_tier?: string
+          proposed_value?: number | null
+          sponsor_id?: string | null
+          stage?: string
+          stage_entered_at?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          next_follow_up_date?: string | null
+          notes?: string | null
+          proposal_document_url?: string | null
+          proposed_tier?: string
+          proposed_value?: number | null
+          sponsor_id?: string | null
+          stage?: string
+          stage_entered_at?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_sponsor_proposals_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_sponsors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_sponsor_proposals_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_sponsors: {
         Row: {
           amount_paid: number | null
