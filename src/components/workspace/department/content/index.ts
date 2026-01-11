@@ -16,3 +16,5 @@ export { AssignJudgeModal } from './AssignJudgeModal';
 export { EnterScoreModal } from './EnterScoreModal';
 export { UploadMediaAssetModal } from './UploadMediaAssetModal';
 export { RegisterSpeakerModal } from './RegisterSpeakerModal';
+// Department tabs
+export * from './tabs';

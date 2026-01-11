@@ -7,3 +7,4 @@ export { DepartmentDashboard } from './DepartmentDashboard';
 export * from './tech';
 export * from './finance';
 export * from './volunteers';
+export * from './content';
