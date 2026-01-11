@@ -3549,6 +3549,62 @@ export type Database = {
           },
         ]
       }
+      workspace_event_briefings: {
+        Row: {
+          activity: string
+          created_at: string
+          event_date: string | null
+          id: string
+          lead_id: string | null
+          lead_name: string | null
+          location: string | null
+          notes: string | null
+          scheduled_time: string
+          sort_order: number | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          activity: string
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          lead_id?: string | null
+          lead_name?: string | null
+          location?: string | null
+          notes?: string | null
+          scheduled_time: string
+          sort_order?: number | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          activity?: string
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          lead_id?: string | null
+          lead_name?: string | null
+          location?: string | null
+          notes?: string | null
+          scheduled_time?: string
+          sort_order?: number | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_event_briefings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_expenses: {
         Row: {
           amount: number
@@ -3601,6 +3657,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_expenses_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_facility_checks: {
+        Row: {
+          area: string
+          checked_at: string | null
+          checked_by: string | null
+          checked_by_name: string | null
+          created_at: string
+          follow_up_required: boolean | null
+          id: string
+          item: string
+          notes: string | null
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          area: string
+          checked_at?: string | null
+          checked_by?: string | null
+          checked_by_name?: string | null
+          created_at?: string
+          follow_up_required?: boolean | null
+          id?: string
+          item: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          area?: string
+          checked_at?: string | null
+          checked_by?: string | null
+          checked_by_name?: string | null
+          created_at?: string
+          follow_up_required?: boolean | null
+          id?: string
+          item?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_facility_checks_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -3777,6 +3886,68 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_hashtags_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_incidents: {
+        Row: {
+          assigned_to: string | null
+          assigned_to_name: string | null
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          reported_by: string | null
+          reported_by_name: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          reported_by?: string | null
+          reported_by_name?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          reported_by?: string | null
+          reported_by_name?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_incidents_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -4017,6 +4188,71 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_judges_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_logistics: {
+        Row: {
+          actual_arrival: string | null
+          carrier: string | null
+          created_at: string
+          created_by: string | null
+          destination: string | null
+          eta: string | null
+          id: string
+          item_name: string
+          notes: string | null
+          origin: string | null
+          priority: string | null
+          progress: number | null
+          status: string
+          tracking_number: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          actual_arrival?: string | null
+          carrier?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination?: string | null
+          eta?: string | null
+          id?: string
+          item_name: string
+          notes?: string | null
+          origin?: string | null
+          priority?: string | null
+          progress?: number | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          actual_arrival?: string | null
+          carrier?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination?: string | null
+          eta?: string | null
+          id?: string
+          item_name?: string
+          notes?: string | null
+          origin?: string | null
+          priority?: string | null
+          progress?: number | null
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_logistics_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
