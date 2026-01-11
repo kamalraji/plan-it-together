@@ -2657,6 +2657,7 @@ export type Database = {
         Row: {
           author_id: string | null
           author_name: string | null
+          category: string | null
           content_url: string | null
           created_at: string
           description: string | null
@@ -2664,15 +2665,25 @@ export type Database = {
           id: string
           metadata: Json | null
           priority: string
+          published_at: string | null
+          review_status: string | null
+          reviewer_id: string | null
+          reviewer_name: string | null
+          scheduled_publish_date: string | null
           status: string
+          tags: string[] | null
+          target_word_count: number | null
           title: string
           type: string
           updated_at: string
+          version: number | null
+          word_count: number | null
           workspace_id: string
         }
         Insert: {
           author_id?: string | null
           author_name?: string | null
+          category?: string | null
           content_url?: string | null
           created_at?: string
           description?: string | null
@@ -2680,15 +2691,25 @@ export type Database = {
           id?: string
           metadata?: Json | null
           priority?: string
+          published_at?: string | null
+          review_status?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          scheduled_publish_date?: string | null
           status?: string
+          tags?: string[] | null
+          target_word_count?: number | null
           title: string
           type?: string
           updated_at?: string
+          version?: number | null
+          word_count?: number | null
           workspace_id: string
         }
         Update: {
           author_id?: string | null
           author_name?: string | null
+          category?: string | null
           content_url?: string | null
           created_at?: string
           description?: string | null
@@ -2696,15 +2717,146 @@ export type Database = {
           id?: string
           metadata?: Json | null
           priority?: string
+          published_at?: string | null
+          review_status?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          scheduled_publish_date?: string | null
           status?: string
+          tags?: string[] | null
+          target_word_count?: number | null
           title?: string
           type?: string
           updated_at?: string
+          version?: number | null
+          word_count?: number | null
           workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "workspace_content_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_content_reviews: {
+        Row: {
+          assigned_at: string | null
+          content_item_id: string
+          created_at: string
+          feedback: string | null
+          id: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          reviewer_name: string | null
+          score: number | null
+          status: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          content_item_id: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          score?: number | null
+          status?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          content_item_id?: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          score?: number | null
+          status?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_content_reviews_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_content_reviews_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_content_templates: {
+        Row: {
+          category: string | null
+          content_type: string | null
+          created_at: string
+          created_by: string | null
+          created_by_name: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          sample_content: string | null
+          template_structure: Json | null
+          thumbnail_url: string | null
+          updated_at: string
+          usage_count: number | null
+          workspace_id: string
+        }
+        Insert: {
+          category?: string | null
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sample_content?: string | null
+          template_structure?: Json | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          usage_count?: number | null
+          workspace_id: string
+        }
+        Update: {
+          category?: string | null
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sample_content?: string | null
+          template_structure?: Json | null
+          thumbnail_url?: string | null
+          updated_at?: string
+          usage_count?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_content_templates_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -3528,6 +3680,72 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_rubrics_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_scheduled_content: {
+        Row: {
+          assigned_name: string | null
+          assigned_to: string | null
+          content_item_id: string | null
+          content_preview: string | null
+          created_at: string
+          id: string
+          media_urls: string[] | null
+          platform: string
+          scheduled_date: string
+          scheduled_time: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_name?: string | null
+          assigned_to?: string | null
+          content_item_id?: string | null
+          content_preview?: string | null
+          created_at?: string
+          id?: string
+          media_urls?: string[] | null
+          platform: string
+          scheduled_date: string
+          scheduled_time?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_name?: string | null
+          assigned_to?: string | null
+          content_item_id?: string | null
+          content_preview?: string | null
+          created_at?: string
+          id?: string
+          media_urls?: string[] | null
+          platform?: string
+          scheduled_date?: string
+          scheduled_time?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_scheduled_content_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_scheduled_content_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
