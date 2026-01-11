@@ -115,7 +115,12 @@ export type WorkspaceTab =
   | 'upload-media'
   | 'add-speaker'
   | 'schedule-session'
-  | 'view-rubrics';
+  | 'view-rubrics'
+  // Media Committee tabs (L3)
+  | 'upload-media-committee'
+  | 'create-shot-list'
+  | 'gallery-review'
+  | 'export-assets';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

@@ -183,10 +183,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'export-results', label: 'Export Results', icon: Download, color: 'text-purple-500', tab: 'reports' },
   ],
   media: [
-    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'tasks' },
-    { id: 'create-shot-list', label: 'Create Shot List', icon: Camera, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'approvals' },
-    { id: 'export-assets', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'reports' },
+    { id: 'upload-media', label: 'Upload Media', icon: Upload, color: 'text-fuchsia-500', tab: 'upload-media-committee' },
+    { id: 'create-shot-list', label: 'Create Shot List', icon: Camera, color: 'text-blue-500', tab: 'create-shot-list' },
+    { id: 'gallery-review', label: 'Gallery Review', icon: Image, color: 'text-purple-500', tab: 'gallery-review' },
+    { id: 'export-assets', label: 'Export Assets', icon: Download, color: 'text-emerald-500', tab: 'export-assets' },
   ],
   event: [
     { id: 'update-schedule', label: 'Update Schedule', icon: Clock, color: 'text-blue-500', tab: 'tasks' },

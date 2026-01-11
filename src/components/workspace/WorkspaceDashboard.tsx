@@ -86,6 +86,13 @@ import {
   ScheduleSessionTab,
   ViewRubricsTab,
 } from './department/content/tabs';
+// Media Committee tabs (L3)
+import {
+  UploadMediaTab as MediaUploadTab,
+  CreateShotListTab,
+  GalleryReviewTab,
+  ExportAssetsTab,
+} from './committee/media';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -524,6 +531,23 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'view-rubrics' && (
           <ViewRubricsTab workspace={workspace} />
+        )}
+
+        {/* Media Committee tabs (L3) */}
+        {activeTab === 'upload-media-committee' && (
+          <MediaUploadTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'create-shot-list' && (
+          <CreateShotListTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'gallery-review' && (
+          <GalleryReviewTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'export-assets' && (
+          <ExportAssetsTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

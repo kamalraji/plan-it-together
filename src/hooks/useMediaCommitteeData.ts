@@ -87,7 +87,7 @@ export function useMediaAssets(workspaceId: string | undefined) {
 
 export function useUploadMediaAsset(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (params: { 
@@ -131,7 +131,7 @@ export function useUploadMediaAsset(workspaceId: string | undefined) {
           file_size: params.file.size,
           mime_type: mimeType,
           uploaded_by: user.id,
-          uploader_name: profile?.full_name || user.email,
+          uploader_name: user.name || user.email,
           category: params.category,
           event_segment: params.eventSegment,
           tags: params.tags,
@@ -329,7 +329,7 @@ export function useAssetsWithReviews(workspaceId: string | undefined) {
 
 export function useCreateGalleryReview(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (params: { 
@@ -348,7 +348,7 @@ export function useCreateGalleryReview(workspaceId: string | undefined) {
           workspace_id: workspaceId,
           asset_id: params.assetId,
           reviewer_id: user.id,
-          reviewer_name: profile?.full_name || user.email,
+          reviewer_name: user.name || user.email,
           status: params.status,
           rating: params.rating,
           feedback: params.feedback,
@@ -373,7 +373,7 @@ export function useCreateGalleryReview(workspaceId: string | undefined) {
 
 export function useBulkReviewAssets(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (params: { 
@@ -387,7 +387,7 @@ export function useBulkReviewAssets(workspaceId: string | undefined) {
         workspace_id: workspaceId,
         asset_id: assetId,
         reviewer_id: user.id,
-        reviewer_name: profile?.full_name || user.email,
+        reviewer_name: user.name || user.email,
         status: params.status,
         usage_rights: params.usageRights || 'internal',
         reviewed_at: new Date().toISOString(),
