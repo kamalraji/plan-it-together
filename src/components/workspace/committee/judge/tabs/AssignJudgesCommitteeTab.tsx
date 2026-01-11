@@ -11,16 +11,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Plus, 
   UserPlus, 
   Users, 
   Mail, 
   Trash2, 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle,
   Shuffle,
-  RefreshCw
+  RefreshCw,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import {
   useWorkspaceJudges,
@@ -33,6 +33,7 @@ import {
   useDeleteAssignment,
   useJudgingProgress,
 } from '@/hooks/useJudgeCommitteeData';
+import { JudgePortalShareButton, JudgePortalNavigateButton } from '../JudgePortalShareButton';
 
 interface AssignJudgesCommitteeTabProps {
   workspaceId: string;
@@ -150,7 +151,24 @@ export function AssignJudgesCommitteeTab({ workspaceId }: AssignJudgesCommitteeT
 
   return (
     <div className="space-y-6">
-      {/* Progress Stats */}
+      {/* Portal Access Card */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">Judge Portal</CardTitle>
+              <CardDescription>
+                Share the portal link with judges so they can access their scoring dashboard
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <JudgePortalShareButton variant="outline" />
+              <JudgePortalNavigateButton variant="default" />
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
