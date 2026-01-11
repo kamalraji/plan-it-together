@@ -4260,6 +4260,53 @@ export type Database = {
           },
         ]
       }
+      workspace_logistics_reports: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          date_range_end: string | null
+          date_range_start: string | null
+          generated_by: string | null
+          generated_by_name: string | null
+          id: string
+          report_type: string
+          title: string
+          workspace_id: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          date_range_end?: string | null
+          date_range_start?: string | null
+          generated_by?: string | null
+          generated_by_name?: string | null
+          id?: string
+          report_type: string
+          title: string
+          workspace_id: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          date_range_end?: string | null
+          date_range_start?: string | null
+          generated_by?: string | null
+          generated_by_name?: string | null
+          id?: string
+          report_type?: string
+          title?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_logistics_reports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_media_assets: {
         Row: {
           category: string | null
@@ -6196,6 +6243,74 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_time_entries_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_transport_schedules: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          created_by: string | null
+          departure_time: string | null
+          driver_contact: string | null
+          driver_name: string | null
+          dropoff_location: string | null
+          id: string
+          name: string
+          notes: string | null
+          passengers_booked: number | null
+          pickup_location: string | null
+          status: string
+          transport_type: string
+          updated_at: string | null
+          vehicle_info: string | null
+          workspace_id: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          departure_time?: string | null
+          driver_contact?: string | null
+          driver_name?: string | null
+          dropoff_location?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          passengers_booked?: number | null
+          pickup_location?: string | null
+          status?: string
+          transport_type?: string
+          updated_at?: string | null
+          vehicle_info?: string | null
+          workspace_id: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          departure_time?: string | null
+          driver_contact?: string | null
+          driver_name?: string | null
+          dropoff_location?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          passengers_booked?: number | null
+          pickup_location?: string | null
+          status?: string
+          transport_type?: string
+          updated_at?: string | null
+          vehicle_info?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_transport_schedules_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
