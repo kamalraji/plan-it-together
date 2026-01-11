@@ -171,6 +171,17 @@ import {
   ReportIssueTab,
   RoomStatusTab,
 } from './committee/facility/tabs';
+// Logistics Committee tabs (L3)
+import {
+  TrackShipmentTab,
+  AddEquipmentTab,
+  ScheduleTransportTab,
+  AddVenueTab,
+  CreateChecklistTab,
+  GenerateReportTab as LogisticsGenerateReportTab,
+  ReportIssueTab as LogisticsReportIssueTab,
+  ViewTimelineTab,
+} from './committee/logistics/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -843,6 +854,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'room-status-facility' && (
           <RoomStatusTab workspaceId={workspace.id} />
+        )}
+
+        {/* Logistics Committee tabs (L3) */}
+        {activeTab === 'track-shipment-logistics' && (
+          <TrackShipmentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'add-equipment-logistics' && (
+          <AddEquipmentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'schedule-transport-logistics' && (
+          <ScheduleTransportTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'add-venue-logistics' && (
+          <AddVenueTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'create-checklist-logistics' && (
+          <CreateChecklistTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'generate-report-logistics' && (
+          <LogisticsGenerateReportTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'report-issue-logistics' && (
+          <LogisticsReportIssueTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'view-timeline-logistics' && (
+          <ViewTimelineTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

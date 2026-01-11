@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Json } from '@/integrations/supabase/types';
 
 // Types
 export type TransportType = 'shuttle' | 'vip' | 'equipment' | 'staff' | 'cargo';
@@ -190,18 +191,30 @@ export function useGenerateReport(workspaceId: string) {
         .eq('id', userId)
         .single() : { data: null };
 
+      const insertData: {
+        workspace_id: string;
+        report_type: string;
+        title: string;
+        content: Json;
+        date_range_start?: string;
+        date_range_end?: string;
+        generated_by?: string;
+        generated_by_name?: string;
+      } = {
+        workspace_id: workspaceId,
+        report_type: report.report_type || 'daily_summary',
+        title: report.title || 'Report',
+        content: (report.content || {}) as Json,
+      };
+
+      if (report.date_range_start) insertData.date_range_start = report.date_range_start;
+      if (report.date_range_end) insertData.date_range_end = report.date_range_end;
+      if (userId) insertData.generated_by = userId;
+      insertData.generated_by_name = profile?.full_name || 'Unknown';
+
       const { data, error } = await supabase
         .from('workspace_logistics_reports')
-        .insert({
-          report_type: report.report_type || 'daily_summary',
-          title: report.title || 'Report',
-          content: report.content || {},
-          date_range_start: report.date_range_start,
-          date_range_end: report.date_range_end,
-          workspace_id: workspaceId,
-          generated_by: userId,
-          generated_by_name: profile?.full_name || 'Unknown',
-        })
+        .insert([insertData])
         .select()
         .single();
       if (error) throw error;

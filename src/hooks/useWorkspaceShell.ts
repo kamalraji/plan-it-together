@@ -147,7 +147,16 @@ export type WorkspaceTab =
   | 'safety-check-facility'
   | 'venue-walkthrough-facility'
   | 'report-issue-facility'
-  | 'room-status-facility';
+  | 'room-status-facility'
+  // Logistics Committee tabs (L3)
+  | 'track-shipment-logistics'
+  | 'add-equipment-logistics'
+  | 'schedule-transport-logistics'
+  | 'add-venue-logistics'
+  | 'create-checklist-logistics'
+  | 'generate-report-logistics'
+  | 'report-issue-logistics'
+  | 'view-timeline-logistics';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;
