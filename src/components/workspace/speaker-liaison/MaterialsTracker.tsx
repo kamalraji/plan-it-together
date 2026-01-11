@@ -5,53 +5,25 @@ import {
   FileText, 
   FileCheck,
   AlertCircle,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
+import { useMaterialsStats, useUpdateSpeaker } from '@/hooks/useSpeakerLiaisonData';
+import { Workspace } from '@/types';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
-interface MaterialStatus {
-  speakerId: string;
-  speakerName: string;
-  bio: { submitted: boolean; approved: boolean };
-  photo: { submitted: boolean; approved: boolean };
-  presentation: { submitted: boolean; approved: boolean };
-  avRequirements: { submitted: boolean; approved: boolean };
+interface MaterialsTrackerProps {
+  workspace?: Workspace;
 }
 
-export function MaterialsTracker() {
-  const materials: MaterialStatus[] = [
-    {
-      speakerId: '1',
-      speakerName: 'Dr. Sarah Chen',
-      bio: { submitted: true, approved: true },
-      photo: { submitted: true, approved: true },
-      presentation: { submitted: true, approved: true },
-      avRequirements: { submitted: true, approved: true },
-    },
-    {
-      speakerId: '2',
-      speakerName: 'James Wilson',
-      bio: { submitted: true, approved: true },
-      photo: { submitted: true, approved: false },
-      presentation: { submitted: false, approved: false },
-      avRequirements: { submitted: true, approved: true },
-    },
-    {
-      speakerId: '3',
-      speakerName: 'Maria Garcia',
-      bio: { submitted: false, approved: false },
-      photo: { submitted: false, approved: false },
-      presentation: { submitted: false, approved: false },
-      avRequirements: { submitted: false, approved: false },
-    },
-    {
-      speakerId: '4',
-      speakerName: 'Prof. Robert Kim',
-      bio: { submitted: true, approved: true },
-      photo: { submitted: true, approved: true },
-      presentation: { submitted: true, approved: false },
-      avRequirements: { submitted: true, approved: true },
-    },
-  ];
+export function MaterialsTracker({ workspace }: MaterialsTrackerProps) {
+  const { materials, totalItems, approvedItems, submittedItems } = useMaterialsStats(workspace?.id);
+  const updateSpeaker = useUpdateSpeaker(workspace?.id);
 
   const getStatusIcon = (status: { submitted: boolean; approved: boolean }) => {
     if (status.approved) return <FileCheck className="h-3 w-3 text-emerald-500" />;
@@ -59,18 +31,28 @@ export function MaterialsTracker() {
     return <AlertCircle className="h-3 w-3 text-muted-foreground" />;
   };
 
-
-  const calculateProgress = (material: MaterialStatus) => {
+  const calculateProgress = (material: typeof materials[0]) => {
     const items = [material.bio, material.photo, material.presentation, material.avRequirements];
     const approved = items.filter(i => i.approved).length;
     return (approved / items.length) * 100;
   };
 
-  const totalApproved = materials.reduce((sum, m) => {
-    const items = [m.bio, m.photo, m.presentation, m.avRequirements];
-    return sum + items.filter(i => i.approved).length;
-  }, 0);
-  const totalItems = materials.length * 4;
+  const handleApprove = async (speakerId: string, field: string) => {
+    await updateSpeaker.mutateAsync({
+      id: speakerId,
+      [`${field}_approved`]: true,
+    });
+  };
+
+  if (!workspace?.id) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -82,7 +64,7 @@ export function MaterialsTracker() {
               Materials Tracker
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
-              {totalApproved}/{totalItems} items approved
+              {approvedItems}/{totalItems} items approved • {submittedItems} submitted
             </p>
           </div>
           <Button variant="outline" size="sm">
@@ -92,53 +74,119 @@ export function MaterialsTracker() {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Column Headers */}
-        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground px-3 pb-2 border-b border-border/50">
-          <span>Speaker</span>
-          <span className="text-center">Bio</span>
-          <span className="text-center">Photo</span>
-          <span className="text-center">Slides</span>
-          <span className="text-center">A/V</span>
-        </div>
+        {materials.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground text-sm">
+            No speakers to track materials for
+          </div>
+        ) : (
+          <>
+            {/* Column Headers */}
+            <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground px-3 pb-2 border-b border-border/50">
+              <span>Speaker</span>
+              <span className="text-center">Bio</span>
+              <span className="text-center">Photo</span>
+              <span className="text-center">Slides</span>
+              <span className="text-center">A/V</span>
+            </div>
 
-        {materials.map((material) => {
-          const progress = calculateProgress(material);
-          
-          return (
-            <div
-              key={material.speakerId}
-              className="p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors"
-            >
-              <div className="grid grid-cols-5 gap-2 items-center mb-2">
-                <span className="text-sm font-medium truncate">{material.speakerName}</span>
-                <div className="flex justify-center">{getStatusIcon(material.bio)}</div>
-                <div className="flex justify-center">{getStatusIcon(material.photo)}</div>
-                <div className="flex justify-center">{getStatusIcon(material.presentation)}</div>
-                <div className="flex justify-center">{getStatusIcon(material.avRequirements)}</div>
+            <TooltipProvider>
+              {materials.map((material) => {
+                const progress = calculateProgress(material);
+                
+                return (
+                  <div
+                    key={material.speakerId}
+                    className="p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="grid grid-cols-5 gap-2 items-center mb-2">
+                      <span className="text-sm font-medium truncate">{material.speakerName}</span>
+                      
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            className="flex justify-center cursor-pointer hover:scale-110 transition-transform"
+                            onClick={() => material.bio.submitted && !material.bio.approved && 
+                              handleApprove(material.speakerId, 'bio')}
+                          >
+                            {getStatusIcon(material.bio)}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {material.bio.approved ? 'Approved' : material.bio.submitted ? 'Click to approve' : 'Not submitted'}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            className="flex justify-center cursor-pointer hover:scale-110 transition-transform"
+                            onClick={() => material.photo.submitted && !material.photo.approved && 
+                              handleApprove(material.speakerId, 'photo')}
+                          >
+                            {getStatusIcon(material.photo)}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {material.photo.approved ? 'Approved' : material.photo.submitted ? 'Click to approve' : 'Not submitted'}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            className="flex justify-center cursor-pointer hover:scale-110 transition-transform"
+                            onClick={() => material.presentation.submitted && !material.presentation.approved && 
+                              handleApprove(material.speakerId, 'presentation')}
+                          >
+                            {getStatusIcon(material.presentation)}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {material.presentation.approved ? 'Approved' : material.presentation.submitted ? 'Click to approve' : 'Not submitted'}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            className="flex justify-center cursor-pointer hover:scale-110 transition-transform"
+                            onClick={() => material.avRequirements.submitted && !material.avRequirements.approved && 
+                              handleApprove(material.speakerId, 'av_requirements')}
+                          >
+                            {getStatusIcon(material.avRequirements)}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {material.avRequirements.approved ? 'Approved' : material.avRequirements.submitted ? 'Click to approve' : 'Not submitted'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Progress value={progress} className="h-1.5 flex-1" />
+                      <span className="text-xs text-muted-foreground">{Math.round(progress)}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </TooltipProvider>
+
+            {/* Legend */}
+            <div className="flex items-center gap-4 pt-2 border-t border-border/50 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Approved</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Progress value={progress} className="h-1.5 flex-1" />
-                <span className="text-xs text-muted-foreground">{Math.round(progress)}%</span>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>Pending Review</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-muted" />
+                <span>Not Submitted</span>
               </div>
             </div>
-          );
-        })}
-
-        {/* Legend */}
-        <div className="flex items-center gap-4 pt-2 border-t border-border/50 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Approved</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <span>Pending Review</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-muted" />
-            <span>Not Submitted</span>
-          </div>
-        </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

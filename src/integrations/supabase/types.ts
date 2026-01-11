@@ -1422,6 +1422,225 @@ export type Database = {
           },
         ]
       }
+      speaker_communications: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          sent_by: string | null
+          sent_by_name: string | null
+          speaker_id: string
+          status: string | null
+          subject: string
+          type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          sent_by?: string | null
+          sent_by_name?: string | null
+          speaker_id: string
+          status?: string | null
+          subject: string
+          type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          sent_by?: string | null
+          sent_by_name?: string | null
+          speaker_id?: string
+          status?: string | null
+          subject?: string
+          type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_communications_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_speakers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "speaker_communications_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      speaker_sessions: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          end_time: string | null
+          id: string
+          is_published: boolean | null
+          location: string | null
+          notes: string | null
+          room: string | null
+          scheduled_date: string | null
+          session_type: string | null
+          speaker_id: string
+          start_time: string | null
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          id?: string
+          is_published?: boolean | null
+          location?: string | null
+          notes?: string | null
+          room?: string | null
+          scheduled_date?: string | null
+          session_type?: string | null
+          speaker_id: string
+          start_time?: string | null
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          id?: string
+          is_published?: boolean | null
+          location?: string | null
+          notes?: string | null
+          room?: string | null
+          scheduled_date?: string | null
+          session_type?: string | null
+          speaker_id?: string
+          start_time?: string | null
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_sessions_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_speakers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "speaker_sessions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      speaker_travel: {
+        Row: {
+          arrival_time: string | null
+          check_in_date: string | null
+          check_out_date: string | null
+          created_at: string
+          departure_time: string | null
+          dietary_requirements: string | null
+          flight_details: string | null
+          flight_number: string | null
+          flight_status: string | null
+          hotel_details: string | null
+          hotel_name: string | null
+          hotel_status: string | null
+          id: string
+          meals_details: string | null
+          meals_status: string | null
+          notes: string | null
+          speaker_id: string
+          transport_details: string | null
+          transport_status: string | null
+          transport_type: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          arrival_time?: string | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          created_at?: string
+          departure_time?: string | null
+          dietary_requirements?: string | null
+          flight_details?: string | null
+          flight_number?: string | null
+          flight_status?: string | null
+          hotel_details?: string | null
+          hotel_name?: string | null
+          hotel_status?: string | null
+          id?: string
+          meals_details?: string | null
+          meals_status?: string | null
+          notes?: string | null
+          speaker_id: string
+          transport_details?: string | null
+          transport_status?: string | null
+          transport_type?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          arrival_time?: string | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          created_at?: string
+          departure_time?: string | null
+          dietary_requirements?: string | null
+          flight_details?: string | null
+          flight_number?: string | null
+          flight_status?: string | null
+          hotel_details?: string | null
+          hotel_name?: string | null
+          hotel_status?: string | null
+          id?: string
+          meals_details?: string | null
+          meals_status?: string | null
+          notes?: string | null
+          speaker_id?: string
+          transport_details?: string | null
+          transport_status?: string | null
+          transport_type?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_travel_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_speakers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "speaker_travel_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       submissions: {
         Row: {
           created_at: string
@@ -3563,8 +3782,14 @@ export type Database = {
       workspace_speakers: {
         Row: {
           accommodation_arranged: boolean | null
+          av_requirements_approved: boolean | null
+          av_requirements_submitted: boolean | null
+          av_requirements_text: string | null
           avatar_url: string | null
           bio: string | null
+          bio_approved: boolean | null
+          bio_submitted: boolean | null
+          bio_url: string | null
           created_at: string
           email: string | null
           id: string
@@ -3573,9 +3798,18 @@ export type Database = {
           name: string
           notes: string | null
           phone: string | null
+          photo_approved: boolean | null
+          photo_submitted: boolean | null
+          photo_url: string | null
+          presentation_approved: boolean | null
+          presentation_submitted: boolean | null
+          presentation_url: string | null
           role: string | null
+          room: string | null
+          session_duration: string | null
           session_time: string | null
           session_title: string | null
+          session_type: string | null
           status: string
           travel_arranged: boolean | null
           updated_at: string
@@ -3583,8 +3817,14 @@ export type Database = {
         }
         Insert: {
           accommodation_arranged?: boolean | null
+          av_requirements_approved?: boolean | null
+          av_requirements_submitted?: boolean | null
+          av_requirements_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          bio_approved?: boolean | null
+          bio_submitted?: boolean | null
+          bio_url?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -3593,9 +3833,18 @@ export type Database = {
           name: string
           notes?: string | null
           phone?: string | null
+          photo_approved?: boolean | null
+          photo_submitted?: boolean | null
+          photo_url?: string | null
+          presentation_approved?: boolean | null
+          presentation_submitted?: boolean | null
+          presentation_url?: string | null
           role?: string | null
+          room?: string | null
+          session_duration?: string | null
           session_time?: string | null
           session_title?: string | null
+          session_type?: string | null
           status?: string
           travel_arranged?: boolean | null
           updated_at?: string
@@ -3603,8 +3852,14 @@ export type Database = {
         }
         Update: {
           accommodation_arranged?: boolean | null
+          av_requirements_approved?: boolean | null
+          av_requirements_submitted?: boolean | null
+          av_requirements_text?: string | null
           avatar_url?: string | null
           bio?: string | null
+          bio_approved?: boolean | null
+          bio_submitted?: boolean | null
+          bio_url?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -3613,9 +3868,18 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string | null
+          photo_approved?: boolean | null
+          photo_submitted?: boolean | null
+          photo_url?: string | null
+          presentation_approved?: boolean | null
+          presentation_submitted?: boolean | null
+          presentation_url?: string | null
           role?: string | null
+          room?: string | null
+          session_duration?: string | null
           session_time?: string | null
           session_title?: string | null
+          session_type?: string | null
           status?: string
           travel_arranged?: boolean | null
           updated_at?: string
