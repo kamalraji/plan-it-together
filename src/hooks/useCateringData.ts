@@ -148,18 +148,16 @@ export function useCateringMenuMutations(workspaceId: string) {
 }
 
 // Vendors Hooks
+// Uses secure RPC function that masks contact info for non-privileged users
 export function useCateringVendors(workspaceId: string) {
   return useQuery({
     queryKey: ['catering-vendors', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('catering_vendors')
-        .select('*')
-        .eq('workspace_id', workspaceId)
-        .order('status', { ascending: true });
+        .rpc('get_catering_vendors_secure', { _workspace_id: workspaceId });
       
       if (error) throw error;
-      return data as CateringVendor[];
+      return (data ?? []) as CateringVendor[];
     },
     enabled: !!workspaceId,
   });

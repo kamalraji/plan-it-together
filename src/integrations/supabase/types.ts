@@ -4535,6 +4535,25 @@ export type Database = {
     }
     Functions: {
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_catering_vendors_secure: {
+        Args: { _workspace_id: string }
+        Returns: {
+          address: string
+          contact_name: string
+          contract_value: number
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string
+          phone: string
+          rating: number
+          status: string
+          updated_at: string
+          vendor_type: string
+          workspace_id: string
+        }[]
+      }
       get_public_event_by_slug: {
         Args: { _event_slug: string; _org_slug: string }
         Returns: {
