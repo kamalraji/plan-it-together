@@ -100,6 +100,14 @@ import {
   ExportResultsTab as JudgeExportResultsTab,
   JudgeScoringPortalTab,
 } from './committee/judge';
+// Speaker Liaison Committee tabs (L3)
+import {
+  SpeakerRosterTab,
+  SessionScheduleTab as SpeakerSessionScheduleTab,
+  MaterialsCollectionTab,
+  TravelCoordinationTab,
+  CommunicationLogTab,
+} from './committee/speaker-liaison/tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -576,6 +584,27 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'judge-scoring-portal' && (
           <JudgeScoringPortalTab workspaceId={workspace.id} />
+        )}
+
+        {/* Speaker Liaison Committee tabs (L3) */}
+        {activeTab === 'speaker-roster-committee' && (
+          <SpeakerRosterTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'materials-collection-committee' && (
+          <MaterialsCollectionTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'session-schedule-committee' && (
+          <SpeakerSessionScheduleTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'travel-coordination-committee' && (
+          <TravelCoordinationTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'communication-log-committee' && (
+          <CommunicationLogTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>

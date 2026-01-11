@@ -92,7 +92,13 @@ export type WorkspaceTab =
   | 'setup-rubrics-committee'
   | 'view-scores-committee'
   | 'export-results-committee'
-  | 'judge-scoring-portal';
+  | 'judge-scoring-portal'
+  // Speaker Liaison Committee tabs (L3)
+  | 'speaker-roster-committee'
+  | 'materials-collection-committee'
+  | 'session-schedule-committee'
+  | 'travel-coordination-committee'
+  | 'communication-log-committee';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

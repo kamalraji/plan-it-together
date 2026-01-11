@@ -158,7 +158,10 @@ export function ScheduleSessionDialog({
 
             <div className="space-y-2">
               <Label htmlFor="type">Session Type</Label>
-              <Select value={sessionType} onValueChange={setSessionType}>
+              <Select 
+                value={sessionType} 
+                onValueChange={(value: 'keynote' | 'workshop' | 'panel' | 'breakout' | 'fireside') => setSessionType(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
