@@ -4,14 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Send, Clock, CheckCircle, XCircle, RefreshCw, Loader2, Calendar, Zap, Pause, Play, Trash2 } from 'lucide-react';
+import { Send, Clock, CheckCircle, XCircle, RefreshCw, Loader2, Calendar, Zap, Pause, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSocialPostQueue, usePublishPost, useSyncAnalytics } from '@/hooks/useContentApprovalWorkflow';
+import { useSocialPostQueue, usePublishToSocial, useSyncSocialAnalytics } from '@/hooks/useContentApprovalWorkflow';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 interface SocialPostQueueTabProps { workspaceId: string; }
-interface QueueItem { id: string; platform: string; status: string; scheduled_for?: string; posted_at?: string; error_message?: string; }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   pending: { label: 'Pending', color: 'bg-amber-500', icon: Clock },
@@ -29,15 +28,15 @@ export function SocialPostQueueTab({ workspaceId }: SocialPostQueueTabProps) {
   const [filterPlatform, setFilterPlatform] = useState<string>('all');
 
   const { data: postQueue, isLoading } = useSocialPostQueue(workspaceId);
-  const { mutateAsync: publishPost, isPending: isPublishing } = usePublishPost(workspaceId);
-  const { mutateAsync: syncAnalytics, isPending: isSyncing } = useSyncAnalytics(workspaceId);
+  const { mutateAsync: publishPost, isPending: isPublishing } = usePublishToSocial(workspaceId);
+  const { mutateAsync: syncAnalytics, isPending: isSyncing } = useSyncSocialAnalytics(workspaceId);
 
-  const filteredQueue = postQueue?.filter((p: QueueItem) => (filterStatus === 'all' || p.status === filterStatus) && (filterPlatform === 'all' || p.platform === filterPlatform)) || [];
+  const filteredQueue = (postQueue || []).filter((p) => (filterStatus === 'all' || p.status === filterStatus) && (filterPlatform === 'all' || p.platform === filterPlatform));
 
-  const handlePublishNow = async (queueItemId: string) => { try { await publishPost({ queueItemId }); toast.success('Post sent for publishing'); } catch { toast.error('Failed to publish'); } };
-  const handleSyncAnalytics = async () => { try { await syncAnalytics({ platforms: ['twitter', 'linkedin', 'instagram'] }); toast.success('Analytics sync started'); } catch { toast.error('Failed to sync'); } };
+  const handlePublishNow = async (queueItemId: string) => { try { await publishPost(queueItemId); toast.success('Post sent for publishing'); } catch { toast.error('Failed to publish'); } };
+  const handleSyncAnalytics = async () => { try { await syncAnalytics('sync_post_metrics'); toast.success('Analytics sync started'); } catch { toast.error('Failed to sync'); } };
 
-  const queueStats = { pending: postQueue?.filter((p: QueueItem) => p.status === 'pending').length || 0, scheduled: postQueue?.filter((p: QueueItem) => p.status === 'scheduled').length || 0, posted: postQueue?.filter((p: QueueItem) => p.status === 'posted').length || 0, failed: postQueue?.filter((p: QueueItem) => p.status === 'failed').length || 0 };
+  const queueStats = { pending: (postQueue || []).filter((p) => p.status === 'pending').length, scheduled: (postQueue || []).filter((p) => p.status === 'scheduled').length, posted: (postQueue || []).filter((p) => p.status === 'posted').length, failed: (postQueue || []).filter((p) => p.status === 'failed').length };
 
   return (
     <div className="space-y-6">
@@ -59,8 +58,8 @@ export function SocialPostQueueTab({ workspaceId }: SocialPostQueueTabProps) {
         <CardContent>
           {isLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
           : filteredQueue.length === 0 ? <div className="text-center py-12"><Send className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" /><p className="text-muted-foreground">No posts in queue</p></div>
-          : <ScrollArea className="h-[400px]"><div className="space-y-3">{filteredQueue.map((post: QueueItem) => {
-              const statusConfig = STATUS_CONFIG[post.status] || STATUS_CONFIG.pending;
+          : <ScrollArea className="h-[400px]"><div className="space-y-3">{filteredQueue.map((post) => {
+              const statusConfig = STATUS_CONFIG[post.status || 'pending'] || STATUS_CONFIG.pending;
               const StatusIcon = statusConfig.icon;
               return (
                 <div key={post.id} className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
