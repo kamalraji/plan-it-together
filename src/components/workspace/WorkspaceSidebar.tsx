@@ -46,7 +46,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
-import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
+
 
 export type WorkspaceTab =
   | 'overview'
@@ -274,16 +274,10 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   const isCollapsed = state === 'collapsed';
   const [hierarchyExpanded, setHierarchyExpanded] = useState(true);
 
-  // Determine if event-settings tab should be shown
+  // Show event-settings tab for ALL workspaces with an event
   const showEventSettingsTab = useMemo(() => {
-    if (!workspace.eventId) return false;
-    if (workspace.workspaceType === WorkspaceType.ROOT) return true;
-    if (workspace.workspaceType === WorkspaceType.COMMITTEE) {
-      const committeeType = detectCommitteeType(workspace.name);
-      return ['registration', 'finance', 'marketing', 'logistics', 'event'].includes(committeeType);
-    }
-    return false;
-  }, [workspace]);
+    return !!workspace.eventId;
+  }, [workspace.eventId]);
 
   // Filter nav items based on workspace type
   const navItems = useMemo(() => {
