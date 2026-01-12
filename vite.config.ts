@@ -45,7 +45,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           // Vendor chunks for better caching (npm packages only)
-          'react-vendor': ['react', 'react-dom'],
           'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
         },
       },
