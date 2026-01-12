@@ -17,7 +17,7 @@ import {
   Settings2,
   ClipboardCheck
 } from 'lucide-react';
-import { detectCommitteeType } from '@/hooks/useEventSettingsAccess';
+
 
 interface WorkspaceNavigationProps {
   workspace: Workspace;
@@ -76,16 +76,10 @@ export function WorkspaceNavigation({
   const [searchParams, setSearchParams] = useSearchParams();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  // Determine if event-settings tab should be shown
+  // Show event-settings tab for ALL workspaces with an event
   const showEventSettingsTab = useMemo(() => {
-    if (!workspace.eventId) return false;
-    if (workspace.workspaceType === WorkspaceType.ROOT) return true;
-    if (workspace.workspaceType === WorkspaceType.COMMITTEE) {
-      const committeeType = detectCommitteeType(workspace.name);
-      return ['registration', 'finance', 'marketing', 'logistics', 'event'].includes(committeeType);
-    }
-    return false;
-  }, [workspace]);
+    return !!workspace.eventId;
+  }, [workspace.eventId]);
 
   // Handle tab change while preserving hierarchical URL params
   const handleTabChange = (tabId: TabId) => {
