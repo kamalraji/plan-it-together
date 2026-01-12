@@ -8,60 +8,26 @@ import {
   X,
   ChevronRight,
   ArrowUpRight,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-
-interface BudgetRequest {
-  id: string;
-  requestingTeam: string;
-  amount: number;
-  reason: string;
-  requestedBy: string;
-  requestedAt: Date;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  category: string;
-}
+import { useBudgetRequests, BudgetRequest } from '@/hooks/useWorkspaceBudget';
+import { useAuth } from '@/hooks/useAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface BudgetApprovalQueueProps {
   workspaceId: string;
   parentWorkspaceId?: string | null;
 }
 
-const mockRequests: BudgetRequest[] = [
-  {
-    id: '1',
-    requestingTeam: 'Marketing Committee',
-    amount: 15000,
-    reason: 'Additional social media advertising for ticket sales push',
-    requestedBy: 'Priya Sharma',
-    requestedAt: new Date('2025-01-04T10:30:00'),
-    priority: 'high',
-    category: 'Marketing',
-  },
-  {
-    id: '2',
-    requestingTeam: 'Technical Committee',
-    amount: 8000,
-    reason: 'Emergency backup equipment rental for main stage',
-    requestedBy: 'Rahul Patel',
-    requestedAt: new Date('2025-01-04T14:15:00'),
-    priority: 'urgent',
-    category: 'Equipment',
-  },
-  {
-    id: '3',
-    requestingTeam: 'Catering Committee',
-    amount: 5500,
-    reason: 'Additional refreshments for increased guest count',
-    requestedBy: 'Anjali Gupta',
-    requestedAt: new Date('2025-01-03T16:00:00'),
-    priority: 'medium',
-    category: 'Catering',
-  },
-];
+export function BudgetApprovalQueue({ workspaceId }: BudgetApprovalQueueProps) {
+  const { user } = useAuth();
+  const { requests, isLoading, reviewRequest, isReviewing } = useBudgetRequests(workspaceId, 'approver');
 
-export function BudgetApprovalQueue({ workspaceId: _workspaceId, parentWorkspaceId: _parentWorkspaceId }: BudgetApprovalQueueProps) {
+  // Filter to only pending requests
+  const pendingRequests = requests.filter(r => r.status === 'pending');
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -70,20 +36,51 @@ export function BudgetApprovalQueue({ workspaceId: _workspaceId, parentWorkspace
     }).format(amount);
   };
 
-  const getPriorityBadge = (priority: BudgetRequest['priority']) => {
-    switch (priority) {
-      case 'urgent':
-        return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Urgent</Badge>;
-      case 'high':
-        return <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20">High</Badge>;
-      case 'medium':
-        return <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">Medium</Badge>;
-      case 'low':
-        return <Badge className="bg-muted text-muted-foreground border-border">Low</Badge>;
+  const getPriorityBadge = (request: BudgetRequest) => {
+    const amount = request.requested_amount;
+    if (amount >= 50000) {
+      return <Badge className="bg-destructive/10 text-destructive border-destructive/20">High Priority</Badge>;
     }
+    if (amount >= 20000) {
+      return <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20">Medium</Badge>;
+    }
+    return <Badge className="bg-muted text-muted-foreground border-border">Standard</Badge>;
   };
 
-  const totalPending = mockRequests.reduce((sum, r) => sum + r.amount, 0);
+  const totalPending = pendingRequests.reduce((sum, r) => sum + r.requested_amount, 0);
+
+  const handleApprove = (requestId: string) => {
+    if (!user) return;
+    reviewRequest({
+      id: requestId,
+      status: 'approved',
+      reviewed_by: user.id,
+    });
+  };
+
+  const handleReject = (requestId: string) => {
+    if (!user) return;
+    reviewRequest({
+      id: requestId,
+      status: 'rejected',
+      reviewed_by: user.id,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
@@ -96,7 +93,7 @@ export function BudgetApprovalQueue({ workspaceId: _workspaceId, parentWorkspace
             <div>
               <CardTitle className="text-lg">Budget Approval Queue</CardTitle>
               <p className="text-sm text-muted-foreground mt-0.5">
-                {mockRequests.length} pending · {formatCurrency(totalPending)} total
+                {pendingRequests.length} pending · {formatCurrency(totalPending)} total
               </p>
             </div>
           </div>
@@ -107,63 +104,76 @@ export function BudgetApprovalQueue({ workspaceId: _workspaceId, parentWorkspace
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {mockRequests.length === 0 ? (
+        {pendingRequests.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Wallet className="w-10 h-10 mx-auto mb-2 opacity-50" />
             <p>No pending budget requests</p>
           </div>
         ) : (
-          mockRequests.map(request => (
-            <div
-              key={request.id}
-              className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                      {request.requestedBy.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-sm">{request.requestingTeam}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{request.requestedBy}</span>
-                      <span>·</span>
-                      <Clock className="w-3 h-3" />
-                      <span>{formatDistanceToNow(request.requestedAt, { addSuffix: true })}</span>
+          pendingRequests.map(request => {
+            const requestingWorkspaceName = request.requesting_workspace?.name || 'Unknown Workspace';
+            const initials = requestingWorkspaceName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+            
+            return (
+              <div
+                key={request.id}
+                className="p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-sm">{requestingWorkspaceName}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span>{formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1.5">
-                    <ArrowUpRight className="w-4 h-4 text-emerald-600" />
-                    <span className="font-semibold text-emerald-600">{formatCurrency(request.amount)}</span>
+                  <div className="text-right">
+                    <div className="flex items-center gap-1.5">
+                      <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+                      <span className="font-semibold text-emerald-600">
+                        {formatCurrency(request.requested_amount)}
+                      </span>
+                    </div>
+                    {getPriorityBadge(request)}
                   </div>
-                  {getPriorityBadge(request.priority)}
+                </div>
+                
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  {request.reason}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1" />
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-7 text-xs gap-1 text-destructive hover:bg-destructive/10"
+                    onClick={() => handleReject(request.id)}
+                    disabled={isReviewing}
+                  >
+                    {isReviewing ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                    Reject
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="h-7 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => handleApprove(request.id)}
+                    disabled={isReviewing}
+                  >
+                    {isReviewing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                    Approve
+                  </Button>
                 </div>
               </div>
-              
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {request.reason}
-              </p>
-
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {request.category}
-                </Badge>
-                <div className="flex-1" />
-                <Button size="sm" variant="ghost" className="h-7 text-xs gap-1 text-destructive hover:bg-destructive/10">
-                  <X className="w-3 h-3" />
-                  Reject
-                </Button>
-                <Button size="sm" className="h-7 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700">
-                  <Check className="w-3 h-3" />
-                  Approve
-                </Button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </CardContent>
     </Card>

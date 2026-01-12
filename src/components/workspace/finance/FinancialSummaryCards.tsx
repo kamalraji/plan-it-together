@@ -1,7 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Wallet, 
-   
   TrendingDown,
   AlertTriangle,
   ArrowUpRight,
@@ -9,25 +8,19 @@ import {
   PiggyBank,
   Receipt
 } from 'lucide-react';
+import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useWorkspaceExpenses } from '@/hooks/useWorkspaceExpenses';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface FinancialSummaryCardsProps {
   workspaceId: string;
 }
 
-export function FinancialSummaryCards({ workspaceId: _workspaceId }: FinancialSummaryCardsProps) {
-  // Mock data - would be replaced with real data from hooks
-  const financialData = {
-    totalBudget: 500000,
-    spent: 185000,
-    committed: 120000,
-    pendingApprovals: 28500,
-    invoicesDue: 54700,
-    budgetTrend: 12,
-    spendingTrend: -8,
-  };
+export function FinancialSummaryCards({ workspaceId }: FinancialSummaryCardsProps) {
+  const { budget, isLoading: budgetLoading } = useWorkspaceBudget(workspaceId);
+  const { stats, isLoading: expensesLoading } = useWorkspaceExpenses(workspaceId);
 
-  const available = financialData.totalBudget - financialData.spent - financialData.committed;
-  const utilizationPercent = Math.round((financialData.spent / financialData.totalBudget) * 100);
+  const isLoading = budgetLoading || expensesLoading;
 
   const formatCurrency = (amount: number) => {
     if (amount >= 100000) {
@@ -40,45 +33,66 @@ export function FinancialSummaryCards({ workspaceId: _workspaceId }: FinancialSu
     }).format(amount);
   };
 
+  const totalBudget = budget?.allocated || 0;
+  const spent = budget?.used || 0;
+  const available = totalBudget - spent;
+  const utilizationPercent = totalBudget > 0 ? Math.round((spent / totalBudget) * 100) : 0;
+  const remainingPercent = totalBudget > 0 ? Math.round((available / totalBudget) * 100) : 0;
+
   const cards = [
     {
       title: 'Total Budget',
-      value: formatCurrency(financialData.totalBudget),
+      value: formatCurrency(totalBudget),
       subtitle: `${utilizationPercent}% utilized`,
       icon: Wallet,
       iconBg: 'bg-primary/10',
       iconColor: 'text-primary',
-      trend: financialData.budgetTrend,
-      trendLabel: 'vs last month',
     },
     {
       title: 'Spent',
-      value: formatCurrency(financialData.spent),
-      subtitle: `${formatCurrency(financialData.committed)} committed`,
+      value: formatCurrency(spent),
+      subtitle: `${formatCurrency(stats.approved)} approved expenses`,
       icon: TrendingDown,
       iconBg: 'bg-orange-500/10',
       iconColor: 'text-orange-600',
-      trend: financialData.spendingTrend,
-      trendLabel: 'burn rate',
+      trend: utilizationPercent > 80 ? -Math.round((utilizationPercent - 80)) : undefined,
+      trendLabel: utilizationPercent > 80 ? 'over target' : undefined,
     },
     {
       title: 'Available',
       value: formatCurrency(available),
-      subtitle: `${Math.round((available / financialData.totalBudget) * 100)}% remaining`,
+      subtitle: `${remainingPercent}% remaining`,
       icon: PiggyBank,
       iconBg: 'bg-emerald-500/10',
       iconColor: 'text-emerald-600',
+      trend: remainingPercent > 20 ? remainingPercent : undefined,
     },
     {
       title: 'Pending',
-      value: formatCurrency(financialData.pendingApprovals),
-      subtitle: `${formatCurrency(financialData.invoicesDue)} invoices due`,
+      value: formatCurrency(stats.pending),
+      subtitle: `${stats.pendingCount} expense${stats.pendingCount !== 1 ? 's' : ''} awaiting approval`,
       icon: Receipt,
       iconBg: 'bg-amber-500/10',
       iconColor: 'text-amber-600',
-      alert: financialData.invoicesDue > 50000,
+      alert: stats.pendingCount > 5,
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="border-border/50 bg-card/50">
+            <CardContent className="p-4">
+              <Skeleton className="h-10 w-10 rounded-lg mb-3" />
+              <Skeleton className="h-8 w-24 mb-2" />
+              <Skeleton className="h-4 w-32" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
