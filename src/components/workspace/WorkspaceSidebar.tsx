@@ -226,7 +226,7 @@ const baseNavItems: NavItem[] = [
   { id: 'tasks', name: 'Tasks', icon: ClipboardList, group: 'core' },
   { id: 'team', name: 'Team', icon: Users, group: 'core' },
   { id: 'communication', name: 'Communication', icon: MessageSquare, group: 'core' },
-  { id: 'approvals', name: 'Approvals', icon: ClipboardCheck, group: 'core' },
+  { id: 'approvals', name: 'Requests & Approvals', icon: ClipboardCheck, group: 'core' },
   { id: 'checklists', name: 'Checklists', icon: ListChecks, group: 'core' },
   { id: 'event-settings', name: 'Event Settings', icon: Settings2, group: 'core' },
   { id: 'marketplace', name: 'Marketplace', icon: ShoppingBag, group: 'management' },
