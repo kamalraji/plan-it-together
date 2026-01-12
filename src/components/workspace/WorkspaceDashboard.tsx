@@ -24,6 +24,7 @@ import { WorkspaceSettingsContent } from './WorkspaceSettingsContent';
 import { EventSettingsTabContent } from './event-settings';
 import { ApprovalsTabContent } from './approvals';
 import { ChecklistsTabContent } from './checklists';
+import { MemberDirectoryPage } from './MemberDirectoryPage';
 // Committee tabs (L3)
 import { 
   AssignShiftsTab, 
@@ -439,6 +440,10 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'checklists' && (
           <ChecklistsTabContent workspace={workspace} />
+        )}
+
+        {activeTab === 'directory' && workspace.eventId && (
+          <MemberDirectoryPage eventId={workspace.eventId} />
         )}
 
         {activeTab === 'assign-shifts' && (
