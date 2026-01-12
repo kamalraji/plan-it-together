@@ -6240,6 +6240,68 @@ export type Database = {
           },
         ]
       }
+      workspace_team_briefings: {
+        Row: {
+          agenda: string | null
+          attendees: Json | null
+          briefing_type: string | null
+          created_at: string
+          created_by: string | null
+          duration_minutes: number | null
+          id: string
+          location: string | null
+          materials_url: string | null
+          notes: string | null
+          scheduled_at: string
+          status: string | null
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          agenda?: string | null
+          attendees?: Json | null
+          briefing_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number | null
+          id?: string
+          location?: string | null
+          materials_url?: string | null
+          notes?: string | null
+          scheduled_at: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          agenda?: string | null
+          attendees?: Json | null
+          briefing_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number | null
+          id?: string
+          location?: string | null
+          materials_url?: string | null
+          notes?: string | null
+          scheduled_at?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_team_briefings_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_team_members: {
         Row: {
           id: string
@@ -6455,6 +6517,87 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_venue_walkthroughs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_vip_guests: {
+        Row: {
+          accessibility_needs: string | null
+          arrival_time: string | null
+          company: string | null
+          created_at: string
+          departure_time: string | null
+          dietary_requirements: string | null
+          email: string | null
+          escort_assigned: string | null
+          event_id: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          seating_assignment: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          vip_level: string | null
+          workspace_id: string
+        }
+        Insert: {
+          accessibility_needs?: string | null
+          arrival_time?: string | null
+          company?: string | null
+          created_at?: string
+          departure_time?: string | null
+          dietary_requirements?: string | null
+          email?: string | null
+          escort_assigned?: string | null
+          event_id?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          seating_assignment?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          vip_level?: string | null
+          workspace_id: string
+        }
+        Update: {
+          accessibility_needs?: string | null
+          arrival_time?: string | null
+          company?: string | null
+          created_at?: string
+          departure_time?: string | null
+          dietary_requirements?: string | null
+          email?: string | null
+          escort_assigned?: string | null
+          event_id?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          seating_assignment?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          vip_level?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_vip_guests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_vip_guests_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
