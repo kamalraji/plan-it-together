@@ -5,7 +5,8 @@ export type EventSettingsCategory =
   | 'ticketing'
   | 'promo_codes'
   | 'seo'
-  | 'accessibility';
+  | 'accessibility'
+  | 'landing_page';
 
 export type CommitteeType = 
   | 'registration'
@@ -13,6 +14,7 @@ export type CommitteeType =
   | 'marketing'
   | 'logistics'
   | 'event'
+  | 'content'
   | 'unknown';
 
 /**
@@ -25,6 +27,7 @@ export function detectCommitteeType(workspaceName: string): CommitteeType {
   if (name.includes('finance')) return 'finance';
   if (name.includes('marketing')) return 'marketing';
   if (name.includes('logistics')) return 'logistics';
+  if (name.includes('content')) return 'content';
   if (name.includes('event') && !name.includes('settings')) return 'event';
   
   return 'unknown';
@@ -42,17 +45,22 @@ export interface EventSettingsAccess {
   canAccessSEO: boolean;
   /** Can access accessibility settings */
   canAccessAccessibility: boolean;
+  /** Can access landing page management */
+  canAccessLandingPage: boolean;
   /** Can access ALL event settings (Root workspace owners only) */
   canAccessAllSettings: boolean;
   /** Should show the Event Settings tab in navigation */
   showEventSettingsTab: boolean;
   /** Detected committee type */
   committeeType: CommitteeType;
+  /** Is root workspace owner */
+  isRootOwner: boolean;
 }
 
 export function useEventSettingsAccess(
   workspace: Workspace | undefined,
-  userRole: WorkspaceRole | null | undefined
+  userRole: WorkspaceRole | null | undefined,
+  hasPageBuildingResponsibility?: boolean
 ): EventSettingsAccess {
   return useMemo(() => {
     const defaultAccess: EventSettingsAccess = {
@@ -60,9 +68,11 @@ export function useEventSettingsAccess(
       canAccessPromoCodes: false,
       canAccessSEO: false,
       canAccessAccessibility: false,
+      canAccessLandingPage: false,
       canAccessAllSettings: false,
       showEventSettingsTab: false,
       committeeType: 'unknown',
+      isRootOwner: false,
     };
 
     if (!workspace) return defaultAccess;
@@ -70,6 +80,7 @@ export function useEventSettingsAccess(
     const committeeType = detectCommitteeType(workspace.name);
     const isRootWorkspace = workspace.workspaceType === WorkspaceType.ROOT;
     const isCommittee = workspace.workspaceType === WorkspaceType.COMMITTEE;
+    const isDepartment = workspace.workspaceType === WorkspaceType.DEPARTMENT;
     
     // Root workspace owner gets full access to all settings
     const isRootOwner = isRootWorkspace && userRole === WorkspaceRole.WORKSPACE_OWNER;
@@ -98,21 +109,33 @@ export function useEventSettingsAccess(
       isRootMember || 
       (isCommittee && (committeeType === 'logistics' || committeeType === 'event'));
 
+    // Landing page access: ROOT owners always, or workspaces with assigned responsibility
+    const canAccessLandingPage = 
+      isRootOwner || 
+      isRootMember ||
+      hasPageBuildingResponsibility === true ||
+      (isCommittee && (committeeType === 'content' || committeeType === 'marketing')) ||
+      (isDepartment && committeeType === 'content');
+
     const canAccessAllSettings = isRootOwner || isRootMember;
 
-    // Show the tab for Root workspaces or committees with relevant functions
+    // Show the tab for Root workspaces, committees with relevant functions, or those with page building responsibility
     const showEventSettingsTab = 
       isRootWorkspace || 
-      (isCommittee && ['registration', 'finance', 'marketing', 'logistics', 'event'].includes(committeeType));
+      hasPageBuildingResponsibility === true ||
+      (isCommittee && ['registration', 'finance', 'marketing', 'logistics', 'event', 'content'].includes(committeeType)) ||
+      (isDepartment && committeeType === 'content');
 
     return {
       canAccessTicketing,
       canAccessPromoCodes,
       canAccessSEO,
       canAccessAccessibility,
+      canAccessLandingPage,
       canAccessAllSettings,
       showEventSettingsTab,
       committeeType,
+      isRootOwner,
     };
-  }, [workspace, userRole]);
+  }, [workspace, userRole, hasPageBuildingResponsibility]);
 }

@@ -5,15 +5,22 @@ import { RegistrationSettingsCard } from '@/components/events/settings/Registrat
 import { PromoCodeManager } from '@/components/events/settings/PromoCodeManager';
 import { SEOSettingsCard } from '@/components/events/settings/SEOSettingsCard';
 import { AccessibilitySettingsCard } from '@/components/events/settings/AccessibilitySettingsCard';
+import { LandingPageSettingsPanel } from './LandingPageSettingsPanel';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TicketIcon, Tag, SearchIcon, AccessibilityIcon } from 'lucide-react';
+import { TicketIcon, Tag, SearchIcon, AccessibilityIcon, Paintbrush } from 'lucide-react';
 
 interface AllEventSettingsPanelProps {
   eventId: string;
+  workspaceId: string;
+  isRootOwner?: boolean;
 }
 
-export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({ eventId }) => {
+export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({ 
+  eventId, 
+  workspaceId,
+  isRootOwner = true,
+}) => {
   const { data: event, isLoading, refetch } = useQuery({
     queryKey: ['event-branding', eventId],
     queryFn: async () => {
@@ -55,8 +62,12 @@ export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({ ev
         </p>
       </div>
 
-      <Tabs defaultValue="ticketing" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="landing-page" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="landing-page" className="flex items-center gap-2">
+            <Paintbrush className="h-4 w-4" />
+            <span className="hidden sm:inline">Landing Page</span>
+          </TabsTrigger>
           <TabsTrigger value="ticketing" className="flex items-center gap-2">
             <TicketIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Ticketing</span>
@@ -74,6 +85,14 @@ export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({ ev
             <span className="hidden sm:inline">Accessibility</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="landing-page" className="mt-6 space-y-6">
+          <LandingPageSettingsPanel 
+            eventId={eventId} 
+            workspaceId={workspaceId}
+            isRootOwner={isRootOwner}
+          />
+        </TabsContent>
 
         <TabsContent value="ticketing" className="mt-6 space-y-6">
           <RegistrationSettingsCard 

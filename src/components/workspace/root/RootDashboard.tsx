@@ -7,9 +7,7 @@ import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { ChildWorkspacesManager } from './ChildWorkspacesManager';
 import { WorkspaceStructureOverview } from '../WorkspaceStructureOverview';
 import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
-import { AssignPageBuilderDialog } from '../AssignPageBuilderDialog';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   Building2, 
@@ -19,12 +17,10 @@ import {
   ChevronDown,
   GitBranch,
   Send,
-  Paintbrush,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { usePageBuildingResponsibilities } from '@/hooks/usePageBuildingResponsibilities';
 
 interface RootDashboardProps {
   workspace: Workspace;
@@ -44,9 +40,6 @@ export function RootDashboard({
   const { data, isLoading } = useRootDashboard(workspace.eventId);
   const [structureOpen, setStructureOpen] = useState(true);
   const [delegationsOpen, setDelegationsOpen] = useState(true);
-  const [pageBuilderDialogOpen, setPageBuilderDialogOpen] = useState(false);
-  
-  const { data: responsibilities } = usePageBuildingResponsibilities(workspace.eventId);
 
   const handleDepartmentClick = (workspaceId: string) => {
     const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/workspaces';
@@ -151,39 +144,6 @@ export function RootDashboard({
         </section>
         {/* Right Column: Workspace Management, Activity & Milestones */}
         <div className="space-y-4">
-          {/* Page Builder Assignment */}
-          <section id="page-builder" className="bg-card rounded-xl border border-border p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Paintbrush className="h-4 w-4 text-primary" />
-                Page Builder
-              </h3>
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => setPageBuilderDialogOpen(true)}
-              >
-                Assign
-              </Button>
-            </div>
-            
-            {responsibilities && responsibilities.length > 0 ? (
-              <div className="space-y-2">
-                {responsibilities.map((resp: { id: string; workspaceName: string; responsibilityType: string }) => (
-                  <div key={resp.id} className="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-lg">
-                    <span className="text-foreground">{resp.workspaceName}</span>
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {resp.responsibilityType.replace(/_/g, ' ').toLowerCase()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-2">
-                No page building responsibilities assigned
-              </p>
-            )}
-          </section>
 
           {/* Child Workspaces Manager */}
           <section id="workspaces">
@@ -328,16 +288,6 @@ export function RootDashboard({
       <section id="team-stats">
         <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={8} />
       </section>
-
-      {/* Assign Page Builder Dialog */}
-      {workspace.eventId && (
-        <AssignPageBuilderDialog
-          open={pageBuilderDialogOpen}
-          onOpenChange={setPageBuilderDialogOpen}
-          eventId={workspace.eventId}
-          rootWorkspaceId={workspace.id}
-        />
-      )}
     </div>
   );
 }

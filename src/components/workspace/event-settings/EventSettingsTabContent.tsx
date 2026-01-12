@@ -1,11 +1,13 @@
 import React from 'react';
 import { Workspace, WorkspaceRole } from '@/types';
 import { useEventSettingsAccess } from '@/hooks/useEventSettingsAccess';
+import { useWorkspacePageResponsibility } from '@/hooks/usePageBuildingResponsibilities';
 import { TicketingSettingsPanel } from './TicketingSettingsPanel';
 import { PromoCodesSettingsPanel } from './PromoCodesSettingsPanel';
 import { SEOSettingsPanel } from './SEOSettingsPanel';
 import { AccessibilitySettingsPanel } from './AccessibilitySettingsPanel';
 import { AllEventSettingsPanel } from './AllEventSettingsPanel';
+import { LandingPageSettingsPanel } from './LandingPageSettingsPanel';
 import { AlertCircle, Settings } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -18,8 +20,13 @@ export const EventSettingsTabContent: React.FC<EventSettingsTabContentProps> = (
   workspace,
   userRole,
 }) => {
-  const access = useEventSettingsAccess(workspace, userRole);
   const eventId = workspace.eventId;
+  
+  // Check if this workspace has page building responsibility
+  const { data: pageResponsibility } = useWorkspacePageResponsibility(workspace.id);
+  const hasPageBuildingResponsibility = pageResponsibility?.hasResponsibility ?? false;
+  
+  const access = useEventSettingsAccess(workspace, userRole, hasPageBuildingResponsibility);
 
   // No event linked to workspace
   if (!eventId) {
@@ -42,7 +49,24 @@ export const EventSettingsTabContent: React.FC<EventSettingsTabContentProps> = (
   if (access.canAccessAllSettings) {
     return (
       <div className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6">
-        <AllEventSettingsPanel eventId={eventId} />
+        <AllEventSettingsPanel 
+          eventId={eventId} 
+          workspaceId={workspace.id}
+          isRootOwner={access.isRootOwner}
+        />
+      </div>
+    );
+  }
+
+  // Content/Marketing committees with landing page responsibility
+  if (access.canAccessLandingPage && (access.committeeType === 'content' || access.committeeType === 'marketing')) {
+    return (
+      <div className="bg-card rounded-lg shadow-sm border border-border p-4 sm:p-6">
+        <LandingPageSettingsPanel 
+          eventId={eventId} 
+          workspaceId={workspace.id}
+          isRootOwner={false}
+        />
       </div>
     );
   }
