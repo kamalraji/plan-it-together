@@ -112,7 +112,22 @@ export function VolunteerTrainingTracker({ workspaceId }: VolunteerTrainingTrack
     },
   });
 
-  const modules = (trainingData?.items as any[]) || [];
+  // Safely parse items that might be stored as a JSON string
+  const parseItems = (items: unknown): any[] => {
+    if (!items) return [];
+    if (Array.isArray(items)) return items;
+    if (typeof items === 'string') {
+      try {
+        const parsed = JSON.parse(items);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const modules = parseItems(trainingData?.items);
   const completedCount = modules.filter((m: any) => m.completed).length;
   const requiredCount = modules.filter((m: any) => m.required).length;
   const requiredCompleted = modules.filter((m: any) => m.required && m.completed).length;
