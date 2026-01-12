@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceType, WorkspaceStatus } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import { Users, LayoutGrid, FileText } from 'lucide-react';
+import { PageBuilderStatusCard } from '../../content/PageBuilderStatusCard';
 
 import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
 import { TaskSummaryCards } from '../../TaskSummaryCards';
@@ -114,6 +115,9 @@ export function ContentDepartmentDashboard({
           </div>
         </div>
       </div>
+
+      {/* Page Builder Status - Shows if this workspace has page building responsibility */}
+      <PageBuilderStatusCard workspaceId={workspace.id} eventId={workspace.eventId} />
 
       {/* Stats Overview - Connected to real data */}
       <ContentStatsConnected workspaceId={workspace.id} />
