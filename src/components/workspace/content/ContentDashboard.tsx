@@ -11,7 +11,7 @@ import { ContentCalendar } from './ContentCalendar';
 import { SocialMediaTracker } from './SocialMediaTracker';
 import { MediaAssetsLibrary } from './MediaAssetsLibrary';
 import { BlogArticleTracker } from './BlogArticleTracker';
-
+import { PageBuilderStatusCard } from './PageBuilderStatusCard';
 import { PublicationPipeline } from './PublicationPipeline';
 
 interface ContentDashboardProps {
@@ -96,6 +96,9 @@ export function ContentDashboard({
         mediaAssets={156}
         socialReach={12500}
       />
+
+      {/* Page Builder Status */}
+      <PageBuilderStatusCard workspaceId={workspace.id} eventId={workspace.eventId} />
 
       {/* Role-Based Actions */}
       <RoleBasedActions
