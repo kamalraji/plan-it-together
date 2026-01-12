@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Workspace, WorkspaceRole, WorkspaceType } from '@/types';
-import { useWorkspaceApprovals } from '@/hooks/useWorkspaceApprovals';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ApprovalsSummaryCards } from './ApprovalsSummaryCards';
-import { BudgetApprovalList } from './BudgetApprovalList';
-import { ResourceApprovalList } from './ResourceApprovalList';
-import { AccessApprovalList } from './AccessApprovalList';
-import { UnifiedApprovalsList } from './UnifiedApprovalsList';
-import { DollarSign, Package, UserPlus, LayoutList } from 'lucide-react';
+import { IncomingApprovalsSection } from './IncomingApprovalsSection';
+import { OutgoingRequestsSection } from './OutgoingRequestsSection';
+import { useWorkspaceApprovals } from '@/hooks/useWorkspaceApprovals';
+import { useOutgoingRequests } from '@/hooks/useOutgoingRequests';
+import { Inbox, Send } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ApprovalsTabContentProps {
   workspace: Workspace;
@@ -15,104 +14,58 @@ interface ApprovalsTabContentProps {
 }
 
 export function ApprovalsTabContent({ workspace }: ApprovalsTabContentProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'budget' | 'resources' | 'access'>('all');
+  const [mainTab, setMainTab] = useState<'incoming' | 'outgoing'>('incoming');
 
-  const {
-    budgetRequests,
-    resourceRequests,
-    accessRequests,
-    allRequests,
-    totalPending,
-    isLoading,
-  } = useWorkspaceApprovals(workspace.id, workspace.workspaceType);
+  const { totalPending } = useWorkspaceApprovals(workspace.id, workspace.workspaceType);
+  const { pendingCount: outgoingPendingCount } = useOutgoingRequests(workspace.id);
 
-  // Teams can't approve budget/resource requests
-  const isTeam = workspace.workspaceType === WorkspaceType.TEAM;
+  // Determine if outgoing is available (has parent workspace and is not ROOT or TEAM)
+  const canMakeRequests = 
+    !!workspace.parentWorkspaceId && 
+    workspace.workspaceType !== WorkspaceType.ROOT &&
+    workspace.workspaceType !== WorkspaceType.TEAM;
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <ApprovalsSummaryCards
-        budgetCount={budgetRequests.length}
-        resourceCount={resourceRequests.length}
-        accessCount={accessRequests.length}
-      />
-
-      {/* Tabbed Interface */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all" className="flex items-center gap-2">
-            <LayoutList className="h-4 w-4" />
-            <span className="hidden sm:inline">All</span>
+      {/* Main Section Tabs: Incoming / Outgoing */}
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as typeof mainTab)}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="incoming" className="flex items-center gap-2">
+            <Inbox className="h-4 w-4" />
+            <span>Incoming</span>
             {totalPending > 0 && (
-              <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
+              <Badge variant="secondary" className="text-xs px-1.5 py-0">
                 {totalPending}
-              </span>
+              </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="budget" className="flex items-center gap-2" disabled={isTeam}>
-            <DollarSign className="h-4 w-4" />
-            <span className="hidden sm:inline">Budget</span>
-            {budgetRequests.length > 0 && (
-              <span className="text-xs bg-emerald-500/20 text-emerald-600 px-1.5 py-0.5 rounded-full">
-                {budgetRequests.length}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="resources" className="flex items-center gap-2" disabled={isTeam}>
-            <Package className="h-4 w-4" />
-            <span className="hidden sm:inline">Resources</span>
-            {resourceRequests.length > 0 && (
-              <span className="text-xs bg-blue-500/20 text-blue-600 px-1.5 py-0.5 rounded-full">
-                {resourceRequests.length}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="access" className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            <span className="hidden sm:inline">Access</span>
-            {accessRequests.length > 0 && (
-              <span className="text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
-                {accessRequests.length}
-              </span>
+          <TabsTrigger 
+            value="outgoing" 
+            className="flex items-center gap-2"
+            disabled={!canMakeRequests}
+          >
+            <Send className="h-4 w-4" />
+            <span>Outgoing</span>
+            {outgoingPendingCount > 0 && (
+              <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                {outgoingPendingCount}
+              </Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
         <div className="mt-6">
-          <TabsContent value="all" className="m-0">
-            <UnifiedApprovalsList
-              requests={allRequests}
-              isLoading={isLoading}
-              onSelectRequest={(request) => {
-                // Navigate to specific tab when clicking a request
-                setActiveTab(request.type === 'budget' ? 'budget' : request.type === 'resource' ? 'resources' : 'access');
-              }}
-            />
+          <TabsContent value="incoming" className="m-0">
+            <IncomingApprovalsSection workspace={workspace} />
           </TabsContent>
 
-          <TabsContent value="budget" className="m-0">
-            <BudgetApprovalList
-              requests={budgetRequests}
-              isLoading={isLoading}
-              workspaceId={workspace.id}
-            />
-          </TabsContent>
-
-          <TabsContent value="resources" className="m-0">
-            <ResourceApprovalList
-              requests={resourceRequests}
-              isLoading={isLoading}
-              workspaceId={workspace.id}
-            />
-          </TabsContent>
-
-          <TabsContent value="access" className="m-0">
-            <AccessApprovalList
-              requests={accessRequests}
-              isLoading={isLoading}
-              workspaceId={workspace.id}
-            />
+          <TabsContent value="outgoing" className="m-0">
+            {canMakeRequests && workspace.parentWorkspaceId && (
+              <OutgoingRequestsSection
+                workspaceId={workspace.id}
+                parentWorkspaceId={workspace.parentWorkspaceId}
+              />
+            )}
           </TabsContent>
         </div>
       </Tabs>
