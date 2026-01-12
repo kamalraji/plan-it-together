@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FinancialSummaryCards } from '@/components/workspace/finance/FinancialSummaryCards';
 import { SpendingByCategory } from '@/components/workspace/finance/SpendingByCategory';
+import { BudgetTrackerConnected } from '@/components/workspace/department/BudgetTrackerConnected';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { Wallet, TrendingUp, PieChart } from 'lucide-react';
 
