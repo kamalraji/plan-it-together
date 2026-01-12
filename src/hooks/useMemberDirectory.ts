@@ -54,11 +54,12 @@ export function useMemberDirectory({ eventId }: UseMemberDirectoryOptions) {
       const workspaceMap = new Map(workspaces.map(w => [w.id, { name: w.name, type: w.workspace_type }]));
 
       // Get all team members from these workspaces
+      // Note: status can be 'ACTIVE' or 'active' depending on how it was inserted
       const { data: teamMembers, error: tmError } = await supabase
         .from('workspace_team_members')
-        .select('user_id, role, workspace_id')
+        .select('user_id, role, workspace_id, status')
         .in('workspace_id', workspaceIds)
-        .eq('status', 'ACTIVE');
+        .or('status.ilike.active,status.eq.ACTIVE');
 
       if (tmError) {
         console.error('Error fetching team members:', tmError);
