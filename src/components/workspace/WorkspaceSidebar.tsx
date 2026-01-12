@@ -202,7 +202,9 @@ export type WorkspaceTab =
   | 'update-schedule-event'
   | 'brief-teams-event'
   | 'vip-tracker-event'
-  | 'run-of-show-event';
+  | 'run-of-show-event'
+  // Page Builder tab
+  | 'page-builder';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

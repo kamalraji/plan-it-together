@@ -197,6 +197,8 @@ import {
   VIPTrackerTab,
   RunOfShowTab,
 } from './committee/event/tabs';
+// Page Builder tab
+import { PageBuilderTab } from './tabs/PageBuilderTab';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface WorkspaceDashboardProps {
@@ -933,6 +935,11 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'run-of-show-event' && (
           <RunOfShowTab workspaceId={workspace.id} />
+        )}
+
+        {/* Page Builder tab */}
+        {activeTab === 'page-builder' && (
+          <PageBuilderTab workspace={workspace} />
         )}
       </div>
     </WorkspaceLayout>
