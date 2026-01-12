@@ -149,6 +149,7 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'view-analytics-marketing', label: 'View Analytics', icon: BarChart3, color: 'text-blue-500', tab: 'view-analytics-marketing' },
     { id: 'create-campaign-marketing', label: 'Create Campaign', icon: Zap, color: 'text-amber-500', tab: 'create-campaign-marketing' },
     { id: 'ab-test-marketing', label: 'A/B Testing', icon: Target, color: 'text-purple-500', tab: 'ab-test-marketing' },
+    { id: 'edit-landing-page', label: 'Edit Landing Page', icon: Layers, color: 'text-indigo-500', tab: 'page-builder' },
   ],
   communication: [
     { id: 'send-announcement-communication', label: 'Send Announcement', icon: Megaphone, color: 'text-pink-500', tab: 'send-announcement-communication' },
@@ -179,6 +180,7 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'publish', label: 'Publish', icon: Upload, color: 'text-emerald-500', tab: 'publish-content-committee' },
     { id: 'content-calendar', label: 'Content Calendar', icon: Calendar, color: 'text-cyan-500', tab: 'content-calendar-committee' },
     { id: 'content-pipeline', label: 'Pipeline', icon: Activity, color: 'text-rose-500', tab: 'content-pipeline-committee' },
+    { id: 'edit-landing-page', label: 'Edit Landing Page', icon: Layers, color: 'text-indigo-500', tab: 'page-builder' },
   ],
   speaker_liaison: [
     { id: 'speaker-roster', label: 'Speaker Roster', icon: Mic, color: 'text-rose-500', tab: 'speaker-roster-committee' },

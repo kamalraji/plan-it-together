@@ -1338,6 +1338,111 @@ export type Database = {
         }
         Relationships: []
       }
+      page_builder_history: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          event_id: string
+          id: string
+          new_content: Json | null
+          previous_content: Json | null
+          section_id: string | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          new_content?: Json | null
+          previous_content?: Json | null
+          section_id?: string | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          new_content?: Json | null
+          previous_content?: Json | null
+          section_id?: string | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_builder_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_builder_history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_builder_sections: {
+        Row: {
+          created_at: string | null
+          css_content: string | null
+          event_id: string
+          html_content: string | null
+          id: string
+          locked_at: string | null
+          locked_by_user_id: string | null
+          owned_by_workspace_id: string | null
+          section_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          css_content?: string | null
+          event_id: string
+          html_content?: string | null
+          id?: string
+          locked_at?: string | null
+          locked_by_user_id?: string | null
+          owned_by_workspace_id?: string | null
+          section_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          css_content?: string | null
+          event_id?: string
+          html_content?: string | null
+          id?: string
+          locked_at?: string | null
+          locked_by_user_id?: string | null
+          owned_by_workspace_id?: string | null
+          section_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_builder_sections_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_builder_sections_owned_by_workspace_id_fkey"
+            columns: ["owned_by_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promo_codes: {
         Row: {
           applicable_tier_ids: string[] | null
@@ -4503,6 +4608,60 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_milestones_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_page_responsibilities: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          responsibility_type: string
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          responsibility_type?: string
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          responsibility_type?: string
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_page_responsibilities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_page_responsibilities_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
