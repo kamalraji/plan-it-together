@@ -1,175 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ParticipantDashboard } from './ParticipantDashboard';
-import { supabase } from '@/integrations/supabase/client';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { UserRole } from '@/types';
 
 /**
  * DashboardRouter
  *
- * Chooses which high-level dashboard to render based on the authenticated user's state.
- * For now, all authenticated users land on the ParticipantDashboard, which also
- * surfaces organizer onboarding prompts when relevant.
- *
- * Additionally, new organizers who have not yet completed their organizer
- * onboarding checklist are redirected once to the dedicated onboarding flow.
+ * Simplified dashboard router that acts as a fallback for direct /dashboard visits.
+ * Most users arrive here already routed by LoginForm's direct navigation.
+ * 
+ * - Participants: Renders ParticipantDashboard directly
+ * - Organizers/Admins: Redirects to their primary org dashboard
  */
 export const DashboardRouter: React.FC = () => {
-  const { user, isLoading, isAuthenticated, refreshUserRoles } = useAuth();
-  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
-  const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false);
-  const [rolesRefreshed, setRolesRefreshed] = useState(false);
-  const [primaryOrgSlug, setPrimaryOrgSlug] = useState<string | null>(null);
-  const [fetchingOrg, setFetchingOrg] = useState(true);
- 
-  // Refresh roles once when the dashboard mounts so any server-side
-  // changes (like new organizer approvals) are reflected in the client.
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    console.log('[DashboardRouter] Refreshing user roles on mount. Current user:', {
-      id: user?.id,
-      role: user?.role,
-      isAuthenticated,
-    });
-    void refreshUserRoles().then(() => {
-      console.log('[DashboardRouter] Finished refreshing user roles. Updated user:', {
-        id: user?.id,
-        role: user?.role,
-      });
-      setRolesRefreshed(true);
-    });
-  }, [isAuthenticated, refreshUserRoles, user?.id]);
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
 
-  // Fetch the user's primary organization for super admin/organizer redirect
-  useEffect(() => {
-    const fetchPrimaryOrg = async () => {
-      if (!isAuthenticated || !user) {
-        setFetchingOrg(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('organization_memberships')
-          .select('organization_id, organizations!inner(slug)')
-          .eq('user_id', user.id)
-          .eq('status', 'ACTIVE')
-          .order('created_at', { ascending: true })
-          .limit(1)
-          .maybeSingle();
-
-        if (error) {
-          console.warn('[DashboardRouter] Failed to fetch primary org:', error);
-        } else if (data?.organizations) {
-          const org = data.organizations as { slug: string };
-          setPrimaryOrgSlug(org.slug);
-        }
-      } catch (err) {
-        console.warn('[DashboardRouter] Unexpected error fetching primary org:', err);
-      } finally {
-        setFetchingOrg(false);
-      }
-    };
-
-    void fetchPrimaryOrg();
-  }, [isAuthenticated, user?.id]);
- 
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      if (!isAuthenticated || !user) {
-        console.log('[DashboardRouter] Skipping onboarding check: not authenticated or no user', {
-          isAuthenticated,
-          hasUser: !!user,
-        });
-        setCheckingOnboarding(false);
-        return;
-      }
- 
-      if (!rolesRefreshed) {
-        console.log('[DashboardRouter] Waiting for roles to be refreshed before onboarding check', {
-          id: user.id,
-          role: user.role,
-        });
-        return;
-      }
- 
-      console.log('[DashboardRouter] Running onboarding check for user:', {
-        id: user.id,
-        role: user.role,
-      });
- 
-      if (user.role !== UserRole.ORGANIZER) {
-        console.log('[DashboardRouter] User is not an organizer, skipping organizer onboarding redirect.', {
-          id: user.id,
-          role: user.role,
-        });
-        setCheckingOnboarding(false);
-        return;
-      }
- 
-      try {
-        const { data, error } = await supabase
-          .from('onboarding_checklist')
-          .select('completed_at')
-          .eq('user_id', user.id)
-          .maybeSingle();
- 
-        console.log('[DashboardRouter] Onboarding checklist query result:', {
-          userId: user.id,
-          data,
-          error,
-        });
- 
-        if (error) {
-          console.warn('Failed to load organizer onboarding checklist status', error);
-          setCheckingOnboarding(false);
-          return;
-        }
- 
-        const isCompleted = !!data?.completed_at;
-        console.log('[DashboardRouter] Computed onboarding status:', {
-          userId: user.id,
-          isCompleted,
-        });
-        setShouldRedirectToOnboarding(!isCompleted);
-      } catch (err) {
-        console.warn('Unexpected error while checking organizer onboarding status', err);
-      } finally {
-        setCheckingOnboarding(false);
-      }
-    };
- 
-    void checkOnboarding();
-  }, [isAuthenticated, rolesRefreshed, user?.id]);
-
-  if (isLoading || checkingOnboarding || fetchingOrg) {
+  // Show loading while auth or org is resolving
+  if (authLoading || orgLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+          <p className="text-sm text-muted-foreground">Loading your workspace...</p>
+        </div>
       </div>
     );
   }
 
+  // Not authenticated - redirect to login
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (shouldRedirectToOnboarding) {
-    return <Navigate to="/dashboard/onboarding/organizer" replace />;
+  // Organizers and admins with a primary org go to org-scoped dashboard
+  if (
+    (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN) &&
+    primaryOrg?.slug
+  ) {
+    return <Navigate to={`/${primaryOrg.slug}/dashboard`} replace />;
   }
 
-  // Route based on user role
-  if (user.role === UserRole.SUPER_ADMIN) {
-    const targetPath = primaryOrgSlug ? `/${primaryOrgSlug}/dashboard` : '/dashboard';
-    return <Navigate to={targetPath} replace />;
+  // Organizers without an org - might need onboarding
+  if (user.role === UserRole.ORGANIZER && !primaryOrg) {
+    return <Navigate to="/onboarding/organization" replace />;
   }
 
-  if (user.role === UserRole.ORGANIZER) {
-    const targetPath = primaryOrgSlug ? `/${primaryOrgSlug}/dashboard` : '/organizer/dashboard';
-    return <Navigate to={targetPath} replace />;
-  }
-
+  // Participants and fallback: render participant dashboard directly
   return <ParticipantDashboard />;
 };
 

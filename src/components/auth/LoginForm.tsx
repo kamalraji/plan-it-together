@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthLayout } from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useSeo } from '@/hooks/useSeo';
+import { fetchPrimaryOrganizationForUser } from '@/hooks/usePrimaryOrganization';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -20,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -40,12 +41,6 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -69,41 +64,50 @@ export function LoginForm() {
     });
 
     try {
-      // Support deep-linking into organizer onboarding after signup
+      // Support deep-linking via ?next= param
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next');
-
-      // If a specific next URL is provided, always respect it
       if (next) {
-        navigate(next);
+        navigate(next, { replace: true });
         return;
       }
 
-      // Otherwise, check if this is an organizer signup without an organization yet
+      // Get current user to check role and fetch primary org
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (!userError && userData?.user) {
-        const sbUser = userData.user;
-        const desiredRole = sbUser.user_metadata?.desiredRole;
+      if (userError || !userData?.user) {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
 
-        if (desiredRole === 'ORGANIZER') {
-          const { data: org, error: orgError } = await supabase
-            .from('organizations')
-            .select('id')
-            .eq('owner_id', sbUser.id)
-            .maybeSingle();
+      const sbUser = userData.user;
+      const desiredRole = sbUser.user_metadata?.desiredRole;
 
-          // Only redirect to onboarding if there is clearly no organization yet
-          if (!orgError && !org) {
-            navigate('/onboarding/organization');
-            return;
-          }
+      // New organizers without an org go to onboarding
+      if (desiredRole === 'ORGANIZER') {
+        const { data: org, error: orgError } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('owner_id', sbUser.id)
+          .maybeSingle();
+
+        if (!orgError && !org) {
+          navigate('/onboarding/organization', { replace: true });
+          return;
         }
       }
+
+      // Direct navigation: fetch primary org and go directly to /{orgSlug}/dashboard
+      const primaryOrg = await fetchPrimaryOrganizationForUser(sbUser.id);
+      if (primaryOrg?.slug) {
+        navigate(`/${primaryOrg.slug}/dashboard`, { replace: true });
+      } else {
+        // Participant or user without org membership
+        navigate('/dashboard', { replace: true });
+      }
     } catch (checkError) {
-      console.warn('Failed to run organizer onboarding redirect logic', checkError);
+      console.warn('Failed to determine navigation target', checkError);
+      navigate('/dashboard', { replace: true });
     } finally {
-      // Fallback: if we didn't navigate earlier, go to dashboard
-      navigate('/dashboard');
       setIsLoading(false);
     }
   };
