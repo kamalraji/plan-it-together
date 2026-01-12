@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
 import OrganizerBookingsManager from '../../organizer/OrganizerBookingsManager';
@@ -15,18 +15,19 @@ import OrganizerBookingsManager from '../../organizer/OrganizerBookingsManager';
  */
 export const BookingListPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId?: string }>();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const pageActions = [
     {
       label: 'Browse Services',
-      action: () => { window.location.href = '/console/marketplace/services'; },
+      action: () => navigate('/console/marketplace/services'),
       icon: MagnifyingGlassIcon,
       variant: 'primary' as const,
     },
     {
       label: 'Vendor Dashboard',
-      action: () => { window.location.href = '/console/marketplace/vendors'; },
+      action: () => navigate('/console/marketplace/vendors'),
       icon: BuildingStorefrontIcon,
       variant: 'secondary' as const,
     },

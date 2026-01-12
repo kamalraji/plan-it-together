@@ -1,4 +1,5 @@
 export { WorkspaceDashboard } from './WorkspaceDashboard';
+export { WorkspaceDashboardSkeleton } from './WorkspaceDashboardSkeleton';
 export { ResponsiveWorkspaceDashboard } from './ResponsiveWorkspaceDashboard';
 export { WorkspaceHeader } from './WorkspaceHeader';
 export { WorkspaceNavigation } from './WorkspaceNavigation';

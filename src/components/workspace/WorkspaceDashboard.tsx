@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { WorkspaceDashboardSkeleton } from './WorkspaceDashboardSkeleton';
 import { WorkspaceStatus, WorkspaceRole, WorkspaceType } from '../../types';
 import { WorkspaceLayout } from './WorkspaceLayout';
 import { TeamManagement } from './TeamManagement';
@@ -206,6 +207,7 @@ interface WorkspaceDashboardProps {
 export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardProps) {
   const { state, actions, permissions } = useWorkspaceShell({ workspaceId, orgSlug });
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const {
     workspace,
@@ -237,11 +239,7 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
   }, [searchParams, workspace]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-      </div>
-    );
+    return <WorkspaceDashboardSkeleton />;
   }
 
   if (error || !workspace) {
@@ -254,7 +252,7 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
           </p>
           <p className="text-xs text-muted-foreground mb-4">Status: {WorkspaceStatus.DISSOLVED}</p>
           <button
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/dashboard` : '/dashboard')}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
           >
             Back to Dashboard

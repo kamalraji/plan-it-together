@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { EventCanvasHero } from './EventCanvasHero';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
 
@@ -16,6 +17,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const eventId = propEventId || paramEventId;
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
@@ -103,7 +105,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     },
     onSuccess: () => {
       setShowRegistrationModal(false);
-      navigate('/dashboard');
+      navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard');
     },
   });
 

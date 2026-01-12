@@ -16,6 +16,7 @@ import {
 import { MobileTaskSummary } from './MobileTaskSummary';
 import { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
 import { MobileNavigation } from './MobileNavigation';
+import { MobileWorkspaceDashboardSkeleton } from './MobileWorkspaceDashboardSkeleton';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface MobileWorkspaceDashboardProps {
@@ -48,11 +49,7 @@ export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspa
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
+    return <MobileWorkspaceDashboardSkeleton />;
   }
 
   if (error || !workspace) {
@@ -62,7 +59,7 @@ export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspa
           <h2 className="text-xl font-bold text-foreground mb-4">Workspace Not Found</h2>
           <p className="text-muted-foreground mb-4 text-sm">The workspace you're looking for doesn't exist or you don't have access to it.</p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/dashboard` : '/dashboard')}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 text-sm transition-colors"
           >
             Back to Dashboard

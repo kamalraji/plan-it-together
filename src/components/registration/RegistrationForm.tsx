@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { Event, Registration, RegistrationFormData, RegistrationStatus } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useToast } from '@/hooks/use-toast';
 
 interface RegistrationFormProps {
@@ -27,6 +28,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const [formData, setFormData] = useState<Record<string, any>>({
     name: user?.name || '',
     email: user?.email || '',
@@ -76,7 +78,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/dashboard');
+        navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard');
       }
     },
     onError: (error: any) => {
@@ -136,7 +138,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               'Your registration is being processed.'}
           </p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard')}
             className="w-full rounded-full bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
           >
             Go to Dashboard
