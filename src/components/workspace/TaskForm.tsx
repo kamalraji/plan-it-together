@@ -25,12 +25,15 @@ import {
 import { SubtaskSection, type Subtask, MultiAssigneeSelector, useTaskFormKeyboard, CustomTemplateManager } from './task-form';
 import { useTaskDraft } from '@/hooks/useTaskDraft';
 import { useTaskNotifications } from '@/hooks/useTaskNotifications';
+import { useChildWorkspaceMembers } from '@/hooks/useChildWorkspaceMembers';
 
 interface TaskFormProps {
   task?: WorkspaceTask;
   teamMembers: TeamMember[];
   availableTasks: WorkspaceTask[];
   workspaceId?: string;
+  eventId?: string;
+  enableCrossWorkspaceAssignment?: boolean;
   onSubmit?: (taskData: TaskFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -50,6 +53,7 @@ export interface TaskFormData {
   roleScope?: WorkspaceRoleScope;
   subtasks?: Subtask[];
   estimatedHours?: number;
+  crossWorkspaceAssignees?: { userId: string; targetWorkspaceId: string }[];
 }
 
 const TASK_TEMPLATES = [
@@ -71,11 +75,19 @@ export function TaskForm({
   teamMembers,
   availableTasks,
   workspaceId,
+  eventId,
+  enableCrossWorkspaceAssignment = false,
   onSubmit,
   onCancel,
   isLoading = false
 }: TaskFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  
+  // Fetch child workspace members when cross-workspace assignment is enabled
+  const { data: childWorkspaceMembers = [] } = useChildWorkspaceMembers({
+    workspaceId: workspaceId || '',
+    eventId,
+  });
   
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
@@ -90,6 +102,7 @@ export function TaskForm({
     templateId: '',
     roleScope: task?.roleScope || (task?.metadata?.roleScope as WorkspaceRoleScope | undefined),
     subtasks: (task?.subtasks || []).map(s => ({ id: s.id, title: s.title, status: s.status, assignedTo: s.assignedTo })),
+    crossWorkspaceAssignees: [],
   });
 
   const [newTag, setNewTag] = useState('');
@@ -390,6 +403,9 @@ export function TaskForm({
               selectedIds={formData.assigneeIds || []}
               onChange={(ids) => handleInputChange('assigneeIds', ids)}
               disabled={isLoading}
+              enableCrossWorkspace={enableCrossWorkspaceAssignment && childWorkspaceMembers.length > 0}
+              childWorkspaceMembers={childWorkspaceMembers}
+              onCrossWorkspaceChange={(members) => handleInputChange('crossWorkspaceAssignees', members)}
             />
           </div>
 

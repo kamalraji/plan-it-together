@@ -17,6 +17,8 @@ interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
   teamMembers: TeamMember[];
   workspaceId?: string;
+  eventId?: string;
+  workspaceType?: string;
   roleScope?: WorkspaceRoleScope;
   onTaskEdit?: (task: WorkspaceTask) => void;
   onTaskDelete?: (taskId: string) => void;
@@ -32,6 +34,8 @@ export function TaskManagementInterface({
   tasks,
   teamMembers,
   workspaceId,
+  eventId,
+  workspaceType,
   roleScope,
   onTaskEdit,
   onTaskDelete,
@@ -334,6 +338,9 @@ export function TaskManagementInterface({
         task={editingTask ?? undefined}
         teamMembers={teamMembers}
         availableTasks={tasks}
+        workspaceId={workspaceId}
+        eventId={eventId}
+        enableCrossWorkspaceAssignment={workspaceType === 'ROOT' || workspaceType === 'DEPARTMENT'}
         onSubmit={handleFormSubmit}
         onClose={handleModalClose}
         isLoading={createTaskMutation.isPending || updateTaskMutation.isPending}

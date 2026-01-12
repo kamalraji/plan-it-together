@@ -6,6 +6,9 @@ interface TaskFormModalProps {
   task?: WorkspaceTask;
   teamMembers: TeamMember[];
   availableTasks: WorkspaceTask[];
+  workspaceId?: string;
+  eventId?: string;
+  enableCrossWorkspaceAssignment?: boolean;
   onSubmit: (taskData: TaskFormData) => void;
   onClose: () => void;
   isLoading?: boolean;
@@ -16,6 +19,9 @@ export function TaskFormModal({
   task,
   teamMembers,
   availableTasks,
+  workspaceId,
+  eventId,
+  enableCrossWorkspaceAssignment = false,
   onSubmit,
   onClose,
   isLoading = false
@@ -39,6 +45,9 @@ export function TaskFormModal({
             task={task}
             teamMembers={teamMembers}
             availableTasks={availableTasks}
+            workspaceId={workspaceId}
+            eventId={eventId}
+            enableCrossWorkspaceAssignment={enableCrossWorkspaceAssignment}
             onSubmit={onSubmit}
             onCancel={onClose}
             isLoading={isLoading}

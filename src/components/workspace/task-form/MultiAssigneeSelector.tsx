@@ -11,7 +11,7 @@ export interface ChildWorkspaceMember {
   avatarUrl: string | null;
   workspaceId: string;
   workspaceName: string;
-  workspaceType: string;
+  workspaceType: string | null;
   role: string;
   path: string[];
 }

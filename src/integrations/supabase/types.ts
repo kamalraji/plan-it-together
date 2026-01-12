@@ -6126,6 +6126,7 @@ export type Database = {
       }
       workspace_tasks: {
         Row: {
+          assigned_by: string | null
           assigned_to: string | null
           attachments: string[] | null
           category: string | null
@@ -6138,12 +6139,14 @@ export type Database = {
           priority: string
           progress: number | null
           role_scope: string | null
+          source_workspace_id: string | null
           status: string
           title: string
           updated_at: string
           workspace_id: string
         }
         Insert: {
+          assigned_by?: string | null
           assigned_to?: string | null
           attachments?: string[] | null
           category?: string | null
@@ -6156,12 +6159,14 @@ export type Database = {
           priority?: string
           progress?: number | null
           role_scope?: string | null
+          source_workspace_id?: string | null
           status?: string
           title: string
           updated_at?: string
           workspace_id: string
         }
         Update: {
+          assigned_by?: string | null
           assigned_to?: string | null
           attachments?: string[] | null
           category?: string | null
@@ -6174,12 +6179,20 @@ export type Database = {
           priority?: string
           progress?: number | null
           role_scope?: string | null
+          source_workspace_id?: string | null
           status?: string
           title?: string
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_tasks_source_workspace_id_fkey"
+            columns: ["source_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_tasks_workspace_id_fkey"
             columns: ["workspace_id"]
