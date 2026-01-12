@@ -76,20 +76,19 @@ export function CreateSubWorkspaceModal({
     enabled: open && !!parentWorkspaceId,
   });
 
-  // Fetch existing sub-workspaces to prevent duplicates
+  // Fetch ALL existing workspaces for this event to prevent duplicates
   const { data: existingWorkspaces } = useQuery({
-    queryKey: ['existing-sub-workspaces', eventId, parentWorkspaceId],
+    queryKey: ['existing-sub-workspaces', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
         .select('id, name, workspace_type, department_id')
-        .eq('event_id', eventId)
-        .eq('parent_workspace_id', parentWorkspaceId);
+        .eq('event_id', eventId);
 
       if (error) throw error;
       return data || [];
     },
-    enabled: open && !!parentWorkspaceId && !!eventId,
+    enabled: open && !!eventId,
   });
 
   // Build sets of already-created items for quick lookup
