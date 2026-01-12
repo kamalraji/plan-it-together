@@ -41,6 +41,7 @@ import {
   ClipboardCheck,
   ListChecks,
   Contact,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -204,7 +205,9 @@ export type WorkspaceTab =
   | 'vip-tracker-event'
   | 'run-of-show-event'
   // Page Builder tab
-  | 'page-builder';
+  | 'page-builder'
+  // Workspace Management tab (ROOT only)
+  | 'workspace-management';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;
@@ -234,6 +237,7 @@ const baseNavItems: NavItem[] = [
   { id: 'checklists', name: 'Checklists', icon: ListChecks, group: 'core' },
   { id: 'directory', name: 'Member Directory', icon: Contact, group: 'core' },
   { id: 'event-settings', name: 'Event Settings', icon: Settings2, group: 'core' },
+  { id: 'workspace-management', name: 'Workspace Control', icon: Layers, group: 'management' },
   { id: 'marketplace', name: 'Marketplace', icon: ShoppingBag, group: 'management' },
   { id: 'templates', name: 'Templates', icon: FileText, group: 'management' },
   { id: 'role-management', name: 'Actions & Roles', icon: UserCog, group: 'core' },
@@ -293,6 +297,10 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
       if (item.id === 'directory') {
         return workspace.workspaceType === WorkspaceType.ROOT || 
                workspace.workspaceType === WorkspaceType.DEPARTMENT;
+      }
+      // Show workspace-management only for ROOT workspaces
+      if (item.id === 'workspace-management') {
+        return workspace.workspaceType === WorkspaceType.ROOT;
       }
       return true;
     });

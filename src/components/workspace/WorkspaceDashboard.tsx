@@ -25,6 +25,7 @@ import { EventSettingsTabContent } from './event-settings';
 import { ApprovalsTabContent } from './approvals';
 import { ChecklistsTabContent } from './checklists';
 import { MemberDirectoryPage } from './MemberDirectoryPage';
+import { WorkspaceManagementTab } from './tabs/WorkspaceManagementTab';
 // Committee tabs (L3)
 import { 
   AssignShiftsTab, 
@@ -945,6 +946,15 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
         {/* Page Builder tab */}
         {activeTab === 'page-builder' && (
           <PageBuilderTab workspace={workspace} />
+        )}
+
+        {/* Workspace Management tab (ROOT only) */}
+        {activeTab === 'workspace-management' && workspace.workspaceType === WorkspaceType.ROOT && (
+          <WorkspaceManagementTab 
+            workspace={workspace} 
+            orgSlug={orgSlug}
+            onCreateSubWorkspace={() => actions.setShowSubWorkspaceModal(true)}
+          />
         )}
       </div>
     </WorkspaceLayout>
