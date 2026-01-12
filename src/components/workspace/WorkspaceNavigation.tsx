@@ -15,7 +15,8 @@ import {
   ChevronDown,
   ChevronRight,
   Settings2,
-  ClipboardCheck
+  ClipboardCheck,
+  Layers
 } from 'lucide-react';
 
 
@@ -34,7 +35,8 @@ interface WorkspaceNavigationProps {
   | 'audit'
   | 'role-management'
   | 'event-settings'
-  | 'approvals';
+  | 'approvals'
+  | 'workspace-management';
   onTabChange: (
     tab:
       | 'overview'
@@ -49,6 +51,7 @@ interface WorkspaceNavigationProps {
       | 'role-management'
       | 'approvals'
       | 'event-settings'
+      | 'workspace-management'
   ) => void;
   onWorkspaceSwitch: (workspaceId: string) => void;
 }
@@ -105,6 +108,7 @@ export function WorkspaceNavigation({
     { id: 'communication', name: 'Communication', icon: <MessageSquare className="w-4 h-4" />, group: 'core' },
     { id: 'approvals', name: 'Approvals', icon: <ClipboardCheck className="w-4 h-4" />, group: 'core' },
     { id: 'event-settings', name: 'Event Settings', icon: <Settings2 className="w-4 h-4" />, group: 'core' },
+    { id: 'workspace-management', name: 'Workspace Control', icon: <Layers className="w-4 h-4" />, group: 'management' },
     { id: 'marketplace', name: 'Marketplace', icon: <ShoppingBag className="w-4 h-4" />, group: 'management' },
     { id: 'templates', name: 'Templates', icon: <FileText className="w-4 h-4" />, group: 'management' },
     { id: 'role-management', name: 'Actions & Roles', icon: <UserCog className="w-4 h-4" />, group: 'core' },
@@ -123,9 +127,13 @@ export function WorkspaceNavigation({
       if (tab.id === 'approvals') {
         return workspace.workspaceType !== WorkspaceType.TEAM;
       }
+      // Only show workspace-management for ROOT workspaces
+      if (tab.id === 'workspace-management') {
+        return workspace.workspaceType === WorkspaceType.ROOT;
+      }
       return true;
     });
-  }, [showEventSettingsTab]);
+  }, [showEventSettingsTab, workspace.workspaceType]);
 
   const toggleGroup = (group: string) => {
     setCollapsedGroups(prev => ({ ...prev, [group]: !prev[group] }));

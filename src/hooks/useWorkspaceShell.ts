@@ -169,7 +169,9 @@ export type WorkspaceTab =
   | 'vip-tracker-event'
   | 'run-of-show-event'
   // Page Builder tab
-  | 'page-builder';
+  | 'page-builder'
+  // Workspace Management tab (ROOT only)
+  | 'workspace-management';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;
