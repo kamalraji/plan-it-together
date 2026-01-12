@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { 
   MagnifyingGlassIcon, 
@@ -30,6 +30,7 @@ import { TeamCollaboration } from '@/components/illustrations';
 export const WorkspaceListPage: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { confirm, dialogProps } = useConfirmation();
 
@@ -260,9 +261,7 @@ export const WorkspaceListPage: React.FC = () => {
     ? [
         {
           label: 'Create Workspace',
-          action: () => {
-            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-          },
+          action: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
           variant: 'primary' as const,
         },
         {
@@ -361,7 +360,7 @@ export const WorkspaceListPage: React.FC = () => {
                 canManageWorkspaces
                   ? {
                       label: 'Create Workspace',
-                      onClick: () => window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`,
+                      onClick: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
                     }
                   : undefined
               }

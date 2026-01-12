@@ -196,9 +196,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     ? [
         {
           label: 'Create Workspace',
-          action: () => {
-            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-          },
+          action: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
           variant: 'primary' as const,
         },
         {

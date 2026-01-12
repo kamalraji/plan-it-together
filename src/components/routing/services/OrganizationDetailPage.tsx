@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceDetailPage } from '../ResourceDetailPage';
 import OrganizationPage from '../../organization/OrganizationPage';
@@ -13,8 +13,9 @@ import MembershipBadge from '@/components/organization/MembershipBadge';
  * Now backed by real Supabase data via useOrganizerOrganizations.
  */
 export const OrganizationDetailPage: React.FC = () => {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { organizationId, orgSlug } = useParams<{ organizationId: string; orgSlug?: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { organizations, perOrgAnalytics, isLoadingOrganizations } = useOrganizerOrganizations();
   const { data: myMemberships } = useMyOrganizationMemberships();
 
@@ -161,28 +162,25 @@ export const OrganizationDetailPage: React.FC = () => {
     },
   ];
 
+  // Use org-scoped paths when available
+  const basePath = orgSlug ? `/${orgSlug}` : `/dashboard/organizations/${organization.id}`;
+  
   const actions = [
     {
       label: 'Manage Members',
-      action: () => {
-        window.location.href = `/dashboard/organizations/${organization.id}/members`;
-      },
+      action: () => navigate(`${basePath}/settings/members`),
       variant: 'primary' as const,
       roles: ['OWNER'],
     },
     {
       label: 'View Analytics',
-      action: () => {
-        window.location.href = `/dashboard/organizations/${organization.id}/analytics`;
-      },
+      action: () => navigate(`${basePath}/analytics`),
       variant: 'secondary' as const,
       roles: ['OWNER'],
     },
     {
       label: 'Organization Settings',
-      action: () => {
-        window.location.href = `/dashboard/organizations/${organization.id}/settings`;
-      },
+      action: () => navigate(`${basePath}/settings`),
       variant: 'secondary' as const,
       roles: ['OWNER'],
     },

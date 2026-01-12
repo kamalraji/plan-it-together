@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { EventDetailSkeleton } from '../EventDetailSkeleton';
 import { Event, EventStatus, EventMode, UserRole } from '../../../types';
@@ -37,6 +37,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   const [activeTab, setActiveTab] = useState(defaultTab);
   const { canView, canManage, isLoading: accessLoading } = useEventAccess(eventId);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: event, isLoading: eventLoading, error } = useQuery<EventWithSlug | null>({
     queryKey: ['organizer-event', eventId],
@@ -138,19 +139,19 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Edit Landing Page',
-          action: () => (window.location.href = `/console/events/${eventId}/page-builder`),
+          action: () => navigate(`/console/events/${eventId}/page-builder`),
           icon: PaintBrushIcon,
           variant: 'primary' as const,
         },
         {
           label: 'Edit Event',
-          action: () => (window.location.href = `/console/events/${eventId}/edit`),
+          action: () => navigate(`/console/events/${eventId}/edit`),
           icon: PencilIcon,
           variant: 'secondary' as const,
         },
         {
           label: 'View Workspaces',
-          action: () => (window.location.href = workspacePath),
+          action: () => navigate(workspacePath),
           icon: Squares2X2Icon,
           variant: 'secondary' as const,
         },
@@ -172,7 +173,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Open Ops Console',
-          action: () => (window.location.href = `/console/events/${eventId}/ops`),
+          action: () => navigate(`/console/events/${eventId}/ops`),
           icon: UsersIcon,
           variant: 'secondary' as const,
         },

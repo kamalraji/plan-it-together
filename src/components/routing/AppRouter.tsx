@@ -28,6 +28,7 @@ import { OrganizationLandingPage } from '../organization/OrganizationLandingPage
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 
 import AttendflowLanding from '@/pages/AttendflowLanding';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import PricingPage from '@/pages/PricingPage';
 import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
 
@@ -429,10 +430,19 @@ const ProfileService = () => {
 };
 
 const RootLandingRoute: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
+
+  if (authLoading) {
+    return <RouteLoadingFallback />;
+  }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    // Wait for org data before redirecting
+    if (orgLoading) {
+      return <RouteLoadingFallback />;
+    }
+    return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
   }
 
   return <AttendflowLanding />;

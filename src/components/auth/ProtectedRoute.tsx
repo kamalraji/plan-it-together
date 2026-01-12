@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -15,7 +16,10 @@ export function ProtectedRoute({
   requireEmailVerification = false 
 }: ProtectedRouteProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const location = useLocation();
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
   if (isLoading) {
     return (
@@ -66,7 +70,7 @@ export function ProtectedRoute({
               You don't have permission to access this page.
             </p>
             <div className="mt-4">
-              <Navigate to="/dashboard" replace />
+              <Navigate to={dashboardPath} replace />
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole, UserStatus } from '../../types';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 interface ConsoleRouteProps {
   children: React.ReactNode;
@@ -27,8 +28,11 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
   requireActiveStatus = true, // Console requires active user status by default
 }) => {
   const { user, isLoading, isRolesLoading, isAuthenticated } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
   // Show console-style loading indicator while checking authentication or loading roles
   if (isLoading || (isAuthenticated && isRolesLoading && requiredRoles.length > 0)) {
@@ -168,7 +172,7 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
                 Go Back
               </button>
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate(dashboardPath)}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Return to Dashboard

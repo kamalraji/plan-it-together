@@ -5,6 +5,7 @@ import { useMyOrganizations } from '@/hooks/useOrganization';
 import { UserRole } from '@/types';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useAdminSessionTimeout } from '@/hooks/useAdminSessionTimeout';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 /**
  * AdminLayout
@@ -22,10 +23,13 @@ import { useAdminSessionTimeout } from '@/hooks/useAdminSessionTimeout';
 export const AdminLayout: React.FC = () => {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const location = useLocation();
   
   const [serverVerified, setServerVerified] = useState<boolean | null>(null);
   const [verifying, setVerifying] = useState(true);
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
   // Session timeout for admin users - 15 minutes of inactivity
   useAdminSessionTimeout({ enabled: isAuthenticated && serverVerified === true });
@@ -91,7 +95,7 @@ export const AdminLayout: React.FC = () => {
       userId: user.id,
       role: user.role,
     });
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   // Server-side role verification failed
@@ -99,7 +103,7 @@ export const AdminLayout: React.FC = () => {
     console.warn('AdminLayout: Access denied - server-side role verification failed', {
       userId: user.id,
     });
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   // Check if user is admin of the thittam1hub organization
@@ -109,7 +113,7 @@ export const AdminLayout: React.FC = () => {
       userId: user.id,
       orgs: myOrganizations?.map((o: any) => o.slug),
     });
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   // All checks passed - render admin content

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
@@ -38,6 +38,7 @@ type TabValue = typeof VALID_TABS[number];
  */
 export const OrgMarketplacePage: React.FC = () => {
   const organization = useCurrentOrganization();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const tabFromUrl = searchParams.get('tab') as TabValue | null;
@@ -110,7 +111,7 @@ export const OrgMarketplacePage: React.FC = () => {
           actions={[
             {
               label: 'Add Product',
-              action: () => window.location.href = `/${organization?.slug}/settings/story`,
+              action: () => navigate(`/${organization?.slug}/settings/story`),
               variant: 'primary' as const,
             },
           ]}

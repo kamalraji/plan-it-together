@@ -12,6 +12,7 @@ import { UserRole } from '../../../types';
 import { RequireEventAccess } from './RequireEventAccess';
 import { EventAnalyticsPage } from './EventAnalyticsPage';
 import { EventRegistrationsOverviewPage } from './EventRegistrationsOverviewPage';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 /**
  * EventService component provides the main routing structure for the Event Management Service.
@@ -120,9 +121,12 @@ const EventAccessRoute: React.FC<{ requireManage?: boolean; children: React.Reac
 const EventCheckInRoute: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { user, isLoading } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
   if (!eventId) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   if (isLoading) {
@@ -136,7 +140,7 @@ const EventCheckInRoute: React.FC = () => {
       user.role === UserRole.VOLUNTEER);
 
   if (!hasAccess) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   return <VolunteerCheckInInterface eventId={eventId} />;

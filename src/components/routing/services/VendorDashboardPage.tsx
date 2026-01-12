@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
@@ -24,18 +24,19 @@ interface VendorDashboardPageProps {
 export const VendorDashboardPage: React.FC<VendorDashboardPageProps> = ({ defaultTab = 'overview' }) => {
   const { vendorId } = useParams<{ vendorId?: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab || 'overview');
 
   const pageActions = [
     {
       label: 'Browse Services',
-      action: () => { window.location.href = '/marketplace/services'; },
+      action: () => navigate('/marketplace/services'),
       icon: MagnifyingGlassIcon,
       variant: 'secondary' as const,
     },
     {
       label: 'View Bookings',
-      action: () => { window.location.href = '/marketplace/bookings'; },
+      action: () => navigate('/marketplace/bookings'),
       icon: CalendarIcon,
       variant: 'primary' as const,
     },
