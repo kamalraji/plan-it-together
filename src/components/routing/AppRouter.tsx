@@ -405,7 +405,7 @@ export const ConsoleDashboard = () => {
               Join Workspace
             </button>
             <button
-              onClick={() => window.location.href = '/marketplace'}
+              onClick={() => navigate('/marketplace')}
               className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Browse Services

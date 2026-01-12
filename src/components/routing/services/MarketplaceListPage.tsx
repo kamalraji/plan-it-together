@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import ServiceDiscoveryUI from '../../marketplace/ServiceDiscoveryUI';
 
@@ -13,16 +13,17 @@ import ServiceDiscoveryUI from '../../marketplace/ServiceDiscoveryUI';
  */
 export const MarketplaceListPage: React.FC = () => {
   const { category } = useParams<{ category?: string }>();
+  const navigate = useNavigate();
 
   const pageActions = [
     {
       label: 'Manage Bookings',
-      action: () => { window.location.href = '/marketplace/bookings'; },
+      action: () => navigate('/marketplace/bookings'),
       variant: 'primary' as const,
     },
     {
       label: 'Vendor Dashboard',
-      action: () => { window.location.href = '/marketplace/vendors'; },
+      action: () => navigate('/marketplace/vendors'),
       variant: 'secondary' as const,
     },
   ];

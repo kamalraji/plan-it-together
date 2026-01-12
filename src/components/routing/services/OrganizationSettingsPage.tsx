@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganization, useUpdateOrganization, useMyOrganizationMemberships } from '@/hooks/useOrganization';
@@ -12,6 +12,7 @@ import { z } from 'zod';
 export const OrganizationSettingsPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data: orgData, isLoading } = useOrganization(organizationId || '');
   const updateOrganization = useUpdateOrganization(organizationId || '');
@@ -298,12 +299,12 @@ export const OrganizationSettingsPage: React.FC = () => {
   const pageActions = [
     {
       label: 'View Organization',
-      action: () => { window.location.href = `/dashboard/organizations/${organizationId}`; },
+      action: () => navigate(`/dashboard/organizations/${organizationId}`),
       variant: 'secondary' as const,
     },
     {
       label: 'Manage Members',
-      action: () => { window.location.href = `/dashboard/organizations/${organizationId}/members`; },
+      action: () => navigate(`/dashboard/organizations/${organizationId}/members`),
       variant: 'secondary' as const,
     },
   ];

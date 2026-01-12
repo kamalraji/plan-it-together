@@ -1,5 +1,6 @@
 import React, { useCallback, Suspense, lazy } from 'react';
-import { Navigate, Route, Routes, useParams, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
@@ -67,9 +68,11 @@ const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> =
 export const OrgScopedLayout: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { data: memberOrganizations, isLoading: orgsLoading } = useMyMemberOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
+  const { data: userPrimaryOrg } = usePrimaryOrganization();
   const isMobile = useIsMobile();
 
   const isLoadingAny = isLoading || orgsLoading || orgLoading;
@@ -128,7 +131,7 @@ export const OrgScopedLayout: React.FC = () => {
             You don't have access to this organization. Please contact the organization administrator if you believe this is an error.
           </p>
           <button
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => navigate(userPrimaryOrg?.slug ? `/${userPrimaryOrg.slug}/dashboard` : '/dashboard')}
             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Go to Your Dashboard

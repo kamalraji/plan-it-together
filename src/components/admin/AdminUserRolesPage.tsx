@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useMyOrganizations } from '@/hooks/useOrganization';
 import { VendorApprovalPanel } from './VendorApprovalPanel';
 
@@ -43,7 +44,9 @@ export const AdminUserRolesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
+  const { data: primaryOrg } = usePrimaryOrganization();
 
   const [search, setSearch] = useState('');
   const [newUserId, setNewUserId] = useState('');
@@ -86,9 +89,9 @@ export const AdminUserRolesPage: React.FC = () => {
 
     const isThittamAdmin = myOrganizations?.some((org: any) => org.slug === 'thittam1hub');
     if (!isThittamAdmin) {
-      window.location.href = '/dashboard';
+      navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard', { replace: true });
     }
-  }, [user, myOrganizations, orgsLoading]);
+  }, [user, myOrganizations, orgsLoading, navigate, primaryOrg]);
 
   const { data, isLoading } = useQuery<UserRoleRow[]>({
     queryKey: ['admin-user-roles'],
