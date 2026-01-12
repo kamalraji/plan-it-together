@@ -218,7 +218,7 @@ export const OrgScopedLayout: React.FC = () => {
             <OrganizationSidebar />
 
             <SidebarInset className="flex w-full min-h-0 overflow-y-auto">
-              <div className={`my-4 sm:my-6 w-full ${isNarrowPage ? 'mx-auto max-w-5xl xl:max-w-6xl px-3 sm:px-4 md:px-6 lg:px-8' : 'mx-1 sm:mx-2 px-2 sm:px-3 md:px-4'} rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in overflow-x-hidden min-h-min`}>
+              <div className={`w-full ${isNarrowPage ? 'my-4 sm:my-6 mx-auto max-w-5xl xl:max-w-6xl px-3 sm:px-4 md:px-6 lg:px-8 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl' : 'px-4 sm:px-6 md:px-8 py-4 sm:py-6'} animate-fade-in overflow-x-hidden min-h-min`}>
                 {isNarrowPage && <OrgScopedBreadcrumbs className="mb-4" />}
                 <Routes>
                   <Route path="dashboard" element={<OrganizerDashboard />} />
