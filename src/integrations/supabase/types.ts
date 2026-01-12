@@ -6687,6 +6687,44 @@ export type Database = {
           workspace_id: string
         }[]
       }
+      get_event_registrant_profile: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          full_name: string
+          id: string
+          organization: string
+        }[]
+      }
+      get_event_registrants_profiles: {
+        Args: { _event_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          organization: string
+        }[]
+      }
+      get_org_member_profile: {
+        Args: { _organization_id: string; _user_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          full_name: string
+          id: string
+          organization: string
+        }[]
+      }
+      get_org_members_profiles: {
+        Args: { _organization_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          organization: string
+        }[]
+      }
       get_public_event_by_slug: {
         Args: { _event_slug: string; _org_slug: string }
         Returns: {
