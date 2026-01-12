@@ -11,6 +11,7 @@ export interface CrossWorkspaceTask {
   priority: string;
   dueDate: string | null;
   createdAt: string;
+  parentTaskId: string | null;
   targetWorkspace: {
     id: string;
     name: string;
@@ -21,6 +22,8 @@ export interface CrossWorkspaceTask {
     fullName: string;
     avatarUrl: string | null;
   } | null;
+  // Sync status indicator
+  isSynced: boolean;
 }
 
 interface UseCrossWorkspaceTasksOptions {
@@ -54,7 +57,8 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
           due_date,
           created_at,
           workspace_id,
-          assigned_to
+          assigned_to,
+          parent_task_id
         `)
         .eq('source_workspace_id', sourceWorkspaceId)
         .order('created_at', { ascending: false });
@@ -111,6 +115,7 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
           priority: task.priority,
           dueDate: task.due_date,
           createdAt: task.created_at,
+          parentTaskId: task.parent_task_id,
           targetWorkspace: {
             id: task.workspace_id,
             name: workspace?.name || 'Unknown',
@@ -121,6 +126,7 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
             fullName: profile.full_name || 'Unknown',
             avatarUrl: profile.avatar_url,
           } : null,
+          isSynced: !!task.parent_task_id, // Task is synced if it has a parent
         };
       });
     },

@@ -13,7 +13,8 @@ import {
   Circle, 
   Loader2,
   FolderTree,
-  AlertCircle
+  AlertCircle,
+  Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, isPast, isToday } from 'date-fns';
@@ -240,6 +241,13 @@ function TaskRow({ task }: { task: CrossWorkspaceTask }) {
           <span className="text-xs text-muted-foreground hidden sm:block max-w-[100px] truncate">
             {task.assignee.fullName}
           </span>
+        </div>
+      )}
+
+      {/* Sync Status */}
+      {task.isSynced && (
+        <div className="shrink-0" title="Status synced with parent task">
+          <Link2 className="h-3.5 w-3.5 text-primary" />
         </div>
       )}
 

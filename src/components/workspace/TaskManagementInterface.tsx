@@ -59,12 +59,13 @@ export function TaskManagementInterface({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Create task mutation
+  // Create task mutation with cross-workspace support
   const createTaskMutation = useMutation({
     mutationFn: async (taskData: TaskFormData) => {
       if (!workspaceId) throw new Error('Workspace ID is required');
       
-      const { error } = await supabase
+      // Create the main task
+      const { data: mainTask, error: mainError } = await supabase
         .from('workspace_tasks')
         .insert({
           workspace_id: workspaceId,
@@ -75,9 +76,37 @@ export function TaskManagementInterface({
           due_date: taskData.dueDate || null,
           role_scope: taskData.roleScope || (roleScope === 'ALL' ? null : roleScope),
           assigned_to: taskData.assigneeId || null,
-        });
+        })
+        .select('id')
+        .single();
 
-      if (error) throw error;
+      if (mainError) throw mainError;
+
+      // Create linked tasks in child workspaces for cross-workspace assignees
+      if (taskData.crossWorkspaceAssignees?.length && mainTask?.id) {
+        const linkedTasks = taskData.crossWorkspaceAssignees.map(({ userId, targetWorkspaceId }) => ({
+          workspace_id: targetWorkspaceId,
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority || TaskPriority.MEDIUM,
+          status: TaskStatus.NOT_STARTED,
+          due_date: taskData.dueDate || null,
+          assigned_to: userId,
+          source_workspace_id: workspaceId,
+          parent_task_id: mainTask.id, // Link to parent for status sync
+        }));
+
+        const { error: linkedError } = await supabase
+          .from('workspace_tasks')
+          .insert(linkedTasks);
+
+        if (linkedError) {
+          console.error('Failed to create linked tasks:', linkedError);
+          // Don't throw - main task was created successfully
+        }
+      }
+
+      return mainTask;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });

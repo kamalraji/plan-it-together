@@ -6136,6 +6136,7 @@ export type Database = {
           estimated_hours: number | null
           id: string
           location: string | null
+          parent_task_id: string | null
           priority: string
           progress: number | null
           role_scope: string | null
@@ -6156,6 +6157,7 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           location?: string | null
+          parent_task_id?: string | null
           priority?: string
           progress?: number | null
           role_scope?: string | null
@@ -6176,6 +6178,7 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           location?: string | null
+          parent_task_id?: string | null
           priority?: string
           progress?: number | null
           role_scope?: string | null
@@ -6186,6 +6189,13 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_tasks_source_workspace_id_fkey"
             columns: ["source_workspace_id"]
