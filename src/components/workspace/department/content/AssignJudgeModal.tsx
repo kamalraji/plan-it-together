@@ -22,14 +22,16 @@ export function AssignJudgeModal({ open, onOpenChange, eventId }: AssignJudgeMod
   const [selectedJudgeId, setSelectedJudgeId] = useState<string>('');
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
 
-  // Fetch judges (users with judge role)
+  // Fetch judges (workspace team members with JUDGE_COORDINATOR role for this event)
   const { data: judges = [], isLoading: loadingJudges } = useQuery({
-    queryKey: ['judges'],
+    queryKey: ['judges', eventId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'judge');
+        .from('workspace_team_members')
+        .select('user_id, workspaces!inner(event_id)')
+        .eq('workspaces.event_id', eventId)
+        .eq('role', 'JUDGE_COORDINATOR')
+        .eq('status', 'ACTIVE');
 
       if (error) throw error;
 

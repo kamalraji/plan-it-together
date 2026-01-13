@@ -1,14 +1,14 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { z, uuidSchema, emailSchema, legacyAppRoleSchema, parseAndValidate } from "../_shared/validation.ts";
+import { z, uuidSchema, emailSchema, appRoleSchema, parseAndValidate } from "../_shared/validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-type AppRole = z.infer<typeof legacyAppRoleSchema>;
+type AppRole = z.infer<typeof appRoleSchema>;
 
 type AdminUser = {
   id: string;
@@ -33,8 +33,8 @@ const lookupActionSchema = z.object({
 const updateActionSchema = z.object({
   action: z.literal("update"),
   userId: uuidSchema,
-  appRole: legacyAppRoleSchema.optional(),
-  roles: z.array(legacyAppRoleSchema).max(6, "Maximum 6 roles allowed").optional(),
+  appRole: appRoleSchema.optional(),
+  roles: z.array(appRoleSchema).max(3, "Maximum 3 roles allowed").optional(),
   note: z.string().trim().max(500, "Note too long").optional(),
 }).strict();
 
