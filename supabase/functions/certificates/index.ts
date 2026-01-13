@@ -283,7 +283,7 @@ serve(async (req) => {
     // ==================== DELEGATION ACTIONS ====================
 
     // ========== ACTION: getDelegations (list all delegations from a ROOT workspace) ==========
-    if (action === "getDelegations") {
+    if (body.action === "getDelegations") {
       const { workspaceId } = body as { workspaceId?: string };
       
       if (!workspaceId) {
@@ -329,7 +329,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: createDelegation ==========
-    if (action === "createDelegation") {
+    if (body.action === "createDelegation") {
       const { workspaceId, delegatedWorkspaceId, permissions, notes } = body as {
         workspaceId?: string;
         delegatedWorkspaceId?: string;
@@ -375,7 +375,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: updateDelegation ==========
-    if (action === "updateDelegation") {
+    if (body.action === "updateDelegation") {
       const { workspaceId, delegationId, permissions, notes } = body as {
         workspaceId?: string;
         delegationId?: string;
@@ -415,7 +415,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: removeDelegation ==========
-    if (action === "removeDelegation") {
+    if (body.action === "removeDelegation") {
       const { workspaceId, delegationId } = body as { workspaceId?: string; delegationId?: string };
 
       if (!workspaceId || !delegationId) {
@@ -439,7 +439,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: getMyDelegation (for delegated workspace) ==========
-    if (action === "getMyDelegation") {
+    if (body.action === "getMyDelegation") {
       const { workspaceId } = body as { workspaceId?: string };
       
       if (!workspaceId) {
@@ -492,7 +492,7 @@ serve(async (req) => {
     // ==================== TEMPLATE ACTIONS ====================
 
     // ========== ACTION: listTemplates ==========
-    if (action === "listTemplates") {
+    if (body.action === "listTemplates") {
       const { workspaceId } = body as { workspaceId?: string };
       
       if (!workspaceId) {
@@ -516,7 +516,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: createTemplate ==========
-    if (action === "createTemplate") {
+    if (body.action === "createTemplate") {
       const { workspaceId, template } = body as {
         workspaceId?: string;
         template?: {
@@ -574,7 +574,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: updateTemplate ==========
-    if (action === "updateTemplate") {
+    if (body.action === "updateTemplate") {
       const { workspaceId, templateId, template } = body as {
         workspaceId?: string;
         templateId?: string;
@@ -631,7 +631,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: deleteTemplate ==========
-    if (action === "deleteTemplate") {
+    if (body.action === "deleteTemplate") {
       const { workspaceId, templateId } = body as { workspaceId?: string; templateId?: string };
 
       if (!workspaceId || !templateId) {
@@ -657,7 +657,7 @@ serve(async (req) => {
     // ==================== EXISTING ACTIONS (updated with permission checks) ====================
 
     // ========== ACTION: getCriteria ==========
-    if (action === "getCriteria") {
+    if (body.action === "getCriteria") {
       await requireUser();
       const { workspaceId } = body as { workspaceId?: string };
 
@@ -681,7 +681,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: saveCriteria (now requires 'criteria' permission) ==========
-    if (action === "saveCriteria") {
+    if (body.action === "saveCriteria") {
       const { workspaceId, criteria } = body as {
         workspaceId?: string;
         criteria?: Array<{ type: string; conditions: Record<string, unknown> }>;
@@ -729,7 +729,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: getMyCertificates ==========
-    if (action === "getMyCertificates") {
+    if (body.action === "getMyCertificates") {
       await requireUser();
 
       const { data, error } = await supabaseClient
@@ -760,7 +760,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: listWorkspaceCertificates ==========
-    if (action === "listWorkspaceCertificates") {
+    if (body.action === "listWorkspaceCertificates") {
       const { workspaceId } = body as { workspaceId?: string };
       
       if (!workspaceId) {
@@ -841,7 +841,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: batchGenerate (now requires 'generate' permission) ==========
-    if (action === "batchGenerate") {
+    if (body.action === "batchGenerate") {
       const { workspaceId, templateId } = body as { workspaceId?: string; templateId?: string };
       
       if (!workspaceId) {
@@ -986,7 +986,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: distribute (now requires 'distribute' permission) ==========
-    if (action === "distribute") {
+    if (body.action === "distribute") {
       const { workspaceId, certificateIds } = body as { workspaceId?: string; certificateIds?: string[] };
       
       if (!workspaceId) {
@@ -1014,7 +1014,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: verify (public via service role) ==========
-    if (action === "verify") {
+    if (body.action === "verify") {
       const { certificateId } = body as { certificateId?: string };
       if (!certificateId) {
         return errorResponse("Missing certificateId");
@@ -1068,7 +1068,7 @@ serve(async (req) => {
     }
 
     // ========== ACTION: getStats (workspace certificate statistics) ==========
-    if (action === "getStats") {
+    if (body.action === "getStats") {
       const { workspaceId } = body as { workspaceId?: string };
       
       if (!workspaceId) {
