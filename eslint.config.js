@@ -65,6 +65,19 @@ export default tseslint.config(
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/rules-of-hooks": "error",
       
+      // Prevent hardcoded Tailwind colors - use semantic tokens instead
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "Literal[value=/\\b(bg-white|bg-black|bg-gray-|text-white|text-black|text-gray-|border-white|border-black|border-gray-|bg-slate-|text-slate-|border-slate-)\\b/]",
+          "message": "Avoid hardcoded colors. Use semantic tokens instead: bg-background, bg-card, bg-muted, text-foreground, text-muted-foreground, border-border, etc."
+        },
+        {
+          "selector": "TemplateLiteral[quasis.0.value.raw=/\\b(bg-white|bg-black|bg-gray-|text-white|text-black|text-gray-|border-white|border-black|border-gray-|bg-slate-|text-slate-|border-slate-)\\b/]",
+          "message": "Avoid hardcoded colors. Use semantic tokens instead: bg-background, bg-card, bg-muted, text-foreground, text-muted-foreground, border-border, etc."
+        }
+      ],
+      
       // Import organization
       "sort-imports": ["error", {
         "ignoreCase": false,
