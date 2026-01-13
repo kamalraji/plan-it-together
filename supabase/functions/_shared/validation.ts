@@ -303,11 +303,6 @@ export const appRoleSchema = z
   .enum(["admin", "organizer", "participant"])
   .describe("User application role (core authentication only)");
 
-// Legacy app role schema for backward compatibility with existing data
-export const legacyAppRoleSchema = z
-  .enum(["admin", "organizer", "participant", "judge", "volunteer", "speaker"])
-  .describe("Legacy app role (includes workspace-handled roles)");
-
 // Organization category (matches database enum)
 export const organizationCategorySchema = z.enum([
   "COLLEGE",
