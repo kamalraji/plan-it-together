@@ -4239,6 +4239,84 @@ export type Database = {
           },
         ]
       }
+      workspace_invoices: {
+        Row: {
+          amount: number
+          attachment_url: string | null
+          created_at: string | null
+          created_by: string
+          due_date: string
+          id: string
+          invoice_number: string
+          issue_date: string | null
+          notes: string | null
+          paid_amount: number | null
+          paid_at: string | null
+          payment_terms: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string | null
+          vendor_id: string | null
+          vendor_name: string
+          workspace_id: string
+        }
+        Insert: {
+          amount: number
+          attachment_url?: string | null
+          created_at?: string | null
+          created_by: string
+          due_date: string
+          id?: string
+          invoice_number: string
+          issue_date?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_name: string
+          workspace_id: string
+        }
+        Update: {
+          amount?: number
+          attachment_url?: string | null
+          created_at?: string | null
+          created_by?: string
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          issue_date?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_terms?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_name?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invoices_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "catering_vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_invoices_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_judge_assignments: {
         Row: {
           assigned_at: string | null
