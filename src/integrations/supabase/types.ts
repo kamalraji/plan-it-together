@@ -521,6 +521,126 @@ export type Database = {
           },
         ]
       }
+      certificate_delegation: {
+        Row: {
+          can_define_criteria: boolean | null
+          can_design_templates: boolean | null
+          can_distribute: boolean | null
+          can_generate: boolean | null
+          delegated_at: string | null
+          delegated_by: string | null
+          delegated_workspace_id: string
+          id: string
+          notes: string | null
+          root_workspace_id: string
+        }
+        Insert: {
+          can_define_criteria?: boolean | null
+          can_design_templates?: boolean | null
+          can_distribute?: boolean | null
+          can_generate?: boolean | null
+          delegated_at?: string | null
+          delegated_by?: string | null
+          delegated_workspace_id: string
+          id?: string
+          notes?: string | null
+          root_workspace_id: string
+        }
+        Update: {
+          can_define_criteria?: boolean | null
+          can_design_templates?: boolean | null
+          can_distribute?: boolean | null
+          can_generate?: boolean | null
+          delegated_at?: string | null
+          delegated_by?: string | null
+          delegated_workspace_id?: string
+          id?: string
+          notes?: string | null
+          root_workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_delegation_delegated_workspace_id_fkey"
+            columns: ["delegated_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_delegation_root_workspace_id_fkey"
+            columns: ["root_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      certificate_templates: {
+        Row: {
+          background_url: string | null
+          branding: Json
+          content: Json
+          created_at: string | null
+          created_by: string | null
+          event_id: string | null
+          id: string
+          is_default: boolean | null
+          logo_url: string | null
+          name: string
+          signature_url: string | null
+          type: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          background_url?: string | null
+          branding?: Json
+          content?: Json
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          is_default?: boolean | null
+          logo_url?: string | null
+          name: string
+          signature_url?: string | null
+          type: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          background_url?: string | null
+          branding?: Json
+          content?: Json
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          is_default?: boolean | null
+          logo_url?: string | null
+          name?: string
+          signature_url?: string | null
+          type?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_templates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_templates_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           certificate_id: string
@@ -533,6 +653,7 @@ export type Database = {
           pdf_url: string | null
           qr_payload: string
           recipient_id: string
+          template_id: string | null
           type: string
           updated_at: string
           workspace_id: string | null
@@ -548,6 +669,7 @@ export type Database = {
           pdf_url?: string | null
           qr_payload: string
           recipient_id: string
+          template_id?: string | null
           type: string
           updated_at?: string
           workspace_id?: string | null
@@ -563,6 +685,7 @@ export type Database = {
           pdf_url?: string | null
           qr_payload?: string
           recipient_id?: string
+          template_id?: string | null
           type?: string
           updated_at?: string
           workspace_id?: string | null
@@ -573,6 +696,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_templates"
             referencedColumns: ["id"]
           },
           {
@@ -7086,6 +7216,10 @@ export type Database = {
           id: string
           organization: string
         }[]
+      }
+      has_certificate_permission: {
+        Args: { _permission: string; _user_id?: string; _workspace_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
