@@ -7,6 +7,7 @@ export interface CertificateTemplateBranding {
   fontFamily?: string;
   borderStyle?: string;
   layout?: 'classic' | 'modern' | 'minimal';
+  canvasJSON?: string; // Fabric.js canvas state for visual editor
 }
 
 export interface CertificateTemplateContent {

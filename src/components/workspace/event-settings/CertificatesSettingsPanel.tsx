@@ -3,11 +3,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Palette, FileCheck, Users, Award, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCertificateTemplates, type CertificateTemplate, type CreateTemplateInput, type UpdateTemplateInput } from '@/hooks/useCertificateTemplates';
-import { CertificateTemplateDesigner } from '@/components/certificates/CertificateTemplateDesigner';
+import { CertificateDesignStudio } from '@/components/certificates/CertificateDesignStudio';
 import { DelegationManager } from '@/components/certificates/DelegationManager';
 import { WorkspaceCertificateManagement } from '@/components/certificates/WorkspaceCertificateManagement';
 
@@ -30,14 +29,17 @@ export function CertificatesSettingsPanel({
     templates,
     isLoading: isLoadingTemplates,
     createTemplate,
-    isCreating,
     updateTemplate,
-    isUpdating,
     deleteTemplate,
     isDeleting,
   } = useCertificateTemplates(workspaceId);
 
-  const handleCreateTemplate = (templateData: CreateTemplateInput) => {
+  const handleCreateTemplate = (data: { canvasJSON: object; name: string }) => {
+    const templateData: CreateTemplateInput = {
+      name: data.name,
+      type: 'COMPLETION',
+      branding: { canvasJSON: JSON.stringify(data.canvasJSON) },
+    };
     createTemplate(templateData, {
       onSuccess: () => {
         toast.success('Template created successfully');
@@ -47,8 +49,13 @@ export function CertificatesSettingsPanel({
     });
   };
 
-  const handleUpdateTemplate = (templateData: UpdateTemplateInput) => {
+  const handleUpdateTemplate = (data: { canvasJSON: object; name: string }) => {
     if (!editingTemplate) return;
+
+    const templateData: UpdateTemplateInput = {
+      name: data.name,
+      branding: { canvasJSON: JSON.stringify(data.canvasJSON) },
+    };
 
     updateTemplate(
       { templateId: editingTemplate.id, template: templateData },
@@ -213,41 +220,28 @@ export function CertificatesSettingsPanel({
               </div>
             )}
 
-            {/* Create Template Dialog */}
-            <Dialog open={isDesignerOpen} onOpenChange={setIsDesignerOpen}>
-              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Create Certificate Template</DialogTitle>
-                </DialogHeader>
-                <CertificateTemplateDesigner
-                  workspaceId={workspaceId}
-                  onSave={(data) => handleCreateTemplate(data as CreateTemplateInput)}
-                  onCancel={() => setIsDesignerOpen(false)}
-                  isSaving={isCreating}
-                />
-              </DialogContent>
-            </Dialog>
+            {/* Design Studio - Full Screen */}
+            {isDesignerOpen && (
+              <CertificateDesignStudio
+                onSave={handleCreateTemplate}
+                onCancel={() => setIsDesignerOpen(false)}
+                templateName="New Certificate Template"
+              />
+            )}
 
-            {/* Edit Template Dialog */}
-            <Dialog 
-              open={!!editingTemplate} 
-              onOpenChange={(open) => !open && setEditingTemplate(null)}
-            >
-              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Edit Certificate Template</DialogTitle>
-                </DialogHeader>
-                {editingTemplate && (
-                  <CertificateTemplateDesigner
-                    workspaceId={workspaceId}
-                    template={editingTemplate}
-                    onSave={(data) => handleUpdateTemplate(data as any)}
-                    onCancel={() => setEditingTemplate(null)}
-                    isSaving={isUpdating}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
+            {/* Edit Template - Full Screen */}
+            {editingTemplate && (
+              <CertificateDesignStudio
+                initialData={
+                  editingTemplate.branding && typeof (editingTemplate.branding as any).canvasJSON === 'string'
+                    ? JSON.parse((editingTemplate.branding as any).canvasJSON)
+                    : undefined
+                }
+                onSave={handleUpdateTemplate}
+                onCancel={() => setEditingTemplate(null)}
+                templateName={editingTemplate.name}
+              />
+            )}
           </div>
         </TabsContent>
 

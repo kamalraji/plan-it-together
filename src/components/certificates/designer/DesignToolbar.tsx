@@ -6,13 +6,10 @@ import {
   Square,
   Circle,
   Minus,
-  Image,
-  QrCode,
-  PenTool,
   LayoutTemplate,
   Trash2,
 } from 'lucide-react';
-import { CERTIFICATE_PLACEHOLDERS, getPlaceholdersByCategory } from '@/lib/certificate-placeholders';
+import { getPlaceholdersByCategory } from '@/lib/certificate-placeholders';
 import {
   Accordion,
   AccordionContent,

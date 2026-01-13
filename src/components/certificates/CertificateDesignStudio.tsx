@@ -7,13 +7,11 @@ import { PropertiesPanel } from './designer/PropertiesPanel';
 import { TemplateGallery } from './designer/TemplateGallery';
 import { CertificateTemplatePreset } from './templates';
 import { downloadCertificatePDF, downloadCertificatePNG } from '@/lib/certificate-pdf';
-import { getSamplePlaceholderData } from '@/lib/certificate-placeholders';
 import { toast } from 'sonner';
 import {
   Save,
   Download,
-  Image,
-  Eye,
+  FileImage,
   X,
   Loader2,
 } from 'lucide-react';
@@ -25,8 +23,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 interface CertificateDesignStudioProps {
-  templateId?: string;
-  workspaceId: string;
   initialData?: object;
   onSave: (data: { canvasJSON: object; name: string }) => void;
   onCancel: () => void;
@@ -34,8 +30,6 @@ interface CertificateDesignStudioProps {
 }
 
 export function CertificateDesignStudio({
-  templateId,
-  workspaceId,
   initialData,
   onSave,
   onCancel,
@@ -142,7 +136,7 @@ export function CertificateDesignStudio({
                 Download PDF
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportPNG}>
-                <Image className="h-4 w-4 mr-2" />
+                <FileImage className="h-4 w-4 mr-2" />
                 Download PNG
               </DropdownMenuItem>
             </DropdownMenuContent>

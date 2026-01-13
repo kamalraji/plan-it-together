@@ -198,9 +198,9 @@ export function PropertiesPanel({ selectedObject, onUpdate }: PropertiesPanelPro
           </div>
 
           <div className="space-y-2">
-            <Label>Stroke Width: {properties.strokeWidth}</Label>
+            <Label>Stroke Width: {String(properties.strokeWidth)}</Label>
             <Slider
-              value={[properties.strokeWidth as number]}
+              value={[Number(properties.strokeWidth) || 0]}
               onValueChange={([v]) => updateProperty('strokeWidth', v)}
               min={0}
               max={20}
@@ -209,9 +209,9 @@ export function PropertiesPanel({ selectedObject, onUpdate }: PropertiesPanelPro
           </div>
 
           <div className="space-y-2">
-            <Label>Opacity: {properties.opacity}%</Label>
+            <Label>Opacity: {String(properties.opacity)}%</Label>
             <Slider
-              value={[properties.opacity as number]}
+              value={[Number(properties.opacity) || 100]}
               onValueChange={([v]) => updateProperty('opacity', v)}
               min={0}
               max={100}
