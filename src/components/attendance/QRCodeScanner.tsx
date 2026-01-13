@@ -263,23 +263,23 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-card rounded-lg shadow-md p-6 border border-border">
       <div className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">QR Code Check-in</h3>
-        <p className="text-gray-600">
+        <h3 className="text-xl font-semibold text-foreground mb-2">QR Code Check-in</h3>
+        <p className="text-muted-foreground">
           Scan participant QR codes or enter codes manually for event check-in
         </p>
       </div>
 
       {/* Scan Mode Toggle */}
       <div className="flex mb-6">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-muted rounded-lg p-1">
           <button
             onClick={() => setScanMode('camera')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               scanMode === 'camera'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Camera Scan
@@ -288,8 +288,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             onClick={() => setScanMode('manual')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               scanMode === 'manual'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Manual Entry
@@ -322,7 +322,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               <button
                 onClick={startCamera}
                 disabled={isScanning}
-                className="bg-white text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50"
+                className="bg-card text-foreground px-6 py-2 rounded-full font-medium hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50"
               >
                 {isScanning ? 'Scanning…' : 'Start Scanner'}
               </button>
@@ -331,10 +331,10 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
 
           {!isScanning && (
             <div className="mt-4 text-center">
-              <p className="text-gray-600 mb-2">Camera not available</p>
+              <p className="text-muted-foreground mb-2">Camera not available</p>
               <button
                 onClick={startCamera}
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 Try Again
               </button>
@@ -346,7 +346,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {/* Manual Entry */}
       {scanMode === 'manual' && (
         <div className="mb-6">
-          <label htmlFor="manualCode" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="manualCode" className="block text-sm font-medium text-foreground mb-2">
             Enter QR Code
           </label>
           <div className="flex gap-2">
@@ -356,7 +356,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               value={manualCode}
               onChange={(e) => setManualCode(e.target.value)}
               placeholder="Paste or type QR code here..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   handleManualScan();
@@ -366,7 +366,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             <button
               onClick={handleManualScan}
               disabled={!manualCode.trim() || checkInMutation.isPending}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {checkInMutation.isPending ? 'Checking...' : 'Check In'}
             </button>
@@ -442,9 +442,9 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       )}
 
       {/* Instructions */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-2">Instructions</h4>
-        <div className="text-sm text-gray-600 space-y-1">
+      <div className="bg-muted rounded-lg p-4">
+        <h4 className="font-medium text-foreground mb-2">Instructions</h4>
+        <div className="text-sm text-muted-foreground space-y-1">
           <p>• <strong>Camera Mode:</strong> Point camera at participant's QR code and tap "Scan QR Code"</p>
           <p>• <strong>Manual Mode:</strong> Ask participant to read their QR code aloud or copy/paste it</p>
           <p>• Green confirmation means successful check-in</p>

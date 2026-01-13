@@ -265,7 +265,7 @@ const MetricWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         {change && (
           <div className={`flex items-center text-sm ${
             changeType === 'increase' ? 'text-green-600' : 'text-red-600'
@@ -278,8 +278,8 @@ const MetricWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
         )}
       </div>
       <div className="mt-2">
-        <div className="text-3xl font-bold text-gray-900">{value}</div>
-        {label && <div className="text-sm text-gray-500">{label}</div>}
+        <div className="text-3xl font-bold text-foreground">{value}</div>
+        {label && <div className="text-sm text-muted-foreground">{label}</div>}
       </div>
     </div>
   );
@@ -288,10 +288,10 @@ const MetricWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
 const ChartWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
   return (
     <div className="p-6">
-      <h3 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h3>
-      <div className="h-32 bg-gray-100 rounded flex items-center justify-center">
-        <ChartBarIcon className="h-8 w-8 text-gray-400" />
-        <span className="ml-2 text-gray-500">Chart placeholder</span>
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">{widget.title}</h3>
+      <div className="h-32 bg-muted rounded flex items-center justify-center">
+        <ChartBarIcon className="h-8 w-8 text-muted-foreground" />
+        <span className="ml-2 text-muted-foreground">Chart placeholder</span>
       </div>
     </div>
   );
@@ -303,23 +303,23 @@ const TableWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
 
   return (
     <div className="p-6">
-      <h3 className="text-sm font-medium text-gray-500 mb-4">{title}</h3>
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">{title}</h3>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-border">
           <thead>
             <tr>
               {headers?.map((header: string, index: number) => (
-                <th key={index} className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th key={index} className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-border">
             {rows?.slice(0, 5).map((row: any[], index: number) => (
               <tr key={index}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="px-3 py-2 text-sm text-gray-900">
+                  <td key={cellIndex} className="px-3 py-2 text-sm text-foreground">
                     {cell}
                   </td>
                 ))}
@@ -338,12 +338,12 @@ const ListWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
 
   return (
     <div className="p-6">
-      <h3 className="text-sm font-medium text-gray-500 mb-4">{title}</h3>
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">{title}</h3>
       <ul className="space-y-2">
         {items?.slice(0, 5).map((item: any, index: number) => (
           <li key={index} className="flex items-center justify-between text-sm">
-            <span className="text-gray-900">{item.label || item.name || item}</span>
-            {item.value && <span className="text-gray-500">{item.value}</span>}
+            <span className="text-foreground">{item.label || item.name || item}</span>
+            {item.value && <span className="text-muted-foreground">{item.value}</span>}
           </li>
         ))}
       </ul>
@@ -360,30 +360,30 @@ const StatusWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
       case 'healthy':
       case 'active':
       case 'online':
-        return 'text-green-600 bg-green-100';
+        return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
       case 'warning':
       case 'degraded':
-        return 'text-yellow-600 bg-yellow-100';
+        return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'error':
       case 'offline':
       case 'failed':
-        return 'text-red-600 bg-red-100';
+        return 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-muted-foreground bg-muted';
     }
   };
 
   return (
     <div className="p-6">
-      <h3 className="text-sm font-medium text-gray-500 mb-4">{title}</h3>
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">{title}</h3>
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
             {status}
           </span>
         </div>
-        {message && <p className="text-sm text-gray-900">{message}</p>}
-        {details && <p className="text-xs text-gray-500">{details}</p>}
+        {message && <p className="text-sm text-foreground">{message}</p>}
+        {details && <p className="text-xs text-muted-foreground">{details}</p>}
       </div>
     </div>
   );
@@ -395,13 +395,13 @@ const QuickActionWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) =>
 
   return (
     <div className="p-6">
-      <h3 className="text-sm font-medium text-gray-500 mb-4">{title}</h3>
+      <h3 className="text-sm font-medium text-muted-foreground mb-4">{title}</h3>
       <div className="space-y-2">
         {actions?.map((action: any, index: number) => (
           <button
             key={index}
             onClick={action.onClick}
-            className="w-full text-left px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+            className="w-full text-left px-3 py-2 text-sm text-primary hover:bg-primary/10 rounded-md transition-colors"
           >
             {action.label}
           </button>

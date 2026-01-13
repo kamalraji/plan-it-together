@@ -188,7 +188,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
             type="button"
             onClick={() => onChange?.(star)}
             className={`w-6 h-6 ${
-              star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              star <= rating ? 'text-yellow-400' : 'text-muted-foreground/40'
             } ${onChange ? 'hover:text-yellow-400 cursor-pointer' : ''}`}
           >
             <Star className="w-full h-full fill-current" />
@@ -207,23 +207,23 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+      <div className="bg-card rounded-lg border border-border p-8 text-center">
         <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Thank You for Your Feedback!</h2>
-        <p className="text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-foreground mb-2">Thank You for Your Feedback!</h2>
+        <p className="text-muted-foreground mb-6">
           We appreciate you taking the time to share your thoughts. 
           Your feedback helps us improve the platform for everyone.
         </p>
         <div className="flex justify-center space-x-4">
           <button
             onClick={() => setSubmitted(false)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             Submit More Feedback
           </button>
           <button
             onClick={() => setActiveTab('browse')}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted"
           >
             Browse Feedback
           </button>
@@ -235,15 +235,15 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-card rounded-lg border border-border">
+        <div className="border-b border-border">
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('submit')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'submit'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               Submit Feedback
@@ -252,8 +252,8 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
               onClick={() => setActiveTab('browse')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'browse'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               Browse Feedback ({existingFeedback.length})
@@ -264,11 +264,11 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
         {/* Submit Feedback Tab */}
         {activeTab === 'submit' && (
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Share Your Feedback</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Share Your Feedback</h2>
             
             {/* Feedback Type Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-foreground mb-3">
                 What type of feedback would you like to share?
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -281,15 +281,15 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                       onClick={() => setFeedbackForm(prev => ({ ...prev, type: type.value as any }))}
                       className={`p-4 text-left border rounded-lg transition-colors ${
                         feedbackForm.type === type.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-foreground/30'
                       }`}
                     >
                       <div className="flex items-center mb-2">
-                        <Icon className="w-5 h-5 mr-2 text-blue-600" />
-                        <span className="font-medium text-gray-900">{type.label}</span>
+                        <Icon className="w-5 h-5 mr-2 text-primary" />
+                        <span className="font-medium text-foreground">{type.label}</span>
                       </div>
-                      <p className="text-sm text-gray-600">{type.description}</p>
+                      <p className="text-sm text-muted-foreground">{type.description}</p>
                     </button>
                   );
                 })}
@@ -299,7 +299,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
             <form onSubmit={handleSubmitFeedback} className="space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Title *
                 </label>
                 <input
@@ -307,7 +307,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                   required
                   value={feedbackForm.title}
                   onChange={(e) => setFeedbackForm(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                   placeholder="Brief summary of your feedback"
                 />
               </div>
@@ -315,14 +315,14 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
               {/* Rating (only for rating type) */}
               {feedbackForm.type === 'rating' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Overall Rating *
                   </label>
                   <div className="flex items-center space-x-4">
                     {renderStarRating(feedbackForm.rating, (rating) => 
                       setFeedbackForm(prev => ({ ...prev, rating }))
                     )}
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-muted-foreground">
                       {feedbackForm.rating} out of 5 stars
                     </span>
                   </div>
@@ -331,13 +331,13 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Category
                 </label>
                 <select
                   value={feedbackForm.category}
                   onChange={(e) => setFeedbackForm(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 >
                   {categories.map(category => (
                     <option key={category.value} value={category.value}>
@@ -349,7 +349,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Description *
                 </label>
                 <textarea
@@ -357,7 +357,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                   rows={5}
                   value={feedbackForm.description}
                   onChange={(e) => setFeedbackForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                   placeholder="Please provide detailed feedback..."
                 />
               </div>
@@ -365,14 +365,14 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
               {/* Contact Information */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Email (optional)
                   </label>
                   <input
                     type="email"
                     value={feedbackForm.email}
                     onChange={(e) => setFeedbackForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -383,9 +383,9 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                     id="allowContact"
                     checked={feedbackForm.allowContact}
                     onChange={(e) => setFeedbackForm(prev => ({ ...prev, allowContact: e.target.checked }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
                   />
-                  <label htmlFor="allowContact" className="ml-2 text-sm text-gray-700">
+                  <label htmlFor="allowContact" className="ml-2 text-sm text-muted-foreground">
                     Allow us to contact you about this feedback
                   </label>
                 </div>
@@ -396,11 +396,11 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex items-center px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
                       Submitting...
                     </>
                   ) : (
@@ -418,15 +418,15 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
         {/* Browse Feedback Tab */}
         {activeTab === 'browse' && (
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Community Feedback</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Community Feedback</h2>
             
             <div className="space-y-4">
               {filteredFeedback.map((item) => (
-                <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={item.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-medium text-gray-900">{item.title}</h3>
+                        <h3 className="font-medium text-foreground">{item.title}</h3>
                         <span className={`px-2 py-1 text-xs rounded-full ${statusColors[item.status]}`}>
                           {item.status.replace('_', ' ')}
                         </span>
@@ -436,8 +436,8 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                           </div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <span>
                           {categories.find(c => c.value === item.category)?.label}
                         </span>
@@ -452,15 +452,15 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
                       <button
                         onClick={() => handleVote(item.id, true)}
                         className={`p-1 rounded ${
-                          item.userVoted ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'
+                          item.userVoted ? 'text-primary' : 'text-muted-foreground hover:text-primary'
                         }`}
                       >
                         <ThumbsUp className="w-4 h-4" />
                       </button>
-                      <span className="text-sm font-medium text-gray-700">{item.votes}</span>
+                      <span className="text-sm font-medium text-foreground">{item.votes}</span>
                       <button
                         onClick={() => handleVote(item.id, false)}
-                        className="p-1 rounded text-gray-400 hover:text-red-600"
+                        className="p-1 rounded text-muted-foreground hover:text-red-600"
                       >
                         <ThumbsDown className="w-4 h-4" />
                       </button>

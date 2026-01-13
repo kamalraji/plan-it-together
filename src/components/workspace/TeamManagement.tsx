@@ -238,22 +238,22 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Team Management</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-foreground">Team Management</h2>
+          <p className="text-muted-foreground mt-1">
             Manage team members, roles, and access for {workspace.name}
           </p>
         </div>
         <div className="flex space-x-3">
           <button
             onClick={() => setActiveView('invite')}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
           >
             <UserPlusIcon className="w-4 h-4 mr-2" />
             Invite Member
           </button>
           <button
             onClick={() => setActiveView('bulk-invite')}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            className="inline-flex items-center px-4 py-2 border border-border text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted"
           >
             <UserGroupIcon className="w-4 h-4 mr-2" />
             Bulk Invite
@@ -262,13 +262,13 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
       </div>
 
       {/* View Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveView('roster')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'roster'
-                ? 'border-indigo-500 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             Team Roster ({filteredMembers.length})
@@ -276,8 +276,8 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
           <button
             onClick={() => setActiveView('invite')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'invite'
-                ? 'border-indigo-500 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             Invite Members
@@ -285,13 +285,13 @@ export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
           <button
             onClick={() => setActiveView('bulk-invite')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'bulk-invite'
-                ? 'border-indigo-500 text-indigo-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
           >
             Bulk Invite
             {pendingInvitations && pendingInvitations.length > 0 && (
-              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                 {pendingInvitations.length} pending
               </span>
             )}
