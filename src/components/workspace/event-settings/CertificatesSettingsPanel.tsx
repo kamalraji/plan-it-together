@@ -226,6 +226,7 @@ export function CertificatesSettingsPanel({
                 onSave={handleCreateTemplate}
                 onCancel={() => setIsDesignerOpen(false)}
                 templateName="New Certificate Template"
+                workspaceId={workspaceId}
               />
             )}
 
@@ -240,6 +241,7 @@ export function CertificatesSettingsPanel({
                 onSave={handleUpdateTemplate}
                 onCancel={() => setEditingTemplate(null)}
                 templateName={editingTemplate.name}
+                workspaceId={workspaceId}
               />
             )}
           </div>

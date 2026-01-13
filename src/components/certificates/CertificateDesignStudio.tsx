@@ -28,6 +28,7 @@ interface CertificateDesignStudioProps {
   onSave: (data: { canvasJSON: object; name: string }) => void;
   onCancel: () => void;
   templateName?: string;
+  workspaceId: string;
 }
 
 export function CertificateDesignStudio({
@@ -35,6 +36,7 @@ export function CertificateDesignStudio({
   onSave,
   onCancel,
   templateName = 'Untitled Template',
+  workspaceId,
 }: CertificateDesignStudioProps) {
   const canvasRef = useRef<DesignCanvasRef>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
@@ -173,6 +175,7 @@ export function CertificateDesignStudio({
           onDeleteSelected={() => canvasRef.current?.deleteSelected()}
           onClearCanvas={() => canvasRef.current?.clearCanvas()}
           onLoadAIDesign={handleLoadAIDesign}
+          workspaceId={workspaceId}
         />
 
         {/* Canvas area */}

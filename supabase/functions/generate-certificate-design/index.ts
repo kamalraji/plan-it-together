@@ -1,9 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 5;
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+// Predefined valid values
+const VALID_CERTIFICATE_TYPES = ['Completion', 'Achievement', 'Participation', 'Excellence', 'Appreciation'];
+const VALID_STYLES = ['elegant', 'modern', 'corporate', 'creative', 'academic'];
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
+
+// Input limits
+const MAX_EVENT_THEME_LENGTH = 200;
+const MAX_ADDITIONAL_NOTES_LENGTH = 500;
 
 interface GenerateDesignRequest {
   eventTheme: string;
@@ -12,6 +27,125 @@ interface GenerateDesignRequest {
   secondaryColor?: string;
   style?: string;
   additionalNotes?: string;
+  workspaceId: string;
+}
+
+function getClientIP(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
+function hashIP(ip: string): string {
+  // Simple hash for privacy-preserving logs
+  let hash = 0;
+  for (let i = 0; i < ip.length; i++) {
+    const char = ip.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16).substring(0, 8);
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const record = rateLimitStore.get(ip);
+
+  // Clean up expired entries periodically
+  if (rateLimitStore.size > 1000) {
+    for (const [key, value] of rateLimitStore.entries()) {
+      if (value.resetTime < now) {
+        rateLimitStore.delete(key);
+      }
+    }
+  }
+
+  if (!record || record.resetTime < now) {
+    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return { allowed: false, remaining: 0, resetIn: record.resetTime - now };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - record.count, resetIn: record.resetTime - now };
+}
+
+function sanitizeString(input: string): string {
+  // Remove control characters and potential prompt injection patterns
+  return input
+    .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+    .replace(/[{}[\]]/g, '') // Remove JSON-like brackets that could interfere
+    .trim();
+}
+
+function validateInput(body: GenerateDesignRequest): { success: boolean; error?: string; sanitized?: GenerateDesignRequest } {
+  // Required field: workspaceId
+  if (!body.workspaceId || typeof body.workspaceId !== 'string') {
+    return { success: false, error: "Workspace ID is required" };
+  }
+
+  // Required field: eventTheme
+  if (!body.eventTheme || typeof body.eventTheme !== 'string') {
+    return { success: false, error: "Event theme is required" };
+  }
+
+  const eventTheme = sanitizeString(body.eventTheme);
+  if (eventTheme.length === 0) {
+    return { success: false, error: "Event theme cannot be empty" };
+  }
+  if (eventTheme.length > MAX_EVENT_THEME_LENGTH) {
+    return { success: false, error: `Event theme must be less than ${MAX_EVENT_THEME_LENGTH} characters` };
+  }
+
+  // Validate certificate type
+  const certificateType = body.certificateType || 'Completion';
+  if (!VALID_CERTIFICATE_TYPES.includes(certificateType)) {
+    return { success: false, error: `Invalid certificate type. Must be one of: ${VALID_CERTIFICATE_TYPES.join(', ')}` };
+  }
+
+  // Validate style
+  const style = body.style || 'elegant';
+  if (!VALID_STYLES.includes(style)) {
+    return { success: false, error: `Invalid style. Must be one of: ${VALID_STYLES.join(', ')}` };
+  }
+
+  // Validate colors
+  const primaryColor = body.primaryColor || '#1a365d';
+  const secondaryColor = body.secondaryColor || '#c9a227';
+  
+  if (!HEX_COLOR_REGEX.test(primaryColor)) {
+    return { success: false, error: "Primary color must be a valid hex color (e.g., #1a365d)" };
+  }
+  if (!HEX_COLOR_REGEX.test(secondaryColor)) {
+    return { success: false, error: "Secondary color must be a valid hex color (e.g., #c9a227)" };
+  }
+
+  // Validate additional notes (optional)
+  let additionalNotes = '';
+  if (body.additionalNotes) {
+    additionalNotes = sanitizeString(body.additionalNotes);
+    if (additionalNotes.length > MAX_ADDITIONAL_NOTES_LENGTH) {
+      return { success: false, error: `Additional notes must be less than ${MAX_ADDITIONAL_NOTES_LENGTH} characters` };
+    }
+  }
+
+  return {
+    success: true,
+    sanitized: {
+      workspaceId: body.workspaceId,
+      eventTheme,
+      certificateType,
+      primaryColor,
+      secondaryColor,
+      style,
+      additionalNotes,
+    }
+  };
 }
 
 serve(async (req) => {
@@ -19,14 +153,105 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const { eventTheme, certificateType, primaryColor, secondaryColor, style, additionalNotes } = 
-      await req.json() as GenerateDesignRequest;
+  const clientIP = getClientIP(req);
+  const hashedIP = hashIP(clientIP);
 
+  try {
+    // 1. Rate limiting check (before any processing)
+    const rateLimit = checkRateLimit(clientIP);
+    if (!rateLimit.allowed) {
+      console.log(`[RATE_LIMIT] IP: ${hashedIP}, resetIn: ${rateLimit.resetIn}ms`);
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please wait a minute and try again." }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": Math.ceil(rateLimit.resetIn / 1000).toString()
+          } 
+        }
+      );
+    }
+
+    // 2. Authentication check
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.log(`[AUTH_FAIL] IP: ${hashedIP}, reason: No authorization header`);
+      return new Response(
+        JSON.stringify({ error: "Please sign in to use AI design" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Create client with user's auth
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: userData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !userData?.user) {
+      console.log(`[AUTH_FAIL] IP: ${hashedIP}, reason: Invalid token`);
+      return new Response(
+        JSON.stringify({ error: "Please sign in to use AI design" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = userData.user.id;
+
+    // 3. Parse and validate input
+    const body = await req.json() as GenerateDesignRequest;
+    const validation = validateInput(body);
+    
+    if (!validation.success) {
+      console.log(`[VALIDATION_FAIL] user: ${userId}, error: ${validation.error}`);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { workspaceId, eventTheme, certificateType, primaryColor, secondaryColor, style, additionalNotes } = validation.sanitized!;
+
+    // 4. Authorization check - verify user has certificate design permission
+    const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    const { data: hasPermission, error: permError } = await serviceClient
+      .rpc("has_certificate_permission", {
+        _workspace_id: workspaceId,
+        _permission: 'design',
+        _user_id: userId,
+      });
+
+    if (permError) {
+      console.error(`[AUTHZ_ERROR] user: ${userId}, workspace: ${workspaceId}, error:`, permError);
+      return new Response(
+        JSON.stringify({ error: "Authorization check failed" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!hasPermission) {
+      console.log(`[AUTHZ_FAIL] user: ${userId}, workspace: ${workspaceId}, permission: design`);
+      return new Response(
+        JSON.stringify({ error: "You don't have permission to design certificates for this workspace" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 5. Generate design with AI
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("[CONFIG_ERROR] LOVABLE_API_KEY is not configured");
+      throw new Error("AI service is not configured");
     }
+
+    console.log(`[AI_REQUEST] user: ${userId}, workspace: ${workspaceId}, type: ${certificateType}, style: ${style}`);
 
     const systemPrompt = `You are a professional certificate designer. Generate Fabric.js canvas JSON for a certificate design.
 
@@ -58,9 +283,9 @@ For shapes use type "rect", "circle", or "line" with appropriate properties.`;
 
 Event Theme: ${eventTheme}
 Certificate Type: ${certificateType}
-Primary Color: ${primaryColor || '#1a365d'}
-Secondary Color: ${secondaryColor || '#c9a227'}
-Style Preference: ${style || 'elegant and professional'}
+Primary Color: ${primaryColor}
+Secondary Color: ${secondaryColor}
+Style Preference: ${style}
 ${additionalNotes ? `Additional Notes: ${additionalNotes}` : ''}
 
 Create a complete Fabric.js canvas JSON with:
@@ -94,19 +319,21 @@ Return only the JSON object, no additional text.`;
 
     if (!response.ok) {
       if (response.status === 429) {
+        console.log(`[AI_RATE_LIMIT] user: ${userId}, workspace: ${workspaceId}`);
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "AI service rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
+        console.log(`[AI_CREDITS] user: ${userId}, workspace: ${workspaceId}`);
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error(`[AI_ERROR] user: ${userId}, status: ${response.status}, error:`, errorText);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -114,29 +341,31 @@ Return only the JSON object, no additional text.`;
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
+      console.error(`[AI_ERROR] user: ${userId}, reason: No content received`);
       throw new Error("No content received from AI");
     }
 
     // Parse the JSON from the response (handle markdown code blocks if present)
     let canvasJSON;
     try {
-      // Remove markdown code blocks if present
       let jsonString = content.trim();
       if (jsonString.startsWith("```")) {
         jsonString = jsonString.replace(/```json?\n?/g, "").replace(/```\n?$/g, "");
       }
       canvasJSON = JSON.parse(jsonString);
     } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", content);
+      console.error(`[PARSE_ERROR] user: ${userId}, content:`, content.substring(0, 200));
       throw new Error("Failed to parse AI-generated design");
     }
+
+    console.log(`[AI_SUCCESS] user: ${userId}, workspace: ${workspaceId}, type: ${certificateType}`);
 
     return new Response(
       JSON.stringify({ canvasJSON }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in generate-certificate-design:", error);
+    console.error(`[ERROR] IP: ${hashedIP}, error:`, error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

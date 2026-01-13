@@ -29,6 +29,7 @@ interface DesignToolbarProps {
   onDeleteSelected: () => void;
   onClearCanvas: () => void;
   onLoadAIDesign?: (canvasJSON: object) => void;
+  workspaceId: string;
 }
 
 export function DesignToolbar({
@@ -40,6 +41,7 @@ export function DesignToolbar({
   onDeleteSelected,
   onClearCanvas,
   onLoadAIDesign,
+  workspaceId,
 }: DesignToolbarProps) {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const placeholdersByCategory = getPlaceholdersByCategory();
@@ -195,6 +197,7 @@ export function DesignToolbar({
         open={aiDialogOpen}
         onOpenChange={setAiDialogOpen}
         onDesignGenerated={handleAIDesignGenerated}
+        workspaceId={workspaceId}
       />
     </div>
   );

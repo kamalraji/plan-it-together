@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.social-media-sync]
 verify_jwt = false
+
+[functions.generate-certificate-design]
+verify_jwt = false
