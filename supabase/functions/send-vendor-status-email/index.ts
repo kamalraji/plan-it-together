@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  z,
+  emailSchema,
+  shortStringSchema,
+  vendorStatusSchema,
+  validationError,
+} from "../_shared/validation.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -9,12 +16,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface VendorStatusPayload {
-  vendorEmail: string;
-  vendorName: string;
-  status: 'VERIFIED' | 'REJECTED' | 'SUSPENDED';
-  rejectionReason?: string;
-}
+// Zod schema for vendor status email
+const vendorStatusEmailSchema = z.object({
+  vendorEmail: emailSchema,
+  vendorName: shortStringSchema,
+  status: vendorStatusSchema,
+  rejectionReason: z.string().trim().max(500, "Rejection reason must be less than 500 characters").optional(),
+});
 
 const getStatusEmailContent = (vendorName: string, status: string, rejectionReason?: string) => {
   if (status === 'VERIFIED') {
@@ -160,8 +168,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const payload: VendorStatusPayload = await req.json();
-    const { vendorEmail, vendorName, status, rejectionReason } = payload;
+    const rawBody = await req.json().catch(() => ({}));
+    
+    // Validate input with Zod
+    const parseResult = vendorStatusEmailSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
+    }
+
+    const { vendorEmail, vendorName, status, rejectionReason } = parseResult.data;
 
     console.log(`Sending vendor status email to ${vendorEmail} - Status: ${status}`);
 

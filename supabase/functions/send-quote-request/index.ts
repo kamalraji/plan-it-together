@@ -1,5 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  z,
+  emailSchema,
+  phoneSchema,
+  shortStringSchema,
+  longStringSchema,
+  validationError,
+} from "../_shared/validation.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -58,32 +66,20 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Input validation
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^[\d\s()+-]{7,20}$/;
-
-function validateEmail(email: string): boolean {
-  return EMAIL_REGEX.test(email) && email.length <= 255;
-}
-
-function validatePhone(phone: string | undefined): boolean {
-  if (!phone) return true; // Optional field
-  return PHONE_REGEX.test(phone);
-}
-
-interface QuoteRequestPayload {
-  vendorEmail: string;
-  vendorName: string;
-  senderName: string;
-  senderEmail: string;
-  senderPhone?: string;
-  eventDate?: string;
-  eventType?: string;
-  guestCount?: number;
-  budget?: string;
-  message: string;
-  serviceNames?: string[];
-}
+// Zod schema for quote request
+const quoteRequestSchema = z.object({
+  vendorEmail: emailSchema,
+  vendorName: shortStringSchema,
+  senderName: shortStringSchema,
+  senderEmail: emailSchema,
+  senderPhone: phoneSchema,
+  eventDate: z.string().max(50, "Event date must be less than 50 characters").optional(),
+  eventType: z.string().max(100, "Event type must be less than 100 characters").optional(),
+  guestCount: z.number().min(0, "Guest count cannot be negative").max(100000, "Guest count must be less than 100,000").optional(),
+  budget: z.string().max(50, "Budget must be less than 50 characters").optional(),
+  message: longStringSchema,
+  serviceNames: z.array(z.string().max(50)).max(10, "Maximum 10 services allowed").optional(),
+});
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -116,7 +112,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const payload: QuoteRequestPayload = await req.json();
+    const rawBody = await req.json().catch(() => ({}));
+    
+    // Validate input with Zod
+    const parseResult = quoteRequestSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
+    }
+
     const {
       vendorEmail,
       vendorName,
@@ -129,57 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
       budget,
       message,
       serviceNames,
-    } = payload;
-
-    // Input validation
-    if (!vendorEmail || !validateEmail(vendorEmail)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid vendor email address" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!senderEmail || !validateEmail(senderEmail)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid sender email address" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!senderName || senderName.length > 100) {
-      return new Response(
-        JSON.stringify({ error: "Sender name is required and must be less than 100 characters" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!vendorName || vendorName.length > 100) {
-      return new Response(
-        JSON.stringify({ error: "Vendor name is required and must be less than 100 characters" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!message || message.length > 2000) {
-      return new Response(
-        JSON.stringify({ error: "Message is required and must be less than 2000 characters" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!validatePhone(senderPhone)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid phone number format" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (guestCount !== undefined && (guestCount < 0 || guestCount > 100000)) {
-      return new Response(
-        JSON.stringify({ error: "Guest count must be between 0 and 100,000" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    } = parseResult.data;
 
     // Build the email HTML with escaped content
     const emailHtml = `

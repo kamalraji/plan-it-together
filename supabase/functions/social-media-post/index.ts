@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 import { createHmac } from "node:crypto";
+import { z, uuidSchema, socialPlatformSchema, validationError } from "../_shared/validation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,6 +11,24 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Zod schemas for social media post actions
+const postNowSchema = z.object({
+  action: z.literal("post_now"),
+  workspace_id: uuidSchema,
+  queue_id: uuidSchema,
+});
+
+const addToQueueSchema = z.object({
+  action: z.literal("add_to_queue"),
+  workspace_id: uuidSchema,
+  post_id: uuidSchema,
+});
+
+const requestSchema = z.discriminatedUnion("action", [
+  postNowSchema,
+  addToQueueSchema,
+]);
 
 // Twitter API v2 implementation
 async function postToTwitter(content: string, credentials: Record<string, string>): Promise<{ success: boolean; postId?: string; error?: string }> {
@@ -189,11 +208,19 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { action, workspace_id, post_id, queue_id } = await req.json();
+    const rawBody = await req.json().catch(() => ({}));
 
-    console.log('Social media post action:', action, 'workspace:', workspace_id);
+    // Validate input with Zod
+    const parseResult = requestSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
+    }
 
-    if (action === 'post_now') {
+    const body = parseResult.data;
+
+    console.log('Social media post action:', body.action, 'workspace:', body.workspace_id);
+
+    if (body.action === 'post_now') {
       // Get the post from queue
       const { data: queueItem, error: queueError } = await supabase
         .from('social_post_queue')
@@ -201,7 +228,7 @@ serve(async (req) => {
           *,
           social_post:workspace_social_posts(*)
         `)
-        .eq('id', queue_id)
+        .eq('id', body.queue_id)
         .single();
 
       if (queueError || !queueItem) {
@@ -212,7 +239,7 @@ serve(async (req) => {
       const { data: credentials, error: credError } = await supabase
         .from('workspace_social_api_credentials')
         .select('*')
-        .eq('workspace_id', workspace_id)
+        .eq('workspace_id', body.workspace_id)
         .eq('platform', queueItem.platform)
         .eq('is_active', true)
         .single();
@@ -225,7 +252,7 @@ serve(async (req) => {
             status: 'failed', 
             error_message: 'No active API credentials found for platform' 
           })
-          .eq('id', queue_id);
+          .eq('id', body.queue_id);
 
         return new Response(JSON.stringify({ 
           success: false, 
@@ -240,7 +267,7 @@ serve(async (req) => {
       await supabase
         .from('social_post_queue')
         .update({ status: 'processing' })
-        .eq('id', queue_id);
+        .eq('id', body.queue_id);
 
       const postContent = queueItem.social_post?.content || '';
       const mediaUrl = queueItem.social_post?.media_urls?.[0] || null;
@@ -272,7 +299,7 @@ serve(async (req) => {
             external_post_id: result.postId,
             error_message: null
           })
-          .eq('id', queue_id);
+          .eq('id', body.queue_id);
 
         // Update the social post status
         if (queueItem.social_post_id) {
@@ -293,7 +320,7 @@ serve(async (req) => {
             error_message: result.error,
             retry_count: retryCount
           })
-          .eq('id', queue_id);
+          .eq('id', body.queue_id);
       }
 
       return new Response(JSON.stringify(result), {
@@ -301,12 +328,12 @@ serve(async (req) => {
       });
     }
 
-    if (action === 'add_to_queue') {
+    if (body.action === 'add_to_queue') {
       // Add a post to the queue
       const { data: post, error: postError } = await supabase
         .from('workspace_social_posts')
         .select('*')
-        .eq('id', post_id)
+        .eq('id', body.post_id)
         .single();
 
       if (postError || !post) {
@@ -316,8 +343,8 @@ serve(async (req) => {
       const { data: queueItem, error: insertError } = await supabase
         .from('social_post_queue')
         .insert({
-          workspace_id,
-          social_post_id: post_id,
+          workspace_id: body.workspace_id,
+          social_post_id: body.post_id,
           platform: post.platform,
           status: 'queued',
           scheduled_for: post.scheduled_for,

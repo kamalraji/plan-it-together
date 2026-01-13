@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
+import { z, uuidSchema, socialPlatformSchema, validationError } from "../_shared/validation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,17 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Zod schemas for social media sync actions
+const syncActionSchema = z.enum(["sync_post_metrics", "sync_platform_stats", "generate_report"]);
+const syncTypeSchema = z.enum(["full", "incremental", "metrics_only"]);
+
+const syncRequestSchema = z.object({
+  action: syncActionSchema,
+  workspace_id: uuidSchema,
+  platform: socialPlatformSchema.optional(),
+  sync_type: syncTypeSchema.optional(),
+});
 
 // Twitter Analytics Sync
 async function syncTwitterAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, any>; error?: string }> {
@@ -202,7 +214,15 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { action, workspace_id, platform, sync_type } = await req.json();
+    const rawBody = await req.json().catch(() => ({}));
+
+    // Validate input with Zod
+    const parseResult = syncRequestSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
+    }
+
+    const { action, workspace_id, platform, sync_type } = parseResult.data;
 
     console.log('Social media sync action:', action, 'platform:', platform);
 

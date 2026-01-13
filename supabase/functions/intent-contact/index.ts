@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  z,
+  emailSchema,
+  shortStringSchema,
+  longStringSchema,
+  validationError,
+} from "../_shared/validation.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -57,20 +64,15 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Input validation
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VALID_INTENTS = ['demo', 'pricing', 'walkthrough', 'general', null];
+// Zod schema for intent contact
+const intentSchema = z.enum(["demo", "pricing", "walkthrough", "general"]);
 
-function validateEmail(email: string): boolean {
-  return EMAIL_REGEX.test(email) && email.length <= 255;
-}
-
-interface IntentContactPayload {
-  intent: string | null;
-  name: string;
-  email: string;
-  message: string;
-}
+const intentContactSchema = z.object({
+  intent: intentSchema.nullable().optional(),
+  name: shortStringSchema,
+  email: emailSchema,
+  message: longStringSchema,
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -110,54 +112,32 @@ serve(async (req) => {
   }
 
   try {
-    const body = (await req.json()) as IntentContactPayload;
+    const rawBody = await req.json().catch(() => ({}));
 
-    // Input validation
-    if (!body.name || body.name.length > 100) {
-      return new Response(
-        JSON.stringify({ error: "Name is required and must be less than 100 characters" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+    // Validate input with Zod
+    const parseResult = intentContactSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
     }
 
-    if (!body.email || !validateEmail(body.email)) {
-      return new Response(
-        JSON.stringify({ error: "Valid email address is required" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+    const { intent, name, email, message } = parseResult.data;
 
-    if (!body.message || body.message.length > 2000) {
-      return new Response(
-        JSON.stringify({ error: "Message is required and must be less than 2000 characters" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    // Validate intent is one of allowed values
-    if (body.intent !== null && !VALID_INTENTS.includes(body.intent)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid intent value" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    const subjectPrefix = body.intent === "demo"
+    const subjectPrefix = intent === "demo"
       ? "Demo request"
-      : body.intent === "pricing"
+      : intent === "pricing"
       ? "Pricing question"
-      : body.intent === "walkthrough"
+      : intent === "walkthrough"
       ? "Guided walkthrough"
       : "Help request";
 
     // Build email body with escaped content
     const emailBody = `
-      Intent: ${escapeHtml(body.intent ?? "general")}
-      Name: ${escapeHtml(body.name)}
-      Email: ${escapeHtml(body.email)}
+      Intent: ${escapeHtml(intent ?? "general")}
+      Name: ${escapeHtml(name)}
+      Email: ${escapeHtml(email)}
 
       Message:
-      ${escapeHtml(body.message)}
+      ${escapeHtml(message)}
     `;
 
     // Get contact email from environment or use default
@@ -166,7 +146,7 @@ serve(async (req) => {
     const emailResponse = await resend.emails.send({
       from: "Thittam1Hub <onboarding@resend.dev>",
       to: [contactEmail],
-      reply_to: body.email,
+      reply_to: email,
       subject: `${subjectPrefix} via Thittam1Hub help form`,
       text: emailBody,
     });

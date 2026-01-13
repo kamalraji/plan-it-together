@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z, uuidSchema, validationError } from "../_shared/validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +10,30 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+// Zod schemas for different actions
+const assignedSubmissionsSchema = z.object({
+  action: z.literal("assignedSubmissions"),
+  eventId: uuidSchema,
+});
+
+const getScoreForSubmissionSchema = z.object({
+  action: z.literal("getScoreForSubmission"),
+  submissionId: uuidSchema,
+});
+
+const submitScoreSchema = z.object({
+  action: z.literal("submitScore"),
+  submissionId: uuidSchema,
+  scores: z.record(z.string(), z.number().min(0).max(100)),
+  comments: z.string().max(2000).optional(),
+});
+
+const requestSchema = z.discriminatedUnion("action", [
+  assignedSubmissionsSchema,
+  getScoreForSubmissionSchema,
+  submitScoreSchema,
+]);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -22,14 +47,15 @@ serve(async (req) => {
   });
 
   try {
-    const { action, eventId, judgeId, submissionId, scores } = await req.json();
-
-    if (!action) {
-      return new Response(JSON.stringify({ error: "Missing action" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const rawBody = await req.json().catch(() => ({}));
+    
+    // Validate request body
+    const parseResult = requestSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return validationError(parseResult.error, corsHeaders);
     }
+
+    const body = parseResult.data;
 
     // Resolve current user
     const {
@@ -44,14 +70,7 @@ serve(async (req) => {
       });
     }
 
-    if (action === "assignedSubmissions") {
-      if (!eventId) {
-        return new Response(JSON.stringify({ error: "Missing eventId" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
+    if (body.action === "assignedSubmissions") {
       // Judges should only see submissions explicitly assigned to them
       const { data: assignments, error: assignmentsError } = await supabaseClient
         .from("judge_assignments")
@@ -79,7 +98,7 @@ serve(async (req) => {
         .from("submissions")
         .select("*")
         .in("id", submissionIds)
-        .eq("event_id", eventId)
+        .eq("event_id", body.eventId)
         .order("created_at", { ascending: true });
 
       if (error) {
@@ -108,19 +127,12 @@ serve(async (req) => {
       });
     }
 
-    if (action === "getScoreForSubmission") {
-      if (!submissionId) {
-        return new Response(JSON.stringify({ error: "Missing submissionId" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
+    if (body.action === "getScoreForSubmission") {
       // Ensure this judge is assigned to the submission before revealing any score
       const { data: assignment, error: assignmentError } = await supabaseClient
         .from("judge_assignments")
         .select("id")
-        .eq("submission_id", submissionId)
+        .eq("submission_id", body.submissionId)
         .eq("judge_id", user.id)
         .maybeSingle();
 
@@ -142,7 +154,7 @@ serve(async (req) => {
       const { data, error } = await supabaseClient
         .from("scores")
         .select("*")
-        .eq("submission_id", submissionId)
+        .eq("submission_id", body.submissionId)
         .eq("judge_id", user.id)
         .maybeSingle();
 
@@ -177,19 +189,12 @@ serve(async (req) => {
       });
     }
 
-    if (action === "submitScore") {
-      if (!submissionId || !scores) {
-        return new Response(JSON.stringify({ error: "Missing submissionId or scores" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
+    if (body.action === "submitScore") {
       // Ensure this judge is assigned to the submission before allowing scoring
       const { data: assignment, error: assignmentError } = await supabaseClient
         .from("judge_assignments")
         .select("id")
-        .eq("submission_id", submissionId)
+        .eq("submission_id", body.submissionId)
         .eq("judge_id", user.id)
         .maybeSingle();
 
@@ -212,7 +217,7 @@ serve(async (req) => {
       const { data: submission, error: subError } = await supabaseClient
         .from("submissions")
         .select("*")
-        .eq("id", submissionId)
+        .eq("id", body.submissionId)
         .single();
 
       if (subError || !submission) {
@@ -240,7 +245,7 @@ serve(async (req) => {
       const criteria = (rubric.criteria as any[]) ?? [];
       for (const c of criteria) {
         if (!c.id) continue;
-        const value = scores[c.id];
+        const value = body.scores[c.id];
         if (value === undefined || value === null) {
           return new Response(
             JSON.stringify({ error: `Missing score for criterion ${c.name}` }),
@@ -267,10 +272,11 @@ serve(async (req) => {
         .from("scores")
         .upsert(
           {
-            submission_id: submissionId,
+            submission_id: body.submissionId,
             judge_id: user.id,
             rubric_id: submission.rubric_id,
-            scores,
+            scores: body.scores,
+            comments: body.comments ?? null,
             updated_at: new Date().toISOString(),
           },
           { onConflict: "submission_id,judge_id" },
