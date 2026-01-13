@@ -221,7 +221,7 @@ export function CertificatesSettingsPanel({
                 </DialogHeader>
                 <CertificateTemplateDesigner
                   workspaceId={workspaceId}
-                  onSave={handleCreateTemplate}
+                  onSave={(data) => handleCreateTemplate(data as CreateTemplateInput)}
                   onCancel={() => setIsDesignerOpen(false)}
                   isSaving={isCreating}
                 />

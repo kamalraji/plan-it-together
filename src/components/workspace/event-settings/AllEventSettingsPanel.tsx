@@ -6,9 +6,10 @@ import { PromoCodeManager } from '@/components/events/settings/PromoCodeManager'
 import { SEOSettingsCard } from '@/components/events/settings/SEOSettingsCard';
 import { AccessibilitySettingsCard } from '@/components/events/settings/AccessibilitySettingsCard';
 import { LandingPageSettingsPanel } from './LandingPageSettingsPanel';
+import { CertificatesSettingsPanel } from './CertificatesSettingsPanel';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TicketIcon, Tag, SearchIcon, AccessibilityIcon, Paintbrush } from 'lucide-react';
+import { TicketIcon, Tag, SearchIcon, AccessibilityIcon, Paintbrush, Award } from 'lucide-react';
 
 interface AllEventSettingsPanelProps {
   eventId: string;
@@ -63,7 +64,7 @@ export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({
       </div>
 
       <Tabs defaultValue="landing-page" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="landing-page" className="flex items-center gap-2">
             <Paintbrush className="h-4 w-4" />
             <span className="hidden sm:inline">Landing Page</span>
@@ -83,6 +84,10 @@ export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({
           <TabsTrigger value="accessibility" className="flex items-center gap-2">
             <AccessibilityIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Accessibility</span>
+          </TabsTrigger>
+          <TabsTrigger value="certificates" className="flex items-center gap-2">
+            <Award className="h-4 w-4" />
+            <span className="hidden sm:inline">Certificates</span>
           </TabsTrigger>
         </TabsList>
 
@@ -120,6 +125,14 @@ export const AllEventSettingsPanel: React.FC<AllEventSettingsPanelProps> = ({
             eventId={eventId} 
             branding={branding} 
             onUpdate={() => refetch()} 
+          />
+        </TabsContent>
+
+        <TabsContent value="certificates" className="mt-6 space-y-6">
+          <CertificatesSettingsPanel 
+            eventId={eventId}
+            workspaceId={workspaceId}
+            isRootOwner={isRootOwner}
           />
         </TabsContent>
       </Tabs>
