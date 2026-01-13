@@ -57,6 +57,13 @@ export function CertificateDesignStudio({
     toast.success(`Loaded "${template.name}" template`);
   };
 
+  const handleLoadAIDesign = (canvasJSON: object) => {
+    if (fabricCanvas) {
+      fabricCanvas.loadFromJSON(canvasJSON).then(() => fabricCanvas.renderAll());
+      toast.success('AI-generated design loaded!');
+    }
+  };
+
   const handleSave = async () => {
     if (!canvasRef.current) return;
     setIsSaving(true);
@@ -165,6 +172,7 @@ export function CertificateDesignStudio({
           onOpenGallery={() => setGalleryOpen(true)}
           onDeleteSelected={() => canvasRef.current?.deleteSelected()}
           onClearCanvas={() => canvasRef.current?.clearCanvas()}
+          onLoadAIDesign={handleLoadAIDesign}
         />
 
         {/* Canvas area */}
