@@ -1,16 +1,17 @@
-import React from 'react';
+
 import { AppRouter } from './components/routing';
 import { ErrorBoundary } from './components/routing';
+import { ThemeProvider } from './components/theme/ThemeProvider';
 import './index.css';
 
 function App() {
   return (
     <ErrorBoundary>
-      <React.Fragment>
+      <ThemeProvider>
         <div className="App" data-app-root>
           <AppRouter />
         </div>
-      </React.Fragment>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

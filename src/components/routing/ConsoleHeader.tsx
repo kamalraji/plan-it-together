@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { GlobalSearch } from './GlobalSearch';
 import { NotificationCenter } from './NotificationCenter';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 interface ConsoleHeaderProps {
   user: any;
@@ -259,9 +260,12 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
          </div>
 
          {/* Right Section */}
-         <div className="flex items-center gap-3 sm:gap-4">
-           {/* Notification Center */}
-           <NotificationCenter />
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Notification Center */}
+            <NotificationCenter />
  
            {/* User Menu */}
            <div className="relative" ref={userMenuRef}>
