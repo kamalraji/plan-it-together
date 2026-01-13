@@ -1,27 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, Receipt, TrendingUp, AlertTriangle } from 'lucide-react';
+import { DollarSign, Receipt, TrendingUp, AlertTriangle, FileText } from 'lucide-react';
+import { useWorkspaceExpenses } from '@/hooks/useWorkspaceExpenses';
+import { useWorkspaceInvoices } from '@/hooks/useWorkspaceInvoices';
 
 interface FinanceDepartmentStatsCardsProps {
   workspaceId: string;
 }
 
 export function FinanceDepartmentStatsCards({ workspaceId }: FinanceDepartmentStatsCardsProps) {
-  // Fetch child committees
-  const { data: committees = [] } = useQuery({
-    queryKey: ['finance-dept-committees', workspaceId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('workspaces')
-        .select('id, name')
-        .eq('parent_workspace_id', workspaceId)
-        .eq('workspace_type', 'COMMITTEE');
-      if (error) throw error;
-      return data;
-    },
-  });
-
   // Fetch budget data
   const { data: budget } = useQuery({
     queryKey: ['finance-dept-budget', workspaceId],
@@ -50,60 +38,78 @@ export function FinanceDepartmentStatsCards({ workspaceId }: FinanceDepartmentSt
     },
   });
 
+  // Get expense stats
+  const { stats: expenseStats } = useWorkspaceExpenses(workspaceId);
+
+  // Get invoice stats
+  const { stats: invoiceStats } = useWorkspaceInvoices(workspaceId);
+
   const totalBudget = budget?.allocated || 0;
   const usedBudget = budget?.used || 0;
   const remainingBudget = totalBudget - usedBudget;
   const utilizationRate = totalBudget > 0 ? Math.round((usedBudget / totalBudget) * 100) : 0;
-  const pendingAmount = pendingRequests.reduce((sum, req) => sum + (req.requested_amount || 0), 0);
+
+  const formatCurrency = (amount: number) => {
+    if (amount >= 100000) {
+      return `₹${(amount / 100000).toFixed(1)}L`;
+    } else if (amount >= 1000) {
+      return `₹${(amount / 1000).toFixed(1)}k`;
+    }
+    return `₹${amount.toLocaleString()}`;
+  };
 
   const stats = [
     {
       label: 'Total Budget',
-      value: `$${(totalBudget / 1000).toFixed(1)}k`,
-      subtext: `${committees.length} committees`,
+      value: formatCurrency(totalBudget),
+      subtext: `${utilizationRate}% utilized`,
       icon: DollarSign,
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
     },
     {
-      label: 'Spent',
-      value: `$${(usedBudget / 1000).toFixed(1)}k`,
-      subtext: `${utilizationRate}% utilized`,
+      label: 'Expenses',
+      value: formatCurrency(expenseStats.total),
+      subtext: `${expenseStats.pending > 0 ? formatCurrency(expenseStats.pending) + ' pending' : 'All processed'}`,
       icon: Receipt,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
     },
     {
-      label: 'Remaining',
-      value: `$${(remainingBudget / 1000).toFixed(1)}k`,
-      subtext: 'Available funds',
-      icon: TrendingUp,
-      color: remainingBudget > 0 ? 'text-emerald-500' : 'text-red-500',
-      bgColor: remainingBudget > 0 ? 'bg-emerald-500/10' : 'bg-red-500/10',
+      label: 'Invoices Outstanding',
+      value: formatCurrency(invoiceStats.totalOutstanding),
+      subtext: invoiceStats.overdueCount > 0 
+        ? `${invoiceStats.overdueCount} overdue`
+        : `${invoiceStats.sentCount} awaiting payment`,
+      icon: FileText,
+      color: invoiceStats.overdueCount > 0 ? 'text-amber-500' : 'text-purple-500',
+      bgColor: invoiceStats.overdueCount > 0 ? 'bg-amber-500/10' : 'bg-purple-500/10',
     },
     {
-      label: 'Pending',
-      value: `$${(pendingAmount / 1000).toFixed(1)}k`,
-      subtext: `${pendingRequests.length} requests`,
-      icon: AlertTriangle,
-      color: pendingRequests.length > 0 ? 'text-yellow-500' : 'text-muted-foreground',
-      bgColor: pendingRequests.length > 0 ? 'bg-yellow-500/10' : 'bg-muted/50',
+      label: 'Remaining',
+      value: formatCurrency(remainingBudget),
+      subtext: pendingRequests.length > 0 
+        ? `${pendingRequests.length} pending requests`
+        : 'Available funds',
+      icon: remainingBudget > 0 ? TrendingUp : AlertTriangle,
+      color: remainingBudget > 0 ? 'text-emerald-500' : 'text-red-500',
+      bgColor: remainingBudget > 0 ? 'bg-emerald-500/10' : 'bg-red-500/10',
     },
   ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="border-border">
+        <Card key={stat.label} className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <div className="min-w-0">
+                <p className="text-xl font-bold text-foreground truncate">{stat.value}</p>
                 <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                <p className="text-xs text-muted-foreground/70">{stat.subtext}</p>
+                <p className="text-xs text-muted-foreground/70 truncate">{stat.subtext}</p>
               </div>
             </div>
           </CardContent>

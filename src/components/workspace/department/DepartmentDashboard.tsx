@@ -19,6 +19,7 @@ import { ContentDepartmentDashboard } from './content';
 import { OperationsDepartmentDashboard } from './operations';
 import { GrowthDepartmentDashboard } from './growth';
 import { VolunteersDepartmentDashboard } from './volunteers';
+import { TechFinanceDepartmentDashboard } from './TechFinanceDepartmentDashboard';
 
 interface DepartmentDashboardProps {
   workspace: Workspace;
@@ -37,38 +38,59 @@ export function DepartmentDashboard({
   // Extract department type from workspace name
   const departmentType = workspace.name.toLowerCase();
 
-  // Check if this is a tech department - render specialized dashboard
-  const isTechDepartment = departmentType.includes('tech') || 
+  // Check if this is a combined Tech & Finance department
+  const isTechFinanceDepartment = 
+    (departmentType.includes('tech') && departmentType.includes('finance')) ||
+    departmentType.includes('tech & finance') ||
+    departmentType.includes('tech and finance');
+
+  // Check if this is a tech-only department
+  const isTechDepartment = !isTechFinanceDepartment && (
+    departmentType.includes('tech') || 
     departmentType.includes('it') ||
     departmentType.includes('technology') ||
-    departmentType.includes('infrastructure');
+    departmentType.includes('infrastructure')
+  );
 
-  // Check if this is a finance department - render specialized dashboard
-  const isFinanceDepartment = departmentType.includes('finance') || 
+  // Check if this is a finance-only department
+  const isFinanceDepartment = !isTechFinanceDepartment && (
+    departmentType.includes('finance') || 
     departmentType.includes('accounting') ||
     departmentType.includes('budget') ||
-    departmentType.includes('treasury');
+    departmentType.includes('treasury')
+  );
 
-  // Check if this is a content department - render specialized dashboard
+  // Check if this is a content department
   const isContentDepartment = departmentType.includes('content') || 
     departmentType.includes('editorial') ||
     departmentType.includes('programming') ||
     departmentType.includes('creative');
 
-  // Check if this is an operations department - render specialized dashboard
+  // Check if this is an operations department
   const isOperationsDepartment = departmentType.includes('operation') || 
     departmentType.includes('ops') ||
     departmentType.includes('execution') ||
     departmentType.includes('coordination');
 
-  // Check if this is a growth department - render specialized dashboard
+  // Check if this is a growth department
   const isGrowthDepartment = departmentType.includes('growth') || 
     departmentType.includes('outreach') ||
     (departmentType.includes('marketing') && departmentType.includes('comm'));
 
-  // Check if this is a volunteers department - render specialized dashboard
+  // Check if this is a volunteers department
   const isVolunteersDepartment = departmentType.includes('volunteer') || 
     departmentType.includes('volunteering');
+
+  // Combined Tech & Finance department
+  if (isTechFinanceDepartment) {
+    return (
+      <TechFinanceDepartmentDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        onViewTasks={onViewTasks}
+      />
+    );
+  }
 
   if (isTechDepartment) {
     return (

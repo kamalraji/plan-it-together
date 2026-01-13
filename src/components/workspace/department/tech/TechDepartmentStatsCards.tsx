@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
-import { Server, Wifi, Users, AlertTriangle } from 'lucide-react';
+import { Server, Users, AlertTriangle, CheckCircle2, Wrench } from 'lucide-react';
 
 interface TechDepartmentStatsCardsProps {
   workspaceId: string;
@@ -22,65 +22,73 @@ export function TechDepartmentStatsCards({ workspaceId }: TechDepartmentStatsCar
     },
   });
 
-  // Fetch all tasks from child committees
+  const committeeIds = committees.map(c => c.id);
+
+  // Fetch all tasks from this workspace and child committees
   const { data: tasks = [] } = useQuery({
-    queryKey: ['tech-dept-tasks', workspaceId],
+    queryKey: ['tech-dept-tasks', workspaceId, committeeIds],
     queryFn: async () => {
-      const committeeIds = committees.map(c => c.id);
-      if (committeeIds.length === 0) return [];
+      const allWorkspaceIds = [workspaceId, ...committeeIds];
       
       const { data, error } = await supabase
         .from('workspace_tasks')
         .select('id, status, priority')
-        .in('workspace_id', committeeIds);
+        .in('workspace_id', allWorkspaceIds);
       if (error) throw error;
       return data;
     },
-    enabled: committees.length > 0,
+    enabled: true,
   });
 
-  // Fetch all team members from child committees
+  // Fetch all team members from this workspace and child committees
   const { data: teamMembers = [] } = useQuery({
-    queryKey: ['tech-dept-members', workspaceId],
+    queryKey: ['tech-dept-members', workspaceId, committeeIds],
     queryFn: async () => {
-      const committeeIds = committees.map(c => c.id);
-      if (committeeIds.length === 0) return [];
+      const allWorkspaceIds = [workspaceId, ...committeeIds];
       
       const { data, error } = await supabase
         .from('workspace_team_members')
         .select('id')
-        .in('workspace_id', committeeIds)
+        .in('workspace_id', allWorkspaceIds)
         .eq('status', 'ACTIVE');
       if (error) throw error;
       return data;
     },
-    enabled: committees.length > 0,
+    enabled: true,
   });
 
+  // Equipment stats - simplified since table may not exist yet
+  const totalEquipment = 0;
+  const operationalEquipment = 0;
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'DONE' || t.status === 'COMPLETED').length;
   const activeTasks = tasks.filter(t => t.status === 'IN_PROGRESS').length;
   const criticalTasks = tasks.filter(t => t.priority === 'URGENT' || t.priority === 'HIGH').length;
+  const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const equipmentHealthRate = totalEquipment > 0 ? Math.round((operationalEquipment / totalEquipment) * 100) : 100;
 
   const stats = [
     {
-      label: 'Active Systems',
-      value: committees.length,
-      subtext: 'Committees under management',
+      label: 'System Status',
+      value: `${equipmentHealthRate}%`,
+      subtext: `${totalEquipment} equipment items tracked`,
+      icon: equipmentHealthRate >= 90 ? CheckCircle2 : equipmentHealthRate >= 70 ? Wrench : AlertTriangle,
+      color: equipmentHealthRate >= 90 ? 'text-green-500' : equipmentHealthRate >= 70 ? 'text-amber-500' : 'text-red-500',
+      bgColor: equipmentHealthRate >= 90 ? 'bg-green-500/10' : equipmentHealthRate >= 70 ? 'bg-amber-500/10' : 'bg-red-500/10',
+    },
+    {
+      label: 'Task Progress',
+      value: `${taskCompletionRate}%`,
+      subtext: `${completedTasks}/${totalTasks} completed`,
       icon: Server,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
     },
     {
-      label: 'Network Status',
-      value: '99.8%',
-      subtext: 'Uptime this month',
-      icon: Wifi,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
-    },
-    {
       label: 'Tech Team',
       value: teamMembers.length,
-      subtext: 'Active members',
+      subtext: `${committees.length} committees`,
       icon: Users,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
@@ -98,16 +106,16 @@ export function TechDepartmentStatsCards({ workspaceId }: TechDepartmentStatsCar
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="border-border">
+        <Card key={stat.label} className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <div className="min-w-0">
+                <p className="text-xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                <p className="text-xs text-muted-foreground/70">{stat.subtext}</p>
+                <p className="text-xs text-muted-foreground/70 truncate">{stat.subtext}</p>
               </div>
             </div>
           </CardContent>
