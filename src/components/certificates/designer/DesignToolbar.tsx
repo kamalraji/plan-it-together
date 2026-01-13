@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +9,7 @@ import {
   Minus,
   LayoutTemplate,
   Trash2,
+  Sparkles,
 } from 'lucide-react';
 import { getPlaceholdersByCategory } from '@/lib/certificate-placeholders';
 import {
@@ -16,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { AIDesignDialog } from './AIDesignDialog';
 
 interface DesignToolbarProps {
   onAddText: (text: string) => void;
@@ -25,6 +28,7 @@ interface DesignToolbarProps {
   onOpenGallery: () => void;
   onDeleteSelected: () => void;
   onClearCanvas: () => void;
+  onLoadAIDesign?: (canvasJSON: object) => void;
 }
 
 export function DesignToolbar({
@@ -35,7 +39,9 @@ export function DesignToolbar({
   onOpenGallery,
   onDeleteSelected,
   onClearCanvas,
+  onLoadAIDesign,
 }: DesignToolbarProps) {
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const placeholdersByCategory = getPlaceholdersByCategory();
 
   const categoryLabels: Record<string, string> = {
@@ -43,6 +49,10 @@ export function DesignToolbar({
     event: '📅 Event',
     certificate: '📜 Certificate',
     custom: '⚙️ Custom',
+  };
+
+  const handleAIDesignGenerated = (canvasJSON: object) => {
+    onLoadAIDesign?.(canvasJSON);
   };
 
   return (
@@ -53,6 +63,19 @@ export function DesignToolbar({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
+          {/* AI Design */}
+          <div>
+            <Button
+              className="w-full justify-start gap-2 bg-gradient-to-r from-primary to-primary/80"
+              onClick={() => setAiDialogOpen(true)}
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Design Generator
+            </Button>
+          </div>
+
+          <Separator />
+
           {/* Templates */}
           <div>
             <Button
@@ -166,6 +189,13 @@ export function DesignToolbar({
           </div>
         </div>
       </ScrollArea>
+
+      {/* AI Design Dialog */}
+      <AIDesignDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        onDesignGenerated={handleAIDesignGenerated}
+      />
     </div>
   );
 }
