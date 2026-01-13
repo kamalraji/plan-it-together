@@ -664,38 +664,23 @@ serve(async (req) => {
       
       const workspace = await getWorkspaceWithEvent(workspaceId);
 
-      // Fetch certificates without joining user_profiles (no FK exists)
-      const { data: certsData, error: certsError } = await supabaseClient
+      // Fetch certificates with FK join to user_profiles
+      const { data, error } = await supabaseClient
         .from("certificates")
         .select(
           `id, certificate_id, recipient_id, event_id, type, pdf_url, qr_payload, issued_at, distributed_at, template_id,
+           user_profiles!certificates_recipient_id_fkey ( id, full_name ),
            events!inner ( id, name )`
         )
         .eq("workspace_id", workspaceId)
         .order("issued_at", { ascending: false });
 
-      if (certsError) {
-        console.error("certificates:listWorkspaceCertificates error", certsError);
-        return errorResponse(certsError.message, 500);
+      if (error) {
+        console.error("certificates:listWorkspaceCertificates error", error);
+        return errorResponse(error.message, 500);
       }
 
-      // Fetch recipient profiles separately
-      const recipientIds = [...new Set((certsData ?? []).map((c: any) => c.recipient_id).filter(Boolean))];
-      let profilesMap: Record<string, string> = {};
-      
-      if (recipientIds.length > 0) {
-        const { data: profilesData } = await supabaseClient
-          .from("user_profiles")
-          .select("id, full_name")
-          .in("id", recipientIds);
-        
-        profilesMap = (profilesData ?? []).reduce((acc: Record<string, string>, p: any) => {
-          acc[p.id] = p.full_name ?? "Participant";
-          return acc;
-        }, {});
-      }
-
-      const mapped = (certsData ?? []).map((row: any) => ({
+      const mapped = (data ?? []).map((row: any) => ({
         id: row.id,
         certificateId: row.certificate_id,
         recipientId: row.recipient_id,
@@ -707,7 +692,7 @@ serve(async (req) => {
         distributedAt: row.distributed_at ?? undefined,
         templateId: row.template_id,
         recipient: {
-          name: profilesMap[row.recipient_id] ?? "Participant",
+          name: row.user_profiles?.full_name ?? "Participant",
           email: "",
         },
       }));
