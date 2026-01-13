@@ -253,53 +253,114 @@ serve(async (req) => {
 
     console.log(`[AI_REQUEST] user: ${userId}, workspace: ${workspaceId}, type: ${certificateType}, style: ${style}`);
 
-    const systemPrompt = `You are a professional certificate designer. Generate Fabric.js canvas JSON for a certificate design.
+    // Style-specific design guidelines
+    const styleGuidelines: Record<string, string> = {
+      elegant: `
+- Use serif fonts like "Georgia", "Playfair Display", or "Times New Roman" for headers
+- Add ornate corner decorations with curved lines and flourishes
+- Include a gold/bronze accent gradient effect using multiple layered shapes
+- Create a double or triple border frame with elegant spacing
+- Add subtle decorative dividers between sections
+- Use italics for secondary text elements`,
+      modern: `
+- Use clean sans-serif fonts like "Helvetica", "Arial", or "Montserrat"
+- Create bold geometric shapes as accent elements (circles, rectangles with rounded corners)
+- Use asymmetric layouts with left or right alignment
+- Add a bold accent stripe or gradient bar across one edge
+- Minimize decorative elements - let whitespace do the work
+- Use large, bold typography for the title with tight letter spacing`,
+      corporate: `
+- Use professional sans-serif fonts like "Arial", "Calibri", or "Open Sans"
+- Create a clean header bar with the primary color
+- Add a subtle watermark pattern in the background
+- Include a formal seal placeholder (circle with inner circle)
+- Use structured, centered alignment throughout
+- Add horizontal rule dividers between sections`,
+      creative: `
+- Use playful display fonts for headers
+- Add vibrant gradient backgrounds using multiple overlapping shapes
+- Include artistic brush stroke effects (irregular rectangles/shapes)
+- Create dynamic diagonal or curved accent elements
+- Use bold, contrasting colors throughout
+- Add decorative confetti or abstract shapes in corners`,
+      academic: `
+- Use traditional serif fonts like "Times New Roman" or "Garamond"
+- Include a formal laurel wreath or similar classical decoration (using shapes)
+- Add a formal seal at the bottom center
+- Use a parchment-like off-white background color (#faf8f5)
+- Include formal horizontal rules with decorative ends
+- Create a classic double-line border frame`,
+    };
 
-The canvas dimensions are 842x595 pixels (A4 landscape at 72 DPI).
+    const systemPrompt = `You are an award-winning certificate designer creating stunning, professional Fabric.js canvas JSON designs.
 
-IMPORTANT: Return ONLY valid JSON, no markdown or explanation. The response must be a valid Fabric.js canvas JSON object.
+CANVAS SPECIFICATIONS:
+- Dimensions: 842x595 pixels (A4 landscape at 72 DPI)
+- Background: Use a gradient effect by layering rectangles, or a solid elegant color
 
-Design guidelines:
-- Use elegant, professional typography
-- Include placeholder text elements for dynamic content using these exact keys: {recipient_name}, {event_name}, {issue_date}, {certificate_id}
-- Create a visually balanced layout with proper spacing
-- Use the specified colors for accents and text
-- Add decorative elements (lines, shapes) that complement the style
-- Position elements appropriately:
-  - Title/header at top
-  - Recipient name prominently in center
-  - Event details below recipient
-  - Certificate ID and date at bottom
-  - Decorative borders or accents as appropriate
+CRITICAL REQUIREMENTS:
+1. Return ONLY valid JSON - no markdown, no explanation, no backticks
+2. The response must be a complete Fabric.js canvas JSON object
+3. Use these EXACT dynamic placeholders in text: {recipient_name}, {event_name}, {issue_date}, {certificate_id}
 
-Fabric.js object structure must include:
-- version: "6.0.0"
-- objects: array of fabric objects (IText, Rect, Line, Circle, etc.)
+DESIGN EXCELLENCE GUIDELINES:
+${styleGuidelines[style as keyof typeof styleGuidelines] || styleGuidelines.elegant}
 
-For text objects use type "i-text" with properties: left, top, text, fontSize, fontFamily, fill, fontWeight, textAlign, originX, originY.
-For shapes use type "rect", "circle", or "line" with appropriate properties.`;
+FABRIC.JS OBJECT SPECIFICATIONS:
+- Canvas structure: { "version": "6.0.0", "objects": [...] }
+- Text objects: Use type "i-text" with: left, top, text, fontSize, fontFamily, fill, fontWeight, textAlign, originX, originY, charSpacing, lineHeight
+- Rectangles: type "rect" with: left, top, width, height, fill, stroke, strokeWidth, rx, ry (for rounded corners), angle, opacity
+- Circles: type "circle" with: left, top, radius, fill, stroke, strokeWidth, opacity
+- Lines: type "line" with: x1, y1, x2, y2, stroke, strokeWidth, opacity
 
-    const userPrompt = `Generate a certificate design with these specifications:
+VISUAL HIERARCHY (from most to least prominent):
+1. Recipient name: 36-48px, bold, primary color, center - THE STAR of the design
+2. Certificate title: 28-36px, uppercase, letterSpacing: 200-400
+3. Event name: 20-24px, secondary emphasis
+4. Supporting text: 14-16px, subtle coloring
+5. Date and ID: 10-12px, footer positioning
 
-Event Theme: ${eventTheme}
-Certificate Type: ${certificateType}
-Primary Color: ${primaryColor}
-Secondary Color: ${secondaryColor}
-Style Preference: ${style}
-${additionalNotes ? `Additional Notes: ${additionalNotes}` : ''}
+LAYERING ORDER (bottom to top):
+1. Background shapes/gradients
+2. Border frames and decorative elements
+3. Accent shapes and dividers
+4. Text content (supporting → main → title)
 
-Create a complete Fabric.js canvas JSON with:
-1. A decorative border or frame
-2. Certificate title (e.g., "Certificate of ${certificateType}")
-3. Placeholder text "{recipient_name}" styled prominently
-4. Text for "has successfully completed" or similar
-5. Placeholder "{event_name}" for the event
-6. Date placeholder "{issue_date}"
-7. Certificate ID placeholder "{certificate_id}"
-8. Decorative elements matching the theme
-9. Space for signature and logo (placeholder areas)
+COLORS TO USE:
+- Primary: ${primaryColor}
+- Secondary/Accent: ${secondaryColor}
+- Text Dark: #1a1a2e (for main text)
+- Text Light: #4a4a68 (for supporting text)
+- Background: #ffffff or subtle tint of primary
 
-Return only the JSON object, no additional text.`;
+CREATE A VISUALLY STUNNING DESIGN THAT:
+- Has clear visual hierarchy guiding the eye
+- Uses the primary color strategically (not overwhelming)
+- Includes at least 3-4 decorative elements (borders, shapes, dividers)
+- Balances whitespace with content
+- Feels premium and worth framing`;
+
+    const userPrompt = `Design a stunning "${certificateType}" certificate for:
+
+EVENT: ${eventTheme}
+STYLE: ${style} - apply the style guidelines precisely
+PRIMARY COLOR: ${primaryColor}
+ACCENT COLOR: ${secondaryColor}
+${additionalNotes ? `SPECIAL REQUESTS: ${additionalNotes}` : ''}
+
+Required elements:
+1. DECORATIVE FRAME: Create an impressive border (double-line, ornate corners, or modern geometric)
+2. TITLE: "Certificate of ${certificateType}" - make it commanding
+3. RECIPIENT PLACEHOLDER: "{recipient_name}" - this should be the visual centerpiece, styled beautifully
+4. BODY TEXT: "This certificate is presented to" or similar elegant phrasing
+5. EVENT PLACEHOLDER: "{event_name}" - styled to complement the recipient name
+6. ACHIEVEMENT TEXT: Describe what was achieved (e.g., "for outstanding participation in", "for successful completion of")
+7. DATE: "{issue_date}" positioned elegantly
+8. CERTIFICATE ID: "{certificate_id}" small and subtle at the bottom
+9. SIGNATURE AREA: A line with "Authorized Signature" text below
+10. DECORATIVE ACCENTS: Add style-appropriate flourishes, shapes, or design elements
+
+Make this certificate look like something people would proudly display. Return ONLY the JSON object.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
