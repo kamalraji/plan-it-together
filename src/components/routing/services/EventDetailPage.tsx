@@ -437,6 +437,8 @@ const AnalyticsTab: React.FC<{ event: Event }> = ({ event }) => (
 const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
   const { orgSlug } = useParams<{ orgSlug?: string }>();
   const { user, isLoading } = useAuth();
+  // Access is now controlled by canManage in the parent component's tab definition
+  // This tab is only rendered for users who can manage the event
 
   const checkInPath = orgSlug
     ? `/${orgSlug}/eventmanagement/${event.id}/check-in`
@@ -450,18 +452,18 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
     );
   }
 
+  // Access check now based on user role (admin/organizer) - workspace access is handled at route level
   const hasAccess =
     user &&
     (user.role === UserRole.SUPER_ADMIN ||
-      user.role === UserRole.ORGANIZER ||
-      user.role === UserRole.VOLUNTEER);
+      user.role === UserRole.ORGANIZER);
 
   if (!hasAccess) {
     return (
       <div className="bg-card rounded-lg border border-border p-6">
         <h3 className="text-lg font-medium text-foreground mb-2">Restricted Access</h3>
         <p className="text-sm text-muted-foreground">
-          Attendance analytics are only available to organizers and volunteers for this event.
+          Attendance analytics are only available to organizers for this event.
         </p>
       </div>
     );

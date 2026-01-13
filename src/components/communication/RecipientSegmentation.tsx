@@ -51,11 +51,10 @@ export function RecipientSegmentation({
     onCriteriaChange({});
   };
 
+  // Note: Judges, Volunteers, and Speakers are now managed via workspace roles
+  // and should be targeted through workspace-based segmentation in a future enhancement
   const roleOptions = [
     { value: UserRole.PARTICIPANT, label: 'Participants', description: 'Event attendees' },
-    { value: UserRole.JUDGE, label: 'Judges', description: 'Competition judges' },
-    { value: UserRole.VOLUNTEER, label: 'Volunteers', description: 'Event volunteers' },
-    { value: UserRole.SPEAKER, label: 'Speakers', description: 'Event speakers' },
     { value: UserRole.ORGANIZER, label: 'Organizers', description: 'Event organizers' },
   ];
 
