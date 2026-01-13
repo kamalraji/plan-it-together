@@ -227,11 +227,8 @@ serve(async (req) => {
       }
 
       const priority: Record<AppRole, number> = {
-        admin: 6,
-        organizer: 5,
-        judge: 4,
-        volunteer: 3,
-        speaker: 2,
+        admin: 3,
+        organizer: 2,
         participant: 1,
       };
 
