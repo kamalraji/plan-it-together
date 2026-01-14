@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.generate-certificate-design]
 verify_jwt = false
+
+[functions.generate-idcard-design]
+verify_jwt = false

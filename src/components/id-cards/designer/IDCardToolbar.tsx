@@ -10,6 +10,7 @@ import {
   Trash2,
   QrCode,
   User,
+  Sparkles,
 } from 'lucide-react';
 import { getIDCardPlaceholdersByCategory } from '../templates';
 import {
@@ -27,6 +28,7 @@ interface IDCardToolbarProps {
   onAddQrPlaceholder: () => Promise<void>;
   onAddPhotoPlaceholder: () => Promise<void>;
   onOpenGallery: () => void;
+  onOpenAIDialog: () => void;
   onDeleteSelected: () => void;
   onClearCanvas: () => void;
 }
@@ -39,6 +41,7 @@ export function IDCardToolbar({
   onAddQrPlaceholder,
   onAddPhotoPlaceholder,
   onOpenGallery,
+  onOpenAIDialog,
   onDeleteSelected,
   onClearCanvas,
 }: IDCardToolbarProps) {
@@ -58,6 +61,19 @@ export function IDCardToolbar({
 
       <ScrollArea className="flex-1">
         <div className="p-3 space-y-3">
+          {/* AI Design Generator */}
+          <div>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 border-purple-200"
+              size="sm"
+              onClick={onOpenAIDialog}
+            >
+              <Sparkles className="h-4 w-4 text-purple-600" />
+              AI Design Generator
+            </Button>
+          </div>
+
           {/* Templates */}
           <div>
             <Button

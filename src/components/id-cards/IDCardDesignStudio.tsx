@@ -6,6 +6,7 @@ import { IDCardCanvas, IDCardCanvasRef } from './designer/IDCardCanvas';
 import { IDCardToolbar } from './designer/IDCardToolbar';
 import { IDCardTemplateGallery } from './designer/IDCardTemplateGallery';
 import { IDCardPreviewPanel } from './designer/IDCardPreviewPanel';
+import { AIDesignDialog } from './designer/AIDesignDialog';
 import { PropertiesPanel } from '@/components/certificates/designer/PropertiesPanel';
 import { IDCardTemplatePreset, IDCardOrientation } from './templates';
 import { toast } from 'sonner';
@@ -32,6 +33,7 @@ export function IDCardDesignStudio({
   onSave,
   onCancel,
   templateName = 'Untitled Template',
+  workspaceId,
 }: IDCardDesignStudioProps) {
   const canvasRef = useRef<IDCardCanvasRef>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
@@ -41,6 +43,13 @@ export function IDCardDesignStudio({
   const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState(templateName);
   const [orientation, setOrientation] = useState<IDCardOrientation>('landscape');
+  const [aiDialogOpen, setAIDialogOpen] = useState(false);
+
+  const handleAIDesignGenerated = (canvasJSON: object) => {
+    fabricCanvas?.loadFromJSON(canvasJSON).then(() => {
+      fabricCanvas?.renderAll();
+    });
+  };
   const handleCanvasReady = useCallback((canvas: FabricCanvas) => {
     setFabricCanvas(canvas);
     if (initialData) {
@@ -151,6 +160,7 @@ export function IDCardDesignStudio({
           onAddQrPlaceholder={() => canvasRef.current?.addQrPlaceholder() || Promise.resolve()}
           onAddPhotoPlaceholder={() => canvasRef.current?.addPhotoPlaceholder() || Promise.resolve()}
           onOpenGallery={() => setGalleryOpen(true)}
+          onOpenAIDialog={() => setAIDialogOpen(true)}
           onDeleteSelected={() => canvasRef.current?.deleteSelected()}
           onClearCanvas={() => canvasRef.current?.clearCanvas()}
         />
@@ -181,6 +191,15 @@ export function IDCardDesignStudio({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         sourceCanvas={fabricCanvas}
+      />
+
+      {/* AI Design Dialog */}
+      <AIDesignDialog
+        open={aiDialogOpen}
+        onOpenChange={setAIDialogOpen}
+        onDesignGenerated={handleAIDesignGenerated}
+        workspaceId={workspaceId}
+        orientation={orientation}
       />
     </div>
   );
