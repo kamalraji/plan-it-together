@@ -10,8 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Sparkles, Loader2, Wand2 } from 'lucide-react';
+import { Sparkles, Loader2, Wand2, ImageIcon, Shapes } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +22,13 @@ import {
   type IDCardBackground,
 } from '../templates/backgrounds';
 import {
+  ID_CARD_IMAGE_BACKGROUNDS,
+  IMAGE_BACKGROUND_THEMES,
+  IMAGE_BACKGROUND_STYLES,
+  getFilteredImageBackgrounds,
+  type IDCardImageBackground,
+} from '../templates/image-backgrounds';
+import {
   ID_CARD_CONTENT_LAYOUTS,
   LAYOUT_STYLES,
 } from '../templates/content-layouts';
@@ -28,6 +36,7 @@ import {
   applyColorTheme,
   scaleObjectsForOrientation,
   combineDesignElements,
+  createCanvasWithImageBackground,
   COLOR_PALETTES,
 } from '@/lib/idcard-theming';
 import type { IDCardOrientation } from '../templates';
@@ -51,19 +60,33 @@ export function AIDesignDialog({
   const [selectedStyle, setSelectedStyle] = useState<string>('professional');
   const [primaryColor, setPrimaryColor] = useState('#3B82F6');
   const [secondaryColor, setSecondaryColor] = useState('#1E40AF');
+  
+  // Pattern background state
   const [selectedBackground, setSelectedBackground] = useState<string>('gradient-top-fade');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  
+  // Image background state
+  const [backgroundType, setBackgroundType] = useState<'pattern' | 'image'>('pattern');
+  const [selectedImageBackground, setSelectedImageBackground] = useState<string | null>(null);
+  const [themeFilter, setThemeFilter] = useState<string>('all');
+  const [styleFilter, setStyleFilter] = useState<string>('all');
+  
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Get canvas dimensions based on orientation
   const canvasWidth = orientation === 'landscape' ? 324 : 204;
   const canvasHeight = orientation === 'landscape' ? 204 : 324;
 
-  // Filter backgrounds by category
+  // Filter pattern backgrounds by category
   const filteredBackgrounds = useMemo(() => {
     if (categoryFilter === 'all') return ID_CARD_BACKGROUNDS;
     return ID_CARD_BACKGROUNDS.filter(bg => bg.category === categoryFilter);
   }, [categoryFilter]);
+
+  // Filter image backgrounds by theme and style
+  const filteredImageBackgrounds = useMemo(() => {
+    return getFilteredImageBackgrounds(themeFilter, styleFilter);
+  }, [themeFilter, styleFilter]);
 
   // Get layout for current style and orientation
   const currentLayout = useMemo(() => {
@@ -77,45 +100,67 @@ export function AIDesignDialog({
     return ID_CARD_BACKGROUNDS.find(bg => bg.id === selectedBackground);
   }, [selectedBackground]);
 
+  // Get image background by ID
+  const currentImageBackground = useMemo(() => {
+    return ID_CARD_IMAGE_BACKGROUNDS.find(bg => bg.id === selectedImageBackground);
+  }, [selectedImageBackground]);
+
   const handleGenerate = async () => {
-    if (!currentBackground || !currentLayout) {
-      toast.error('Please select a background and style');
+    if (!currentLayout) {
+      toast.error('Please select a style');
       return;
     }
 
     setIsGenerating(true);
 
     try {
-      // 1. Apply color theme to background objects
-      let backgroundObjects = applyColorTheme(
-        currentBackground.objects,
-        primaryColor,
-        secondaryColor
-      );
-
-      // 2. Scale background if needed (backgrounds are designed for landscape)
-      if (orientation === 'portrait' && currentBackground.supportsPortrait) {
-        backgroundObjects = scaleObjectsForOrientation(
-          backgroundObjects,
-          'landscape',
-          'portrait'
-        );
-      }
-
-      // 3. Apply color theme to content layout
+      // Apply color theme to content layout
       const contentObjects = applyColorTheme(
         currentLayout.objects,
         primaryColor,
         secondaryColor
       );
 
-      // 4. Combine into final canvas JSON
-      const canvasJSON = combineDesignElements(
-        backgroundObjects,
-        contentObjects,
-        canvasWidth,
-        canvasHeight
-      );
+      let canvasJSON: object;
+
+      if (backgroundType === 'image' && currentImageBackground) {
+        // Use pre-generated image background
+        canvasJSON = createCanvasWithImageBackground(
+          currentImageBackground.imageUrl,
+          contentObjects,
+          canvasWidth,
+          canvasHeight
+        );
+      } else if (currentBackground) {
+        // Use pattern background
+        // 1. Apply color theme to background objects
+        let backgroundObjects = applyColorTheme(
+          currentBackground.objects,
+          primaryColor,
+          secondaryColor
+        );
+
+        // 2. Scale background if needed (backgrounds are designed for landscape)
+        if (orientation === 'portrait' && currentBackground.supportsPortrait) {
+          backgroundObjects = scaleObjectsForOrientation(
+            backgroundObjects,
+            'landscape',
+            'portrait'
+          );
+        }
+
+        // 3. Combine into final canvas JSON
+        canvasJSON = combineDesignElements(
+          backgroundObjects,
+          contentObjects,
+          canvasWidth,
+          canvasHeight
+        );
+      } else {
+        toast.error('Please select a background');
+        setIsGenerating(false);
+        return;
+      }
 
       // Small delay for UX feel (instant feels too abrupt)
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -297,36 +342,104 @@ export function AIDesignDialog({
 
   const renderBackgroundStep = () => (
     <div className="space-y-4">
-      {/* Category filter */}
-      <div className="flex gap-1 flex-wrap">
-        {BACKGROUND_CATEGORIES.map((cat) => (
-          <Button
-            key={cat.id}
-            variant={categoryFilter === cat.id ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setCategoryFilter(cat.id)}
-            className="text-xs"
-          >
-            {cat.label}
-          </Button>
-        ))}
-      </div>
+      <Tabs value={backgroundType} onValueChange={(v) => setBackgroundType(v as 'pattern' | 'image')}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="pattern" className="gap-2">
+            <Shapes className="h-4 w-4" />
+            Patterns
+          </TabsTrigger>
+          <TabsTrigger value="image" className="gap-2">
+            <ImageIcon className="h-4 w-4" />
+            AI Backgrounds
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Background grid */}
-      <ScrollArea className="h-[280px]">
-        <div className="grid grid-cols-3 gap-3 pr-4">
-          {filteredBackgrounds.map((bg) => (
-            <BackgroundPreview
-              key={bg.id}
-              background={bg}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              isSelected={selectedBackground === bg.id}
-              onClick={() => setSelectedBackground(bg.id)}
-            />
-          ))}
-        </div>
-      </ScrollArea>
+        <TabsContent value="pattern" className="space-y-4 mt-4">
+          {/* Category filter */}
+          <div className="flex gap-1 flex-wrap">
+            {BACKGROUND_CATEGORIES.map((cat) => (
+              <Button
+                key={cat.id}
+                variant={categoryFilter === cat.id ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setCategoryFilter(cat.id)}
+                className="text-xs"
+              >
+                {cat.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Pattern grid */}
+          <ScrollArea className="h-[240px]">
+            <div className="grid grid-cols-3 gap-3 pr-4">
+              {filteredBackgrounds.map((bg) => (
+                <BackgroundPreview
+                  key={bg.id}
+                  background={bg}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                  isSelected={selectedBackground === bg.id && backgroundType === 'pattern'}
+                  onClick={() => {
+                    setSelectedBackground(bg.id);
+                    setBackgroundType('pattern');
+                  }}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+
+        <TabsContent value="image" className="space-y-4 mt-4">
+          {/* Theme filter */}
+          <div className="flex gap-1 flex-wrap">
+            {IMAGE_BACKGROUND_THEMES.map((theme) => (
+              <Button
+                key={theme.id}
+                variant={themeFilter === theme.id ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setThemeFilter(theme.id)}
+                className="text-xs gap-1"
+              >
+                <span>{theme.icon}</span>
+                {theme.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Style filter */}
+          <div className="flex gap-1 flex-wrap">
+            {IMAGE_BACKGROUND_STYLES.map((style) => (
+              <Button
+                key={style.id}
+                variant={styleFilter === style.id ? 'outline' : 'ghost'}
+                size="sm"
+                onClick={() => setStyleFilter(style.id)}
+                className="text-xs"
+              >
+                {style.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Image grid */}
+          <ScrollArea className="h-[200px]">
+            <div className="grid grid-cols-3 gap-3 pr-4">
+              {filteredImageBackgrounds.map((bg) => (
+                <ImageBackgroundPreview
+                  key={bg.id}
+                  background={bg}
+                  isSelected={selectedImageBackground === bg.id && backgroundType === 'image'}
+                  onClick={() => {
+                    setSelectedImageBackground(bg.id);
+                    setBackgroundType('image');
+                  }}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
 
       <div className="flex justify-between">
         <Button variant="outline" onClick={() => setStep('colors')}>
@@ -339,64 +452,77 @@ export function AIDesignDialog({
     </div>
   );
 
-  const renderGenerateStep = () => (
-    <div className="space-y-6">
-      {/* Summary */}
-      <div className="space-y-3">
-        <h4 className="font-medium">Design Summary</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 rounded-lg bg-muted/50">
-            <div className="text-muted-foreground">Style</div>
-            <div className="font-medium capitalize">{selectedStyle}</div>
-          </div>
-          <div className="p-3 rounded-lg bg-muted/50">
-            <div className="text-muted-foreground">Orientation</div>
-            <div className="font-medium capitalize">{orientation}</div>
-          </div>
-          <div className="p-3 rounded-lg bg-muted/50">
-            <div className="text-muted-foreground">Colors</div>
-            <div className="flex gap-2 mt-1">
-              <div
-                className="w-6 h-6 rounded"
-                style={{ backgroundColor: primaryColor }}
-              />
-              <div
-                className="w-6 h-6 rounded"
-                style={{ backgroundColor: secondaryColor }}
-              />
+  const renderGenerateStep = () => {
+    const backgroundName = backgroundType === 'image' 
+      ? currentImageBackground?.name || 'None'
+      : currentBackground?.name || 'None';
+
+    return (
+      <div className="space-y-6">
+        {/* Summary */}
+        <div className="space-y-3">
+          <h4 className="font-medium">Design Summary</h4>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="p-3 rounded-lg bg-muted/50">
+              <div className="text-muted-foreground">Style</div>
+              <div className="font-medium capitalize">{selectedStyle}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50">
+              <div className="text-muted-foreground">Orientation</div>
+              <div className="font-medium capitalize">{orientation}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50">
+              <div className="text-muted-foreground">Colors</div>
+              <div className="flex gap-2 mt-1">
+                <div
+                  className="w-6 h-6 rounded"
+                  style={{ backgroundColor: primaryColor }}
+                />
+                <div
+                  className="w-6 h-6 rounded"
+                  style={{ backgroundColor: secondaryColor }}
+                />
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50">
+              <div className="text-muted-foreground">Background</div>
+              <div className="font-medium flex items-center gap-1">
+                {backgroundType === 'image' ? (
+                  <ImageIcon className="h-3 w-3" />
+                ) : (
+                  <Shapes className="h-3 w-3" />
+                )}
+                {backgroundName}
+              </div>
             </div>
           </div>
-          <div className="p-3 rounded-lg bg-muted/50">
-            <div className="text-muted-foreground">Background</div>
-            <div className="font-medium">{currentBackground?.name || 'None'}</div>
-          </div>
+        </div>
+
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={() => setStep('background')}>
+            Back
+          </Button>
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Wand2 className="h-4 w-4" />
+                Generate Design
+              </>
+            )}
+          </Button>
         </div>
       </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep('background')}>
-          Back
-        </Button>
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="gap-2"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Wand2 className="h-4 w-4" />
-              Generate Design
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -445,7 +571,7 @@ export function AIDesignDialog({
   );
 }
 
-// Background preview component
+// Pattern background preview component
 interface BackgroundPreviewProps {
   background: IDCardBackground;
   primaryColor: string;
@@ -472,6 +598,42 @@ function BackgroundPreview({
       <div className="text-xs font-medium text-center">{background.name}</div>
       <div className="text-[10px] text-muted-foreground capitalize">
         {background.category}
+      </div>
+    </button>
+  );
+}
+
+// Image background preview component
+interface ImageBackgroundPreviewProps {
+  background: IDCardImageBackground;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+function ImageBackgroundPreview({
+  background,
+  isSelected,
+  onClick,
+}: ImageBackgroundPreviewProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all',
+        'hover:border-primary/50 hover:bg-accent/30',
+        isSelected ? 'border-primary bg-primary/5' : 'border-border'
+      )}
+    >
+      {/* Color preview representing the background */}
+      <div 
+        className="w-full aspect-[16/10] rounded-md shadow-sm"
+        style={{ 
+          background: `linear-gradient(135deg, ${background.dominantColors.primary}, ${background.dominantColors.secondary})` 
+        }}
+      />
+      <div className="text-xs font-medium text-center leading-tight">{background.name}</div>
+      <div className="text-[10px] text-muted-foreground capitalize">
+        {background.theme} • {background.style}
       </div>
     </button>
   );
