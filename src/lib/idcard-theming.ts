@@ -289,6 +289,36 @@ export function combineDesignElements(
 }
 
 /**
+ * Creates canvas JSON with a background image
+ * Used for pre-generated AI background images
+ */
+export function createCanvasWithImageBackground(
+  backgroundImageUrl: string,
+  contentObjects: object[],
+  canvasWidth: number,
+  canvasHeight: number
+): object {
+  return {
+    version: '6.0.0',
+    objects: contentObjects,
+    background: '#FFFFFF',
+    backgroundImage: {
+      type: 'image',
+      src: backgroundImageUrl,
+      scaleX: 1,
+      scaleY: 1,
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      crossOrigin: 'anonymous',
+    },
+    width: canvasWidth,
+    height: canvasHeight,
+  };
+}
+
+/**
  * Pre-defined color palettes for quick selection
  */
 export const COLOR_PALETTES = [
