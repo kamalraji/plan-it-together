@@ -19,7 +19,7 @@ import {
 import { Workspace } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { IDCardDesigner } from '@/components/id-cards/IDCardDesigner';
+import { IDCardDesignStudio } from '@/components/id-cards/IDCardDesignStudio';
 import { IDCardPreview } from '@/components/id-cards/IDCardPreview';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -130,6 +130,46 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
     setShowDesigner(false);
     setSelectedTemplate(null);
     refetch();
+  };
+
+  const handleSaveTemplate = async (data: { canvasJSON: object; name: string }) => {
+    try {
+      const designJson = JSON.parse(JSON.stringify(data.canvasJSON));
+      
+      if (selectedTemplate?.id) {
+        // Update existing template
+        const { error } = await supabase
+          .from('id_card_templates')
+          .update({
+            name: data.name,
+            design: designJson,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', selectedTemplate.id);
+
+        if (error) throw error;
+        toast.success('Template updated successfully');
+      } else {
+        // Create new template
+        const { error } = await supabase
+          .from('id_card_templates')
+          .insert([{
+            workspace_id: workspace.id,
+            event_id: workspace.eventId || '',
+            name: data.name,
+            design: designJson,
+            card_type: 'attendee',
+          }]);
+
+        if (error) throw error;
+        toast.success('Template created successfully');
+      }
+
+      handleDesignerClose();
+    } catch (error) {
+      console.error('Error saving template:', error);
+      toast.error('Failed to save template');
+    }
   };
 
   return (
@@ -358,23 +398,17 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
         </TabsContent>
       </Tabs>
 
-      {/* Designer Dialog */}
-      <Dialog open={showDesigner} onOpenChange={setShowDesigner}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedTemplate ? 'Edit Template' : 'Create ID Card Template'}
-            </DialogTitle>
-          </DialogHeader>
-          <IDCardDesigner
-            workspaceId={workspace.id}
-            eventId={workspace.eventId || ''}
-            template={selectedTemplate}
-            onSave={handleDesignerClose}
-            onCancel={() => setShowDesigner(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Full-screen Design Studio */}
+      {showDesigner && (
+        <IDCardDesignStudio
+          initialData={selectedTemplate?.design?.canvasJSON as object | undefined}
+          onSave={handleSaveTemplate}
+          onCancel={() => setShowDesigner(false)}
+          templateName={selectedTemplate?.name || 'New ID Card Template'}
+          workspaceId={workspace.id}
+          eventId={workspace.eventId || ''}
+        />
+      )}
 
       {/* Preview Dialog */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
