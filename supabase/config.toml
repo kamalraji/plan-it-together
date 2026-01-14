@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.generate-idcard-backgrounds]
 verify_jwt = false
+
+[functions.generate-certificate-backgrounds]
+verify_jwt = false
