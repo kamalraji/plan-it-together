@@ -48,11 +48,11 @@ export function RootDashboard({
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse h-32 bg-muted rounded-xl" />
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="w-full space-y-4 sm:space-y-6">
+        <div className="animate-pulse h-24 sm:h-32 bg-muted rounded-xl" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse h-24 bg-muted rounded-xl" />
+            <div key={i} className="animate-pulse h-20 sm:h-24 bg-muted rounded-xl" />
           ))}
         </div>
       </div>
@@ -62,19 +62,20 @@ export function RootDashboard({
   const { departments, recentActivity, upcomingMilestones } = data;
 
   return (
-    <div className="w-full space-y-6">
-      {/* Main Content Grid - 12-column system for finer control */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
-        {/* Left Column: Departments Performance - 8/12 on xl screens */}
-        <section id="departments" className="xl:col-span-8 space-y-4">
+    <div className="w-full space-y-4 sm:space-y-6">
+      {/* Main Content Grid - Responsive breakpoints: stack on mobile/tablet, side-by-side on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:gap-6 w-full">
+        {/* Left Column: Departments Performance - Full width on mobile/tablet, 8/12 on lg+ */}
+        <section id="departments" className="lg:col-span-8 space-y-3 sm:space-y-4 order-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-semibold text-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" />
               Department Performance
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-h-[200px]">
+          {/* Department cards: 1 col on mobile, 2 cols on sm+, with responsive gaps */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 min-h-[150px] sm:min-h-[200px]">
             {departments.map((dept) => {
               const colors = getDepartmentColor(dept.departmentId);
               const progress = dept.tasksTotal > 0 
@@ -85,7 +86,7 @@ export function RootDashboard({
                 <div
                   key={dept.workspaceId}
                   onClick={() => handleDepartmentClick(dept.workspaceId)}
-                  className={`bg-card rounded-xl border ${colors.border} p-4 cursor-pointer hover:shadow-md transition-all hover:scale-[1.02]`}
+                  className={`bg-card rounded-lg sm:rounded-xl border ${colors.border} p-3 sm:p-4 cursor-pointer hover:shadow-md transition-all hover:scale-[1.01] sm:hover:scale-[1.02]`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -142,8 +143,12 @@ export function RootDashboard({
             )}
           </div>
         </section>
-        {/* Right Column: Workspace Management, Activity & Milestones - 4/12 on xl screens */}
-        <div className="xl:col-span-4 space-y-4">
+        {/* Right Column: Workspace Management, Activity & Milestones
+            - On mobile: displays after departments (order-2)
+            - On tablet (md): 2-column grid for better use of space
+            - On lg+: single column sidebar (4/12 width)
+        */}
+        <div className="lg:col-span-4 space-y-3 sm:space-y-4 order-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
 
           {/* Child Workspaces Manager */}
           <section id="workspaces">
@@ -205,7 +210,7 @@ export function RootDashboard({
           </section>
 
           {/* Upcoming Milestones */}
-          <section id="milestones" className="bg-card rounded-xl border border-border p-4">
+          <section id="milestones" className="bg-card rounded-lg sm:rounded-xl border border-border p-3 sm:p-4">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Calendar className="h-4 w-4 text-primary" />
               Upcoming Milestones
@@ -237,7 +242,7 @@ export function RootDashboard({
           </section>
 
           {/* Recent Activity */}
-          <section id="activity" className="bg-card rounded-xl border border-border p-4">
+          <section id="activity" className="bg-card rounded-lg sm:rounded-xl border border-border p-3 sm:p-4">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Activity className="h-4 w-4 text-primary" />
               Recent Activity
