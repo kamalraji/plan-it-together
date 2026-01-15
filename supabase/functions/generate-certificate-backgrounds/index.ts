@@ -13,24 +13,31 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-// Themes and styles for certificate backgrounds
-const THEMES = [
-  { id: 'formal', prompts: ['formal ceremony backdrop with elegant marble textures', 'regal governmental document style background'] },
-  { id: 'celebration', prompts: ['celebration with subtle confetti and festive elements', 'achievement celebration with warm lighting'] },
-  { id: 'corporate', prompts: ['professional corporate office environment', 'modern business setting with clean lines'] },
-  { id: 'academic', prompts: ['university campus with classical architecture', 'scholarly library with books and knowledge symbols'] },
-  { id: 'tech', prompts: ['futuristic technology with circuit patterns', 'digital innovation with abstract data flows'] },
-  { id: 'creative', prompts: ['artistic studio with paint splashes and brushstrokes', 'creative workshop with colorful elements'] },
-  { id: 'nature', prompts: ['serene nature landscape with trees and mountains', 'environmental sustainability with green elements'] },
-  { id: 'awards', prompts: ['award ceremony stage with spotlights', 'trophy display with golden accents'] },
+// Orientations for certificate backgrounds
+const ORIENTATIONS = [
+  { id: 'landscape', dimensions: '842x595 pixels', aspectDesc: 'A4 landscape, wider than tall' },
+  { id: 'portrait', dimensions: '595x842 pixels', aspectDesc: 'A4 portrait, taller than wide' },
 ];
 
+// Themes with refined, subtle prompts for certificate backgrounds
+const THEMES = [
+  { id: 'formal', prompts: ['subtle cream and gold gradient with delicate corner ornaments', 'soft ivory background with faint watermark pattern and thin golden border'] },
+  { id: 'celebration', prompts: ['warm champagne gradient with very subtle sparkle texture', 'soft peach to cream gradient with elegant light rays'] },
+  { id: 'corporate', prompts: ['clean slate blue to white gradient with geometric corner accents', 'professional navy edge fade with crisp white center'] },
+  { id: 'academic', prompts: ['parchment texture with subtle laurel wreath watermark', 'classic ivory with faint book spine pattern border'] },
+  { id: 'tech', prompts: ['soft blue gradient with subtle circuit line accents in corners', 'minimal gray gradient with faint hexagonal pattern'] },
+  { id: 'creative', prompts: ['soft watercolor wash in muted pastels around edges', 'gentle gradient with abstract brush stroke accents'] },
+  { id: 'nature', prompts: ['soft sage green gradient with delicate leaf silhouettes in corners', 'calm earth tones with subtle organic texture'] },
+  { id: 'awards', prompts: ['warm gold gradient fading to cream with subtle ribbon motif', 'champagne background with elegant trophy silhouette watermark'] },
+];
+
+// Refined styles - more subtle modifiers
 const STYLES = [
-  { id: 'elegant', modifier: 'elegant sophisticated refined luxurious' },
-  { id: 'modern', modifier: 'modern contemporary sleek minimalist' },
-  { id: 'minimal', modifier: 'minimal clean simple subtle' },
-  { id: 'vibrant', modifier: 'vibrant colorful dynamic energetic' },
-  { id: 'classic', modifier: 'classic traditional timeless vintage' },
+  { id: 'elegant', modifier: 'sophisticated, refined, subtle luxury, understated' },
+  { id: 'modern', modifier: 'clean, contemporary, minimalist, geometric' },
+  { id: 'minimal', modifier: 'very simple, mostly blank, sparse details, clean' },
+  { id: 'vibrant', modifier: 'slightly brighter colors, still professional, tasteful' },
+  { id: 'classic', modifier: 'timeless, traditional, dignified, formal' },
 ];
 
 serve(async (req) => {
@@ -71,86 +78,91 @@ serve(async (req) => {
       );
     }
 
-    const results: { theme: string; style: string; url: string; error?: string }[] = [];
+    const results: { orientation: string; theme: string; style: string; url: string; error?: string }[] = [];
 
-    // Generate backgrounds based on request
+    // Generate backgrounds based on request - now includes orientations
     const themesToProcess = generateAll ? THEMES : THEMES.filter(t => t.id === theme);
     const stylesToProcess = generateAll ? STYLES : STYLES.filter(s => s.id === style);
+    const orientationsToProcess = ORIENTATIONS;
 
-    for (const themeConfig of themesToProcess) {
-      for (const styleConfig of stylesToProcess) {
-        try {
-          console.log(`Generating: ${themeConfig.id}/${styleConfig.id}`);
-          
-          // Create a unique prompt for this combination
-          const basePrompt = themeConfig.prompts[Math.floor(Math.random() * themeConfig.prompts.length)];
-          const prompt = `A4 landscape certificate background (842x595 pixels), ${basePrompt}, ${styleConfig.modifier} style. Abstract, elegant, suitable for formal document. No text, no people, no faces. Professional gradients and subtle patterns. Ultra high resolution.`;
+    for (const orientation of orientationsToProcess) {
+      for (const themeConfig of themesToProcess) {
+        for (const styleConfig of stylesToProcess) {
+          try {
+            console.log(`Generating: ${orientation.id}/${themeConfig.id}/${styleConfig.id}`);
+            
+            // Create a refined, subtle prompt for this combination
+            const basePrompt = themeConfig.prompts[Math.floor(Math.random() * themeConfig.prompts.length)];
+            const prompt = `Professional certificate background, ${orientation.aspectDesc} (${orientation.dimensions}). ${basePrompt}. Style: ${styleConfig.modifier}. IMPORTANT: Subtle and understated design suitable for formal documents. Large empty center area for text. Decorative elements only in corners or edges. No text, no people, no faces. Soft gradients, muted colors. Ultra high resolution, print quality.`;
 
-          // Generate image using Lovable AI
-          const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'google/gemini-2.5-flash-image-preview',
-              messages: [{ role: 'user', content: prompt }],
-              modalities: ['image', 'text'],
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error(`Image generation failed: ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-          if (!imageBase64) {
-            throw new Error('No image returned from AI');
-          }
-
-          // Extract base64 data (remove data:image/png;base64, prefix)
-          const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
-          const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-
-          // Upload to Supabase Storage
-          const fileName = `${themeConfig.id}/${styleConfig.id}-01.png`;
-          const { error: uploadError } = await supabase.storage
-            .from('certificate-backgrounds')
-            .upload(fileName, imageBuffer, {
-              contentType: 'image/png',
-              upsert: true,
+            // Generate image using Lovable AI
+            const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.5-flash-image-preview',
+                messages: [{ role: 'user', content: prompt }],
+                modalities: ['image', 'text'],
+              }),
             });
 
-          if (uploadError) {
-            throw uploadError;
+            if (!response.ok) {
+              throw new Error(`Image generation failed: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+            if (!imageBase64) {
+              throw new Error('No image returned from AI');
+            }
+
+            // Extract base64 data (remove data:image/png;base64, prefix)
+            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+            const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
+            // Upload to Supabase Storage with orientation in path
+            const fileName = `${orientation.id}/${themeConfig.id}/${styleConfig.id}-01.png`;
+            const { error: uploadError } = await supabase.storage
+              .from('certificate-backgrounds')
+              .upload(fileName, imageBuffer, {
+                contentType: 'image/png',
+                upsert: true,
+              });
+
+            if (uploadError) {
+              throw uploadError;
+            }
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+              .from('certificate-backgrounds')
+              .getPublicUrl(fileName);
+
+            results.push({
+              orientation: orientation.id,
+              theme: themeConfig.id,
+              style: styleConfig.id,
+              url: urlData.publicUrl,
+            });
+
+            console.log(`Successfully generated: ${orientation.id}/${themeConfig.id}/${styleConfig.id}`);
+
+            // Add a small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } catch (error) {
+            console.error(`Error generating ${orientation.id}/${themeConfig.id}/${styleConfig.id}:`, error);
+            results.push({
+              orientation: orientation.id,
+              theme: themeConfig.id,
+              style: styleConfig.id,
+              url: '',
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
           }
-
-          // Get public URL
-          const { data: urlData } = supabase.storage
-            .from('certificate-backgrounds')
-            .getPublicUrl(fileName);
-
-          results.push({
-            theme: themeConfig.id,
-            style: styleConfig.id,
-            url: urlData.publicUrl,
-          });
-
-          console.log(`Successfully generated: ${themeConfig.id}/${styleConfig.id}`);
-
-          // Add a small delay to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error(`Error generating ${themeConfig.id}/${styleConfig.id}:`, error);
-          results.push({
-            theme: themeConfig.id,
-            style: styleConfig.id,
-            url: '',
-            error: error instanceof Error ? error.message : 'Unknown error',
-          });
         }
       }
     }
