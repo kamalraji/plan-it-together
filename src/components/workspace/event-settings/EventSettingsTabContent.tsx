@@ -8,6 +8,9 @@ import { SEOSettingsPanel } from './SEOSettingsPanel';
 import { AccessibilitySettingsPanel } from './AccessibilitySettingsPanel';
 import { AllEventSettingsPanel } from './AllEventSettingsPanel';
 import { LandingPageSettingsPanel } from './LandingPageSettingsPanel';
+import { PublishRequirementsCard } from '@/components/events/publish/PublishRequirementsCard';
+import { EventPublishStatusIndicator } from '@/components/events/publish/EventPublishStatusIndicator';
+import { ContributeToPublishCard } from './ContributeToPublishCard';
 import { AlertCircle, Settings, Ticket, BadgePercent, Search, Accessibility, Paintbrush, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -150,58 +153,79 @@ export const EventSettingsTabContent: React.FC<EventSettingsTabContentProps> = (
     });
   }
 
-  // No assigned settings - show helpful message
+  // Collect setting keys for contribution tracking
+  const assignedSettingKeys = assignedSettings.map(s => s.key);
+
+  // No assigned settings - show helpful message with publish requirements
   if (assignedSettings.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12">
-          <div className="text-center max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <Info className="h-8 w-8 text-muted-foreground" />
+      <div className="space-y-4">
+        {/* Publish Readiness Section for child workspaces */}
+        <div className="space-y-3">
+          <PublishRequirementsCard eventId={eventId} />
+          <EventPublishStatusIndicator eventId={eventId} />
+        </div>
+
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center max-w-md mx-auto">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <Info className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No Event Settings Assigned</h3>
+              <p className="text-muted-foreground mb-4">
+                This workspace doesn't have any event settings responsibilities assigned yet.
+              </p>
+              <div className="bg-muted/50 rounded-lg p-4 text-left">
+                <h4 className="text-sm font-medium mb-2">How settings are assigned:</h4>
+                <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Registration</strong> committees manage Ticketing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Finance</strong> committees manage Promo Codes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Marketing</strong> committees manage SEO</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Logistics/Event</strong> committees manage Accessibility</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span><strong>Landing Page</strong> can be assigned by the ROOT workspace owner</span>
+                  </li>
+                </ul>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Contact your event organizer to request access or to have settings delegated to this workspace.
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-2">No Event Settings Assigned</h3>
-            <p className="text-muted-foreground mb-4">
-              This workspace doesn't have any event settings responsibilities assigned yet.
-            </p>
-            <div className="bg-muted/50 rounded-lg p-4 text-left">
-              <h4 className="text-sm font-medium mb-2">How settings are assigned:</h4>
-              <ul className="text-sm text-muted-foreground space-y-1.5">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span><strong>Registration</strong> committees manage Ticketing</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span><strong>Finance</strong> committees manage Promo Codes</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span><strong>Marketing</strong> committees manage SEO</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span><strong>Logistics/Event</strong> committees manage Accessibility</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span><strong>Landing Page</strong> can be assigned by the ROOT workspace owner</span>
-                </li>
-              </ul>
-            </div>
-            <p className="text-xs text-muted-foreground mt-4">
-              Contact your event organizer to request access or to have settings delegated to this workspace.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  // Single assigned setting - show directly
+  // Single assigned setting - show with publish readiness
   if (assignedSettings.length === 1) {
     const setting = assignedSettings[0];
     return (
       <div className="space-y-4">
+        {/* Publish Readiness Section */}
+        <div className="space-y-3">
+          <PublishRequirementsCard eventId={eventId} />
+          <ContributeToPublishCard 
+            eventId={eventId} 
+            assignedSettings={assignedSettingKeys}
+          />
+          <EventPublishStatusIndicator eventId={eventId} />
+        </div>
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="py-3 px-4">
             <div className="flex items-center gap-3">
@@ -225,9 +249,19 @@ export const EventSettingsTabContent: React.FC<EventSettingsTabContentProps> = (
     );
   }
 
-  // Multiple assigned settings - show in tabs
+  // Multiple assigned settings - show with publish readiness and tabs
   return (
     <div className="space-y-4">
+      {/* Publish Readiness Section */}
+      <div className="space-y-3">
+        <PublishRequirementsCard eventId={eventId} />
+        <ContributeToPublishCard 
+          eventId={eventId} 
+          assignedSettings={assignedSettingKeys}
+        />
+        <EventPublishStatusIndicator eventId={eventId} />
+      </div>
+
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="py-3 px-4">
           <div className="flex items-center gap-2">
