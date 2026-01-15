@@ -29,7 +29,7 @@ export const useNotificationFeed = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notifications')
-        .select('id, user_id, title, message, type, category, created_at, read, action_url, action_label, metadata')
+        .select('id, user_id, title, message, type, category, created_at, read, action_url, action_label, avatar_url, metadata')
         .order('created_at', { ascending: false })
         .limit(100);
 

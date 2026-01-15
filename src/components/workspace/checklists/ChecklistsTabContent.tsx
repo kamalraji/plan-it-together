@@ -136,7 +136,7 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
         </TabsList>
 
         <TabsContent value="shared" className="mt-6">
-          <SharedChecklistsView workspace={workspace} eventId={workspace.event_id || null} />
+          <SharedChecklistsView workspace={workspace} eventId={workspace.eventId || null} />
         </TabsContent>
 
         <TabsContent value="workspace" className="mt-6">

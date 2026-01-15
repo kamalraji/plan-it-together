@@ -134,6 +134,36 @@ export type Database = {
           },
         ]
       }
+      badges: {
+        Row: {
+          category: string
+          description: string
+          icon: string
+          id: string
+          name: string
+          points_required: number
+          rarity: string
+        }
+        Insert: {
+          category: string
+          description: string
+          icon: string
+          id?: string
+          name: string
+          points_required?: number
+          rarity?: string
+        }
+        Update: {
+          category?: string
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          points_required?: number
+          rarity?: string
+        }
+        Relationships: []
+      }
       catering_dietary_requirements: {
         Row: {
           count: number
@@ -859,6 +889,157 @@ export type Database = {
           },
         ]
       }
+      circle_members: {
+        Row: {
+          circle_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_messages: {
+        Row: {
+          circle_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_messages_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circles: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_id: string | null
+          icon: string
+          id: string
+          is_private: boolean
+          is_public: boolean
+          max_members: number | null
+          member_count: number
+          name: string
+          tags: string[] | null
+          type: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string | null
+          icon?: string
+          id?: string
+          is_private?: boolean
+          is_public?: boolean
+          max_members?: number | null
+          member_count?: number
+          name: string
+          tags?: string[] | null
+          type?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string | null
+          icon?: string
+          id?: string
+          is_private?: boolean
+          is_public?: boolean
+          max_members?: number | null
+          member_count?: number
+          name?: string
+          tags?: string[] | null
+          type?: string
+        }
+        Relationships: []
+      }
+      connections: {
+        Row: {
+          connection_type: string
+          created_at: string
+          id: string
+          match_score: number | null
+          message: string | null
+          receiver_id: string
+          requester_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          match_score?: number | null
+          message?: string | null
+          receiver_id: string
+          requester_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          match_score?: number | null
+          message?: string | null
+          receiver_id?: string
+          requester_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       content_approval_stages: {
         Row: {
           approval_id: string
@@ -1247,6 +1428,105 @@ export type Database = {
           },
         ]
       }
+      impact_leaderboard: {
+        Row: {
+          event_id: string | null
+          id: string
+          rank: number
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id?: string | null
+          id?: string
+          rank?: number
+          score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string | null
+          id?: string
+          rank?: number
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      impact_profiles: {
+        Row: {
+          avatar_url: string | null
+          badges: string[]
+          bio: string | null
+          created_at: string
+          current_event_id: string | null
+          education_status: string
+          full_name: string
+          headline: string
+          id: string
+          impact_score: number
+          interests: string[]
+          is_online: boolean
+          last_seen: string
+          level: number
+          looking_for: string[]
+          organization: string | null
+          relationship_status: string
+          skills: string[]
+          updated_at: string
+          user_id: string
+          vibe_emoji: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          badges?: string[]
+          bio?: string | null
+          created_at?: string
+          current_event_id?: string | null
+          education_status?: string
+          full_name: string
+          headline?: string
+          id?: string
+          impact_score?: number
+          interests?: string[]
+          is_online?: boolean
+          last_seen?: string
+          level?: number
+          looking_for?: string[]
+          organization?: string | null
+          relationship_status?: string
+          skills?: string[]
+          updated_at?: string
+          user_id: string
+          vibe_emoji?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          badges?: string[]
+          bio?: string | null
+          created_at?: string
+          current_event_id?: string | null
+          education_status?: string
+          full_name?: string
+          headline?: string
+          id?: string
+          impact_score?: number
+          interests?: string[]
+          is_online?: boolean
+          last_seen?: string
+          level?: number
+          looking_for?: string[]
+          organization?: string | null
+          relationship_status?: string
+          skills?: string[]
+          updated_at?: string
+          user_id?: string
+          vibe_emoji?: string
+        }
+        Relationships: []
+      }
       judge_assignments: {
         Row: {
           created_at: string
@@ -1275,6 +1555,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      messages: {
+        Row: {
+          attachments: Json | null
+          channel_id: string
+          content: string
+          edited_at: string | null
+          id: string
+          sender_avatar: string | null
+          sender_id: string
+          sender_name: string
+          sent_at: string
+        }
+        Insert: {
+          attachments?: Json | null
+          channel_id: string
+          content?: string
+          edited_at?: string | null
+          id?: string
+          sender_avatar?: string | null
+          sender_id: string
+          sender_name: string
+          sent_at?: string
+        }
+        Update: {
+          attachments?: Json | null
+          channel_id?: string
+          content?: string
+          edited_at?: string | null
+          id?: string
+          sender_avatar?: string | null
+          sender_id?: string
+          sender_name?: string
+          sent_at?: string
+        }
+        Relationships: []
       }
       notification_preferences: {
         Row: {
@@ -1322,6 +1638,7 @@ export type Database = {
         Row: {
           action_label: string | null
           action_url: string | null
+          avatar_url: string | null
           category: string
           created_at: string
           id: string
@@ -1335,6 +1652,7 @@ export type Database = {
         Insert: {
           action_label?: string | null
           action_url?: string | null
+          avatar_url?: string | null
           category?: string
           created_at?: string
           id?: string
@@ -1348,6 +1666,7 @@ export type Database = {
         Update: {
           action_label?: string | null
           action_url?: string | null
+          avatar_url?: string | null
           category?: string
           created_at?: string
           id?: string
@@ -1755,6 +2074,27 @@ export type Database = {
           },
         ]
       }
+      profile_skips: {
+        Row: {
+          created_at: string
+          id: string
+          skipped_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          skipped_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          skipped_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       promo_codes: {
         Row: {
           applicable_tier_ids: string[] | null
@@ -1982,6 +2322,27 @@ export type Database = {
           },
         ]
       }
+      saved_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          saved_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          saved_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          saved_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scores: {
         Row: {
           comments: string | null
@@ -2140,6 +2501,212 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_audience: {
+        Row: {
+          id: string
+          joined_at: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_audience_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_speakers: {
+        Row: {
+          id: string
+          is_muted: boolean
+          joined_at: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_speakers_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spaces: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_live: boolean
+          tags: string[] | null
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_live?: boolean
+          tags?: string[] | null
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_live?: boolean
+          tags?: string[] | null
+          topic?: string
+        }
+        Relationships: []
+      }
+      spark_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spark_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "spark_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spark_posts: {
+        Row: {
+          author_avatar: string | null
+          author_id: string
+          author_name: string | null
+          comment_count: number
+          content: string
+          created_at: string
+          event_id: string | null
+          expires_at: string | null
+          id: string
+          is_anonymous: boolean
+          spark_count: number
+          status: string
+          tags: string[] | null
+          title: string
+          type: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_id: string
+          author_name?: string | null
+          comment_count?: number
+          content: string
+          created_at?: string
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          spark_count?: number
+          status?: string
+          tags?: string[] | null
+          title: string
+          type: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_id?: string
+          author_name?: string | null
+          comment_count?: number
+          content?: string
+          created_at?: string
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          spark_count?: number
+          status?: string
+          tags?: string[] | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      spark_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spark_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "spark_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -2503,11 +3070,76 @@ export type Database = {
           },
         ]
       }
+      trivia_responses: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          is_correct: boolean
+          option_index: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          is_correct?: boolean
+          option_index: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          is_correct?: boolean
+          option_index?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trivia_responses_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           github_url: string | null
           id: string
@@ -2520,12 +3152,14 @@ export type Database = {
           portfolio_sections: string[]
           qr_code: string
           twitter_url: string | null
+          updated_at: string | null
           website: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           github_url?: string | null
           id: string
@@ -2538,12 +3172,14 @@ export type Database = {
           portfolio_sections?: string[]
           qr_code: string
           twitter_url?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           github_url?: string | null
           id?: string
@@ -2556,6 +3192,7 @@ export type Database = {
           portfolio_sections?: string[]
           qr_code?: string
           twitter_url?: string | null
+          updated_at?: string | null
           website?: string | null
         }
         Relationships: []
@@ -2880,6 +3517,80 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      vibe_games: {
+        Row: {
+          correct_answer: number | null
+          created_at: string
+          event_id: string | null
+          expires_at: string
+          id: string
+          name: string
+          options: string[]
+          participant_count: number
+          question: string
+          type: string
+        }
+        Insert: {
+          correct_answer?: number | null
+          created_at?: string
+          event_id?: string | null
+          expires_at: string
+          id?: string
+          name: string
+          options: string[]
+          participant_count?: number
+          question: string
+          type: string
+        }
+        Update: {
+          correct_answer?: number | null
+          created_at?: string
+          event_id?: string | null
+          expires_at?: string
+          id?: string
+          name?: string
+          options?: string[]
+          participant_count?: number
+          question?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      vibe_responses: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          option_index: number | null
+          response: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          option_index?: number | null
+          response: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          option_index?: number | null
+          response?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vibe_responses_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       volunteer_assignments: {
         Row: {
@@ -7255,6 +7966,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrement_ticket_sold_count: {
+        Args: { quantity: number; ticket_id: string }
+        Returns: undefined
+      }
       generate_slug: { Args: { input_text: string }; Returns: string }
       get_catering_vendors_secure: {
         Args: { _workspace_id: string }
@@ -7413,6 +8128,11 @@ export type Database = {
       has_workspace_management_access: {
         Args: { _user_id?: string; _workspace_id: string }
         Returns: boolean
+      }
+      increment_spark_count: { Args: { post_id: string }; Returns: undefined }
+      increment_ticket_sold_count: {
+        Args: { quantity: number; ticket_id: string }
+        Returns: undefined
       }
       is_org_admin_for_org: {
         Args: { _organization_id: string; _user_id: string }
