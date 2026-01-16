@@ -49,7 +49,16 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
 
         const userData = userMap.get(c.user_id);
         const comment: TaskComment = {
-          ...c,
+          id: c.id,
+          task_id: c.task_id,
+          user_id: c.user_id,
+          content: c.content,
+          parent_id: c.parent_id,
+          mentions: c.mentions || [],
+          is_edited: c.is_edited || false,
+          created_at: c.created_at,
+          updated_at: c.updated_at,
+          deleted_at: c.deleted_at,
           user: userData ? { id: userData.id, full_name: userData.full_name || 'Unknown', email: userData.email || '', avatar_url: userData.avatar_url || undefined } : undefined,
           reactions: commentReactions,
           reactionCounts,

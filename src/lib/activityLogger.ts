@@ -22,7 +22,7 @@ export async function logTaskActivity({
       user_id: userId,
       activity_type: activityType,
       description,
-      metadata,
+      metadata: metadata as Record<string, string | number | boolean | null | undefined>,
     }]);
 
     if (error) {
