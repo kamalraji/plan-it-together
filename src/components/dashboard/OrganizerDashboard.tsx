@@ -165,10 +165,14 @@ export function OrganizerDashboard() {
       });
       return response.data;
     },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
+    retry: 0, // No retries for faster feedback
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+    gcTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
     refetchOnWindowFocus: false,
-    enabled: isHealthy !== false
+    refetchOnMount: false,
+    networkMode: 'offlineFirst',
+    enabled: isHealthy === true, // Only fetch when API is confirmed healthy
+    placeholderData: { totalRegistrations: 0, totalRevenue: 0 }, // Fallback data
   });
   const eventCreatePath = useEventCreatePath();
   

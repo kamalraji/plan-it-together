@@ -19,6 +19,7 @@ export function SharedChecklistsView({ workspace, eventId }: SharedChecklistsVie
   const {
     sharedChecklists,
     isLoading,
+    isError,
     event,
     categoryTemplates,
     createSharedChecklist,
@@ -43,6 +44,18 @@ export function SharedChecklistsView({ workspace, eventId }: SharedChecklistsVie
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-8 text-center">
+        <Globe className="h-12 w-12 mx-auto text-destructive mb-4" />
+        <h3 className="text-lg font-semibold text-foreground mb-2">Failed to Load</h3>
+        <p className="text-sm text-muted-foreground">
+          Could not load shared checklists. Please try refreshing the page.
+        </p>
       </div>
     );
   }

@@ -1,9 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const REQUEST_TIMEOUT = 8000; // 8 seconds to fail fast on slow/unreachable backend
-const MAX_RETRY_ATTEMPTS = 1;
-const RETRY_DELAY = 1000; // 1 second
+const REQUEST_TIMEOUT = 5000; // 5 seconds for faster failure detection
 
 // Create axios instance with enhanced configuration
 export const api = axios.create({
@@ -15,96 +13,26 @@ export const api = axios.create({
   },
 });
 
-// Utility function for exponential backoff delay
-const getRetryDelay = (attempt: number): number => {
-  return RETRY_DELAY * Math.pow(2, attempt - 1);
-};
-
-// Utility function to check if error is retryable
-const isRetryableError = (error: AxiosError): boolean => {
-  if (!error.response) {
-    // Network errors are retryable
-    return true;
-  }
-
-  const status = error.response.status;
-  // Retry on server errors (5xx) and rate limiting (429)
-  return status >= 500 || status === 429;
-};
-
-// Request interceptor for adding request metadata and logging
+// Request interceptor for adding request metadata (minimal logging)
 api.interceptors.request.use(
   (config) => {
-    // Add request ID for tracking
     config.headers['X-Request-ID'] = crypto.randomUUID();
-
-    // Log request in development
-    if (import.meta.env.DEV) {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-      });
-    }
-
     return config;
   },
-  (error) => {
-    console.error('[API Request Error]', error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor with retry logic and enhanced error handling
+// Response interceptor with minimal logging and fast error handling
 api.interceptors.response.use(
-  (response: AxiosResponse) => {
-    // Log successful responses in development
-    if (import.meta.env.DEV) {
-      console.log(`[API Response] ${response.status} ${response.config.url}`, {
-        data: response.data,
-        headers: response.headers,
-      });
-    }
-    return response;
-  },
+  (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { 
-      _retry?: boolean; 
-      _retryCount?: number; 
-    };
-
-    // Log error in development
-    if (import.meta.env.DEV) {
-      console.error(`[API Error] ${error.response?.status} ${originalRequest?.url}`, {
-        error: error.message,
-        response: error.response?.data,
-      });
-    }
-
-    // On 401, rely on backend cookie-based session; do not attempt token refresh here
+    // On 401, dispatch auth logout event
     if (error.response?.status === 401) {
-      // Optional: dispatch auth logout event so UI can redirect to login
       window.dispatchEvent(
         new CustomEvent('auth:logout', {
           detail: { reason: 'unauthorized' },
         }),
       );
-    }
-
-    // Retry logic for retryable errors
-    if (isRetryableError(error) && originalRequest) {
-      const retryCount = originalRequest._retryCount || 0;
-
-      if (retryCount < MAX_RETRY_ATTEMPTS) {
-        originalRequest._retryCount = retryCount + 1;
-
-        // Wait before retrying with exponential backoff
-        await new Promise((resolve) =>
-          setTimeout(resolve, getRetryDelay(originalRequest._retryCount!)),
-        );
-
-        console.log(`[API Retry] Attempt ${originalRequest._retryCount} for ${originalRequest.url}`);
-        return api(originalRequest);
-      }
     }
 
     // Enhanced error object with additional context
@@ -113,7 +41,6 @@ api.interceptors.response.use(
       isNetworkError: !error.response,
       isServerError: error.response?.status ? error.response.status >= 500 : false,
       isClientError: error.response?.status ? error.response.status >= 400 && error.response.status < 500 : false,
-      requestId: originalRequest?.headers?.['X-Request-ID'],
       timestamp: new Date().toISOString(),
     };
 
