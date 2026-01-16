@@ -134,6 +134,54 @@ export type Database = {
           },
         ]
       }
+      automation_execution_logs: {
+        Row: {
+          action_taken: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          rule_id: string
+          success: boolean
+          task_id: string
+          triggered_at: string
+        }
+        Insert: {
+          action_taken: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          rule_id: string
+          success?: boolean
+          task_id: string
+          triggered_at?: string
+        }
+        Update: {
+          action_taken?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          rule_id?: string
+          success?: boolean
+          task_id?: string
+          triggered_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_execution_logs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_automation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_execution_logs_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           category: string
@@ -3977,6 +4025,62 @@ export type Database = {
           },
         ]
       }
+      workspace_automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: string
+          conditions: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_enabled: boolean
+          name: string
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          name: string
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          conditions?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          name?: string
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_automation_rules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_broadcast_messages: {
         Row: {
           channels: string[]
@@ -7641,8 +7745,12 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          end_time: string | null
           hours: number
           id: string
+          is_billable: boolean
+          is_running: boolean
+          start_time: string | null
           status: string
           task_id: string | null
           updated_at: string
@@ -7653,8 +7761,12 @@ export type Database = {
           created_at?: string
           date: string
           description?: string | null
+          end_time?: string | null
           hours: number
           id?: string
+          is_billable?: boolean
+          is_running?: boolean
+          start_time?: string | null
           status?: string
           task_id?: string | null
           updated_at?: string
@@ -7665,8 +7777,12 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string | null
+          end_time?: string | null
           hours?: number
           id?: string
+          is_billable?: boolean
+          is_running?: boolean
+          start_time?: string | null
           status?: string
           task_id?: string | null
           updated_at?: string
