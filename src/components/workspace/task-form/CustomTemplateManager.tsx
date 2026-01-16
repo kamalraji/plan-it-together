@@ -90,11 +90,16 @@ export function CustomTemplateManager({
       return;
     }
 
+    if (!user?.id) {
+      setError('You must be logged in to save templates');
+      return;
+    }
+
     try {
       setSaving(true);
       setError(null);
 
-      const { error } = await supabase.from('workspace_custom_templates').insert({
+      const insertData = {
         workspace_id: workspaceId,
         name: newTemplateName.trim(),
         icon: selectedIcon,
@@ -102,16 +107,42 @@ export function CustomTemplateManager({
         priority: currentFormData.priority,
         description: currentFormData.description,
         tags: currentFormData.tags,
-        created_by: user?.id,
-      });
+        created_by: user.id,
+      };
 
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from('workspace_custom_templates')
+        .insert(insertData)
+        .select()
+        .single();
 
-      await fetchTemplates();
+      if (error) {
+        console.error('Failed to save template:', error);
+        throw error;
+      }
+
+      console.log('Template saved successfully:', data);
+
+      // Immediately add to local state for instant feedback
+      if (data) {
+        setTemplates(prev => [{
+          id: data.id,
+          name: data.name,
+          icon: data.icon || '📌',
+          category: (data.category as TaskCategory) || TaskCategory.GENERAL,
+          priority: (data.priority as TaskPriority) || TaskPriority.MEDIUM,
+          description: data.description || '',
+          tags: data.tags || [],
+          createdBy: data.created_by || '',
+          createdAt: data.created_at,
+        }, ...prev]);
+      }
+
       setShowSaveForm(false);
       setNewTemplateName('');
       setSelectedIcon('📌');
     } catch (err: any) {
+      console.error('Template save error:', err);
       setError(err.message || 'Failed to save template');
     } finally {
       setSaving(false);
