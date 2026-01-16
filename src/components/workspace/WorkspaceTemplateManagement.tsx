@@ -3,6 +3,7 @@ import { WorkspaceTemplateLibrary } from './WorkspaceTemplateLibrary';
 import { WorkspaceTemplateCreation } from './WorkspaceTemplateCreation';
 import { WorkspaceTemplatePreview } from './WorkspaceTemplatePreview';
 import { WorkspaceTemplateRating } from './WorkspaceTemplateRating';
+import { IndustryTemplateBrowser } from './templates/IndustryTemplateBrowser';
 import { WorkspaceTemplate } from '../../types/workspace-template';
 import { supabase } from '@/integrations/supabase/client';
 import api from '../../lib/api';
@@ -21,6 +22,7 @@ export function WorkspaceTemplateManagement({
   onTemplateCreated
 }: WorkspaceTemplateManagementProps) {
   const [currentMode, setCurrentMode] = useState(mode);
+  const [libraryTab, setLibraryTab] = useState<'workspace' | 'tasks'>('workspace');
   const [selectedTemplate, setSelectedTemplate] = useState<WorkspaceTemplate | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showRating, setShowRating] = useState(false);
@@ -134,11 +136,46 @@ export function WorkspaceTemplateManagement({
 
       {/* Content */}
       {currentMode === 'library' && (
-        <WorkspaceTemplateLibrary
-          onTemplateSelect={handleTemplateSelect}
-          onTemplatePreview={handleTemplatePreview}
-          showActions={true}
-        />
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setLibraryTab('workspace')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                libraryTab === 'workspace'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Workspace Templates
+            </button>
+            <button
+              type="button"
+              onClick={() => setLibraryTab('tasks')}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                libraryTab === 'tasks'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+            >
+              Task Templates
+            </button>
+          </div>
+
+          {libraryTab === 'workspace' ? (
+            <WorkspaceTemplateLibrary
+              onTemplateSelect={handleTemplateSelect}
+              onTemplatePreview={handleTemplatePreview}
+              showActions={true}
+            />
+          ) : workspaceId ? (
+            <IndustryTemplateBrowser workspaceId={workspaceId} />
+          ) : (
+            <div className="rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">
+              Select a workspace to browse and import task templates.
+            </div>
+          )}
+        </div>
       )}
 
       {currentMode === 'create' && workspaceId && (
