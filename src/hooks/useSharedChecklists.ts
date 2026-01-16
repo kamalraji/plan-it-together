@@ -55,39 +55,47 @@ export function useSharedChecklists({ eventId, workspaceId }: UseSharedChecklist
   });
 
   // Fetch shared checklists for the event
-  const { data: sharedChecklists = [], isLoading, refetch } = useQuery({
+  const { data: sharedChecklists = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['shared-checklists', eventId],
     queryFn: async () => {
       if (!eventId) return [];
       
-      const { data, error } = await supabase
-        .from('workspace_checklists')
-        .select(`
-          id,
-          title,
-          description,
-          phase,
-          items,
-          workspace_id,
-          event_id,
-          is_shared,
-          due_date,
-          created_at,
-          workspaces!inner(name)
-        `)
-        .eq('event_id', eventId)
-        .eq('is_shared', true)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      return (data || []).map((checklist: any) => ({
-        ...checklist,
-        workspace_name: checklist.workspaces?.name,
-        items: Array.isArray(checklist.items) ? checklist.items : [],
-      })) as SharedChecklist[];
+      try {
+        const { data, error } = await supabase
+          .from('workspace_checklists')
+          .select(`
+            id,
+            title,
+            description,
+            phase,
+            items,
+            workspace_id,
+            event_id,
+            is_shared,
+            due_date,
+            created_at,
+            workspaces!inner(name)
+          `)
+          .eq('event_id', eventId)
+          .eq('is_shared', true)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        return (data || []).map((checklist: any) => ({
+          ...checklist,
+          workspace_name: checklist.workspaces?.name,
+          items: Array.isArray(checklist.items) ? checklist.items : [],
+        })) as SharedChecklist[];
+      } catch (error) {
+        console.error('Failed to fetch shared checklists:', error);
+        return [];
+      }
     },
     enabled: !!eventId,
+    retry: 1,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   // Get template suggestions based on event category
@@ -253,6 +261,7 @@ export function useSharedChecklists({ eventId, workspaceId }: UseSharedChecklist
   return {
     sharedChecklists,
     isLoading,
+    isError,
     refetch,
     event,
     categoryTemplates,
