@@ -188,6 +188,7 @@ export function SharedChecklistsView({ workspace, eventId }: SharedChecklistsVie
           setShowCreateDialog(false);
         }}
         isSubmitting={createSharedChecklist.isPending}
+        eventCategory={event?.category || null}
       />
     </div>
   );

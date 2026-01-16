@@ -109,6 +109,7 @@ export function useSharedChecklists({ eventId, workspaceId }: UseSharedChecklist
       title: string;
       description?: string;
       phase: 'pre_event' | 'during_event' | 'post_event';
+      priority?: 'low' | 'medium' | 'high' | 'urgent';
       items: { title: string; description?: string }[];
       dueDate?: string;
     }) => {
