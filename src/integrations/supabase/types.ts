@@ -3135,6 +3135,187 @@ export type Database = {
           },
         ]
       }
+      task_approval_decisions: {
+        Row: {
+          approver_id: string
+          approver_role: string
+          decided_at: string
+          decision: string
+          delegated_reason: string | null
+          delegated_to: string | null
+          id: string
+          level: number
+          notes: string | null
+          request_id: string
+        }
+        Insert: {
+          approver_id: string
+          approver_role: string
+          decided_at?: string
+          decision: string
+          delegated_reason?: string | null
+          delegated_to?: string | null
+          id?: string
+          level: number
+          notes?: string | null
+          request_id: string
+        }
+        Update: {
+          approver_id?: string
+          approver_role?: string
+          decided_at?: string
+          decision?: string
+          delegated_reason?: string | null
+          delegated_to?: string | null
+          id?: string
+          level?: number
+          notes?: string | null
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_approval_decisions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "task_approval_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_approval_policies: {
+        Row: {
+          allow_self_approval: boolean | null
+          applies_to_categories: string[] | null
+          applies_to_priorities: string[] | null
+          applies_to_role_scopes: string[] | null
+          approval_chain: Json
+          auto_approve_after_hours: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          is_enabled: boolean | null
+          min_estimated_hours: number | null
+          name: string
+          require_all_levels: boolean | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_self_approval?: boolean | null
+          applies_to_categories?: string[] | null
+          applies_to_priorities?: string[] | null
+          applies_to_role_scopes?: string[] | null
+          approval_chain?: Json
+          auto_approve_after_hours?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_enabled?: boolean | null
+          min_estimated_hours?: number | null
+          name: string
+          require_all_levels?: boolean | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_self_approval?: boolean | null
+          applies_to_categories?: string[] | null
+          applies_to_priorities?: string[] | null
+          applies_to_role_scopes?: string[] | null
+          approval_chain?: Json
+          auto_approve_after_hours?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_enabled?: boolean | null
+          min_estimated_hours?: number | null
+          name?: string
+          require_all_levels?: boolean | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_approval_policies_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_approval_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_level: number
+          final_decision_by: string | null
+          final_decision_notes: string | null
+          id: string
+          original_status: string
+          overall_status: string
+          policy_id: string | null
+          requested_at: string
+          requested_by: string
+          target_status: string
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_level?: number
+          final_decision_by?: string | null
+          final_decision_notes?: string | null
+          id?: string
+          original_status: string
+          overall_status?: string
+          policy_id?: string | null
+          requested_at?: string
+          requested_by: string
+          target_status?: string
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_level?: number
+          final_decision_by?: string | null
+          final_decision_notes?: string | null
+          id?: string
+          original_status?: string
+          overall_status?: string
+          policy_id?: string | null
+          requested_at?: string
+          requested_by?: string
+          target_status?: string
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_approval_requests_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "task_approval_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_approval_requests_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_comment_reactions: {
         Row: {
           comment_id: string
@@ -7742,6 +7923,8 @@ export type Database = {
       }
       workspace_tasks: {
         Row: {
+          approval_policy_id: string | null
+          approval_status: string | null
           assigned_by: string | null
           assigned_to: string | null
           attachments: string[] | null
@@ -7760,6 +7943,7 @@ export type Database = {
           priority: string
           progress: number | null
           recurring_task_id: string | null
+          requires_approval: boolean | null
           role_scope: string | null
           source_workspace_id: string | null
           start_date: string | null
@@ -7769,6 +7953,8 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          approval_policy_id?: string | null
+          approval_status?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
           attachments?: string[] | null
@@ -7787,6 +7973,7 @@ export type Database = {
           priority?: string
           progress?: number | null
           recurring_task_id?: string | null
+          requires_approval?: boolean | null
           role_scope?: string | null
           source_workspace_id?: string | null
           start_date?: string | null
@@ -7796,6 +7983,8 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          approval_policy_id?: string | null
+          approval_status?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
           attachments?: string[] | null
@@ -7814,6 +8003,7 @@ export type Database = {
           priority?: string
           progress?: number | null
           recurring_task_id?: string | null
+          requires_approval?: boolean | null
           role_scope?: string | null
           source_workspace_id?: string | null
           start_date?: string | null
@@ -7828,6 +8018,13 @@ export type Database = {
             columns: ["recurring_task_id"]
             isOneToOne: false
             referencedRelation: "workspace_recurring_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_tasks_approval_policy_id_fkey"
+            columns: ["approval_policy_id"]
+            isOneToOne: false
+            referencedRelation: "task_approval_policies"
             referencedColumns: ["id"]
           },
           {
