@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority } from '../../types';
+import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority, TaskCategory } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
@@ -9,7 +9,6 @@ import { TaskFormModal } from './TaskFormModal';
 import { TaskFormData } from './TaskForm';
 import { TaskAISuggestionsPanel } from './TaskAISuggestionsPanel';
 import { TaskDependencyGraph } from './TaskDependencyGraph';
-import { TaskDependencyModal } from './TaskDependencyModal';
 import { LayoutList, Columns3, Plus, GitBranch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -60,7 +59,6 @@ export function TaskManagementInterface({
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
-  const [showDependencyModal, setShowDependencyModal] = useState(false);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'ALL',
@@ -326,7 +324,9 @@ export function TaskManagementInterface({
       title: suggestion.title,
       description: suggestion.description,
       priority: suggestion.priority as TaskPriority,
-      category: suggestion.category,
+      category: suggestion.category as TaskCategory,
+      dependencies: [],
+      tags: [],
     });
   };
 
