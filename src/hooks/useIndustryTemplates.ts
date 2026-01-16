@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { INDUSTRY_TASK_TEMPLATES, getTemplatesByIndustry, getTemplateById } from '@/lib/industryTaskTemplates';
-import { IndustryType } from '@/lib/industryTemplateTypes';
+import { INDUSTRY_TEMPLATES, getTemplatesByIndustry, getTemplateById } from '@/lib/industryTaskTemplates';
+import { IndustryType, IndustryTaskTemplate } from '@/lib/industryTemplateTypes';
 import { TaskStatus } from '@/types';
 import { toast } from 'sonner';
 
@@ -19,14 +19,14 @@ export function useIndustryTemplates(workspaceId: string) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredTemplates = useMemo(() => {
-    let templates = selectedIndustry === 'all' 
-      ? INDUSTRY_TASK_TEMPLATES 
+    let templates: IndustryTaskTemplate[] = selectedIndustry === 'all' 
+      ? INDUSTRY_TEMPLATES 
       : getTemplatesByIndustry(selectedIndustry);
     
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       templates = templates.filter(
-        t => t.name.toLowerCase().includes(query) ||
+        (t: IndustryTaskTemplate) => t.name.toLowerCase().includes(query) ||
              t.description.toLowerCase().includes(query) ||
              t.eventType.toLowerCase().includes(query)
       );
@@ -136,7 +136,7 @@ export function useIndustryTemplates(workspaceId: string) {
   });
 
   return {
-    templates: INDUSTRY_TASK_TEMPLATES,
+    templates: INDUSTRY_TEMPLATES,
     filteredTemplates,
     selectedIndustry,
     setSelectedIndustry,

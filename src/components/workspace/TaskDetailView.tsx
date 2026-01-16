@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember, WorkspaceRoleScope } from '../../types';
 import { supabase } from '@/integrations/supabase/client';
+import { TaskCommentsPanel, TaskActivityFeed } from './comments';
+
 interface TaskComment {
   id: string;
   userId: string;
@@ -50,22 +52,14 @@ interface TaskDetailViewProps {
 export function TaskDetailView({
   task,
   teamMembers,
-  comments = [],
   files = [],
-  activities = [],
   onStatusChange,
   onProgressUpdate,
-  onCommentAdd,
-  onCommentEdit,
-  onCommentDelete,
   onFileUpload,
   onFileDelete,
   onClose,
 }: TaskDetailViewProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'files' | 'activity'>('details');
-  const [newComment, setNewComment] = useState('');
-  const [editingComment, setEditingComment] = useState<string | null>(null);
-  const [editCommentContent, setEditCommentContent] = useState('');
   const [progressValue, setProgressValue] = useState(task.progress);
   const [isEditingProgress, setIsEditingProgress] = useState(false);
   const [isSavingRoleScope, setIsSavingRoleScope] = useState(false);
@@ -146,27 +140,6 @@ export function TaskDetailView({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim() && onCommentAdd) {
-      onCommentAdd(task.id, newComment.trim());
-      setNewComment('');
-    }
-  };
-
-  const handleCommentEdit = (commentId: string, content: string) => {
-    setEditingComment(commentId);
-    setEditCommentContent(content);
-  };
-
-  const handleCommentEditSubmit = (commentId: string) => {
-    if (editCommentContent.trim() && onCommentEdit) {
-      onCommentEdit(commentId, editCommentContent.trim());
-      setEditingComment(null);
-      setEditCommentContent('');
-    }
-  };
-
   const handleProgressUpdate = () => {
     if (onProgressUpdate && progressValue !== task.progress) {
       onProgressUpdate(task.id, progressValue);
@@ -199,9 +172,9 @@ export function TaskDetailView({
   };
   const tabs = [
     { id: 'details', name: 'Details' },
-    { id: 'comments', name: 'Comments', count: comments.length },
+    { id: 'comments', name: 'Comments' },
     { id: 'files', name: 'Files', count: files.length },
-    { id: 'activity', name: 'Activity', count: activities.length }
+    { id: 'activity', name: 'Activity' }
   ];
 
   return (
@@ -453,96 +426,14 @@ export function TaskDetailView({
 
             {activeTab === 'comments' && (
               <div className="space-y-4">
-                {/* Add Comment Form */}
-                <form onSubmit={handleCommentSubmit} className="space-y-3">
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    rows={3}
-                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      disabled={!newComment.trim()}
-                      className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Add Comment
-                    </button>
-                  </div>
-                </form>
-
-                {/* Comments List */}
-                <div className="space-y-4">
-                  {comments.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      No comments yet. Be the first to add one!
-                    </p>
-                  ) : (
-                    comments.map((comment) => (
-                      <div key={comment.id} className="border border-border rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium text-sm text-foreground">
-                              {comment.userName}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {formatDate(comment.createdAt)}
-                            </span>
-                            {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-                              <span className="text-xs text-muted-foreground">(edited)</span>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleCommentEdit(comment.id, comment.content)}
-                              className="text-xs text-indigo-600 hover:text-indigo-500"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => onCommentDelete?.(comment.id)}
-                              className="text-xs text-red-600 hover:text-red-500"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <div className="mt-2">
-                          {editingComment === comment.id ? (
-                            <div className="space-y-2">
-                              <textarea
-                                value={editCommentContent}
-                                onChange={(e) => setEditCommentContent(e.target.value)}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
-                              />
-                              <div className="flex justify-end space-x-2">
-                                <button
-                                  onClick={() => setEditingComment(null)}
-                                  className="px-3 py-1 text-sm text-muted-foreground hover:text-foreground"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  onClick={() => handleCommentEditSubmit(comment.id)}
-                                  className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700"
-                                >
-                                  Save
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-sm text-foreground whitespace-pre-wrap">
-                              {comment.content}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <TaskCommentsPanel 
+                  taskId={task.id} 
+                  teamMembers={teamMembers.map(m => ({
+                    id: m.user?.id || m.id || '',
+                    full_name: m.user?.name || 'Unknown',
+                    avatar_url: undefined
+                  }))} 
+                />
               </div>
             )}
 
@@ -620,45 +511,7 @@ export function TaskDetailView({
 
             {activeTab === 'activity' && (
               <div className="space-y-4">
-                {activities.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No activity yet.
-                  </p>
-                ) : (
-                  <div className="flow-root">
-                    <ul className="-mb-8">
-                      {activities.map((activity, activityIdx) => (
-                        <li key={activity.id}>
-                          <div className="relative pb-8">
-                            {activityIdx !== activities.length - 1 ? (
-                              <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-muted" aria-hidden="true" />
-                            ) : null}
-                            <div className="relative flex space-x-3">
-                              <div>
-                                <span className="h-8 w-8 rounded-full bg-muted-foreground/20 flex items-center justify-center ring-8 ring-background">
-                                  <span className="text-white text-xs font-medium">
-                                    {activity.userName.charAt(0).toUpperCase()}
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                <div>
-                                  <p className="text-sm text-muted-foreground">
-                                    <span className="font-medium text-foreground">{activity.userName}</span>{' '}
-                                    {activity.description}
-                                  </p>
-                                </div>
-                                <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
-                                  {formatDate(activity.createdAt)}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <TaskActivityFeed taskId={task.id} />
               </div>
             )}
           </div>

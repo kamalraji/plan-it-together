@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock, RefreshCw } from 'lucide-react';
+import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock, RefreshCw, FileStack } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { Workspace, WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { AutomationRulesPanel } from './AutomationRulesPanel';
 import { TimeLogsView } from './TimeLogsView';
 import { WeeklyTimeReport } from './WeeklyTimeReport';
 import { RecurringTasksPanel } from './RecurringTasksPanel';
+import { IndustryTemplateBrowser } from './templates/IndustryTemplateBrowser';
 import { useAuth } from '@/hooks/useAuth';
 import {
   AlertDialog,
@@ -30,7 +31,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'recurring' | 'danger';
+type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'recurring' | 'templates' | 'danger';
 
 interface WorkspaceSettingsContentProps {
   workspace: Workspace;
@@ -143,6 +144,7 @@ export function WorkspaceSettingsContent({
     { id: 'automations' as const, label: 'Automations', icon: Zap },
     { id: 'time-tracking' as const, label: 'Time Tracking', icon: Clock },
     { id: 'recurring' as const, label: 'Recurring Tasks', icon: RefreshCw },
+    { id: 'templates' as const, label: 'Task Templates', icon: FileStack },
     { id: 'danger' as const, label: 'Danger Zone', icon: Trash2 },
   ];
 
@@ -468,6 +470,22 @@ export function WorkspaceSettingsContent({
             <div className="space-y-6">
               <div className="rounded-xl border border-border bg-card p-6">
                 <RecurringTasksPanel workspaceId={workspace.id} />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'templates' && (
+            <div className="space-y-6">
+              <div className="rounded-xl border border-border bg-card p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Task Templates Library</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Browse and import pre-built task templates for various event types. Templates include
+                  tasks, subtasks, estimated hours, and dependencies.
+                </p>
+                <IndustryTemplateBrowser 
+                  workspaceId={workspace.id} 
+                  eventDate={workspace.event?.startDate ? new Date(workspace.event.startDate) : undefined}
+                />
               </div>
             </div>
           )}

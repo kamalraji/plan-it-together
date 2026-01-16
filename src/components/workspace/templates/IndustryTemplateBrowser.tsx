@@ -68,7 +68,7 @@ export function IndustryTemplateBrowser({ workspaceId, eventDate }: IndustryTemp
       </Tabs>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredTemplates.map((template) => (
+        {filteredTemplates.map((template: IndustryTaskTemplate) => (
           <div
             key={template.id}
             className="border border-border rounded-xl bg-card p-5 hover:shadow-md transition-shadow"
@@ -79,7 +79,7 @@ export function IndustryTemplateBrowser({ workspaceId, eventDate }: IndustryTemp
                 <div>
                   <h3 className="font-semibold text-foreground">{template.name}</h3>
                   <Badge variant="secondary" className="text-xs mt-1">
-                    {INDUSTRY_CONFIG[template.industry].label}
+                    {INDUSTRY_CONFIG[template.industry as IndustryType].label}
                   </Badge>
                 </div>
               </div>
