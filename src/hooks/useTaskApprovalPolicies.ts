@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TaskApprovalPolicy, ApprovalPolicyFormData, ApprovalLevel } from '@/lib/taskApprovalTypes';
+import { TaskCategory, TaskPriority, WorkspaceRole } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -189,9 +190,9 @@ function mapPolicyFromDb(row: Record<string, unknown>): TaskApprovalPolicy {
     workspaceId: row.workspace_id as string,
     name: row.name as string,
     description: row.description as string | undefined,
-    appliesToCategories: (row.applies_to_categories as string[] | null) || undefined,
-    appliesToPriorities: (row.applies_to_priorities as string[] | null) || undefined,
-    appliesToRoleScopes: (row.applies_to_role_scopes as string[] | null) || undefined,
+    appliesToCategories: (row.applies_to_categories as TaskCategory[] | null) || undefined,
+    appliesToPriorities: (row.applies_to_priorities as TaskPriority[] | null) || undefined,
+    appliesToRoleScopes: (row.applies_to_role_scopes as WorkspaceRole[] | null) || undefined,
     minEstimatedHours: row.min_estimated_hours as number | undefined,
     isDefault: row.is_default as boolean,
     approvalChain,

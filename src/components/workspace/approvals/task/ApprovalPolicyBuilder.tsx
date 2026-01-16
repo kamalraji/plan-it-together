@@ -26,7 +26,7 @@ import {
   ApprovalPolicyFormData, 
   ApprovalLevel,
 } from '@/lib/taskApprovalTypes';
-import { WorkspaceRole } from '@/types';
+import { WorkspaceRole, TaskCategory, TaskPriority } from '@/types';
 import { WorkspaceHierarchyLevel } from '@/lib/workspaceHierarchy';
 import { useTaskApprovalPolicies } from '@/hooks/useTaskApprovalPolicies';
 import { cn } from '@/lib/utils';
@@ -45,9 +45,31 @@ const STEPS = [
   { id: 'options', title: 'Options' },
 ];
 
-const CATEGORIES = ['LOGISTICS', 'MARKETING', 'TECHNICAL', 'ADMINISTRATION', 'FINANCE', 'CREATIVE', 'OUTREACH', 'GENERAL'];
-const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
-const ROLES = [WorkspaceRole.OWNER, WorkspaceRole.DEPARTMENT_MANAGER, WorkspaceRole.COMMITTEE_LEAD, WorkspaceRole.IT_COORDINATOR];
+// Use enum values for type safety
+const CATEGORIES: TaskCategory[] = [
+  TaskCategory.LOGISTICS, 
+  TaskCategory.MARKETING, 
+  TaskCategory.TECHNICAL, 
+  TaskCategory.FINANCE, 
+  TaskCategory.GENERAL,
+  TaskCategory.OPERATIONS,
+  TaskCategory.CONTENT,
+  TaskCategory.DESIGN,
+];
+
+const PRIORITIES: TaskPriority[] = [
+  TaskPriority.LOW, 
+  TaskPriority.MEDIUM, 
+  TaskPriority.HIGH, 
+  TaskPriority.URGENT,
+];
+
+const ROLES: WorkspaceRole[] = [
+  WorkspaceRole.WORKSPACE_OWNER, 
+  WorkspaceRole.OPERATIONS_MANAGER, 
+  WorkspaceRole.EVENT_LEAD, 
+  WorkspaceRole.IT_COORDINATOR,
+];
 
 export function ApprovalPolicyBuilder({
   workspaceId,
@@ -226,9 +248,9 @@ export function ApprovalPolicyBuilder({
                             key={cat}
                             variant={formData.appliesToCategories?.includes(cat) ? 'default' : 'outline'}
                             className="cursor-pointer"
-                            onClick={() => toggleArrayItem(formData.appliesToCategories, cat, 'appliesToCategories')}
+                            onClick={() => toggleArrayItem<TaskCategory>(formData.appliesToCategories, cat, 'appliesToCategories')}
                           >
-                            {cat}
+                            {cat.replace(/_/g, ' ')}
                           </Badge>
                         ))}
                       </div>
@@ -242,7 +264,7 @@ export function ApprovalPolicyBuilder({
                             key={pri}
                             variant={formData.appliesToPriorities?.includes(pri) ? 'default' : 'outline'}
                             className="cursor-pointer"
-                            onClick={() => toggleArrayItem(formData.appliesToPriorities, pri, 'appliesToPriorities')}
+                            onClick={() => toggleArrayItem<TaskPriority>(formData.appliesToPriorities, pri, 'appliesToPriorities')}
                           >
                             {pri}
                           </Badge>

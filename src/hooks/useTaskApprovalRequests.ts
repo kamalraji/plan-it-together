@@ -7,7 +7,7 @@ import {
   ApprovalLevel,
   ApprovalRequestStatus,
 } from '@/lib/taskApprovalTypes';
-import { TaskStatus, WorkspaceRole } from '@/types';
+import { TaskStatus, WorkspaceRole, TaskCategory, TaskPriority } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -219,7 +219,7 @@ export function useTaskApprovalRequests(workspaceId: string | undefined) {
         if (typeof chainData === 'string') {
           approvalChain = JSON.parse(chainData);
         } else if (Array.isArray(chainData)) {
-          approvalChain = chainData as ApprovalLevel[];
+          approvalChain = parseApprovalChain(chainData as unknown);
         }
       } catch {
         approvalChain = [];
@@ -416,8 +416,8 @@ function mapRequestFromDb(
     task: task ? {
       id: task.id as string,
       title: task.title as string,
-      category: task.category as string | undefined,
-      priority: task.priority as string | undefined,
+      category: task.category as TaskCategory | undefined,
+      priority: task.priority as TaskPriority | undefined,
       status: task.status as TaskStatus,
     } : undefined,
     policyId: row.policy_id as string | undefined,

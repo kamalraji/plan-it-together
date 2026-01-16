@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Workspace, WorkspaceType } from '@/types';
+import { Workspace, WorkspaceType, WorkspaceRole } from '@/types';
 import { useWorkspaceApprovals } from '@/hooks/useWorkspaceApprovals';
 import { useEventPublishApprovals } from '@/hooks/useEventPublishApprovals';
+import { useTaskApprovalRequests } from '@/hooks/useTaskApprovalRequests';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ApprovalsSummaryCards } from './ApprovalsSummaryCards';
 import { BudgetApprovalList } from './BudgetApprovalList';
@@ -9,14 +10,16 @@ import { ResourceApprovalList } from './ResourceApprovalList';
 import { AccessApprovalList } from './AccessApprovalList';
 import { UnifiedApprovalsList } from './UnifiedApprovalsList';
 import { EventPublishApprovalList } from './EventPublishApprovalList';
-import { DollarSign, Package, UserPlus, LayoutList, Rocket } from 'lucide-react';
+import { PendingApprovalsPanel } from './task/PendingApprovalsPanel';
+import { DollarSign, Package, UserPlus, LayoutList, Rocket, ClipboardCheck } from 'lucide-react';
 
 interface IncomingApprovalsSectionProps {
   workspace: Workspace;
+  userRole?: WorkspaceRole;
 }
 
-export function IncomingApprovalsSection({ workspace }: IncomingApprovalsSectionProps) {
-  const [activeTab, setActiveTab] = useState<'all' | 'budget' | 'resources' | 'access' | 'event-publish'>('all');
+export function IncomingApprovalsSection({ workspace, userRole }: IncomingApprovalsSectionProps) {
+  const [activeTab, setActiveTab] = useState<'all' | 'budget' | 'resources' | 'access' | 'event-publish' | 'tasks'>('all');
 
   const {
     budgetRequests,
@@ -31,12 +34,17 @@ export function IncomingApprovalsSection({ workspace }: IncomingApprovalsSection
     totalPending: eventPublishPending,
   } = useEventPublishApprovals(workspace.id);
 
+  const {
+    pendingApprovals: taskApprovals,
+  } = useTaskApprovalRequests(workspace.id);
+
   // Teams can't approve budget/resource requests
   const isTeam = workspace.workspaceType === WorkspaceType.TEAM;
   // Only ROOT workspaces can approve event publish requests
   const isRoot = workspace.workspaceType === WorkspaceType.ROOT;
 
-  const totalAllPending = totalPending + (isRoot ? eventPublishPending : 0);
+  const taskApprovalCount = taskApprovals.length;
+  const totalAllPending = totalPending + (isRoot ? eventPublishPending : 0) + taskApprovalCount;
 
   return (
     <div className="space-y-6">
@@ -46,17 +54,27 @@ export function IncomingApprovalsSection({ workspace }: IncomingApprovalsSection
         resourceCount={resourceRequests.length}
         accessCount={accessRequests.length}
         eventPublishCount={isRoot ? eventPublishPending : undefined}
+        taskApprovalCount={taskApprovalCount}
       />
 
       {/* Tabbed Interface */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className={`grid w-full ${isRoot ? 'grid-cols-5' : 'grid-cols-4'}`}>
+        <TabsList className={`grid w-full ${isRoot ? 'grid-cols-6' : 'grid-cols-5'}`}>
           <TabsTrigger value="all" className="flex items-center gap-2">
             <LayoutList className="h-4 w-4" />
             <span className="hidden sm:inline">All</span>
             {totalAllPending > 0 && (
               <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
                 {totalAllPending}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="tasks" className="flex items-center gap-2">
+            <ClipboardCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Tasks</span>
+            {taskApprovalCount > 0 && (
+              <span className="text-xs bg-violet-500/20 text-violet-600 px-1.5 py-0.5 rounded-full">
+                {taskApprovalCount}
               </span>
             )}
           </TabsTrigger>
@@ -110,6 +128,15 @@ export function IncomingApprovalsSection({ workspace }: IncomingApprovalsSection
                 setActiveTab(request.type === 'budget' ? 'budget' : request.type === 'resource' ? 'resources' : 'access');
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="tasks" className="m-0">
+            {userRole && (
+              <PendingApprovalsPanel 
+                workspaceId={workspace.id} 
+                userRole={userRole}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="budget" className="m-0">

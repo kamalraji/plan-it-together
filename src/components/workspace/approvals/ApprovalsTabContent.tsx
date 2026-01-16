@@ -13,7 +13,7 @@ interface ApprovalsTabContentProps {
   userRole?: WorkspaceRole | null;
 }
 
-export function ApprovalsTabContent({ workspace }: ApprovalsTabContentProps) {
+export function ApprovalsTabContent({ workspace, userRole }: ApprovalsTabContentProps) {
   const [mainTab, setMainTab] = useState<'incoming' | 'outgoing'>('incoming');
 
   const { totalPending } = useWorkspaceApprovals(workspace.id, workspace.workspaceType);
@@ -56,7 +56,7 @@ export function ApprovalsTabContent({ workspace }: ApprovalsTabContentProps) {
 
         <div className="mt-6">
           <TabsContent value="incoming" className="m-0">
-            <IncomingApprovalsSection workspace={workspace} />
+            <IncomingApprovalsSection workspace={workspace} userRole={userRole ?? undefined} />
           </TabsContent>
 
           <TabsContent value="outgoing" className="m-0">

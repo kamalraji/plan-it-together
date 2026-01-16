@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, Package, UserPlus, AlertCircle, Rocket } from 'lucide-react';
+import { DollarSign, Package, UserPlus, AlertCircle, Rocket, ClipboardCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ApprovalsSummaryCardsProps {
@@ -7,6 +7,7 @@ interface ApprovalsSummaryCardsProps {
   resourceCount: number;
   accessCount: number;
   eventPublishCount?: number;
+  taskApprovalCount?: number;
 }
 
 export function ApprovalsSummaryCards({
@@ -14,8 +15,9 @@ export function ApprovalsSummaryCards({
   resourceCount,
   accessCount,
   eventPublishCount,
+  taskApprovalCount,
 }: ApprovalsSummaryCardsProps) {
-  const totalPending = budgetCount + resourceCount + accessCount + (eventPublishCount || 0);
+  const totalPending = budgetCount + resourceCount + accessCount + (eventPublishCount || 0) + (taskApprovalCount || 0);
 
   const cards = [
     {
@@ -26,6 +28,15 @@ export function ApprovalsSummaryCards({
       bgColor: 'bg-primary/10',
       borderColor: 'border-primary/20',
       show: true,
+    },
+    {
+      label: 'Task Approvals',
+      count: taskApprovalCount || 0,
+      icon: ClipboardCheck,
+      color: 'text-violet-600',
+      bgColor: 'bg-violet-500/10',
+      borderColor: 'border-violet-500/20',
+      show: taskApprovalCount !== undefined,
     },
     {
       label: 'Budget Requests',
@@ -70,6 +81,7 @@ export function ApprovalsSummaryCards({
   return (
     <div className={cn(
       'grid gap-4',
+      visibleCards.length >= 6 ? 'grid-cols-2 lg:grid-cols-6' :
       visibleCards.length === 5 ? 'grid-cols-2 lg:grid-cols-5' : 'grid-cols-2 lg:grid-cols-4'
     )}>
       {visibleCards.map((card) => (
