@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { Workspace, WorkspaceRole } from '@/types';
 import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
 import { TeamMemberRoster } from '../TeamMemberRoster';
-import { HierarchyTreeCard } from '../HierarchyTreeCard';
-import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
-import { ChildWorkspacesManager } from './ChildWorkspacesManager';
-import { WorkspaceStructureOverview } from '../WorkspaceStructureOverview';
 import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -15,7 +11,6 @@ import {
   Calendar,
   Activity,
   ChevronDown,
-  GitBranch,
   Send,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,11 +29,9 @@ interface RootDashboardProps {
 export function RootDashboard({ 
   workspace, 
   orgSlug, 
-  onManageSettings,
 }: RootDashboardProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRootDashboard(workspace.eventId);
-  const [structureOpen, setStructureOpen] = useState(true);
   const [delegationsOpen, setDelegationsOpen] = useState(true);
 
   const handleDepartmentClick = (workspaceId: string) => {
@@ -143,48 +136,12 @@ export function RootDashboard({
             )}
           </div>
         </section>
-        {/* Right Column: Workspace Management, Activity & Milestones
+        {/* Right Column: Activity & Milestones
             - On mobile: displays after departments (order-2)
             - On tablet (md): 2-column grid for better use of space
             - On lg+: single column sidebar (4/12 width)
         */}
         <div className="lg:col-span-4 space-y-3 sm:space-y-4 order-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-
-          {/* Child Workspaces Manager */}
-          <section id="workspaces">
-            <ChildWorkspacesManager
-              workspace={workspace}
-              orgSlug={orgSlug}
-              onWorkspaceSelect={handleDepartmentClick}
-            />
-          </section>
-
-          {/* Workspace Structure Overview - Planned vs Created */}
-          <section id="structure">
-            <Collapsible open={structureOpen} onOpenChange={setStructureOpen}>
-              <div className="bg-card rounded-xl border border-border overflow-hidden">
-                <CollapsibleTrigger className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <GitBranch className="h-4 w-4 text-primary" />
-                    Hierarchy Overview
-                  </h3>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    structureOpen && "rotate-180"
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="px-4 pb-4">
-                    <WorkspaceStructureOverview
-                      eventId={workspace.eventId}
-                      parentWorkspaceId={workspace.id}
-                      canManage={!!onManageSettings}
-                    />
-                  </div>
-                </CollapsibleContent>
-              </div>
-            </Collapsible>
-          </section>
 
           {/* Delegation Progress */}
           <section id="delegations">
@@ -264,26 +221,6 @@ export function RootDashboard({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
-            )}
-          </section>
-
-          {/* Mini-Map - Quick Position Indicator */}
-          <section id="hierarchy">
-            <WorkspaceHierarchyMiniMap
-              workspaceId={workspace.id}
-              eventId={workspace.eventId}
-              orgSlug={orgSlug}
-              orientation="vertical"
-              showLabels={true}
-            />
-
-            {/* Hierarchy Tree */}
-            {workspace.eventId && (
-              <HierarchyTreeCard
-                eventId={workspace.eventId}
-                currentWorkspaceId={workspace.id}
-                onWorkspaceSelect={handleDepartmentClick}
-              />
             )}
           </section>
         </div>
