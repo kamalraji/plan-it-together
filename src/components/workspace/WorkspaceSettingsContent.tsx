@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock } from 'lucide-react';
+import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock, RefreshCw } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { Workspace, WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { AutomationRulesPanel } from './AutomationRulesPanel';
 import { TimeLogsView } from './TimeLogsView';
 import { WeeklyTimeReport } from './WeeklyTimeReport';
+import { RecurringTasksPanel } from './RecurringTasksPanel';
 import { useAuth } from '@/hooks/useAuth';
 import {
   AlertDialog,
@@ -29,7 +30,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'danger';
+type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'recurring' | 'danger';
 
 interface WorkspaceSettingsContentProps {
   workspace: Workspace;
@@ -141,6 +142,7 @@ export function WorkspaceSettingsContent({
     { id: 'permissions' as const, label: 'Permissions', icon: Shield },
     { id: 'automations' as const, label: 'Automations', icon: Zap },
     { id: 'time-tracking' as const, label: 'Time Tracking', icon: Clock },
+    { id: 'recurring' as const, label: 'Recurring Tasks', icon: RefreshCw },
     { id: 'danger' as const, label: 'Danger Zone', icon: Trash2 },
   ];
 
@@ -459,6 +461,14 @@ export function WorkspaceSettingsContent({
                   </div>
                 </TabsContent>
               </Tabs>
+            </div>
+          )}
+
+          {activeTab === 'recurring' && (
+            <div className="space-y-6">
+              <div className="rounded-xl border border-border bg-card p-6">
+                <RecurringTasksPanel workspaceId={workspace.id} />
+              </div>
             </div>
           )}
 

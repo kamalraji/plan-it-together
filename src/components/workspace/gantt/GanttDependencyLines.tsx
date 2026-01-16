@@ -45,7 +45,6 @@ export function GanttDependencyLines({
         if (!line) return;
         
         // Calculate control points for curved line
-        const _midX = (line.x1 + line.x2) / 2;
         const curveOffset = Math.min(Math.abs(line.x2 - line.x1) / 3, 30);
         
         // Determine if dependency is satisfied (source completed)

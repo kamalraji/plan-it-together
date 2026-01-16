@@ -20,7 +20,6 @@ const TASK_LIST_WIDTH = 280;
 
 export function TaskGanttChart({ 
   tasks, 
-  teamMembers, 
   workspaceId, 
   onTaskClick 
 }: TaskGanttChartProps) {
@@ -41,7 +40,6 @@ export function TaskGanttChart({
     taskRowMap,
     scrollToToday,
     handleTaskDrag,
-    handleMilestoneCreate,
     isDrawingDependency,
     dependencySource,
     startDependencyDraw,
@@ -173,7 +171,7 @@ export function TaskGanttChart({
               )}
 
               {/* Grid Lines */}
-              {timelineHeaders.map((header, index) => {
+              {timelineHeaders.map((_, index) => {
                 let offset = 0;
                 for (let i = 0; i < index; i++) {
                   offset += timelineHeaders[i].width;
