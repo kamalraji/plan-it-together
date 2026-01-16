@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Workspace, WorkspaceRole } from '@/types';
 import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
+import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
+import { AllPendingApprovalsWidget } from '../approvals/AllPendingApprovalsWidget';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
@@ -28,11 +30,13 @@ interface RootDashboardProps {
 
 export function RootDashboard({ 
   workspace, 
-  orgSlug, 
+  orgSlug,
+  userRole, 
 }: RootDashboardProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useRootDashboard(workspace.eventId);
   const [delegationsOpen, setDelegationsOpen] = useState(true);
+  const rbac = useWorkspaceRBAC(userRole || null);
 
   const handleDepartmentClick = (workspaceId: string) => {
     const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/workspaces';
@@ -142,6 +146,16 @@ export function RootDashboard({
             - On lg+: single column sidebar (4/12 width)
         */}
         <div className="lg:col-span-4 space-y-3 sm:space-y-4 order-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
+
+          {/* Pending Approvals Widget - Only for Leads and above */}
+          {rbac.isLeadOrAbove && (
+            <section id="pending-approvals">
+              <AllPendingApprovalsWidget 
+                eventId={workspace.eventId} 
+                orgSlug={orgSlug}
+              />
+            </section>
+          )}
 
           {/* Delegation Progress */}
           <section id="delegations">
