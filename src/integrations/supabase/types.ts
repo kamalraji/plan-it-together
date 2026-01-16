@@ -6091,6 +6091,83 @@ export type Database = {
           },
         ]
       }
+      workspace_recurring_tasks: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          last_created_at: string | null
+          max_occurrences: number | null
+          next_occurrence: string
+          occurrence_count: number | null
+          priority: string
+          recurrence_config: Json
+          recurrence_type: string
+          role_scope: string | null
+          template_data: Json
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          last_created_at?: string | null
+          max_occurrences?: number | null
+          next_occurrence: string
+          occurrence_count?: number | null
+          priority?: string
+          recurrence_config?: Json
+          recurrence_type: string
+          role_scope?: string | null
+          template_data?: Json
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          last_created_at?: string | null
+          max_occurrences?: number | null
+          next_occurrence?: string
+          occurrence_count?: number | null
+          priority?: string
+          recurrence_config?: Json
+          recurrence_type?: string
+          role_scope?: string | null
+          template_data?: Json
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_recurring_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_resource_requests: {
         Row: {
           created_at: string
@@ -7510,14 +7587,20 @@ export type Database = {
           created_at: string
           description: string | null
           due_date: string | null
+          end_date: string | null
           estimated_hours: number | null
+          gantt_row_order: number | null
           id: string
+          is_milestone: boolean
           location: string | null
+          occurrence_number: number | null
           parent_task_id: string | null
           priority: string
           progress: number | null
+          recurring_task_id: string | null
           role_scope: string | null
           source_workspace_id: string | null
+          start_date: string | null
           status: string
           title: string
           updated_at: string
@@ -7531,14 +7614,20 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          end_date?: string | null
           estimated_hours?: number | null
+          gantt_row_order?: number | null
           id?: string
+          is_milestone?: boolean
           location?: string | null
+          occurrence_number?: number | null
           parent_task_id?: string | null
           priority?: string
           progress?: number | null
+          recurring_task_id?: string | null
           role_scope?: string | null
           source_workspace_id?: string | null
+          start_date?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -7552,20 +7641,33 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          end_date?: string | null
           estimated_hours?: number | null
+          gantt_row_order?: number | null
           id?: string
+          is_milestone?: boolean
           location?: string | null
+          occurrence_number?: number | null
           parent_task_id?: string | null
           priority?: string
           progress?: number | null
+          recurring_task_id?: string | null
           role_scope?: string | null
           source_workspace_id?: string | null
+          start_date?: string | null
           status?: string
           title?: string
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_recurring_task"
+            columns: ["recurring_task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_recurring_tasks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_tasks_parent_task_id_fkey"
             columns: ["parent_task_id"]
