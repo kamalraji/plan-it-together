@@ -9,7 +9,8 @@ import { TaskFormModal } from './TaskFormModal';
 import { TaskFormData } from './TaskForm';
 import { TaskAISuggestionsPanel } from './TaskAISuggestionsPanel';
 import { TaskDependencyGraph } from './TaskDependencyGraph';
-import { LayoutList, Columns3, Plus, GitBranch } from 'lucide-react';
+import { LayoutList, Columns3, Plus, GitBranch, GanttChart } from 'lucide-react';
+import { TaskGanttChart } from './gantt';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,7 +36,7 @@ interface TaskManagementInterfaceProps {
   initialTaskId?: string;
 }
 
-type ViewMode = 'list' | 'kanban' | 'dependencies';
+type ViewMode = 'list' | 'kanban' | 'dependencies' | 'gantt';
 
 export function TaskManagementInterface({
   tasks,
@@ -393,6 +394,18 @@ export function TaskManagementInterface({
               <GitBranch className="h-4 w-4" />
               <span className="hidden sm:inline">Deps</span>
             </button>
+            <button
+              onClick={() => setViewMode('gantt')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'gantt'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <GanttChart className="h-4 w-4" />
+              <span className="hidden sm:inline">Gantt</span>
+            </button>
           </div>
 
           {/* Create Task Button */}
@@ -416,6 +429,13 @@ export function TaskManagementInterface({
         <TaskDependencyGraph
           tasks={filteredTasks}
           selectedTaskId={selectedTask?.id}
+          onTaskClick={handleTaskClick}
+        />
+      )}
+      {viewMode === 'gantt' && workspaceId && (
+        <TaskGanttChart
+          tasks={filteredTasks}
+          workspaceId={workspaceId}
           onTaskClick={handleTaskClick}
         />
       )}
