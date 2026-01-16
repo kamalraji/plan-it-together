@@ -15,6 +15,62 @@ export interface ChecklistTemplate {
 }
 
 export const EVENT_CATEGORY_TEMPLATES: Partial<Record<EventCategory, ChecklistTemplate[]>> = {
+  OTHER: [
+    {
+      title: 'Event Planning Essentials',
+      description: 'Core planning tasks for any event',
+      phase: 'pre_event',
+      items: [
+        { title: 'Define event objectives and success metrics', description: 'Establish clear goals and KPIs' },
+        { title: 'Create detailed timeline and milestones', description: 'Map out all key dates' },
+        { title: 'Confirm venue and logistics', description: 'Finalize location, layout, and requirements' },
+        { title: 'Finalize attendee registration', description: 'Close registration and confirm headcount' },
+        { title: 'Brief all team members and volunteers', description: 'Conduct pre-event orientation' },
+        { title: 'Test all equipment and technology', description: 'Verify AV, WiFi, and tools work' },
+        { title: 'Prepare contingency plans', description: 'Document backup plans for key scenarios' },
+      ]
+    },
+    {
+      title: 'Communication & Marketing',
+      description: 'Attendee communication and promotion',
+      phase: 'pre_event',
+      items: [
+        { title: 'Send event reminders to attendees', description: 'Email/SMS with key details' },
+        { title: 'Prepare event signage and materials', description: 'Banners, programs, name tags' },
+        { title: 'Coordinate social media promotion', description: 'Schedule pre-event posts' },
+        { title: 'Brief speakers and presenters', description: 'Share schedule and requirements' },
+        { title: 'Prepare welcome packets', description: 'Assemble materials for attendees' },
+      ]
+    },
+    {
+      title: 'Day-of Operations',
+      description: 'Tasks for smooth event execution',
+      phase: 'during_event',
+      items: [
+        { title: 'Set up registration and check-in', description: 'Configure welcome desk' },
+        { title: 'Conduct morning team briefing', description: 'Align on day\'s schedule and roles' },
+        { title: 'Monitor event flow and timing', description: 'Keep activities on schedule' },
+        { title: 'Manage attendee experience', description: 'Address questions and issues' },
+        { title: 'Coordinate breaks and refreshments', description: 'Ensure catering runs smoothly' },
+        { title: 'Capture photos and content', description: 'Document key moments' },
+        { title: 'Monitor safety and security', description: 'Ensure attendee wellbeing' },
+      ]
+    },
+    {
+      title: 'Post-Event Wrap-up',
+      description: 'Essential follow-up tasks',
+      phase: 'post_event',
+      items: [
+        { title: 'Send thank-you messages', description: 'Appreciate attendees, speakers, sponsors' },
+        { title: 'Collect feedback surveys', description: 'Gather attendee insights' },
+        { title: 'Process outstanding payments', description: 'Handle invoices and reimbursements' },
+        { title: 'Document lessons learned', description: 'Create retrospective notes' },
+        { title: 'Share event photos and highlights', description: 'Distribute content to attendees' },
+        { title: 'Analyze event metrics', description: 'Review attendance, engagement, ROI' },
+        { title: 'Archive event materials', description: 'Store documents for future reference' },
+      ]
+    }
+  ],
   HACKATHON: [
     {
       title: 'Hackathon Preparation',
