@@ -1,5 +1,12 @@
 import { WorkspaceTask, TeamMember } from '../../types';
 import { TaskForm, TaskFormData } from './TaskForm';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -26,34 +33,30 @@ export function TaskFormModal({
   onClose,
   isLoading = false
 }: TaskFormModalProps) {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="relative w-full max-w-4xl text-left">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{task ? 'Edit Task' : 'Create New Task'}</DialogTitle>
+          <DialogDescription>
+            {task 
+              ? 'Update task details, assignees, and deadlines' 
+              : 'Create a new task to organize your event activities'}
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Background overlay */}
-        <div 
-          className="fixed inset-0 bg-muted-foreground/30 bg-opacity-75 transition-opacity"
-          onClick={onClose}
+        <TaskForm
+          task={task}
+          teamMembers={teamMembers}
+          availableTasks={availableTasks}
+          workspaceId={workspaceId}
+          eventId={eventId}
+          enableCrossWorkspaceAssignment={enableCrossWorkspaceAssignment}
+          onSubmit={onSubmit}
+          onCancel={onClose}
+          isLoading={isLoading}
         />
-
-        {/* Modal panel */}
-        <div className="bg-card rounded-lg text-left shadow-xl transform transition-all w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-
-          <TaskForm
-            task={task}
-            teamMembers={teamMembers}
-            availableTasks={availableTasks}
-            workspaceId={workspaceId}
-            eventId={eventId}
-            enableCrossWorkspaceAssignment={enableCrossWorkspaceAssignment}
-            onSubmit={onSubmit}
-            onCancel={onClose}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -52,6 +52,10 @@ export function TaskManagementInterface({
     search: '',
     status: 'ALL',
     assigneeId: 'ALL',
+    priority: 'ALL',
+    category: 'ALL',
+    phase: 'ALL',
+    datePreset: 'ALL',
     sortKey: 'dueDate',
     sortDirection: 'asc',
   });
@@ -218,12 +222,42 @@ export function TaskManagementInterface({
         return false;
       }
 
+      if (filters.priority !== 'ALL' && task.priority !== filters.priority) {
+        return false;
+      }
+
+      if (filters.category !== 'ALL' && task.category !== filters.category) {
+        return false;
+      }
+
       if (filters.assigneeId !== 'ALL') {
         if (filters.assigneeId === 'UNASSIGNED' && task.assignee) {
           return false;
         }
         if (filters.assigneeId !== 'UNASSIGNED' && task.assignee?.userId !== filters.assigneeId) {
           return false;
+        }
+      }
+
+      // Date preset filtering
+      if (filters.datePreset !== 'ALL') {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekEnd = new Date(today);
+        weekEnd.setDate(weekEnd.getDate() + 7);
+
+        if (filters.datePreset === 'NO_DUE_DATE' && task.dueDate) return false;
+        if (filters.datePreset === 'TODAY' && task.dueDate) {
+          const due = new Date(task.dueDate);
+          if (due.toDateString() !== today.toDateString()) return false;
+        }
+        if (filters.datePreset === 'THIS_WEEK' && task.dueDate) {
+          const due = new Date(task.dueDate);
+          if (due < today || due > weekEnd) return false;
+        }
+        if (filters.datePreset === 'OVERDUE') {
+          if (!task.dueDate || task.status === TaskStatus.COMPLETED) return false;
+          if (new Date(task.dueDate) >= now) return false;
         }
       }
 
@@ -239,6 +273,11 @@ export function TaskManagementInterface({
 
     scoped.sort((a, b) => {
       const direction = filters.sortDirection === 'asc' ? 1 : -1;
+
+      if (filters.sortKey === 'priority') {
+        const priorityOrder = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
+        return (priorityOrder[b.priority as keyof typeof priorityOrder] - priorityOrder[a.priority as keyof typeof priorityOrder]) * direction;
+      }
 
       if (filters.sortKey === 'createdAt') {
         const aTime = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
