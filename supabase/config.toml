@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.generate-certificate-backgrounds]
 verify_jwt = false
+
+[functions.suggest-tasks]
+verify_jwt = false

@@ -7,11 +7,15 @@ import { TaskDetailView } from './TaskDetailView';
 import { TaskFilterBar, TaskFilters } from './TaskFilterBar';
 import { TaskFormModal } from './TaskFormModal';
 import { TaskFormData } from './TaskForm';
-import { LayoutList, Columns3, Plus } from 'lucide-react';
+import { TaskAISuggestionsPanel } from './TaskAISuggestionsPanel';
+import { TaskDependencyGraph } from './TaskDependencyGraph';
+import { TaskDependencyModal } from './TaskDependencyModal';
+import { LayoutList, Columns3, Plus, GitBranch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { TaskSuggestion } from '@/hooks/useTaskAISuggestions';
 
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
@@ -20,6 +24,10 @@ interface TaskManagementInterfaceProps {
   eventId?: string;
   workspaceType?: string;
   roleScope?: WorkspaceRoleScope;
+  eventName?: string;
+  eventCategory?: string;
+  startDate?: string;
+  endDate?: string;
   onTaskEdit?: (task: WorkspaceTask) => void;
   onTaskDelete?: (taskId: string) => void;
   onTaskStatusChange?: (taskId: string, status: TaskStatus) => void;
@@ -28,7 +36,7 @@ interface TaskManagementInterfaceProps {
   initialTaskId?: string;
 }
 
-type ViewMode = 'list' | 'kanban';
+type ViewMode = 'list' | 'kanban' | 'dependencies';
 
 export function TaskManagementInterface({
   tasks,
@@ -37,6 +45,10 @@ export function TaskManagementInterface({
   eventId,
   workspaceType,
   roleScope,
+  eventName,
+  eventCategory,
+  startDate,
+  endDate,
   onTaskEdit,
   onTaskDelete,
   onTaskStatusChange,
@@ -48,6 +60,7 @@ export function TaskManagementInterface({
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
+  const [showDependencyModal, setShowDependencyModal] = useState(false);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'ALL',
@@ -308,8 +321,30 @@ export function TaskManagementInterface({
     setFilters((prev) => ({ ...prev, ...next }));
   };
 
+  const handleAddAISuggestion = (suggestion: TaskSuggestion) => {
+    createTaskMutation.mutate({
+      title: suggestion.title,
+      description: suggestion.description,
+      priority: suggestion.priority as TaskPriority,
+      category: suggestion.category,
+    });
+  };
+
   return (
     <div className="space-y-4">
+      {/* AI Suggestions Panel */}
+      {eventName && (
+        <TaskAISuggestionsPanel
+          eventName={eventName}
+          eventCategory={eventCategory}
+          startDate={startDate}
+          endDate={endDate}
+          existingTasks={tasks.map(t => t.title)}
+          workspaceType={workspaceType}
+          onAddTask={handleAddAISuggestion}
+        />
+      )}
+
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -346,6 +381,18 @@ export function TaskManagementInterface({
               <Columns3 className="h-4 w-4" />
               <span className="hidden sm:inline">Kanban</span>
             </button>
+            <button
+              onClick={() => setViewMode('dependencies')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'dependencies'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <GitBranch className="h-4 w-4" />
+              <span className="hidden sm:inline">Deps</span>
+            </button>
           </div>
 
           {/* Create Task Button */}
@@ -363,10 +410,14 @@ export function TaskManagementInterface({
       <TaskFilterBar filters={filters} onChange={handleFilterChange} teamMembers={teamMembers} />
 
       {/* Task Views */}
-      {viewMode === 'list' ? (
-        <TaskList {...commonProps} />
-      ) : (
-        <TaskKanbanBoard {...commonProps} />
+      {viewMode === 'list' && <TaskList {...commonProps} />}
+      {viewMode === 'kanban' && <TaskKanbanBoard {...commonProps} />}
+      {viewMode === 'dependencies' && (
+        <TaskDependencyGraph
+          tasks={filteredTasks}
+          selectedTaskId={selectedTask?.id}
+          onTaskClick={handleTaskClick}
+        />
       )}
 
       {/* Task Detail Modal */}
