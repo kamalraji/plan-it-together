@@ -1227,6 +1227,62 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          include_qr_code: boolean | null
+          is_default: boolean | null
+          name: string
+          subject: string
+          updated_at: string
+          variables: string[] | null
+          workspace_id: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          include_qr_code?: boolean | null
+          is_default?: boolean | null
+          name: string
+          subject: string
+          updated_at?: string
+          variables?: string[] | null
+          workspace_id: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          include_qr_code?: boolean | null
+          is_default?: boolean | null
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: string[] | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_page_views: {
         Row: {
           created_at: string
@@ -8975,6 +9031,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
       decrement_ticket_sold_count: {
         Args: { quantity: number; ticket_id: string }
         Returns: undefined
