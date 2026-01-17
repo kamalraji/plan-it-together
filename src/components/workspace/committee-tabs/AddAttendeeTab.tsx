@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   UserPlus,
   Mail,
@@ -16,11 +17,13 @@ import {
   Users,
   CheckCircle2,
   Plus,
-  Trash2
+  Trash2,
+  Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Workspace } from '@/types';
 import { useForm } from 'react-hook-form';
+import { useManualRegistration } from '@/hooks/useManualRegistration';
 
 interface AddAttendeeTabProps {
   workspace: Workspace;
@@ -35,55 +38,78 @@ interface AttendeeFormData {
   sendConfirmation: boolean;
 }
 
-const ticketTypes = [
-  { id: 'vip', name: 'VIP Pass', price: 150, available: 25 },
-  { id: 'general', name: 'General Admission', price: 50, available: 234 },
-  { id: 'student', name: 'Student', price: 25, available: 100 },
-  { id: 'speaker', name: 'Speaker', price: 0, available: 10 },
-  { id: 'sponsor', name: 'Sponsor', price: 0, available: 50 },
-];
-
-export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
   const [bulkMode, setBulkMode] = useState(false);
   const [bulkEmails, setBulkEmails] = useState<string[]>(['']);
+  const [bulkTicketType, setBulkTicketType] = useState<string>('');
   const [recentlyAdded, setRecentlyAdded] = useState<{ name: string; email: string; ticket: string }[]>([]);
+
+  const { 
+    ticketTiers, 
+    isLoading, 
+    isSubmitting, 
+    createManualRegistration,
+    sendBulkInvitations 
+  } = useManualRegistration(workspace.eventId || null);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<AttendeeFormData>({
     defaultValues: {
-      ticketType: 'general',
+      ticketType: '',
       sendConfirmation: true,
     }
   });
 
   const selectedTicketType = watch('ticketType');
 
-  const onSubmit = async (data: AttendeeFormData) => {
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newAttendee = {
-      name: data.fullName,
-      email: data.email,
-      ticket: ticketTypes.find(t => t.id === data.ticketType)?.name || data.ticketType,
-    };
-    
-    setRecentlyAdded(prev => [newAttendee, ...prev].slice(0, 5));
-    
-    if (data.sendConfirmation) {
-      toast.success('Attendee added & confirmation sent!', {
-        description: `${data.fullName} has been registered for ${newAttendee.ticket}`,
-      });
-    } else {
-      toast.success('Attendee added successfully!', {
-        description: `${data.fullName} registered - no email sent`,
-      });
+  // Set default ticket type when tiers load
+  if (ticketTiers.length > 0 && !selectedTicketType) {
+    const firstAvailable = ticketTiers.find(t => t.available > 0);
+    if (firstAvailable) {
+      setValue('ticketType', firstAvailable.id);
     }
-    
-    reset({ ticketType: 'general', sendConfirmation: true });
-    setIsSubmitting(false);
+  }
+
+  // Set default bulk ticket type
+  if (ticketTiers.length > 0 && !bulkTicketType) {
+    const firstAvailable = ticketTiers.find(t => t.available > 0);
+    if (firstAvailable) {
+      setBulkTicketType(firstAvailable.id);
+    }
+  }
+
+  const onSubmit = async (data: AttendeeFormData) => {
+    const success = await createManualRegistration({
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      ticketTierId: data.ticketType,
+      notes: data.notes,
+      sendConfirmation: data.sendConfirmation
+    });
+
+    if (success) {
+      const tier = ticketTiers.find(t => t.id === data.ticketType);
+      const newAttendee = {
+        name: data.fullName,
+        email: data.email,
+        ticket: tier?.name || 'Ticket',
+      };
+      
+      setRecentlyAdded(prev => [newAttendee, ...prev].slice(0, 5));
+      
+      if (data.sendConfirmation) {
+        toast.success('Attendee added & confirmation sent!', {
+          description: `${data.fullName} has been registered for ${newAttendee.ticket}`,
+        });
+      } else {
+        toast.success('Attendee added successfully!', {
+          description: `${data.fullName} registered - no email sent`,
+        });
+      }
+      
+      // Reset form but keep ticket type
+      reset({ ticketType: data.ticketType, sendConfirmation: true });
+    }
   };
 
   const handleBulkAdd = async () => {
@@ -93,15 +119,26 @@ export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
       return;
     }
 
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success(`${validEmails.length} attendees invited!`, {
-      description: 'Invitation emails have been sent',
+    if (!bulkTicketType) {
+      toast.error('Please select a ticket type');
+      return;
+    }
+
+    const result = await sendBulkInvitations({
+      emails: validEmails,
+      ticketTierId: bulkTicketType
     });
     
-    setBulkEmails(['']);
-    setIsSubmitting(false);
+    if (result.sent > 0) {
+      toast.success(`${result.sent} invitation(s) sent!`, {
+        description: result.failed > 0 ? `${result.failed} failed (duplicates or errors)` : undefined,
+      });
+      setBulkEmails(['']);
+    } else if (result.failed > 0) {
+      toast.error('Failed to send invitations', {
+        description: 'All emails failed - they may already be registered',
+      });
+    }
   };
 
   const addBulkEmailField = () => {
@@ -119,6 +156,50 @@ export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
   const removeBulkEmail = (index: number) => {
     setBulkEmails(prev => prev.filter((_, i) => i !== index));
   };
+
+  // No event linked
+  if (!workspace.eventId) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <Calendar className="w-16 h-16 text-muted-foreground/50 mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No Event Associated</h3>
+        <p className="text-muted-foreground max-w-md">
+          This workspace is not linked to an event. Link an event in workspace settings to add attendees.
+        </p>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Skeleton className="h-96 w-full" />
+          </div>
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  // No ticket tiers configured
+  if (ticketTiers.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <Ticket className="w-16 h-16 text-muted-foreground/50 mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No Ticket Types Available</h3>
+        <p className="text-muted-foreground max-w-md mb-4">
+          Configure ticket tiers for this event before adding attendees. Make sure tickets are active and within sale windows.
+        </p>
+        <Button variant="outline" asChild>
+          <a href={`/events/${workspace.eventId}/settings`}>Configure Tickets</a>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -222,12 +303,16 @@ export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
                           <SelectValue placeholder="Select ticket" />
                         </SelectTrigger>
                         <SelectContent>
-                          {ticketTypes.map(ticket => (
-                            <SelectItem key={ticket.id} value={ticket.id}>
+                          {ticketTiers.map(ticket => (
+                            <SelectItem 
+                              key={ticket.id} 
+                              value={ticket.id}
+                              disabled={ticket.available <= 0}
+                            >
                               <div className="flex items-center justify-between w-full">
                                 <span>{ticket.name}</span>
                                 <span className="text-muted-foreground ml-2">
-                                  {ticket.price > 0 ? `$${ticket.price}` : 'Free'} · {ticket.available} left
+                                  {ticket.price > 0 ? `₹${ticket.price}` : 'Free'} · {ticket.available > 0 ? `${ticket.available} left` : 'Sold Out'}
                                 </span>
                               </div>
                             </SelectItem>
@@ -315,13 +400,19 @@ export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
 
                   <div className="space-y-2">
                     <Label>Ticket Type for All</Label>
-                    <Select defaultValue="general">
+                    <Select value={bulkTicketType} onValueChange={setBulkTicketType}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="Select ticket type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {ticketTypes.map(ticket => (
-                          <SelectItem key={ticket.id} value={ticket.id}>{ticket.name}</SelectItem>
+                        {ticketTiers.map(ticket => (
+                          <SelectItem 
+                            key={ticket.id} 
+                            value={ticket.id}
+                            disabled={ticket.available <= 0}
+                          >
+                            {ticket.name} {ticket.available <= 0 && '(Sold Out)'}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -353,12 +444,21 @@ export function AddAttendeeTab({ workspace: _workspace }: AddAttendeeTabProps) {
               <CardTitle className="text-base">Ticket Availability</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {ticketTypes.map(ticket => (
+              {ticketTiers.map(ticket => (
                 <div key={ticket.id} className="flex items-center justify-between">
                   <span className="text-sm">{ticket.name}</span>
-                  <Badge variant={ticket.available > 20 ? 'outline' : 'secondary'} className={ticket.available < 10 ? 'bg-amber-500/10 text-amber-600' : ''}>
-                    {ticket.available} left
-                  </Badge>
+                  {ticket.available <= 0 ? (
+                    <Badge variant="destructive" className="text-xs">
+                      Sold Out
+                    </Badge>
+                  ) : (
+                    <Badge 
+                      variant={ticket.available > 20 ? 'outline' : 'secondary'} 
+                      className={ticket.available < 10 ? 'bg-amber-500/10 text-amber-600' : ''}
+                    >
+                      {ticket.available} left
+                    </Badge>
+                  )}
                 </div>
               ))}
             </CardContent>
