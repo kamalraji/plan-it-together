@@ -62,7 +62,7 @@ export function ExportListTab({ workspace }: ExportListTabProps) {
     exportProgress,
     exportData,
   } = useExportList({ 
-    eventId: workspace.event_id || '', 
+    eventId: workspace.eventId || '', 
     workspaceId: workspace.id 
   });
 
@@ -229,7 +229,7 @@ export function ExportListTab({ workspace }: ExportListTabProps) {
                   onClick={handleExport} 
                   className="w-full bg-purple-600 hover:bg-purple-700" 
                   size="lg"
-                  disabled={!workspace.event_id || stats.total === 0}
+                  disabled={!workspace.eventId || stats.total === 0}
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Export {selectedFields.length} Fields as {exportFormats.find(f => f.id === selectedFormat)?.name}
