@@ -1449,6 +1449,63 @@ export type Database = {
           },
         ]
       }
+      export_history: {
+        Row: {
+          created_at: string
+          event_id: string
+          fields: string[]
+          filename: string
+          filters: Json | null
+          format: string
+          id: string
+          record_count: number
+          status: string
+          user_id: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          fields?: string[]
+          filename: string
+          filters?: Json | null
+          format: string
+          id?: string
+          record_count?: number
+          status?: string
+          user_id: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          fields?: string[]
+          filename?: string
+          filters?: Json | null
+          format?: string
+          id?: string
+          record_count?: number
+          status?: string
+          user_id?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "export_history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       id_card_templates: {
         Row: {
           card_type: string | null

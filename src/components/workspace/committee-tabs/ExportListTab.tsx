@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Download,
   FileSpreadsheet,
@@ -15,23 +16,16 @@ import {
   CheckCircle2,
   Clock,
   Users,
-  Calendar
+  Calendar,
+  XCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 import { Workspace } from '@/types';
+import { useExportList } from '@/hooks/useExportList';
+import { type ExportField } from '@/lib/export-utils';
 
 interface ExportListTabProps {
   workspace: Workspace;
-}
-
-interface ExportHistory {
-  id: string;
-  filename: string;
-  format: string;
-  records: number;
-  createdAt: Date;
-  status: 'completed' | 'processing';
 }
 
 const exportFormats = [
@@ -41,7 +35,7 @@ const exportFormats = [
   { id: 'json', name: 'JSON', icon: FileJson, description: 'Developer-friendly format' },
 ];
 
-const dataFields = [
+const dataFields: { id: ExportField; label: string; required: boolean }[] = [
   { id: 'name', label: 'Full Name', required: true },
   { id: 'email', label: 'Email Address', required: true },
   { id: 'phone', label: 'Phone Number', required: false },
@@ -50,25 +44,29 @@ const dataFields = [
   { id: 'status', label: 'Status', required: false },
   { id: 'checkInTime', label: 'Check-in Time', required: false },
   { id: 'customFields', label: 'Custom Fields', required: false },
-  { id: 'notes', label: 'Notes', required: false },
 ];
 
-const mockExportHistory: ExportHistory[] = [
-  { id: '1', filename: 'attendees_2025-01-10.csv', format: 'CSV', records: 1250, createdAt: new Date('2025-01-10T14:30:00'), status: 'completed' },
-  { id: '2', filename: 'vip_attendees.xlsx', format: 'Excel', records: 156, createdAt: new Date('2025-01-09T09:15:00'), status: 'completed' },
-  { id: '3', filename: 'checkin_report.pdf', format: 'PDF', records: 847, createdAt: new Date('2025-01-08T16:45:00'), status: 'completed' },
-];
-
-export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
+export function ExportListTab({ workspace }: ExportListTabProps) {
   const [selectedFormat, setSelectedFormat] = useState('csv');
-  const [selectedFields, setSelectedFields] = useState<string[]>(['name', 'email', 'ticketType', 'status']);
+  const [selectedFields, setSelectedFields] = useState<ExportField[]>(['name', 'email', 'ticketType', 'status']);
   const [statusFilter, setStatusFilter] = useState('all');
   const [ticketFilter, setTicketFilter] = useState('all');
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState(0);
-  const [exportHistory, setExportHistory] = useState<ExportHistory[]>(mockExportHistory);
 
-  const toggleField = (fieldId: string) => {
+  const {
+    stats,
+    ticketTiers,
+    exportHistory,
+    isLoadingStats,
+    isLoadingHistory,
+    isExporting,
+    exportProgress,
+    exportData,
+  } = useExportList({ 
+    eventId: workspace.event_id || '', 
+    workspaceId: workspace.id 
+  });
+
+  const toggleField = (fieldId: ExportField) => {
     const field = dataFields.find(f => f.id === fieldId);
     if (field?.required) return;
     
@@ -79,47 +77,19 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
     );
   };
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    setExportProgress(0);
-
-    // Simulate export progress
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      setExportProgress(i);
-    }
-
-    const formatInfo = exportFormats.find(f => f.id === selectedFormat);
-    const filename = `attendees_${format(new Date(), 'yyyy-MM-dd')}.${selectedFormat}`;
-    
-    const newExport: ExportHistory = {
-      id: Date.now().toString(),
-      filename,
-      format: formatInfo?.name || selectedFormat.toUpperCase(),
-      records: 1250,
-      createdAt: new Date(),
-      status: 'completed',
-    };
-
-    setExportHistory(prev => [newExport, ...prev]);
-    setIsExporting(false);
-    setExportProgress(0);
-
-    toast.success('Export completed!', {
-      description: `${filename} is ready for download`,
-      action: {
-        label: 'Download',
-        onClick: () => {
-          // Trigger download
-          toast.info('Download started');
-        },
-      },
-    });
+  const handleExport = () => {
+    exportData(
+      selectedFormat,
+      selectedFields,
+      statusFilter,
+      ticketFilter,
+      workspace.name || 'event'
+    );
   };
 
   const getFormatIcon = (formatId: string) => {
-    const format = exportFormats.find(f => f.id === formatId.toLowerCase());
-    return format?.icon || FileText;
+    const fmt = exportFormats.find(f => f.id === formatId.toLowerCase());
+    return fmt?.icon || FileText;
   };
 
   return (
@@ -144,21 +114,21 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {exportFormats.map(format => {
-                  const Icon = format.icon;
+                {exportFormats.map(fmt => {
+                  const Icon = fmt.icon;
                   return (
                     <button
-                      key={format.id}
-                      onClick={() => setSelectedFormat(format.id)}
+                      key={fmt.id}
+                      onClick={() => setSelectedFormat(fmt.id)}
                       className={`p-4 rounded-lg border-2 transition-all text-left ${
-                        selectedFormat === format.id
+                        selectedFormat === fmt.id
                           ? 'border-primary bg-primary/5'
                           : 'border-border hover:border-primary/50'
                       }`}
                     >
-                      <Icon className={`w-8 h-8 mb-2 ${selectedFormat === format.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                      <p className="font-medium">{format.name}</p>
-                      <p className="text-xs text-muted-foreground">{format.description}</p>
+                      <Icon className={`w-8 h-8 mb-2 ${selectedFormat === fmt.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <p className="font-medium">{fmt.name}</p>
+                      <p className="text-xs text-muted-foreground">{fmt.description}</p>
                     </button>
                   );
                 })}
@@ -231,10 +201,11 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Tickets</SelectItem>
-                      <SelectItem value="vip">VIP Pass</SelectItem>
-                      <SelectItem value="general">General Admission</SelectItem>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="speaker">Speaker</SelectItem>
+                      {ticketTiers.map(tier => (
+                        <SelectItem key={tier.id} value={tier.id}>
+                          {tier.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -254,7 +225,12 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
                   <Progress value={exportProgress} className="h-2" />
                 </div>
               ) : (
-                <Button onClick={handleExport} className="w-full bg-purple-600 hover:bg-purple-700" size="lg">
+                <Button 
+                  onClick={handleExport} 
+                  className="w-full bg-purple-600 hover:bg-purple-700" 
+                  size="lg"
+                  disabled={!workspace.event_id || stats.total === 0}
+                >
                   <Download className="w-5 h-5 mr-2" />
                   Export {selectedFields.length} Fields as {exportFormats.find(f => f.id === selectedFormat)?.name}
                 </Button>
@@ -271,27 +247,44 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
               <CardTitle className="text-base">Export Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span>Total Records</span>
-                </div>
-                <Badge>1,250</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Confirmed</span>
-                </div>
-                <span className="text-sm">847</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="w-4 h-4 text-amber-500" />
-                  <span>Pending</span>
-                </div>
-                <span className="text-sm">403</span>
-              </div>
+              {isLoadingStats ? (
+                <>
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span>Total Records</span>
+                    </div>
+                    <Badge>{stats.total.toLocaleString()}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <span>Confirmed</span>
+                    </div>
+                    <span className="text-sm">{stats.confirmed.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="w-4 h-4 text-amber-500" />
+                      <span>Pending</span>
+                    </div>
+                    <span className="text-sm">{stats.pending.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <XCircle className="w-4 h-4 text-red-500" />
+                      <span>Cancelled</span>
+                    </div>
+                    <span className="text-sm">{stats.cancelled.toLocaleString()}</span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -304,27 +297,35 @@ export function ExportListTab({ workspace: _workspace }: ExportListTabProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {exportHistory.map(exp => {
-                const Icon = getFormatIcon(exp.format);
-                return (
-                  <div key={exp.id} className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <Icon className="w-5 h-5 text-muted-foreground mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{exp.filename}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          <span>{exp.records.toLocaleString()} records</span>
-                          <span>·</span>
-                          <span>{format(exp.createdAt, 'MMM d, h:mm a')}</span>
+              {isLoadingHistory ? (
+                <>
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </>
+              ) : exportHistory.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No exports yet
+                </p>
+              ) : (
+                exportHistory.map(exp => {
+                  const Icon = getFormatIcon(exp.format);
+                  return (
+                    <div key={exp.id} className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <Icon className="w-5 h-5 text-muted-foreground mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{exp.filename}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <span>{exp.record_count.toLocaleString()} records</span>
+                            <span>·</span>
+                            <span>{format(new Date(exp.created_at), 'MMM d, h:mm a')}</span>
+                          </div>
                         </div>
                       </div>
-                      <Button size="icon" variant="ghost" className="h-7 w-7">
-                        <Download className="w-3.5 h-3.5" />
-                      </Button>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </CardContent>
           </Card>
         </div>
