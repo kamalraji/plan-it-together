@@ -14,13 +14,23 @@ export interface TicketTier {
   sale_end: string | null;
 }
 
-interface ManualRegistrationData {
+export interface ManualRegistrationData {
   fullName: string;
   email: string;
   phone?: string;
   ticketTierId: string;
   notes?: string;
   sendConfirmation: boolean;
+  promoCodeId?: string;
+  discountAmount?: number;
+}
+
+export interface BulkImportAttendee {
+  fullName: string;
+  email: string;
+  phone?: string;
+  ticketTierId: string;
+  notes?: string;
 }
 
 interface BulkInviteData {
@@ -125,6 +135,11 @@ export function useManualRegistration(eventId: string | null) {
         return false;
       }
 
+      // Calculate totals with discount
+      const subtotal = tier.price;
+      const discountAmount = data.discountAmount || 0;
+      const totalAmount = Math.max(0, subtotal - discountAmount);
+
       // Create registration
       const { data: registration, error: regError } = await supabase
         .from('registrations')
@@ -139,9 +154,10 @@ export function useManualRegistration(eventId: string | null) {
             registered_by: user.id,
             notes: data.notes || null
           },
-          subtotal: tier.price,
-          total_amount: tier.price,
-          discount_amount: 0
+          subtotal: subtotal,
+          total_amount: totalAmount,
+          discount_amount: discountAmount,
+          promo_code_id: data.promoCodeId || null
         })
         .select()
         .single();
@@ -171,6 +187,26 @@ export function useManualRegistration(eventId: string | null) {
 
       if (updateError) {
         console.error('Failed to update sold count:', updateError);
+      }
+
+      // Update promo code usage if applied
+      if (data.promoCodeId) {
+        try {
+          const { data: promoData } = await supabase
+            .from('promo_codes')
+            .select('current_uses')
+            .eq('id', data.promoCodeId)
+            .single();
+          
+          if (promoData) {
+            await supabase
+              .from('promo_codes')
+              .update({ current_uses: (promoData.current_uses || 0) + 1 })
+              .eq('id', data.promoCodeId);
+          }
+        } catch (err) {
+          console.warn('Failed to increment promo code usage:', err);
+        }
       }
 
       // Send confirmation email if requested
@@ -275,12 +311,51 @@ export function useManualRegistration(eventId: string | null) {
     }
   };
 
+  const bulkImportAttendees = async (
+    attendees: BulkImportAttendee[],
+    sendConfirmation: boolean = true
+  ): Promise<{ success: number; failed: number; errors: string[] }> => {
+    if (!eventId) {
+      toast.error('No event associated with this workspace');
+      return { success: 0, failed: attendees.length, errors: ['No event ID'] };
+    }
+
+    setIsSubmitting(true);
+    let success = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    try {
+      for (const attendee of attendees) {
+        const result = await createManualRegistration({
+          ...attendee,
+          sendConfirmation
+        });
+
+        if (result) {
+          success++;
+        } else {
+          failed++;
+          errors.push(`Failed to register: ${attendee.email}`);
+        }
+      }
+
+      return { success, failed, errors };
+    } catch (error) {
+      console.error('Bulk import error:', error);
+      return { success, failed: attendees.length - success, errors: [...errors, 'Unexpected error'] };
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return {
     ticketTiers,
     isLoading,
     isSubmitting,
     createManualRegistration,
     sendBulkInvitations,
+    bulkImportAttendees,
     refreshTicketTiers: fetchTicketTiers
   };
 }
