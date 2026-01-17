@@ -1375,6 +1375,88 @@ export type Database = {
           },
         ]
       }
+      event_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string
+          full_name: string
+          id: string
+          invited_at: string | null
+          notes: string | null
+          phone: string | null
+          position: number
+          priority: string
+          promoted_at: string | null
+          referred_by: string | null
+          registration_id: string | null
+          source: string
+          status: string
+          ticket_tier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id: string
+          full_name: string
+          id?: string
+          invited_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          position: number
+          priority?: string
+          promoted_at?: string | null
+          referred_by?: string | null
+          registration_id?: string | null
+          source?: string
+          status?: string
+          ticket_tier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string
+          full_name?: string
+          id?: string
+          invited_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          position?: number
+          priority?: string
+          promoted_at?: string | null
+          referred_by?: string | null
+          registration_id?: string | null
+          source?: string
+          status?: string
+          ticket_tier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_waitlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_waitlist_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_waitlist_ticket_tier_id_fkey"
+            columns: ["ticket_tier_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           branding: Json | null
@@ -9075,6 +9157,10 @@ export type Database = {
       }
       record_organization_product_metrics: {
         Args: { _event_type: string; _product_ids: string[] }
+        Returns: undefined
+      }
+      reorder_waitlist_positions: {
+        Args: { p_entry_id: string; p_event_id: string; p_new_position: number }
         Returns: undefined
       }
       update_user_streak: { Args: { user_uuid: string }; Returns: undefined }

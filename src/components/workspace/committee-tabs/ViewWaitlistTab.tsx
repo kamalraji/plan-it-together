@@ -19,107 +19,72 @@ import {
   Filter,
   Download,
   RefreshCw,
-  Ticket
+  Ticket,
+  Loader2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from 'sonner';
 import { Workspace } from '@/types';
+import { useWaitlist, WaitlistEntry } from '@/hooks/useWaitlist';
 
 interface ViewWaitlistTabProps {
   workspace: Workspace;
 }
 
-interface WaitlistEntry {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  ticketType: string;
-  position: number;
-  joinedAt: Date;
-  priority: 'normal' | 'high' | 'vip';
-  notes?: string;
-  source: 'website' | 'referral' | 'manual';
-}
+export function ViewWaitlistTab({ workspace }: ViewWaitlistTabProps) {
+  const {
+    waitlist,
+    stats,
+    ticketAvailability,
+    ticketTiers,
+    isLoading,
+    isProcessing,
+    moveUp,
+    moveDown,
+    promoteEntry,
+    removeEntry,
+    sendInvites,
+    bulkPromote,
+    refetch,
+  } = useWaitlist({ eventId: workspace.eventId || '' });
 
-const mockWaitlist: WaitlistEntry[] = [
-  { id: '1', name: 'Arun Kumar', email: 'arun.k@email.com', phone: '+91 98765 43210', ticketType: 'General', position: 1, joinedAt: new Date('2025-01-03T14:30:00'), priority: 'high', source: 'website' },
-  { id: '2', name: 'Sneha Reddy', email: 'sneha.r@email.com', ticketType: 'VIP Pass', position: 2, joinedAt: new Date('2025-01-03T16:00:00'), priority: 'vip', notes: 'Referred by sponsor', source: 'referral' },
-  { id: '3', name: 'Kiran Joshi', email: 'kiran.j@email.com', ticketType: 'General', position: 3, joinedAt: new Date('2025-01-04T09:15:00'), priority: 'normal', source: 'website' },
-  { id: '4', name: 'Deepa Menon', email: 'deepa.m@email.com', ticketType: 'Student', position: 4, joinedAt: new Date('2025-01-04T11:45:00'), priority: 'normal', source: 'website' },
-  { id: '5', name: 'Rajesh Iyer', email: 'rajesh.i@email.com', ticketType: 'General', position: 5, joinedAt: new Date('2025-01-05T10:00:00'), priority: 'normal', source: 'manual' },
-  { id: '6', name: 'Priya Nair', email: 'priya.n@email.com', ticketType: 'VIP Pass', position: 6, joinedAt: new Date('2025-01-05T14:30:00'), priority: 'high', source: 'website' },
-  { id: '7', name: 'Amit Shah', email: 'amit.s@email.com', ticketType: 'General', position: 7, joinedAt: new Date('2025-01-06T09:00:00'), priority: 'normal', source: 'website' },
-];
-
-const ticketAvailability = [
-  { type: 'General', available: 12, waitlisted: 25 },
-  { type: 'VIP Pass', available: 3, waitlisted: 8 },
-  { type: 'Student', available: 5, waitlisted: 4 },
-];
-
-export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps) {
-  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>(mockWaitlist);
   const [searchTerm, setSearchTerm] = useState('');
   const [ticketFilter, setTicketFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
 
   const filteredWaitlist = waitlist.filter(entry => {
-    const matchesSearch = entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = entry.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTicket = ticketFilter === 'all' || entry.ticketType === ticketFilter;
+    const matchesTicket = ticketFilter === 'all' || entry.ticketTierId === ticketFilter;
     const matchesPriority = priorityFilter === 'all' || entry.priority === priorityFilter;
     return matchesSearch && matchesTicket && matchesPriority;
   });
 
-  const handlePromote = (entry: WaitlistEntry) => {
-    setWaitlist(prev => prev.filter(e => e.id !== entry.id));
-    toast.success('Attendee promoted!', {
-      description: `${entry.name} has been moved to confirmed registrations`,
-    });
+  const handlePromote = async (entry: WaitlistEntry) => {
+    await promoteEntry(entry.id);
+    setSelectedEntries(prev => prev.filter(id => id !== entry.id));
   };
 
-  const handleRemove = (entry: WaitlistEntry) => {
-    setWaitlist(prev => prev.filter(e => e.id !== entry.id));
-    toast.info('Removed from waitlist', {
-      description: `${entry.name} has been removed`,
-    });
+  const handleRemove = async (entry: WaitlistEntry) => {
+    await removeEntry(entry.id);
+    setSelectedEntries(prev => prev.filter(id => id !== entry.id));
   };
 
-  const handleMoveUp = (entry: WaitlistEntry) => {
-    setWaitlist(prev => {
-      const index = prev.findIndex(e => e.id === entry.id);
-      if (index <= 0) return prev;
-      const newList = [...prev];
-      [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
-      return newList.map((e, i) => ({ ...e, position: i + 1 }));
-    });
+  const handleMoveUp = async (entry: WaitlistEntry) => {
+    await moveUp(entry.id);
   };
 
-  const handleMoveDown = (entry: WaitlistEntry) => {
-    setWaitlist(prev => {
-      const index = prev.findIndex(e => e.id === entry.id);
-      if (index >= prev.length - 1) return prev;
-      const newList = [...prev];
-      [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
-      return newList.map((e, i) => ({ ...e, position: i + 1 }));
-    });
+  const handleMoveDown = async (entry: WaitlistEntry) => {
+    await moveDown(entry.id);
   };
 
-  const handleBulkPromote = () => {
-    const count = selectedEntries.length;
-    setWaitlist(prev => prev.filter(e => !selectedEntries.includes(e.id)));
+  const handleBulkPromote = async () => {
+    await bulkPromote(selectedEntries);
     setSelectedEntries([]);
-    toast.success(`${count} attendees promoted!`);
   };
 
-  const handleSendInvites = () => {
-    const availableSpots = ticketAvailability.reduce((sum, t) => sum + t.available, 0);
-    const toInvite = Math.min(availableSpots, waitlist.length);
-    toast.success(`Invitations sent!`, {
-      description: `Sent to top ${toInvite} waitlisted attendees`,
-    });
+  const handleSendInvites = async () => {
+    await sendInvites();
   };
 
   const getPriorityBadge = (priority: WaitlistEntry['priority']) => {
@@ -147,6 +112,16 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
     }
   };
 
+  const totalAvailableSpots = ticketAvailability.reduce((sum, t) => sum + t.available, 0);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -157,7 +132,7 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
             Waitlist Manager
           </h2>
           <p className="text-muted-foreground mt-1">
-            {waitlist.length} in queue · Manage and promote waitlisted attendees
+            {stats.totalWaiting} in queue · Manage and promote waitlisted attendees
           </p>
         </div>
         <div className="flex gap-2">
@@ -165,8 +140,14 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
             <Download className="w-4 h-4" />
             Export
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <RefreshCw className="w-4 h-4" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1.5"
+            onClick={() => refetch()}
+            disabled={isProcessing}
+          >
+            <RefreshCw className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -176,29 +157,25 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-cyan-500/20 bg-cyan-500/5">
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-cyan-600">{waitlist.length}</p>
+            <p className="text-3xl font-bold text-cyan-600">{stats.totalWaiting}</p>
             <p className="text-sm text-muted-foreground">Total Waitlisted</p>
           </CardContent>
         </Card>
         <Card className="border-emerald-500/20 bg-emerald-500/5">
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-emerald-600">
-              {ticketAvailability.reduce((sum, t) => sum + t.available, 0)}
-            </p>
+            <p className="text-3xl font-bold text-emerald-600">{totalAvailableSpots}</p>
             <p className="text-sm text-muted-foreground">Spots Available</p>
           </CardContent>
         </Card>
         <Card className="border-orange-500/20 bg-orange-500/5">
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-orange-600">
-              {waitlist.filter(e => e.priority === 'high' || e.priority === 'vip').length}
-            </p>
+            <p className="text-3xl font-bold text-orange-600">{stats.priorityCount}</p>
             <p className="text-sm text-muted-foreground">Priority Entries</p>
           </CardContent>
         </Card>
         <Card className="border-blue-500/20 bg-blue-500/5">
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-blue-600">2.3</p>
+            <p className="text-3xl font-bold text-blue-600">{stats.avgWaitDays}</p>
             <p className="text-sm text-muted-foreground">Avg Days Waiting</p>
           </CardContent>
         </Card>
@@ -226,9 +203,9 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Tickets</SelectItem>
-                    <SelectItem value="General">General</SelectItem>
-                    <SelectItem value="VIP Pass">VIP Pass</SelectItem>
-                    <SelectItem value="Student">Student</SelectItem>
+                    {ticketTiers.map(tier => (
+                      <SelectItem key={tier.id} value={tier.id}>{tier.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
@@ -247,8 +224,13 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
               {selectedEntries.length > 0 && (
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 mt-4">
                   <span className="text-sm font-medium">{selectedEntries.length} selected</span>
-                  <Button size="sm" onClick={handleBulkPromote} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
-                    <UserPlus className="w-3.5 h-3.5" />
+                  <Button 
+                    size="sm" 
+                    onClick={handleBulkPromote} 
+                    className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
                     Promote Selected
                   </Button>
                   <Button size="sm" variant="outline" className="gap-1.5">
@@ -296,22 +278,24 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
                         </div>
                         <Avatar className="h-10 w-10">
                           <AvatarFallback className="text-sm bg-muted">
-                            {entry.name.split(' ').map(n => n[0]).join('')}
+                            {entry.fullName.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-medium">{entry.name}</p>
+                            <p className="font-medium">{entry.fullName}</p>
                             {getPriorityBadge(entry.priority)}
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span>{entry.email}</span>
                             <span>·</span>
-                            <Badge variant="outline" className="text-[10px]">{entry.ticketType}</Badge>
+                            <Badge variant="outline" className="text-[10px]">
+                              {entry.ticketTierName || 'No tier'}
+                            </Badge>
                           </div>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                             <Clock className="w-3 h-3" />
-                            <span>Joined {formatDistanceToNow(entry.joinedAt, { addSuffix: true })}</span>
+                            <span>Joined {formatDistanceToNow(entry.createdAt, { addSuffix: true })}</span>
                             {entry.notes && (
                               <>
                                 <span>·</span>
@@ -323,16 +307,40 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
                       </div>
                       
                       <div className="flex items-center gap-1">
-                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleMoveUp(entry)} disabled={index === 0}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8" 
+                          onClick={() => handleMoveUp(entry)} 
+                          disabled={index === 0 || isProcessing}
+                        >
                           <ChevronUp className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleMoveDown(entry)} disabled={index === filteredWaitlist.length - 1}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8" 
+                          onClick={() => handleMoveDown(entry)} 
+                          disabled={index === filteredWaitlist.length - 1 || isProcessing}
+                        >
                           <ChevronDown className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600 hover:bg-emerald-500/10" onClick={() => handlePromote(entry)}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 text-emerald-600 hover:bg-emerald-500/10" 
+                          onClick={() => handlePromote(entry)}
+                          disabled={isProcessing}
+                        >
                           <Check className="w-4 h-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleRemove(entry)}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10" 
+                          onClick={() => handleRemove(entry)}
+                          disabled={isProcessing}
+                        >
                           <X className="w-4 h-4" />
                         </Button>
                       </div>
@@ -355,16 +363,20 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {ticketAvailability.map(ticket => (
-                <div key={ticket.type} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-                  <span className="text-sm">{ticket.type}</span>
-                  <div className="flex items-center gap-2">
-                    <Badge className={ticket.available > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}>
-                      {ticket.available} spots
-                    </Badge>
+              {ticketAvailability.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-2">No ticket tiers configured</p>
+              ) : (
+                ticketAvailability.map(ticket => (
+                  <div key={ticket.tierId} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <span className="text-sm">{ticket.tierName}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge className={ticket.available > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}>
+                        {ticket.available} spots
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
 
@@ -374,11 +386,20 @@ export function ViewWaitlistTab({ workspace: _workspace }: ViewWaitlistTabProps)
               <CardTitle className="text-base">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700" onClick={handleSendInvites}>
-                <Mail className="w-4 h-4" />
+              <Button 
+                className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700" 
+                onClick={handleSendInvites}
+                disabled={isProcessing || totalAvailableSpots === 0 || stats.totalWaiting === 0}
+              >
+                {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
                 Send Invites to Available
               </Button>
-              <Button variant="outline" className="w-full gap-2">
+              <Button 
+                variant="outline" 
+                className="w-full gap-2"
+                onClick={() => waitlist[0] && handlePromote(waitlist[0])}
+                disabled={isProcessing || waitlist.length === 0}
+              >
                 <UserPlus className="w-4 h-4" />
                 Promote Top Entry
               </Button>
