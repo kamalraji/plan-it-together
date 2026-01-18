@@ -7501,6 +7501,81 @@ export type Database = {
           },
         ]
       }
+      workspace_runsheet_cues: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          cue_type: string | null
+          description: string | null
+          duration_minutes: number | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          order_index: number | null
+          scheduled_time: string
+          started_at: string | null
+          status: string | null
+          technician_id: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cue_type?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          order_index?: number | null
+          scheduled_time: string
+          started_at?: string | null
+          status?: string | null
+          technician_id?: string | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cue_type?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          order_index?: number | null
+          scheduled_time?: string
+          started_at?: string | null
+          status?: string | null
+          technician_id?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_runsheet_cues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_runsheet_cues_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_scheduled_content: {
         Row: {
           assigned_name: string | null
