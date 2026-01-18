@@ -113,7 +113,7 @@ export function usePowerDistribution({ workspaceId }: UsePowerDistributionOption
     mutationFn: async (data: Partial<PowerZone>) => {
       const { error } = await supabase.from('workspace_power_zones').insert([{
         workspace_id: workspaceId,
-        name: data.name,
+        name: data.name || 'New Zone',
         location: data.location,
         zone_type: data.zoneType || 'standard',
         total_capacity_amps: data.totalCapacityAmps,
@@ -195,7 +195,7 @@ export function usePowerDistribution({ workspaceId }: UsePowerDistributionOption
       const { error } = await supabase.from('workspace_power_circuits').insert([{
         workspace_id: workspaceId,
         zone_id: zoneId,
-        name: data.name,
+        name: data.name || 'New Circuit',
         circuit_number: data.circuitNumber,
         rated_amps: data.ratedAmps || 20,
         current_load_amps: data.currentLoadAmps || 0,

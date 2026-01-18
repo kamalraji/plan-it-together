@@ -84,7 +84,7 @@ export function useTechIncidents({ workspaceId }: UseTechIncidentsOptions) {
     mutationFn: async (data: Partial<TechIncident>) => {
       const { error } = await supabase.from('workspace_incidents').insert([{
         workspace_id: workspaceId,
-        title: data.title,
+        title: data.title || 'Untitled Incident',
         description: data.description,
         severity: data.severity || 'medium',
         status: 'open',

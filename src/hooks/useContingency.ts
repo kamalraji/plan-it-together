@@ -125,8 +125,8 @@ export function useContingency({ workspaceId }: UseContingencyOptions) {
     mutationFn: async (data: Partial<BackupEquipment>) => {
       const { error } = await supabase.from('workspace_backup_equipment').insert([{
         workspace_id: workspaceId,
-        name: data.name,
-        equipment_type: data.equipmentType,
+        name: data.name || 'Backup Equipment',
+        equipment_type: data.equipmentType || 'general',
         primary_equipment_id: data.primaryEquipmentId,
         location: data.location,
         status: data.status || 'ready',
@@ -242,9 +242,9 @@ export function useContingency({ workspaceId }: UseContingencyOptions) {
     mutationFn: async (data: Partial<ContingencyProcedure>) => {
       const { error } = await supabase.from('workspace_contingency_procedures').insert([{
         workspace_id: workspaceId,
-        name: data.name,
-        category: data.category,
-        trigger_condition: data.triggerCondition,
+        name: data.name || 'New Procedure',
+        category: data.category || 'other',
+        trigger_condition: data.triggerCondition || 'When triggered',
         procedure_steps: JSON.parse(JSON.stringify(data.procedureSteps || [])),
         recovery_time_objective_minutes: data.rtoMinutes,
         primary_contact_name: data.primaryContactName,
