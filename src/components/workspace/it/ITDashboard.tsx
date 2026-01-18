@@ -21,7 +21,7 @@ export function ITDashboard({
   orgSlug,
   onViewTasks: _onViewTasks,
 }: ITDashboardProps) {
-  const { tickets, accessRequests, systems, securityAlerts, stats, isLoading } = useITDashboardData(workspace.id);
+  const { accessRequests, systems, securityAlerts, stats, isLoading } = useITDashboardData(workspace.id);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -45,7 +45,7 @@ export function ITDashboard({
 
           {/* Helpdesk & Access Management */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <HelpdeskTickets tickets={tickets} isLoading={isLoading} />
+            <HelpdeskTickets workspaceId={workspace.id} eventId={workspace.eventId} />
             <AccessManagement requests={accessRequests} isLoading={isLoading} />
           </div>
         </div>

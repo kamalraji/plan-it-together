@@ -7082,6 +7082,160 @@ export type Database = {
           },
         ]
       }
+      workspace_it_tickets: {
+        Row: {
+          affected_users_count: number | null
+          assigned_to_id: string | null
+          assigned_to_name: string | null
+          category: string
+          created_at: string
+          created_by_id: string | null
+          description: string | null
+          escalated_at: string | null
+          escalated_to_id: string | null
+          escalated_to_name: string | null
+          escalation_level: number | null
+          escalation_reason: string | null
+          event_id: string | null
+          first_response_at: string | null
+          id: string
+          impact_level: string | null
+          internal_notes: string | null
+          priority: string
+          related_asset_id: string | null
+          related_asset_name: string | null
+          related_license_id: string | null
+          requester_department: string | null
+          requester_email: string | null
+          requester_id: string | null
+          requester_name: string
+          resolution_category: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by_id: string | null
+          resolved_by_name: string | null
+          satisfaction_feedback: string | null
+          satisfaction_rating: number | null
+          sla_resolution_breached: boolean | null
+          sla_resolution_deadline: string | null
+          sla_response_breached: boolean | null
+          sla_response_deadline: string | null
+          status: string
+          ticket_number: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          affected_users_count?: number | null
+          assigned_to_id?: string | null
+          assigned_to_name?: string | null
+          category?: string
+          created_at?: string
+          created_by_id?: string | null
+          description?: string | null
+          escalated_at?: string | null
+          escalated_to_id?: string | null
+          escalated_to_name?: string | null
+          escalation_level?: number | null
+          escalation_reason?: string | null
+          event_id?: string | null
+          first_response_at?: string | null
+          id?: string
+          impact_level?: string | null
+          internal_notes?: string | null
+          priority?: string
+          related_asset_id?: string | null
+          related_asset_name?: string | null
+          related_license_id?: string | null
+          requester_department?: string | null
+          requester_email?: string | null
+          requester_id?: string | null
+          requester_name: string
+          resolution_category?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_id?: string | null
+          resolved_by_name?: string | null
+          satisfaction_feedback?: string | null
+          satisfaction_rating?: number | null
+          sla_resolution_breached?: boolean | null
+          sla_resolution_deadline?: string | null
+          sla_response_breached?: boolean | null
+          sla_response_deadline?: string | null
+          status?: string
+          ticket_number: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          affected_users_count?: number | null
+          assigned_to_id?: string | null
+          assigned_to_name?: string | null
+          category?: string
+          created_at?: string
+          created_by_id?: string | null
+          description?: string | null
+          escalated_at?: string | null
+          escalated_to_id?: string | null
+          escalated_to_name?: string | null
+          escalation_level?: number | null
+          escalation_reason?: string | null
+          event_id?: string | null
+          first_response_at?: string | null
+          id?: string
+          impact_level?: string | null
+          internal_notes?: string | null
+          priority?: string
+          related_asset_id?: string | null
+          related_asset_name?: string | null
+          related_license_id?: string | null
+          requester_department?: string | null
+          requester_email?: string | null
+          requester_id?: string | null
+          requester_name?: string
+          resolution_category?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_id?: string | null
+          resolved_by_name?: string | null
+          satisfaction_feedback?: string | null
+          satisfaction_rating?: number | null
+          sla_resolution_breached?: boolean | null
+          sla_resolution_deadline?: string | null
+          sla_response_breached?: boolean | null
+          sla_response_deadline?: string | null
+          status?: string
+          ticket_number?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_it_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_it_tickets_related_license_id_fkey"
+            columns: ["related_license_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_software_licenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_it_tickets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_judge_assignments: {
         Row: {
           assigned_at: string | null
