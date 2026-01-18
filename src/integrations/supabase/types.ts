@@ -5976,6 +5976,141 @@ export type Database = {
           },
         ]
       }
+      workspace_equipment: {
+        Row: {
+          assigned_to: string | null
+          assigned_to_name: string | null
+          created_at: string | null
+          created_by: string | null
+          equipment_type: string
+          event_id: string | null
+          id: string
+          last_tested_at: string | null
+          last_tested_by: string | null
+          last_tested_by_name: string | null
+          location: string | null
+          name: string
+          next_maintenance_date: string | null
+          notes: string | null
+          order_index: number | null
+          serial_number: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          equipment_type?: string
+          event_id?: string | null
+          id?: string
+          last_tested_at?: string | null
+          last_tested_by?: string | null
+          last_tested_by_name?: string | null
+          location?: string | null
+          name: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          order_index?: number | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          equipment_type?: string
+          event_id?: string | null
+          id?: string
+          last_tested_at?: string | null
+          last_tested_by?: string | null
+          last_tested_by_name?: string | null
+          location?: string | null
+          name?: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          order_index?: number | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_equipment_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_equipment_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_equipment_tests: {
+        Row: {
+          created_at: string | null
+          equipment_id: string
+          id: string
+          metrics: Json | null
+          notes: string | null
+          result: string
+          test_type: string | null
+          tested_by: string | null
+          tested_by_name: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          equipment_id: string
+          id?: string
+          metrics?: Json | null
+          notes?: string | null
+          result: string
+          test_type?: string | null
+          tested_by?: string | null
+          tested_by_name?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          equipment_id?: string
+          id?: string
+          metrics?: Json | null
+          notes?: string | null
+          result?: string
+          test_type?: string | null
+          tested_by?: string | null
+          tested_by_name?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_equipment_tests_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_equipment_tests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_event_briefings: {
         Row: {
           activity: string
