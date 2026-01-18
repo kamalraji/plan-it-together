@@ -9453,6 +9453,136 @@ export type Database = {
           },
         ]
       }
+      workspace_support_tickets: {
+        Row: {
+          affected_system: string | null
+          assigned_at: string | null
+          assigned_by: string | null
+          assignee_id: string | null
+          category: Database["public"]["Enums"]["support_ticket_category"]
+          created_at: string
+          description: string | null
+          escalated_at: string | null
+          escalated_to: string | null
+          escalation_reason: string | null
+          event_id: string | null
+          first_response_at: string | null
+          id: string
+          internal_notes: string | null
+          is_escalated: boolean | null
+          linked_incident_id: string | null
+          location: string | null
+          priority: Database["public"]["Enums"]["support_ticket_priority"]
+          reporter_email: string | null
+          reporter_id: string | null
+          reporter_name: string | null
+          reporter_phone: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          sla_resolution_deadline: string | null
+          sla_response_deadline: string | null
+          status: Database["public"]["Enums"]["support_ticket_status"]
+          tags: string[] | null
+          ticket_number: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          affected_system?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignee_id?: string | null
+          category?: Database["public"]["Enums"]["support_ticket_category"]
+          created_at?: string
+          description?: string | null
+          escalated_at?: string | null
+          escalated_to?: string | null
+          escalation_reason?: string | null
+          event_id?: string | null
+          first_response_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_escalated?: boolean | null
+          linked_incident_id?: string | null
+          location?: string | null
+          priority?: Database["public"]["Enums"]["support_ticket_priority"]
+          reporter_email?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sla_resolution_deadline?: string | null
+          sla_response_deadline?: string | null
+          status?: Database["public"]["Enums"]["support_ticket_status"]
+          tags?: string[] | null
+          ticket_number: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          affected_system?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignee_id?: string | null
+          category?: Database["public"]["Enums"]["support_ticket_category"]
+          created_at?: string
+          description?: string | null
+          escalated_at?: string | null
+          escalated_to?: string | null
+          escalation_reason?: string | null
+          event_id?: string | null
+          first_response_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          is_escalated?: boolean | null
+          linked_incident_id?: string | null
+          location?: string | null
+          priority?: Database["public"]["Enums"]["support_ticket_priority"]
+          reporter_email?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sla_resolution_deadline?: string | null
+          sla_response_deadline?: string | null
+          status?: Database["public"]["Enums"]["support_ticket_status"]
+          tags?: string[] | null
+          ticket_number?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_support_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_support_tickets_linked_incident_id_fkey"
+            columns: ["linked_incident_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_support_tickets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_task_drafts: {
         Row: {
           created_at: string
@@ -9878,6 +10008,50 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_ticket_activities: {
+        Row: {
+          activity_type: string
+          comment: string | null
+          created_at: string
+          id: string
+          new_value: string | null
+          performed_by: string | null
+          performed_by_name: string | null
+          previous_value: string | null
+          ticket_id: string
+        }
+        Insert: {
+          activity_type: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          previous_value?: string | null
+          ticket_id: string
+        }
+        Update: {
+          activity_type?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          new_value?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          previous_value?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_ticket_activities_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_support_tickets"
             referencedColumns: ["id"]
           },
         ]
@@ -10476,6 +10650,24 @@ export type Database = {
         | "REMOVED"
       portfolio_layout: "stacked" | "grid"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
+      support_ticket_category:
+        | "bug"
+        | "request"
+        | "question"
+        | "incident"
+        | "feature"
+        | "hardware"
+        | "network"
+        | "other"
+      support_ticket_priority: "low" | "medium" | "high" | "critical"
+      support_ticket_status:
+        | "open"
+        | "assigned"
+        | "in_progress"
+        | "pending"
+        | "on_hold"
+        | "resolved"
+        | "closed"
       user_role:
         | "SUPER_ADMIN"
         | "ORGANIZER"
@@ -10671,6 +10863,26 @@ export const Constants = {
       ],
       portfolio_layout: ["stacked", "grid"],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
+      support_ticket_category: [
+        "bug",
+        "request",
+        "question",
+        "incident",
+        "feature",
+        "hardware",
+        "network",
+        "other",
+      ],
+      support_ticket_priority: ["low", "medium", "high", "critical"],
+      support_ticket_status: [
+        "open",
+        "assigned",
+        "in_progress",
+        "pending",
+        "on_hold",
+        "resolved",
+        "closed",
+      ],
       user_role: [
         "SUPER_ADMIN",
         "ORGANIZER",

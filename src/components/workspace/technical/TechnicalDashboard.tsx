@@ -33,7 +33,7 @@ export function TechnicalDashboard({
           {/* Network Status & Support Tickets */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <NetworkStatus workspaceId={workspace.id} />
-            <SupportTicketQueue />
+            <SupportTicketQueue workspaceId={workspace.id} eventId={workspace.eventId} />
           </div>
 
           {/* Equipment & Setup Checklist */}
