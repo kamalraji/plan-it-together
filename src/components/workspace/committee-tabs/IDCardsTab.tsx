@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   CreditCard, 
   Plus, 
@@ -14,7 +18,8 @@ import {
   Pencil,
   Trash2,
   CheckCircle,
-  Clock
+  Clock,
+  History
 } from 'lucide-react';
 import { Workspace } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +28,11 @@ import { IDCardDesignStudio } from '@/components/id-cards/IDCardDesignStudio';
 import { IDCardPreview } from '@/components/id-cards/IDCardPreview';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { useIDCardGeneration, GenerateParams } from '@/hooks/useIDCardGeneration';
+import { generateIDCardsPDF, downloadPDF } from '@/lib/id-card-pdf-generator';
+import { AttendeeSelectionModal } from '@/components/id-cards/AttendeeSelectionModal';
+import { CardGenerationProgress } from '@/components/id-cards/CardGenerationProgress';
+import { format } from 'date-fns';
 
 interface IDCardsTabProps {
   workspace: Workspace;

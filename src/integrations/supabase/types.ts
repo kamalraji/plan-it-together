@@ -1668,6 +1668,82 @@ export type Database = {
         }
         Relationships: []
       }
+      id_card_print_jobs: {
+        Row: {
+          attendee_filter: Json | null
+          attendee_ids: string[] | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          event_id: string
+          generated_cards: number | null
+          id: string
+          name: string
+          pdf_url: string | null
+          status: string
+          template_id: string
+          total_cards: number | null
+          workspace_id: string
+        }
+        Insert: {
+          attendee_filter?: Json | null
+          attendee_ids?: string[] | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          event_id: string
+          generated_cards?: number | null
+          id?: string
+          name: string
+          pdf_url?: string | null
+          status?: string
+          template_id: string
+          total_cards?: number | null
+          workspace_id: string
+        }
+        Update: {
+          attendee_filter?: Json | null
+          attendee_ids?: string[] | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          event_id?: string
+          generated_cards?: number | null
+          id?: string
+          name?: string
+          pdf_url?: string | null
+          status?: string
+          template_id?: string
+          total_cards?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "id_card_print_jobs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "id_card_print_jobs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "id_card_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "id_card_print_jobs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       id_card_templates: {
         Row: {
           card_type: string | null
