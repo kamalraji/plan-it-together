@@ -5181,6 +5181,78 @@ export type Database = {
           },
         ]
       }
+      workspace_backup_equipment: {
+        Row: {
+          created_at: string | null
+          deployed_at: string | null
+          deployed_for: string | null
+          equipment_type: string
+          id: string
+          last_tested_at: string | null
+          last_tested_by: string | null
+          location: string | null
+          name: string
+          notes: string | null
+          order_index: number | null
+          primary_equipment_id: string | null
+          status: string | null
+          test_result: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          deployed_at?: string | null
+          deployed_for?: string | null
+          equipment_type: string
+          id?: string
+          last_tested_at?: string | null
+          last_tested_by?: string | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          order_index?: number | null
+          primary_equipment_id?: string | null
+          status?: string | null
+          test_result?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          deployed_at?: string | null
+          deployed_for?: string | null
+          equipment_type?: string
+          id?: string
+          last_tested_at?: string | null
+          last_tested_by?: string | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          order_index?: number | null
+          primary_equipment_id?: string | null
+          status?: string | null
+          test_result?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_backup_equipment_primary_equipment_id_fkey"
+            columns: ["primary_equipment_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_backup_equipment_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_broadcast_messages: {
         Row: {
           channels: string[]
@@ -5790,6 +5862,86 @@ export type Database = {
           },
         ]
       }
+      workspace_contingency_procedures: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          is_verified: boolean | null
+          last_drill_at: string | null
+          name: string
+          notes: string | null
+          primary_contact_name: string | null
+          primary_contact_phone: string | null
+          priority: number | null
+          procedure_steps: Json
+          recovery_time_objective_minutes: number | null
+          related_equipment: string[] | null
+          related_zones: string[] | null
+          secondary_contact_name: string | null
+          secondary_contact_phone: string | null
+          trigger_condition: string
+          updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          last_drill_at?: string | null
+          name: string
+          notes?: string | null
+          primary_contact_name?: string | null
+          primary_contact_phone?: string | null
+          priority?: number | null
+          procedure_steps?: Json
+          recovery_time_objective_minutes?: number | null
+          related_equipment?: string[] | null
+          related_zones?: string[] | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          trigger_condition: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          last_drill_at?: string | null
+          name?: string
+          notes?: string | null
+          primary_contact_name?: string | null
+          primary_contact_phone?: string | null
+          priority?: number | null
+          procedure_steps?: Json
+          recovery_time_objective_minutes?: number | null
+          related_equipment?: string[] | null
+          related_zones?: string[] | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          trigger_condition?: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_contingency_procedures_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_custom_templates: {
         Row: {
           category: string | null
@@ -6050,6 +6202,97 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_equipment_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_equipment_checkouts: {
+        Row: {
+          actual_return_date: string | null
+          borrowed_by_committee: string | null
+          borrowed_by_name: string
+          borrowed_by_user_id: string | null
+          borrowed_by_workspace_id: string | null
+          checked_out_by: string | null
+          checkout_date: string
+          checkout_notes: string | null
+          condition_at_checkout: string | null
+          condition_at_return: string | null
+          created_at: string | null
+          damage_description: string | null
+          equipment_id: string
+          expected_return_date: string
+          id: string
+          return_notes: string | null
+          returned_to: string | null
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          actual_return_date?: string | null
+          borrowed_by_committee?: string | null
+          borrowed_by_name: string
+          borrowed_by_user_id?: string | null
+          borrowed_by_workspace_id?: string | null
+          checked_out_by?: string | null
+          checkout_date?: string
+          checkout_notes?: string | null
+          condition_at_checkout?: string | null
+          condition_at_return?: string | null
+          created_at?: string | null
+          damage_description?: string | null
+          equipment_id: string
+          expected_return_date: string
+          id?: string
+          return_notes?: string | null
+          returned_to?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          actual_return_date?: string | null
+          borrowed_by_committee?: string | null
+          borrowed_by_name?: string
+          borrowed_by_user_id?: string | null
+          borrowed_by_workspace_id?: string | null
+          checked_out_by?: string | null
+          checkout_date?: string
+          checkout_notes?: string | null
+          condition_at_checkout?: string | null
+          condition_at_return?: string | null
+          created_at?: string | null
+          damage_description?: string | null
+          equipment_id?: string
+          expected_return_date?: string
+          id?: string
+          return_notes?: string | null
+          returned_to?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_equipment_checkouts_borrowed_by_workspace_id_fkey"
+            columns: ["borrowed_by_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_equipment_checkouts_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_equipment_checkouts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -6457,52 +6700,88 @@ export type Database = {
       }
       workspace_incidents: {
         Row: {
+          affected_systems: string[] | null
           assigned_to: string | null
           assigned_to_name: string | null
           created_at: string
           description: string | null
           id: string
+          impact_assessment: string | null
+          incident_type: string | null
+          is_recurring: boolean | null
+          lessons_learned: string | null
           location: string | null
+          post_event_notes: string | null
+          preventive_actions: string | null
+          related_incident_id: string | null
           reported_by: string | null
           reported_by_name: string | null
           resolution_notes: string | null
           resolved_at: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_cause: string | null
           severity: string
           status: string
+          time_to_resolve_minutes: number | null
           title: string
           updated_at: string
           workspace_id: string
         }
         Insert: {
+          affected_systems?: string[] | null
           assigned_to?: string | null
           assigned_to_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          impact_assessment?: string | null
+          incident_type?: string | null
+          is_recurring?: boolean | null
+          lessons_learned?: string | null
           location?: string | null
+          post_event_notes?: string | null
+          preventive_actions?: string | null
+          related_incident_id?: string | null
           reported_by?: string | null
           reported_by_name?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_cause?: string | null
           severity?: string
           status?: string
+          time_to_resolve_minutes?: number | null
           title: string
           updated_at?: string
           workspace_id: string
         }
         Update: {
+          affected_systems?: string[] | null
           assigned_to?: string | null
           assigned_to_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          impact_assessment?: string | null
+          incident_type?: string | null
+          is_recurring?: boolean | null
+          lessons_learned?: string | null
           location?: string | null
+          post_event_notes?: string | null
+          preventive_actions?: string | null
+          related_incident_id?: string | null
           reported_by?: string | null
           reported_by_name?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_cause?: string | null
           severity?: string
           status?: string
+          time_to_resolve_minutes?: number | null
           title?: string
           updated_at?: string
           workspace_id?: string
@@ -7183,6 +7462,140 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_partners_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_power_circuits: {
+        Row: {
+          assigned_to: string | null
+          circuit_number: string | null
+          created_at: string | null
+          current_load_amps: number | null
+          equipment_connected: string[] | null
+          id: string
+          last_checked_at: string | null
+          last_checked_by: string | null
+          name: string
+          notes: string | null
+          rated_amps: number
+          status: string | null
+          updated_at: string | null
+          workspace_id: string
+          zone_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          circuit_number?: string | null
+          created_at?: string | null
+          current_load_amps?: number | null
+          equipment_connected?: string[] | null
+          id?: string
+          last_checked_at?: string | null
+          last_checked_by?: string | null
+          name: string
+          notes?: string | null
+          rated_amps: number
+          status?: string | null
+          updated_at?: string | null
+          workspace_id: string
+          zone_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          circuit_number?: string | null
+          created_at?: string | null
+          current_load_amps?: number | null
+          equipment_connected?: string[] | null
+          id?: string
+          last_checked_at?: string | null
+          last_checked_by?: string | null
+          name?: string
+          notes?: string | null
+          rated_amps?: number
+          status?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+          zone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_power_circuits_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_power_circuits_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_power_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_power_zones: {
+        Row: {
+          allocated_amps: number | null
+          created_at: string | null
+          emergency_procedure: string | null
+          fuel_level_percent: number | null
+          generator_id: string | null
+          id: string
+          is_generator_backed: boolean | null
+          location: string | null
+          name: string
+          notes: string | null
+          order_index: number | null
+          status: string | null
+          total_capacity_amps: number | null
+          updated_at: string | null
+          workspace_id: string
+          zone_type: string | null
+        }
+        Insert: {
+          allocated_amps?: number | null
+          created_at?: string | null
+          emergency_procedure?: string | null
+          fuel_level_percent?: number | null
+          generator_id?: string | null
+          id?: string
+          is_generator_backed?: boolean | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          order_index?: number | null
+          status?: string | null
+          total_capacity_amps?: number | null
+          updated_at?: string | null
+          workspace_id: string
+          zone_type?: string | null
+        }
+        Update: {
+          allocated_amps?: number | null
+          created_at?: string | null
+          emergency_procedure?: string | null
+          fuel_level_percent?: number | null
+          generator_id?: string | null
+          id?: string
+          is_generator_backed?: boolean | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          order_index?: number | null
+          status?: string | null
+          total_capacity_amps?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+          zone_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_power_zones_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
