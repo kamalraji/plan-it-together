@@ -1644,6 +1644,30 @@ export type Database = {
           },
         ]
       }
+      feature_usage: {
+        Row: {
+          feature_type: string
+          id: string
+          target_user_id: string | null
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          feature_type: string
+          id?: string
+          target_user_id?: string | null
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          feature_type?: string
+          id?: string
+          target_user_id?: string | null
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       id_card_templates: {
         Row: {
           card_type: string | null
@@ -1733,6 +1757,7 @@ export type Database = {
           avatar_url: string | null
           badges: string[]
           bio: string | null
+          boost_expires_at: string | null
           college: string | null
           created_at: string
           current_courses: string[] | null
@@ -1744,7 +1769,10 @@ export type Database = {
           id: string
           impact_score: number
           interests: string[]
+          is_boosted: boolean | null
           is_online: boolean
+          is_premium: boolean | null
+          is_verified: boolean | null
           last_seen: string
           last_streak_date: string | null
           level: number
@@ -1755,14 +1783,18 @@ export type Database = {
           skills: string[]
           streak_actions_today: number | null
           streak_count: number | null
+          super_like_count: number | null
           updated_at: string
           user_id: string
+          verification_type: string | null
+          verified_at: string | null
           vibe_emoji: string
         }
         Insert: {
           avatar_url?: string | null
           badges?: string[]
           bio?: string | null
+          boost_expires_at?: string | null
           college?: string | null
           created_at?: string
           current_courses?: string[] | null
@@ -1774,7 +1806,10 @@ export type Database = {
           id?: string
           impact_score?: number
           interests?: string[]
+          is_boosted?: boolean | null
           is_online?: boolean
+          is_premium?: boolean | null
+          is_verified?: boolean | null
           last_seen?: string
           last_streak_date?: string | null
           level?: number
@@ -1785,14 +1820,18 @@ export type Database = {
           skills?: string[]
           streak_actions_today?: number | null
           streak_count?: number | null
+          super_like_count?: number | null
           updated_at?: string
           user_id: string
+          verification_type?: string | null
+          verified_at?: string | null
           vibe_emoji?: string
         }
         Update: {
           avatar_url?: string | null
           badges?: string[]
           bio?: string | null
+          boost_expires_at?: string | null
           college?: string | null
           created_at?: string
           current_courses?: string[] | null
@@ -1804,7 +1843,10 @@ export type Database = {
           id?: string
           impact_score?: number
           interests?: string[]
+          is_boosted?: boolean | null
           is_online?: boolean
+          is_premium?: boolean | null
+          is_verified?: boolean | null
           last_seen?: string
           last_streak_date?: string | null
           level?: number
@@ -1815,8 +1857,11 @@ export type Database = {
           skills?: string[]
           streak_actions_today?: number | null
           streak_count?: number | null
+          super_like_count?: number | null
           updated_at?: string
           user_id?: string
+          verification_type?: string | null
+          verified_at?: string | null
           vibe_emoji?: string
         }
         Relationships: []
@@ -1884,6 +1929,67 @@ export type Database = {
             columns: ["submission_id"]
             isOneToOne: false
             referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_read_receipts: {
+        Row: {
+          id: string
+          message_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_read_receipts_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -2460,6 +2566,45 @@ export type Database = {
           id?: string
           skipped_user_id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      profile_verifications: {
+        Row: {
+          id: string
+          linked_account_id: string | null
+          linked_account_url: string | null
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          selfie_url: string | null
+          status: string
+          submitted_at: string
+          user_id: string
+          verification_type: string
+        }
+        Insert: {
+          id?: string
+          linked_account_id?: string | null
+          linked_account_url?: string | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          selfie_url?: string | null
+          status?: string
+          submitted_at?: string
+          user_id: string
+          verification_type: string
+        }
+        Update: {
+          id?: string
+          linked_account_id?: string | null
+          linked_account_url?: string | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          selfie_url?: string | null
+          status?: string
+          submitted_at?: string
+          user_id?: string
+          verification_type?: string
         }
         Relationships: []
       }
@@ -4045,6 +4190,54 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          boost_credits: number
+          created_at: string
+          daily_rewind_limit: number
+          expires_at: string | null
+          id: string
+          last_credit_refresh: string | null
+          plan_type: string
+          rewind_credits: number
+          started_at: string
+          status: string
+          super_like_credits: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_credits?: number
+          created_at?: string
+          daily_rewind_limit?: number
+          expires_at?: string | null
+          id?: string
+          last_credit_refresh?: string | null
+          plan_type?: string
+          rewind_credits?: number
+          started_at?: string
+          status?: string
+          super_like_credits?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_credits?: number
+          created_at?: string
+          daily_rewind_limit?: number
+          expires_at?: string | null
+          id?: string
+          last_credit_refresh?: string | null
+          plan_type?: string
+          rewind_credits?: number
+          started_at?: string
+          status?: string
+          super_like_credits?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

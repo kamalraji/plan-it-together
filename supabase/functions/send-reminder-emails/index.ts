@@ -232,10 +232,11 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in send-reminder-emails:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to send reminders";
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to send reminders" }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

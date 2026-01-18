@@ -401,21 +401,19 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       const eventDetails = await getEventDetails();
 
       // Create campaign record
-      const campaignData = {
-        workspace_id: workspaceId,
-        name: data.subject.substring(0, 100),
-        subject: data.subject,
-        content: data.body,
-        status: data.scheduledFor ? 'scheduled' : 'sending',
-        target_audience: data.audience,
-        scheduled_for: data.scheduledFor || null,
-        recipient_list: recipients as unknown as Record<string, unknown>,
-        recipients_count: recipients.length,
-      };
-      
       const { data: campaign, error: campaignError } = await supabase
         .from('workspace_email_campaigns')
-        .insert(campaignData)
+        .insert([{
+          workspace_id: workspaceId,
+          name: data.subject.substring(0, 100),
+          subject: data.subject,
+          content: data.body,
+          status: data.scheduledFor ? 'scheduled' : 'sending',
+          target_audience: data.audience,
+          scheduled_for: data.scheduledFor || null,
+          recipient_list: JSON.parse(JSON.stringify(recipients)),
+          recipients_count: recipients.length,
+        }])
         .select()
         .single();
 

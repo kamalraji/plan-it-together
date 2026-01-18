@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Mail,
   Send,
@@ -19,109 +19,98 @@ import {
   MessageSquare,
   Smartphone,
   History,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { toast } from 'sonner';
 import { Workspace } from '@/types';
+import { useReminders } from '@/hooks/useReminders';
 
 interface SendRemindersTabProps {
   workspace: Workspace;
 }
 
-interface ReminderHistory {
-  id: string;
-  subject: string;
-  recipientCount: number;
-  sentAt: Date;
-  status: 'sent' | 'scheduled' | 'failed';
-  openRate?: number;
-}
+export function SendRemindersTab({ workspace }: SendRemindersTabProps) {
+  const {
+    templates,
+    campaigns,
+    audienceCounts,
+    isLoadingTemplates,
+    isLoadingCampaigns,
+    isLoadingAudience,
+    isSending,
+    sendReminder,
+  } = useReminders(workspace.id, workspace.eventId);
 
-const reminderTemplates = [
-  { id: 'event-reminder', name: 'Event Reminder', description: 'General reminder about the upcoming event' },
-  { id: 'checkin-reminder', name: 'Check-in Info', description: 'Details about check-in process and QR codes' },
-  { id: 'schedule-update', name: 'Schedule Update', description: 'Notify about schedule changes' },
-  { id: 'last-minute', name: 'Last Minute Info', description: 'Day-of information and reminders' },
-  { id: 'custom', name: 'Custom Message', description: 'Write your own message' },
-];
-
-const audienceFilters = [
-  { id: 'all', name: 'All Registered', count: 1250 },
-  { id: 'confirmed', name: 'Confirmed Only', count: 847 },
-  { id: 'not-checked-in', name: 'Not Checked In', count: 403 },
-  { id: 'vip', name: 'VIP Attendees', count: 156 },
-  { id: 'pending', name: 'Pending Registration', count: 89 },
-];
-
-const mockHistory: ReminderHistory[] = [
-  { id: '1', subject: 'Event starts tomorrow!', recipientCount: 847, sentAt: new Date('2025-01-09T10:00:00'), status: 'sent', openRate: 72 },
-  { id: '2', subject: 'Your QR code for check-in', recipientCount: 1250, sentAt: new Date('2025-01-08T14:30:00'), status: 'sent', openRate: 85 },
-  { id: '3', subject: 'Schedule update: New session added', recipientCount: 1250, sentAt: new Date('2025-01-07T09:00:00'), status: 'sent', openRate: 68 },
-];
-
-export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProps) {
-  const [selectedTemplate, setSelectedTemplate] = useState('event-reminder');
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('event-reminder');
   const [selectedAudience, setSelectedAudience] = useState('confirmed');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [includeQR, setIncludeQR] = useState(true);
   const [scheduleTime, setScheduleTime] = useState<'now' | 'scheduled'>('now');
   const [scheduledDate, setScheduledDate] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Build audience filters with real counts
+  const audienceFilters = [
+    { id: 'all', name: 'All Registered', count: audienceCounts.all },
+    { id: 'confirmed', name: 'Confirmed Only', count: audienceCounts.confirmed },
+    { id: 'not-checked-in', name: 'Not Checked In', count: audienceCounts.notCheckedIn },
+    { id: 'vip', name: 'VIP Attendees', count: audienceCounts.vip },
+    { id: 'pending', name: 'Pending Registration', count: audienceCounts.pending },
+  ];
 
   const selectedAudienceData = audienceFilters.find(a => a.id === selectedAudience);
 
   const handleSend = async () => {
     if (!subject.trim()) {
-      toast.error('Please enter a subject line');
       return;
     }
 
-    setIsSending(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSending(false);
+    await sendReminder({
+      subject,
+      body: message,
+      audience: selectedAudience,
+      includeQR,
+      scheduledFor: scheduleTime === 'scheduled' ? scheduledDate : undefined,
+    });
 
-    if (scheduleTime === 'scheduled') {
-      toast.success('Reminder scheduled!', {
-        description: `Will be sent to ${selectedAudienceData?.count} recipients on ${scheduledDate}`,
-      });
-    } else {
-      toast.success('Reminder sent!', {
-        description: `Sent to ${selectedAudienceData?.count} recipients`,
-      });
+    // Reset form on success
+    if (!isSending) {
+      setSubject('');
+      setMessage('');
     }
-
-    setSubject('');
-    setMessage('');
   };
 
   const loadTemplate = (templateId: string) => {
     setSelectedTemplate(templateId);
     
-    switch (templateId) {
-      case 'event-reminder':
-        setSubject('Don\'t forget: [Event Name] is coming up!');
-        setMessage('Hi {{name}},\n\nThis is a friendly reminder that [Event Name] is happening soon. We\'re excited to see you there!\n\n📅 Date: [Event Date]\n📍 Location: [Venue]\n\nDon\'t forget to bring your ticket QR code for quick check-in.\n\nSee you soon!');
-        break;
-      case 'checkin-reminder':
-        setSubject('Your check-in details for [Event Name]');
-        setMessage('Hi {{name}},\n\nHere\'s everything you need for a smooth check-in:\n\n✅ Show your QR code (attached below)\n✅ Bring a valid ID\n✅ Arrive 15 minutes early\n\nCheck-in opens at [Time] at the [Location].\n\nSee you there!');
-        break;
-      case 'schedule-update':
-        setSubject('Important: Schedule update for [Event Name]');
-        setMessage('Hi {{name}},\n\nWe have an important update to share about the event schedule:\n\n[Describe changes here]\n\nPlease check the updated schedule on our event page.\n\nThank you for your understanding!');
-        break;
-      case 'last-minute':
-        setSubject('[Event Name] starts today!');
-        setMessage('Hi {{name}},\n\n🎉 It\'s finally here! [Event Name] starts today.\n\nQuick reminders:\n• Doors open at [Time]\n• Don\'t forget your QR code\n• [Any last-minute info]\n\nWe can\'t wait to see you!');
-        break;
-      default:
-        setSubject('');
-        setMessage('');
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      setSubject(template.subject);
+      setMessage(template.body);
+      setIncludeQR(template.include_qr_code);
+    } else {
+      // Check default templates by id pattern
+      const defaultTemplate = templates.find(t => t.name.toLowerCase().includes(templateId.replace(/-/g, ' ')));
+      if (defaultTemplate) {
+        setSubject(defaultTemplate.subject);
+        setMessage(defaultTemplate.body);
+        setIncludeQR(defaultTemplate.include_qr_code);
+      }
     }
   };
+
+  // Set initial template on load
+  useEffect(() => {
+    if (templates.length > 0 && !subject) {
+      const firstTemplate = templates[0];
+      setSelectedTemplate(firstTemplate.id);
+      setSubject(firstTemplate.subject);
+      setMessage(firstTemplate.body);
+      setIncludeQR(firstTemplate.include_qr_code);
+    }
+  }, [templates, subject]);
 
   return (
     <div className="space-y-6">
@@ -157,22 +146,30 @@ export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProp
                   <CardDescription>Start with a template or write a custom message</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {reminderTemplates.map(template => (
-                      <button
-                        key={template.id}
-                        onClick={() => loadTemplate(template.id)}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
-                          selectedTemplate === template.id
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                      >
-                        <p className="font-medium text-sm">{template.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
-                      </button>
-                    ))}
-                  </div>
+                  {isLoadingTemplates ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <Skeleton key={i} className="h-20 rounded-lg" />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {templates.map(template => (
+                        <button
+                          key={template.id}
+                          onClick={() => loadTemplate(template.id)}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            selectedTemplate === template.id
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <p className="font-medium text-sm">{template.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -203,7 +200,7 @@ export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProp
                       className="font-mono text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Use {'{{name}}'} to personalize with attendee name
+                      Use {'{{name}}'}, {'{{event_name}}'}, {'{{event_date}}'}, {'{{event_location}}'} to personalize
                     </p>
                   </div>
 
@@ -273,20 +270,28 @@ export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProp
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {audienceFilters.map(audience => (
-                    <button
-                      key={audience.id}
-                      onClick={() => setSelectedAudience(audience.id)}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
-                        selectedAudience === audience.id
-                          ? 'bg-primary/10 border border-primary/30'
-                          : 'bg-muted/30 hover:bg-muted/50'
-                      }`}
-                    >
-                      <span className="text-sm">{audience.name}</span>
-                      <Badge variant="secondary">{audience.count.toLocaleString()}</Badge>
-                    </button>
-                  ))}
+                  {isLoadingAudience ? (
+                    <>
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <Skeleton key={i} className="h-12 rounded-lg" />
+                      ))}
+                    </>
+                  ) : (
+                    audienceFilters.map(audience => (
+                      <button
+                        key={audience.id}
+                        onClick={() => setSelectedAudience(audience.id)}
+                        className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
+                          selectedAudience === audience.id
+                            ? 'bg-primary/10 border border-primary/30'
+                            : 'bg-muted/30 hover:bg-muted/50'
+                        }`}
+                      >
+                        <span className="text-sm">{audience.name}</span>
+                        <Badge variant="secondary">{audience.count.toLocaleString()}</Badge>
+                      </button>
+                    ))
+                  )}
                 </CardContent>
               </Card>
 
@@ -326,20 +331,23 @@ export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProp
                   </Button>
                   <Button 
                     className="w-full bg-amber-600 hover:bg-amber-700" 
-                    disabled={isSending || !subject.trim()}
+                    disabled={isSending || !subject.trim() || (selectedAudienceData?.count || 0) === 0}
                     onClick={handleSend}
                   >
                     {isSending ? (
-                      'Sending...'
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
                     ) : scheduleTime === 'scheduled' ? (
                       <>
                         <Calendar className="w-4 h-4 mr-2" />
-                        Schedule for {selectedAudienceData?.count}
+                        Schedule for {selectedAudienceData?.count || 0}
                       </>
                     ) : (
                       <>
                         <Send className="w-4 h-4 mr-2" />
-                        Send to {selectedAudienceData?.count}
+                        Send to {selectedAudienceData?.count || 0}
                       </>
                     )}
                   </Button>
@@ -356,38 +364,70 @@ export function SendRemindersTab({ workspace: _workspace }: SendRemindersTabProp
               <CardDescription>History of all reminders sent to attendees</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {mockHistory.map(item => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-start gap-3">
-                      {item.status === 'sent' ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5" />
-                      ) : item.status === 'scheduled' ? (
-                        <Clock className="w-5 h-5 text-amber-500 mt-0.5" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-                      )}
-                      <div>
-                        <p className="font-medium">{item.subject}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                          <span>{item.recipientCount.toLocaleString()} recipients</span>
-                          <span>·</span>
-                          <span>{formatDistanceToNow(item.sentAt, { addSuffix: true })}</span>
+              {isLoadingCampaigns ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <Skeleton key={i} className="h-20 rounded-lg" />
+                  ))}
+                </div>
+              ) : campaigns.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Mail className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>No reminders sent yet</p>
+                  <p className="text-sm">Your sent reminders will appear here</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {campaigns.map(item => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        {item.status === 'sent' ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5" />
+                        ) : item.status === 'scheduled' ? (
+                          <Clock className="w-5 h-5 text-amber-500 mt-0.5" />
+                        ) : item.status === 'sending' ? (
+                          <Loader2 className="w-5 h-5 text-blue-500 mt-0.5 animate-spin" />
+                        ) : (
+                          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+                        )}
+                        <div>
+                          <p className="font-medium">{item.subject || item.name}</p>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                            <span>{(item.sent_count || 0).toLocaleString()} recipients</span>
+                            <span>·</span>
+                            <span>
+                              {item.sent_at 
+                                ? formatDistanceToNow(new Date(item.sent_at), { addSuffix: true })
+                                : item.created_at 
+                                  ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true })
+                                  : 'Recently'
+                              }
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div className="text-right">
+                        {item.opened_count != null && item.sent_count && item.sent_count > 0 && (
+                          <p className="text-sm font-medium text-emerald-600">
+                            {Math.round((item.opened_count / item.sent_count) * 100)}% opened
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          {item.sent_at 
+                            ? format(new Date(item.sent_at), 'MMM d, h:mm a')
+                            : item.scheduled_for
+                              ? `Scheduled: ${format(new Date(item.scheduled_for), 'MMM d, h:mm a')}`
+                              : ''
+                          }
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      {item.openRate && (
-                        <p className="text-sm font-medium text-emerald-600">{item.openRate}% opened</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">{format(item.sentAt, 'MMM d, h:mm a')}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
