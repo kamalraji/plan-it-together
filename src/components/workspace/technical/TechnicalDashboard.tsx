@@ -39,7 +39,7 @@ export function TechnicalDashboard({
           {/* Equipment & Setup Checklist */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <EquipmentInventory />
-            <VenueSetupChecklist />
+            <VenueSetupChecklist workspaceId={workspace.id} eventId={workspace.eventId} />
           </div>
         </div>
 
