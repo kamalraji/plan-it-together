@@ -70,6 +70,7 @@ export type WorkspaceTab =
   | 'send-reminders'
   | 'view-waitlist'
   | 'id-cards'
+  | 'certificates'
   // Finance Committee tabs
   | 'record-expense'
   | 'generate-report'

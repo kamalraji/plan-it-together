@@ -127,6 +127,7 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'send-reminders', label: 'Send Reminders', icon: Mail, color: 'text-amber-500', tab: 'send-reminders' },
     { id: 'view-waitlist', label: 'View Waitlist', icon: ListChecks, color: 'text-cyan-500', tab: 'view-waitlist' },
     { id: 'id-cards', label: 'ID Cards', icon: CreditCard, color: 'text-indigo-500', tab: 'id-cards' },
+    { id: 'certificates', label: 'Certificates', icon: Award, color: 'text-emerald-500', tab: 'certificates' },
   ],
   catering: [
     { id: 'update-menu', label: 'Update Menu', icon: Utensils, color: 'text-orange-500', tab: 'update-menu-catering' },
