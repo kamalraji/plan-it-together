@@ -6971,6 +6971,100 @@ export type Database = {
           },
         ]
       }
+      workspace_issues: {
+        Row: {
+          assignee_id: string | null
+          assignee_name: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          escalated_to_incident: boolean | null
+          event_id: string | null
+          id: string
+          incident_id: string | null
+          location: string | null
+          priority: string | null
+          reporter_id: string | null
+          reporter_name: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by_id: string | null
+          resolved_by_name: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          assignee_name?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          escalated_to_incident?: boolean | null
+          event_id?: string | null
+          id?: string
+          incident_id?: string | null
+          location?: string | null
+          priority?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_id?: string | null
+          resolved_by_name?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assignee_id?: string | null
+          assignee_name?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          escalated_to_incident?: boolean | null
+          event_id?: string | null
+          id?: string
+          incident_id?: string | null
+          location?: string | null
+          priority?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_id?: string | null
+          resolved_by_name?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_issues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_issues_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_issues_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_judge_assignments: {
         Row: {
           assigned_at: string | null
