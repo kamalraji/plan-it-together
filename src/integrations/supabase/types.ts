@@ -8958,6 +8958,120 @@ export type Database = {
           },
         ]
       }
+      workspace_tech_check_items: {
+        Row: {
+          assignee_id: string | null
+          checked: boolean | null
+          checked_at: string | null
+          checked_by: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          label: string
+          notes: string | null
+          order_index: number | null
+          section_id: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          checked?: boolean | null
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          label: string
+          notes?: string | null
+          order_index?: number | null
+          section_id: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assignee_id?: string | null
+          checked?: boolean | null
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          label?: string
+          notes?: string | null
+          order_index?: number | null
+          section_id?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_tech_check_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tech_check_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_tech_check_items_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_tech_check_sections: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          event_id: string | null
+          icon: string | null
+          id: string
+          order_index: number | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_tech_check_sections_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_tech_check_sections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_time_entries: {
         Row: {
           created_at: string
