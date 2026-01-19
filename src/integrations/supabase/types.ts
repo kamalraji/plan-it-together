@@ -212,6 +212,27 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_users: {
+        Row: {
+          blocked_at: string | null
+          blocked_user_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          blocked_at?: string | null
+          blocked_user_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          blocked_at?: string | null
+          blocked_user_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       catering_dietary_requirements: {
         Row: {
           count: number
@@ -802,25 +823,34 @@ export type Database = {
       channel_members: {
         Row: {
           channel_id: string
+          cleared_at: string | null
           id: string
+          is_muted: boolean | null
           joined_at: string | null
           last_read_at: string | null
+          muted_until: string | null
           user_id: string
           user_name: string | null
         }
         Insert: {
           channel_id: string
+          cleared_at?: string | null
           id?: string
+          is_muted?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
+          muted_until?: string | null
           user_id: string
           user_name?: string | null
         }
         Update: {
           channel_id?: string
+          cleared_at?: string | null
           id?: string
+          is_muted?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
+          muted_until?: string | null
           user_id?: string
           user_name?: string | null
         }
@@ -2075,8 +2105,10 @@ export type Database = {
           attachments: Json | null
           channel_id: string
           content: string
+          deleted_at: string | null
           edited_at: string | null
           id: string
+          is_deleted: boolean | null
           sender_avatar: string | null
           sender_id: string
           sender_name: string
@@ -2086,8 +2118,10 @@ export type Database = {
           attachments?: Json | null
           channel_id: string
           content?: string
+          deleted_at?: string | null
           edited_at?: string | null
           id?: string
+          is_deleted?: boolean | null
           sender_avatar?: string | null
           sender_id: string
           sender_name: string
@@ -2097,8 +2131,10 @@ export type Database = {
           attachments?: Json | null
           channel_id?: string
           content?: string
+          deleted_at?: string | null
           edited_at?: string | null
           id?: string
+          is_deleted?: boolean | null
           sender_avatar?: string | null
           sender_id?: string
           sender_name?: string
@@ -5692,6 +5728,7 @@ export type Database = {
           type: string
           updated_at: string
           version: number | null
+          view_count: number | null
           word_count: number | null
           workspace_id: string
         }
@@ -5718,6 +5755,7 @@ export type Database = {
           type?: string
           updated_at?: string
           version?: number | null
+          view_count?: number | null
           word_count?: number | null
           workspace_id: string
         }
@@ -5744,6 +5782,7 @@ export type Database = {
           type?: string
           updated_at?: string
           version?: number | null
+          view_count?: number | null
           word_count?: number | null
           workspace_id?: string
         }
