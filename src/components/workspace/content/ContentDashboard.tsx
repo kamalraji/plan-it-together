@@ -79,12 +79,7 @@ export function ContentDashboard({
       />
 
       {/* Content Stats */}
-      <ContentStatsCards
-        publishedPosts={24}
-        scheduledPosts={8}
-        mediaAssets={156}
-        socialReach={12500}
-      />
+      <ContentStatsCards workspaceId={workspace.id} />
 
       {/* Page Builder Status */}
       <PageBuilderStatusCard workspaceId={workspace.id} eventId={workspace.eventId} />
