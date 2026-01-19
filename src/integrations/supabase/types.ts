@@ -911,6 +911,92 @@ export type Database = {
           },
         ]
       }
+      chat_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          invited_by: string | null
+          is_muted: boolean | null
+          joined_at: string | null
+          last_read_at: string | null
+          muted_until: string | null
+          nickname: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          invited_by?: string | null
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted_until?: string | null
+          nickname?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          invited_by?: string | null
+          is_muted?: boolean | null
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted_until?: string | null
+          nickname?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "chat_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_groups: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          icon_url: string | null
+          id: string
+          is_public: boolean | null
+          max_members: number | null
+          member_count: number | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_public?: boolean | null
+          max_members?: number | null
+          member_count?: number | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_public?: boolean | null
+          max_members?: number | null
+          member_count?: number | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       checklist_deadline_extensions: {
         Row: {
           checklist_id: string
