@@ -155,15 +155,15 @@ export const EventOverviewPanel: React.FC<EventOverviewPanelProps> = ({
                 <CardTitle className="text-base">Publish Readiness</CardTitle>
               </div>
               <div className="flex items-center gap-2">
-                {checklist.canPublish ? (
+                {checklist.failCount === 0 ? (
                   <Badge className="bg-green-500/20 text-green-700 dark:text-green-400">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Ready
                   </Badge>
                 ) : (
-                  <Badge className="bg-red-500/20 text-red-700 dark:text-red-400">
-                    <XCircle className="h-3 w-3 mr-1" />
-                    {checklist.failCount} Blocking
+                  <Badge className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-400">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    {checklist.failCount} Issue{checklist.failCount > 1 ? 's' : ''}
                   </Badge>
                 )}
                 {checklist.warningCount > 0 && (
@@ -208,16 +208,16 @@ export const EventOverviewPanel: React.FC<EventOverviewPanelProps> = ({
               ))}
             </div>
 
-            {/* Blocking Items */}
+            {/* Issues to Address */}
             {checklist.failCount > 0 && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">
-                  Items blocking publish:
+              <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400 mb-2">
+                  Issues to address before publishing:
                 </p>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   {checklist.items.filter(i => i.status === 'fail').map((item) => (
                     <li key={item.id} className="flex items-center gap-2">
-                      <XCircle className="h-3 w-3 text-red-500" />
+                      <AlertTriangle className="h-3 w-3 text-yellow-500" />
                       {item.label}
                     </li>
                   ))}

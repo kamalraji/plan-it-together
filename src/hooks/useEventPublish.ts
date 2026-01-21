@@ -39,6 +39,9 @@ export interface ChecklistItem {
 export interface PublishChecklist {
   items: ChecklistItem[];
   canPublish: boolean;
+  hasIssues: boolean;
+  hasWarnings: boolean;
+  requiresAcknowledgment: boolean;
   warningCount: number;
   failCount: number;
   settingsReadiness?: EventSettingsReadiness;
@@ -326,12 +329,19 @@ export function useEventPublish(eventId: string) {
     const failCount = items.filter(i => i.status === 'fail').length;
     const warningCount = items.filter(i => i.status === 'warning').length;
     const passCount = items.filter(i => i.status === 'pass').length;
-    const canPublish = failCount === 0;
+    // Always allow publishing - show warnings but don't block
+    const canPublish = true;
+    const hasIssues = failCount > 0;
+    const hasWarnings = warningCount > 0;
+    const requiresAcknowledgment = hasIssues || hasWarnings;
     const completionPercentage = Math.round((passCount / items.length) * 100);
 
     return { 
       items, 
       canPublish, 
+      hasIssues,
+      hasWarnings,
+      requiresAcknowledgment,
       warningCount, 
       failCount, 
       settingsReadiness,

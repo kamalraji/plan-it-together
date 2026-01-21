@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { EventPublishChecklist } from './EventPublishChecklist';
 import { useEventPublish, type PublishPriority } from '@/hooks/useEventPublish';
-import { Rocket, Send, AlertTriangle, Building2, Loader2 } from 'lucide-react';
+import { Rocket, Send, AlertTriangle, Building2, Loader2, CheckCircle } from 'lucide-react';
 
 interface PublishEventModalProps {
   eventId: string;
@@ -49,6 +49,7 @@ export function PublishEventModal({
   const [priority, setPriority] = useState<PublishPriority>('medium');
   const [notes, setNotes] = useState('');
   const [confirmStep, setConfirmStep] = useState(false);
+  const [acknowledgedIssues, setAcknowledgedIssues] = useState(false);
 
   const handlePublish = async () => {
     try {
@@ -72,6 +73,7 @@ export function PublishEventModal({
 
   const handleClose = () => {
     setConfirmStep(false);
+    setAcknowledgedIssues(false);
     setNotes('');
     setPriority('medium');
     onOpenChange(false);
@@ -178,8 +180,44 @@ export function PublishEventModal({
             </div>
           )}
 
+          {/* Acknowledgment Step for Issues */}
+          {!requiresApproval && checklist.requiresAcknowledgment && !acknowledgedIssues && (
+            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium text-yellow-700 dark:text-yellow-400">
+                    {checklist.failCount > 0 
+                      ? `${checklist.failCount} issue${checklist.failCount > 1 ? 's' : ''} require attention`
+                      : `${checklist.warningCount} warning${checklist.warningCount > 1 ? 's' : ''} to review`}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    You can still publish, but we recommend addressing these items first.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Acknowledged confirmation */}
+          {!requiresApproval && acknowledgedIssues && !confirmStep && (
+            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium text-green-700 dark:text-green-400">
+                    Issues acknowledged
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    You can now proceed to publish your event.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Confirmation Step for Direct Publish */}
-          {!requiresApproval && checklist.canPublish && confirmStep && (
+          {!requiresApproval && confirmStep && (
             <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
               <p className="text-sm font-medium text-primary">
                 Ready to publish "{event?.name}"?
@@ -196,43 +234,50 @@ export function PublishEventModal({
             Cancel
           </Button>
 
-          {checklist.canPublish && (
-            requiresApproval ? (
+          {requiresApproval ? (
+            <Button
+              onClick={handleRequestApproval}
+              disabled={isPending}
+              className="gap-2"
+            >
+              {isRequestingApproval ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              Request Approval
+            </Button>
+          ) : (
+            confirmStep ? (
               <Button
-                onClick={handleRequestApproval}
+                onClick={handlePublish}
                 disabled={isPending}
                 className="gap-2"
               >
-                {isRequestingApproval ? (
+                {isPublishing ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  <Rocket className="h-4 w-4" />
                 )}
-                Request Approval
+                Confirm & Publish
+              </Button>
+            ) : checklist.requiresAcknowledgment && !acknowledgedIssues ? (
+              <Button
+                onClick={() => setAcknowledgedIssues(true)}
+                variant="outline"
+                className="gap-2 border-yellow-500/50 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/10"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                Acknowledge & Continue
               </Button>
             ) : (
-              confirmStep ? (
-                <Button
-                  onClick={handlePublish}
-                  disabled={isPending}
-                  className="gap-2"
-                >
-                  {isPublishing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Rocket className="h-4 w-4" />
-                  )}
-                  Confirm & Publish
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setConfirmStep(true)}
-                  className="gap-2"
-                >
-                  <Rocket className="h-4 w-4" />
-                  Publish Now
-                </Button>
-              )
+              <Button
+                onClick={() => setConfirmStep(true)}
+                className="gap-2"
+              >
+                <Rocket className="h-4 w-4" />
+                Publish Now
+              </Button>
             )
           )}
         </DialogFooter>

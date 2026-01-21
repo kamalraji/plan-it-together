@@ -16,7 +16,6 @@ interface EventPublishChecklistProps {
 
 export function EventPublishChecklist({ 
   items, 
-  canPublish, 
   warningCount, 
   failCount,
   onNavigateToSetting,
@@ -93,28 +92,28 @@ export function EventPublishChecklist({
       {/* Summary */}
       <div className={cn(
         'rounded-lg border p-4',
-        canPublish 
+        failCount === 0 
           ? 'bg-green-500/10 border-green-500/20' 
-          : 'bg-red-500/10 border-red-500/20'
+          : 'bg-yellow-500/10 border-yellow-500/20'
       )}>
         <div className="flex items-center gap-3">
-          {canPublish ? (
+          {failCount === 0 ? (
             <CheckCircle className="h-6 w-6 text-green-500" />
           ) : (
-            <XCircle className="h-6 w-6 text-red-500" />
+            <AlertCircle className="h-6 w-6 text-yellow-500" />
           )}
           <div>
             <p className={cn(
               'font-medium',
-              canPublish ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+              failCount === 0 ? 'text-green-700 dark:text-green-400' : 'text-yellow-700 dark:text-yellow-400'
             )}>
-              {canPublish 
-                ? 'Ready to Publish' 
-                : `${failCount} required item${failCount > 1 ? 's' : ''} need attention`}
+              {failCount === 0 
+                ? 'All checks passed - Ready to Publish' 
+                : `${failCount} issue${failCount > 1 ? 's' : ''} to review before publishing`}
             </p>
-            {warningCount > 0 && canPublish && (
+            {warningCount > 0 && (
               <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                {warningCount} optional item{warningCount > 1 ? 's' : ''} could be improved
+                {warningCount} warning{warningCount > 1 ? 's' : ''} to consider
               </p>
             )}
           </div>
