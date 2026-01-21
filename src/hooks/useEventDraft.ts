@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
 
 const DRAFT_STORAGE_KEY = 'event-draft';
@@ -19,7 +19,16 @@ interface DraftState {
 }
 
 export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseEventDraftOptions) {
-  const { user } = useAuth();
+  // Safely get auth context - return null user if not available
+  let user: { id: string } | null = null;
+  try {
+    const auth = useAuth();
+    user = auth?.user ?? null;
+  } catch {
+    // useAuth throws if not in AuthProvider - safe fallback
+    user = null;
+  }
+  
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasDraft, setHasDraft] = useState(false);
