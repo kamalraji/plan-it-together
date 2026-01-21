@@ -2151,6 +2151,51 @@ export type Database = {
           },
         ]
       }
+      event_drafts: {
+        Row: {
+          created_at: string
+          draft_data: Json
+          event_id: string | null
+          id: string
+          organization_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          draft_data?: Json
+          event_id?: string | null
+          id?: string
+          organization_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          draft_data?: Json
+          event_id?: string | null
+          id?: string
+          organization_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_drafts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_drafts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_icebreakers: {
         Row: {
           created_at: string
@@ -13284,6 +13329,10 @@ export type Database = {
       check_blocked_status: {
         Args: { target_user_id: string }
         Returns: boolean
+      }
+      check_event_slug_availability: {
+        Args: { _event_id?: string; _organization_id: string; _slug: string }
+        Returns: Json
       }
       check_username_availability: {
         Args: { _user_id?: string; _username: string }
