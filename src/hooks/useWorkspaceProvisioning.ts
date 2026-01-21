@@ -8,6 +8,68 @@ import {
 } from '@/lib/workspaceTemplates';
 import { COMMITTEE_CHECKLIST_TEMPLATES } from './useCommitteeDashboard';
 import { WorkspaceRole } from '@/types';
+
+/**
+ * Get the appropriate Manager role based on department name
+ */
+const getManagerRoleForDepartment = (departmentName: string): WorkspaceRole => {
+  const name = departmentName.toLowerCase();
+  if (name.includes('operations')) return WorkspaceRole.OPERATIONS_MANAGER;
+  if (name.includes('growth')) return WorkspaceRole.GROWTH_MANAGER;
+  if (name.includes('content')) return WorkspaceRole.CONTENT_MANAGER;
+  if (name.includes('tech') || name.includes('finance')) return WorkspaceRole.TECH_FINANCE_MANAGER;
+  if (name.includes('volunteer')) return WorkspaceRole.VOLUNTEERS_MANAGER;
+  return WorkspaceRole.OPERATIONS_MANAGER; // Safe fallback
+};
+
+/**
+ * Get the appropriate Lead role based on committee name
+ */
+const getLeadRoleForCommittee = (committeeName: string): WorkspaceRole => {
+  const name = committeeName.toLowerCase();
+  if (name.includes('event')) return WorkspaceRole.EVENT_LEAD;
+  if (name.includes('catering')) return WorkspaceRole.CATERING_LEAD;
+  if (name.includes('logistics')) return WorkspaceRole.LOGISTICS_LEAD;
+  if (name.includes('facility')) return WorkspaceRole.FACILITY_LEAD;
+  if (name.includes('marketing')) return WorkspaceRole.MARKETING_LEAD;
+  if (name.includes('communication')) return WorkspaceRole.COMMUNICATION_LEAD;
+  if (name.includes('sponsor')) return WorkspaceRole.SPONSORSHIP_LEAD;
+  if (name.includes('social')) return WorkspaceRole.SOCIAL_MEDIA_LEAD;
+  if (name.includes('content')) return WorkspaceRole.CONTENT_LEAD;
+  if (name.includes('speaker')) return WorkspaceRole.SPEAKER_LIAISON_LEAD;
+  if (name.includes('judge')) return WorkspaceRole.JUDGE_LEAD;
+  if (name.includes('media')) return WorkspaceRole.MEDIA_LEAD;
+  if (name.includes('finance')) return WorkspaceRole.FINANCE_LEAD;
+  if (name.includes('registration')) return WorkspaceRole.REGISTRATION_LEAD;
+  if (name.includes('tech') || name.includes('it')) return WorkspaceRole.TECHNICAL_LEAD;
+  if (name.includes('volunteer')) return WorkspaceRole.VOLUNTEERS_LEAD;
+  return WorkspaceRole.EVENT_LEAD; // Safe fallback
+};
+
+/**
+ * Get the appropriate Coordinator role based on committee name
+ * Exported for use when inviting coordinators to committees
+ */
+export const getCoordinatorRoleForCommittee = (committeeName: string): WorkspaceRole => {
+  const name = committeeName.toLowerCase();
+  if (name.includes('event')) return WorkspaceRole.EVENT_COORDINATOR;
+  if (name.includes('catering')) return WorkspaceRole.CATERING_COORDINATOR;
+  if (name.includes('logistics')) return WorkspaceRole.LOGISTICS_COORDINATOR;
+  if (name.includes('facility')) return WorkspaceRole.FACILITY_COORDINATOR;
+  if (name.includes('marketing')) return WorkspaceRole.MARKETING_COORDINATOR;
+  if (name.includes('communication')) return WorkspaceRole.COMMUNICATION_COORDINATOR;
+  if (name.includes('sponsor')) return WorkspaceRole.SPONSORSHIP_COORDINATOR;
+  if (name.includes('social')) return WorkspaceRole.SOCIAL_MEDIA_COORDINATOR;
+  if (name.includes('content')) return WorkspaceRole.CONTENT_COORDINATOR;
+  if (name.includes('speaker')) return WorkspaceRole.SPEAKER_LIAISON_COORDINATOR;
+  if (name.includes('judge')) return WorkspaceRole.JUDGE_COORDINATOR;
+  if (name.includes('media')) return WorkspaceRole.MEDIA_COORDINATOR;
+  if (name.includes('finance')) return WorkspaceRole.FINANCE_COORDINATOR;
+  if (name.includes('registration')) return WorkspaceRole.REGISTRATION_COORDINATOR;
+  if (name.includes('tech') || name.includes('it')) return WorkspaceRole.TECHNICAL_COORDINATOR;
+  if (name.includes('volunteer')) return WorkspaceRole.VOLUNTEER_COORDINATOR;
+  return WorkspaceRole.EVENT_COORDINATOR; // Safe fallback
+};
 interface ProvisionWorkspaceParams {
   name: string;
   eventId: string;
@@ -124,11 +186,11 @@ export function useWorkspaceProvisioning() {
 
         createdDepartments.push(dept);
 
-        // Add user as member of department
+        // Add user as member of department with context-aware manager role
         await supabase.from('workspace_team_members').insert({
           workspace_id: dept.id,
           user_id: userId,
-          role: WorkspaceRole.EVENT_LEAD,
+          role: getManagerRoleForDepartment(deptName),
           status: 'ACTIVE',
         });
 
@@ -157,11 +219,11 @@ export function useWorkspaceProvisioning() {
 
           createdCommittees.push({ ...committee, departmentId: dept.id });
 
-          // Add user as member of committee
+          // Add user as member of committee with context-aware lead role
           await supabase.from('workspace_team_members').insert({
             workspace_id: committee.id,
             user_id: userId,
-            role: WorkspaceRole.VOLUNTEER_COORDINATOR,
+            role: getLeadRoleForCommittee(committeeName),
             status: 'ACTIVE',
           });
 
