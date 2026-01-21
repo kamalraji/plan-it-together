@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -20,13 +20,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, UserPlus, Mail } from 'lucide-react';
+import { Loader2, UserPlus, Mail, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { WorkspaceRole, WorkspaceType } from '@/types';
+import { WorkspaceRoleSelect, getDefaultRoleForWorkspace } from '@/components/workspace/WorkspaceRoleSelect';
 
 const inviteSchema = z.object({
   email: z.string().email('Valid email is required'),
+  role: z.nativeEnum(WorkspaceRole),
   message: z.string().optional(),
 });
 
@@ -36,16 +39,38 @@ interface AddVolunteerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   workspaceId: string;
+  workspaceName?: string;
+  workspaceType?: WorkspaceType;
+  departmentId?: string;
+  currentUserRole?: WorkspaceRole | null;
 }
 
-export function AddVolunteerModal({ open, onOpenChange, workspaceId }: AddVolunteerModalProps) {
+export function AddVolunteerModal({ 
+  open, 
+  onOpenChange, 
+  workspaceId,
+  workspaceName = 'Volunteers',
+  workspaceType,
+  departmentId,
+  currentUserRole,
+}: AddVolunteerModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+
+  // Get the default role based on workspace context
+  const defaultRole = useMemo(() => {
+    return getDefaultRoleForWorkspace({
+      workspaceType,
+      workspaceName,
+      departmentId,
+    });
+  }, [workspaceType, workspaceName, departmentId]);
 
   const form = useForm<InviteFormData>({
     resolver: zodResolver(inviteSchema),
     defaultValues: {
       email: '',
+      role: defaultRole,
       message: '',
     },
   });
@@ -61,7 +86,7 @@ export function AddVolunteerModal({ open, onOpenChange, workspaceId }: AddVolunt
         body: {
           workspaceId,
           email: data.email,
-          role: 'VOLUNTEER',
+          role: data.role,
           customMessage: data.message,
         },
       });
@@ -71,7 +96,7 @@ export function AddVolunteerModal({ open, onOpenChange, workspaceId }: AddVolunt
       toast.success(`Invitation sent to ${data.email}`);
       queryClient.invalidateQueries({ queryKey: ['volunteer-roster', workspaceId] });
       queryClient.invalidateQueries({ queryKey: ['full-volunteer-roster', workspaceId] });
-      form.reset();
+      form.reset({ email: '', role: defaultRole, message: '' });
       onOpenChange(false);
     } catch (error) {
       console.error('Error sending invitation:', error);
@@ -87,10 +112,10 @@ export function AddVolunteerModal({ open, onOpenChange, workspaceId }: AddVolunt
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-pink-500" />
-            Add Volunteer
+            Add Team Member
           </DialogTitle>
           <DialogDescription>
-            Send an invitation to join this workspace as a volunteer.
+            Send an invitation to join this workspace.
           </DialogDescription>
         </DialogHeader>
 
@@ -108,8 +133,35 @@ export function AddVolunteerModal({ open, onOpenChange, workspaceId }: AddVolunt
                   <FormControl>
                     <Input 
                       type="email" 
-                      placeholder="volunteer@example.com" 
+                      placeholder="team-member@example.com" 
                       {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    <Shield className="h-3 w-3" />
+                    Role
+                  </FormLabel>
+                  <FormControl>
+                    <WorkspaceRoleSelect
+                      workspace={{
+                        id: workspaceId,
+                        name: workspaceName,
+                        workspaceType,
+                        departmentId,
+                      }}
+                      value={field.value}
+                      onChange={field.onChange}
+                      currentUserRole={currentUserRole}
                     />
                   </FormControl>
                   <FormMessage />
