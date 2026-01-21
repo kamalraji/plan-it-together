@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -12,13 +12,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Building2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+
+// Enhanced form features
+import { useEventDraft } from '@/hooks/useEventDraft';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { useEventFormKeyboard, formatShortcut } from '@/hooks/useEventFormKeyboard';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { SectionProgressIndicator, type SectionProgress, calculateSectionStatus } from '@/components/events/form/SectionProgressIndicator';
+import { DraftStatusIndicator } from '@/components/events/form/DraftStatusIndicator';
+import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
+import { UnsavedChangesDialog } from '@/components/events/form/UnsavedChangesDialog';
 
 import {
   Form,
@@ -339,19 +346,142 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     },
   });
 
-  const { handleSubmit, reset, control } = form;
+  const { handleSubmit, reset, control, formState, watch, getValues } = form;
+  const formValues = watch();
   
+  // Find current organization from URL slug
+  const currentOrganization = myOrganizations.find((org: any) => org.slug === orgSlug);
+  const organizationId = currentOrganization?.id || '';
+
+  // Draft management - auto-save form changes
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState<Record<string, any> | null>(null);
+  
+  const { saveDraft, clearDraft, isSaving: isDraftSaving, lastSaved, hasDraft } = useEventDraft({
+    organizationId,
+    eventId: mode === 'edit' ? eventId : undefined,
+    onDraftRestored: (draft) => {
+      // Don't auto-restore, show prompt instead
+      setPendingDraft(draft);
+      setShowDraftPrompt(true);
+    },
+  });
+
+  // Handle draft restoration
+  const handleRestoreDraft = useCallback(() => {
+    if (pendingDraft) {
+      reset({ ...getValues(), ...pendingDraft });
+      setShowDraftPrompt(false);
+      setPendingDraft(null);
+      toast({ title: 'Draft restored', description: 'Your previous work has been restored.' });
+    }
+  }, [pendingDraft, reset, getValues, toast]);
+
+  const handleDiscardDraft = useCallback(() => {
+    clearDraft();
+    setShowDraftPrompt(false);
+    setPendingDraft(null);
+  }, [clearDraft]);
+
+  // Auto-save on form changes (debounced in the hook)
+  useEffect(() => {
+    if (mode === 'create' && organizationId && formState.isDirty) {
+      saveDraft(formValues);
+    }
+  }, [formValues, organizationId, mode, formState.isDirty, saveDraft]);
+
+  // Unsaved changes warning
+  const { isBlocked, confirmNavigation, cancelNavigation } = useUnsavedChangesWarning({
+    isDirty: formState.isDirty && !isSubmitting,
+    enabled: mode === 'create',
+  });
+
+  // Keyboard shortcuts
+  useEventFormKeyboard({
+    onSave: () => {
+      const formEl = document.getElementById('event-form') as HTMLFormElement | null;
+      if (formEl) formEl.requestSubmit();
+    },
+    onSaveDraft: () => {
+      if (organizationId) {
+        saveDraft(formValues);
+        toast({ title: 'Draft saved', description: 'Your progress has been saved.' });
+      }
+    },
+    onCancel: () => navigate(listPath),
+    disabled: isSubmitting,
+  });
+
   // Watch mode to conditionally show venue/virtual sections
   const selectedMode = useWatch({ control, name: 'mode' });
   const showVenueSection = selectedMode === 'OFFLINE' || selectedMode === 'HYBRID';
   const showVirtualSection = selectedMode === 'ONLINE' || selectedMode === 'HYBRID';
 
+  // Section progress calculation
+  const sectionFieldMap: Record<string, string[]> = {
+    basic: ['name', 'description', 'mode', 'organizationId'],
+    schedule: ['startDate', 'endDate', 'timezone'],
+    organizer: ['contactEmail'],
+    venue: ['venueName', 'venueAddress', 'venueCity'],
+    virtual: ['virtualMeetingUrl'],
+    branding: ['primaryColor'],
+  };
+
+  const sectionProgress: SectionProgress[] = useMemo(() => [
+    { 
+      id: 'basic', 
+      label: 'Basic Info', 
+      status: calculateSectionStatus('basic', formValues, formState.errors, sectionFieldMap),
+      required: true 
+    },
+    { 
+      id: 'schedule', 
+      label: 'Schedule', 
+      status: calculateSectionStatus('schedule', formValues, formState.errors, sectionFieldMap),
+      required: true 
+    },
+    { 
+      id: 'organizer', 
+      label: 'Contact', 
+      status: calculateSectionStatus('organizer', formValues, formState.errors, sectionFieldMap),
+      required: false 
+    },
+    { 
+      id: 'venue', 
+      label: 'Venue', 
+      status: showVenueSection 
+        ? calculateSectionStatus('venue', formValues, formState.errors, sectionFieldMap)
+        : 'complete',
+      required: showVenueSection 
+    },
+    { 
+      id: 'virtual', 
+      label: 'Virtual', 
+      status: showVirtualSection 
+        ? calculateSectionStatus('virtual', formValues, formState.errors, sectionFieldMap)
+        : 'complete',
+      required: showVirtualSection 
+    },
+    { 
+      id: 'branding', 
+      label: 'Branding', 
+      status: calculateSectionStatus('branding', formValues, formState.errors, sectionFieldMap),
+      required: false 
+    },
+  ], [formValues, formState.errors, showVenueSection, showVirtualSection, sectionFieldMap]);
+
+  const handleSectionClick = (sectionId: string) => {
+    setOpenSections(prev => ({ ...prev, [sectionId]: true }));
+    // Scroll to section
+    setTimeout(() => {
+      const el = document.getElementById(`section-${sectionId}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
   const toggleSection = (section: string) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
-
-  // Find current organization from URL slug
-  const currentOrganization = myOrganizations.find((org: any) => org.slug === orgSlug);
 
   // Auto-set organization when available
   useEffect(() => {
@@ -662,59 +792,93 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
   return (
     <div className="w-full space-y-6 pb-8">
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={isBlocked}
+        onConfirm={confirmNavigation}
+        onCancel={cancelNavigation}
+      />
+
+      {/* Draft Restoration Prompt */}
+      {showDraftPrompt && pendingDraft && (
+        <DraftRestorationPrompt
+          onRestore={handleRestoreDraft}
+          onDiscard={handleDiscardDraft}
+        />
+      )}
+
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-border/50 p-6 sm:p-8">
         <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-accent/20 blur-3xl" />
         
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
-              <SparklesIcon className="h-7 w-7" />
+        <div className="relative flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
+                <SparklesIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold text-foreground">{pageTitle}</h1>
+                  <DraftStatusIndicator
+                    isSaving={isDraftSaving}
+                    lastSaved={lastSaved}
+                    hasDraft={hasDraft}
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {mode === 'create' 
+                    ? 'Fill in the details to create your event' 
+                    : 'Update your event information'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{pageTitle}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {mode === 'create' 
-                  ? 'Fill in the details to create your event' 
-                  : 'Update your event information'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => navigate(listPath)}
-              className="gap-2"
-            >
-              <XMarkIcon className="h-4 w-4" />
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                const formEl = document.getElementById('event-form') as HTMLFormElement | null;
-                if (formEl) {
-                  if (typeof formEl.requestSubmit === 'function') {
-                    formEl.requestSubmit();
-                  } else {
-                    formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline-flex text-xs text-muted-foreground mr-2">
+                {formatShortcut('Ctrl+S')} to save
+              </span>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate(listPath)}
+                className="gap-2"
+              >
+                <XMarkIcon className="h-4 w-4" />
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  const formEl = document.getElementById('event-form') as HTMLFormElement | null;
+                  if (formEl) {
+                    if (typeof formEl.requestSubmit === 'function') {
+                      formEl.requestSubmit();
+                    } else {
+                      formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    }
                   }
-                }
-              }}
-              disabled={isSubmitting || myOrganizations.length === 0}
-              className="gap-2 shadow-lg shadow-primary/25"
-            >
-              <CheckIcon className="h-4 w-4" />
-              {isSubmitting
-                ? 'Saving...'
-                : mode === 'create'
-                  ? 'Save & Continue'
-                  : 'Save Changes'}
-            </Button>
+                }}
+                disabled={isSubmitting || myOrganizations.length === 0}
+                className="gap-2 shadow-lg shadow-primary/25"
+              >
+                <CheckIcon className="h-4 w-4" />
+                {isSubmitting
+                  ? 'Saving...'
+                  : mode === 'create'
+                    ? 'Save & Continue'
+                    : 'Save Changes'}
+              </Button>
+            </div>
           </div>
+
+          {/* Progress Indicator */}
+          <SectionProgressIndicator
+            sections={sectionProgress}
+            onSectionClick={handleSectionClick}
+            className="mt-2"
+          />
         </div>
       </div>
 
@@ -1114,158 +1278,59 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       <FormField
                         control={control}
                         name="startDate"
-                        render={({ field }) => {
-                          const dateValue = field.value ? new Date(field.value) : undefined;
-                          return (
-                            <FormItem>
-                              <FormLabel>Start date & time *</FormLabel>
-                              <FormControl>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className={cn(
-                                        'w-full h-11 justify-start text-left font-normal',
-                                        !dateValue && 'text-muted-foreground',
-                                      )}
-                                    >
-                                      <CalendarIcon className="mr-2 h-4 w-4" />
-                                      {dateValue ? (
-                                        format(dateValue, 'PPP p')
-                                      ) : (
-                                        <span>Select start date</span>
-                                      )}
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                      mode="single"
-                                      selected={dateValue}
-                                      onSelect={(date) => {
-                                        if (!date) {
-                                          field.onChange('');
-                                          return;
-                                        }
-                                        const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                        field.onChange(formatted);
-                                      }}
-                                      initialFocus
-                                      className={cn('p-3 pointer-events-auto')}
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Start date & time *</FormLabel>
+                            <FormControl>
+                              <DateTimePicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Select start date and time"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
 
                       <FormField
                         control={control}
                         name="endDate"
-                        render={({ field }) => {
-                          const dateValue = field.value ? new Date(field.value) : undefined;
-                          return (
-                            <FormItem>
-                              <FormLabel>End date & time *</FormLabel>
-                              <FormControl>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className={cn(
-                                        'w-full h-11 justify-start text-left font-normal',
-                                        !dateValue && 'text-muted-foreground',
-                                      )}
-                                    >
-                                      <CalendarIcon className="mr-2 h-4 w-4" />
-                                      {dateValue ? (
-                                        format(dateValue, 'PPP p')
-                                      ) : (
-                                        <span>Select end date</span>
-                                      )}
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                      mode="single"
-                                      selected={dateValue}
-                                      onSelect={(date) => {
-                                        if (!date) {
-                                          field.onChange('');
-                                          return;
-                                        }
-                                        const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                        field.onChange(formatted);
-                                      }}
-                                      initialFocus
-                                      className={cn('p-3 pointer-events-auto')}
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>End date & time *</FormLabel>
+                            <FormControl>
+                              <DateTimePicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Select end date and time"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
 
                     <FormField
                       control={control}
                       name="registrationDeadline"
-                      render={({ field }) => {
-                        const dateValue = field.value ? new Date(field.value) : undefined;
-                        return (
-                          <FormItem>
-                            <FormLabel>Registration deadline</FormLabel>
-                            <FormControl>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    className={cn(
-                                      'w-full h-11 justify-start text-left font-normal',
-                                      !dateValue && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {dateValue ? (
-                                      format(dateValue, 'PPP p')
-                                    ) : (
-                                      <span>Optional: set registration cutoff</span>
-                                    )}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={dateValue}
-                                    onSelect={(date) => {
-                                      if (!date) {
-                                        field.onChange('');
-                                        return;
-                                      }
-                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
-                                      field.onChange(formatted);
-                                    }}
-                                    initialFocus
-                                    className={cn('p-3 pointer-events-auto')}
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                            </FormControl>
-                            <FormDescription>
-                              If set, registrations will automatically close after this time.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                          );
-                      }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Registration deadline</FormLabel>
+                          <FormControl>
+                            <DateTimePicker
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Optional: set registration cutoff"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            If set, registrations will automatically close after this time.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
 
                     <FormField
