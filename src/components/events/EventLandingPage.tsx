@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -7,6 +7,10 @@ import { useAuth } from '../../hooks/useAuth';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { EventCanvasHero } from './EventCanvasHero';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
+import { Badge } from '@/components/ui/badge';
+import { Ticket } from 'lucide-react';
+import type { TicketTier } from '@/types/ticketTier';
+import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/types/ticketTier';
 
 interface EventLandingPageProps {
   eventId?: string;
@@ -69,6 +73,42 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     },
     enabled: !!eventId,
   });
+
+  // Fetch ticket tiers for pricing display
+  const { data: ticketTiers = [] } = useQuery({
+    queryKey: ['event-ticket-tiers', eventId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ticket_tiers')
+        .select('*')
+        .eq('event_id', eventId as string)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      return data as TicketTier[];
+    },
+    enabled: !!eventId && !!event,
+  });
+
+  // Calculate minimum price for display
+  const pricingInfo = useMemo(() => {
+    if (!ticketTiers || ticketTiers.length === 0) return null;
+    
+    const onSaleTiers = ticketTiers.filter(t => getTierSaleStatus(t) === 'on_sale');
+    if (onSaleTiers.length === 0) return null;
+    
+    const minPrice = Math.min(...onSaleTiers.map(t => t.price));
+    const currency = onSaleTiers[0]?.currency || 'INR';
+    
+    return { minPrice, currency, tierCount: ticketTiers.length };
+  }, [ticketTiers]);
+
+  const formatPrice = (price: number, currency: string) => {
+    const symbols: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+    if (price === 0) return 'Free';
+    return `${symbols[currency] || currency}${price.toLocaleString()}`;
+  };
 
   // Check if event is private and redirect to access page (Requirements 24.2, 24.3)
   useEffect(() => {
@@ -266,6 +306,18 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </svg>
                 <span>{event.mode.charAt(0) + event.mode.slice(1).toLowerCase()}</span>
               </div>
+
+              {/* Pricing Badge */}
+              {pricingInfo && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/15 backdrop-blur-sm">
+                  <Ticket className="h-5 w-5" />
+                  <span>
+                    {pricingInfo.minPrice === 0 
+                      ? 'Free' 
+                      : `From ${formatPrice(pricingInfo.minPrice, pricingInfo.currency)}`}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Registration Button (Requirements 10.3) */}
@@ -454,6 +506,21 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               {/* Registration Card */}
               <div className="bg-card rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4">Registration</h3>
+                
+                {/* Pricing display */}
+                {pricingInfo && (
+                  <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {pricingInfo.tierCount} ticket {pricingInfo.tierCount === 1 ? 'tier' : 'tiers'} available
+                    </p>
+                    <p className="text-lg font-semibold">
+                      {pricingInfo.minPrice === 0 
+                        ? 'Free' 
+                        : `From ${formatPrice(pricingInfo.minPrice, pricingInfo.currency)}`}
+                    </p>
+                  </div>
+                )}
+
                 {isAuthenticated ? (
                   <button
                     onClick={() => setShowRegistrationModal(true)}
@@ -479,6 +546,44 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   </div>
                 )}
               </div>
+
+              {/* Ticket Tiers Card */}
+              {ticketTiers.length > 0 && (
+                <div className="bg-card rounded-lg shadow p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Ticket className="h-5 w-5" />
+                    Tickets
+                  </h3>
+                  <div className="space-y-3">
+                    {ticketTiers.map((tier) => {
+                      const status = getTierSaleStatus(tier);
+                      const statusLabel = getTierStatusLabel(status);
+                      const statusColor = getTierStatusColor(status);
+                      
+                      return (
+                        <div key={tier.id} className="p-3 border rounded-lg">
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <p className="font-medium">{tier.name}</p>
+                              <Badge variant="secondary" className={`text-xs mt-1 ${statusColor}`}>
+                                {statusLabel}
+                              </Badge>
+                            </div>
+                            <p className="font-semibold whitespace-nowrap">
+                              {formatPrice(tier.price, tier.currency)}
+                            </p>
+                          </div>
+                          {tier.description && (
+                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                              {tier.description}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Quick Info */}
               <div className="bg-card rounded-lg shadow p-6">

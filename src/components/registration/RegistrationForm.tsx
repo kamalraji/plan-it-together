@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import api from '../../lib/api';
-import { Event, Registration, RegistrationFormData, RegistrationStatus } from '../../types';
+import { supabase } from '@/integrations/supabase/looseClient';
+import { Event, Registration, RegistrationStatus } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { TicketTierSelector, type TicketSelection } from '@/components/events/registration/TicketTierSelector';
+import { OrderSummary } from '@/components/events/registration/OrderSummary';
+import { AttendeeDetailsForm, type AttendeeDetails } from './AttendeeDetailsForm';
 
 interface RegistrationFormProps {
   event: Event;
@@ -20,6 +28,14 @@ interface EventCapacityInfo {
   spotsRemaining: number | null;
 }
 
+type RegistrationStep = 'tickets' | 'details' | 'review';
+
+const STEPS: { key: RegistrationStep; label: string }[] = [
+  { key: 'tickets', label: 'Select Tickets' },
+  { key: 'details', label: 'Attendee Details' },
+  { key: 'review', label: 'Review & Confirm' },
+];
+
 export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   event,
   onSuccess,
@@ -29,51 +45,216 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: primaryOrg } = usePrimaryOrganization();
-  const [formData, setFormData] = useState<Record<string, any>>({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    organization: '',
-    dietaryRestrictions: '',
-    emergencyContact: '',
-    tshirtSize: 'M',
-    experience: 'beginner',
-    expectations: '',
+  
+  // Multi-step form state
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>('tickets');
+  
+  // Ticket selection state
+  const [ticketSelection, setTicketSelection] = useState<TicketSelection | null>(null);
+  const [promoCodeId, setPromoCodeId] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  
+  // Attendee details state
+  const [attendees, setAttendees] = useState<AttendeeDetails[]>([
+    { name: user?.name || '', email: user?.email || '', phone: '' }
+  ]);
+  
+  // Terms acceptance
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Check if event has ticket tiers (paid event)
+  const { data: hasTiers } = useQuery({
+    queryKey: ['event-has-tiers', event.id],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('ticket_tiers')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_id', event.id)
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return (count || 0) > 0;
+    },
   });
 
-  // Fetch event capacity information
+  // Fetch event capacity information (for free events)
   const { data: capacityInfo, isLoading: capacityLoading } = useQuery<EventCapacityInfo>({
     queryKey: ['event-capacity', event.id],
     queryFn: async () => {
-      const response = await api.get(`/events/${event.id}/capacity`);
-      return response.data.data;
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('status')
+        .eq('event_id', event.id);
+      
+      if (error) throw error;
+      
+      const registrations = data || [];
+      const confirmed = registrations.filter((r: { status: string }) => r.status === 'CONFIRMED').length;
+      const waitlisted = registrations.filter((r: { status: string }) => r.status === 'WAITLISTED').length;
+      
+      return {
+        totalRegistrations: registrations.length,
+        confirmedRegistrations: confirmed,
+        waitlistCount: waitlisted,
+        spotsRemaining: event.capacity ? event.capacity - confirmed : null,
+      };
     },
+    enabled: !hasTiers,
   });
 
   // Check if user is already registered
   const { data: existingRegistration } = useQuery<Registration | null>({
-    queryKey: ['user-registration', event.id],
+    queryKey: ['user-registration', event.id, user?.id],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/registrations/user/me`);
-        const registrations = response.data.data;
-        return registrations.find((reg: Registration) => reg.eventId === event.id) || null;
-      } catch (error) {
-        return null;
-      }
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .eq('event_id', event.id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data as Registration | null;
     },
+    enabled: !!user?.id,
   });
+
+  // Handle ticket selection change
+  const handleSelectionChange = useCallback((
+    selection: TicketSelection | null, 
+    promoId: string | null, 
+    discount: number
+  ) => {
+    setTicketSelection(selection);
+    setPromoCodeId(promoId);
+    setDiscountAmount(discount);
+    
+    // Update attendees array to match quantity
+    if (selection) {
+      setAttendees(prev => {
+        const newAttendees = [...prev];
+        while (newAttendees.length < selection.quantity) {
+          newAttendees.push({ name: '', email: '', phone: '' });
+        }
+        while (newAttendees.length > selection.quantity) {
+          newAttendees.pop();
+        }
+        return newAttendees;
+      });
+    }
+  }, []);
+
+  // Handle attendee update
+  const handleAttendeeChange = useCallback((index: number, details: AttendeeDetails) => {
+    setAttendees(prev => {
+      const updated = [...prev];
+      updated[index] = details;
+      return updated;
+    });
+  }, []);
+
+  // Step validation
+  const canProceedFromTickets = useMemo(() => {
+    if (!hasTiers) return true; // Free event, no tier selection needed
+    return ticketSelection !== null;
+  }, [hasTiers, ticketSelection]);
+
+  const canProceedFromDetails = useMemo(() => {
+    return attendees.every(a => a.name.trim() && a.email.trim());
+  }, [attendees]);
+
+  const canSubmit = useMemo(() => {
+    return termsAccepted && canProceedFromDetails;
+  }, [termsAccepted, canProceedFromDetails]);
+
+  // Navigation
+  const goToStep = (step: RegistrationStep) => setCurrentStep(step);
+  
+  const goNext = () => {
+    if (currentStep === 'tickets') {
+      if (!hasTiers) {
+        // Skip tickets for free events
+        setCurrentStep('details');
+      } else if (canProceedFromTickets) {
+        setCurrentStep('details');
+      }
+    } else if (currentStep === 'details' && canProceedFromDetails) {
+      setCurrentStep('review');
+    }
+  };
+
+  const goBack = () => {
+    if (currentStep === 'review') {
+      setCurrentStep('details');
+    } else if (currentStep === 'details') {
+      if (hasTiers) {
+        setCurrentStep('tickets');
+      }
+    }
+  };
 
   // Registration mutation
   const registrationMutation = useMutation({
-    mutationFn: async (data: RegistrationFormData) => {
-      const response = await api.post('/registrations', data);
-      return response.data.data;
+    mutationFn: async () => {
+      if (!user) throw new Error('You must be logged in to register');
+
+      // Prepare registration data
+      const registrationData: Record<string, unknown> = {
+        event_id: event.id,
+        user_id: user.id,
+        status: 'PENDING',
+        form_responses: { attendees },
+      };
+
+      // Add ticket tier data if applicable
+      if (ticketSelection) {
+        registrationData.ticket_tier_id = ticketSelection.tierId;
+        registrationData.quantity = ticketSelection.quantity;
+        registrationData.subtotal = ticketSelection.unitPrice * ticketSelection.quantity;
+        registrationData.discount_amount = discountAmount;
+        registrationData.total_amount = (ticketSelection.unitPrice * ticketSelection.quantity) - discountAmount;
+        
+        if (promoCodeId) {
+          registrationData.promo_code_id = promoCodeId;
+        }
+
+        // Call atomic increment function to reserve tickets
+        const { data: incrementResult, error: incrementError } = await supabase
+          .rpc('increment_sold_count', {
+            p_tier_id: ticketSelection.tierId,
+            p_quantity: ticketSelection.quantity,
+          });
+
+        if (incrementError) throw incrementError;
+        if (!incrementResult) {
+          throw new Error('Sorry, these tickets just sold out. Please select a different tier.');
+        }
+      }
+
+      // Insert registration
+      const { error } = await supabase
+        .from('registrations')
+        .insert(registrationData);
+
+      if (error) {
+        // If registration fails and we incremented, we should decrement
+        if (ticketSelection) {
+          await supabase.rpc('decrement_sold_count', {
+            p_tier_id: ticketSelection.tierId,
+            p_quantity: ticketSelection.quantity,
+          });
+        }
+        throw error;
+      }
+
+      return true;
     },
     onSuccess: () => {
       toast({
-        title: 'Registration submitted',
-        description: 'We\'ve saved your spot. Check your email for details shortly.',
+        title: 'Registration successful!',
+        description: 'Check your email for confirmation details.',
       });
       if (onSuccess) {
         onSuccess();
@@ -81,37 +262,24 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
         navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard');
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         variant: 'destructive',
         title: 'Registration failed',
-        description: error?.message || 'Something went wrong. Please try again.',
+        description: error.message || 'Something went wrong. Please try again.',
       });
     },
   });
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!user) {
       navigate('/login');
       return;
     }
-
-    registrationMutation.mutate({
-      eventId: event.id,
-      formResponses: formData,
-    });
+    if (canSubmit) {
+      registrationMutation.mutate();
+    }
   };
 
   // Show existing registration status
@@ -120,9 +288,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       <div className="max-w-md mx-auto rounded-2xl border border-border bg-card/90 shadow-md p-6">
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
-            <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <CheckCircle2 className="h-6 w-6 text-primary" />
           </div>
           <h3 className="text-lg font-medium text-foreground mb-2">
             {existingRegistration.status === RegistrationStatus.CONFIRMED && 'Registration Confirmed'}
@@ -137,277 +303,258 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             {existingRegistration.status === RegistrationStatus.PENDING &&
               'Your registration is being processed.'}
           </p>
-          <button
+          <Button
             onClick={() => navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard')}
-            className="w-full rounded-full bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+            className="w-full"
           >
             Go to Dashboard
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
+  // Get current step index
+  const currentStepIndex = STEPS.findIndex(s => s.key === currentStep);
+  const effectiveSteps = hasTiers ? STEPS : STEPS.filter(s => s.key !== 'tickets');
+
   return (
-    <div className="max-w-2xl mx-auto rounded-2xl border border-border bg-card/95 shadow-md p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-foreground mb-2">Register for {event.name}</h2>
-
-        {/* Capacity Information */}
-        {!capacityLoading && capacityInfo && (
-          <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 mb-4">
-            <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-accent-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="text-sm">
-                {event.capacity ? (
-                  <>
-                    {capacityInfo.spotsRemaining !== null && capacityInfo.spotsRemaining > 0 ? (
-                      <span className="text-foreground">
-                        <strong>{capacityInfo.spotsRemaining}</strong> spots remaining out of {event.capacity}
-                      </span>
-                    ) : (
-                      <span className="text-foreground">
-                        Event is full. You'll be added to the waitlist.
-                        <br />
-                        <strong>{capacityInfo.waitlistCount}</strong> people currently on waitlist.
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  <span className="text-foreground">Unlimited capacity</span>
+    <div className="max-w-3xl mx-auto">
+      {/* Step indicator */}
+      <div className="mb-8">
+        <div className="flex items-center justify-center gap-2">
+          {effectiveSteps.map((step, index) => {
+            const stepIndex = STEPS.findIndex(s => s.key === step.key);
+            const isActive = step.key === currentStep;
+            const isCompleted = currentStepIndex > stepIndex;
+            
+            return (
+              <React.Fragment key={step.key}>
+                {index > 0 && (
+                  <div className={cn(
+                    "h-0.5 w-8 sm:w-12",
+                    isCompleted ? "bg-primary" : "bg-muted"
+                  )} />
                 )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Registration Deadline */}
-        {event.registrationDeadline && (
-          <p className="text-sm text-muted-foreground">
-            Registration closes: {new Date(event.registrationDeadline).toLocaleDateString()}
-          </p>
-        )}
+                <button
+                  type="button"
+                  onClick={() => isCompleted && goToStep(step.key)}
+                  disabled={!isCompleted}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                    isActive && "bg-primary text-primary-foreground",
+                    isCompleted && !isActive && "bg-primary/20 text-primary cursor-pointer hover:bg-primary/30",
+                    !isActive && !isCompleted && "bg-muted text-muted-foreground"
+                  )}
+                >
+                  <span className="hidden sm:inline">{step.label}</span>
+                  <span className="sm:hidden">{index + 1}</span>
+                </button>
+              </React.Fragment>
+            );
+          })}
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        {/* Step 1: Ticket Selection */}
+        {currentStep === 'tickets' && hasTiers && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold">Select Your Tickets</h2>
+              <p className="text-muted-foreground">Choose the ticket type and quantity</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <TicketTierSelector
+                eventId={event.id}
+                onSelectionChange={handleSelectionChange}
+              />
+              <OrderSummary
+                selection={ticketSelection}
+                discountAmount={discountAmount}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
-              Email Address *
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="organization" className="block text-sm font-medium text-foreground mb-1">
-              Organization/Company
-            </label>
-            <input
-              type="text"
-              id="organization"
-              name="organization"
-              value={formData.organization}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            />
-          </div>
-        </div>
-
-        {/* Event-specific fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="tshirtSize" className="block text-sm font-medium text-foreground mb-1">
-              T-Shirt Size
-            </label>
-            <select
-              id="tshirtSize"
-              name="tshirtSize"
-              value={formData.tshirtSize}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            >
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="experience" className="block text-sm font-medium text-foreground mb-1">
-              Experience Level
-            </label>
-            <select
-              id="experience"
-              name="experience"
-              value={formData.experience}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-            >
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-              <option value="expert">Expert</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="dietaryRestrictions" className="block text-sm font-medium text-foreground mb-1">
-            Dietary Restrictions/Allergies
-          </label>
-          <textarea
-            id="dietaryRestrictions"
-            name="dietaryRestrictions"
-            rows={2}
-            value={formData.dietaryRestrictions}
-            onChange={handleInputChange}
-            placeholder="Please list any dietary restrictions or allergies..."
-            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="emergencyContact" className="block text-sm font-medium text-foreground mb-1">
-            Emergency Contact
-          </label>
-          <input
-            type="text"
-            id="emergencyContact"
-            name="emergencyContact"
-            value={formData.emergencyContact}
-            onChange={handleInputChange}
-            placeholder="Name and phone number"
-            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="expectations" className="block text-sm font-medium text-foreground mb-1">
-            What do you hope to learn or achieve at this event?
-          </label>
-          <textarea
-            id="expectations"
-            name="expectations"
-            rows={3}
-            value={formData.expectations}
-            onChange={handleInputChange}
-            placeholder="Tell us about your goals and expectations..."
-            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-background/80"
-          />
-        </div>
-
-        {/* Terms and Conditions */}
-        <div className="bg-muted/40 p-4 rounded-md">
-          <div className="flex items-start">
-            <input
-              type="checkbox"
-              id="terms"
-              required
-              className="mt-1 h-4 w-4 text-primary focus:ring-primary border-border rounded"
-            />
-            <label htmlFor="terms" className="ml-2 text-sm text-muted-foreground">
-              I agree to the event terms and conditions, and I understand that my information will be used
-              for event management purposes. I consent to receive event-related communications.
-            </label>
-          </div>
-        </div>
-
-        {/* Error Display */}
-        {registrationMutation.isError && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
-            <div className="flex">
-              <svg className="h-5 w-5 text-destructive mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="ml-1">
-                <p className="text-sm text-destructive">
-                  {(registrationMutation.error as any)?.response?.data?.error?.message ||
-                    'Registration failed. Please try again.'}
-                </p>
-              </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                onClick={goNext}
+                disabled={!canProceedFromTickets}
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={registrationMutation.isPending}
-            className="flex-1 bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-medium hover:from-primary hover:to-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {registrationMutation.isPending ? (
-              <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-foreground" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Registering...
-              </div>
-            ) : (
-              'Register Now'
-            )}
-          </button>
+        {/* Step 2: Attendee Details */}
+        {currentStep === 'details' && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold">Attendee Details</h2>
+              <p className="text-muted-foreground">
+                {attendees.length === 1 
+                  ? 'Enter your details'
+                  : `Enter details for all ${attendees.length} attendees`}
+              </p>
+            </div>
 
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 sm:flex-none rounded-full border border-border text-foreground px-6 py-3 font-medium hover:bg-muted focus:outline-none focus:ring-2 focus:ring-border focus:ring-offset-2 transition-colors"
-            >
-              Cancel
-            </button>
-          )}
-        </div>
+            {/* Capacity info for free events */}
+            {!hasTiers && !capacityLoading && capacityInfo && (
+              <Card className="bg-accent/10 border-accent/30">
+                <CardContent className="py-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    {event.capacity ? (
+                      capacityInfo.spotsRemaining !== null && capacityInfo.spotsRemaining > 0 ? (
+                        <span>
+                          <strong>{capacityInfo.spotsRemaining}</strong> spots remaining out of {event.capacity}
+                        </span>
+                      ) : (
+                        <span>
+                          Event is full. You'll be added to the waitlist.
+                          <br />
+                          <strong>{capacityInfo.waitlistCount}</strong> people currently on waitlist.
+                        </span>
+                      )
+                    ) : (
+                      <span>Unlimited capacity</span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="space-y-4">
+              {attendees.map((attendee, index) => (
+                <AttendeeDetailsForm
+                  key={index}
+                  index={index}
+                  values={attendee}
+                  onChange={(details) => handleAttendeeChange(index, details)}
+                  isPrimary={index === 0}
+                />
+              ))}
+            </div>
+
+            <div className="flex justify-between">
+              {hasTiers && (
+                <Button type="button" variant="outline" onClick={goBack}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+              )}
+              {onCancel && !hasTiers && (
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              )}
+              <Button
+                type="button"
+                onClick={goNext}
+                disabled={!canProceedFromDetails}
+                className={!hasTiers && !onCancel ? 'ml-auto' : ''}
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Review & Confirm */}
+        {currentStep === 'review' && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold">Review Your Registration</h2>
+              <p className="text-muted-foreground">Confirm your details before submitting</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Attendee summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Attendee Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {attendees.map((attendee, index) => (
+                    <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                      <p className="font-medium">{attendee.name}</p>
+                      <p className="text-sm text-muted-foreground">{attendee.email}</p>
+                      {attendee.phone && (
+                        <p className="text-sm text-muted-foreground">{attendee.phone}</p>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Order summary */}
+              {ticketSelection ? (
+                <OrderSummary
+                  selection={ticketSelection}
+                  discountAmount={discountAmount}
+                />
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Event</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="font-medium">{event.name}</p>
+                    <p className="text-sm text-muted-foreground">Free Registration</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Terms and Conditions */}
+            <div className="bg-muted/40 p-4 rounded-lg">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-muted-foreground">
+                  I agree to the event terms and conditions, and I understand that my information will be used
+                  for event management purposes. I consent to receive event-related communications.
+                </span>
+              </label>
+            </div>
+
+            {/* Error Display */}
+            {registrationMutation.isError && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
+                <p className="text-sm text-destructive">
+                  {registrationMutation.error?.message || 'Registration failed. Please try again.'}
+                </p>
+              </div>
+            )}
+
+            <div className="flex justify-between">
+              <Button type="button" variant="outline" onClick={goBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={!canSubmit || registrationMutation.isPending}
+                className="min-w-[160px]"
+              >
+                {registrationMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Registering...
+                  </>
+                ) : (
+                  'Complete Registration'
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

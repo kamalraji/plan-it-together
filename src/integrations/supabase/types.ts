@@ -13340,6 +13340,10 @@ export type Database = {
       }
       count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
       decrement_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
+      decrement_sold_count: {
+        Args: { p_quantity: number; p_tier_id: string }
+        Returns: boolean
+      }
       decrement_ticket_sold_count: {
         Args: { quantity: number; ticket_id: string }
         Returns: undefined
@@ -13509,6 +13513,10 @@ export type Database = {
         Returns: undefined
       }
       increment_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
+      increment_sold_count: {
+        Args: { p_quantity: number; p_tier_id: string }
+        Returns: boolean
+      }
       increment_spark_count: { Args: { post_id: string }; Returns: undefined }
       increment_ticket_sold_count: {
         Args: { quantity: number; ticket_id: string }
