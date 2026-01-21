@@ -28,7 +28,6 @@ interface WorkspaceRoleSelectProps {
   onChange: (role: WorkspaceRole) => void;
   currentUserRole?: WorkspaceRole | null;
   disabled?: boolean;
-  disabled?: boolean;
   className?: string;
 }
 
@@ -37,7 +36,6 @@ export function WorkspaceRoleSelect({
   value,
   onChange,
   currentUserRole,
-  disabled = false,
   disabled = false,
   className,
 }: WorkspaceRoleSelectProps) {
