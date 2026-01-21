@@ -3,11 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { WorkspaceRole } from '../../types';
 
 // Legacy role values that may exist in database
+// These are fallback mappings - the database migration handles context-aware mapping
 const LEGACY_ROLE_MAP: Record<string, WorkspaceRole> = {
   'OWNER': WorkspaceRole.WORKSPACE_OWNER,
-  'LEAD': WorkspaceRole.EVENT_LEAD,
-  'COORDINATOR': WorkspaceRole.VOLUNTEER_COORDINATOR,
-  'member': WorkspaceRole.VOLUNTEER_COORDINATOR,
+  'LEAD': WorkspaceRole.EVENT_LEAD,           // Generic lead fallback
+  'COORDINATOR': WorkspaceRole.EVENT_COORDINATOR, // Generic coordinator fallback
+  'member': WorkspaceRole.EVENT_COORDINATOR,      // Generic member fallback
 };
 
 interface WorkspaceRoleBadgeProps {
