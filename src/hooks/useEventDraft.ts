@@ -19,15 +19,8 @@ interface DraftState {
 }
 
 export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseEventDraftOptions) {
-  // Safely get auth context - return null user if not available
-  let user: { id: string } | null = null;
-  try {
-    const auth = useAuth();
-    user = auth?.user ?? null;
-  } catch {
-    // useAuth throws if not in AuthProvider - safe fallback
-    user = null;
-  }
+  // Call useAuth unconditionally - EventFormPage is always inside AuthProvider via ConsoleRoute
+  const { user } = useAuth();
   
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
