@@ -183,6 +183,7 @@ const eventSchema = z
     name: z.string().trim().min(1, 'Event name is required'),
     description: z.string().trim().min(1, 'Description is required'),
     mode: z.enum(['ONLINE', 'OFFLINE', 'HYBRID'], { required_error: 'Mode is required' }),
+    visibility: z.enum(['PUBLIC', 'PRIVATE', 'UNLISTED']).optional(),
     category: z.string().optional(),
     organizationId: z.string().min(1, 'Organization is required'),
     capacity: z
@@ -293,6 +294,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       name: '',
       description: '',
       mode: 'ONLINE',
+      visibility: 'PUBLIC',
       category: '',
       organizationId: '',
       capacity: '',
@@ -706,7 +708,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         capacity:
           values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
         organization_id: values.organizationId,
-        visibility: 'PUBLIC',
+        visibility: values.visibility || 'PUBLIC',
+        slug: values.customSlug?.trim() || null,
         branding: {
           primaryColor: values.primaryColor,
           logoUrl: values.logoUrl || undefined,
@@ -1050,29 +1053,53 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
                       <FormField
                         control={control}
-                        name="category"
+                        name="visibility"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Event category</FormLabel>
+                            <FormLabel>Event visibility</FormLabel>
                             <FormControl>
                               <select
                                 className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 {...field}
                               >
-                                <option value="">Select category...</option>
-                                {Object.entries(categoryLabels).map(([key, label]) => (
-                                  <option key={key} value={key}>{label}</option>
-                                ))}
+                                <option value="PUBLIC">🌐 Public — Visible to everyone</option>
+                                <option value="UNLISTED">👁️ Unlisted — Via direct link only</option>
+                                <option value="PRIVATE">🔒 Private — Invite only</option>
                               </select>
                             </FormControl>
                             <FormDescription>
-                              Helps attendees discover your event.
+                              Control who can see your event.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
+
+                    <FormField
+                      control={control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event category</FormLabel>
+                          <FormControl>
+                            <select
+                              className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              {...field}
+                            >
+                              <option value="">Select category...</option>
+                              {Object.entries(categoryLabels).map(([key, label]) => (
+                                <option key={key} value={key}>{label}</option>
+                              ))}
+                            </select>
+                          </FormControl>
+                          <FormDescription>
+                            Helps attendees discover your event.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <FormField
