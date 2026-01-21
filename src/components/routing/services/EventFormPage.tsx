@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Building2 } from 'lucide-react';
+import { Building2, Ticket } from 'lucide-react';
+import { TicketTierQuickAdd, QuickTier } from '@/components/events/form/TicketTierQuickAdd';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -425,6 +426,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const showVenueSection = selectedMode === 'OFFLINE' || selectedMode === 'HYBRID';
   const showVirtualSection = selectedMode === 'ONLINE' || selectedMode === 'HYBRID';
 
+  // Watch isFreeEvent for ticket tier section
+  const watchIsFreeEvent = useWatch({ control, name: 'isFreeEvent' });
+  
+  // Pending ticket tiers to save after event creation
+  const [pendingTiers, setPendingTiers] = useState<QuickTier[]>([]);
+
   // Section progress calculation
   const sectionFieldMap: Record<string, string[]> = {
     basic: ['name', 'description', 'mode', 'organizationId'],
@@ -753,6 +760,33 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
         if (error) throw error;
         createdEventId = data?.id as string | undefined;
+
+        // Save pending ticket tiers if this is a paid event
+        if (createdEventId && pendingTiers.length > 0 && !values.isFreeEvent) {
+          const tiersToInsert = pendingTiers.map((tier, index) => ({
+            event_id: createdEventId,
+            name: tier.name,
+            price: tier.price,
+            currency: tier.currency,
+            quantity: tier.quantity,
+            sort_order: index,
+            is_active: true,
+            sold_count: 0,
+          }));
+
+          const { error: tiersError } = await supabase
+            .from('ticket_tiers')
+            .insert(tiersToInsert);
+
+          if (tiersError) {
+            console.error('Failed to save ticket tiers:', tiersError);
+            toast({
+              variant: 'destructive',
+              title: 'Warning',
+              description: 'Event created but ticket tiers failed to save. Please add them in settings.',
+            });
+          }
+        }
       } else {
         const { error } = await supabase.from('events').update(payload).eq('id', eventId);
         if (error) throw error;
@@ -1198,6 +1232,24 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         )}
                       />
                     </div>
+
+                    {/* Ticket Tiers Section - show when paid event */}
+                    {!watchIsFreeEvent && (
+                      <div className="mt-4 p-4 border border-dashed border-primary/30 rounded-lg bg-primary/5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Ticket className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-foreground">Ticket Tiers</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Add your ticket tiers below. You can add more or edit these later in event settings.
+                        </p>
+                        <TicketTierQuickAdd
+                          tiers={pendingTiers}
+                          onChange={setPendingTiers}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
 
                     <FormField
                       control={control}
