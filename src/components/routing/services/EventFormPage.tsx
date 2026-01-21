@@ -194,6 +194,14 @@ const eventSchema = z
     isFreeEvent: z.boolean().optional(),
     allowWaitlist: z.boolean().optional(),
     tags: z.string().optional(),
+    // SEO fields (new)
+    metaDescription: z.string().max(160, 'Meta description must be 160 characters or less').optional(),
+    customSlug: z.string().optional(),
+    // Accessibility fields (new)
+    accessibilityLanguage: z.string().optional(),
+    ageRestrictionEnabled: z.boolean().optional(),
+    minAge: z.number().min(0).max(120).optional().nullable(),
+    maxAge: z.number().min(0).max(120).optional().nullable(),
     // Schedule
     startDate: z.string().min(1, 'Start date is required'),
     endDate: z.string().min(1, 'End date is required'),
@@ -286,6 +294,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       isFreeEvent: true,
       allowWaitlist: false,
       tags: '',
+      // SEO defaults
+      metaDescription: '',
+      customSlug: '',
+      // Accessibility defaults
+      accessibilityLanguage: 'en',
+      ageRestrictionEnabled: false,
+      minAge: null,
+      maxAge: null,
       // Schedule
       startDate: '',
       endDate: '',
@@ -376,11 +392,19 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           category: (data as any).category ?? '',
           organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
-          // Registration settings
-          registrationType: branding?.registration?.type ?? 'OPEN',
-          isFreeEvent: branding?.registration?.isFree ?? true,
-          allowWaitlist: branding?.registration?.allowWaitlist ?? false,
-          tags: branding?.tags?.join(', ') ?? '',
+          // Registration settings - try new location first, fall back to legacy
+          registrationType: branding?.ticketing?.registrationType ?? branding?.registration?.type ?? 'OPEN',
+          isFreeEvent: branding?.ticketing?.isFree ?? branding?.registration?.isFree ?? true,
+          allowWaitlist: branding?.ticketing?.allowWaitlist ?? branding?.registration?.allowWaitlist ?? false,
+          // Tags & SEO - try new location first
+          tags: (branding?.seo?.tags ?? branding?.tags ?? []).join(', '),
+          metaDescription: branding?.seo?.metaDescription ?? '',
+          customSlug: branding?.seo?.customSlug ?? '',
+          // Accessibility - try new location first, fall back to venue
+          accessibilityLanguage: branding?.accessibility?.language ?? 'en',
+          ageRestrictionEnabled: branding?.accessibility?.ageRestriction?.enabled ?? false,
+          minAge: branding?.accessibility?.ageRestriction?.minAge ?? null,
+          maxAge: branding?.accessibility?.ageRestriction?.maxAge ?? null,
           // Schedule
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
@@ -399,8 +423,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           venueCountry: branding?.venue?.country ?? '',
           venuePostalCode: branding?.venue?.postalCode ?? '',
           venueCapacity: branding?.venue?.capacity != null ? String(branding.venue.capacity) : '',
-          accessibilityFeatures: branding?.venue?.accessibilityFeatures ?? [],
-          accessibilityNotes: branding?.venue?.accessibilityNotes ?? '',
+          accessibilityFeatures: branding?.accessibility?.features ?? branding?.venue?.accessibilityFeatures ?? [],
+          accessibilityNotes: branding?.accessibility?.notes ?? branding?.venue?.accessibilityNotes ?? '',
           // Virtual fields
           virtualPlatform: branding?.virtualLinks?.platform ?? '',
           virtualMeetingUrl: branding?.virtualLinks?.meetingUrl ?? '',
@@ -504,9 +528,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           }
         : undefined;
 
-      // Build registration settings
+      // Build registration settings (save to both legacy and canonical locations)
       const registrationData = {
         type: values.registrationType || 'OPEN',
+        isFree: values.isFreeEvent ?? true,
+        allowWaitlist: values.allowWaitlist ?? false,
+      };
+
+      // Canonical ticketing data (for settings panels)
+      const ticketingData = {
+        registrationType: values.registrationType || 'OPEN',
         isFree: values.isFreeEvent ?? true,
         allowWaitlist: values.allowWaitlist ?? false,
       };
@@ -515,6 +546,25 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       const tagsArray = values.tags
         ? values.tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
         : [];
+
+      // SEO data (canonical location)
+      const seoData = {
+        tags: tagsArray,
+        metaDescription: values.metaDescription?.trim() || '',
+        customSlug: values.customSlug?.trim() || '',
+      };
+
+      // Accessibility data (canonical location)
+      const accessibilityData = {
+        features: values.accessibilityFeatures || [],
+        notes: values.accessibilityNotes?.trim() || '',
+        language: values.accessibilityLanguage || 'en',
+        ageRestriction: {
+          enabled: values.ageRestrictionEnabled ?? false,
+          minAge: values.minAge ?? null,
+          maxAge: values.maxAge ?? null,
+        },
+      };
 
       const payload: any = {
         name: values.name.trim(),
@@ -537,8 +587,13 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           venue: venueData,
           virtualLinks: virtualLinksData,
           contact: contactData,
+          // Legacy location (for backwards compatibility)
           registration: registrationData,
           tags: tagsArray.length > 0 ? tagsArray : undefined,
+          // Canonical locations (for settings panels)
+          ticketing: ticketingData,
+          seo: seoData,
+          accessibility: accessibilityData,
           timezone: values.timezone,
           registrationDeadline: values.registrationDeadline || undefined,
         },
@@ -968,6 +1023,73 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         </FormItem>
                       )}
                     />
+
+                    {/* SEO Fields */}
+                    <div className="pt-4 border-t border-border/50">
+                      <p className="text-sm font-medium text-foreground mb-4">🔍 Search Engine Optimization</p>
+                      
+                      <div className="space-y-6">
+                        <FormField
+                          control={control}
+                          name="metaDescription"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Meta Description</FormLabel>
+                                <span className="text-xs text-muted-foreground">{field.value?.length || 0}/160</span>
+                              </div>
+                              <FormControl>
+                                <Textarea
+                                  rows={2}
+                                  placeholder="A brief description for search engines..."
+                                  maxLength={160}
+                                  className="resize-none"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Appears in search results and social shares.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
+                          name="customSlug"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Custom URL Slug</FormLabel>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground whitespace-nowrap">/events/</span>
+                                <FormControl>
+                                  <Input
+                                    type="text"
+                                    placeholder="my-event-name"
+                                    className="h-11"
+                                    {...field}
+                                    onChange={(e) => {
+                                      // Auto-slugify the input
+                                      const slugified = e.target.value
+                                        .toLowerCase()
+                                        .replace(/[^\w\s-]/g, '')
+                                        .replace(/\s+/g, '-')
+                                        .replace(/-+/g, '-');
+                                      field.onChange(slugified);
+                                    }}
+                                  />
+                                </FormControl>
+                              </div>
+                              <FormDescription>
+                                Leave blank to auto-generate from event name.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -1522,6 +1644,122 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                           </FormItem>
                         )}
                       />
+
+                      {/* Event Language */}
+                      <FormField
+                        control={control}
+                        name="accessibilityLanguage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event Language</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                {...field}
+                              >
+                                <option value="en">English</option>
+                                <option value="hi">Hindi</option>
+                                <option value="ta">Tamil</option>
+                                <option value="te">Telugu</option>
+                                <option value="kn">Kannada</option>
+                                <option value="ml">Malayalam</option>
+                                <option value="mr">Marathi</option>
+                                <option value="bn">Bengali</option>
+                                <option value="gu">Gujarati</option>
+                                <option value="pa">Punjabi</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="zh">Chinese</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ar">Arabic</option>
+                              </select>
+                            </FormControl>
+                            <FormDescription>
+                              Primary language for the event.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Age Restriction */}
+                      <div className="space-y-4 pt-4 border-t border-border/50">
+                        <FormField
+                          control={control}
+                          name="ageRestrictionEnabled"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border/50 p-4">
+                              <div className="space-y-0.5">
+                                <FormLabel className="text-base">Age Restriction</FormLabel>
+                                <FormDescription>
+                                  Set minimum or maximum age requirements
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        {form.watch('ageRestrictionEnabled') && (
+                          <div className="grid grid-cols-2 gap-4 pl-4 border-l-2 border-primary/20">
+                            <FormField
+                              control={control}
+                              name="minAge"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Minimum Age</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="120"
+                                      placeholder="No minimum"
+                                      className="h-11"
+                                      value={field.value ?? ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        field.onChange(val === '' ? null : parseInt(val));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={control}
+                              name="maxAge"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Maximum Age</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="120"
+                                      placeholder="No maximum"
+                                      className="h-11"
+                                      value={field.value ?? ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        field.onChange(val === '' ? null : parseInt(val));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>

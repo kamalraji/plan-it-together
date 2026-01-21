@@ -39,13 +39,19 @@ export const SEOSettingsCard: React.FC<SEOSettingsCardProps> = ({
 
   const [settings, setSettings] = useState<SEOSettings>(() => ({
     ...defaultSettings,
-    ...branding?.seo,
+    // Try canonical location first, fall back to legacy location
+    tags: branding?.seo?.tags ?? branding?.tags ?? [],
+    metaDescription: branding?.seo?.metaDescription ?? '',
+    customSlug: branding?.seo?.customSlug ?? '',
   }));
 
   useEffect(() => {
     setSettings({
       ...defaultSettings,
-      ...branding?.seo,
+      // Try canonical location first, fall back to legacy location
+      tags: branding?.seo?.tags ?? branding?.tags ?? [],
+      metaDescription: branding?.seo?.metaDescription ?? '',
+      customSlug: branding?.seo?.customSlug ?? '',
     });
   }, [branding]);
 
@@ -54,7 +60,10 @@ export const SEOSettingsCard: React.FC<SEOSettingsCardProps> = ({
     try {
       const updatedBranding = {
         ...branding,
+        // Save to canonical location (seo)
         seo: settings,
+        // Also save to legacy location for backwards compatibility
+        tags: settings.tags,
       };
 
       const { error } = await supabase

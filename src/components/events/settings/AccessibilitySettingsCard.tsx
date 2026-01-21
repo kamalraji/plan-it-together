@@ -79,13 +79,29 @@ export const AccessibilitySettingsCard: React.FC<AccessibilitySettingsCardProps>
 
   const [settings, setSettings] = useState<AccessibilitySettings>(() => ({
     ...defaultSettings,
-    ...branding?.accessibility,
+    // Try canonical location first, fall back to venue accessibility
+    features: branding?.accessibility?.features ?? branding?.venue?.accessibilityFeatures ?? [],
+    notes: branding?.accessibility?.notes ?? branding?.venue?.accessibilityNotes ?? '',
+    language: branding?.accessibility?.language ?? 'en',
+    ageRestriction: branding?.accessibility?.ageRestriction ?? {
+      enabled: false,
+      minAge: null,
+      maxAge: null,
+    },
   }));
 
   useEffect(() => {
     setSettings({
       ...defaultSettings,
-      ...branding?.accessibility,
+      // Try canonical location first, fall back to venue accessibility
+      features: branding?.accessibility?.features ?? branding?.venue?.accessibilityFeatures ?? [],
+      notes: branding?.accessibility?.notes ?? branding?.venue?.accessibilityNotes ?? '',
+      language: branding?.accessibility?.language ?? 'en',
+      ageRestriction: branding?.accessibility?.ageRestriction ?? {
+        enabled: false,
+        minAge: null,
+        maxAge: null,
+      },
     });
   }, [branding]);
 
@@ -103,7 +119,14 @@ export const AccessibilitySettingsCard: React.FC<AccessibilitySettingsCardProps>
     try {
       const updatedBranding = {
         ...branding,
+        // Save to canonical location (accessibility)
         accessibility: settings,
+        // Also sync to venue for backwards compatibility (just features and notes)
+        venue: {
+          ...branding?.venue,
+          accessibilityFeatures: settings.features,
+          accessibilityNotes: settings.notes,
+        },
       };
 
       const { error } = await supabase

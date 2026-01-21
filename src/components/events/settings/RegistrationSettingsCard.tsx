@@ -45,13 +45,19 @@ export const RegistrationSettingsCard: React.FC<RegistrationSettingsCardProps> =
 
   const [settings, setSettings] = useState<TicketingSettings>(() => ({
     ...defaultSettings,
-    ...branding?.ticketing,
+    // Try canonical location first, fall back to legacy location
+    isFree: branding?.ticketing?.isFree ?? branding?.registration?.isFree ?? true,
+    registrationType: branding?.ticketing?.registrationType ?? branding?.registration?.type ?? 'OPEN',
+    allowWaitlist: branding?.ticketing?.allowWaitlist ?? branding?.registration?.allowWaitlist ?? false,
   }));
 
   useEffect(() => {
     setSettings({
       ...defaultSettings,
-      ...branding?.ticketing,
+      // Try canonical location first, fall back to legacy location
+      isFree: branding?.ticketing?.isFree ?? branding?.registration?.isFree ?? true,
+      registrationType: branding?.ticketing?.registrationType ?? branding?.registration?.type ?? 'OPEN',
+      allowWaitlist: branding?.ticketing?.allowWaitlist ?? branding?.registration?.allowWaitlist ?? false,
     });
   }, [branding]);
 
@@ -60,7 +66,14 @@ export const RegistrationSettingsCard: React.FC<RegistrationSettingsCardProps> =
     try {
       const updatedBranding = {
         ...branding,
+        // Save to canonical location (ticketing)
         ticketing: settings,
+        // Also save to legacy location for backwards compatibility
+        registration: {
+          type: settings.registrationType,
+          isFree: settings.isFree,
+          allowWaitlist: settings.allowWaitlist,
+        },
       };
 
       const { error } = await supabase
