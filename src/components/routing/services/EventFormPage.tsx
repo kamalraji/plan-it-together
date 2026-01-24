@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon, UserCircleIcon, PhotoIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useWatch } from 'react-hook-form';
@@ -28,6 +28,11 @@ import { DraftStatusIndicator } from '@/components/events/form/DraftStatusIndica
 import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
 import { UnsavedChangesDialog } from '@/components/events/form/UnsavedChangesDialog';
 import { ImageUpload } from '@/components/ui/image-upload';
+
+// Phase 3: Form UX Enhancements
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { EventImageGallery, type EventImage } from '@/components/events/form/EventImageGallery';
+import { EventFAQsSection, type EventFAQ } from '@/components/events/form/EventFAQsSection';
 
 import {
   Form,
@@ -284,8 +289,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     venue: false,
     virtual: false,
     branding: false,
+    media: false,
+    faqs: false,
     cta: false,
   });
+
+  // Phase 3: Gallery images and FAQs state
+  const [eventImages, setEventImages] = useState<EventImage[]>([]);
+  const [eventFaqs, setEventFaqs] = useState<EventFAQ[]>([]);
 
   // Detect browser timezone
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -1174,15 +1185,17 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                         <FormItem>
                           <FormLabel>Description *</FormLabel>
                           <FormControl>
-                            <Textarea
-                              rows={4}
-                              placeholder="Share what makes this event special"
-                              className="resize-none"
-                              {...field}
+                            <RichTextEditor
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              placeholder="Share what makes this event special. Use formatting to highlight key details..."
+                              minHeight="180px"
+                              disabled={isSubmitting}
                             />
                           </FormControl>
                           <FormDescription>
-                            A quick overview that helps attendees understand who this event is for.
+                            A rich overview that helps attendees understand who this event is for. Supports formatting, links, and lists.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -2306,7 +2319,71 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </CollapsibleContent>
               </Collapsible>
 
-              {/* CTA Section */}
+              {/* Media Gallery Section */}
+              <Collapsible
+                open={openSections.media}
+                onOpenChange={() => toggleSection('media')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Media Gallery"
+                    description="Event images and promotional visuals"
+                    icon={PhotoIcon}
+                    isOpen={openSections.media}
+                    stepNumber={showVenueSection && showVirtualSection ? 6 : (showVenueSection || showVirtualSection ? 5 : 4)}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
+                    <div className="rounded-xl border border-border/50 bg-accent/5 p-4">
+                      <p className="text-sm text-muted-foreground">
+                        🖼️ Add images to showcase your event. The primary image will be used as the event cover.
+                      </p>
+                    </div>
+                    
+                    <EventImageGallery
+                      images={eventImages}
+                      onChange={setEventImages}
+                      maxImages={10}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* FAQs Section */}
+              <Collapsible
+                open={openSections.faqs}
+                onOpenChange={() => toggleSection('faqs')}
+              >
+                <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                  <SectionHeader
+                    title="Frequently Asked Questions"
+                    description="Help attendees with common questions"
+                    icon={QuestionMarkCircleIcon}
+                    isOpen={openSections.faqs}
+                    stepNumber={showVenueSection && showVirtualSection ? 7 : (showVenueSection || showVirtualSection ? 6 : 5)}
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-primary/20 ml-7 mr-4">
+                    <div className="rounded-xl border border-border/50 bg-accent/5 p-4">
+                      <p className="text-sm text-muted-foreground">
+                        ❓ FAQs help reduce attendee inquiries and improve the registration experience.
+                      </p>
+                    </div>
+                    
+                    <EventFAQsSection
+                      faqs={eventFaqs}
+                      onChange={setEventFaqs}
+                      maxFaqs={20}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+
               <Collapsible
                 open={openSections.cta}
                 onOpenChange={() => toggleSection('cta')}
