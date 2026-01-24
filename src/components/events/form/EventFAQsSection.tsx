@@ -12,12 +12,48 @@ import {
   ChevronUp
 } from 'lucide-react';
 
+/**
+ * Form-level EventFAQ for FAQ section component
+ * Uses camelCase for consistency with React conventions
+ */
 export interface EventFAQ {
   id?: string;
   question: string;
   answer: string;
+  sortOrder: number;
+}
+
+/**
+ * Database-level EventFAQ for Supabase operations
+ */
+export interface EventFAQDB {
+  id?: string;
+  event_id: string;
+  question: string;
+  answer: string;
   sort_order: number;
 }
+
+/**
+ * Convert form-level EventFAQ to database format
+ */
+export const toEventFAQDB = (faq: EventFAQ, eventId: string): EventFAQDB => ({
+  id: faq.id,
+  event_id: eventId,
+  question: faq.question,
+  answer: faq.answer,
+  sort_order: faq.sortOrder,
+});
+
+/**
+ * Convert database EventFAQ to form format
+ */
+export const fromEventFAQDB = (dbFaq: EventFAQDB): EventFAQ => ({
+  id: dbFaq.id,
+  question: dbFaq.question,
+  answer: dbFaq.answer,
+  sortOrder: dbFaq.sort_order,
+});
 
 interface EventFAQsSectionProps {
   faqs: EventFAQ[];
@@ -41,7 +77,7 @@ export const EventFAQsSection: React.FC<EventFAQsSectionProps> = ({
     const newFaq: EventFAQ = {
       question: '',
       answer: '',
-      sort_order: faqs.length,
+      sortOrder: faqs.length,
     };
     
     onChange([...faqs, newFaq]);
@@ -52,7 +88,7 @@ export const EventFAQsSection: React.FC<EventFAQsSectionProps> = ({
     const newFaqs = faqs.filter((_, i) => i !== index);
     // Recalculate sort orders
     newFaqs.forEach((faq, i) => {
-      faq.sort_order = i;
+      faq.sortOrder = i;
     });
     onChange(newFaqs);
     
@@ -80,7 +116,7 @@ export const EventFAQsSection: React.FC<EventFAQsSectionProps> = ({
     const newFaqs = [...faqs];
     [newFaqs[index - 1], newFaqs[index]] = [newFaqs[index], newFaqs[index - 1]];
     newFaqs.forEach((faq, i) => {
-      faq.sort_order = i;
+      faq.sortOrder = i;
     });
     onChange(newFaqs);
     setExpandedIndex(index - 1);
@@ -91,7 +127,7 @@ export const EventFAQsSection: React.FC<EventFAQsSectionProps> = ({
     const newFaqs = [...faqs];
     [newFaqs[index], newFaqs[index + 1]] = [newFaqs[index + 1], newFaqs[index]];
     newFaqs.forEach((faq, i) => {
-      faq.sort_order = i;
+      faq.sortOrder = i;
     });
     onChange(newFaqs);
     setExpandedIndex(index + 1);
@@ -112,7 +148,7 @@ export const EventFAQsSection: React.FC<EventFAQsSectionProps> = ({
     newFaqs.splice(index, 0, draggedFaq);
     
     newFaqs.forEach((faq, i) => {
-      faq.sort_order = i;
+      faq.sortOrder = i;
     });
 
     onChange(newFaqs);

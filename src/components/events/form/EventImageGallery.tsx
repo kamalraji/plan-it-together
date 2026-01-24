@@ -14,13 +14,52 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * Form-level EventImage for gallery component
+ * Uses camelCase for React conventions
+ */
 export interface EventImage {
   id?: string;
   url: string;
   caption: string;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
+/**
+ * Database-level EventImage for Supabase operations
+ */
+export interface EventImageDB {
+  id?: string;
+  event_id: string;
+  image_url: string;
+  caption: string | null;
   sort_order: number;
   is_primary: boolean;
 }
+
+/**
+ * Convert form-level EventImage to database format
+ */
+export const toEventImageDB = (image: EventImage, eventId: string): EventImageDB => ({
+  id: image.id,
+  event_id: eventId,
+  image_url: image.url,
+  caption: image.caption || null,
+  sort_order: image.sortOrder,
+  is_primary: image.isPrimary,
+});
+
+/**
+ * Convert database EventImage to form format
+ */
+export const fromEventImageDB = (dbImage: EventImageDB): EventImage => ({
+  id: dbImage.id,
+  url: dbImage.image_url,
+  caption: dbImage.caption || '',
+  sortOrder: dbImage.sort_order,
+  isPrimary: dbImage.is_primary,
+});
 
 interface EventImageGalleryProps {
   images: EventImage[];
@@ -110,8 +149,8 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
         newImages.push({
           url: urlData.publicUrl,
           caption: '',
-          sort_order: images.length + newImages.length,
-          is_primary: images.length === 0 && newImages.length === 0,
+          sortOrder: images.length + newImages.length,
+          isPrimary: images.length === 0 && newImages.length === 0,
         });
       }
 
@@ -161,8 +200,8 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
     const newImage: EventImage = {
       url: urlInput.trim(),
       caption: '',
-      sort_order: images.length,
-      is_primary: images.length === 0,
+      sortOrder: images.length,
+      isPrimary: images.length === 0,
     };
 
     onChange([...images, newImage]);
@@ -173,12 +212,12 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
   const handleRemove = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     // If removed image was primary, set first image as primary
-    if (images[index].is_primary && newImages.length > 0) {
-      newImages[0].is_primary = true;
+    if (images[index].isPrimary && newImages.length > 0) {
+      newImages[0].isPrimary = true;
     }
     // Recalculate sort orders
     newImages.forEach((img, i) => {
-      img.sort_order = i;
+      img.sortOrder = i;
     });
     onChange(newImages);
   };
@@ -186,7 +225,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
   const handleSetPrimary = (index: number) => {
     const newImages = images.map((img, i) => ({
       ...img,
-      is_primary: i === index,
+      isPrimary: i === index,
     }));
     onChange(newImages);
   };
@@ -213,7 +252,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
     
     // Update sort orders
     newImages.forEach((img, i) => {
-      img.sort_order = i;
+      img.sortOrder = i;
     });
 
     onChange(newImages);
@@ -260,13 +299,13 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
                   <Button
                     type="button"
                     size="sm"
-                    variant={image.is_primary ? 'default' : 'secondary'}
+                    variant={image.isPrimary ? 'default' : 'secondary'}
                     className="h-7 text-xs"
                     onClick={() => handleSetPrimary(index)}
-                    title={image.is_primary ? 'Primary image' : 'Set as primary'}
+                    title={image.isPrimary ? 'Primary image' : 'Set as primary'}
                   >
-                    <Star className={cn('h-3 w-3 mr-1', image.is_primary && 'fill-current')} />
-                    {image.is_primary ? 'Primary' : 'Set primary'}
+                    <Star className={cn('h-3 w-3 mr-1', image.isPrimary && 'fill-current')} />
+                    {image.isPrimary ? 'Primary' : 'Set primary'}
                   </Button>
                   <Button
                     type="button"
@@ -289,7 +328,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
               )}
 
               {/* Primary badge */}
-              {image.is_primary && (
+              {image.isPrimary && (
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-medium">
                   Primary
                 </div>

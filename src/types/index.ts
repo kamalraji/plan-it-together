@@ -45,7 +45,11 @@ export interface ApiError {
 }
 
 // Event Management Types
-export interface Event {
+// NOTE: Comprehensive event types are now in src/types/event.types.ts
+// The types below are kept for backward compatibility with existing code
+
+/** @deprecated Use Event from event.types.ts */
+export interface LegacyEvent {
   id: string;
   name: string;
   description: string;
@@ -71,10 +75,7 @@ export interface Event {
   organization?: Organization;
   createdAt: string;
   updatedAt: string;
-
-  /** Serialized canvas state for custom hero layouts */
   canvasState?: any;
-  /** GrapesJS landing page output: html, css, and meta */
   landingPageData?: {
     html: string;
     css: string;
@@ -85,6 +86,8 @@ export interface Event {
   } | null;
 }
 
+// Re-export comprehensive event types
+export * from './event.types';
 
 
 export enum EventMode {
