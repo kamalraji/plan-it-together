@@ -27,7 +27,7 @@ import { eventFormSchema, type EventFormValues } from '@/lib/event-form-schema';
 // Enhanced form features
 import { useEventDraft } from '@/hooks/useEventDraft';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
-import { useEventFormKeyboard, formatShortcut } from '@/hooks/useEventFormKeyboard';
+import { useEventFormKeyboard } from '@/hooks/useEventFormKeyboard';
 import { SectionProgressIndicator, type SectionProgress, calculateSectionStatus } from '@/components/events/form/SectionProgressIndicator';
 import { DraftStatusIndicator } from '@/components/events/form/DraftStatusIndicator';
 import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
@@ -51,7 +51,8 @@ import { getDefaultFormValues, getInitialSectionState, sectionFieldMap } from '@
 import { useEventFormSubmit } from '@/components/events/form/hooks/useEventFormSubmit';
 
 // Types
-import type { EventImage, EventFAQ } from '@/components/events/form/EventImageGallery';
+import type { EventImage } from '@/components/events/form/EventImageGallery';
+import type { EventFAQ } from '@/components/events/form/EventFAQsSection';
 import type { QuickTier } from '@/components/events/form/TicketTierQuickAdd';
 
 interface SectionState {
@@ -250,7 +251,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           category: ((data as Record<string, unknown>).category as string) ?? '',
           organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
-          registrationType: ((data as Record<string, unknown>).registration_type as string) ?? (branding?.registration as { type?: string })?.type ?? 'OPEN',
+          registrationType: (((data as Record<string, unknown>).registration_type as string) ?? (branding?.registration as { type?: string })?.type ?? 'OPEN') as 'OPEN' | 'APPROVAL_REQUIRED' | 'INVITE_ONLY',
           isFreeEvent: ((data as Record<string, unknown>).is_free as boolean) ?? true,
           allowWaitlist: ((data as Record<string, unknown>).allow_waitlist as boolean) ?? false,
           tags: ((branding?.seo as { tags?: string[] })?.tags ?? []).join(', '),
@@ -490,8 +491,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 isOpen={openSections.media}
                 onToggle={() => toggleSection('media')}
                 stepNumber={getStepNumber('media')}
-                eventImages={eventImages}
-                onEventImagesChange={setEventImages}
+                images={eventImages}
+                onImagesChange={setEventImages}
                 isSubmitting={isSubmitting}
               />
             </div>
@@ -501,8 +502,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 isOpen={openSections.faqs}
                 onToggle={() => toggleSection('faqs')}
                 stepNumber={getStepNumber('faqs')}
-                eventFaqs={eventFaqs}
-                onEventFaqsChange={setEventFaqs}
+                faqs={eventFaqs}
+                onFaqsChange={setEventFaqs}
                 isSubmitting={isSubmitting}
               />
             </div>

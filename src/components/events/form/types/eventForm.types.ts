@@ -38,7 +38,7 @@ export interface QuickTier {
   name: string;
   price: number;
   currency: string;
-  quantity: number;
+  quantity: number | null;
 }
 
 export interface SectionState {

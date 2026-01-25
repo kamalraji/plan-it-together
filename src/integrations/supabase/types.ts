@@ -2530,6 +2530,54 @@ export type Database = {
           },
         ]
       }
+      content_reports: {
+        Row: {
+          category: Database["public"]["Enums"]["report_category"]
+          content_id: string
+          content_type: Database["public"]["Enums"]["report_content_type"]
+          created_at: string
+          description: string | null
+          id: string
+          priority: string | null
+          reporter_id: string | null
+          resolution_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["report_category"]
+          content_id: string
+          content_type: Database["public"]["Enums"]["report_content_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          reporter_id?: string | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["report_category"]
+          content_id?: string
+          content_type?: Database["public"]["Enums"]["report_content_type"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          reporter_id?: string | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       daily_discovers: {
         Row: {
           created_at: string | null
@@ -15371,6 +15419,20 @@ export type Database = {
         | "REMOVED"
       portfolio_layout: "stacked" | "grid"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
+      report_category:
+        | "SPAM"
+        | "HARASSMENT"
+        | "INAPPROPRIATE_CONTENT"
+        | "FRAUD"
+        | "COPYRIGHT"
+        | "OTHER"
+      report_content_type:
+        | "EVENT"
+        | "USER"
+        | "COMMENT"
+        | "ORGANIZATION"
+        | "MESSAGE"
+      report_status: "PENDING" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED"
       support_ticket_category:
         | "bug"
         | "request"
@@ -15584,6 +15646,22 @@ export const Constants = {
       ],
       portfolio_layout: ["stacked", "grid"],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
+      report_category: [
+        "SPAM",
+        "HARASSMENT",
+        "INAPPROPRIATE_CONTENT",
+        "FRAUD",
+        "COPYRIGHT",
+        "OTHER",
+      ],
+      report_content_type: [
+        "EVENT",
+        "USER",
+        "COMMENT",
+        "ORGANIZATION",
+        "MESSAGE",
+      ],
+      report_status: ["PENDING", "UNDER_REVIEW", "RESOLVED", "DISMISSED"],
       support_ticket_category: [
         "bug",
         "request",
