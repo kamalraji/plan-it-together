@@ -92,6 +92,47 @@ export type Database = {
         }
         Relationships: []
       }
+      application_status_history: {
+        Row: {
+          application_id: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_status: string
+          previous_status: string | null
+          reason: string | null
+        }
+        Insert: {
+          application_id: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_status: string
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Update: {
+          application_id?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_status?: string
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_status_history_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "organizer_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approval_request_comments: {
         Row: {
           content: string
@@ -1295,10 +1336,13 @@ export type Database = {
       }
       chat_group_members: {
         Row: {
+          cleared_at: string | null
           group_id: string
           id: string
           invited_by: string | null
+          is_hidden: boolean | null
           is_muted: boolean | null
+          is_pinned: boolean | null
           joined_at: string | null
           last_read_at: string | null
           muted_until: string | null
@@ -1307,10 +1351,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cleared_at?: string | null
           group_id: string
           id?: string
           invited_by?: string | null
+          is_hidden?: boolean | null
           is_muted?: boolean | null
+          is_pinned?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
           muted_until?: string | null
@@ -1319,10 +1366,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cleared_at?: string | null
           group_id?: string
           id?: string
           invited_by?: string | null
+          is_hidden?: boolean | null
           is_muted?: boolean | null
+          is_pinned?: boolean | null
           joined_at?: string | null
           last_read_at?: string | null
           muted_until?: string | null
@@ -1351,6 +1401,8 @@ export type Database = {
           max_members: number | null
           member_count: number | null
           name: string
+          only_admins_can_edit: boolean | null
+          only_admins_can_send: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -1363,6 +1415,8 @@ export type Database = {
           max_members?: number | null
           member_count?: number | null
           name: string
+          only_admins_can_edit?: boolean | null
+          only_admins_can_send?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -1375,6 +1429,8 @@ export type Database = {
           max_members?: number | null
           member_count?: number | null
           name?: string
+          only_admins_can_edit?: boolean | null
+          only_admins_can_send?: boolean | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1519,25 +1575,122 @@ export type Database = {
           },
         ]
       }
+      circle_invitations: {
+        Row: {
+          circle_id: string
+          created_at: string | null
+          id: string
+          invitee_email: string | null
+          invitee_id: string | null
+          inviter_id: string
+          responded_at: string | null
+          status: string | null
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string | null
+          id?: string
+          invitee_email?: string | null
+          invitee_id?: string | null
+          inviter_id: string
+          responded_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string | null
+          id?: string
+          invitee_email?: string | null
+          invitee_id?: string | null
+          inviter_id?: string
+          responded_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_invitations_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_invite_links: {
+        Row: {
+          circle_id: string
+          created_at: string | null
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          link_code: string
+          max_uses: number | null
+          use_count: number | null
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string | null
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          link_code?: string
+          max_uses?: number | null
+          use_count?: number | null
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string | null
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          link_code?: string
+          max_uses?: number | null
+          use_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_invite_links_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circle_members: {
         Row: {
           circle_id: string
           id: string
+          invited_by: string | null
+          is_muted: boolean | null
           joined_at: string
+          last_read_at: string | null
+          muted_until: string | null
           role: string
           user_id: string
         }
         Insert: {
           circle_id: string
           id?: string
+          invited_by?: string | null
+          is_muted?: boolean | null
           joined_at?: string
+          last_read_at?: string | null
+          muted_until?: string | null
           role?: string
           user_id: string
         }
         Update: {
           circle_id?: string
           id?: string
+          invited_by?: string | null
+          is_muted?: boolean | null
           joined_at?: string
+          last_read_at?: string | null
+          muted_until?: string | null
           role?: string
           user_id?: string
         }
@@ -1551,26 +1704,76 @@ export type Database = {
           },
         ]
       }
-      circle_messages: {
+      circle_message_reactions: {
         Row: {
-          circle_id: string
-          content: string
-          created_at: string
+          created_at: string | null
+          emoji: string
           id: string
+          message_id: string
           user_id: string
         }
         Insert: {
-          circle_id: string
-          content: string
-          created_at?: string
+          created_at?: string | null
+          emoji: string
           id?: string
+          message_id: string
           user_id: string
         }
         Update: {
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "circle_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_messages: {
+        Row: {
+          attachments: Json | null
+          circle_id: string
+          content: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          is_deleted: boolean | null
+          reply_to_id: string | null
+          sender_avatar: string | null
+          sender_name: string | null
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          circle_id: string
+          content: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          reply_to_id?: string | null
+          sender_avatar?: string | null
+          sender_name?: string | null
+          user_id: string
+        }
+        Update: {
+          attachments?: Json | null
           circle_id?: string
           content?: string
           created_at?: string
+          edited_at?: string | null
           id?: string
+          is_deleted?: boolean | null
+          reply_to_id?: string | null
+          sender_avatar?: string | null
+          sender_name?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1579,6 +1782,13 @@ export type Database = {
             columns: ["circle_id"]
             isOneToOne: false
             referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "circle_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -2735,6 +2945,7 @@ export type Database = {
           id: string
           is_primary: boolean | null
           sort_order: number | null
+          updated_at: string | null
           url: string
         }
         Insert: {
@@ -2745,6 +2956,7 @@ export type Database = {
           id?: string
           is_primary?: boolean | null
           sort_order?: number | null
+          updated_at?: string | null
           url: string
         }
         Update: {
@@ -2755,6 +2967,7 @@ export type Database = {
           id?: string
           is_primary?: boolean | null
           sort_order?: number | null
+          updated_at?: string | null
           url?: string
         }
         Relationships: [
@@ -3808,6 +4021,41 @@ export type Database = {
             foreignKeyName: "group_events_group_id_fkey"
             columns: ["group_id"]
             isOneToOne: false
+            referencedRelation: "chat_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_invite_links: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          group_id: string
+          id: string
+          is_active: boolean | null
+          link_code: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          group_id: string
+          id?: string
+          is_active?: boolean | null
+          link_code?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          group_id?: string
+          id?: string
+          is_active?: boolean | null
+          link_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invite_links_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: true
             referencedRelation: "chat_groups"
             referencedColumns: ["id"]
           },
@@ -5318,6 +5566,87 @@ export type Database = {
         }
         Relationships: []
       }
+      organizer_applications: {
+        Row: {
+          additional_documents: Json | null
+          admin_notes: string | null
+          admin_request_message: string | null
+          created_at: string
+          event_types: string[] | null
+          experience_description: string | null
+          id: string
+          largest_event_size: string | null
+          organization_description: string | null
+          organization_name: string
+          organization_size: string | null
+          organization_type: string
+          organization_website: string | null
+          past_events_count: string | null
+          portfolio_links: string[] | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+          verification_document_type: string | null
+          verification_document_url: string | null
+        }
+        Insert: {
+          additional_documents?: Json | null
+          admin_notes?: string | null
+          admin_request_message?: string | null
+          created_at?: string
+          event_types?: string[] | null
+          experience_description?: string | null
+          id?: string
+          largest_event_size?: string | null
+          organization_description?: string | null
+          organization_name?: string
+          organization_size?: string | null
+          organization_type?: string
+          organization_website?: string | null
+          past_events_count?: string | null
+          portfolio_links?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+          verification_document_type?: string | null
+          verification_document_url?: string | null
+        }
+        Update: {
+          additional_documents?: Json | null
+          admin_notes?: string | null
+          admin_request_message?: string | null
+          created_at?: string
+          event_types?: string[] | null
+          experience_description?: string | null
+          id?: string
+          largest_event_size?: string | null
+          organization_description?: string | null
+          organization_name?: string
+          organization_size?: string | null
+          organization_type?: string
+          organization_website?: string | null
+          past_events_count?: string | null
+          portfolio_links?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_document_type?: string | null
+          verification_document_url?: string | null
+        }
+        Relationships: []
+      }
       page_builder_history: {
         Row: {
           action_type: string
@@ -5568,6 +5897,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
       }
       portfolio_projects: {
         Row: {
@@ -7757,6 +8116,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_bans: {
+        Row: {
+          banned_at: string
+          banned_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          reason: string | null
+          unbanned_at: string | null
+          unbanned_by: string | null
+          user_id: string
+        }
+        Insert: {
+          banned_at?: string
+          banned_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          unbanned_at?: string | null
+          unbanned_by?: string | null
+          user_id: string
+        }
+        Update: {
+          banned_at?: string
+          banned_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          unbanned_at?: string | null
+          unbanned_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_competition_badges: {
         Row: {
@@ -14584,6 +14979,17 @@ export type Database = {
         Returns: Json
       }
       count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
+      create_chat_group: {
+        Args: {
+          p_description?: string
+          p_icon_url?: string
+          p_is_public?: boolean
+          p_max_members?: number
+          p_member_ids?: string[]
+          p_name: string
+        }
+        Returns: Json
+      }
       decrement_comment_like_count: {
         Args: { p_comment_id: string }
         Returns: undefined
@@ -14766,6 +15172,20 @@ export type Database = {
           organization: string
         }[]
       }
+      get_public_ticket_tiers: {
+        Args: { p_event_id: string }
+        Returns: {
+          available_quantity: number
+          currency: string
+          description: string
+          id: string
+          is_available: boolean
+          name: string
+          price: number
+          sale_end: string
+          sale_start: string
+        }[]
+      }
       get_scroll_depth_distribution: {
         Args: { end_date?: string; start_date?: string }
         Returns: {
@@ -14809,6 +15229,10 @@ export type Database = {
         Args: { p_booth_id: string }
         Returns: undefined
       }
+      increment_circle_invite_use_count: {
+        Args: { p_link_code: string }
+        Returns: boolean
+      }
       increment_comment_like_count: {
         Args: { p_comment_id: string }
         Returns: undefined
@@ -14822,6 +15246,11 @@ export type Database = {
       increment_ticket_sold_count: {
         Args: { quantity: number; ticket_id: string }
         Returns: undefined
+      }
+      is_chat_group_member: { Args: { _group_id: string }; Returns: boolean }
+      is_event_registered_attendee: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
       }
       is_following: {
         Args: { follower: string; target: string }
@@ -14852,6 +15281,10 @@ export type Database = {
           p_target_user_id: string
           p_user_id: string
         }
+        Returns: string
+      }
+      mask_anonymous_author: {
+        Args: { is_anonymous: boolean; post_author_id: string }
         Returns: string
       }
       record_organization_product_metrics: {
