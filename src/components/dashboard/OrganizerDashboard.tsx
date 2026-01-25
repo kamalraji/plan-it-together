@@ -71,29 +71,32 @@ export function OrganizerDashboard() {
         .order('start_date', { ascending: false });
       
       if (error) throw error;
+      if (!data || data.length === 0) return [];
       
-      // Get registration counts for each event
-      const eventsWithCounts = await Promise.all(
-        (data || []).map(async (event) => {
-          const { count } = await supabase
-            .from('registrations')
-            .select('*', { count: 'exact', head: true })
-            .eq('event_id', event.id);
-          
-          return {
-            id: event.id,
-            name: event.name,
-            description: event.description || '',
-            startDate: event.start_date,
-            endDate: event.end_date,
-            status: event.status,
-            registrationCount: count || 0,
-            capacity: event.capacity
-          };
-        })
-      );
+      // Batch query: Get all registrations for all events in single query
+      const eventIds = data.map(e => e.id);
+      const { data: registrations } = await supabase
+        .from('registrations')
+        .select('event_id')
+        .in('event_id', eventIds);
       
-      return eventsWithCounts;
+      // Count registrations per event from batch result
+      const regCounts: Record<string, number> = {};
+      (registrations || []).forEach(r => {
+        regCounts[r.event_id] = (regCounts[r.event_id] || 0) + 1;
+      });
+      
+      // Map events with counts without additional queries
+      return data.map(event => ({
+        id: event.id,
+        name: event.name,
+        description: event.description || '',
+        startDate: event.start_date,
+        endDate: event.end_date,
+        status: event.status,
+        registrationCount: regCounts[event.id] || 0,
+        capacity: event.capacity
+      }));
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,

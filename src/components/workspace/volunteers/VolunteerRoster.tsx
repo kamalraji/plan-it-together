@@ -30,39 +30,48 @@ export function VolunteerRoster({ workspaceId }: VolunteerRosterProps) {
         .eq('workspace_id', workspaceId);
       
       if (error) throw error;
-      if (!members) return [];
+      if (!members || members.length === 0) return [];
 
-      // Get user profiles for all members
+      // Get user profiles for all members in single batch query
       const userIds = members.map(m => m.user_id);
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, full_name')
-        .in('id', userIds);
+      
+      // Batch all queries in parallel instead of N+1 pattern
+      const [profilesResult, assignmentsResult] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('id, full_name')
+          .in('id', userIds),
+        supabase
+          .from('volunteer_assignments')
+          .select('user_id')
+          .in('user_id', userIds)
+          .neq('status', 'CANCELLED'),
+      ]);
 
-      const profileMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
-
-      // Get shift assignments for each volunteer
-      const volunteerData = await Promise.all(
-        members.map(async (member) => {
-          const { count: shiftsCount } = await supabase
-            .from('volunteer_assignments')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', member.user_id)
-            .neq('status', 'CANCELLED');
-
-          // Estimate hours based on shifts (average 3 hours per shift)
-          const hoursLogged = (shiftsCount || 0) * 3;
-          
-          return {
-            id: member.id,
-            name: profileMap.get(member.user_id) || 'Unknown Volunteer',
-            email: `volunteer-${member.user_id.slice(0, 8)}@team.local`,
-            status: member.status as 'ACTIVE' | 'PENDING' | 'INACTIVE',
-            shiftsAssigned: shiftsCount || 0,
-            hoursLogged,
-          };
-        })
+      const profileMap = new Map(
+        profilesResult.data?.map(p => [p.id, p.full_name]) || []
       );
+
+      // Count assignments per user from single batch query
+      const assignmentCounts: Record<string, number> = {};
+      (assignmentsResult.data || []).forEach(a => {
+        assignmentCounts[a.user_id] = (assignmentCounts[a.user_id] || 0) + 1;
+      });
+
+      // Transform data without additional queries
+      const volunteerData = members.map((member) => {
+        const shiftsCount = assignmentCounts[member.user_id] || 0;
+        const hoursLogged = shiftsCount * 3; // average 3 hours per shift
+        
+        return {
+          id: member.id,
+          name: profileMap.get(member.user_id) || 'Unknown Volunteer',
+          email: `volunteer-${member.user_id.slice(0, 8)}@team.local`,
+          status: member.status as 'ACTIVE' | 'PENDING' | 'INACTIVE',
+          shiftsAssigned: shiftsCount,
+          hoursLogged,
+        };
+      });
 
       return volunteerData;
     },
