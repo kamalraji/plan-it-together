@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { AB_TEST_COLUMNS, CAMPAIGN_COLUMNS, SOCIAL_POST_COLUMNS } from '@/lib/supabase-columns';
 
 // Re-export campaign types and hooks from Growth Department for reuse
 export { 
@@ -82,7 +83,7 @@ export function useABTests(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_ab_tests')
-        .select('*')
+        .select(AB_TEST_COLUMNS.list)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -297,7 +298,7 @@ export function useMarketingAnalytics(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_campaigns')
-        .select('*')
+        .select(CAMPAIGN_COLUMNS.analytics)
         .eq('workspace_id', workspaceId);
       
       if (error) throw error;
@@ -337,7 +338,7 @@ export function usePostQueue(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('social_post_queue')
-        .select('*, social_post:workspace_social_posts(*)')
+        .select(`id, workspace_id, social_post_id, scheduled_for, status, created_at, social_post:workspace_social_posts(${SOCIAL_POST_COLUMNS.list})`)
         .eq('workspace_id', workspaceId)
         .order('scheduled_for', { ascending: true });
       if (error) throw error;

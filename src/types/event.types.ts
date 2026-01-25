@@ -244,6 +244,32 @@ export interface LegacyVirtualConfig {
   instructions?: string;
 }
 
+/**
+ * Extended branding interface for parsing legacy JSONB data with nested structures
+ * Used in event-compat.ts for type-safe access to deeply nested legacy fields
+ */
+export interface EventBrandingExtended extends EventBranding {
+  // Nested legacy structures
+  registration?: {
+    type?: string;
+    allowWaitlist?: boolean;
+  };
+  ticketing?: {
+    isFree?: boolean;
+    registrationType?: string;
+  };
+  accessibility?: {
+    preferredLanguage?: string;
+    minAge?: number;
+    maxAge?: number;
+  };
+  // Rich content (legacy location)
+  timeline?: TimelineItem[];
+  agenda?: AgendaItem[];
+  prizes?: PrizeInfo[];
+  sponsors?: SponsorInfo[];
+}
+
 // ============================================
 // Complete Event Entity
 // ============================================

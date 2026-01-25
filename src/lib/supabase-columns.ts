@@ -334,6 +334,19 @@ export const HASHTAG_COLUMNS = {
   detail: 'id, workspace_id, name, uses_count, is_branded, category, created_at, updated_at',
 } as const;
 
+// A/B Tests columns
+export const AB_TEST_COLUMNS = {
+  list: 'id, workspace_id, campaign_id, name, test_type, status, variant_a, variant_b, sample_size, current_sample, winner, start_date, end_date, created_at',
+  detail: 'id, workspace_id, campaign_id, name, description, test_type, status, variant_a, variant_b, variant_a_metrics, variant_b_metrics, sample_size, current_sample, winner, confidence_level, start_date, end_date, created_by, created_at, updated_at',
+} as const;
+
+// Campaign columns
+export const CAMPAIGN_COLUMNS = {
+  list: 'id, workspace_id, name, type, channel, status, budget, spent, start_date, end_date, created_at',
+  detail: 'id, workspace_id, name, description, type, channel, status, budget, spent, target_audience, metrics, impressions, clicks, conversions, start_date, end_date, created_by, created_at, updated_at',
+  analytics: 'id, name, status, budget, spent, impressions, clicks, conversions',
+} as const;
+
 // Judge columns
 export const JUDGE_COLUMNS = {
   list: 'id, workspace_id, user_id, expertise, status, assigned_submissions_count, completed_evaluations_count, created_at',
