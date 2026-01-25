@@ -15,6 +15,7 @@ import type {
   EventImage,
   EventFAQ,
   EventBranding,
+  EventBrandingExtended,
   RegistrationType,
   VirtualPlatform,
   LegacyVenueConfig,
@@ -75,7 +76,7 @@ export function extractTimezone(event: Partial<Event>): string {
 export function extractRegistrationType(event: Partial<Event>): RegistrationType | string {
   if (event.registrationType) return event.registrationType;
   
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   if (branding?.registrationType) return branding.registrationType;
   if (branding?.registration?.type) return branding.registration.type;
   if (branding?.ticketing?.registrationType) return branding.ticketing.registrationType;
@@ -93,7 +94,7 @@ export function extractRegistrationType(event: Partial<Event>): RegistrationType
 export function extractIsFree(event: Partial<Event>): boolean {
   if (typeof event.isFree === 'boolean') return event.isFree;
   
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   if (typeof branding?.isFreeEvent === 'boolean') return branding.isFreeEvent;
   if (typeof branding?.ticketing?.isFree === 'boolean') return branding.ticketing.isFree;
   
@@ -110,7 +111,7 @@ export function extractIsFree(event: Partial<Event>): boolean {
 export function extractAllowWaitlist(event: Partial<Event>): boolean {
   if (typeof event.allowWaitlist === 'boolean') return event.allowWaitlist;
   
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   if (typeof branding?.allowWaitlist === 'boolean') return branding.allowWaitlist;
   if (typeof branding?.registration?.allowWaitlist === 'boolean') return branding.registration.allowWaitlist;
   
@@ -163,7 +164,7 @@ export function extractRegistrationDeadline(event: Partial<Event>): string | nul
  * Extract min/max age restrictions
  */
 export function extractAgeRestrictions(event: Partial<Event>): { minAge: number | null; maxAge: number | null } {
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   
   return {
     minAge: event.minAge ?? branding?.minAge ?? branding?.accessibility?.minAge ?? null,
@@ -175,7 +176,7 @@ export function extractAgeRestrictions(event: Partial<Event>): { minAge: number 
  * Extract language preference
  */
 export function extractLanguage(event: Partial<Event>): string | null {
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   return event.language ?? branding?.language ?? branding?.accessibility?.preferredLanguage ?? null;
 }
 
@@ -283,7 +284,7 @@ export function extractVirtualLinks(event: Partial<Event>): EventVirtualLink[] {
  * This is the main utility for ensuring consistent data access
  */
 export function normalizeEventFromDB(dbRow: any): Event {
-  const branding = (dbRow.branding || {}) as EventBranding;
+  const branding = (dbRow.branding || {}) as EventBrandingExtended;
   const eventId = dbRow.id;
   
   // Build venue from joined data or legacy
@@ -363,11 +364,11 @@ export function normalizeEventFromDB(dbRow: any): Event {
     updatedAt: faq.updated_at,
   }));
   
-  // Extract registration type with fallbacks
-  const regType = dbRow.registration_type 
+  // Extract registration type with fallbacks (branding is already typed as EventBrandingExtended)
+  const regType = (dbRow.registration_type as string | undefined)
     || branding.registrationType 
-    || (branding as any).registration?.type 
-    || (branding as any).ticketing?.registrationType
+    || branding.registration?.type 
+    || branding.ticketing?.registrationType
     || 'OPEN';
   
   return {
@@ -416,10 +417,10 @@ export function normalizeEventFromDB(dbRow: any): Event {
     images,
     faqs,
     
-    timeline: dbRow.timeline || (branding as any).timeline || [],
-    agenda: dbRow.agenda || (branding as any).agenda || [],
-    prizes: dbRow.prizes || (branding as any).prizes || [],
-    sponsors: dbRow.sponsors || (branding as any).sponsors || [],
+    timeline: dbRow.timeline || branding.timeline || [],
+    agenda: dbRow.agenda || branding.agenda || [],
+    prizes: dbRow.prizes || branding.prizes || [],
+    sponsors: dbRow.sponsors || branding.sponsors || [],
     
     organization: dbRow.organizations ? {
       id: dbRow.organizations.id,
@@ -548,7 +549,7 @@ export function buildVirtualLinkPayload(eventId: string, formValues: any): Recor
  * Check if an event needs migration from legacy to normalized format
  */
 export function needsMigration(event: Partial<Event>): boolean {
-  const branding = event.branding as any;
+  const branding = event.branding as EventBrandingExtended | undefined;
   
   // Has legacy data in branding but not in normalized columns
   if (branding?.timezone && !event.timezone) return true;
