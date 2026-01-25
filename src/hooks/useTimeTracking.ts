@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, endOfWeek, format, eachDayOfInterval } from 'date-fns';
-import { TIME_TRACKING_COLUMNS, USER_PROFILE_COLUMNS, buildRelation } from '@/lib/supabase-columns';
+import { TIME_TRACKING_COLUMNS, buildRelation } from '@/lib/supabase-columns';
 
 export type TimeEntryStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 

@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
-import { SUPPORT_TICKET_COLUMNS, USER_PROFILE_COLUMNS } from '@/lib/supabase-columns';
+import { SUPPORT_TICKET_COLUMNS } from '@/lib/supabase-columns';
 
 type TicketPriority = Database['public']['Enums']['support_ticket_priority'];
 type TicketStatus = Database['public']['Enums']['support_ticket_status'];

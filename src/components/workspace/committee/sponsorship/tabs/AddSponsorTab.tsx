@@ -26,7 +26,6 @@ import {
   MoreVertical,
   Edit,
   Trash2,
-  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SimpleDropdown, SimpleDropdownTrigger, SimpleDropdownContent, SimpleDropdownItem } from '@/components/ui/simple-dropdown';
@@ -69,7 +68,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
     contract_value: '',
     payment_status: 'pending',
     status: 'active',
-    website_url: '',
     notes: '',
   });
 
@@ -92,7 +90,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
       contract_value: parseFloat(formData.contract_value) || 0,
       payment_status: formData.payment_status,
       status: formData.status,
-      website_url: formData.website_url || null,
       notes: formData.notes || null,
     }, {
       onSuccess: () => {
@@ -115,7 +112,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
       contract_value: parseFloat(formData.contract_value) || 0,
       payment_status: formData.payment_status,
       status: formData.status,
-      website_url: formData.website_url || null,
       notes: formData.notes || null,
     }, {
       onSuccess: () => {
@@ -141,7 +137,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
       contract_value: sponsor.contract_value?.toString() || '',
       payment_status: sponsor.payment_status || 'pending',
       status: sponsor.status || 'active',
-      website_url: sponsor.website_url || '',
       notes: sponsor.notes || '',
     });
     setEditingSponsor(sponsor);
@@ -157,7 +152,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
       contract_value: '',
       payment_status: 'pending',
       status: 'active',
-      website_url: '',
       notes: '',
     });
   };
@@ -269,16 +263,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="website_url">Website URL</Label>
-        <Input
-          id="website_url"
-          value={formData.website_url}
-          onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-          placeholder="https://acme.com"
-        />
       </div>
 
       <div className="space-y-2">
@@ -456,11 +440,6 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
                           <SimpleDropdownItem onClick={() => openEditDialog(sponsor)}>
                             <Edit className="h-4 w-4 mr-2" /> Edit
                           </SimpleDropdownItem>
-                          {sponsor.website_url && (
-                            <SimpleDropdownItem onClick={() => window.open(sponsor.website_url!, '_blank')}>
-                              <ExternalLink className="h-4 w-4 mr-2" /> Visit Website
-                            </SimpleDropdownItem>
-                          )}
                           <SimpleDropdownItem onClick={() => handleDeleteSponsor(sponsor)} className="text-destructive">
                             <Trash2 className="h-4 w-4 mr-2" /> Delete
                           </SimpleDropdownItem>

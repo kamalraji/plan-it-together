@@ -255,11 +255,11 @@ export const WORKSPACE_INTEGRATION_COLUMNS = {
   detail: 'id, workspace_id, platform, name, webhook_url, is_active, notification_types, created_by, created_at, updated_at',
 } as const;
 
-// Sponsor columns
+// Sponsor columns (actual schema: workspace_sponsors)
 export const SPONSOR_COLUMNS = {
-  list: 'id, workspace_id, name, tier, contact_name, contact_email, contract_value, payment_status, status, logo_url, created_at',
-  detail: 'id, workspace_id, name, tier, contact_name, contact_email, contact_phone, contract_value, payment_status, status, logo_url, website_url, notes, created_at, updated_at',
-  minimal: 'id, name, tier, status',
+  list: 'id, workspace_id, name, company_name, tier, contact_name, contact_email, contract_value, payment_status, status, created_at',
+  detail: 'id, workspace_id, name, company_name, tier, contact_name, contact_email, contact_phone, contract_value, amount_paid, payment_status, deliverables, deliverables_status, proposal_sent_at, contract_signed_at, status, notes, created_at, updated_at',
+  minimal: 'id, name, company_name, tier, status',
 } as const;
 
 // Sponsor proposal columns

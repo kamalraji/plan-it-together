@@ -7,23 +7,26 @@ import {
   SPONSOR_DELIVERABLE_COLUMNS,
   SPONSOR_BENEFIT_COLUMNS,
   SPONSOR_COMMUNICATION_COLUMNS,
-  buildRelation
 } from '@/lib/supabase-columns';
 
-// Types
+// Types (matches actual workspace_sponsors table schema)
 export interface Sponsor {
   id: string;
   workspace_id: string;
   name: string;
+  company_name: string | null;
   tier: string;
   contact_name: string | null;
   contact_email: string | null;
   contact_phone: string | null;
   contract_value: number;
+  amount_paid: number | null;
   payment_status: string;
+  deliverables: string | null;
+  deliverables_status: string | null;
+  proposal_sent_at: string | null;
+  contract_signed_at: string | null;
   status: string;
-  logo_url: string | null;
-  website_url: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -162,12 +165,12 @@ export function useDeliverables(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_sponsor_deliverables')
-        .select(`${SPONSOR_DELIVERABLE_COLUMNS.detail}, ${buildRelation('sponsor:workspace_sponsors', 'id, name, tier')}`)
+        .select(`${SPONSOR_DELIVERABLE_COLUMNS.detail}, sponsor:workspace_sponsors(id, name, tier)`)
         .eq('workspace_id', workspaceId)
         .order('due_date', { ascending: true });
       
       if (error) throw error;
-      return data as SponsorDeliverable[];
+      return (data || []) as SponsorDeliverable[];
     },
     enabled: !!workspaceId,
   });
@@ -199,7 +202,7 @@ export function useCommunications(workspaceId: string | undefined, sponsorId?: s
       if (!workspaceId) return [];
       let query = supabase
         .from('workspace_sponsor_communications')
-        .select(`${SPONSOR_COMMUNICATION_COLUMNS.detail}, ${buildRelation('sponsor:workspace_sponsors', 'id, name')}`)
+        .select(`${SPONSOR_COMMUNICATION_COLUMNS.detail}, sponsor:workspace_sponsors(id, name)`)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       
@@ -209,33 +212,7 @@ export function useCommunications(workspaceId: string | undefined, sponsorId?: s
       
       const { data, error } = await query;
       if (error) throw error;
-      return data as SponsorCommunication[];
-    },
-    enabled: !!workspaceId,
-  });
-}
-
-export function useCommunications(workspaceId: string | undefined, sponsorId?: string) {
-  return useQuery({
-    queryKey: ['sponsor-communications', workspaceId, sponsorId],
-    queryFn: async () => {
-      if (!workspaceId) return [];
-      let query = supabase
-        .from('workspace_sponsor_communications')
-        .select(`
-          *,
-          sponsor:workspace_sponsors(id, name)
-        `)
-        .eq('workspace_id', workspaceId)
-        .order('created_at', { ascending: false });
-      
-      if (sponsorId) {
-        query = query.eq('sponsor_id', sponsorId);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as SponsorCommunication[];
+      return (data || []) as SponsorCommunication[];
     },
     enabled: !!workspaceId,
   });
