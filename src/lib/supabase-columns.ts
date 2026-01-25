@@ -255,6 +255,115 @@ export const WORKSPACE_INTEGRATION_COLUMNS = {
   detail: 'id, workspace_id, platform, name, webhook_url, is_active, notification_types, created_by, created_at, updated_at',
 } as const;
 
+// Sponsor columns
+export const SPONSOR_COLUMNS = {
+  list: 'id, workspace_id, name, tier, contact_name, contact_email, contract_value, payment_status, status, logo_url, created_at',
+  detail: 'id, workspace_id, name, tier, contact_name, contact_email, contact_phone, contract_value, payment_status, status, logo_url, website_url, notes, created_at, updated_at',
+  minimal: 'id, name, tier, status',
+} as const;
+
+// Sponsor proposal columns
+export const SPONSOR_PROPOSAL_COLUMNS = {
+  list: 'id, workspace_id, sponsor_id, company_name, contact_name, proposed_tier, proposed_value, stage, stage_entered_at, next_follow_up_date, created_at',
+  detail: 'id, workspace_id, sponsor_id, company_name, contact_name, contact_email, contact_phone, proposed_tier, proposed_value, stage, stage_entered_at, proposal_document_url, notes, next_follow_up_date, assigned_to, created_by, created_at, updated_at',
+} as const;
+
+// Sponsor deliverable columns
+export const SPONSOR_DELIVERABLE_COLUMNS = {
+  list: 'id, workspace_id, sponsor_id, title, category, due_date, status, priority, created_at',
+  detail: 'id, workspace_id, sponsor_id, title, description, category, due_date, completed_at, status, priority, proof_url, notes, assigned_to, created_by, created_at, updated_at',
+} as const;
+
+// Sponsor benefit columns
+export const SPONSOR_BENEFIT_COLUMNS = {
+  list: 'id, workspace_id, tier, name, category, value_estimate, quantity, is_active, display_order',
+  detail: 'id, workspace_id, tier, name, description, category, value_estimate, quantity, is_active, display_order, created_at, updated_at',
+} as const;
+
+// Sponsor communication columns
+export const SPONSOR_COMMUNICATION_COLUMNS = {
+  list: 'id, workspace_id, sponsor_id, type, subject, direction, status, scheduled_for, sent_at, created_at',
+  detail: 'id, workspace_id, sponsor_id, type, subject, content, direction, status, scheduled_for, sent_at, recipient_email, attachments, created_by, created_at, updated_at',
+} as const;
+
+// Time entry columns (extended)
+export const TIME_TRACKING_COLUMNS = {
+  list: 'id, workspace_id, user_id, task_id, date, hours, status, created_at',
+  detail: 'id, workspace_id, user_id, task_id, date, hours, description, status, created_at, updated_at',
+} as const;
+
+// Support ticket columns
+export const SUPPORT_TICKET_COLUMNS = {
+  list: 'id, workspace_id, ticket_number, title, category, priority, status, reporter_id, reporter_name, assignee_id, is_escalated, created_at',
+  detail: 'id, workspace_id, ticket_number, title, description, category, priority, status, location, affected_system, reporter_id, reporter_name, reporter_email, assignee_id, assigned_at, sla_response_deadline, sla_resolution_deadline, first_response_at, resolved_at, resolved_by, resolution_notes, is_escalated, escalated_at, escalation_reason, linked_incident_id, tags, internal_notes, created_at, updated_at',
+} as const;
+
+// Ticket activity columns
+export const TICKET_ACTIVITY_COLUMNS = {
+  list: 'id, ticket_id, activity_type, performed_by, performed_by_name, created_at',
+  detail: 'id, ticket_id, activity_type, previous_value, new_value, comment, performed_by, performed_by_name, created_at',
+} as const;
+
+// Automation rules columns
+export const AUTOMATION_RULE_COLUMNS = {
+  list: 'id, workspace_id, name, trigger_type, action_type, is_active, created_at',
+  detail: 'id, workspace_id, name, description, trigger_type, trigger_conditions, action_type, action_config, is_active, last_triggered_at, trigger_count, created_by, created_at, updated_at',
+} as const;
+
+// Issues columns
+export const ISSUE_COLUMNS = {
+  list: 'id, workspace_id, title, issue_type, severity, status, assigned_to, created_at',
+  detail: 'id, workspace_id, title, description, issue_type, severity, status, assigned_to, reported_by, resolution, resolved_at, due_date, created_at, updated_at',
+} as const;
+
+// Social media platform columns
+export const SOCIAL_PLATFORM_COLUMNS = {
+  list: 'id, workspace_id, platform, followers_count, engagement_rate, is_connected, last_synced_at',
+  detail: 'id, workspace_id, platform, handle, followers_count, following_count, posts_count, engagement_rate, is_connected, last_synced_at, created_at, updated_at',
+} as const;
+
+// Engagement report columns
+export const ENGAGEMENT_REPORT_COLUMNS = {
+  list: 'id, workspace_id, platform, report_date, total_followers, total_posts, engagement_rate, created_at',
+  detail: 'id, workspace_id, platform, report_date, total_followers, follower_growth, total_posts, total_likes, total_comments, total_shares, total_saves, total_reach, total_impressions, engagement_rate, created_at',
+} as const;
+
+// Hashtag columns
+export const HASHTAG_COLUMNS = {
+  list: 'id, workspace_id, name, uses_count, created_at',
+  detail: 'id, workspace_id, name, uses_count, is_branded, category, created_at, updated_at',
+} as const;
+
+// Judge columns
+export const JUDGE_COLUMNS = {
+  list: 'id, workspace_id, user_id, expertise, status, assigned_submissions_count, completed_evaluations_count, created_at',
+  detail: 'id, workspace_id, user_id, expertise, status, bio, profile_url, assigned_submissions_count, completed_evaluations_count, average_score_given, is_lead, panel_id, created_at, updated_at',
+} as const;
+
+// Rubric columns
+export const RUBRIC_COLUMNS = {
+  list: 'id, workspace_id, name, criteria_count, max_score, is_active, created_at',
+  detail: 'id, workspace_id, name, description, criteria, criteria_count, max_score, is_active, created_by, created_at, updated_at',
+} as const;
+
+// Submission columns
+export const SUBMISSION_COLUMNS = {
+  list: 'id, workspace_id, team_name, project_title, category, status, submitted_at, created_at',
+  detail: 'id, workspace_id, team_id, team_name, project_title, project_description, project_url, demo_url, repository_url, presentation_url, category, status, is_eligible, disqualification_reason, submitted_at, created_at, updated_at',
+} as const;
+
+// Content approval columns
+export const CONTENT_APPROVAL_COLUMNS = {
+  list: 'id, workspace_id, title, content_type, status, submitted_at, submitted_by, created_at',
+  detail: 'id, workspace_id, title, content_type, content_url, status, current_stage, total_stages, submitted_at, submitted_by, submitter_name, approved_at, rejected_at, rejection_reason, created_at, updated_at',
+} as const;
+
+// Publish request columns
+export const PUBLISH_REQUEST_COLUMNS = {
+  list: 'id, event_id, status, requested_by, created_at',
+  detail: 'id, event_id, status, requested_by, requester_name, reviewed_by, reviewer_name, reviewed_at, rejection_reason, notes, created_at, updated_at',
+} as const;
+
 /**
  * Helper to build relation selections
  * @example buildRelation('user_profiles', USER_PROFILE_COLUMNS.minimal) 

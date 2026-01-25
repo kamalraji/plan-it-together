@@ -11,6 +11,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
 // Zod schemas for social media post actions (strict mode)
 const postNowSchema = z.object({
@@ -29,6 +30,30 @@ const requestSchema = z.discriminatedUnion("action", [
   postNowSchema,
   addToQueueSchema,
 ]);
+
+// Helper function to verify user has workspace access
+// deno-lint-ignore no-explicit-any
+async function verifyWorkspaceAccess(
+  serviceClient: any,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  const { data, error } = await serviceClient
+    .from('workspace_members')
+    .select('id, role')
+    .eq('workspace_id', workspaceId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return false;
+  }
+
+  // Only allow members with management roles to post
+  const managementRoles = ['owner', 'admin', 'manager', 'l1_organizer', 'l2_committee_head', 'l3_committee_member'];
+  const member = data as { id: string; role: string };
+  return managementRoles.includes(member.role);
+}
 
 // Twitter API v2 implementation
 async function postToTwitter(content: string, credentials: Record<string, string>): Promise<{ success: boolean; postId?: string; error?: string }> {
@@ -88,9 +113,10 @@ async function postToTwitter(content: string, credentials: Record<string, string
     }
 
     return { success: true, postId: data.data?.id };
-  } catch (error: any) {
-    console.error('Twitter posting error:', error);
-    return { success: false, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Twitter posting error:', message);
+    return { success: false, error: message };
   }
 }
 
@@ -134,9 +160,10 @@ async function postToLinkedIn(content: string, credentials: Record<string, strin
     }
 
     return { success: true, postId: data.id };
-  } catch (error: any) {
-    console.error('LinkedIn posting error:', error);
-    return { success: false, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('LinkedIn posting error:', message);
+    return { success: false, error: message };
   }
 }
 
@@ -195,9 +222,10 @@ async function postToInstagram(content: string, mediaUrl: string | null, credent
     }
 
     return { success: true, postId: publishData.id };
-  } catch (error: any) {
-    console.error('Instagram posting error:', error);
-    return { success: false, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Instagram posting error:', message);
+    return { success: false, error: message };
   }
 }
 
@@ -207,6 +235,30 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Missing authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Create client with user's auth context for permission checks
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Verify the user
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Service client for privileged operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const rawBody = await req.json().catch(() => ({}));
 
@@ -218,7 +270,16 @@ serve(async (req) => {
 
     const body = parseResult.data;
 
-    console.log('Social media post action:', body.action, 'workspace:', body.workspace_id);
+    // ===== AUTHORIZATION CHECK =====
+    const hasAccess = await verifyWorkspaceAccess(supabase, user.id, body.workspace_id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ error: 'Forbidden: You do not have permission to manage social media for this workspace' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Social media post action:', body.action, 'workspace:', body.workspace_id, 'user:', user.id);
 
     if (body.action === 'post_now') {
       // Get the post from queue
@@ -365,9 +426,10 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });
-  } catch (error: any) {
-    console.error('Error in social-media-post:', error);
-    return new Response(JSON.stringify({ error: error?.message || 'Unknown error' }), {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in social-media-post:', message);
+    return new Response(JSON.stringify({ error: message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

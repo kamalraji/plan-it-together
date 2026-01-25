@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { 
+  SPONSOR_COLUMNS, 
+  SPONSOR_PROPOSAL_COLUMNS, 
+  SPONSOR_DELIVERABLE_COLUMNS,
+  SPONSOR_BENEFIT_COLUMNS,
+  SPONSOR_COMMUNICATION_COLUMNS,
+  buildRelation
+} from '@/lib/supabase-columns';
 
 // Types
 export interface Sponsor {
@@ -118,12 +126,12 @@ export function useSponsors(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_sponsors')
-        .select('*')
+        .select(SPONSOR_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return (data || []) as unknown as Sponsor[];
+      return (data || []) as Sponsor[];
     },
     enabled: !!workspaceId,
   });
@@ -136,7 +144,7 @@ export function useProposals(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_sponsor_proposals')
-        .select('*')
+        .select(SPONSOR_PROPOSAL_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       
@@ -154,10 +162,7 @@ export function useDeliverables(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_sponsor_deliverables')
-        .select(`
-          *,
-          sponsor:workspace_sponsors(id, name, tier)
-        `)
+        .select(`${SPONSOR_DELIVERABLE_COLUMNS.detail}, ${buildRelation('sponsor:workspace_sponsors', 'id, name, tier')}`)
         .eq('workspace_id', workspaceId)
         .order('due_date', { ascending: true });
       
@@ -175,13 +180,36 @@ export function useBenefits(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_sponsor_benefits')
-        .select('*')
+        .select(SPONSOR_BENEFIT_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('tier')
         .order('display_order');
       
       if (error) throw error;
       return data as SponsorBenefit[];
+    },
+    enabled: !!workspaceId,
+  });
+}
+
+export function useCommunications(workspaceId: string | undefined, sponsorId?: string) {
+  return useQuery({
+    queryKey: ['sponsor-communications', workspaceId, sponsorId],
+    queryFn: async () => {
+      if (!workspaceId) return [];
+      let query = supabase
+        .from('workspace_sponsor_communications')
+        .select(`${SPONSOR_COMMUNICATION_COLUMNS.detail}, ${buildRelation('sponsor:workspace_sponsors', 'id, name')}`)
+        .eq('workspace_id', workspaceId)
+        .order('created_at', { ascending: false });
+      
+      if (sponsorId) {
+        query = query.eq('sponsor_id', sponsorId);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as SponsorCommunication[];
     },
     enabled: !!workspaceId,
   });

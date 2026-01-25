@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { startOfWeek, endOfWeek, format, eachDayOfInterval } from 'date-fns';
+import { TIME_TRACKING_COLUMNS, USER_PROFILE_COLUMNS, buildRelation } from '@/lib/supabase-columns';
 
 export type TimeEntryStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 
@@ -41,7 +42,7 @@ export function useTimeTracking(workspaceId: string | undefined, userId: string 
       if (!workspaceId || !userId) return [];
       const { data, error } = await supabase
         .from('workspace_time_entries')
-        .select('*')
+        .select(TIME_TRACKING_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .eq('user_id', userId)
         .order('date', { ascending: false });
@@ -160,10 +161,7 @@ export function useTeamTimeEntries(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_time_entries')
-        .select(`
-          *,
-          user_profiles:user_id (full_name, avatar_url)
-        `)
+        .select(`${TIME_TRACKING_COLUMNS.detail}, ${buildRelation('user_profiles:user_id', 'full_name, avatar_url')}`)
         .eq('workspace_id', workspaceId)
         .order('date', { ascending: false });
       if (error) throw error;

@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
+import { SUPPORT_TICKET_COLUMNS, USER_PROFILE_COLUMNS } from '@/lib/supabase-columns';
 
 type TicketPriority = Database['public']['Enums']['support_ticket_priority'];
 type TicketStatus = Database['public']['Enums']['support_ticket_status'];
@@ -114,7 +115,7 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_support_tickets')
-        .select('*')
+        .select(SUPPORT_TICKET_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 

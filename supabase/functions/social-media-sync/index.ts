@@ -10,6 +10,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
 // Zod schemas for social media sync actions (strict mode)
 const syncActionSchema = z.enum(["sync_post_metrics", "sync_platform_stats", "generate_report"]);
@@ -22,8 +23,32 @@ const syncRequestSchema = z.object({
   sync_type: syncTypeSchema.optional(),
 }).strict();
 
+// Helper function to verify user has workspace access
+// deno-lint-ignore no-explicit-any
+async function verifyWorkspaceAccess(
+  serviceClient: any,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  const { data, error } = await serviceClient
+    .from('workspace_members')
+    .select('id, role')
+    .eq('workspace_id', workspaceId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return false;
+  }
+
+  // Only allow members with management roles to sync
+  const managementRoles = ['owner', 'admin', 'manager', 'l1_organizer', 'l2_committee_head', 'l3_committee_member'];
+  const member = data as { id: string; role: string };
+  return managementRoles.includes(member.role);
+}
+
 // Twitter Analytics Sync
-async function syncTwitterAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, any>; error?: string }> {
+async function syncTwitterAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, Record<string, number>>; error?: string }> {
   try {
     const bearerToken = credentials.bearer_token;
     
@@ -31,7 +56,7 @@ async function syncTwitterAnalytics(credentials: Record<string, string>, postIds
       return { metrics: {}, error: 'Missing Twitter bearer token' };
     }
 
-    const metrics: Record<string, any> = {};
+    const metrics: Record<string, Record<string, number>> = {};
 
     for (const postId of postIds) {
       const response = await fetch(
@@ -53,14 +78,15 @@ async function syncTwitterAnalytics(credentials: Record<string, string>, postIds
     }
 
     return { metrics };
-  } catch (error: any) {
-    console.error('Twitter sync error:', error);
-    return { metrics: {}, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Twitter sync error:', message);
+    return { metrics: {}, error: message };
   }
 }
 
 // LinkedIn Analytics Sync
-async function syncLinkedInAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, any>; error?: string }> {
+async function syncLinkedInAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, Record<string, number>>; error?: string }> {
   try {
     const accessToken = credentials.access_token;
     
@@ -68,7 +94,7 @@ async function syncLinkedInAnalytics(credentials: Record<string, string>, postId
       return { metrics: {}, error: 'Missing LinkedIn access token' };
     }
 
-    const metrics: Record<string, any> = {};
+    const metrics: Record<string, Record<string, number>> = {};
 
     for (const postId of postIds) {
       const response = await fetch(
@@ -92,14 +118,15 @@ async function syncLinkedInAnalytics(credentials: Record<string, string>, postId
     }
 
     return { metrics };
-  } catch (error: any) {
-    console.error('LinkedIn sync error:', error);
-    return { metrics: {}, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('LinkedIn sync error:', message);
+    return { metrics: {}, error: message };
   }
 }
 
 // Instagram Analytics Sync
-async function syncInstagramAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, any>; error?: string }> {
+async function syncInstagramAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, Record<string, number>>; error?: string }> {
   try {
     const accessToken = credentials.access_token;
     
@@ -107,7 +134,7 @@ async function syncInstagramAnalytics(credentials: Record<string, string>, postI
       return { metrics: {}, error: 'Missing Instagram access token' };
     }
 
-    const metrics: Record<string, any> = {};
+    const metrics: Record<string, Record<string, number>> = {};
 
     for (const postId of postIds) {
       const response = await fetch(
@@ -118,7 +145,7 @@ async function syncInstagramAnalytics(credentials: Record<string, string>, postI
         const data = await response.json();
         const metricsData: Record<string, number> = {};
         
-        data.data?.forEach((metric: any) => {
+        data.data?.forEach((metric: { name: string; values?: Array<{ value: number }> }) => {
           metricsData[metric.name] = metric.values?.[0]?.value || 0;
         });
 
@@ -134,9 +161,10 @@ async function syncInstagramAnalytics(credentials: Record<string, string>, postI
     }
 
     return { metrics };
-  } catch (error: any) {
-    console.error('Instagram sync error:', error);
-    return { metrics: {}, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Instagram sync error:', message);
+    return { metrics: {}, error: message };
   }
 }
 
@@ -201,9 +229,10 @@ async function syncPlatformStats(platform: string, credentials: Record<string, s
     }
 
     return { stats: {} };
-  } catch (error: any) {
-    console.error(`${platform} stats sync error:`, error);
-    return { stats: {}, error: error?.message || 'Unknown error' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`${platform} stats sync error:`, message);
+    return { stats: {}, error: message };
   }
 }
 
@@ -213,6 +242,30 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Missing authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Create client with user's auth context for permission checks
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Verify the user
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Service client for privileged operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const rawBody = await req.json().catch(() => ({}));
 
@@ -224,7 +277,16 @@ serve(async (req) => {
 
     const { action, workspace_id, platform, sync_type } = parseResult.data;
 
-    console.log('Social media sync action:', action, 'platform:', platform);
+    // ===== AUTHORIZATION CHECK =====
+    const hasAccess = await verifyWorkspaceAccess(supabase, user.id, workspace_id);
+    if (!hasAccess) {
+      return new Response(JSON.stringify({ error: 'Forbidden: You do not have permission to sync social media data for this workspace' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Social media sync action:', action, 'platform:', platform, 'user:', user.id);
 
     // Create sync log entry
     const { data: syncLog, error: logError } = await supabase
@@ -278,7 +340,7 @@ serve(async (req) => {
 
         if (!credentials) continue;
 
-        let result: { metrics: Record<string, any>; error?: string };
+        let result: { metrics: Record<string, Record<string, number>>; error?: string };
 
         switch (plat) {
           case 'twitter':
@@ -439,9 +501,10 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });
-  } catch (error: any) {
-    console.error('Error in social-media-sync:', error);
-    return new Response(JSON.stringify({ error: error?.message || 'Unknown error' }), {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in social-media-sync:', message);
+    return new Response(JSON.stringify({ error: message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
