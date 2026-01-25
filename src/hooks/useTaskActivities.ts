@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TaskActivity, ActivityType } from '@/lib/commentTypes';
 import { useEffect } from 'react';
+import { queryKeys, queryPresets } from '@/lib/query-config';
 
 interface UseTaskActivitiesOptions {
   taskId: string;
@@ -15,11 +16,12 @@ export function useTaskActivities({ taskId, enabled = true, limit = 50 }: UseTas
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['task-activities', taskId, limit],
+    queryKey: queryKeys.tasks.activities(taskId),
     queryFn: async () => {
+      // Use explicit column list for performance
       const { data: activitiesData, error } = await supabase
         .from('task_activities')
-        .select('*')
+        .select('id, task_id, user_id, activity_type, description, metadata, created_at')
         .eq('task_id', taskId)
         .order('created_at', { ascending: false })
         .limit(limit);
@@ -52,6 +54,7 @@ export function useTaskActivities({ taskId, enabled = true, limit = 50 }: UseTas
       return mappedActivities;
     },
     enabled: enabled && !!taskId,
+    ...queryPresets.dynamic,
   });
 
   useEffect(() => {

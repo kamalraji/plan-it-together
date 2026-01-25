@@ -12,6 +12,7 @@ export const queryPresets = {
   static: {
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
+    networkMode: 'offlineFirst' as const,
   },
 
   /**
@@ -21,6 +22,7 @@ export const queryPresets = {
   standard: {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
+    networkMode: 'offlineFirst' as const,
   },
 
   /**
@@ -39,6 +41,17 @@ export const queryPresets = {
   realtime: {
     staleTime: 10 * 1000, // 10 seconds
     gcTime: 60 * 1000, // 1 minute
+  },
+
+  /**
+   * Critical data that should work offline
+   * Use for: user auth, core settings
+   */
+  critical: {
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    networkMode: 'offlineFirst' as const,
+    retry: 3,
   },
 } as const;
 
@@ -82,6 +95,8 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.events.details(), id] as const,
     registrations: (id: string) => [...queryKeys.events.detail(id), 'registrations'] as const,
     sessions: (id: string) => [...queryKeys.events.detail(id), 'sessions'] as const,
+    tickets: (id: string) => [...queryKeys.events.detail(id), 'tickets'] as const,
+    branding: (id: string) => [...queryKeys.events.detail(id), 'branding'] as const,
   },
 
   // Team-related queries
@@ -90,6 +105,7 @@ export const queryKeys = {
     workload: (workspaceId: string) => ['team-workload', workspaceId] as const,
     personalProgress: (workspaceId: string, userId: string) =>
       ['personal-progress', workspaceId, userId] as const,
+    members: (workspaceId: string) => ['team-members', workspaceId] as const,
   },
 
   // User-related queries
@@ -98,12 +114,14 @@ export const queryKeys = {
     roles: (id: string) => ['user-roles', id] as const,
     notifications: () => ['notifications'] as const,
     preferences: (id: string) => ['notification-preferences', id] as const,
+    current: () => ['current-user'] as const,
   },
 
   // Dashboard metrics
   dashboard: {
     metrics: () => ['dashboard-metrics'] as const,
     organizer: (orgId: string) => ['organizer-dashboard', orgId] as const,
+    admin: () => ['admin-dashboard'] as const,
   },
 
   // Catering-related queries
@@ -121,7 +139,39 @@ export const queryKeys = {
     content: (workspaceId: string) => ['content-items', workspaceId] as const,
     speakers: (workspaceId: string) => ['speakers', workspaceId] as const,
   },
+
+  // Tasks queries
+  tasks: {
+    all: ['tasks'] as const,
+    list: (workspaceId: string) => [...queryKeys.tasks.all, 'list', workspaceId] as const,
+    detail: (taskId: string) => [...queryKeys.tasks.all, 'detail', taskId] as const,
+    comments: (taskId: string) => [...queryKeys.tasks.detail(taskId), 'comments'] as const,
+    activities: (taskId: string) => [...queryKeys.tasks.detail(taskId), 'activities'] as const,
+  },
+
+  // Budget queries
+  budget: {
+    workspace: (workspaceId: string) => ['budget', workspaceId] as const,
+    requests: (workspaceId: string) => ['budget-requests', workspaceId] as const,
+    expenses: (workspaceId: string) => ['expenses', workspaceId] as const,
+  },
+
+  // Resources queries
+  resources: {
+    workspace: (workspaceId: string) => ['resources', workspaceId] as const,
+    requests: (workspaceId: string) => ['resource-requests', workspaceId] as const,
+  },
+
+  // Checklists queries
+  checklists: {
+    workspace: (workspaceId: string) => ['checklists', workspaceId] as const,
+    detail: (checklistId: string) => ['checklist', checklistId] as const,
+    items: (checklistId: string) => ['checklist-items', checklistId] as const,
+  },
 } as const;
 
 // Type helper for extracting query key types
 export type QueryKeys = typeof queryKeys;
+
+// Re-export column constants for convenience
+export * from './supabase-columns';

@@ -4,6 +4,7 @@ import { TaskComment, CommentReaction } from '@/lib/commentTypes';
 import { logCommentAdded } from '@/lib/activityLogger';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { queryKeys, queryPresets } from '@/lib/query-config';
 
 interface UseTaskCommentsOptions {
   taskId: string;
@@ -14,11 +15,12 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
   const queryClient = useQueryClient();
 
   const { data: comments = [], isLoading, refetch } = useQuery({
-    queryKey: ['task-comments', taskId],
+    queryKey: queryKeys.tasks.comments(taskId),
     queryFn: async () => {
+      // Use explicit column list for performance, cast for type safety
       const { data: commentsData, error: commentsError } = await supabase
         .from('task_comments')
-        .select('*')
+        .select('id, task_id, user_id, content, parent_id, mentions, is_edited, created_at, updated_at, deleted_at')
         .eq('task_id', taskId)
         .is('deleted_at', null)
         .order('created_at', { ascending: true });
@@ -30,7 +32,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       const userMap = new Map(users?.map(u => [u.id, u]) || []);
 
       const commentIds = commentsData.map(c => c.id);
-      const { data: reactions } = await supabase.from('task_comment_reactions').select('*').in('comment_id', commentIds);
+      const { data: reactions } = await supabase.from('task_comment_reactions').select('id, comment_id, user_id, emoji, created_at').in('comment_id', commentIds);
 
       const reactionsByComment = new Map<string, CommentReaction[]>();
       reactions?.forEach(r => {
@@ -77,6 +79,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       return rootComments;
     },
     enabled: enabled && !!taskId,
+    ...queryPresets.dynamic,
   });
 
   useEffect(() => {
@@ -97,7 +100,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       await logCommentAdded(taskId, user.id);
       return data;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['task-comments', taskId] }); queryClient.invalidateQueries({ queryKey: ['task-activities', taskId] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.tasks.comments(taskId) }); queryClient.invalidateQueries({ queryKey: queryKeys.tasks.activities(taskId) }); },
     onError: () => { toast.error('Failed to add comment'); },
   });
 
@@ -107,7 +110,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['task-comments', taskId] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.tasks.comments(taskId) }); },
     onError: () => { toast.error('Failed to update comment'); },
   });
 
@@ -116,7 +119,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       const { error } = await supabase.from('task_comments').update({ deleted_at: new Date().toISOString() }).eq('id', commentId);
       if (error) throw error;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['task-comments', taskId] }); toast.success('Comment deleted'); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.tasks.comments(taskId) }); toast.success('Comment deleted'); },
     onError: () => { toast.error('Failed to delete comment'); },
   });
 
@@ -129,7 +132,7 @@ export function useTaskComments({ taskId, enabled = true }: UseTaskCommentsOptio
       await supabase.from('task_comment_reactions').insert([{ comment_id: commentId, user_id: user.id, emoji }]);
       return { action: 'added' };
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['task-comments', taskId] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.tasks.comments(taskId) }); },
   });
 
   return {
