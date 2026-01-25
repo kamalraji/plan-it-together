@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { WORKSPACE_INTEGRATION_COLUMNS } from '@/lib/supabase-columns';
+import { logger } from '@/lib/logger';
 
 export type Platform = 'slack' | 'discord' | 'teams' | 'webhook';
 export type NotificationType = 'broadcast' | 'task_assignment' | 'deadline_reminder' | 'channel_message';
@@ -36,7 +38,7 @@ export function useWorkspaceIntegrations(workspaceId: string | undefined) {
       
       const { data, error } = await supabase
         .from('workspace_integrations')
-        .select('*')
+        .select(WORKSPACE_INTEGRATION_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -67,7 +69,7 @@ export function useWorkspaceIntegrations(workspaceId: string | undefined) {
       toast.success('Integration added successfully');
     },
     onError: (error) => {
-      console.error('Failed to create integration:', error);
+      logger.error('Failed to create integration:', error);
       toast.error('Failed to add integration');
     },
   });
@@ -89,7 +91,7 @@ export function useWorkspaceIntegrations(workspaceId: string | undefined) {
       toast.success('Integration updated');
     },
     onError: (error) => {
-      console.error('Failed to update integration:', error);
+      logger.error('Failed to update integration:', error);
       toast.error('Failed to update integration');
     },
   });
@@ -108,7 +110,7 @@ export function useWorkspaceIntegrations(workspaceId: string | undefined) {
       toast.success('Integration removed');
     },
     onError: (error) => {
-      console.error('Failed to delete integration:', error);
+      logger.error('Failed to delete integration:', error);
       toast.error('Failed to remove integration');
     },
   });
@@ -134,7 +136,7 @@ export function useWorkspaceIntegrations(workspaceId: string | undefined) {
       toast.success('Test notification sent!');
     },
     onError: (error) => {
-      console.error('Test notification failed:', error);
+      logger.error('Test notification failed:', error);
       toast.error('Failed to send test notification');
     },
   });

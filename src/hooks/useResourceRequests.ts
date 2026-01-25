@@ -49,7 +49,7 @@ export function useResourceRequests(workspaceId: string | undefined) {
       const { data, error } = await supabase
         .from('workspace_resource_requests')
         .select(`
-          *,
+          id, requesting_workspace_id, target_workspace_id, resource_id, requested_by, quantity, start_date, end_date, purpose, status, review_notes, reviewed_by, reviewed_at, created_at, updated_at,
           workspace_resources:resource_id (name, type, available)
         `)
         .eq('requesting_workspace_id', workspaceId)
@@ -126,10 +126,10 @@ export function useIncomingResourceRequests(workspaceId: string | undefined) {
     queryKey: ['incoming-resource-requests', workspaceId],
     queryFn: async () => {
       if (!workspaceId) return [];
-      // First get resource requests
+      // First get resource requests with explicit columns
       const { data: requests, error: requestsError } = await supabase
         .from('workspace_resource_requests')
-        .select('*')
+        .select('id, requesting_workspace_id, target_workspace_id, resource_id, requested_by, quantity, start_date, end_date, purpose, status, review_notes, reviewed_by, reviewed_at, created_at, updated_at')
         .eq('target_workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (requestsError) throw requestsError;

@@ -14,6 +14,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { queryPresets } from '@/lib/query-config';
 import { normalizeEventFromDB } from '@/utils/event-compat';
+import { 
+  EVENT_VENUE_COLUMNS, 
+  EVENT_VIRTUAL_LINK_COLUMNS, 
+  EVENT_IMAGE_COLUMNS, 
+  EVENT_FAQ_COLUMNS 
+} from '@/lib/supabase-columns';
 import type { 
   Event, 
   EventVenue, 
@@ -262,7 +268,7 @@ export function useEventVenue(eventId: string | undefined) {
 
       const { data, error } = await supabase
         .from('event_venues')
-        .select('*')
+        .select(EVENT_VENUE_COLUMNS.detail)
         .eq('event_id', eventId)
         .maybeSingle();
 
@@ -303,7 +309,7 @@ export function useEventVirtualLinks(eventId: string | undefined) {
 
       const { data, error } = await supabase
         .from('event_virtual_links')
-        .select('*')
+        .select(EVENT_VIRTUAL_LINK_COLUMNS.detail)
         .eq('event_id', eventId)
         .order('is_primary', { ascending: false });
 
@@ -338,7 +344,7 @@ export function useEventImages(eventId: string | undefined) {
 
       const { data, error } = await supabase
         .from('event_images')
-        .select('*')
+        .select(EVENT_IMAGE_COLUMNS.detail)
         .eq('event_id', eventId)
         .order('sort_order', { ascending: true });
 
@@ -371,7 +377,7 @@ export function useEventFAQs(eventId: string | undefined) {
 
       const { data, error } = await supabase
         .from('event_faqs')
-        .select('*')
+        .select(EVENT_FAQ_COLUMNS.detail)
         .eq('event_id', eventId)
         .order('sort_order', { ascending: true });
 

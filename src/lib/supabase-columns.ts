@@ -159,6 +159,102 @@ export const TIME_ENTRY_COLUMNS = {
   detail: 'id, workspace_id, user_id, task_id, start_time, end_time, duration_minutes, description, billable, created_at, updated_at',
 } as const;
 
+// Email campaigns columns
+export const EMAIL_CAMPAIGN_COLUMNS = {
+  list: 'id, workspace_id, name, subject, status, recipients_count, sent_count, opened_count, scheduled_for, sent_at, created_at',
+  detail: 'id, workspace_id, name, subject, content, template_id, status, recipients_count, sent_count, opened_count, clicked_count, target_audience, recipient_list, scheduled_for, sent_at, completed_at, created_by, created_at, updated_at',
+} as const;
+
+// Press releases columns
+export const PRESS_RELEASE_COLUMNS = {
+  list: 'id, workspace_id, title, type, status, author_name, embargo_date, distribution_date, created_at',
+  detail: 'id, workspace_id, title, content, type, status, author_id, author_name, reviewer_id, reviewer_name, embargo_date, distribution_date, distribution_channels, media_contacts, attachments, notes, created_at, updated_at',
+} as const;
+
+// Stakeholders columns
+export const STAKEHOLDER_COLUMNS = {
+  list: 'id, workspace_id, name, role, organization, email, category, priority, last_contacted_at, created_at',
+  detail: 'id, workspace_id, name, role, organization, email, phone, category, priority, notes, last_contacted_at, tags, metadata, created_by, created_at, updated_at',
+} as const;
+
+// Broadcast messages columns
+export const BROADCAST_MESSAGE_COLUMNS = {
+  list: 'id, workspace_id, title, message_type, channels, target_audience, status, scheduled_for, sent_at, created_at',
+  detail: 'id, workspace_id, title, content, message_type, channels, target_audience, recipient_ids, status, scheduled_for, sent_at, sent_by, delivery_stats, created_at, updated_at',
+} as const;
+
+// Workspace announcements columns (communication)
+export const WORKSPACE_ANNOUNCEMENT_COLUMNS = {
+  list: 'id, workspace_id, title, announcement_type, status, scheduled_for, sent_at, created_at',
+  detail: 'id, workspace_id, title, content, announcement_type, target_audience, channels, scheduled_for, sent_at, status, sent_by, recipients_count, created_at, updated_at',
+} as const;
+
+// Content items columns
+export const CONTENT_ITEM_COLUMNS = {
+  list: 'id, workspace_id, title, type, status, author_name, due_date, priority, created_at',
+  detail: 'id, workspace_id, title, type, status, author_id, author_name, due_date, priority, description, content_url, created_at, updated_at',
+} as const;
+
+// Speakers columns
+export const SPEAKER_COLUMNS = {
+  list: 'id, workspace_id, name, role, session_title, session_time, status, created_at',
+  detail: 'id, workspace_id, name, avatar_url, role, bio, email, phone, session_title, session_time, location, status, travel_arranged, accommodation_arranged, notes, created_at, updated_at',
+} as const;
+
+// Media assets columns
+export const MEDIA_ASSET_COLUMNS = {
+  list: 'id, workspace_id, name, type, thumbnail_url, status, created_at',
+  detail: 'id, workspace_id, name, type, file_url, thumbnail_url, file_size, mime_type, uploaded_by, uploader_name, tags, description, status, created_at, updated_at',
+} as const;
+
+// Invoice columns
+export const INVOICE_COLUMNS = {
+  list: 'id, workspace_id, invoice_number, vendor_name, amount, paid_amount, due_date, status, created_at',
+  detail: 'id, workspace_id, invoice_number, vendor_name, vendor_id, amount, paid_amount, due_date, issue_date, status, payment_terms, notes, attachment_url, created_by, sent_at, paid_at, created_at, updated_at',
+} as const;
+
+// Software licenses columns (actual schema)
+export const SOFTWARE_LICENSE_COLUMNS = {
+  list: 'id, workspace_id, name, vendor, license_type, assigned_seats, total_seats, expiry_date, status',
+  detail: 'id, workspace_id, name, description, vendor, license_type, license_key, assigned_seats, total_seats, cost, expiry_date, renewal_date, status, notes, created_at, updated_at',
+} as const;
+
+// Network zones columns (actual schema)
+export const NETWORK_ZONE_COLUMNS = {
+  list: 'id, workspace_id, event_id, name, zone_type, vlan_id, status',
+  detail: 'id, workspace_id, event_id, name, description, location, zone_type, max_devices, max_bandwidth_mbps, current_devices, current_bandwidth_percent, status, status_message, device_alert_threshold, bandwidth_alert_threshold, ssid, ip_range, vlan_id, last_checked_at, created_at, updated_at',
+} as const;
+
+// Event venue columns (actual schema)
+export const EVENT_VENUE_COLUMNS = {
+  list: 'id, event_id, name, address, city, country',
+  detail: 'id, event_id, name, address, city, state, postal_code, country, latitude, longitude, capacity, accessibility_features, accessibility_notes, google_place_id, created_at, updated_at',
+} as const;
+
+// Event virtual links columns (actual schema)
+export const EVENT_VIRTUAL_LINK_COLUMNS = {
+  list: 'id, event_id, platform, meeting_url, is_primary',
+  detail: 'id, event_id, platform, meeting_url, meeting_id, password, instructions, is_primary, created_at, updated_at',
+} as const;
+
+// Event images columns (actual schema)
+export const EVENT_IMAGE_COLUMNS = {
+  list: 'id, event_id, url, alt_text, sort_order, is_primary',
+  detail: 'id, event_id, url, caption, alt_text, sort_order, is_primary, created_at, updated_at',
+} as const;
+
+// Event FAQs columns
+export const EVENT_FAQ_COLUMNS = {
+  list: 'id, event_id, question, answer, sort_order',
+  detail: 'id, event_id, question, answer, sort_order, created_at, updated_at',
+} as const;
+
+// Workspace integrations columns (actual schema)
+export const WORKSPACE_INTEGRATION_COLUMNS = {
+  list: 'id, workspace_id, platform, name, is_active, created_at',
+  detail: 'id, workspace_id, platform, name, webhook_url, is_active, notification_types, created_by, created_at, updated_at',
+} as const;
+
 /**
  * Helper to build relation selections
  * @example buildRelation('user_profiles', USER_PROFILE_COLUMNS.minimal) 

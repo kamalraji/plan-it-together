@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
+import { NETWORK_ZONE_COLUMNS } from '@/lib/supabase-columns';
 
 export type NetworkZoneStatus = 'online' | 'offline' | 'degraded' | 'maintenance';
 export type NetworkZoneType = 'wifi' | 'wired' | 'av' | 'staff' | 'guest' | 'backup';
@@ -94,7 +95,7 @@ export function useNetworkZones(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_network_zones')
-        .select('*')
+        .select(NETWORK_ZONE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('name');
 

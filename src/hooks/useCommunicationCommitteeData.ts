@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { 
+  EMAIL_CAMPAIGN_COLUMNS, 
+  PRESS_RELEASE_COLUMNS, 
+  STAKEHOLDER_COLUMNS, 
+  BROADCAST_MESSAGE_COLUMNS,
+  WORKSPACE_ANNOUNCEMENT_COLUMNS 
+} from '@/lib/supabase-columns';
 
 // Types
 export interface EmailCampaign {
@@ -92,7 +99,7 @@ export function useEmailCampaigns(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_email_campaigns')
-        .select('*')
+        .select(EMAIL_CAMPAIGN_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -221,7 +228,7 @@ export function usePressReleases(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_press_releases')
-        .select('*')
+        .select(PRESS_RELEASE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -405,7 +412,7 @@ export function useStakeholders(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_stakeholders')
-        .select('*')
+        .select(STAKEHOLDER_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('priority', { ascending: true })
         .order('name', { ascending: true });
@@ -534,7 +541,7 @@ export function useBroadcastMessages(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_broadcast_messages')
-        .select('*')
+        .select(BROADCAST_MESSAGE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -664,7 +671,7 @@ export function useAnnouncements(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_announcements')
-        .select('*')
+        .select(WORKSPACE_ANNOUNCEMENT_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 

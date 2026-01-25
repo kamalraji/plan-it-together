@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { CONTENT_ITEM_COLUMNS, SPEAKER_COLUMNS, MEDIA_ASSET_COLUMNS } from '@/lib/supabase-columns';
 
 export type ContentItemStatus = 'draft' | 'review' | 'approved' | 'published';
 export type ContentItemType = 'article' | 'presentation' | 'video' | 'document';
@@ -66,7 +67,7 @@ export function useContentItems(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_content_items')
-        .select('*')
+        .select(CONTENT_ITEM_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -83,7 +84,7 @@ export function useSpeakers(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_speakers')
-        .select('*')
+        .select(SPEAKER_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('session_time', { ascending: true });
 
@@ -100,7 +101,7 @@ export function useMediaAssets(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_media_assets')
-        .select('*')
+        .select(MEDIA_ASSET_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 

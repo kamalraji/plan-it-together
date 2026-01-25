@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { INVOICE_COLUMNS } from '@/lib/supabase-columns';
+import type { Database } from '@/integrations/supabase/types';
+
+type WorkspaceInvoiceInsert = Database['public']['Tables']['workspace_invoices']['Insert'];
 
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
 
@@ -44,13 +48,13 @@ export interface RecordPaymentInput {
 export function useWorkspaceInvoices(workspaceId: string) {
   const queryClient = useQueryClient();
 
-  // Fetch invoices
+  // Fetch invoices with explicit columns
   const invoicesQuery = useQuery({
     queryKey: ['workspace-invoices', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_invoices')
-        .select('*')
+        .select(INVOICE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -60,26 +64,29 @@ export function useWorkspaceInvoices(workspaceId: string) {
     enabled: !!workspaceId,
   });
 
-  // Create invoice
+  // Create invoice with typed insert
   const createInvoiceMutation = useMutation({
     mutationFn: async (input: CreateInvoiceInput) => {
       const { data: { user } } = await supabase.auth.getUser();
-      const { data, error } = await (supabase
-        .from('workspace_invoices') as any)
-        .insert({
-          workspace_id: workspaceId,
-          invoice_number: input.invoice_number,
-          vendor_name: input.vendor_name,
-          vendor_id: input.vendor_id || null,
-          amount: input.amount,
-          due_date: input.due_date,
-          issue_date: input.issue_date || new Date().toISOString(),
-          payment_terms: input.payment_terms || null,
-          notes: input.notes || null,
-          created_by: user?.id,
-          status: 'draft',
-          paid_amount: 0,
-        })
+      
+      const insertData: WorkspaceInvoiceInsert = {
+        workspace_id: workspaceId,
+        invoice_number: input.invoice_number,
+        vendor_name: input.vendor_name,
+        vendor_id: input.vendor_id || null,
+        amount: input.amount,
+        due_date: input.due_date,
+        issue_date: input.issue_date || new Date().toISOString(),
+        payment_terms: input.payment_terms || null,
+        notes: input.notes || null,
+        created_by: user?.id || '',
+        status: 'draft',
+        paid_amount: 0,
+      };
+      
+      const { data, error } = await supabase
+        .from('workspace_invoices')
+        .insert(insertData)
         .select()
         .single();
 
