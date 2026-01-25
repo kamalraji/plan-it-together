@@ -59,10 +59,8 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                   <FormLabel>Start date & time *</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value ? new Date(field.value) : undefined}
-                      onChange={(date: Date | undefined) =>
-                        field.onChange(date ? date.toISOString().slice(0, 16) : '')
-                      }
+                      value={field.value || undefined}
+                      onChange={(value) => field.onChange(value || '')}
                       placeholder="Select start date"
                     />
                   </FormControl>
@@ -79,10 +77,8 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                   <FormLabel>End date & time *</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value ? new Date(field.value) : undefined}
-                      onChange={(date: Date | undefined) =>
-                        field.onChange(date ? date.toISOString().slice(0, 16) : '')
-                      }
+                      value={field.value || undefined}
+                      onChange={(value) => field.onChange(value || '')}
                       placeholder="Select end date"
                     />
                   </FormControl>
@@ -127,10 +123,8 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                   <FormLabel>Registration deadline</FormLabel>
                   <FormControl>
                     <DateTimePicker
-                      value={field.value ? new Date(field.value) : undefined}
-                      onChange={(date: Date | undefined) =>
-                        field.onChange(date ? date.toISOString().slice(0, 16) : '')
-                      }
+                      value={field.value || undefined}
+                      onChange={(value) => field.onChange(value || '')}
                       placeholder="Optional deadline"
                     />
                   </FormControl>
