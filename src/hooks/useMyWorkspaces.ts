@@ -77,12 +77,23 @@ export function useMyWorkspaces(eventId?: string) {
 
       // Add member workspaces (if not already owner)
       (memberWorkspaces || []).forEach(m => {
-        const ws = m.workspaces as any;
+        // Type-safe extraction of joined workspace data
+        const ws = m.workspaces as {
+          id: string;
+          name: string;
+          slug: string | null;
+          status: string;
+          workspace_type: string | null;
+          event_id: string;
+          organizer_id: string;
+          parent_workspace_id: string | null;
+          created_at: string;
+        } | null;
         if (ws && (!eventId || ws.event_id === eventId) && !workspaceMap.has(ws.id)) {
           workspaceMap.set(ws.id, {
             ...ws,
             isOwner: false,
-            role: m.role,
+            role: m.role ?? undefined,
           });
         }
       });

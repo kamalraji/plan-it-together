@@ -989,3 +989,85 @@ export interface QuickAction {
   action: () => void;
   variant?: 'primary' | 'secondary';
 }
+
+// =============================================================================
+// SUPABASE TYPE HELPERS
+// =============================================================================
+
+// Re-export type-safe Supabase helpers with prefixes to avoid conflicts
+export {
+  // Workspace types (prefixed to avoid conflicts with existing Workspace interface)
+  type Workspace as DbWorkspace,
+  type WorkspaceWithParent as DbWorkspaceWithParent,
+  type WorkspaceWithEvent as DbWorkspaceWithEvent,
+  type WorkspaceWithHierarchy as DbWorkspaceWithHierarchy,
+  type WorkspaceListItem as DbWorkspaceListItem,
+  // Team member types
+  type WorkspaceTeamMember as DbTeamMember,
+  type TeamMemberWithProfile as DbTeamMemberWithProfile,
+  type TeamMemberWithWorkspace as DbTeamMemberWithWorkspace,
+  // Task types (prefixed to avoid conflicts with existing WorkspaceTask interface)
+  type WorkspaceTask as DbWorkspaceTask,
+  type TaskWithAssignee as DbTaskWithAssignee,
+  type TaskWithRelations as DbTaskWithRelations,
+  type TaskListItem as DbTaskListItem,
+  // Organization types
+  type Organization as DbOrganization,
+  type OrganizationMembership as DbOrganizationMembership,
+  type MembershipWithOrganization as DbMembershipWithOrganization,
+  // Registration types
+  type RegistrationWithDetails as DbRegistrationWithDetails,
+  // Budget types
+  type WorkspaceBudget as DbWorkspaceBudget,
+  type WorkspaceExpense as DbWorkspaceExpense,
+  type BudgetRequest as DbBudgetRequest,
+  type BudgetRequestWithWorkspace as DbBudgetRequestWithWorkspace,
+  // Resource types
+  type WorkspaceResource as DbWorkspaceResource,
+  type ResourceRequest as DbResourceRequest,
+  type ResourceRequestWithDetails as DbResourceRequestWithDetails,
+  // Checklist types (prefixed to avoid conflicts)
+  type Checklist as DbChecklist,
+  type ChecklistItem as DbChecklistItem,
+  type ChecklistWithItems as DbChecklistWithItems,
+  // User types
+  type UserDisplay as DbUserDisplay,
+  // Utility types
+  type TableRow,
+  type TableInsert,
+  type TableUpdate,
+  type PartialBy,
+  type RequiredBy,
+  type Nullable,
+  type DeepPartial,
+  // Type guards
+  isObject,
+  hasProperty,
+  assertDefined,
+  isNonEmptyArray,
+  castQueryResult,
+  castQueryArray,
+} from './supabase-helpers';
+
+// Re-export query utilities
+export { 
+  safeQuery, 
+  safeQueryNullable, 
+  safeMutation,
+  requireAuth,
+  getCurrentUserId,
+  parseJsonColumn,
+  parseEventBranding,
+  extractRelation,
+  extractArrayRelation,
+} from '@/lib/query-utils';
+
+// Re-export error handling
+export { 
+  AppError, 
+  ErrorCode, 
+  isAppError, 
+  handleError, 
+  getUserMessage,
+  fromSupabaseError,
+} from '@/lib/errors';

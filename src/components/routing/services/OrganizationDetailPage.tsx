@@ -26,16 +26,23 @@ export const OrganizationDetailPage: React.FC = () => {
 
   const analytics = organization ? perOrgAnalytics[organization.id] : undefined;
 
+  // Type-safe membership extraction
+  interface MembershipData {
+    organization_id: string;
+    role?: string;
+    status?: string;
+  }
+  
   const membership = useMemo(
     () =>
-      (myMemberships || []).find((m: any) => m.organization_id === organization?.id) ?? null,
+      (myMemberships || []).find((m: MembershipData) => m.organization_id === organization?.id) ?? null,
     [myMemberships, organization?.id],
   );
 
   const isOwner = !!(organization && user && organization.owner_id === user.id);
 
-  const membershipRole = (membership?.role as any) || (isOwner ? 'OWNER' : 'VIEWER');
-  const membershipStatus = (membership?.status as any) || (isOwner ? 'ACTIVE' : 'UNKNOWN');
+  const membershipRole: string = membership?.role || (isOwner ? 'OWNER' : 'VIEWER');
+  const membershipStatus: string = membership?.status || (isOwner ? 'ACTIVE' : 'UNKNOWN');
 
   const userRole: 'OWNER' | 'MEMBER' = membershipRole === 'OWNER' || isOwner ? 'OWNER' : 'MEMBER';
 
