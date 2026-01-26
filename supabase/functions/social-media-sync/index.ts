@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 import { z, uuidSchema, socialPlatformSchema, validationError } from "../_shared/validation.ts";
+import { verifyWorkspaceAccess } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,30 +23,6 @@ const syncRequestSchema = z.object({
   platform: socialPlatformSchema.optional(),
   sync_type: syncTypeSchema.optional(),
 }).strict();
-
-// Helper function to verify user has workspace access
-// deno-lint-ignore no-explicit-any
-async function verifyWorkspaceAccess(
-  serviceClient: any,
-  userId: string,
-  workspaceId: string
-): Promise<boolean> {
-  const { data, error } = await serviceClient
-    .from('workspace_members')
-    .select('id, role')
-    .eq('workspace_id', workspaceId)
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (error || !data) {
-    return false;
-  }
-
-  // Only allow members with management roles to sync
-  const managementRoles = ['owner', 'admin', 'manager', 'l1_organizer', 'l2_committee_head', 'l3_committee_member'];
-  const member = data as { id: string; role: string };
-  return managementRoles.includes(member.role);
-}
 
 // Twitter Analytics Sync
 async function syncTwitterAnalytics(credentials: Record<string, string>, postIds: string[]): Promise<{ metrics: Record<string, Record<string, number>>; error?: string }> {
