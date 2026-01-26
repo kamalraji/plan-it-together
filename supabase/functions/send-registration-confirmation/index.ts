@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireAuth } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,6 +24,12 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authResult = await requireAuth(req, corsHeaders);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     
     if (!RESEND_API_KEY) {
@@ -58,6 +65,8 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log(`User ${authResult.user.id} sending registration confirmation to ${attendeeEmail} for ${eventName}`);
 
     const formattedDate = eventDate 
       ? new Date(eventDate).toLocaleDateString('en-US', { 

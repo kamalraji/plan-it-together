@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z, uuidSchema, notificationTypeSchema, parseAndValidate } from "../_shared/validation.ts";
+import { requireAuth, verifyWorkspaceAccess, forbiddenResponse } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,7 +34,7 @@ interface Integration {
 }
 
 function formatSlackMessage(payload: WebhookPayload) {
-  const blocks: any[] = [
+  const blocks: unknown[] = [
     { type: "header", text: { type: "plain_text", text: payload.title, emoji: true } },
     { type: "section", text: { type: "mrkdwn", text: payload.message } }
   ];
@@ -44,10 +45,10 @@ function formatSlackMessage(payload: WebhookPayload) {
 }
 
 function formatDiscordMessage(payload: WebhookPayload) {
-  const embed: any = { title: payload.title, description: payload.message, color: getColorForType(payload.notification_type), timestamp: new Date().toISOString() };
+  const embed: Record<string, unknown> = { title: payload.title, description: payload.message, color: getColorForType(payload.notification_type), timestamp: new Date().toISOString() };
   if (payload.metadata?.sender_name) embed.author = { name: payload.metadata.sender_name };
   if (payload.metadata?.url) embed.url = payload.metadata.url;
-  const fields = [];
+  const fields: Array<{ name: string; value: string; inline: boolean }> = [];
   if (payload.metadata?.priority) fields.push({ name: "Priority", value: payload.metadata.priority, inline: true });
   if (payload.metadata?.due_date) fields.push({ name: "Due Date", value: payload.metadata.due_date, inline: true });
   if (fields.length > 0) embed.fields = fields;
@@ -55,7 +56,7 @@ function formatDiscordMessage(payload: WebhookPayload) {
 }
 
 function formatTeamsMessage(payload: WebhookPayload) {
-  const card: any = { "@type": "MessageCard", "@context": "http://schema.org/extensions", themeColor: getColorHexForType(payload.notification_type), summary: payload.title, sections: [{ activityTitle: payload.title, activitySubtitle: payload.metadata?.sender_name || "System", text: payload.message }] };
+  const card: Record<string, unknown> = { "@type": "MessageCard", "@context": "http://schema.org/extensions", themeColor: getColorHexForType(payload.notification_type), summary: payload.title, sections: [{ activityTitle: payload.title, activitySubtitle: payload.metadata?.sender_name || "System", text: payload.message }] };
   if (payload.metadata?.url) card.potentialAction = [{ "@type": "OpenUri", name: "View in App", targets: [{ os: "default", uri: payload.metadata.url }] }];
   return card;
 }
@@ -76,15 +77,30 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    // ===== AUTHENTICATION CHECK =====
+    const authResult = await requireAuth(req, corsHeaders);
+    if (!authResult.success) {
+      return authResult.response;
+    }
 
     const parseResult = await parseAndValidate(req, webhookPayloadSchema, corsHeaders);
     if (!parseResult.success) return parseResult.response;
 
     const payload = parseResult.data;
-    console.log('Received webhook notification request:', payload);
 
-    const { data: integrations, error: fetchError } = await supabase.from('workspace_integrations').select('id, platform, webhook_url, notification_types').eq('workspace_id', payload.workspace_id).eq('is_active', true);
+    // ===== AUTHORIZATION CHECK - Workspace access required =====
+    const hasAccess = await verifyWorkspaceAccess(authResult.serviceClient, authResult.user.id, payload.workspace_id);
+    if (!hasAccess) {
+      return forbiddenResponse("You do not have permission to send notifications for this workspace", corsHeaders);
+    }
+
+    console.log('User', authResult.user.id, 'sending webhook notification:', payload);
+
+    const { data: integrations, error: fetchError } = await authResult.serviceClient
+      .from('workspace_integrations')
+      .select('id, platform, webhook_url, notification_types')
+      .eq('workspace_id', payload.workspace_id)
+      .eq('is_active', true);
 
     if (fetchError) {
       console.error('Error fetching integrations:', fetchError);
@@ -99,7 +115,7 @@ serve(async (req) => {
     }
 
     const results = await Promise.allSettled(relevantIntegrations.map(async (integration: Integration) => {
-      let body: any;
+      let body: unknown;
       switch (integration.platform) {
         case 'slack': body = formatSlackMessage(payload); break;
         case 'discord': body = formatDiscordMessage(payload); break;

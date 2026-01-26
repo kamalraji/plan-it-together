@@ -60,18 +60,57 @@ function calculateNextOccurrence(
   return next;
 }
 
+/**
+ * Verify the request is from a trusted source (cron job or admin)
+ * For scheduled jobs, we use a secret token or service role key
+ */
+function verifyScheduledJobAuth(req: Request): boolean {
+  const authHeader = req.headers.get('Authorization');
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const cronSecret = Deno.env.get('CRON_SECRET');
+  
+  // Option 1: Called with service role key (internal)
+  if (authHeader?.includes(serviceRoleKey || '')) {
+    return true;
+  }
+  
+  // Option 2: Called with dedicated cron secret
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return true;
+  }
+  
+  // Option 3: Check for X-Cron-Secret header
+  const cronHeader = req.headers.get('X-Cron-Secret');
+  if (cronSecret && cronHeader === cronSecret) {
+    return true;
+  }
+  
+  return false;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // ===== AUTHENTICATION CHECK - Scheduled job auth =====
+    // This function should only be called by cron/scheduler or internal triggers
+    const isAuthorized = verifyScheduledJobAuth(req);
+    if (!isAuthorized) {
+      console.warn('Unauthorized attempt to trigger recurring task processing');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: This endpoint is for scheduled jobs only' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const now = new Date();
-    console.log(`Processing recurring tasks at ${now.toISOString()}`);
+    console.log(`[CRON] Processing recurring tasks at ${now.toISOString()}`);
 
     // Fetch all active recurring tasks that are due
     const { data: dueTasks, error: fetchError } = await supabase
@@ -182,7 +221,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('Processing complete:', results);
+    console.log('[CRON] Processing complete:', results);
 
     return new Response(JSON.stringify(results), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

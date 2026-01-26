@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireAuth, verifyWorkspaceAccess, forbiddenResponse } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,6 +38,12 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authResult = await requireAuth(req, corsHeaders);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
       console.error("RESEND_API_KEY not configured");
@@ -69,7 +76,13 @@ serve(async (req) => {
       event_location = "",
     }: ReminderRequest = await req.json();
 
-    console.log(`Processing reminder campaign ${campaign_id} for ${recipients.length} recipients`);
+    // ===== AUTHORIZATION CHECK - Workspace access required =====
+    const hasAccess = await verifyWorkspaceAccess(authResult.serviceClient, authResult.user.id, workspace_id);
+    if (!hasAccess) {
+      return forbiddenResponse("You do not have permission to send reminder emails for this workspace", corsHeaders);
+    }
+
+    console.log(`User ${authResult.user.id} processing reminder campaign ${campaign_id} for ${recipients.length} recipients`);
 
     // Update campaign status to 'sending'
     await supabase

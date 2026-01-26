@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireAuth } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,12 +21,20 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authResult = await requireAuth(req, corsHeaders);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
     const { eventName, eventCategory, startDate, endDate, existingTasks, workspaceType } = await req.json() as TaskSuggestionRequest;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    console.log(`User ${authResult.user.id} requesting task suggestions for event: ${eventName}`);
 
     // Calculate days until event
     const now = new Date();

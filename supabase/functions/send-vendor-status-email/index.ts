@@ -7,6 +7,7 @@ import {
   vendorStatusSchema,
   validationError,
 } from "../_shared/validation.ts";
+import { requireAuth, verifyAdminRole, forbiddenResponse } from "../_shared/auth.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -168,6 +169,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // ===== AUTHENTICATION CHECK =====
+    const authResult = await requireAuth(req, corsHeaders);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    // ===== AUTHORIZATION CHECK - Admin only =====
+    const isAdmin = await verifyAdminRole(authResult.serviceClient, authResult.user.id);
+    if (!isAdmin) {
+      return forbiddenResponse("Only administrators can send vendor status emails", corsHeaders);
+    }
+
     const rawBody = await req.json().catch(() => ({}));
     
     // Validate input with Zod
@@ -178,7 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { vendorEmail, vendorName, status, rejectionReason } = parseResult.data;
 
-    console.log(`Sending vendor status email to ${vendorEmail} - Status: ${status}`);
+    console.log(`Admin ${authResult.user.id} sending vendor status email to ${vendorEmail} - Status: ${status}`);
 
     const emailContent = getStatusEmailContent(vendorName, status, rejectionReason);
 
@@ -195,10 +208,10 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error sending vendor status email:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "Failed to send vendor status email" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
