@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { RESOURCE_COLUMNS } from '@/lib/supabase-columns';
 
 export type ResourceType = 'equipment' | 'personnel' | 'venue' | 'digital';
 export type ResourceStatus = 'available' | 'reserved' | 'in_use' | 'depleted';
@@ -30,7 +31,7 @@ export function useWorkspaceResources(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_resources')
-        .select('*')
+        .select(RESOURCE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('type', { ascending: true });
       if (error) throw error;

@@ -9,6 +9,7 @@ import {
   calculateNextOccurrence
 } from '@/lib/recurringTaskTypes';
 import { TaskPriority, TaskCategory, WorkspaceRoleScope } from '@/types';
+import { RECURRING_TASK_COLUMNS } from '@/lib/supabase-columns';
 
 interface UseRecurringTasksOptions {
   workspaceId: string;
@@ -23,7 +24,7 @@ export function useRecurringTasks({ workspaceId }: UseRecurringTasksOptions) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_recurring_tasks')
-        .select('*')
+        .select(RECURRING_TASK_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 

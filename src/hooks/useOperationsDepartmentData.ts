@@ -2,6 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import {
+  INCIDENT_COLUMNS,
+  LOGISTICS_COLUMNS,
+  FACILITY_CHECK_COLUMNS,
+  EVENT_BRIEFING_COLUMNS,
+  CATERING_MEAL_SCHEDULE_COLUMNS,
+  CATERING_MENU_ITEM_COLUMNS,
+  CATERING_DIETARY_COLUMNS,
+  CHECKLIST_COLUMNS,
+} from '@/lib/supabase-columns';
 
 // ============= Types =============
 
@@ -82,7 +92,7 @@ export function useIncidents(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_incidents')
-        .select('*')
+        .select(INCIDENT_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -211,7 +221,7 @@ export function useLogistics(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_logistics')
-        .select('*')
+        .select(LOGISTICS_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -313,7 +323,7 @@ export function useFacilityChecks(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_facility_checks')
-        .select('*')
+        .select(FACILITY_CHECK_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('area', { ascending: true })
         .order('item', { ascending: true });
@@ -449,7 +459,7 @@ export function useEventBriefings(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_event_briefings')
-        .select('*')
+        .select(EVENT_BRIEFING_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('scheduled_time', { ascending: true });
       if (error) throw error;
@@ -607,7 +617,7 @@ export function useCateringMealSchedule(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('catering_meal_schedule')
-        .select('*')
+        .select(CATERING_MEAL_SCHEDULE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('scheduled_time', { ascending: true });
       if (error) throw error;
@@ -624,7 +634,7 @@ export function useCateringMenuItems(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('catering_menu_items')
-        .select('*')
+        .select(CATERING_MENU_ITEM_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('meal_type', { ascending: true });
       if (error) throw error;
@@ -641,7 +651,7 @@ export function useDietaryRequirements(eventId: string | undefined) {
       if (!eventId) return [];
       const { data, error } = await supabase
         .from('catering_dietary_requirements')
-        .select('*')
+        .select(CATERING_DIETARY_COLUMNS.detail)
         .eq('event_id', eventId)
         .order('requirement_type', { ascending: true });
       if (error) throw error;
@@ -660,7 +670,7 @@ export function useMasterChecklist(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_checklists')
-        .select('*')
+        .select(CHECKLIST_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('due_date', { ascending: true });
       if (error) throw error;

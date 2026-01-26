@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Json } from '@/integrations/supabase/types';
+import {
+  WORKSPACE_TASK_COLUMNS,
+  RESOURCE_COLUMNS,
+  INCIDENT_COLUMNS,
+} from '@/lib/supabase-columns';
 
 // ============= Types =============
 export interface SafetyItem {
@@ -92,7 +97,7 @@ export function useSafetyChecklist(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_tasks')
-        .select('*')
+        .select(WORKSPACE_TASK_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .eq('role_scope', 'SAFETY')
         .order('created_at', { ascending: true });
@@ -189,7 +194,7 @@ export function useRooms(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_resources')
-        .select('*')
+        .select(RESOURCE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .eq('type', 'venue')
         .order('created_at', { ascending: true });
@@ -259,7 +264,7 @@ export function useFacilityIncidents(workspaceId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_incidents')
-        .select('*')
+        .select(INCIDENT_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 

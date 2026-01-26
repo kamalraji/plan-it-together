@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { EVENT_STATUS_HISTORY_COLUMNS, USER_PROFILE_COLUMNS } from '@/lib/supabase-columns';
 
 export interface EventStatusHistoryItem {
   id: string;
@@ -18,7 +19,7 @@ export function useEventStatusHistory(eventId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('event_status_history')
-        .select('*')
+        .select(EVENT_STATUS_HISTORY_COLUMNS.detail)
         .eq('event_id', eventId)
         .order('created_at', { ascending: false });
 
@@ -28,7 +29,7 @@ export function useEventStatusHistory(eventId: string) {
       // Fetch user names
       const userIds = [...new Set(data.map((r: any) => r.changed_by).filter(Boolean))] as string[];
       const { data: profiles } = userIds.length > 0
-        ? await supabase.from('user_profiles').select('id, full_name').in('id', userIds)
+        ? await supabase.from('user_profiles').select(USER_PROFILE_COLUMNS.minimal).in('id', userIds)
         : { data: [] as { id: string; full_name: string | null }[] };
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.id, p.full_name]));

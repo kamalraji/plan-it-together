@@ -16706,9 +16706,13 @@ export type Database = {
           content: string | null
           created_at: string | null
           event_id: string | null
+          gif_url: string | null
           id: string | null
           image_url: string | null
           is_anonymous: boolean | null
+          link_url: string | null
+          poll_id: string | null
+          share_count: number | null
           spark_count: number | null
           status: string | null
           tags: string[] | null
@@ -16723,9 +16727,13 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           event_id?: string | null
+          gif_url?: string | null
           id?: string | null
           image_url?: string | null
           is_anonymous?: boolean | null
+          link_url?: string | null
+          poll_id?: string | null
+          share_count?: number | null
           spark_count?: number | null
           status?: string | null
           tags?: string[] | null
@@ -16740,16 +16748,28 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           event_id?: string | null
+          gif_url?: string | null
           id?: string | null
           image_url?: string | null
           is_anonymous?: boolean | null
+          link_url?: string | null
+          poll_id?: string | null
+          share_count?: number | null
           spark_count?: number | null
           status?: string | null
           tags?: string[] | null
           title?: string | null
           type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "spark_posts_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "vibe_games"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -17001,6 +17021,36 @@ export type Database = {
           visibility: string
         }[]
       }
+      get_public_events_list: {
+        Args: never
+        Returns: {
+          allow_waitlist: boolean
+          branding: Json
+          capacity: number
+          category: Database["public"]["Enums"]["event_category"]
+          created_at: string
+          description: string
+          end_date: string
+          event_website: string
+          id: string
+          is_free: boolean
+          landing_page_slug: string
+          language: string
+          max_age: number
+          min_age: number
+          mode: Database["public"]["Enums"]["event_mode"]
+          name: string
+          organization_id: string
+          registration_deadline: string
+          registration_type: string
+          slug: string
+          start_date: string
+          status: Database["public"]["Enums"]["event_status"]
+          timezone: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["event_visibility"]
+        }[]
+      }
       get_public_organization: {
         Args: { _slug: string }
         Returns: {
@@ -17139,6 +17189,30 @@ export type Database = {
         }[]
       }
       get_total_unread_count: { Args: never; Returns: number }
+      get_visible_spark_posts: {
+        Args: { p_event_id?: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          author_avatar: string
+          author_id: string
+          author_name: string
+          comment_count: number
+          content: string
+          created_at: string
+          event_id: string
+          gif_url: string
+          id: string
+          image_url: string
+          is_anonymous: boolean
+          link_url: string
+          poll_id: string
+          share_count: number
+          spark_count: number
+          status: string
+          tags: string[]
+          title: string
+          type: string
+        }[]
+      }
       get_zone_team_members: {
         Args: { p_event_id: string }
         Returns: {

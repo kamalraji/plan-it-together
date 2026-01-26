@@ -15,9 +15,9 @@ export const WORKSPACE_COLUMNS = {
 // Workspace tasks columns
 export const WORKSPACE_TASK_COLUMNS = {
   list: 'id, title, status, priority, due_date, assigned_to, workspace_id, created_at',
-  detail: 'id, title, description, status, priority, due_date, assigned_to, workspace_id, source_workspace_id, start_date, estimated_hours, actual_hours, tags, created_at, updated_at',
+  detail: 'id, title, description, status, priority, due_date, assigned_to, workspace_id, source_workspace_id, start_date, end_date, estimated_hours, progress, category, role_scope, location, attachments, created_at, updated_at',
   minimal: 'id, title, status, priority',
-  kanban: 'id, title, status, priority, due_date, assigned_to, tags, estimated_hours',
+  kanban: 'id, title, status, priority, due_date, assigned_to, category, estimated_hours',
 } as const;
 
 // Workspace team members columns
@@ -30,7 +30,7 @@ export const WORKSPACE_TEAM_MEMBER_COLUMNS = {
 // User profiles columns
 export const USER_PROFILE_COLUMNS = {
   list: 'id, full_name, avatar_url, email',
-  detail: 'id, full_name, avatar_url, email, bio, phone, location, created_at, updated_at',
+  detail: 'id, full_name, avatar_url, email, bio, phone, organization, website, linkedin_url, twitter_url, github_url, username, username_changed_at, skills, social_links, qr_code, cover_image_url, cover_gradient_id, portfolio_accent_color, portfolio_layout, portfolio_sections, portfolio_is_public, created_at, updated_at',
   minimal: 'id, full_name, avatar_url',
   display: 'id, full_name, avatar_url, email',
 } as const;
@@ -87,9 +87,9 @@ export const WORKSPACE_RESOURCE_COLUMNS = {
 
 // Checklists columns
 export const CHECKLIST_COLUMNS = {
-  list: 'id, workspace_id, title, phase, status, due_date, created_at',
-  detail: 'id, workspace_id, title, description, phase, status, due_date, delegated_from_workspace_id, delegation_status, created_at, updated_at',
-  minimal: 'id, title, status',
+  list: 'id, workspace_id, title, phase, due_date, committee_type, delegation_status, created_at',
+  detail: 'id, workspace_id, title, phase, due_date, committee_type, items, is_template, delegated_from_workspace_id, delegated_by, delegated_at, delegation_status, is_shared, event_id, created_at, updated_at',
+  minimal: 'id, title, phase',
 } as const;
 
 // Checklist items columns
@@ -393,3 +393,127 @@ export function buildRelation(table: string, columns: string): string {
 export function combineColumns(...columns: string[]): string {
   return columns.join(', ');
 }
+
+// ============= Operations Department Columns =============
+
+// Incident columns
+export const INCIDENT_COLUMNS = {
+  list: 'id, workspace_id, title, severity, status, location, reported_by_name, assigned_to_name, created_at',
+  detail: 'id, workspace_id, title, description, severity, status, location, reported_by, reported_by_name, assigned_to, assigned_to_name, resolution_notes, resolved_at, created_at, updated_at',
+} as const;
+
+// Logistics columns
+export const LOGISTICS_COLUMNS = {
+  list: 'id, workspace_id, item_name, carrier, tracking_number, status, progress, eta, priority, created_at',
+  detail: 'id, workspace_id, item_name, carrier, tracking_number, origin, destination, status, progress, eta, actual_arrival, notes, priority, created_by, created_at, updated_at',
+} as const;
+
+// Facility check columns
+export const FACILITY_CHECK_COLUMNS = {
+  list: 'id, workspace_id, area, item, status, checked_by_name, checked_at, follow_up_required',
+  detail: 'id, workspace_id, area, item, status, checked_by, checked_by_name, checked_at, notes, follow_up_required, created_at, updated_at',
+} as const;
+
+// Event briefing columns
+export const EVENT_BRIEFING_COLUMNS = {
+  list: 'id, workspace_id, scheduled_time, activity, location, lead_name, status, event_date, sort_order',
+  detail: 'id, workspace_id, scheduled_time, activity, location, lead_name, lead_id, status, notes, sort_order, event_date, created_at, updated_at',
+} as const;
+
+// Catering columns
+export const CATERING_MEAL_SCHEDULE_COLUMNS = {
+  list: 'id, workspace_id, name, meal_type, scheduled_time, expected_guests, location',
+  detail: 'id, workspace_id, name, meal_type, scheduled_time, expected_guests, location, notes, sort_order, created_at, updated_at',
+} as const;
+
+export const CATERING_MENU_ITEM_COLUMNS = {
+  list: 'id, workspace_id, name, meal_type, servings, status, is_vegetarian, is_vegan, is_gluten_free',
+  detail: 'id, workspace_id, name, description, meal_type, servings, status, is_vegetarian, is_vegan, is_gluten_free, allergens, created_at, updated_at',
+} as const;
+
+export const CATERING_DIETARY_COLUMNS = {
+  list: 'id, event_id, workspace_id, requirement_type, count',
+  detail: 'id, event_id, workspace_id, requirement_type, count, special_requests, updated_at',
+} as const;
+
+// ============= Judge Committee Columns =============
+
+export const WORKSPACE_JUDGE_COLUMNS = {
+  list: 'id, workspace_id, user_id, judge_name, judge_email, expertise, category, status, assigned_count, completed_count, created_at',
+  detail: 'id, workspace_id, user_id, judge_name, judge_email, expertise, category, status, availability, assigned_count, completed_count, notes, invited_at, confirmed_at, created_at, updated_at',
+} as const;
+
+export const WORKSPACE_RUBRIC_COLUMNS = {
+  list: 'id, workspace_id, name, category, max_total_score, is_active, is_template, created_at',
+  detail: 'id, workspace_id, name, description, category, criteria, max_total_score, is_active, is_template, created_by, created_at, updated_at',
+} as const;
+
+export const WORKSPACE_SUBMISSION_COLUMNS = {
+  list: 'id, workspace_id, team_name, project_name, track, status, submitted_at, table_number',
+  detail: 'id, workspace_id, event_id, team_name, project_name, description, demo_url, repo_url, presentation_url, table_number, track, submitted_by, submitted_at, status, metadata, created_at, updated_at',
+  leaderboard: 'id, team_name, project_name, track, status',
+} as const;
+
+export const WORKSPACE_ASSIGNMENT_COLUMNS = {
+  list: 'id, workspace_id, judge_id, submission_id, rubric_id, status, priority, assigned_at',
+  detail: 'id, workspace_id, judge_id, submission_id, rubric_id, status, priority, assigned_at, started_at, completed_at, created_at',
+} as const;
+
+export const WORKSPACE_SCORE_COLUMNS = {
+  list: 'id, workspace_id, assignment_id, judge_id, submission_id, total_score, scored_at',
+  detail: 'id, workspace_id, assignment_id, judge_id, submission_id, rubric_id, scores, total_score, weighted_score, comments, private_notes, is_finalist_vote, scored_at, created_at, updated_at',
+} as const;
+
+// ============= Recurring Task Columns =============
+
+export const RECURRING_TASK_COLUMNS = {
+  list: 'id, workspace_id, title, priority, recurrence_type, next_occurrence, is_active, created_at',
+  detail: 'id, workspace_id, title, description, priority, category, role_scope, assigned_to, recurrence_type, recurrence_config, template_data, next_occurrence, last_created_at, end_date, occurrence_count, max_occurrences, is_active, created_by, created_at, updated_at',
+} as const;
+
+// ============= Resource Columns =============
+
+export const RESOURCE_COLUMNS = {
+  list: 'id, workspace_id, name, type, quantity, available, status, assigned_to_name',
+  detail: 'id, workspace_id, name, type, quantity, available, status, assigned_to_workspace_id, assigned_to_name, metadata, created_at, updated_at',
+} as const;
+
+// ============= Event Status History Columns =============
+
+export const EVENT_STATUS_HISTORY_COLUMNS = {
+  list: 'id, event_id, previous_status, new_status, changed_by, reason, created_at',
+  detail: 'id, event_id, previous_status, new_status, changed_by, reason, created_at',
+} as const;
+
+// ============= Notification Preferences Columns =============
+
+export const NOTIFICATION_PREFERENCES_COLUMNS = {
+  list: 'id, user_id, workspace_enabled, event_enabled, marketplace_enabled, organization_enabled, system_enabled, sound_enabled, vibration_enabled',
+  detail: 'id, user_id, workspace_enabled, event_enabled, marketplace_enabled, organization_enabled, system_enabled, sound_enabled, vibration_enabled, created_at, updated_at',
+} as const;
+
+// ============= Workspace Channel Columns =============
+
+export const WORKSPACE_CHANNEL_COLUMNS = {
+  list: 'id, workspace_id, name, type, is_private, created_at',
+  detail: 'id, workspace_id, name, description, type, is_private, created_by, metadata, created_at, updated_at',
+} as const;
+
+// ============= Transport/Logistics Columns =============
+
+export const TRANSPORT_SCHEDULE_COLUMNS = {
+  list: 'id, workspace_id, name, transport_type, departure_time, pickup_location, dropoff_location, status, capacity, passengers_booked',
+  detail: 'id, workspace_id, name, transport_type, departure_time, pickup_location, dropoff_location, capacity, passengers_booked, vehicle_info, driver_name, driver_contact, status, notes, created_by, created_at, updated_at',
+} as const;
+
+export const LOGISTICS_REPORT_COLUMNS = {
+  list: 'id, workspace_id, report_type, title, generated_by_name, date_range_start, date_range_end, created_at',
+  detail: 'id, workspace_id, report_type, title, content, generated_by, generated_by_name, date_range_start, date_range_end, created_at',
+} as const;
+
+// ============= Venue/Walkthrough Columns =============
+
+export const VENUE_WALKTHROUGH_COLUMNS = {
+  list: 'id, workspace_id, name, scheduled_date, scheduled_time, status, lead_name, created_at',
+  detail: 'id, workspace_id, name, scheduled_date, scheduled_time, status, route_areas, lead_name, lead_id, attendees, notes, findings, completed_at, created_at, updated_at',
+} as const;

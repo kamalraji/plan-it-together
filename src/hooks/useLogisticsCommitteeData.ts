@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Json } from '@/integrations/supabase/types';
+import {
+  TRANSPORT_SCHEDULE_COLUMNS,
+  LOGISTICS_REPORT_COLUMNS,
+  LOGISTICS_COLUMNS,
+} from '@/lib/supabase-columns';
 
 // Types
 export type TransportType = 'shuttle' | 'vip' | 'equipment' | 'staff' | 'cargo';
@@ -68,7 +73,7 @@ export function useTransportSchedules(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_transport_schedules')
-        .select('*')
+        .select(TRANSPORT_SCHEDULE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('departure_time', { ascending: true });
       if (error) throw error;
@@ -169,7 +174,7 @@ export function useLogisticsReports(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_logistics_reports')
-        .select('*')
+        .select(LOGISTICS_REPORT_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -260,7 +265,7 @@ export function useLogisticsShipments(workspaceId: string | undefined) {
       if (!workspaceId) return [];
       const { data, error } = await supabase
         .from('workspace_logistics')
-        .select('*')
+        .select(LOGISTICS_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
       if (error) throw error;

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { WORKSPACE_CHANNEL_COLUMNS } from '@/lib/supabase-columns';
 
 export interface WorkspaceChannel {
   id: string;
@@ -39,7 +40,7 @@ export function useWorkspaceChannels(workspaceId: string) {
       
       const { data, error } = await supabase
         .from('workspace_channels')
-        .select('*')
+        .select(WORKSPACE_CHANNEL_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: true });
 

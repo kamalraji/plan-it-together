@@ -2,6 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Json } from '@/integrations/supabase/types';
+import {
+  WORKSPACE_JUDGE_COLUMNS,
+  WORKSPACE_RUBRIC_COLUMNS,
+  WORKSPACE_SUBMISSION_COLUMNS,
+  WORKSPACE_SCORE_COLUMNS,
+} from '@/lib/supabase-columns';
 
 // Types
 export interface WorkspaceJudge {
@@ -134,7 +140,7 @@ export function useWorkspaceJudges(workspaceId: string | undefined) {
       
       const { data, error } = await supabase
         .from('workspace_judges')
-        .select('*')
+        .select(WORKSPACE_JUDGE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -236,7 +242,7 @@ export function useWorkspaceRubrics(workspaceId: string | undefined) {
 
       const { data, error } = await supabase
         .from('workspace_rubrics')
-        .select('*')
+        .select(WORKSPACE_RUBRIC_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -349,7 +355,7 @@ export function useWorkspaceSubmissions(workspaceId: string | undefined) {
 
       const { data, error } = await supabase
         .from('workspace_submissions')
-        .select('*')
+        .select(WORKSPACE_SUBMISSION_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .order('submitted_at', { ascending: false });
 
@@ -571,8 +577,8 @@ export function useLeaderboard(workspaceId: string | undefined) {
       if (!workspaceId) return [];
 
       const [{ data: submissions }, { data: scores }, { data: assignments }] = await Promise.all([
-        supabase.from('workspace_submissions').select('*').eq('workspace_id', workspaceId),
-        supabase.from('workspace_scores').select('submission_id, total_score').eq('workspace_id', workspaceId),
+        supabase.from('workspace_submissions').select(WORKSPACE_SUBMISSION_COLUMNS.leaderboard).eq('workspace_id', workspaceId),
+        supabase.from('workspace_scores').select(WORKSPACE_SCORE_COLUMNS.list).eq('workspace_id', workspaceId),
         supabase.from('workspace_judge_assignments').select('submission_id, status').eq('workspace_id', workspaceId),
       ]);
 
@@ -642,7 +648,7 @@ export function useCurrentUserAsJudge(workspaceId: string | undefined) {
 
       const { data, error } = await supabase
         .from('workspace_judges')
-        .select('*')
+        .select(WORKSPACE_JUDGE_COLUMNS.detail)
         .eq('workspace_id', workspaceId)
         .eq('user_id', userData.user.id)
         .single();
@@ -662,7 +668,7 @@ export function useJudgeScore(assignmentId: string | undefined) {
 
       const { data, error } = await supabase
         .from('workspace_scores')
-        .select('*')
+        .select(WORKSPACE_SCORE_COLUMNS.detail)
         .eq('assignment_id', assignmentId)
         .single();
 
