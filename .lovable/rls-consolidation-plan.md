@@ -144,9 +144,24 @@ ORDER BY tablename, cmd;
 
 ---
 
-## Notes
+## Status: ✅ COMPLETED
 
-- The 1030 `auth_rls_initplan` warnings have been **FIXED** ✅
-- The 2 remaining warnings (Extension in Public, Leaked Password) are unrelated
-- Multiple permissive policies don't break functionality - they just add overhead
-- Consider this optimization for production-scale deployments
+**All 1,412 performance warnings have been resolved:**
+
+- ✅ **1,030 `auth_rls_initplan`** warnings - Fixed by wrapping `auth.uid()` in `(select auth.uid())`
+- ✅ **382 `multiple_permissive_policies`** warnings - Fixed via automated consolidation migration
+
+**Remaining (non-blocking):**
+- Extension in Public (security recommendation)
+- Leaked Password Protection Disabled (enable in Supabase dashboard)
+
+---
+
+## Migration Applied
+
+The consolidation migration:
+1. Removed redundant policies where an `ALL` policy already covered `SELECT/INSERT/UPDATE/DELETE`
+2. Merged duplicate policies for the same table/role/action into single policies using `OR` logic
+3. Preserved all original access control logic
+
+**Date completed:** 2026-01-26
