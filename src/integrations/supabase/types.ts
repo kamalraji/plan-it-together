@@ -16823,6 +16823,30 @@ export type Database = {
           },
         ]
       }
+      workspace_members_with_levels: {
+        Row: {
+          access_level:
+            | Database["public"]["Enums"]["workspace_access_level"]
+            | null
+          avatar_url: string | null
+          full_name: string | null
+          id: string | null
+          joined_at: string | null
+          role: string | null
+          status: string | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_team_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       approve_organizer_application: {
@@ -17269,6 +17293,10 @@ export type Database = {
           type: string
         }[]
       }
+      get_workspace_access_level: {
+        Args: { role_name: string }
+        Returns: Database["public"]["Enums"]["workspace_access_level"]
+      }
       get_youtube_tokens: {
         Args: { p_workspace_id: string }
         Returns: {
@@ -17305,6 +17333,13 @@ export type Database = {
             Returns: boolean
           }
         | { Args: { p_workspace_id: string }; Returns: boolean }
+      has_workspace_access_level: {
+        Args: {
+          _min_level: Database["public"]["Enums"]["workspace_access_level"]
+          _workspace_id: string
+        }
+        Returns: boolean
+      }
       has_workspace_management_access: {
         Args: { _user_id?: string; _workspace_id: string }
         Returns: boolean
@@ -17448,6 +17483,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      user_has_workspace_access_level: {
+        Args: {
+          _min_level: Database["public"]["Enums"]["workspace_access_level"]
+          _user_id: string
+          _workspace_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "organizer" | "participant" | "vendor"
@@ -17552,6 +17595,7 @@ export type Database = {
       user_status: "PENDING" | "ACTIVE" | "SUSPENDED"
       vendor_status: "PENDING" | "VERIFIED" | "REJECTED" | "SUSPENDED"
       verification_status: "PENDING" | "VERIFIED" | "REJECTED"
+      workspace_access_level: "OWNER" | "MANAGER" | "LEAD" | "COORDINATOR"
       workspace_activity_type: "task" | "communication" | "team" | "template"
     }
     CompositeTypes: {
@@ -17784,6 +17828,7 @@ export const Constants = {
       user_status: ["PENDING", "ACTIVE", "SUSPENDED"],
       vendor_status: ["PENDING", "VERIFIED", "REJECTED", "SUSPENDED"],
       verification_status: ["PENDING", "VERIFIED", "REJECTED"],
+      workspace_access_level: ["OWNER", "MANAGER", "LEAD", "COORDINATOR"],
       workspace_activity_type: ["task", "communication", "team", "template"],
     },
   },
