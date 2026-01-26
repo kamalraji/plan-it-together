@@ -1,22 +1,10 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Youtube, ExternalLink, RefreshCw, Unlink, CheckCircle2, AlertCircle, Wifi } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
-
-interface YouTubeChannel {
-  id: string;
-  channel_id: string;
-  channel_name: string;
-  channel_thumbnail?: string;
-  subscriber_count?: number;
-  is_live_enabled: boolean;
-  expires_at: string;
-  is_active: boolean;
-}
+import { useYouTubeOAuth, YouTubeChannel } from '@/hooks/workspace/useYouTubeOAuth';
 
 interface YouTubeChannelCardProps {
   workspaceId: string;
@@ -28,27 +16,39 @@ interface YouTubeChannelCardProps {
 }
 
 export function YouTubeChannelCard({
-  workspaceId: _workspaceId,
-  channel,
-  isLoading,
+  workspaceId,
+  channel: externalChannel,
+  isLoading: externalLoading,
   onConnect,
   onDisconnect,
   onRefresh,
 }: YouTubeChannelCardProps) {
-  const [isConnecting, setIsConnecting] = useState(false);
+  const {
+    channel: hookChannel,
+    isLoading: hookLoading,
+    isConnecting,
+    connect,
+    disconnect,
+    refresh,
+  } = useYouTubeOAuth({ workspaceId });
 
-  const handleConnect = async () => {
-    setIsConnecting(true);
-    try {
-      // In production, this would redirect to OAuth flow
-      // For now, simulate the flow
-      toast.info('YouTube OAuth flow would open here');
-      onConnect?.();
-    } catch (error) {
-      toast.error('Failed to connect YouTube channel');
-    } finally {
-      setIsConnecting(false);
-    }
+  // Use external props if provided, otherwise use hook values
+  const channel = externalChannel !== undefined ? externalChannel : hookChannel;
+  const isLoading = externalLoading !== undefined ? externalLoading : hookLoading;
+
+  const handleConnect = () => {
+    connect();
+    onConnect?.();
+  };
+
+  const handleDisconnect = () => {
+    disconnect();
+    onDisconnect?.();
+  };
+
+  const handleRefresh = () => {
+    refresh();
+    onRefresh?.();
   };
 
   const isTokenExpiring = channel?.expires_at 
@@ -201,7 +201,7 @@ export function YouTubeChannelCard({
               variant="outline" 
               size="sm" 
               className="flex-1 gap-2"
-              onClick={onRefresh}
+              onClick={handleRefresh}
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Refresh Token
@@ -210,7 +210,7 @@ export function YouTubeChannelCard({
               variant="ghost" 
               size="sm"
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={onDisconnect}
+              onClick={handleDisconnect}
             >
               <Unlink className="h-3.5 w-3.5" />
             </Button>
