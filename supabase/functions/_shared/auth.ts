@@ -4,6 +4,73 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+/**
+ * Management-level roles (Level 1-2 in workspace hierarchy)
+ * These roles have elevated permissions for workspace operations
+ */
+export const MANAGEMENT_ROLES = [
+  'WORKSPACE_OWNER',
+  'OPERATIONS_MANAGER',
+  'GROWTH_MANAGER',
+  'CONTENT_MANAGER',
+  'TECH_FINANCE_MANAGER',
+  'VOLUNTEERS_MANAGER',
+  'SOCIAL_MEDIA_LEAD',
+  'MEDIA_LEAD',
+  'TECHNICAL_LEAD',
+  'IT_LEAD',
+] as const;
+
+/**
+ * All lead-level roles (Level 3 in workspace hierarchy)
+ */
+export const ALL_LEAD_ROLES = [
+  'EVENT_LEAD',
+  'CATERING_LEAD',
+  'LOGISTICS_LEAD',
+  'FACILITY_LEAD',
+  'MARKETING_LEAD',
+  'COMMUNICATION_LEAD',
+  'SPONSORSHIP_LEAD',
+  'SOCIAL_MEDIA_LEAD',
+  'CONTENT_LEAD',
+  'SPEAKER_LIAISON_LEAD',
+  'JUDGE_LEAD',
+  'MEDIA_LEAD',
+  'FINANCE_LEAD',
+  'REGISTRATION_LEAD',
+  'TECHNICAL_LEAD',
+  'IT_LEAD',
+  'VOLUNTEERS_LEAD',
+] as const;
+
+/**
+ * All coordinator-level roles (Level 4 in workspace hierarchy)
+ */
+export const ALL_COORDINATOR_ROLES = [
+  'EVENT_COORDINATOR',
+  'CATERING_COORDINATOR',
+  'LOGISTICS_COORDINATOR',
+  'FACILITY_COORDINATOR',
+  'MARKETING_COORDINATOR',
+  'COMMUNICATION_COORDINATOR',
+  'SPONSORSHIP_COORDINATOR',
+  'SOCIAL_MEDIA_COORDINATOR',
+  'CONTENT_COORDINATOR',
+  'SPEAKER_LIAISON_COORDINATOR',
+  'JUDGE_COORDINATOR',
+  'MEDIA_COORDINATOR',
+  'FINANCE_COORDINATOR',
+  'REGISTRATION_COORDINATOR',
+  'TECHNICAL_COORDINATOR',
+  'IT_COORDINATOR',
+  'VOLUNTEER_COORDINATOR',
+] as const;
+
+export type ManagementRole = typeof MANAGEMENT_ROLES[number];
+export type LeadRole = typeof ALL_LEAD_ROLES[number];
+export type CoordinatorRole = typeof ALL_COORDINATOR_ROLES[number];
+
 export interface AuthResult {
   success: true;
   user: { id: string; email?: string };
