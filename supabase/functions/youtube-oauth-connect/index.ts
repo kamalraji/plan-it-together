@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const youtubeClientId = Deno.env.get('YOUTUBE_CLIENT_ID')!;
 const youtubeClientSecret = Deno.env.get('YOUTUBE_CLIENT_SECRET')!;
@@ -47,6 +48,41 @@ interface EncryptedCredentials {
   is_live_enabled: boolean;
 }
 
+/**
+ * Verify user has workspace management access
+ */
+async function verifyWorkspaceAccess(
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+  
+  // Check if user is workspace owner
+  const { data: workspace } = await serviceClient
+    .from('workspaces')
+    .select('organizer_id')
+    .eq('id', workspaceId)
+    .single();
+
+  if (workspace?.organizer_id === userId) {
+    return true;
+  }
+
+  // Check if user is an active team member with management role
+  const { data: member } = await serviceClient
+    .from('workspace_team_members')
+    .select('role, status')
+    .eq('workspace_id', workspaceId)
+    .eq('user_id', userId)
+    .eq('status', 'ACTIVE')
+    .maybeSingle();
+
+  if (!member) return false;
+
+  const managementRoles = ['WORKSPACE_OWNER', 'OPERATIONS_MANAGER', 'TECH_FINANCE_MANAGER'];
+  return managementRoles.includes(member.role);
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -66,6 +102,35 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({ error: 'workspace_id is required' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Verify user has workspace access
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader?.startsWith('Bearer ')) {
+        return new Response(
+          JSON.stringify({ error: 'Authorization required' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: userError } = await userClient.auth.getUser();
+
+      if (userError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const hasAccess = await verifyWorkspaceAccess(user.id, workspaceId);
+      if (!hasAccess) {
+        return new Response(
+          JSON.stringify({ error: 'You do not have permission to manage this workspace' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
