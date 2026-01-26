@@ -4,27 +4,32 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// ============================================================================
+// WORKSPACE ROLE HIERARCHY (4 Levels)
+// ============================================================================
+
 /**
- * Management-level roles (Level 1-2 in workspace hierarchy)
- * These roles have elevated permissions for workspace operations
+ * Level 1: Owner - Full workspace control
  */
-export const MANAGEMENT_ROLES = [
+export const LEVEL_1_OWNER_ROLES = [
   'WORKSPACE_OWNER',
+] as const;
+
+/**
+ * Level 2: Department Managers - High-level operational control
+ */
+export const LEVEL_2_MANAGER_ROLES = [
   'OPERATIONS_MANAGER',
   'GROWTH_MANAGER',
   'CONTENT_MANAGER',
   'TECH_FINANCE_MANAGER',
   'VOLUNTEERS_MANAGER',
-  'SOCIAL_MEDIA_LEAD',
-  'MEDIA_LEAD',
-  'TECHNICAL_LEAD',
-  'IT_LEAD',
 ] as const;
 
 /**
- * All lead-level roles (Level 3 in workspace hierarchy)
+ * Level 3: Team Leads - Team-level oversight and execution
  */
-export const ALL_LEAD_ROLES = [
+export const LEVEL_3_LEAD_ROLES = [
   'EVENT_LEAD',
   'CATERING_LEAD',
   'LOGISTICS_LEAD',
@@ -45,9 +50,9 @@ export const ALL_LEAD_ROLES = [
 ] as const;
 
 /**
- * All coordinator-level roles (Level 4 in workspace hierarchy)
+ * Level 4: Coordinators - Task execution and support
  */
-export const ALL_COORDINATOR_ROLES = [
+export const LEVEL_4_COORDINATOR_ROLES = [
   'EVENT_COORDINATOR',
   'CATERING_COORDINATOR',
   'LOGISTICS_COORDINATOR',
@@ -67,9 +72,55 @@ export const ALL_COORDINATOR_ROLES = [
   'VOLUNTEER_COORDINATOR',
 ] as const;
 
-export type ManagementRole = typeof MANAGEMENT_ROLES[number];
-export type LeadRole = typeof ALL_LEAD_ROLES[number];
-export type CoordinatorRole = typeof ALL_COORDINATOR_ROLES[number];
+// ============================================================================
+// COMBINED ROLE SETS FOR ACCESS CHECKS
+// ============================================================================
+
+/** Level 1 only - Owner access */
+export const OWNER_ACCESS_ROLES = [...LEVEL_1_OWNER_ROLES] as const;
+
+/** Level 1-2 - Manager access (Owner + Managers) */
+export const MANAGER_ACCESS_ROLES = [
+  ...LEVEL_1_OWNER_ROLES,
+  ...LEVEL_2_MANAGER_ROLES,
+] as const;
+
+/** Level 1-3 - Lead access (Owner + Managers + Leads) */
+export const LEAD_ACCESS_ROLES = [
+  ...LEVEL_1_OWNER_ROLES,
+  ...LEVEL_2_MANAGER_ROLES,
+  ...LEVEL_3_LEAD_ROLES,
+] as const;
+
+/** Level 1-4 - Any team member access (all roles) */
+export const TEAM_MEMBER_ACCESS_ROLES = [
+  ...LEVEL_1_OWNER_ROLES,
+  ...LEVEL_2_MANAGER_ROLES,
+  ...LEVEL_3_LEAD_ROLES,
+  ...LEVEL_4_COORDINATOR_ROLES,
+] as const;
+
+// Type exports
+export type OwnerRole = typeof LEVEL_1_OWNER_ROLES[number];
+export type ManagerRole = typeof LEVEL_2_MANAGER_ROLES[number];
+export type LeadRole = typeof LEVEL_3_LEAD_ROLES[number];
+export type CoordinatorRole = typeof LEVEL_4_COORDINATOR_ROLES[number];
+export type WorkspaceRole = OwnerRole | ManagerRole | LeadRole | CoordinatorRole;
+
+// ============================================================================
+// ACCESS LEVEL ENUM
+// ============================================================================
+
+export enum AccessLevel {
+  OWNER = 1,      // Level 1 only
+  MANAGER = 2,    // Level 1-2
+  LEAD = 3,       // Level 1-3
+  TEAM_MEMBER = 4 // Level 1-4 (any active member)
+}
+
+// ============================================================================
+// AUTH TYPES
+// ============================================================================
 
 export interface AuthResult {
   success: true;
@@ -81,6 +132,16 @@ export interface AuthError {
   success: false;
   response: Response;
 }
+
+export interface WorkspaceAccessResult {
+  hasAccess: boolean;
+  role: string | null;
+  level: AccessLevel | null;
+}
+
+// ============================================================================
+// AUTH FUNCTIONS
+// ============================================================================
 
 /**
  * Verify JWT and return authenticated user
@@ -128,14 +189,25 @@ export async function requireAuth(
 }
 
 /**
- * Verify user has workspace management access (owner or team member with management role)
+ * Get user's role level in a workspace
  */
-export async function verifyWorkspaceAccess(
+function getRoleLevel(role: string): AccessLevel | null {
+  if ((LEVEL_1_OWNER_ROLES as readonly string[]).includes(role)) return AccessLevel.OWNER;
+  if ((LEVEL_2_MANAGER_ROLES as readonly string[]).includes(role)) return AccessLevel.MANAGER;
+  if ((LEVEL_3_LEAD_ROLES as readonly string[]).includes(role)) return AccessLevel.LEAD;
+  if ((LEVEL_4_COORDINATOR_ROLES as readonly string[]).includes(role)) return AccessLevel.TEAM_MEMBER;
+  return null;
+}
+
+/**
+ * Get detailed workspace access information for a user
+ */
+export async function getWorkspaceAccess(
   serviceClient: SupabaseClient,
   userId: string,
   workspaceId: string
-): Promise<boolean> {
-  // Check if user is workspace owner
+): Promise<WorkspaceAccessResult> {
+  // Check if user is workspace owner (organizer_id)
   const { data: workspace } = await serviceClient
     .from('workspaces')
     .select('organizer_id')
@@ -143,10 +215,10 @@ export async function verifyWorkspaceAccess(
     .single();
 
   if (workspace?.organizer_id === userId) {
-    return true;
+    return { hasAccess: true, role: 'WORKSPACE_OWNER', level: AccessLevel.OWNER };
   }
 
-  // Check if user is an active team member with management role
+  // Check team membership
   const { data: member } = await serviceClient
     .from('workspace_team_members')
     .select('role, status')
@@ -156,23 +228,75 @@ export async function verifyWorkspaceAccess(
     .maybeSingle();
 
   if (!member) {
+    return { hasAccess: false, role: null, level: null };
+  }
+
+  const level = getRoleLevel(member.role);
+  return { hasAccess: level !== null, role: member.role, level };
+}
+
+/**
+ * Verify user has workspace access at specified level or higher
+ * @param requiredLevel - Minimum access level required (default: LEAD for backward compatibility)
+ */
+export async function verifyWorkspaceAccess(
+  serviceClient: SupabaseClient,
+  userId: string,
+  workspaceId: string,
+  requiredLevel: AccessLevel = AccessLevel.LEAD
+): Promise<boolean> {
+  const access = await getWorkspaceAccess(serviceClient, userId, workspaceId);
+  
+  if (!access.hasAccess || access.level === null) {
     return false;
   }
 
-  const managementRoles = [
-    'WORKSPACE_OWNER', 
-    'OPERATIONS_MANAGER', 
-    'GROWTH_MANAGER',
-    'CONTENT_MANAGER', 
-    'TECH_FINANCE_MANAGER', 
-    'VOLUNTEERS_MANAGER',
-    'SOCIAL_MEDIA_LEAD',
-    'MEDIA_LEAD',
-    'TECHNICAL_LEAD',
-    'IT_LEAD',
-  ];
-  
-  return managementRoles.includes(member.role);
+  // Lower level number = higher access (OWNER=1 > MANAGER=2 > LEAD=3 > TEAM_MEMBER=4)
+  return access.level <= requiredLevel;
+}
+
+/**
+ * Verify user has owner-level access (Level 1)
+ */
+export async function verifyOwnerAccess(
+  serviceClient: SupabaseClient,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  return verifyWorkspaceAccess(serviceClient, userId, workspaceId, AccessLevel.OWNER);
+}
+
+/**
+ * Verify user has manager-level access (Level 1-2)
+ */
+export async function verifyManagerAccess(
+  serviceClient: SupabaseClient,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  return verifyWorkspaceAccess(serviceClient, userId, workspaceId, AccessLevel.MANAGER);
+}
+
+/**
+ * Verify user has lead-level access (Level 1-3)
+ */
+export async function verifyLeadAccess(
+  serviceClient: SupabaseClient,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  return verifyWorkspaceAccess(serviceClient, userId, workspaceId, AccessLevel.LEAD);
+}
+
+/**
+ * Verify user is any active team member (Level 1-4)
+ */
+export async function verifyTeamMemberAccess(
+  serviceClient: SupabaseClient,
+  userId: string,
+  workspaceId: string
+): Promise<boolean> {
+  return verifyWorkspaceAccess(serviceClient, userId, workspaceId, AccessLevel.TEAM_MEMBER);
 }
 
 /**
