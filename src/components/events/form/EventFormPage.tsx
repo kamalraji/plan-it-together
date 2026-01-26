@@ -1,7 +1,7 @@
 /**
  * Event Form Page - Modular Refactored Version
  * 
- * This is the main orchestrator component (~400 lines vs original 2400+)
+ * This is the main orchestrator component (~300 lines)
  * All section-specific logic has been extracted to:
  * - src/components/events/form/sections/ - UI components
  * - src/components/events/form/hooks/ - State management
@@ -9,16 +9,12 @@
  */
 import React, { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
 
 // Form imports
 import { Form } from '@/components/ui/form';
@@ -28,10 +24,15 @@ import { eventFormSchema, type EventFormValues } from '@/lib/event-form-schema';
 import { useEventDraft } from '@/hooks/useEventDraft';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { useEventFormKeyboard } from '@/hooks/useEventFormKeyboard';
-import { SectionProgressIndicator, type SectionProgress, calculateSectionStatus } from '@/components/events/form/SectionProgressIndicator';
-import { DraftStatusIndicator } from '@/components/events/form/DraftStatusIndicator';
+import { type SectionProgress, calculateSectionStatus } from '@/components/events/form/SectionProgressIndicator';
 import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
 import { UnsavedChangesDialog } from '@/components/events/form/UnsavedChangesDialog';
+
+// Extracted components
+import { EventFormHeader } from './EventFormHeader';
+import { EventFormActions } from './EventFormActions';
+import { EventFormLoadingState } from './EventFormLoadingState';
+import { EventFormServerError } from './EventFormServerError';
 
 // Section components
 import {
@@ -46,26 +47,17 @@ import {
   CTASection,
 } from '@/components/events/form/sections';
 
+// Hooks
+import { useEventFormLoader } from './hooks/useEventFormLoader';
+import { useEventFormSubmit } from './hooks/useEventFormSubmit';
+
 // Utils
-import { getDefaultFormValues, getInitialSectionState, sectionFieldMap } from '@/components/events/form/utils/eventFormDefaults';
-import { useEventFormSubmit } from '@/components/events/form/hooks/useEventFormSubmit';
+import { getDefaultFormValues, getInitialSectionState, sectionFieldMap } from './utils/eventFormDefaults';
 
 // Types
-import type { EventImage } from '@/components/events/form/EventImageGallery';
-import type { EventFAQ } from '@/components/events/form/EventFAQsSection';
-import type { QuickTier } from '@/components/events/form/TicketTierQuickAdd';
-
-interface SectionState {
-  basic: boolean;
-  schedule: boolean;
-  organizer: boolean;
-  venue: boolean;
-  virtual: boolean;
-  branding: boolean;
-  media: boolean;
-  faqs: boolean;
-  cta: boolean;
-}
+import type { EventImage } from './EventImageGallery';
+import type { EventFAQ } from './EventFAQsSection';
+import type { QuickTier, SectionState } from './types/eventForm.types';
 
 interface EventFormPageProps {
   mode: 'create' | 'edit';
@@ -86,7 +78,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
-  const [isRequestingAccess, setIsRequestingAccess] = useState(false);
   const [openSections, setOpenSections] = useState<SectionState>(getInitialSectionState());
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
 
@@ -94,9 +85,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [eventImages, setEventImages] = useState<EventImage[]>([]);
   const [eventFaqs, setEventFaqs] = useState<EventFAQ[]>([]);
   const [pendingTiers, setPendingTiers] = useState<QuickTier[]>([]);
-
-  // Browser timezone detection
-  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Form initialization
   const form = useForm<EventFormValues>({
@@ -111,6 +99,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const selectedMode = useWatch({ control, name: 'mode' });
   const showVenueSection = selectedMode === 'OFFLINE' || selectedMode === 'HYBRID';
   const showVirtualSection = selectedMode === 'ONLINE' || selectedMode === 'HYBRID';
+
+  // Load event data for edit mode
+  useEventFormLoader({
+    mode,
+    eventId,
+    form,
+    setIsLoadingEvent,
+  });
 
   // Draft management
   const [pendingDraft, setPendingDraft] = useState<Record<string, unknown> | null>(null);
@@ -193,17 +189,17 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     { id: 'branding', label: 'Branding', status: calculateSectionStatus('branding', formValues, formState.errors, sectionFieldMap), required: false },
   ], [formValues, formState.errors, showVenueSection, showVirtualSection]);
 
-  const handleSectionClick = (sectionId: string) => {
+  const handleSectionClick = useCallback((sectionId: string) => {
     setOpenSections(prev => ({ ...prev, [sectionId]: true }));
     setTimeout(() => {
       const el = document.getElementById(`section-${sectionId}`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
-  };
+  }, []);
 
-  const toggleSection = (section: keyof SectionState) => {
+  const toggleSection = useCallback((section: keyof SectionState) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
+  }, []);
 
   // Auto-set organization
   useEffect(() => {
@@ -211,99 +207,6 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       form.setValue('organizationId', currentOrganization.id);
     }
   }, [currentOrganization, mode, form]);
-
-  // Load event for edit mode
-  useEffect(() => {
-    const loadEvent = async () => {
-      if (mode !== 'edit' || !eventId) return;
-      try {
-        setIsLoadingEvent(true);
-
-        const { data, error } = await supabase
-          .from('events')
-          .select(`
-            id, name, description, mode, start_date, end_date, capacity, visibility, status, 
-            created_at, updated_at, organization_id, branding, canvas_state, slug, category,
-            timezone, registration_deadline, registration_type, is_free, allow_waitlist,
-            contact_email, contact_phone, event_website, min_age, max_age, language
-          `)
-          .eq('id', eventId)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (!data) {
-          toast({ title: 'Event not found', description: 'The requested event could not be found.', variant: 'destructive' });
-          navigate('../list');
-          return;
-        }
-
-        // Fetch related data
-        const { data: venueData } = await supabase.from('event_venues').select('*').eq('event_id', eventId).maybeSingle();
-        const { data: virtualData } = await supabase.from('event_virtual_links').select('*').eq('event_id', eventId).eq('is_primary', true).maybeSingle();
-
-        const branding = data.branding as Record<string, unknown> | null;
-
-        reset({
-          name: data.name ?? '',
-          description: data.description ?? '',
-          mode: (data.mode as 'ONLINE' | 'OFFLINE' | 'HYBRID') ?? 'ONLINE',
-          visibility: ((data as Record<string, unknown>).visibility as 'PUBLIC' | 'PRIVATE' | 'UNLISTED') ?? 'PUBLIC',
-          category: ((data as Record<string, unknown>).category as string) ?? '',
-          organizationId: data.organization_id ?? '',
-          capacity: data.capacity != null ? String(data.capacity) : '',
-          registrationType: (((data as Record<string, unknown>).registration_type as string) ?? (branding?.registration as { type?: string })?.type ?? 'OPEN') as 'OPEN' | 'APPROVAL_REQUIRED' | 'INVITE_ONLY',
-          isFreeEvent: ((data as Record<string, unknown>).is_free as boolean) ?? true,
-          allowWaitlist: ((data as Record<string, unknown>).allow_waitlist as boolean) ?? false,
-          tags: ((branding?.seo as { tags?: string[] })?.tags ?? []).join(', '),
-          metaDescription: (branding?.seo as { metaDescription?: string })?.metaDescription ?? '',
-          customSlug: ((data as Record<string, unknown>).slug as string) ?? '',
-          accessibilityLanguage: ((data as Record<string, unknown>).language as string) ?? 'en',
-          ageRestrictionEnabled: ((data as Record<string, unknown>).min_age as number) != null,
-          minAge: ((data as Record<string, unknown>).min_age as number) ?? null,
-          maxAge: ((data as Record<string, unknown>).max_age as number) ?? null,
-          startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
-          endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
-          registrationDeadline: ((data as Record<string, unknown>).registration_deadline as string)
-            ? new Date((data as Record<string, unknown>).registration_deadline as string).toISOString().slice(0, 16)
-            : '',
-          timezone: ((data as Record<string, unknown>).timezone as string) ?? browserTimezone ?? 'Asia/Kolkata',
-          contactEmail: ((data as Record<string, unknown>).contact_email as string) ?? '',
-          contactPhone: ((data as Record<string, unknown>).contact_phone as string) ?? '',
-          supportUrl: (branding?.contact as { supportUrl?: string })?.supportUrl ?? '',
-          eventWebsite: ((data as Record<string, unknown>).event_website as string) ?? '',
-          venueName: venueData?.name ?? '',
-          venueAddress: venueData?.address ?? '',
-          venueCity: venueData?.city ?? '',
-          venueState: venueData?.state ?? '',
-          venueCountry: venueData?.country ?? '',
-          venuePostalCode: venueData?.postal_code ?? '',
-          venueCapacity: venueData?.capacity != null ? String(venueData.capacity) : '',
-          accessibilityFeatures: venueData?.accessibility_features ?? [],
-          accessibilityNotes: venueData?.accessibility_notes ?? '',
-          virtualPlatform: virtualData?.platform ?? '',
-          virtualMeetingUrl: virtualData?.meeting_url ?? '',
-          virtualMeetingId: virtualData?.meeting_id ?? '',
-          virtualPassword: virtualData?.password ?? '',
-          virtualInstructions: virtualData?.instructions ?? '',
-          primaryColor: (branding?.primaryColor as string) ?? '#2563eb',
-          logoUrl: (branding?.logoUrl as string) ?? '',
-          heroSubtitle: (branding?.heroSubtitle as string) ?? '',
-          bannerUrl: (branding?.bannerUrl as string) ?? '',
-          primaryCtaLabel: (branding?.primaryCtaLabel as string) ?? '',
-          secondaryCtaLabel: (branding?.secondaryCtaLabel as string) ?? '',
-          canvasState: ((data as Record<string, unknown>).canvas_state as unknown) ?? undefined,
-        });
-      } catch (err) {
-        logger.error('Failed to load event', err);
-        toast({ title: 'Failed to load event', description: 'Please try again.', variant: 'destructive' });
-        navigate('../list');
-      } finally {
-        setIsLoadingEvent(false);
-      }
-    };
-
-    loadEvent();
-  }, [mode, eventId, navigate, reset, toast, browserTimezone]);
 
   // Form submit handler
   const { onSubmit } = useEventFormSubmit({
@@ -316,17 +219,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     setServerError,
   });
 
-  const pageTitle = mode === 'create' ? 'Create Event' : 'Edit Event';
-
   if (isLoadingEvent) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="mt-4 text-muted-foreground">Loading event...</p>
-        </div>
-      </div>
-    );
+    return <EventFormLoadingState />;
   }
 
   return (
@@ -349,32 +243,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       />
 
       {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{pageTitle}</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {mode === 'create' 
-                  ? 'Fill in the details to create your event draft'
-                  : 'Update your event information'
-                }
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <DraftStatusIndicator
-                isSaving={isDraftSaving}
-                lastSaved={lastSaved}
-                hasDraft={hasDraft}
-              />
-              <SectionProgressIndicator
-                sections={sectionProgress}
-                onSectionClick={handleSectionClick}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <EventFormHeader
+        mode={mode}
+        isDraftSaving={isDraftSaving}
+        lastSaved={lastSaved}
+        hasDraft={hasDraft}
+        sectionProgress={sectionProgress}
+        onSectionClick={handleSectionClick}
+      />
 
       {/* Form Content */}
       <div className="mx-auto max-w-4xl px-4 pb-24 sm:px-6">
@@ -388,40 +264,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             )}
           >
             {/* Server Error */}
-            {serverError && (
-              <div className="p-4 sm:p-6">
-                <Alert variant="destructive">
-                  <AlertTitle>Failed to save event</AlertTitle>
-                  <AlertDescription>
-                    <p>{serverError}</p>
-                    {serverError.includes('organizer/admin permissions') && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-3 border-destructive text-destructive hover:bg-destructive/10"
-                        disabled={isRequestingAccess}
-                        onClick={async () => {
-                          if (isRequestingAccess) return;
-                          setIsRequestingAccess(true);
-                          try {
-                            const { error } = await supabase.functions.invoke('self-approve-organizer');
-                            if (error) throw error;
-                            toast({ title: 'Organizer access requested', description: 'Your request has been recorded.' });
-                          } catch {
-                            toast({ title: 'Failed to request access', variant: 'destructive' });
-                          } finally {
-                            setIsRequestingAccess(false);
-                          }
-                        }}
-                      >
-                        {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
-                      </Button>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              </div>
-            )}
+            {serverError && <EventFormServerError error={serverError} />}
 
             {/* Form Sections */}
             <div id="section-basic">
@@ -518,28 +361,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             </div>
 
             {/* Form Actions */}
-            <div className="sticky bottom-0 bg-card/95 backdrop-blur-sm border-t border-border/50 p-4 sm:p-6">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-sm text-muted-foreground hidden sm:block">
-                  {mode === 'create' ? 'Fill required fields to continue' : 'Changes save immediately'}
-                </p>
-                <div className="flex items-center gap-3 ml-auto">
-                  <Button type="button" variant="ghost" onClick={() => safeNavigate(listPath)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting} className="min-w-[140px]">
-                    {isSubmitting ? (
-                      <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Saving...
-                      </>
-                    ) : (
-                      mode === 'create' ? 'Create Event' : 'Save Changes'
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <EventFormActions
+              mode={mode}
+              isSubmitting={isSubmitting}
+              onCancel={() => safeNavigate(listPath)}
+            />
           </form>
         </Form>
       </div>

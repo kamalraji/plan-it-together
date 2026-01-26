@@ -4,3 +4,4 @@
 export { useEventFormState } from './useEventFormState';
 export { useEventFormSubmit } from './useEventFormSubmit';
 export { useEventFormDraftManager } from './useEventFormDraftManager';
+export { useEventFormLoader } from './useEventFormLoader';
