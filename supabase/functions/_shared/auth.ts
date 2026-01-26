@@ -61,32 +61,51 @@ export async function requireAuth(
 }
 
 /**
- * Verify user has workspace management access (owner, admin, manager, or lead roles)
+ * Verify user has workspace management access (owner or team member with management role)
  */
 export async function verifyWorkspaceAccess(
   serviceClient: SupabaseClient,
   userId: string,
   workspaceId: string
 ): Promise<boolean> {
-  const { data, error } = await serviceClient
-    .from('workspace_members')
-    .select('id, role')
+  // Check if user is workspace owner
+  const { data: workspace } = await serviceClient
+    .from('workspaces')
+    .select('organizer_id')
+    .eq('id', workspaceId)
+    .single();
+
+  if (workspace?.organizer_id === userId) {
+    return true;
+  }
+
+  // Check if user is an active team member with management role
+  const { data: member } = await serviceClient
+    .from('workspace_team_members')
+    .select('role, status')
     .eq('workspace_id', workspaceId)
     .eq('user_id', userId)
+    .eq('status', 'ACTIVE')
     .maybeSingle();
 
-  if (error || !data) {
+  if (!member) {
     return false;
   }
 
   const managementRoles = [
-    'owner', 'admin', 'manager',
-    'l1_organizer', 'l2_committee_head', 'l3_committee_member',
-    'WORKSPACE_OWNER', 'OPERATIONS_MANAGER', 'GROWTH_MANAGER',
-    'CONTENT_MANAGER', 'TECH_FINANCE_MANAGER', 'VOLUNTEERS_MANAGER',
+    'WORKSPACE_OWNER', 
+    'OPERATIONS_MANAGER', 
+    'GROWTH_MANAGER',
+    'CONTENT_MANAGER', 
+    'TECH_FINANCE_MANAGER', 
+    'VOLUNTEERS_MANAGER',
+    'SOCIAL_MEDIA_LEAD',
+    'MEDIA_LEAD',
+    'TECHNICAL_LEAD',
+    'IT_LEAD',
   ];
   
-  return managementRoles.includes((data as { role: string }).role);
+  return managementRoles.includes(member.role);
 }
 
 /**

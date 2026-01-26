@@ -114,37 +114,64 @@ async function callYouTubeAPI(
   }
 }
 
-// Get YouTube credentials for workspace
+// Get YouTube credentials for workspace (using secure vault storage)
 async function getYouTubeCredentials(
   // deno-lint-ignore no-explicit-any
   supabase: any,
   workspaceId: string
-): Promise<{ success: boolean; credentials?: Record<string, string>; error?: string }> {
-  const { data, error } = await supabase
+): Promise<{ success: boolean; accessToken?: string; error?: string }> {
+  // First check if YouTube is connected and active
+  const { data: credential, error: credError } = await supabase
     .from('workspace_social_api_credentials')
-    .select('encrypted_credentials, expires_at')
+    .select('id, is_active, expires_at, access_token_secret_id')
     .eq('workspace_id', workspaceId)
     .eq('platform', 'youtube')
-    .eq('is_active', true)
-    .single();
+    .maybeSingle();
   
-  if (error || !data) {
+  if (credError || !credential) {
     return { 
       success: false, 
       error: 'No YouTube credentials found. Please connect your YouTube channel first.' 
     };
   }
-  
-  // Check if token is expired
-  if (data.expires_at && new Date(data.expires_at) < new Date()) {
-    // TODO: Implement token refresh logic
+
+  if (!credential.is_active) {
+    return {
+      success: false,
+      error: 'YouTube channel is disconnected. Please reconnect.'
+    };
+  }
+
+  // Check if token is expired and needs refresh
+  if (credential.expires_at && new Date(credential.expires_at) < new Date()) {
     return { 
       success: false, 
-      error: 'YouTube token expired. Please reconnect your channel.' 
+      error: 'YouTube token expired. Please refresh your connection.' 
     };
   }
   
-  return { success: true, credentials: data.encrypted_credentials };
+  // Retrieve decrypted tokens from vault using RPC
+  const { data: tokenData, error: tokenError } = await supabase
+    .rpc('get_youtube_tokens', { p_workspace_id: workspaceId });
+  
+  if (tokenError || !tokenData || tokenData.length === 0) {
+    console.error('Failed to retrieve tokens from vault:', tokenError);
+    return { 
+      success: false, 
+      error: 'Failed to retrieve YouTube credentials. Please reconnect.' 
+    };
+  }
+
+  const { access_token } = tokenData[0];
+  
+  if (!access_token) {
+    return {
+      success: false,
+      error: 'YouTube access token not found. Please reconnect your channel.'
+    };
+  }
+  
+  return { success: true, accessToken: access_token };
 }
 
 // Create a YouTube live broadcast
@@ -160,13 +187,13 @@ async function createYouTubeBroadcast(
   scheduledStart: string | null,
   chatEnabled: boolean
 ): Promise<{ success: boolean; stream?: unknown; error?: string }> {
-  // Get YouTube credentials
+  // Get YouTube credentials from vault
   const credResult = await getYouTubeCredentials(supabase, workspaceId);
-  if (!credResult.success || !credResult.credentials) {
+  if (!credResult.success || !credResult.accessToken) {
     return { success: false, error: credResult.error };
   }
   
-  const accessToken = credResult.credentials.access_token;
+  const accessToken = credResult.accessToken;
   
   // Create broadcast
   const broadcastBody = {
@@ -302,13 +329,13 @@ async function startYouTubeStream(
     return { success: false, error: 'Stream not found' };
   }
   
-  // Get credentials
+  // Get credentials from vault
   const credResult = await getYouTubeCredentials(supabase, workspaceId);
-  if (!credResult.success || !credResult.credentials) {
+  if (!credResult.success || !credResult.accessToken) {
     return { success: false, error: credResult.error };
   }
   
-  const accessToken = credResult.credentials.access_token;
+  const accessToken = credResult.accessToken;
   
   // Transition broadcast to live
   const result = await callYouTubeAPI(
@@ -357,12 +384,13 @@ async function endYouTubeStream(
     return { success: false, error: 'Stream not found' };
   }
   
+  // Get credentials from vault
   const credResult = await getYouTubeCredentials(supabase, workspaceId);
-  if (!credResult.success || !credResult.credentials) {
+  if (!credResult.success || !credResult.accessToken) {
     return { success: false, error: credResult.error };
   }
   
-  const accessToken = credResult.credentials.access_token;
+  const accessToken = credResult.accessToken;
   
   // Transition broadcast to complete
   const result = await callYouTubeAPI(
@@ -413,8 +441,9 @@ async function getStreamStatus(
     return { success: false, error: 'Stream not found' };
   }
   
+  // Get credentials from vault
   const credResult = await getYouTubeCredentials(supabase, workspaceId);
-  if (!credResult.success || !credResult.credentials) {
+  if (!credResult.success || !credResult.accessToken) {
     // Return database status if can't get YouTube status
     return { 
       success: true, 
@@ -425,7 +454,7 @@ async function getStreamStatus(
     };
   }
   
-  const accessToken = credResult.credentials.access_token;
+  const accessToken = credResult.accessToken;
   
   // Get broadcast status
   const result = await callYouTubeAPI(
