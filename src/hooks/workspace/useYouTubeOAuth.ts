@@ -129,12 +129,19 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
 
     setIsConnecting(true);
     try {
+      // Get current session for auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('You must be logged in to connect YouTube');
+      }
+
       const response = await fetch(
         `https://ltsniuflqfahdcirrmjh.supabase.co/functions/v1/youtube-oauth-connect?action=init&workspace_id=${workspaceId}&redirect_uri=${encodeURIComponent(window.location.href)}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
           },
         }
       );
