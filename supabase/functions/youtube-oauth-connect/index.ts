@@ -1,4 +1,5 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.89.0';
+import { verifyWorkspaceAccess } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,41 +44,6 @@ interface YouTubeChannelInfo {
   thumbnailUrl?: string;
   subscriberCount?: number;
   isLiveEnabled: boolean;
-}
-
-/**
- * Verify user has workspace management access
- */
-async function verifyWorkspaceAccess(
-  userId: string,
-  workspaceId: string
-): Promise<boolean> {
-  const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
-  
-  // Check if user is workspace owner
-  const { data: workspace } = await serviceClient
-    .from('workspaces')
-    .select('organizer_id')
-    .eq('id', workspaceId)
-    .single();
-
-  if (workspace?.organizer_id === userId) {
-    return true;
-  }
-
-  // Check if user is an active team member with management role
-  const { data: member } = await serviceClient
-    .from('workspace_team_members')
-    .select('role, status')
-    .eq('workspace_id', workspaceId)
-    .eq('user_id', userId)
-    .eq('status', 'ACTIVE')
-    .maybeSingle();
-
-  if (!member) return false;
-
-  const managementRoles = ['WORKSPACE_OWNER', 'OPERATIONS_MANAGER', 'TECH_FINANCE_MANAGER'];
-  return managementRoles.includes(member.role);
 }
 
 /**
@@ -179,7 +145,8 @@ Deno.serve(async (req) => {
         );
       }
 
-      const hasAccess = await verifyWorkspaceAccess(user.id, workspaceId);
+      const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+      const hasAccess = await verifyWorkspaceAccess(serviceClient, user.id, workspaceId);
       if (!hasAccess) {
         return new Response(
           JSON.stringify({ error: 'You do not have permission to manage this workspace' }),
