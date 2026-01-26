@@ -3266,6 +3266,82 @@ export type Database = {
           },
         ]
       }
+      event_live_streams: {
+        Row: {
+          chat_enabled: boolean | null
+          created_at: string
+          ended_at: string | null
+          event_id: string
+          id: string
+          is_recording_available: boolean | null
+          platform: string
+          recording_url: string | null
+          session_id: string
+          started_at: string | null
+          stream_status: string
+          stream_url: string
+          updated_at: string | null
+          video_id: string
+          viewer_count: number | null
+        }
+        Insert: {
+          chat_enabled?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          event_id: string
+          id?: string
+          is_recording_available?: boolean | null
+          platform?: string
+          recording_url?: string | null
+          session_id: string
+          started_at?: string | null
+          stream_status?: string
+          stream_url: string
+          updated_at?: string | null
+          video_id: string
+          viewer_count?: number | null
+        }
+        Update: {
+          chat_enabled?: boolean | null
+          created_at?: string
+          ended_at?: string | null
+          event_id?: string
+          id?: string
+          is_recording_available?: boolean | null
+          platform?: string
+          recording_url?: string | null
+          session_id?: string
+          started_at?: string | null
+          stream_status?: string
+          stream_url?: string
+          updated_at?: string | null
+          video_id?: string
+          viewer_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_live_streams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_live_streams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_live_streams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
       event_materials: {
         Row: {
           created_at: string
@@ -3599,6 +3675,106 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_session_feedback: {
+        Row: {
+          content_rating: number | null
+          created_at: string
+          event_id: string
+          feedback_text: string | null
+          id: string
+          overall_rating: number
+          session_id: string
+          speaker_rating: number | null
+          user_id: string
+          would_recommend: boolean | null
+        }
+        Insert: {
+          content_rating?: number | null
+          created_at?: string
+          event_id: string
+          feedback_text?: string | null
+          id?: string
+          overall_rating: number
+          session_id: string
+          speaker_rating?: number | null
+          user_id: string
+          would_recommend?: boolean | null
+        }
+        Update: {
+          content_rating?: number | null
+          created_at?: string
+          event_id?: string
+          feedback_text?: string | null
+          id?: string
+          overall_rating?: number
+          session_id?: string
+          speaker_rating?: number | null
+          user_id?: string
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_session_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_session_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_session_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "event_session_feedback_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "event_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_session_ratings_aggregate: {
+        Row: {
+          average_rating: number | null
+          rating_distribution: Json | null
+          session_id: string
+          total_ratings: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          average_rating?: number | null
+          rating_distribution?: Json | null
+          session_id: string
+          total_ratings?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          average_rating?: number | null
+          rating_distribution?: Json | null
+          session_id?: string
+          total_ratings?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_session_ratings_aggregate_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "event_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -7405,6 +7581,83 @@ export type Database = {
         }
         Relationships: []
       }
+      session_materials: {
+        Row: {
+          created_at: string
+          description: string | null
+          download_count: number | null
+          event_id: string
+          file_size_bytes: number | null
+          file_type: string
+          file_url: string
+          id: string
+          is_downloadable: boolean | null
+          session_id: string
+          sort_order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          download_count?: number | null
+          event_id: string
+          file_size_bytes?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          is_downloadable?: boolean | null
+          session_id: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          download_count?: number | null
+          event_id?: string
+          file_size_bytes?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          is_downloadable?: boolean | null
+          session_id?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_materials_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_materials_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_materials_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "session_materials_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "event_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skill_endorsements: {
         Row: {
           created_at: string
@@ -8163,6 +8416,50 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stream_viewer_sessions: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          id: string
+          last_seen_at: string | null
+          quality_preference: string | null
+          started_at: string
+          stream_id: string
+          user_id: string
+          watch_duration_seconds: number | null
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          last_seen_at?: string | null
+          quality_preference?: string | null
+          started_at?: string
+          stream_id: string
+          user_id: string
+          watch_duration_seconds?: number | null
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          last_seen_at?: string | null
+          quality_preference?: string | null
+          started_at?: string
+          stream_id?: string
+          user_id?: string
+          watch_duration_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_viewer_sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "event_live_streams"
             referencedColumns: ["id"]
           },
         ]
@@ -15901,6 +16198,333 @@ export type Database = {
           },
         ]
       }
+      zone_badges: {
+        Row: {
+          activity_threshold: number | null
+          activity_type: string | null
+          category: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points_threshold: number | null
+        }
+        Insert: {
+          activity_threshold?: number | null
+          activity_type?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name: string
+          points_threshold?: number | null
+        }
+        Update: {
+          activity_threshold?: number | null
+          activity_type?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          points_threshold?: number | null
+        }
+        Relationships: []
+      }
+      zone_leaderboard: {
+        Row: {
+          activity_count: number
+          badges_earned: number
+          event_id: string
+          id: string
+          last_activity_at: string | null
+          rank: number | null
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_count?: number
+          badges_earned?: number
+          event_id: string
+          id?: string
+          last_activity_at?: string | null
+          rank?: number | null
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_count?: number
+          badges_earned?: number
+          event_id?: string
+          id?: string
+          last_activity_at?: string | null
+          rank?: number | null
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zone_leaderboard_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_leaderboard_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_leaderboard_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      zone_notification_preferences: {
+        Row: {
+          announcements_enabled: boolean
+          badge_notifications_enabled: boolean
+          created_at: string
+          event_id: string
+          id: string
+          leaderboard_updates_enabled: boolean
+          poll_notifications_enabled: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          session_reminders_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          announcements_enabled?: boolean
+          badge_notifications_enabled?: boolean
+          created_at?: string
+          event_id: string
+          id?: string
+          leaderboard_updates_enabled?: boolean
+          poll_notifications_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          session_reminders_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          announcements_enabled?: boolean
+          badge_notifications_enabled?: boolean
+          created_at?: string
+          event_id?: string
+          id?: string
+          leaderboard_updates_enabled?: boolean
+          poll_notifications_enabled?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          session_reminders_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zone_notification_preferences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notification_preferences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notification_preferences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      zone_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          data: Json | null
+          event_id: string
+          id: string
+          push_sent: boolean
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          data?: Json | null
+          event_id: string
+          id?: string
+          push_sent?: boolean
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          data?: Json | null
+          event_id?: string
+          id?: string
+          push_sent?: boolean
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zone_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      zone_point_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          event_id: string
+          id: string
+          metadata: Json | null
+          points: number
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          points?: number
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          points?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zone_point_activities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_point_activities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_point_activities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      zone_user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zone_user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "zone_badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_user_badges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_user_badges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_user_badges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
     }
     Views: {
       dashboard_stats: {
@@ -16137,6 +16761,20 @@ export type Database = {
         Args: { user_a: string; user_b: string }
         Returns: boolean
       }
+      award_zone_points: {
+        Args: {
+          p_activity_type: string
+          p_event_id: string
+          p_metadata?: Json
+          p_points: number
+          p_user_id: string
+        }
+        Returns: number
+      }
+      can_manage_zone_content: {
+        Args: { p_event_id: string }
+        Returns: boolean
+      }
       check_blocked_status: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -16148,6 +16786,26 @@ export type Database = {
       check_username_availability: {
         Args: { _user_id?: string; _username: string }
         Returns: Json
+      }
+      check_zone_badges: {
+        Args: { p_event_id: string; p_user_id: string }
+        Returns: {
+          activity_threshold: number | null
+          activity_type: string | null
+          category: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points_threshold: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "zone_badges"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
       create_chat_group: {
@@ -16466,6 +17124,10 @@ export type Database = {
         Args: { _post_id: string; _requester_id: string }
         Returns: string
       }
+      get_stream_viewer_count: {
+        Args: { p_stream_id: string }
+        Returns: number
+      }
       get_team_member_count: { Args: { p_team_id: string }; Returns: number }
       get_top_commenters: {
         Args: { p_limit?: number; p_post_id: string }
@@ -16477,6 +17139,17 @@ export type Database = {
         }[]
       }
       get_total_unread_count: { Args: never; Returns: number }
+      get_zone_team_members: {
+        Args: { p_event_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          joined_at: string
+          role: string
+          user_id: string
+          workspace_name: string
+        }[]
+      }
       has_certificate_permission: {
         Args: { _permission: string; _user_id?: string; _workspace_id: string }
         Returns: boolean
@@ -16508,6 +17181,10 @@ export type Database = {
       }
       increment_comment_like_count: {
         Args: { p_comment_id: string }
+        Returns: undefined
+      }
+      increment_material_download: {
+        Args: { p_material_id: string }
         Returns: undefined
       }
       increment_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
@@ -16568,6 +17245,10 @@ export type Database = {
         Args: { is_anonymous: boolean; post_author_id: string }
         Returns: string
       }
+      recalculate_zone_ranks: {
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
       record_organization_product_metrics: {
         Args: { _event_type: string; _product_ids: string[] }
         Returns: undefined
@@ -16597,6 +17278,18 @@ export type Database = {
         }[]
       }
       toggle_comment_like: { Args: { p_comment_id: string }; Returns: Json }
+      update_icebreaker_streak: {
+        Args: { p_event_id: string; p_user_id: string }
+        Returns: number
+      }
+      update_stream_viewer_heartbeat: {
+        Args: {
+          p_device_type?: string
+          p_quality?: string
+          p_stream_id: string
+        }
+        Returns: undefined
+      }
       update_user_streak: { Args: { user_uuid: string }; Returns: undefined }
     }
     Enums: {
