@@ -1,0 +1,106 @@
+project_id = "ltsniuflqfahdcirrmjh"
+
+[functions.certificates]
+verify_jwt = false
+
+[functions.admin-audit-log]
+verify_jwt = false
+
+[functions.admin-user-roles]
+verify_jwt = true
+
+[functions.approve-organizer]
+verify_jwt = true
+
+[functions.pending-organizers]
+verify_jwt = false
+
+[functions.create-organization]
+verify_jwt = false
+
+[functions.attendance-qr]
+verify_jwt = true
+
+[functions.attendance-checkin]
+verify_jwt = true
+
+[functions.attendance-report]
+verify_jwt = true
+
+[functions.attendance-manual-checkin]
+verify_jwt = true
+
+[functions.judging-rubric]
+verify_jwt = false
+
+[functions.judging-submissions]
+verify_jwt = true
+
+[functions.judging-leaderboard]
+verify_jwt = false
+
+[functions.invite-to-workspace]
+verify_jwt = false
+
+[functions.accept-invitation]
+verify_jwt = false
+
+[functions.request-workspace-access]
+verify_jwt = false
+
+[functions.respond-access-request]
+verify_jwt = false
+
+[functions.send-webhook-notification]
+verify_jwt = false
+
+[functions.track-page-view]
+verify_jwt = false
+
+[functions.social-media-post]
+verify_jwt = false
+
+[functions.social-media-sync]
+verify_jwt = false
+
+[functions.generate-certificate-design]
+verify_jwt = false
+
+[functions.generate-idcard-design]
+verify_jwt = false
+
+[functions.generate-idcard-backgrounds]
+verify_jwt = false
+
+[functions.generate-certificate-backgrounds]
+verify_jwt = false
+
+[functions.suggest-tasks]
+verify_jwt = false
+
+[functions.process-automation-rules]
+verify_jwt = false
+
+[functions.process-recurring-tasks]
+verify_jwt = false
+
+[functions.send-registration-confirmation]
+verify_jwt = false
+
+[functions.send-reminder-emails]
+verify_jwt = false
+
+[functions.validate-ticket-purchase]
+verify_jwt = false
+
+[functions.create-ticket-checkout]
+verify_jwt = false
+
+[functions.verify-payment]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.youtube-oauth-connect]
+verify_jwt = false
