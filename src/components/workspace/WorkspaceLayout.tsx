@@ -14,12 +14,12 @@ import { GlobalTimerWidget } from './GlobalTimerWidget';
 const WorkspaceConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> = ({ user, onLogout }) => {
   const { toggleSidebar } = useSidebar();
 
-  const handleServiceChange = useCallback((service: string) => {
-    console.log('Workspace console service change:', service);
+  const handleServiceChange = useCallback((_service: string) => {
+    // Service change handler - can be extended for analytics
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    console.log('Workspace console global search:', query);
+  const handleSearch = useCallback((_query: string) => {
+    // Global search handler - can be extended for workspace-scoped search
   }, []);
 
   return (
