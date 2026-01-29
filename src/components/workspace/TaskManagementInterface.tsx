@@ -445,27 +445,27 @@ export function TaskManagementInterface({
         <TaskDetailView
           task={selectedTask}
           teamMembers={teamMembers}
-          onTaskUpdate={(taskId, updates) => {
-            console.log('Update task:', taskId, updates);
+          onTaskUpdate={(_taskId, _updates) => {
+            // TODO: Implement task update mutation
           }}
           onStatusChange={onTaskStatusChange}
-          onProgressUpdate={(taskId, progress) => {
-            console.log('Update progress:', taskId, progress);
+          onProgressUpdate={(_taskId, _progress) => {
+            // TODO: Implement progress update mutation
           }}
-          onCommentAdd={(taskId, content) => {
-            console.log('Add comment:', taskId, content);
+          onCommentAdd={(_taskId, _content) => {
+            // TODO: Implement comment add mutation
           }}
-          onCommentEdit={(commentId, content) => {
-            console.log('Edit comment:', commentId, content);
+          onCommentEdit={(_commentId, _content) => {
+            // TODO: Implement comment edit mutation
           }}
-          onCommentDelete={(commentId) => {
-            console.log('Delete comment:', commentId);
+          onCommentDelete={(_commentId) => {
+            // TODO: Implement comment delete mutation
           }}
-          onFileUpload={(taskId, files) => {
-            console.log('Upload files:', taskId, files);
+          onFileUpload={(_taskId, _files) => {
+            // TODO: Implement file upload mutation
           }}
-          onFileDelete={(fileId) => {
-            console.log('Delete file:', fileId);
+          onFileDelete={(_fileId) => {
+            // TODO: Implement file delete mutation
           }}
           onClose={handleTaskDetailClose}
         />

@@ -91,8 +91,8 @@ export function ViewRubricsTab({ workspace }: ViewRubricsTabProps) {
         <div className="[&_.bg-card]:bg-card [&_.text-foreground]:text-foreground [&_.text-muted-foreground]:text-muted-foreground [&_.text-foreground]:text-foreground [&_.text-muted-foreground]:text-muted-foreground [&_.border-border]:border-border [&_.border-input]:border-input [&_.bg-muted]:bg-muted [&_.hover\\:bg-muted/50]:hover:bg-muted/50 [&_.focus\\:ring-blue-500]:focus:ring-primary [&_.bg-blue-600]:bg-primary [&_.hover\\:bg-blue-700]:hover:bg-primary/90 [&_.text-blue-600]:text-primary [&_.border-blue-600]:border-primary [&_.hover\\:bg-blue-50]:hover:bg-primary/10 [&_.bg-red-50]:bg-destructive/10 [&_.border-red-200]:border-destructive/30 [&_.text-red-800]:text-destructive [&_.text-red-600]:text-destructive [&_.hover\\:text-red-800]:hover:text-destructive [&_.bg-green-50]:bg-green-500/10 [&_.border-green-200]:border-green-500/30 [&_.text-green-800]:text-green-600 [&_.text-green-600]:text-green-600 [&_input]:bg-background [&_textarea]:bg-background [&_.rounded-lg]:rounded-lg [&_.shadow-md]:shadow-none">
           <RubricManagement 
             eventId={eventId} 
-            onRubricCreated={(rubric) => {
-              console.log('Rubric created/updated:', rubric);
+            onRubricCreated={(_rubric) => {
+              // Rubric created/updated - could trigger a refresh if needed
             }}
           />
         </div>

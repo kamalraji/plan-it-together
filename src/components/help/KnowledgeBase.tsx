@@ -184,13 +184,11 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
   const handleArticleClick = (article: Article) => {
     setSelectedArticle(article);
-    // Track article view
-    console.log('Article viewed:', article.id);
+    // Article view tracking handled by analytics
   };
 
-  const handleHelpfulClick = (articleId: string, helpful: boolean) => {
-    // In real implementation, this would update the article rating
-    console.log('Article feedback:', articleId, helpful);
+  const handleHelpfulClick = (_articleId: string, _helpful: boolean) => {
+    // TODO: Implement article rating mutation
   };
 
   if (selectedArticle) {

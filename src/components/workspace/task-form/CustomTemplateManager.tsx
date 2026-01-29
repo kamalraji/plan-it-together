@@ -121,7 +121,7 @@ export function CustomTemplateManager({
         throw error;
       }
 
-      console.log('Template saved successfully:', data);
+      // Template saved successfully
 
       // Immediately add to local state for instant feedback
       if (data) {

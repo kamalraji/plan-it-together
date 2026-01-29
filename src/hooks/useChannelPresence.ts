@@ -51,11 +51,11 @@ export function useChannelPresence({ channelId, userId, userName }: UseChannelPr
         setOnlineMembers(members);
         setTypingUsers(typing);
       })
-      .on('presence', { event: 'join' }, ({ newPresences }) => {
-        console.log('User joined:', newPresences);
+      .on('presence', { event: 'join' }, ({ newPresences: _newPresences }) => {
+        // User joined - presence state updated automatically
       })
-      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        console.log('User left:', leftPresences);
+      .on('presence', { event: 'leave' }, ({ leftPresences: _leftPresences }) => {
+        // User left - presence state updated automatically
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {

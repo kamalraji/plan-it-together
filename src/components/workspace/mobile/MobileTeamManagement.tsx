@@ -325,8 +325,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => {
-                        // Handle edit role
-                        console.log('Edit role for', member.id);
+                        // TODO: Implement edit role functionality
                       }}
                       className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                     >
@@ -335,8 +334,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                     </button>
                     <button
                       onClick={() => {
-                        // Handle send message
-                        console.log('Send message to', member.id);
+                        // TODO: Implement messaging functionality
                       }}
                       className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                     >

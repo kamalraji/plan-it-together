@@ -19,7 +19,6 @@ export function useAdminSessionTimeout(options: UseAdminSessionTimeoutOptions = 
   const lastActivityRef = useRef<number>(Date.now());
 
   const handleLogout = useCallback(async () => {
-    console.log('Admin session timeout - logging out');
     await supabase.auth.signOut();
     toast.error('Session expired due to inactivity', {
       description: 'Please log in again to continue.',
