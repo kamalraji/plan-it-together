@@ -1,149 +1,380 @@
 
+# Comprehensive Event Management System Analysis & Industrial Best Practice Implementation Plan
 
-# Fix 1030+ RLS Performance Issues
+## Executive Summary
 
-## Problem Summary
-
-Your Supabase database has **1030 performance warnings** caused by RLS policies that call `auth.uid()` and `auth.jwt()` functions directly. This causes the functions to be **re-evaluated for every single row** during queries, which severely impacts performance at scale.
-
-**Scope of the issue:**
-- **253 tables** affected
-- **648+ RLS policies** need optimization
-- All policies use patterns like `auth.uid() = user_id` or `has_role(auth.uid(), ...)`
+This analysis covers all event-related features across the **Thittam1Hub** platform, identifying gaps against industrial standards and providing a prioritized implementation roadmap. The assessment includes 47+ mock data implementations requiring real backend integration, 15+ incomplete workflows, and numerous opportunities for UI/UX, accessibility, security, and performance improvements.
 
 ---
 
-## The Fix
+## 1. Current Architecture Overview
 
-Wrap all `auth.<function>()` calls in a subselect `(select auth.<function>())`. This tells PostgreSQL to evaluate the function **once per query** instead of once per row.
+### 1.1 Event Feature Landscape
 
 ```text
-BEFORE (slow - evaluated per row):
-  auth.uid() = user_id
-  has_role(auth.uid(), 'admin')
+Event Management Hierarchy:
++----------------------------------------------------------+
+|                    EVENT LIFECYCLE                        |
++----------------------------------------------------------+
+|  Create --> Draft --> Published --> Ongoing --> Completed |
+|                        |                                  |
+|              +------------------+                         |
+|              |  ROOT Workspace  |                         |
+|              +------------------+                         |
+|                     |                                     |
+|     +---------------+---------------+                     |
+|     |               |               |                     |
+| Department     Department      Department                 |
+| (Volunteers)   (Operations)   (Growth)                    |
+|     |               |               |                     |
+| Committee      Committee       Committee                  |
+| (Registration) (Logistics)    (Marketing)                 |
+|     |               |               |                     |
+|   Team           Team           Team                      |
++----------------------------------------------------------+
+```
 
-AFTER (fast - evaluated once):
-  (select auth.uid()) = user_id
-  has_role((select auth.uid()), 'admin')
+### 1.2 Core Event Components Identified
+
+| Layer | Component Count | Real Data | Mock Data |
+|-------|-----------------|-----------|-----------|
+| Events Core | 15 components | 80% | 20% |
+| Workspaces | 95+ components | 45% | 55% |
+| Registration | 8 components | 60% | 40% |
+| Committee Tabs | 70+ tabs | 25% | 75% |
+
+---
+
+## 2. Gap Analysis: Industry Standards vs Current Implementation
+
+### 2.1 Mock Data Requiring Real Backend Integration
+
+**Critical (47 files identified with mock data):**
+
+| Component | Location | Priority |
+|-----------|----------|----------|
+| `WaitlistManager` | `registration/` | HIGH |
+| `RegistrationStatsCards` | `registration/` | HIGH |
+| `AttendeeList` | `registration/` | HIGH |
+| `EventScheduleManager` | `workspace/event/` | HIGH |
+| `ScoringRubricManager` | `workspace/judge/` | MEDIUM |
+| `TrainingScheduleTab` | `department/volunteers/` | MEDIUM |
+| `SendBriefTab` | `committee-tabs/` | MEDIUM |
+| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM |
+
+### 2.2 Incomplete Workflow Assignments
+
+| Workspace Type | Missing Workflows |
+|----------------|-------------------|
+| ROOT | Event-wide analytics aggregation, Cross-department approval routing |
+| Department | Budget rollup from committees, Resource conflict detection |
+| Committee | Real-time task sync, Member availability tracking |
+| Team | Time logging integration, Skill-based task matching |
+
+### 2.3 Pending Implementation Items (from IMPLEMENTATION_CHECKLIST.md)
+
+- [ ] Template selection during event creation
+- [ ] Post-event template feedback
+- [ ] Mobile navigation polish (5 items)
+- [ ] Mobile task and team flows (4 items)
+- [ ] Mobile communication utilities (3 items)
+
+---
+
+## 3. Technical Implementation Requirements
+
+### 3.1 Query & Data Layer
+
+**Current Issues:**
+- 358+ `console.log` statements in production components
+- Inconsistent query key patterns across hooks
+- Missing optimistic updates in 60%+ of mutations
+
+**Industrial Standards to Implement:**
+
+```text
+Query Architecture Improvements:
++----------------------------------+
+|   Query Layer Best Practices     |
++----------------------------------+
+| - Consistent query key factories |
+| - Optimistic updates everywhere  |
+| - Stale-while-revalidate pattern |
+| - Request deduplication          |
+| - Prefetching on hover           |
+| - Infinite scroll pagination     |
++----------------------------------+
+```
+
+### 3.2 Security Analysis Required
+
+**Areas needing RLS policy review:**
+- Event access controls (owner/org member)
+- Workspace team member permissions
+- Cross-workspace resource sharing
+- Publish approval workflow
+
+**Recommended security enhancements:**
+- Rate limiting on public endpoints
+- Input sanitization (DOMPurify already present)
+- CSRF protection on mutations
+- Session timeout handling (hook exists but partial)
+
+### 3.3 Accessibility Gaps
+
+**Current state:** 44 files have some ARIA attributes
+**Missing implementations:**
+- Focus management on modal dialogs
+- Skip navigation links
+- Live region announcements
+- Keyboard navigation in Kanban boards
+- Color contrast validation in dynamic themes
+
+---
+
+## 4. Prioritized Implementation Roadmap
+
+### Phase 1: Critical Data Integration (Week 1-2)
+
+#### 4.1.1 Registration System Real Data
+
+**Files to update:**
+- `src/components/workspace/registration/WaitlistManager.tsx`
+- `src/components/workspace/registration/RegistrationStatsCards.tsx`
+- `src/components/workspace/registration/AttendeeList.tsx`
+
+**Implementation:**
+- Create `useRegistrationData` hook with real Supabase queries
+- Wire waitlist to `registrations` table with `status = 'WAITLISTED'`
+- Implement real-time subscription for live check-in counts
+
+#### 4.1.2 Event Schedule Real Data
+
+**Files to update:**
+- `src/components/workspace/event/EventScheduleManager.tsx`
+- `src/components/workspace/event/EventTimeline.tsx`
+
+**Implementation:**
+- Query `event_sessions` or `event_agenda_items` table
+- Add CRUD operations with optimistic updates
+- Implement drag-and-drop reordering
+
+### Phase 2: Workflow Completion (Week 3-4)
+
+#### 4.2.1 Committee Tab Real Functions
+
+**High-priority tabs (currently console.log only):**
+
+| Tab | Current State | Required Implementation |
+|-----|---------------|------------------------|
+| `SendBriefTab` | Logs to console | Email integration via Supabase Edge Function |
+| `AssignShiftsTab` | Mock volunteer list | Connect to `volunteer_shifts` table |
+| `ViewBudgetTab` | Static display | Link to `workspace_budgets` table |
+| `ExportListTab` | No export | Generate CSV/PDF via edge function |
+
+#### 4.2.2 Cross-Workspace Approval Routing
+
+**Current gap:** Approvals don't propagate up hierarchy
+**Solution:** 
+- Implement `useApprovalWorkflow` hook
+- Add approval escalation based on workspace type
+- Create notification triggers on status changes
+
+### Phase 3: UI/UX Enhancement (Week 5-6)
+
+#### 4.3.1 Responsive Design Improvements
+
+**Mobile-first fixes needed:**
+- `MobileWorkspaceDashboard` - Tab navigation inconsistent
+- `TaskKanbanBoard` - Not touch-optimized
+- `TeamMemberRoster` - Horizontal overflow on mobile
+
+**Implementation approach:**
+- Audit all components for `md:` breakpoint usage
+- Add swipe gestures for Kanban columns
+- Implement collapsible sections for mobile
+
+#### 4.3.2 Loading States & Skeletons
+
+**Missing loading states in:**
+- Committee dashboard sections
+- Department tab content
+- Event settings forms
+
+**Standard:** Implement skeleton components matching content layout
+
+### Phase 4: Security & Performance (Week 7-8)
+
+#### 4.4.1 Security Hardening
+
+| Issue | Solution | Priority |
+|-------|----------|----------|
+| RLS gaps | Audit all tables with `get_table_schema` | HIGH |
+| Console logging | Remove 358+ debug statements | MEDIUM |
+| Error exposure | Sanitize error messages shown to users | MEDIUM |
+| Session handling | Complete `useAdminSessionTimeout` integration | LOW |
+
+#### 4.4.2 Performance Optimization
+
+**Query optimization:**
+- Implement column selection using `supabase-columns.ts` consistently
+- Add pagination to all list queries (currently missing in 15+ hooks)
+- Enable request deduplication in React Query config
+
+**Bundle optimization:**
+- Lazy load all committee tab components (partially done)
+- Split workspace dashboard by workspace type
+- Preload critical paths on hover
+
+---
+
+## 5. Settings Integration Requirements
+
+### 5.1 Settings That Should Reflect App-wide
+
+| Setting Location | Affected Areas |
+|------------------|----------------|
+| Event branding colors | Landing page, registration, certificates |
+| Workspace publish requirements | All child workspace dashboards |
+| Organization timezone | All date displays, scheduling |
+| Accessibility preferences | All UI components |
+
+**Implementation:**
+- Create `useGlobalSettings` context
+- Propagate settings via React Context
+- Add settings sync to offline storage
+
+### 5.2 Missing Settings Panels
+
+- Event analytics display preferences
+- Notification aggregation rules
+- Export format defaults
+- API rate limit configuration
+
+---
+
+## 6. Code Quality Improvements
+
+### 6.1 Console.log Removal
+
+**Locations requiring cleanup (26 files, 358 instances):**
+- `WorkspaceLayout.tsx` - Service change logging
+- `TaskManagementInterface.tsx` - 8 instances
+- `EventListPage.tsx` - Delete action logging
+- `WorkspaceListPage.tsx` - Bulk action logging
+
+**Action:** Replace with proper logging service or remove
+
+### 6.2 Type Safety Improvements
+
+**Issues identified:**
+- `any` types in event branding JSONB parsing
+- Loose type assertions in workspace settings
+- Missing null checks in optional chaining
+
+### 6.3 Error Handling Standardization
+
+**Current state:** Mixed toast.error, console.error, and silent failures
+**Standard:** Implement ErrorBoundary with Sentry integration at route level
+
+---
+
+## 7. Industrial Best Practice Checklist
+
+### 7.1 URL & Navigation
+
+- [x] Consistent route structure (org-scoped)
+- [x] Breadcrumb navigation
+- [ ] Deep linking to workspace sections (partial - sectionid param exists)
+- [ ] URL state management for filters
+- [ ] Back button handling in modals
+
+### 7.2 Optimistic Updates
+
+- [x] `useOptimisticMutation` helper exists
+- [ ] Applied to task operations (partial)
+- [ ] Applied to team management
+- [ ] Applied to workspace settings
+- [ ] Applied to event publishing
+
+### 7.3 Accessibility (WCAG 2.1 AA)
+
+- [x] ARIA labels on interactive elements (44 files)
+- [ ] Focus trap in modals (partial)
+- [ ] Keyboard navigation in complex widgets
+- [ ] Screen reader announcements for state changes
+- [ ] Reduced motion support (CSS exists, not fully applied)
+
+### 7.4 Responsive Design
+
+- [x] Mobile components exist
+- [ ] Consistent breakpoint usage
+- [ ] Touch target sizing (44px minimum)
+- [ ] Swipe gesture support
+- [ ] Orientation change handling
+
+---
+
+## 8. Recommended Tech Stack Additions
+
+| Need | Recommended Solution |
+|------|---------------------|
+| Form validation feedback | Already using zod - standardize error display |
+| Real-time sync | Supabase realtime channels (partial implementation) |
+| Offline support | Service worker with `useOffline` hook |
+| Analytics | Existing Sentry, add custom event tracking |
+| Testing | Add Playwright for E2E flows |
+
+---
+
+## 9. Implementation Priority Matrix
+
+```text
+                    IMPACT
+                    HIGH
+        +---------------------------+
+        |  Phase 1    |   Phase 2   |
+URGENT  | Registration|   Workflow  |
+        | Real Data   |   Completion|
+        +-------------+-------------+
+        |  Phase 4    |   Phase 3   |
+NORMAL  | Security &  |   UI/UX     |
+        | Performance |   Polish    |
+        +---------------------------+
+                    LOW
 ```
 
 ---
 
-## Solution Approach
+## 10. Success Metrics
 
-Due to the large number of policies (1030+), I will create an **automated migration** that:
-
-1. Queries all affected policies from the database
-2. Generates `DROP POLICY` + `CREATE POLICY` statements with the fixed syntax
-3. Applies changes in batches to avoid timeout issues
-
----
-
-## Implementation Plan
-
-### Phase 1: Create Automated Fix Migration
-
-A single SQL migration that:
-
-1. **Drops all affected policies** (policies using `auth.uid()` without the `select` wrapper)
-2. **Recreates them** with optimized syntax: `(select auth.uid())` instead of `auth.uid()`
-
-The migration will use a **DO block with dynamic SQL** to:
-- Query `pg_policies` for all affected policies
-- Extract the policy definition (table, name, command, roles, USING clause, WITH CHECK clause)
-- Generate and execute the fixed policy statements
-
-### Phase 2: Verification
-
-After the migration:
-- Re-run the Supabase linter to confirm 0 performance warnings
-- Test critical queries to ensure RLS still works correctly
+| Metric | Current | Target |
+|--------|---------|--------|
+| Mock data files | 47 | 0 |
+| Console.log statements | 358 | 0 |
+| ARIA coverage | 44 files | 100% |
+| Optimistic update coverage | 40% | 95% |
+| Mobile usability score | Unknown | 90+ |
+| Lighthouse performance | Unknown | 85+ |
 
 ---
 
-## Technical Details
+## Technical Implementation Notes
 
-### Migration Strategy
+### Database Tables Referenced
 
-```text
-DO $$
-DECLARE
-  policy_rec RECORD;
-  fixed_qual TEXT;
-  fixed_with_check TEXT;
-BEGIN
-  FOR policy_rec IN 
-    SELECT tablename, policyname, cmd, roles, qual, with_check
-    FROM pg_policies 
-    WHERE schemaname = 'public'
-      AND (qual::text LIKE '%auth.uid()%' OR with_check::text LIKE '%auth.uid()%')
-  LOOP
-    -- Drop old policy
-    EXECUTE 'DROP POLICY IF EXISTS "' || policy_rec.policyname || '" ON public.' || policy_rec.tablename;
-    
-    -- Fix the expressions by wrapping auth.uid() in (select ...)
-    fixed_qual := REPLACE(policy_rec.qual::text, 'auth.uid()', '(select auth.uid())');
-    fixed_with_check := REPLACE(policy_rec.with_check::text, 'auth.uid()', '(select auth.uid())');
-    
-    -- Recreate policy with fixed expressions
-    -- ... dynamic CREATE POLICY statement
-  END LOOP;
-END $$;
-```
+The Supabase types file shows 18,500+ lines indicating a comprehensive schema including:
+- `events`, `event_venues`, `event_virtual_links`, `event_images`, `event_faqs`
+- `workspaces`, `workspace_team_members`, `workspace_tasks`
+- `registrations`, `attendance_records`
+- `ticket_tiers`, `promo_codes`
+- `organizations`, `organization_memberships`
 
-### Key Patterns to Fix
+### Existing Infrastructure to Leverage
 
-| Count | Pattern | Fix |
-|-------|---------|-----|
-| 225 | `column = auth.uid()` | `column = (select auth.uid())` |
-| 162 | `auth.uid() = column` | `(select auth.uid()) = column` |
-| 54 | `has_role(auth.uid(), ...)` | `has_role((select auth.uid()), ...)` |
-| 47 | Other patterns | Apply same wrapping logic |
+- **Query configuration:** `src/lib/query-config.ts` - Well-structured presets
+- **Optimistic mutations:** `src/hooks/useOptimisticMutation.ts` - Ready to use
+- **Event normalization:** `src/utils/event-compat.ts` - Handles legacy data
+- **Column selection:** `src/lib/supabase-columns.ts` - Prevents over-fetching
 
-### Tables with Most Policies to Fix
-
-| Table | Policies |
-|-------|----------|
-| stream_viewer_sessions | 10 |
-| event_live_streams | 7 |
-| registrations | 7 |
-| notifications | 6 |
-| profile_visibility_settings | 6 |
-| user_roles | 6 |
-| + 247 more tables... | |
-
----
-
-## Risk Mitigation
-
-1. **Transaction Safety**: All changes run in a single transaction - if any policy fails, everything rolls back
-2. **No Data Loss**: Only RLS policies are modified, not table data
-3. **Reversible**: Original policies can be restored from migration history
-4. **Testing**: Verify RLS still works after migration by testing authenticated queries
-
----
-
-## Expected Outcome
-
-| Before | After |
-|--------|-------|
-| 1030 performance warnings | 0 warnings |
-| ~253 affected tables | All optimized |
-| Slow queries at scale | 10-100x faster RLS evaluation |
-
----
-
-## Files to Create/Modify
-
-| File | Purpose |
-|------|---------|
-| `supabase/migrations/[timestamp]_fix_rls_performance.sql` | Automated policy fix migration |
-
----
-
-## Post-Migration Steps
-
-1. Re-run Supabase linter to verify 0 performance issues
-2. Test authentication flows to ensure RLS still works
-3. Monitor query performance in production
-
+This plan provides a comprehensive roadmap to transform the current implementation into an industrial-grade event management platform with proper data integration, security, accessibility, and performance optimizations.
