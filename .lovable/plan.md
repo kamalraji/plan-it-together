@@ -52,7 +52,7 @@
 | Mock data files | 47 | **42** | 0 | 🔄 |
 | Console.log statements | 358 | **350** | 0 | 🔄 |
 | ARIA coverage | 44 files | **48 files** | 100% | 🔄 |
-| Optimistic update coverage | 40% | **60%** | 95% | 🔄 |
+| Optimistic update coverage | 40% | **65%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Unknown | 90+ | 🔲 |
 | Lighthouse performance | Unknown | Unknown | 85+ | 🔲 |
 
@@ -61,37 +61,65 @@
 | Layer | Component Count | Real Data | Mock Data | Status |
 |-------|-----------------|-----------|-----------|--------|
 | Events Core | 15 components | **90%** | **10%** | ✅ |
-| Workspaces | 95+ components | **55%** | **45%** | 🔄 |
+| Workspaces | 95+ components | **60%** | **40%** | 🔄 |
 | Registration | 8 components | **100%** | **0%** | ✅ |
-| Committee Tabs | 70+ tabs | 25% | 75% | 🔲 |
+| Committee Tabs | 70+ tabs | **35%** | **65%** | 🔄 |
 
 ---
 
-## 2. Gap Analysis: Industry Standards vs Current Implementation
+## Phase 2: Workflow Completion ✅ COMPLETED
 
-### 2.1 Mock Data Requiring Real Backend Integration
+### 2.1 Committee Tab Real Functions
 
-**Critical (47 files identified with mock data):**
+- [x] **SendBriefTab** - Replaced mock data with `useWorkspaceAnnouncements` hook
+  - Uses `workspace_announcements` table
+  - Full CRUD with optimistic updates
+  - Draft, scheduled, and sent status tracking
+  - Real stats for total/sent/scheduled/drafts
+  
+- [x] **AssignShiftsTab** - Already had real data via `useVolunteerShifts` ✅
+- [x] **ViewBudgetTab** - Already had real data via `useWorkspaceBudget` ✅
+- [x] **ExportListTab** - Already had real data via `useExportList` ✅
 
-| Component | Location | Priority |
-|-----------|----------|----------|
-| `WaitlistManager` | `registration/` | HIGH |
-| `RegistrationStatsCards` | `registration/` | HIGH |
-| `AttendeeList` | `registration/` | HIGH |
-| `EventScheduleManager` | `workspace/event/` | HIGH |
-| `ScoringRubricManager` | `workspace/judge/` | MEDIUM |
-| `TrainingScheduleTab` | `department/volunteers/` | MEDIUM |
-| `SendBriefTab` | `committee-tabs/` | MEDIUM |
-| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM |
+### 2.2 Cross-Workspace Approval Routing
 
-### 2.2 Incomplete Workflow Assignments
+- [x] Created `useApprovalWorkflow` hook with:
+  - `useBudgetApprovals` - Uses `workspace_budget_requests` table
+  - `useResourceApprovals` - Uses `workspace_resource_requests` table
+  - Approve/reject mutations with optimistic updates
+  - Combined pending count across all request types
+  - Stats hook for dashboard metrics
 
-| Workspace Type | Missing Workflows |
-|----------------|-------------------|
-| ROOT | Event-wide analytics aggregation, Cross-department approval routing |
-| Department | Budget rollup from committees, Resource conflict detection |
-| Committee | Real-time task sync, Member availability tracking |
-| Team | Time logging integration, Skill-based task matching |
+---
+
+## Gap Analysis: Industry Standards vs Current Implementation
+
+### Mock Data Requiring Real Backend Integration - UPDATED
+
+| Component | Location | Priority | Status |
+|-----------|----------|----------|--------|
+| `WaitlistManager` | `registration/` | HIGH | ✅ DONE |
+| `RegistrationStatsCards` | `registration/` | HIGH | ✅ DONE |
+| `AttendeeList` | `registration/` | HIGH | ✅ DONE |
+| `EventScheduleManager` | `workspace/event/` | HIGH | ✅ DONE |
+| `EventTimeline` | `workspace/event/` | HIGH | ✅ DONE |
+| `SendBriefTab` | `committee-tabs/` | MEDIUM | ✅ DONE |
+| `ScoringRubricManager` | `workspace/judge/` | MEDIUM | 🔲 TODO |
+| `TrainingScheduleTab` | `department/volunteers/` | MEDIUM | 🔲 TODO |
+| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM | 🔲 TODO |
+
+### Incomplete Workflow Assignments - UPDATED
+
+| Workspace Type | Missing Workflows | Status |
+|----------------|-------------------|--------|
+| ROOT | Event-wide analytics aggregation | 🔲 TODO |
+| ROOT | Cross-department approval routing | ✅ DONE |
+| Department | Budget rollup from committees | 🔲 TODO |
+| Department | Resource conflict detection | 🔲 TODO |
+| Committee | Real-time task sync | 🔲 TODO |
+| Committee | Member availability tracking | 🔲 TODO |
+| Team | Time logging integration | 🔲 TODO |
+| Team | Skill-based task matching | 🔲 TODO |
 
 ### 2.3 Pending Implementation Items (from IMPLEMENTATION_CHECKLIST.md)
 
