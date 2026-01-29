@@ -4,38 +4,19 @@ import { BookOpen, Calendar, Clock, Users, Plus, Video, MapPin } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useTrainingSessions, TrainingSession } from '@/hooks/useTrainingSessions';
+import { SkeletonStatsGrid, SkeletonCard } from '@/components/ui/skeleton-patterns';
 
 interface TrainingScheduleTabProps {
   workspace: Workspace;
 }
 
-interface TrainingSession {
-  id: string;
-  title: string;
-  type: 'in-person' | 'virtual' | 'self-paced';
-  date: string;
-  time: string;
-  duration: string;
-  location?: string;
-  instructor: string;
-  enrolled: number;
-  capacity: number;
-  status: 'upcoming' | 'in-progress' | 'completed';
-}
+export function TrainingScheduleTab({ workspace }: TrainingScheduleTabProps) {
+  const { sessions, isLoading, stats } = useTrainingSessions(workspace.id);
 
-const mockSessions: TrainingSession[] = [
-  { id: '1', title: 'Volunteer Orientation', type: 'in-person', date: '2024-01-15', time: '09:00 AM', duration: '2 hours', location: 'Main Hall', instructor: 'Sarah Johnson', enrolled: 25, capacity: 30, status: 'upcoming' },
-  { id: '2', title: 'Safety & Emergency Procedures', type: 'virtual', date: '2024-01-16', time: '02:00 PM', duration: '1.5 hours', instructor: 'Mike Chen', enrolled: 40, capacity: 50, status: 'upcoming' },
-  { id: '3', title: 'Customer Service Excellence', type: 'self-paced', date: '2024-01-10', time: 'Anytime', duration: '1 hour', instructor: 'Online Module', enrolled: 35, capacity: 100, status: 'in-progress' },
-  { id: '4', title: 'Event Tech Training', type: 'in-person', date: '2024-01-08', time: '10:00 AM', duration: '3 hours', location: 'Tech Room', instructor: 'David Lee', enrolled: 20, capacity: 20, status: 'completed' },
-];
-
-export function TrainingScheduleTab({ workspace: _workspace }: TrainingScheduleTabProps) {
-  const upcomingSessions = mockSessions.filter(s => s.status === 'upcoming');
-  const inProgressSessions = mockSessions.filter(s => s.status === 'in-progress');
-  const completedSessions = mockSessions.filter(s => s.status === 'completed');
-
-  const totalEnrolled = mockSessions.reduce((acc, s) => acc + s.enrolled, 0);
+  const upcomingSessions = sessions.filter(s => s.status === 'upcoming');
+  const inProgressSessions = sessions.filter(s => s.status === 'in-progress');
+  const completedSessions = sessions.filter(s => s.status === 'completed');
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -52,6 +33,26 @@ export function TrainingScheduleTab({ workspace: _workspace }: TrainingScheduleT
       default: return 'border-purple-500/30 text-purple-600';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <BookOpen className="h-6 w-6 text-rose-500" />
+              Training Schedule
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Manage volunteer training sessions
+            </p>
+          </div>
+        </div>
+        <SkeletonStatsGrid count={4} />
+        <SkeletonCard />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -76,29 +77,46 @@ export function TrainingScheduleTab({ workspace: _workspace }: TrainingScheduleT
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-rose-500/10 to-rose-600/5 border-rose-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-rose-600">{mockSessions.length}</div>
+            <div className="text-2xl font-bold text-rose-600">{stats.totalSessions}</div>
             <div className="text-xs text-muted-foreground">Total Sessions</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{upcomingSessions.length}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.upcomingSessions}</div>
             <div className="text-xs text-muted-foreground">Upcoming</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{totalEnrolled}</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.totalEnrolled}</div>
             <div className="text-xs text-muted-foreground">Total Enrolled</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{completedSessions.length}</div>
+            <div className="text-2xl font-bold text-purple-600">{stats.completedSessions}</div>
             <div className="text-xs text-muted-foreground">Completed</div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Empty State */}
+      {sessions.length === 0 && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No training sessions</h3>
+            <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm">
+              Schedule training sessions for your volunteers to help them prepare for the event.
+            </p>
+            <Button className="bg-rose-500 hover:bg-rose-600 text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Schedule First Training
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Upcoming Sessions */}
       {upcomingSessions.length > 0 && (
@@ -160,10 +178,17 @@ function SessionCard({
   getTypeIcon: (type: string) => React.ReactNode;
   getTypeBadge: (type: string) => string;
 }) {
-  const enrollmentPercent = (session.enrolled / session.capacity) * 100;
+  const enrollmentPercent = session.capacity > 0 
+    ? (session.enrolled / session.capacity) * 100 
+    : 0;
+  const spotsLeft = Math.max(0, session.capacity - session.enrolled);
 
   return (
-    <div className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+    <div 
+      className="p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+      role="listitem"
+      aria-label={`Training: ${session.title}`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -200,7 +225,7 @@ function SessionCard({
           </div>
           <Progress value={enrollmentPercent} className="h-1.5" />
           <p className="text-xs text-muted-foreground mt-1">
-            {session.capacity - session.enrolled} spots left
+            {spotsLeft} spots left
           </p>
         </div>
       </div>

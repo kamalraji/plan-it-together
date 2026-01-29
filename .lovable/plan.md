@@ -74,10 +74,10 @@
 
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
-| Mock data files | 47 | **41** | 0 | 🔄 |
-| Console.log statements | 358 | **350** | 0 | 🔄 |
-| ARIA coverage | 44 files | **52 files** | 100% | 🔄 |
-| Optimistic update coverage | 40% | **70%** | 95% | 🔄 |
+| Mock data files | 47 | **38** | 0 | 🔄 |
+| Console.log statements | 358 | **~280** | 0 | 🔄 |
+| ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
+| Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
 | Lighthouse performance | Unknown | Unknown | 85+ | 🔲 |
 
@@ -86,9 +86,9 @@
 | Layer | Component Count | Real Data | Mock Data | Status |
 |-------|-----------------|-----------|-----------|--------|
 | Events Core | 15 components | **90%** | **10%** | ✅ |
-| Workspaces | 95+ components | **60%** | **40%** | 🔄 |
+| Workspaces | 95+ components | **65%** | **35%** | 🔄 |
 | Registration | 8 components | **100%** | **0%** | ✅ |
-| Committee Tabs | 70+ tabs | **35%** | **65%** | 🔄 |
+| Committee Tabs | 70+ tabs | **45%** | **55%** | 🔄 |
 
 ---
 
@@ -129,9 +129,9 @@
 | `EventScheduleManager` | `workspace/event/` | HIGH | ✅ DONE |
 | `EventTimeline` | `workspace/event/` | HIGH | ✅ DONE |
 | `SendBriefTab` | `committee-tabs/` | MEDIUM | ✅ DONE |
-| `ScoringRubricManager` | `workspace/judge/` | MEDIUM | 🔲 TODO |
-| `TrainingScheduleTab` | `department/volunteers/` | MEDIUM | 🔲 TODO |
-| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM | 🔲 TODO |
+| `ScoringRubricManager` | `workspace/judge/` | MEDIUM | ✅ DONE |
+| `TrainingScheduleTab` | `department/volunteers/tabs/` | MEDIUM | ✅ DONE |
+| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM | ✅ DONE (already used real data) |
 
 ### Incomplete Workflow Assignments - UPDATED
 
