@@ -35,8 +35,7 @@ export function WorkspaceTemplateManagement({
         setLoading(true);
         await api.post(`/api/workspace-templates/${template.id}/apply/${workspaceId}`);
         onTemplateApplied?.(template);
-      } catch (error) {
-        console.error('Error applying template:', error);
+      } catch {
         setError('Failed to apply template');
       } finally {
         setLoading(false);
@@ -73,8 +72,7 @@ export function WorkspaceTemplateManagement({
 
         setShowPreview(false);
         onTemplateApplied?.(template);
-      } catch (error) {
-        console.error('Error applying template:', error);
+      } catch {
         setError('Failed to apply template');
       } finally {
         setLoading(false);

@@ -47,7 +47,6 @@ export const OrgTestimonialsManager: React.FC = () => {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Failed to load testimonials', error);
       toast({
         title: 'Error loading testimonials',
         description: 'Please try again in a moment.',
@@ -104,7 +103,6 @@ export const OrgTestimonialsManager: React.FC = () => {
         .eq('id', editingId);
 
       if (error) {
-        console.error('Failed to update testimonial', error);
         toast({
           title: 'Error updating testimonial',
           description: 'Please try again.',
@@ -123,7 +121,6 @@ export const OrgTestimonialsManager: React.FC = () => {
         .insert({ ...payload, position: maxPosition + 1 });
 
       if (error) {
-        console.error('Failed to create testimonial', error);
         toast({
           title: 'Error creating testimonial',
           description: 'Please try again.',
@@ -164,7 +161,6 @@ export const OrgTestimonialsManager: React.FC = () => {
       .eq('id', id);
 
     if (error) {
-      console.error('Failed to delete testimonial', error);
       toast({
         title: 'Error deleting testimonial',
         description: 'Please try again.',
@@ -213,7 +209,6 @@ export const OrgTestimonialsManager: React.FC = () => {
     const results = await Promise.all(updates);
     const hasError = results.some((r) => r.error);
     if (hasError) {
-      console.error('Failed to save testimonial order', results);
       toast({
         title: 'Error saving order',
         description: 'Some items may not be in the correct order.',

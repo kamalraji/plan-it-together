@@ -26,14 +26,12 @@ export function useWebhookNotifications() {
       });
 
       if (error) {
-        console.error('Webhook notification error:', error);
         return { success: false, error };
       }
 
       return { success: true, data };
-    } catch (error) {
-      console.error('Failed to send webhook notification:', error);
-      return { success: false, error };
+    } catch (err) {
+      return { success: false, error: err };
     }
   }, []);
 

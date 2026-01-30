@@ -35,17 +35,7 @@ export function logWorkspaceUrl(entry: Omit<UrlLogEntry, 'timestamp'>): void {
   }
   
   if (URL_DEBUG_ENABLED) {
-    const icon = entry.isValid ? '✅' : '❌';
-    
-    console.log(
-      `${icon} [WorkspaceURL:${entry.component}] ${entry.action.toUpperCase()}`,
-      {
-        url: entry.url,
-        isValid: entry.isValid,
-        ...(entry.context && { context: entry.context }),
-        ...(entry.error && { error: entry.error }),
-      }
-    );
+    // Debug logging disabled in production for zero console output
   }
 }
 
@@ -679,5 +669,5 @@ if (typeof window !== 'undefined' && (import.meta.env.DEV || localStorage.getIte
     isHierarchical: isHierarchicalWorkspaceUrl,
   };
   
-  console.log('[WorkspaceURL] Debug utilities available at window.__workspaceUrlDebug');
+  // Debug utilities registered at window.__workspaceUrlDebug
 }

@@ -38,7 +38,6 @@ export function useMyWorkspaces(eventId?: string) {
       const { data: ownedWorkspaces, error: ownedError } = await ownedQuery;
 
       if (ownedError) {
-        console.error('Error fetching owned workspaces:', ownedError);
         throw ownedError;
       }
 
@@ -58,7 +57,6 @@ export function useMyWorkspaces(eventId?: string) {
       const { data: memberWorkspaces, error: memberError } = await memberQuery;
 
       if (memberError) {
-        console.error('Error fetching member workspaces:', memberError);
         throw memberError;
       }
 

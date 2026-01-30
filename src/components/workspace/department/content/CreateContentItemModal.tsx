@@ -87,8 +87,7 @@ export function CreateContentItemModal({ open, onOpenChange, workspaceId }: Crea
         dueDate: '',
         contentUrl: '',
       });
-    } catch (error) {
-      console.error('Error creating content item:', error);
+    } catch {
       toast.error('Failed to create content item');
     } finally {
       setIsSubmitting(false);

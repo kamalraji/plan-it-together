@@ -40,8 +40,8 @@ export default function FollowedOrganizations({ className = '' }: FollowedOrgani
     if (confirmed) {
       try {
         await unfollowMutation.mutateAsync(organizationId);
-      } catch (error) {
-        console.error('Failed to unfollow organization:', error);
+      } catch {
+        // Error handled by mutation
       }
     }
   };

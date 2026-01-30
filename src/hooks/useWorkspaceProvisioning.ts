@@ -180,7 +180,6 @@ export function useWorkspaceProvisioning() {
           .single();
 
         if (deptError) {
-          console.error('Failed to create department:', deptError);
           continue;
         }
 
@@ -213,7 +212,6 @@ export function useWorkspaceProvisioning() {
             .single();
 
           if (committeeError) {
-            console.error('Failed to create committee:', committeeError);
             continue;
           }
 
@@ -392,7 +390,6 @@ export function useWorkspaceProvisioning() {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
     },
     onError: (error) => {
-      console.error('Failed to provision workspace:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to create workspace');
     },
   });

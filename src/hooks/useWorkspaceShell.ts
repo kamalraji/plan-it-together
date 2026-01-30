@@ -428,7 +428,6 @@ export function useWorkspaceShell({
     }
     
     // Fallback - redirect to org dashboard if hierarchical URL cannot be built
-    console.warn('[WorkspaceShell] Cannot build workspace URL, redirecting to org dashboard');
     if (orgSlug) {
       navigate(`/${orgSlug}/dashboard`);
     } else {

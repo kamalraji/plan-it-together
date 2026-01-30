@@ -43,8 +43,7 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
         name: `${response.data.name} Template`,
         description: `Template based on successful workspace: ${response.data.name}`
       }));
-    } catch (error) {
-      console.error('Error fetching workspace data:', error);
+    } catch {
       setError('Failed to load workspace data');
     }
   };
@@ -82,7 +81,6 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
       const response = await api.post(`/api/workspace-templates/from-workspace/${workspaceId}`, formData);
       onTemplateCreated(response.data);
     } catch (error: any) {
-      console.error('Error creating template:', error);
       setError(error.response?.data?.message || 'Failed to create template');
     } finally {
       setLoading(false);

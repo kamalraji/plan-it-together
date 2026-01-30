@@ -259,16 +259,16 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
     if (recent) {
       try {
         setRecentSearches(JSON.parse(recent));
-      } catch (error) {
-        console.error('Failed to load recent searches:', error);
+      } catch {
+        // Ignore invalid JSON
       }
     }
     
     if (saved) {
       try {
         setSavedSearches(JSON.parse(saved));
-      } catch (error) {
-        console.error('Failed to load saved searches:', error);
+      } catch {
+        // Ignore invalid JSON
       }
     }
   }, []);
@@ -288,8 +288,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
       setTotal(response.total);
       setSuggestions(response.suggestions);
       setFilters(response.filters);
-    } catch (error) {
-      console.error('Search failed:', error);
+    } catch {
       setResults([]);
       setTotal(0);
     } finally {

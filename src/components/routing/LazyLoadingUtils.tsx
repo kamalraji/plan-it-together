@@ -35,7 +35,6 @@ export class RetryableErrorBoundary extends React.Component<
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('RetryableErrorBoundary caught an error:', error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -150,7 +149,7 @@ export const createLazyComponent = <P extends object>(
 
   // Preload the component if requested
   if (options.preload) {
-    importFn().catch(console.error);
+    importFn().catch(() => { /* silent fail */ });
   }
 
   return LazyComponent;
@@ -208,11 +207,11 @@ export const preloadRoute = (importFn: () => Promise<any>) => {
     // Use requestIdleCallback if available, otherwise setTimeout
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(() => {
-        importFn().catch(console.error);
+        importFn().catch(() => { /* silent fail */ });
       });
     } else {
       setTimeout(() => {
-        importFn().catch(console.error);
+        importFn().catch(() => { /* silent fail */ });
       }, 100);
     }
   }

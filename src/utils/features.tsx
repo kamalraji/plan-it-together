@@ -39,8 +39,8 @@ export async function fetchEnabledFeatures(): Promise<FeatureFlags> {
       lastFetch = now;
       return cachedFeatures || getDefaultFeatures();
     }
-  } catch (error) {
-    console.warn('Failed to fetch feature flags:', error);
+  } catch {
+    // Feature flags fetch failed - use defaults
   }
 
   // Return empty object if fetch fails

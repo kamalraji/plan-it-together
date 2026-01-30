@@ -124,7 +124,6 @@ export function useWorkspaceChannels(workspaceId: string) {
       .single();
 
     if (error) {
-      console.error('Failed to create default channel:', error);
       return null;
     }
 

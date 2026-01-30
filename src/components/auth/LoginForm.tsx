@@ -104,8 +104,7 @@ export function LoginForm() {
         // Participant or user without org membership
         navigate('/dashboard', { replace: true });
       }
-    } catch (checkError) {
-      console.warn('Failed to determine navigation target', checkError);
+    } catch {
       navigate('/dashboard', { replace: true });
     } finally {
       setIsLoading(false);

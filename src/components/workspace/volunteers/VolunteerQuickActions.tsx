@@ -68,8 +68,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       }
 
       toast.success(`Briefing sent to ${notifications.length} volunteers`);
-    } catch (error) {
-      console.error('Error sending brief:', error);
+    } catch {
       toast.error('Failed to send briefing');
     } finally {
       setLoadingAction(null);
@@ -118,8 +117,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       window.URL.revokeObjectURL(url);
 
       toast.success('Roster exported successfully');
-    } catch (error) {
-      console.error('Error exporting roster:', error);
+    } catch {
       toast.error('Failed to export roster');
     } finally {
       setLoadingAction(null);
@@ -165,8 +163,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       }
 
       toast.success(`Reminder sent to ${notifications.length} volunteers`);
-    } catch (error) {
-      console.error('Error sending reminder:', error);
+    } catch {
       toast.error('Failed to send reminder');
     } finally {
       setLoadingAction(null);

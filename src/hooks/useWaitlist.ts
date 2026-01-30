@@ -99,8 +99,8 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       }));
 
       setWaitlist(entries);
-    } catch (error) {
-      console.error('Error fetching waitlist:', error);
+    } catch {
+      // Silent fail - UI will show empty state
     }
   }, [eventId]);
 
@@ -152,8 +152,8 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
         avgWaitDays: Math.round(avgWaitDays * 10) / 10,
         invitedToday: invitedCount || 0,
       });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
+    } catch {
+      // Silent fail
     }
   }, [eventId]);
 
@@ -198,8 +198,8 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       });
 
       setTicketAvailability(availability);
-    } catch (error) {
-      console.error('Error fetching ticket availability:', error);
+    } catch {
+      // Silent fail
     }
   }, [eventId]);
 
@@ -218,8 +218,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
 
       if (error) throw error;
       await fetchWaitlist();
-    } catch (error) {
-      console.error('Error moving entry up:', error);
+    } catch {
       toast.error('Failed to move entry');
     } finally {
       setIsProcessing(false);
@@ -241,8 +240,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
 
       if (error) throw error;
       await fetchWaitlist();
-    } catch (error) {
-      console.error('Error moving entry down:', error);
+    } catch {
       toast.error('Failed to move entry');
     } finally {
       setIsProcessing(false);
@@ -325,8 +323,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       });
 
       await Promise.all([fetchWaitlist(), fetchStats(), fetchTicketAvailability()]);
-    } catch (error) {
-      console.error('Error promoting entry:', error);
+    } catch {
       toast.error('Failed to promote entry');
     } finally {
       setIsProcessing(false);
@@ -355,8 +352,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       });
 
       await Promise.all([fetchWaitlist(), fetchStats()]);
-    } catch (error) {
-      console.error('Error removing entry:', error);
+    } catch {
       toast.error('Failed to remove entry');
     } finally {
       setIsProcessing(false);
@@ -413,8 +409,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       });
 
       await Promise.all([fetchWaitlist(), fetchStats()]);
-    } catch (error) {
-      console.error('Error sending invites:', error);
+    } catch {
       toast.error('Failed to send invites');
     } finally {
       setIsProcessing(false);
@@ -476,15 +471,14 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
             .eq('id', entryId);
 
           successCount++;
-        } catch (err) {
-          console.error('Error promoting entry:', err);
+        } catch {
+          // Skip this entry
         }
       }
 
       toast.success(`${successCount} attendees promoted!`);
       await Promise.all([fetchWaitlist(), fetchStats(), fetchTicketAvailability()]);
-    } catch (error) {
-      console.error('Error in bulk promote:', error);
+    } catch {
       toast.error('Failed to promote some entries');
     } finally {
       setIsProcessing(false);
@@ -525,8 +519,7 @@ export function useWaitlist({ eventId }: UseWaitlistProps) {
       });
 
       await Promise.all([fetchWaitlist(), fetchStats()]);
-    } catch (error) {
-      console.error('Error adding to waitlist:', error);
+    } catch {
       toast.error('Failed to add to waitlist');
     } finally {
       setIsProcessing(false);

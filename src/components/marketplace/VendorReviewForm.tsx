@@ -90,7 +90,6 @@ export const VendorReviewForm: React.FC<VendorReviewFormProps> = ({
       setOpen(false);
       onSuccess?.();
     } catch (error: any) {
-      console.error('Failed to submit review:', error);
       if (error.code === '23505') {
         toast.error('You have already reviewed this vendor for this event');
       } else {

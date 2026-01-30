@@ -117,8 +117,7 @@ export function TaskManagementInterface({
           .insert(linkedTasks);
 
         if (linkedError) {
-          console.error('Failed to create linked tasks:', linkedError);
-          // Don't throw - main task was created successfully
+          // Linked task creation failed but main task succeeded - continue silently
         }
       }
 

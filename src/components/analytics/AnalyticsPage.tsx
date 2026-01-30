@@ -72,8 +72,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
       const data = await response.json();
       setAnalyticsData(data);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
+    } catch {
+      // Analytics fetch failed - UI will show empty state
     } finally {
       setLoading(false);
     }
@@ -118,8 +118,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export error:', error);
+    } catch {
+      // Export failed silently
     }
   };
 

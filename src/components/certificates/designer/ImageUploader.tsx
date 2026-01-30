@@ -110,8 +110,7 @@ export function ImageUploader({
       onImageSelected(urlData.publicUrl, setAsBackground);
       onOpenChange(false);
       toast.success('Image uploaded successfully');
-    } catch (error) {
-      console.error('Upload error:', error);
+    } catch {
       toast.error('Failed to upload image');
     } finally {
       setIsUploading(false);

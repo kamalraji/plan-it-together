@@ -46,8 +46,7 @@ export const PublicProfilePage: React.FC = () => {
           const profileData = Array.isArray(data) ? data[0] : data;
           setProfile(profileData as PublicProfile);
         }
-      } catch (err) {
-        console.error('Error loading public profile', err);
+      } catch {
         setError('Unexpected error while loading profile.');
       } finally {
         setIsLoading(false);

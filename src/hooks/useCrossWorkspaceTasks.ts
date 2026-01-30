@@ -64,7 +64,6 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
         .order('created_at', { ascending: false });
 
       if (tasksError) {
-        console.error('Error fetching cross-workspace tasks:', tasksError);
         throw tasksError;
       }
 
@@ -78,7 +77,7 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
         .in('id', workspaceIds);
 
       if (wsError) {
-        console.error('Error fetching workspaces:', wsError);
+        // Workspace fetch failed - continue with empty map
       }
 
       // Get assignee profiles
@@ -92,7 +91,7 @@ export function useCrossWorkspaceTasks({ sourceWorkspaceId }: UseCrossWorkspaceT
           .in('id', assigneeIds);
 
         if (profilesError) {
-          console.error('Error fetching profiles:', profilesError);
+          // Profile fetch failed - continue with empty profiles
         } else {
           profiles = profileData || [];
         }

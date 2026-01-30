@@ -184,7 +184,6 @@ export const ProfilePage: React.FC = () => {
         });
 
       if (uploadError) {
-        console.error('Failed to upload avatar:', uploadError.message);
         toast({
           title: 'Upload failed',
           description: 'We could not upload your avatar. Please try again.',
@@ -205,8 +204,7 @@ export const ProfilePage: React.FC = () => {
           description: 'Your profile picture has been updated.',
         });
       }
-    } catch (err) {
-      console.error('Error processing avatar image', err);
+    } catch {
       toast({
         title: 'Something went wrong',
         description: 'We could not process this image. Please try a different one.',

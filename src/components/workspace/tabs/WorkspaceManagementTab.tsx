@@ -84,8 +84,7 @@ export function WorkspaceManagementTab({
       });
 
       refetch();
-    } catch (err) {
-      console.error('Error archiving workspace:', err);
+    } catch {
       toast({
         title: 'Archive Failed',
         description: 'Failed to archive workspace. Please try again.',
@@ -109,8 +108,7 @@ export function WorkspaceManagementTab({
       });
 
       refetch();
-    } catch (err) {
-      console.error('Error deleting workspace:', err);
+    } catch {
       toast({
         title: 'Delete Failed',
         description: 'Failed to delete workspace. Please try again.',

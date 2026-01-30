@@ -122,8 +122,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         setEventData(data);
         setSlug(data.existingSlug || slugify(data.name));
         setLoading(false);
-      } catch (err) {
-        console.error('Failed to load event', err);
+      } catch {
         toast({
           title: 'Failed to load builder',
           description: 'Please refresh the page or try again later.',
@@ -409,8 +408,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
           if (error) throw error;
           toast({ title: 'Landing page saved', description: 'Your event page has been saved successfully.' });
-        } catch (err) {
-          console.error('Failed to save landing page', err);
+        } catch {
           toast({ title: 'Save failed', description: 'We could not save your landing page. Please try again.', variant: 'destructive' });
         } finally {
           setSaving(false);

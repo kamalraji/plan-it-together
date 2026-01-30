@@ -19,13 +19,11 @@ export const useAdminAuditLog = () => {
       });
 
       if (error) {
-        console.error("Audit log error:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true };
-    } catch (err) {
-      console.error("Unexpected audit log error:", err);
+    } catch {
       return { success: false, error: "Failed to create audit log" };
     }
   };

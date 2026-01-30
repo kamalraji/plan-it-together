@@ -41,10 +41,10 @@ export function usePageViewTracking({
         });
 
         if (error) {
-          console.warn('[Analytics] Failed to record page view:', error.message);
+          // Analytics tracking failed - silent fail
         }
-      } catch (err) {
-        console.warn('[Analytics] Page view tracking error:', err);
+      } catch {
+        // Analytics error - silent fail
       }
     };
 

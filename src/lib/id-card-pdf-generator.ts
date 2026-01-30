@@ -421,8 +421,8 @@ export async function generateIDCardsPDF(
           if (options.includeCutMarks) {
             drawCutMarks(pdf, x, y, cardWidth, cardHeight);
           }
-        } catch (error) {
-          console.error(`Failed to render card for ${attendee.full_name}:`, error);
+        } catch {
+          // Skip this card on render failure
         }
         
         cardIndex++;

@@ -88,7 +88,7 @@ export function ChecklistsTabContent({ workspace }: ChecklistsTabContentProps) {
         });
       
       if (error) {
-        console.error('Error creating delegated checklist:', error);
+        // Delegated checklist creation failed - error handled by UI
       }
     } else {
       // Standard creation in current workspace

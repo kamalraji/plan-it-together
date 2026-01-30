@@ -129,8 +129,7 @@ export function useIndustryTemplates(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
       toast.success(`Imported ${tasksImported} tasks from "${template.name}"`);
     },
-    onError: (error) => {
-      console.error('Failed to import template:', error);
+    onError: () => {
       toast.error('Failed to import template');
     },
   });

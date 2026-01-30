@@ -55,8 +55,6 @@ export const JoinOrganizationPage: React.FC = () => {
           (error as any)?.data?.message ||
           'Failed to send join request. Please try again.';
         setJoinError(message);
-        // eslint-disable-next-line no-console
-        console.error('Join organization error', error);
       },
       onSettled: () => setRequestingOrgId(null),
     });
