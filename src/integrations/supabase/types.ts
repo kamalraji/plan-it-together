@@ -53,6 +53,67 @@ export type Database = {
         }
         Relationships: []
       }
+      activity_feed_events: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          event_id: string
+          id: string
+          is_highlighted: boolean
+          metadata: Json | null
+          target_id: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          is_highlighted?: boolean
+          metadata?: Json | null
+          target_id?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          is_highlighted?: boolean
+          metadata?: Json | null
+          target_id?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_feed_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -91,6 +152,124 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      ai_experiment_assignments: {
+        Row: {
+          assigned_at: string | null
+          experiment_id: string
+          id: string
+          user_id: string
+          variant: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          experiment_id: string
+          id?: string
+          user_id: string
+          variant: string
+        }
+        Update: {
+          assigned_at?: string | null
+          experiment_id?: string
+          id?: string
+          user_id?: string
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_experiment_assignments_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "ai_matching_experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_match_feedback: {
+        Row: {
+          created_at: string
+          feedback_reason: string | null
+          feedback_type: string
+          id: string
+          match_category: string | null
+          match_score: number
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_reason?: string | null
+          feedback_type: string
+          id?: string
+          match_category?: string | null
+          match_score: number
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_reason?: string | null
+          feedback_type?: string
+          id?: string
+          match_category?: string | null
+          match_score?: number
+          target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_match_impressions: {
+        Row: {
+          avg_score: number
+          context: string
+          created_at: string | null
+          event_id: string | null
+          experiment_id: string | null
+          id: string
+          match_scores: number[]
+          match_user_ids: string[]
+          processing_time_ms: number | null
+          user_id: string
+          variant: string | null
+          weights_config: Json
+        }
+        Insert: {
+          avg_score: number
+          context: string
+          created_at?: string | null
+          event_id?: string | null
+          experiment_id?: string | null
+          id?: string
+          match_scores: number[]
+          match_user_ids: string[]
+          processing_time_ms?: number | null
+          user_id: string
+          variant?: string | null
+          weights_config: Json
+        }
+        Update: {
+          avg_score?: number
+          context?: string
+          created_at?: string | null
+          event_id?: string | null
+          experiment_id?: string | null
+          id?: string
+          match_scores?: number[]
+          match_user_ids?: string[]
+          processing_time_ms?: number | null
+          user_id?: string
+          variant?: string | null
+          weights_config?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_match_impressions_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "ai_matching_experiments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_match_insights: {
         Row: {
@@ -133,6 +312,174 @@ export type Database = {
           model_version?: string | null
           shared_context?: Json | null
           target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_matching_analytics: {
+        Row: {
+          context: string
+          created_at: string
+          event_type: string
+          id: string
+          match_category: string | null
+          match_score: number | null
+          match_user_id: string | null
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          context?: string
+          created_at?: string
+          event_type: string
+          id?: string
+          match_category?: string | null
+          match_score?: number | null
+          match_user_id?: string | null
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          match_category?: string | null
+          match_score?: number | null
+          match_user_id?: string | null
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_matching_experiments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          ended_at: string | null
+          experiment_type: string
+          id: string
+          name: string
+          results_summary: Json | null
+          started_at: string | null
+          status: string
+          target_audience: string | null
+          target_config: Json | null
+          traffic_allocation: Json
+          updated_at: string | null
+          variants: Json
+          winner_variant: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          experiment_type?: string
+          id?: string
+          name: string
+          results_summary?: Json | null
+          started_at?: string | null
+          status?: string
+          target_audience?: string | null
+          target_config?: Json | null
+          traffic_allocation?: Json
+          updated_at?: string | null
+          variants?: Json
+          winner_variant?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          experiment_type?: string
+          id?: string
+          name?: string
+          results_summary?: Json | null
+          started_at?: string | null
+          status?: string
+          target_audience?: string | null
+          target_config?: Json | null
+          traffic_allocation?: Json
+          updated_at?: string | null
+          variants?: Json
+          winner_variant?: string | null
+        }
+        Relationships: []
+      }
+      ai_matching_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metrics: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metrics?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metrics?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_matching_privacy_settings: {
+        Row: {
+          ai_matching_enabled: boolean | null
+          allow_ai_insights: boolean | null
+          consent_given_at: string | null
+          created_at: string | null
+          hide_from_users: string[] | null
+          id: string
+          include_activity_in_matching: boolean | null
+          include_bio_in_matching: boolean | null
+          include_interests_in_matching: boolean | null
+          include_skills_in_matching: boolean | null
+          last_reviewed_at: string | null
+          only_show_to_mutual_interests: boolean | null
+          show_in_recommendations: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_matching_enabled?: boolean | null
+          allow_ai_insights?: boolean | null
+          consent_given_at?: string | null
+          created_at?: string | null
+          hide_from_users?: string[] | null
+          id?: string
+          include_activity_in_matching?: boolean | null
+          include_bio_in_matching?: boolean | null
+          include_interests_in_matching?: boolean | null
+          include_skills_in_matching?: boolean | null
+          last_reviewed_at?: string | null
+          only_show_to_mutual_interests?: boolean | null
+          show_in_recommendations?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_matching_enabled?: boolean | null
+          allow_ai_insights?: boolean | null
+          consent_given_at?: string | null
+          created_at?: string | null
+          hide_from_users?: string[] | null
+          id?: string
+          include_activity_in_matching?: boolean | null
+          include_bio_in_matching?: boolean | null
+          include_interests_in_matching?: boolean | null
+          include_skills_in_matching?: boolean | null
+          last_reviewed_at?: string | null
+          only_show_to_mutual_interests?: boolean | null
+          show_in_recommendations?: boolean | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -2971,6 +3318,51 @@ export type Database = {
           },
         ]
       }
+      embedding_job_queue: {
+        Row: {
+          attempts: number | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          max_attempts: number | null
+          priority: number | null
+          scheduled_at: string | null
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          priority?: number | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          priority?: number | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_announcements: {
         Row: {
           author_avatar: string | null
@@ -5043,6 +5435,131 @@ export type Database = {
             columns: ["icebreaker_id"]
             isOneToOne: false
             referencedRelation: "event_icebreakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      icebreaker_prompts: {
+        Row: {
+          active_date: string
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          prompt_type: string
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          active_date: string
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          prompt_type?: string
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          active_date?: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          prompt_type?: string
+          question?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "icebreaker_prompts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "icebreaker_prompts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "icebreaker_prompts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      icebreaker_response_likes: {
+        Row: {
+          created_at: string
+          id: string
+          response_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          response_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          response_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "icebreaker_response_likes_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "icebreaker_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      icebreaker_responses: {
+        Row: {
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          likes_count: number
+          prompt_id: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          likes_count?: number
+          prompt_id: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          likes_count?: number
+          prompt_id?: string
+          response?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "icebreaker_responses_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "icebreaker_prompts"
             referencedColumns: ["id"]
           },
         ]
@@ -7567,6 +8084,84 @@ export type Database = {
         }
         Relationships: []
       }
+      route_analytics_events: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          entered_at: string
+          event_type: string
+          exited_at: string | null
+          id: string
+          metadata: Json | null
+          referrer: string | null
+          route_name: string
+          route_params: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number
+          entered_at: string
+          event_type?: string
+          exited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          route_name: string
+          route_params?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          entered_at?: string
+          event_type?: string
+          exited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          route_name?: string
+          route_params?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      route_navigation_patterns: {
+        Row: {
+          created_at: string
+          dwell_time_ms: number
+          from_route: string
+          id: string
+          session_id: string
+          timestamp: string
+          to_route: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dwell_time_ms?: number
+          from_route: string
+          id?: string
+          session_id: string
+          timestamp: string
+          to_route: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dwell_time_ms?: number
+          from_route?: string
+          id?: string
+          session_id?: string
+          timestamp?: string
+          to_route?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       rubrics: {
         Row: {
           created_at: string
@@ -7931,6 +8526,51 @@ export type Database = {
           },
         ]
       }
+      session_feedback: {
+        Row: {
+          content_rating: number | null
+          created_at: string
+          feedback_text: string | null
+          id: string
+          overall_rating: number
+          quick_tags: string[] | null
+          session_id: string
+          show_to_speaker: boolean
+          speaker_rating: number | null
+          updated_at: string
+          user_id: string
+          would_recommend: boolean | null
+        }
+        Insert: {
+          content_rating?: number | null
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          overall_rating: number
+          quick_tags?: string[] | null
+          session_id: string
+          show_to_speaker?: boolean
+          speaker_rating?: number | null
+          updated_at?: string
+          user_id: string
+          would_recommend?: boolean | null
+        }
+        Update: {
+          content_rating?: number | null
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          overall_rating?: number
+          quick_tags?: string[] | null
+          session_id?: string
+          show_to_speaker?: boolean
+          speaker_rating?: number | null
+          updated_at?: string
+          user_id?: string
+          would_recommend?: boolean | null
+        }
+        Relationships: []
+      }
       session_materials: {
         Row: {
           created_at: string
@@ -8110,6 +8750,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      settings_audit_log: {
+        Row: {
+          created_at: string
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          setting_key: string
+          setting_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          setting_key: string
+          setting_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          setting_key?: string
+          setting_type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       skill_endorsements: {
         Row: {
@@ -9747,6 +10417,48 @@ export type Database = {
           key_type?: string
           public_key?: string
           revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_engagement_scores: {
+        Row: {
+          activity_score: number | null
+          created_at: string | null
+          engagement_tier: string | null
+          id: string
+          last_calculated_at: string | null
+          networking_score: number | null
+          overall_engagement_score: number | null
+          profile_completeness_score: number | null
+          responsiveness_score: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_score?: number | null
+          created_at?: string | null
+          engagement_tier?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          networking_score?: number | null
+          overall_engagement_score?: number | null
+          profile_completeness_score?: number | null
+          responsiveness_score?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_score?: number | null
+          created_at?: string | null
+          engagement_tier?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          networking_score?: number | null
+          overall_engagement_score?: number | null
+          profile_completeness_score?: number | null
+          responsiveness_score?: number | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -17517,6 +18229,17 @@ export type Database = {
           },
         ]
       }
+      user_interaction_summary: {
+        Row: {
+          event_count: number | null
+          event_type: string | null
+          last_interaction: string | null
+          target_user_id: string | null
+          user_id: string | null
+          weighted_score: number | null
+        }
+        Relationships: []
+      }
       workspace_members_with_levels: {
         Row: {
           access_level:
@@ -17565,9 +18288,17 @@ export type Database = {
         Args: { created_at: string; half_life_days: number }
         Returns: number
       }
+      calculate_user_engagement_score: {
+        Args: { target_user_id: string }
+        Returns: number
+      }
       can_manage_zone_content: {
         Args: { p_event_id: string }
         Returns: boolean
+      }
+      check_ai_matching_eligibility: {
+        Args: { target_user_id: string }
+        Returns: Json
       }
       check_blocked_status: {
         Args: { target_user_id: string }
@@ -17610,6 +18341,11 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      cleanup_old_embedding_jobs: { Args: never; Returns: number }
+      complete_embedding_job: {
+        Args: { p_error_message?: string; p_job_id: string; p_success: boolean }
+        Returns: undefined
+      }
       count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
       create_chat_group: {
         Args: {
@@ -17640,7 +18376,69 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
+      find_similar_profiles: {
+        Args: { p_event_id?: string; p_limit?: number; p_user_id: string }
+        Returns: {
+          bio_similarity: number
+          interests_similarity: number
+          similarity_score: number
+          skills_similarity: number
+          user_id: string
+        }[]
+      }
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_ai_matches_v2: {
+        Args: {
+          p_context?: string
+          p_event_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_user_id: string
+        }
+        Returns: {
+          avatar_url: string
+          bio: string
+          common_interests: string[]
+          common_skills: string[]
+          context_score: number
+          embedding_similarity: number
+          final_score: number
+          follows_you: boolean
+          freshness_score: number
+          full_name: string
+          has_pending_meeting: boolean
+          headline: string
+          interaction_score: number
+          interests: string[]
+          is_online: boolean
+          is_premium: boolean
+          is_verified: boolean
+          looking_for: string[]
+          match_category: string
+          organization: string
+          profile_overlap_score: number
+          reciprocity_score: number
+          skills: string[]
+          user_id: string
+          you_follow: boolean
+        }[]
+      }
+      get_ai_matching_hourly_stats: {
+        Args: { p_context?: string; p_days?: number }
+        Returns: {
+          avg_match_score: number
+          context: string
+          conversation_starters_used: number
+          errors: number
+          follows: number
+          hour: string
+          matches_expanded: number
+          matches_loaded: number
+          matches_viewed: number
+          total_events: number
+          unique_users: number
+        }[]
+      }
       get_audit_logs_cursor: {
         Args: {
           p_action?: string
@@ -17739,6 +18537,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_embedding_similarities: {
+        Args: { candidate_ids: string[]; query_user_id: string }
+        Returns: {
+          similarity: number
+          user_id: string
+        }[]
+      }
       get_event_registrant_profile: {
         Args: { _event_id: string; _user_id: string }
         Returns: {
@@ -17758,6 +18563,10 @@ export type Database = {
           organization: string
         }[]
       }
+      get_experiment_weights: {
+        Args: { context: string; target_user_id: string }
+        Returns: Json
+      }
       get_follower_count: { Args: { target_user_id: string }; Returns: number }
       get_following_count: { Args: { target_user_id: string }; Returns: number }
       get_high_follow_count_users: {
@@ -17774,6 +18583,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      get_match_explanation: {
+        Args: { p_target_user_id: string; p_user_id: string }
+        Returns: {
+          conversation_starters: string[]
+          explanation: string
+          top_reasons: string[]
+        }[]
       }
       get_org_member_profile: {
         Args: { _organization_id: string; _user_id: string }
@@ -17793,6 +18610,19 @@ export type Database = {
           id: string
           organization: string
         }[]
+      }
+      get_pending_embedding_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          job_id: string
+          priority: number
+          user_id: string
+        }[]
+      }
+      get_privacy_filtered_candidates: {
+        Args: { candidate_ids: string[]; requesting_user_id: string }
+        Returns: string[]
       }
       get_public_event_by_slug: {
         Args: { _event_slug: string; _org_slug: string }
@@ -17997,6 +18827,10 @@ export type Database = {
         }[]
       }
       get_total_unread_count: { Args: never; Returns: number }
+      get_user_experiment_variant: {
+        Args: { experiment_name: string; target_user_id: string }
+        Returns: string
+      }
       get_visible_spark_posts: {
         Args: { p_event_id?: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -18152,6 +18986,16 @@ export type Database = {
         Args: { _event_type: string; _product_ids: string[] }
         Returns: undefined
       }
+      refresh_ai_matching_data: { Args: never; Returns: undefined }
+      refresh_all_engagement_scores: {
+        Args: { batch_size?: number }
+        Returns: {
+          avg_score: number
+          duration_ms: number
+          processed_count: number
+        }[]
+      }
+      refresh_interaction_summary: { Args: never; Returns: undefined }
       reject_organizer_application: {
         Args: { p_application_id: string; p_rejection_reason: string }
         Returns: Json
@@ -18164,6 +19008,7 @@ export type Database = {
         Args: { p_application_id: string; p_info_request: string }
         Returns: Json
       }
+      run_ai_matching_maintenance: { Args: never; Returns: Json }
       search_messages_by_username: {
         Args: { _channel_id: string; _limit?: number; _search_term: string }
         Returns: {
@@ -18191,6 +19036,14 @@ export type Database = {
       update_icebreaker_streak: {
         Args: { p_event_id: string; p_user_id: string }
         Returns: number
+      }
+      update_profile_view_stats: {
+        Args: {
+          p_total_duration_ms: number
+          p_user_id: string
+          p_view_count: number
+        }
+        Returns: undefined
       }
       update_stream_viewer_heartbeat: {
         Args: {
