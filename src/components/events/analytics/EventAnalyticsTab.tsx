@@ -1,6 +1,11 @@
 /**
  * EventAnalyticsTab
  * Industrial-standard event analytics dashboard with charts and metrics
+ * 
+ * Features:
+ * - URL state for date range (deep-linkable)
+ * - Responsive chart heights for mobile
+ * - LiveRegion announcements for accessibility
  */
 
 import React from 'react';
@@ -19,10 +24,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEventRegistrationStats } from '@/hooks/useEventRegistrations';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { queryKeys, queryPresets } from '@/lib/query-config';
+import { queryPresets } from '@/lib/query-config';
+import { eventQueryKeys } from '@/lib/query-keys/events';
+import { useUrlState } from '@/hooks/useUrlState';
+import { LiveRegion, useLiveAnnouncement } from '@/components/accessibility/LiveRegion';
 import { 
   AreaChart, 
   Area, 
@@ -47,12 +56,36 @@ interface EventAnalyticsTabProps {
 // Color palette for charts
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
+// Date range options
+const DATE_RANGES = ['7d', '30d', '90d'] as const;
+type DateRange = typeof DATE_RANGES[number];
+
+const DATE_RANGE_LABELS: Record<DateRange, string> = {
+  '7d': 'Last 7 days',
+  '30d': 'Last 30 days',
+  '90d': 'Last 90 days',
+};
+
+const getDaysForRange = (range: DateRange): number => {
+  switch (range) {
+    case '7d': return 7;
+    case '30d': return 30;
+    case '90d': return 90;
+    default: return 30;
+  }
+};
+
 export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId }) => {
-  const { data: stats, isLoading: statsLoading } = useEventRegistrationStats(eventId);
+  // URL state for filters (deep-linkable)
+  const [dateRange, setDateRange] = useUrlState<string>('range', '30d');
+  const { message: announcement, announce } = useLiveAnnouncement();
   
+  // Fetch stats
+  const { data: stats, isLoading: statsLoading } = useEventRegistrationStats(eventId);
+
   // Fetch registration timeline data
   const { data: timelineData, isLoading: timelineLoading } = useQuery({
-    queryKey: [...queryKeys.events.registrations(eventId), 'timeline'],
+    queryKey: eventQueryKeys.timeline(eventId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('registrations')
@@ -62,13 +95,14 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
 
       if (error) throw error;
 
-      // Group by day for the last 30 days
-      const last30Days = eachDayOfInterval({
-        start: subDays(new Date(), 29),
+      // Group by day based on selected range
+      const days = getDaysForRange(dateRange as DateRange);
+      const interval = eachDayOfInterval({
+        start: subDays(new Date(), days - 1),
         end: new Date(),
       });
 
-      const dailyData = last30Days.map(day => {
+      const dailyData = interval.map(day => {
         const dayStart = startOfDay(day);
         const dayRegistrations = (data || []).filter(r => {
           const regDate = startOfDay(new Date(r.created_at));
@@ -82,6 +116,9 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
         };
       });
 
+      // Announce data update for screen readers
+      announce(`Analytics updated: ${data?.length ?? 0} registrations in the selected period`);
+
       return dailyData;
     },
     staleTime: queryPresets.dynamic.staleTime,
@@ -89,7 +126,7 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
 
   // Fetch ticket tier breakdown
   const { data: tierBreakdown, isLoading: tierLoading } = useQuery({
-    queryKey: [...queryKeys.events.registrations(eventId), 'tiers'],
+    queryKey: eventQueryKeys.tierBreakdown(eventId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('registrations')
@@ -121,7 +158,7 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
 
   // Fetch attendance data
   const { data: attendanceData, isLoading: attendanceLoading } = useQuery({
-    queryKey: [...queryKeys.events.attendees(eventId), 'hourly'],
+    queryKey: eventQueryKeys.attendanceHourly(eventId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('attendance_records')
@@ -157,6 +194,25 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
 
   return (
     <div className="space-y-6">
+      {/* Accessibility: Live region for dynamic updates */}
+      <LiveRegion message={announcement} priority="polite" />
+
+      {/* Date Range Filter - URL preserved for deep linking */}
+      <div className="flex justify-end">
+        <Select value={dateRange} onValueChange={setDateRange}>
+          <SelectTrigger className="w-40" aria-label="Select date range">
+            <SelectValue placeholder="Date range" />
+          </SelectTrigger>
+          <SelectContent>
+            {DATE_RANGES.map((range) => (
+              <SelectItem key={range} value={range}>
+                {DATE_RANGE_LABELS[range]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -186,7 +242,7 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
         />
       </div>
 
-      {/* Charts Row */}
+      {/* Charts Row - Responsive heights */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Registration Timeline */}
         <Card>
@@ -195,10 +251,10 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
               <Calendar className="h-5 w-5 text-primary" />
               Registration Timeline
             </CardTitle>
-            <CardDescription>Daily registrations over the last 30 days</CardDescription>
+            <CardDescription>Daily registrations over {DATE_RANGE_LABELS[dateRange as DateRange]?.toLowerCase() || 'the selected period'}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[250px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={timelineData || []}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -243,7 +299,7 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
             <CardDescription>Breakdown by ticket tier</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[250px] sm:h-[300px]">
               {tierBreakdown && tierBreakdown.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsPie>
@@ -288,7 +344,7 @@ export const EventAnalyticsTab: React.FC<EventAnalyticsTabProps> = ({ eventId })
             <CardDescription>Hourly check-in distribution</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[250px] sm:h-[300px]">
               {attendanceData && attendanceData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={attendanceData}>
@@ -453,7 +509,7 @@ const AnalyticsSkeleton: React.FC = () => (
             <Skeleton className="h-5 w-40" />
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-[250px] sm:h-[300px] w-full" />
           </CardContent>
         </Card>
       ))}
