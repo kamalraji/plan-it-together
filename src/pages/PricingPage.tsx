@@ -1,34 +1,19 @@
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { PublicPageLayout } from "@/components/layout/PublicPageLayout";
+import { useSeo } from "@/hooks/useSeo";
 
 const PricingPage = () => {
-  useEffect(() => {
-    const title = "Pricing for event teams | Thittam1Hub";
-    document.title = title;
-
-    const description =
-      "Transparent Thittam1Hub pricing for event teams, from starter workspaces to full multi-organization rollouts.";
-
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "description");
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute("content", description);
-
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", window.location.origin + "/pricing");
-  }, []);
+  useSeo({
+    title: "Pricing for event teams | Thittam1Hub",
+    description:
+      "Transparent Thittam1Hub pricing for event teams, from starter workspaces to full multi-organization rollouts.",
+    canonicalPath: "/pricing",
+  });
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <PublicPageLayout>
+      <main className="bg-background text-foreground">
       <section className="border-b border-border/60 bg-card/80 py-14 md:py-20">
         <div className="container max-w-4xl mx-auto text-center space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Pricing</p>
@@ -186,7 +171,8 @@ const PricingPage = () => {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </PublicPageLayout>
   );
 };
 
