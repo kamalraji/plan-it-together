@@ -3,6 +3,8 @@ import grapesjs, { Editor } from 'grapesjs';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAutosave, SaveStatus } from '@/hooks/useAutosave';
 import { 
   heroBlockHtml, 
   scheduleBlockHtml, 
@@ -43,6 +45,7 @@ interface EventData {
   description: string;
   branding: any;
   existingLanding: LandingPageData | null;
+  existingDraft: LandingPageData | null;
   existingSlug: string;
   organizationName?: string;
   startDate?: string;
@@ -59,6 +62,7 @@ interface UsePageBuilderOptions {
 export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const editorRef = useRef<Editor | null>(null);
   
   // Container refs for GrapesJS rendering
@@ -72,11 +76,38 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [device, setDevice] = useState<'Desktop' | 'Tablet' | 'Mobile'>('Desktop');
   const [layers, setLayers] = useState<LayerData[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [hasPublishedVersion, setHasPublishedVersion] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [previewContent, setPreviewContent] = useState<{ html: string; css: string }>({ html: '', css: '' });
 
-  // Fetch event data
+  // Autosave handler - saves to draft_landing_page_data
+  const handleAutosave = useCallback(async (data: unknown) => {
+    if (!eventId) return;
+    
+    const payload = data as LandingPageData;
+    const { error } = await supabase
+      .from('events')
+      .update({ draft_landing_page_data: payload })
+      .eq('id', eventId);
+
+    if (error) throw error;
+  }, [eventId]);
+
+  const { triggerSave: triggerAutosave } = useAutosave({
+    debounceMs: 2000,
+    intervalMs: 30000,
+    onSave: handleAutosave,
+    onStatusChange: setSaveStatus,
+  });
+
+  // Fetch event data (including draft)
   useEffect(() => {
     if (!eventId) return;
 
@@ -85,7 +116,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
         const { data: eventRow, error } = await supabase
           .from('events')
           .select(`
-            id, name, description, organization_id, branding, landing_page_data, landing_page_slug,
+            id, name, description, organization_id, branding, landing_page_data, landing_page_slug, draft_landing_page_data,
             start_date, end_date, mode, capacity, category,
             organizations:organization_id ( name )
           `)
@@ -110,6 +141,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
           description: eventRow.description || '',
           branding: (eventRow.branding as any) || {},
           existingLanding: (eventRow as any).landing_page_data ?? null,
+          existingDraft: (eventRow as any).draft_landing_page_data ?? null,
           existingSlug: (eventRow as any).landing_page_slug ?? '',
           organizationName: org?.name,
           startDate: eventRow.start_date,
@@ -121,6 +153,7 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
 
         setEventData(data);
         setSlug(data.existingSlug || slugify(data.name));
+        setHasPublishedVersion(!!data.existingLanding?.html);
         setLoading(false);
       } catch {
         toast({
@@ -139,9 +172,12 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
   useEffect(() => {
     if (loading || !eventData || !containerRef.current || editorRef.current) return;
 
-    const { name, description, branding, existingLanding, organizationName, startDate, endDate, mode, capacity, category } = eventData;
+    const { name, description, branding, existingLanding, existingDraft, organizationName, startDate, endDate, mode, capacity, category } = eventData;
     const primaryColor = branding?.primaryColor || '#2563eb';
     const logoUrl = branding?.logoUrl as string | undefined;
+    
+    // Prefer draft over published for editing
+    const contentToLoad = existingDraft || existingLanding;
 
     const editor = grapesjs.init({
       container: containerRef.current,
@@ -389,7 +425,8 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     editor.Commands.add('set-device-tablet', { run: (ed) => ed.setDevice('Tablet') });
     editor.Commands.add('set-device-mobile', { run: (ed) => ed.setDevice('Mobile') });
 
-    editor.Commands.add('save-page', {
+    // Save draft command (called by autosave and manual save)
+    editor.Commands.add('save-draft', {
       run: async () => {
         const html = editor.getHtml();
         const css = editor.getCss() || '';
@@ -403,26 +440,64 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
           setSaving(true);
           const { error } = await supabase
             .from('events')
-            .update({ landing_page_data: payload, landing_page_slug: slug })
+            .update({ draft_landing_page_data: payload })
             .eq('id', eventId);
 
           if (error) throw error;
-          toast({ title: 'Landing page saved', description: 'Your event page has been saved successfully.' });
+          setLastSavedAt(new Date());
+          setSaveStatus('saved');
         } catch {
-          toast({ title: 'Save failed', description: 'We could not save your landing page. Please try again.', variant: 'destructive' });
+          setSaveStatus('error');
+          toast({ title: 'Save failed', description: 'Could not save draft.', variant: 'destructive' });
         } finally {
           setSaving(false);
         }
       },
     });
 
+    // Legacy save-page command (now saves to draft)
+    editor.Commands.add('save-page', {
+      run: () => editor.runCommand('save-draft'),
+    });
+
+    // Preview command - open overlay instead of new tab
     editor.Commands.add('preview-page', {
       run: () => {
-        if (eventId) {
-          const publicUrl = `${window.location.origin}/events/${eventId}`;
-          window.open(publicUrl, '_blank', 'noopener,noreferrer');
+        const html = editor.getHtml();
+        const css = editor.getCss() || '';
+        setPreviewContent({ html, css });
+        setShowPreview(true);
+      },
+    });
+
+    editor.Commands.add('clear-canvas', {
+      run: () => {
+        if (window.confirm('Are you sure you want to clear the canvas?')) {
+          editor.DomComponents.clear();
+          editor.CssComposer.clear();
         }
       },
+    });
+
+    // Listen for changes to trigger autosave
+    editor.on('component:update', () => {
+      const html = editor.getHtml();
+      const css = editor.getCss() || '';
+      const meta: LandingPageDataMeta = {
+        title: extractTitleFromHtml(html) || undefined,
+        description: extractDescriptionFromHtml(html) || undefined,
+      };
+      triggerAutosave({ html, css, meta });
+    });
+
+    editor.on('style:change', () => {
+      const html = editor.getHtml();
+      const css = editor.getCss() || '';
+      const meta: LandingPageDataMeta = {
+        title: extractTitleFromHtml(html) || undefined,
+        description: extractDescriptionFromHtml(html) || undefined,
+      };
+      triggerAutosave({ html, css, meta });
     });
 
     editor.Commands.add('clear-canvas', {
@@ -440,10 +515,11 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     assetUploadPlugin(editor, { eventId });
 
     // Load existing content or use template with styles
-    if (existingLanding?.html) {
-      editor.setComponents(existingLanding.html);
-      if (existingLanding.css) {
-        editor.setStyle(existingLanding.css);
+    // Prefer draft over published version for editing
+    if (contentToLoad?.html) {
+      editor.setComponents(contentToLoad.html);
+      if (contentToLoad.css) {
+        editor.setStyle(contentToLoad.css);
       }
     } else {
       // Use PublicEventPage-style template with real event data
@@ -557,6 +633,97 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     setLayers(newLayers);
   }, []);
 
+  // Publish handler - copies draft to live and creates version
+  const handlePublish = useCallback(async (label?: string) => {
+    const editor = editorRef.current;
+    if (!editor || !eventId) return;
+
+    setPublishing(true);
+    try {
+      // Get current content
+      const html = editor.getHtml();
+      const css = editor.getCss() || '';
+      const meta: LandingPageDataMeta = {
+        title: extractTitleFromHtml(html) || undefined,
+        description: extractDescriptionFromHtml(html) || undefined,
+      };
+      const payload: LandingPageData = { html, css, meta };
+
+      // Get next version number
+      const { data: latestVersion } = await supabase
+        .from('landing_page_versions')
+        .select('version_number')
+        .eq('event_id', eventId)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const nextVersionNumber = (latestVersion?.version_number || 0) + 1;
+
+      // Create version
+      await supabase
+        .from('landing_page_versions')
+        .insert({
+          event_id: eventId,
+          version_number: nextVersionNumber,
+          landing_page_data: payload,
+          label: label || null,
+        });
+
+      // Update event with published content
+      const { error } = await supabase
+        .from('events')
+        .update({ 
+          landing_page_data: payload, 
+          landing_page_slug: slug,
+          draft_landing_page_data: null, // Clear draft after publish
+        })
+        .eq('id', eventId);
+
+      if (error) throw error;
+
+      setHasPublishedVersion(true);
+      queryClient.invalidateQueries({ queryKey: ['landing-page-versions', eventId] });
+      toast({ 
+        title: 'Published!', 
+        description: `Version ${nextVersionNumber} is now live.` 
+      });
+    } catch {
+      toast({ 
+        title: 'Publish failed', 
+        description: 'Could not publish landing page.', 
+        variant: 'destructive' 
+      });
+      throw new Error('Publish failed');
+    } finally {
+      setPublishing(false);
+    }
+  }, [eventId, slug, toast, queryClient]);
+
+  // Get current content for preview/SEO
+  const getCurrentContent = useCallback(() => {
+    const editor = editorRef.current;
+    if (!editor) return { html: '', css: '', meta: {} };
+    
+    const html = editor.getHtml();
+    const css = editor.getCss() || '';
+    const meta = {
+      title: extractTitleFromHtml(html),
+      description: extractDescriptionFromHtml(html),
+    };
+    return { html, css, meta };
+  }, []);
+
+  // Restore version handler
+  const handleRestoreVersion = useCallback((data: { html: string; css: string }) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    
+    editor.setComponents(data.html);
+    editor.setStyle(data.css);
+    setSaveStatus('unsaved');
+  }, []);
+
   return {
     // Refs
     containerRef,
@@ -568,10 +735,20 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     // State
     loading,
     saving,
+    publishing,
     device,
     layers,
     selectedLayerId,
     eventData,
+    slug,
+    saveStatus,
+    lastSavedAt,
+    hasPublishedVersion,
+    showPreview,
+    setShowPreview,
+    showPublishDialog,
+    setShowPublishDialog,
+    previewContent,
     // Handlers
     handleDeviceChange,
     handleSave,
@@ -583,5 +760,8 @@ export function usePageBuilder({ eventId }: UsePageBuilderOptions) {
     handleLayerLockToggle,
     handleLayerDelete,
     handleLayersReorder,
+    handlePublish,
+    getCurrentContent,
+    handleRestoreVersion,
   };
 }

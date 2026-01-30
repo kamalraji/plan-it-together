@@ -4732,6 +4732,7 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           description: string | null
+          draft_landing_page_data: Json | null
           end_date: string
           event_website: string | null
           id: string
@@ -4764,6 +4765,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          draft_landing_page_data?: Json | null
           end_date: string
           event_website?: string | null
           id?: string
@@ -4796,6 +4798,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          draft_landing_page_data?: Json | null
           end_date?: string
           event_website?: string | null
           id?: string
@@ -5969,6 +5972,58 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "submissions"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      landing_page_versions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          event_id: string
+          id: string
+          label: string | null
+          landing_page_data: Json
+          version_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          event_id: string
+          id?: string
+          label?: string | null
+          landing_page_data: Json
+          version_number: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          label?: string | null
+          landing_page_data?: Json
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "landing_page_versions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_page_versions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_page_versions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
           },
         ]
       }
