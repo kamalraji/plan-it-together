@@ -35,23 +35,37 @@ export function NewsletterSignup({
     setErrorMessage('');
 
     try {
-      // For now, we'll use a simple approach - in production, this would call an edge function
-      // that handles double opt-in and stores in newsletter_subscribers table
-      const { error } = await supabase.functions.invoke('newsletter-subscribe', {
-        body: { email, source },
-      });
+      // Direct insert into newsletter_subscribers table
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({
+          email: email.toLowerCase().trim(),
+          source,
+          metadata: {
+            subscribed_via: 'web',
+            user_agent: navigator.userAgent,
+          },
+        });
 
       if (error) {
-        // If edge function doesn't exist yet, just show success (graceful degradation)
-        console.warn('Newsletter subscription pending backend setup:', error);
+        if (error.code === '23505') {
+          // Unique constraint violation - email already exists
+          setErrorMessage('This email is already subscribed.');
+          setStatus('error');
+          return;
+        }
+        console.error('Newsletter subscription error:', error);
+        setErrorMessage('Something went wrong. Please try again.');
+        setStatus('error');
+        return;
       }
 
       setStatus('success');
       setEmail('');
-    } catch {
-      // Graceful fallback - show success anyway for demo
-      setStatus('success');
-      setEmail('');
+    } catch (err) {
+      console.error('Newsletter subscription error:', err);
+      setErrorMessage('Something went wrong. Please try again.');
+      setStatus('error');
     }
   };
 
