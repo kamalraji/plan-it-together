@@ -20,7 +20,10 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,18 +44,59 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+  const handleResendConfirmation = async () => {
+    if (!pendingEmail) return;
+    
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingEmail,
+      });
+      
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Failed to resend',
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: 'Email sent',
+          description: 'A new confirmation email has been sent to your inbox.',
+        });
+      }
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to resend confirmation email.',
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError(null);
+    setEmailNotConfirmed(false);
+    setPendingEmail(null);
 
     const { error } = await login(data.email, data.password);
     if (error) {
-      setError(error.message);
+      const isUnconfirmed = error.message?.toLowerCase().includes('email not confirmed');
+      setError(isUnconfirmed ? 'Email not confirmed' : error.message);
+      setEmailNotConfirmed(isUnconfirmed);
+      if (isUnconfirmed) {
+        setPendingEmail(data.email);
+      }
       toast({
         variant: 'destructive',
         title: 'Sign-in failed',
-        description: error.message || 'Please check your details and try again.',
+        description: isUnconfirmed 
+          ? 'Please verify your email before signing in.' 
+          : (error.message || 'Please check your details and try again.'),
       });
       setIsLoading(false);
       return;
@@ -150,6 +194,28 @@ export function LoginForm() {
                   <span className="text-destructive">⚠️</span>
                   <div className="text-sm text-destructive font-medium">{error}</div>
                 </div>
+                {emailNotConfirmed && pendingEmail && (
+                  <div className="mt-3 pt-3 border-t border-destructive/20">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Didn't receive the confirmation email?
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={isResending}
+                      className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                    >
+                      {isResending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Resend confirmation email'
+                      )}
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
 
