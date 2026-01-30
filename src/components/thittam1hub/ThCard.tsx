@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface AfCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ThCardProps extends React.HTMLAttributes<HTMLDivElement> {
   subtle?: boolean;
 }
 
 /**
  * Thittam1Hub-style surface card used across dashboards, auth, and event flows.
  */
-export const AfCard = React.forwardRef<HTMLDivElement, AfCardProps>(
+export const ThCard = React.forwardRef<HTMLDivElement, ThCardProps>(
   ({ className, subtle = false, ...props }, ref) => {
     return (
       <div
@@ -26,4 +26,8 @@ export const AfCard = React.forwardRef<HTMLDivElement, AfCardProps>(
   },
 );
 
-AfCard.displayName = 'AfCard';
+ThCard.displayName = 'ThCard';
+
+// Backward compatibility alias
+export const AfCard = ThCard;
+export type AfCardProps = ThCardProps;

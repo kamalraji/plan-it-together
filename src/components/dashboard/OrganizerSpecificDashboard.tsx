@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
-import { AfCard } from '@/components/attendflow/AfCard';
+import { ThCard as AfCard } from '@/components/thittam1hub';
 
 export function OrganizerSpecificDashboard() {
   const { user, logout } = useAuth();

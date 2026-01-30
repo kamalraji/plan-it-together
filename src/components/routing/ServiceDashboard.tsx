@@ -7,7 +7,7 @@ import {
   ArrowTrendingUpIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import { AfCard } from '@/components/attendflow/AfCard';
+import { ThCard as AfCard } from '@/components/thittam1hub';
 
 interface DashboardWidget {
   id: string;
