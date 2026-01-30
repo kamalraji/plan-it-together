@@ -50,7 +50,7 @@ export function useAllPendingApprovals(): AllPendingApprovalsResult {
         .from('workspace_team_members')
         .select('workspace_id, role, workspaces!inner(id, name)')
         .eq('user_id', user.id)
-        .eq('status', 'active');
+        .eq('status', 'ACTIVE');
 
       if (membershipError) throw membershipError;
       if (!memberships?.length) {
