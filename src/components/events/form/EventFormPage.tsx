@@ -1,20 +1,32 @@
 /**
  * Event Form Page - Modular Refactored Version
  * 
- * This is the main orchestrator component (~300 lines)
+ * This is the main orchestrator component
  * All section-specific logic has been extracted to:
  * - src/components/events/form/sections/ - UI components
  * - src/components/events/form/hooks/ - State management
  * - src/components/events/form/utils/ - Helpers and constants
+ * 
+ * Industrial Features:
+ * - URL deep linking (#section-schedule)
+ * - LiveRegion accessibility announcements
+ * - SectionErrorBoundary isolation
+ * - Optimistic draft save with sync status
  */
 import React, { useEffect, useCallback, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 import { cn } from '@/lib/utils';
+
+// Accessibility
+import { LiveRegion, useLiveAnnouncement } from '@/components/accessibility/LiveRegion';
+
+// Error Boundaries
+import { SectionErrorBoundary } from '@/components/events/shared/SectionErrorBoundary';
 
 // Form imports
 import { Form } from '@/components/ui/form';
@@ -27,6 +39,7 @@ import { useEventFormKeyboard } from '@/hooks/useEventFormKeyboard';
 import { type SectionProgress, calculateSectionStatus } from '@/components/events/form/SectionProgressIndicator';
 import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
 import { UnsavedChangesDialog } from '@/components/events/form/UnsavedChangesDialog';
+import { PostCreateOptionsDialog } from './PostCreateOptionsDialog';
 
 // Extracted components
 import { EventFormHeader } from './EventFormHeader';
@@ -66,6 +79,7 @@ interface EventFormPageProps {
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const { eventId, orgSlug } = useParams<{ eventId?: string; orgSlug?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { listPath } = useEventManagementPaths();
   const { data: myOrganizations = [], isLoading: isLoadingOrganizations } = useMyMemberOrganizations();
@@ -74,12 +88,20 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const currentOrganization = myOrganizations.find((org: { slug: string }) => org.slug === orgSlug);
   const organizationId = currentOrganization?.id || '';
 
+  // Accessibility announcements
+  const { message: announcement, announce } = useLiveAnnouncement();
+
   // Core form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<SectionState>(getInitialSectionState());
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  
+  // Post-creation dialog state
+  const [showPostCreate, setShowPostCreate] = useState(false);
+  const [createdEventId, setCreatedEventId] = useState<string | null>(null);
+  const [createdEventName, setCreatedEventName] = useState<string>('');
 
   // Additional form data
   const [eventImages, setEventImages] = useState<EventImage[]>([]);
@@ -111,7 +133,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   // Draft management
   const [pendingDraft, setPendingDraft] = useState<Record<string, unknown> | null>(null);
 
-  const { saveDraft, clearDraft, isSaving: isDraftSaving, lastSaved, hasDraft } = useEventDraft({
+  const { saveDraft, clearDraft, isSaving: isDraftSaving, lastSaved, hasDraft, syncStatus } = useEventDraft({
     organizationId,
     eventId: mode === 'edit' ? eventId : undefined,
     onDraftRestored: (draft) => {
@@ -142,6 +164,26 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       saveDraft(formValues);
     }
   }, [formValues, organizationId, mode, formState.isDirty, saveDraft]);
+
+  // Announce validation errors for screen readers
+  useEffect(() => {
+    const errorCount = Object.keys(formState.errors).length;
+    if (errorCount > 0 && formState.isSubmitted) {
+      announce(`Form has ${errorCount} validation error${errorCount > 1 ? 's' : ''}. Please review highlighted fields.`);
+    }
+  }, [formState.errors, formState.isSubmitted, announce]);
+
+  // URL hash deep linking - parse on mount and navigate to section
+  useEffect(() => {
+    const hash = location.hash.replace('#section-', '');
+    if (hash && Object.prototype.hasOwnProperty.call(openSections, hash)) {
+      setOpenSections(prev => ({ ...prev, [hash]: true }));
+      setTimeout(() => {
+        const el = document.getElementById(`section-${hash}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [location.hash]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Unsaved changes warning
   const { isBlocked, requestNavigation, confirmNavigation, cancelNavigation } = useUnsavedChangesWarning({
@@ -189,16 +231,31 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     { id: 'branding', label: 'Branding', status: calculateSectionStatus('branding', formValues, formState.errors, sectionFieldMap), required: false },
   ], [formValues, formState.errors, showVenueSection, showVirtualSection]);
 
+  // Section click handler with URL hash update
   const handleSectionClick = useCallback((sectionId: string) => {
     setOpenSections(prev => ({ ...prev, [sectionId]: true }));
+    window.history.replaceState(null, '', `#section-${sectionId}`);
     setTimeout(() => {
       const el = document.getElementById(`section-${sectionId}`);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   }, []);
 
+  // Toggle section with URL hash update and focus management
   const toggleSection = useCallback((section: keyof SectionState) => {
-    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setOpenSections(prev => {
+      const isOpening = !prev[section];
+      if (isOpening) {
+        window.history.replaceState(null, '', `#section-${section}`);
+        // Focus first input in section after animation
+        setTimeout(() => {
+          const sectionEl = document.getElementById(`section-${section}`);
+          const firstInput = sectionEl?.querySelector('input, select, textarea');
+          (firstInput as HTMLElement)?.focus();
+        }, 300);
+      }
+      return { ...prev, [section]: !prev[section] };
+    });
   }, []);
 
   // Auto-set organization
@@ -208,8 +265,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     }
   }, [currentOrganization, mode, form]);
 
-  // Form submit handler
-  const { onSubmit } = useEventFormSubmit({
+  // Form submit handler with post-creation dialog
+  const { onSubmit: baseOnSubmit } = useEventFormSubmit({
     mode,
     eventId,
     listPath,
@@ -219,12 +276,62 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     setServerError,
   });
 
+  // Wrap submit to show post-creation dialog
+  const onSubmit = useCallback(async (values: EventFormValues) => {
+    const result = await baseOnSubmit(values);
+    if (result.success && mode === 'create' && result.eventId) {
+      setCreatedEventId(result.eventId);
+      setCreatedEventName(values.name);
+      setShowPostCreate(true);
+    }
+    return result;
+  }, [baseOnSubmit, mode]);
+
+  // Post-create dialog handlers
+  const handleContinueEditing = useCallback(() => {
+    setShowPostCreate(false);
+    if (createdEventId) {
+      const currentPath = location.pathname;
+      const basePath = currentPath.replace(/\/events\/create$/, '');
+      navigate(`${basePath}/events/${createdEventId}/edit`, { replace: true });
+    }
+  }, [createdEventId, location.pathname, navigate]);
+
+  const handleCreateWorkspace = useCallback(() => {
+    setShowPostCreate(false);
+    if (createdEventId) {
+      const currentPath = location.pathname;
+      const basePath = currentPath.replace(/\/events\/create$/, '');
+      navigate(`${basePath}/events/new/${createdEventId}/workspaces`, { replace: true });
+    }
+  }, [createdEventId, location.pathname, navigate]);
+
+  const handleViewEvent = useCallback(() => {
+    setShowPostCreate(false);
+    if (createdEventId) {
+      // Navigate to public event page - this would need the slug
+      navigate(`/event/${createdEventId}`, { replace: true });
+    }
+  }, [createdEventId, navigate]);
+
   if (isLoadingEvent) {
     return <EventFormLoadingState />;
   }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Accessibility: Live region for screen reader announcements */}
+      <LiveRegion message={announcement} priority="assertive" />
+
+      {/* Post-Creation Options Dialog */}
+      <PostCreateOptionsDialog
+        open={showPostCreate}
+        eventName={createdEventName}
+        onContinueEditing={handleContinueEditing}
+        onCreateWorkspace={handleCreateWorkspace}
+        onViewEvent={handleViewEvent}
+      />
+
       {/* Draft Restoration Prompt */}
       {showDraftPrompt && (
         <div className="mx-auto max-w-4xl px-4 pt-4 sm:px-6">
@@ -248,6 +355,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         isDraftSaving={isDraftSaving}
         lastSaved={lastSaved}
         hasDraft={hasDraft}
+        syncStatus={syncStatus}
         sectionProgress={sectionProgress}
         onSectionClick={handleSectionClick}
       />
@@ -266,98 +374,116 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
             {/* Server Error */}
             {serverError && <EventFormServerError error={serverError} />}
 
-            {/* Form Sections */}
+            {/* Form Sections with Error Boundaries */}
             <div id="section-basic">
-              <BasicInfoSection
-                form={form}
-                isOpen={openSections.basic}
-                onToggle={() => toggleSection('basic')}
-                isSubmitting={isSubmitting}
-                isLoadingOrganizations={isLoadingOrganizations}
-                currentOrganization={currentOrganization}
-                pendingTiers={pendingTiers}
-                onPendingTiersChange={setPendingTiers}
-              />
+              <SectionErrorBoundary sectionName="Basic Info">
+                <BasicInfoSection
+                  form={form}
+                  isOpen={openSections.basic}
+                  onToggle={() => toggleSection('basic')}
+                  isSubmitting={isSubmitting}
+                  isLoadingOrganizations={isLoadingOrganizations}
+                  currentOrganization={currentOrganization}
+                  pendingTiers={pendingTiers}
+                  onPendingTiersChange={setPendingTiers}
+                />
+              </SectionErrorBoundary>
             </div>
 
             <div id="section-schedule">
-              <ScheduleSection
-                form={form}
-                isOpen={openSections.schedule}
-                onToggle={() => toggleSection('schedule')}
-              />
+              <SectionErrorBoundary sectionName="Schedule">
+                <ScheduleSection
+                  form={form}
+                  isOpen={openSections.schedule}
+                  onToggle={() => toggleSection('schedule')}
+                />
+              </SectionErrorBoundary>
             </div>
 
             <div id="section-organizer">
-              <OrganizerSection
-                form={form}
-                isOpen={openSections.organizer}
-                onToggle={() => toggleSection('organizer')}
-              />
+              <SectionErrorBoundary sectionName="Organizer Contact">
+                <OrganizerSection
+                  form={form}
+                  isOpen={openSections.organizer}
+                  onToggle={() => toggleSection('organizer')}
+                />
+              </SectionErrorBoundary>
             </div>
 
             {showVenueSection && (
               <div id="section-venue">
-                <VenueSection
-                  form={form}
-                  isOpen={openSections.venue}
-                  onToggle={() => toggleSection('venue')}
-                  stepNumber={getStepNumber('venue')}
-                  selectedMode={selectedMode}
-                />
+                <SectionErrorBoundary sectionName="Venue">
+                  <VenueSection
+                    form={form}
+                    isOpen={openSections.venue}
+                    onToggle={() => toggleSection('venue')}
+                    stepNumber={getStepNumber('venue')}
+                    selectedMode={selectedMode}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             {showVirtualSection && (
               <div id="section-virtual">
-                <VirtualSection
-                  form={form}
-                  isOpen={openSections.virtual}
-                  onToggle={() => toggleSection('virtual')}
-                  stepNumber={getStepNumber('virtual')}
-                  selectedMode={selectedMode}
-                />
+                <SectionErrorBoundary sectionName="Virtual">
+                  <VirtualSection
+                    form={form}
+                    isOpen={openSections.virtual}
+                    onToggle={() => toggleSection('virtual')}
+                    stepNumber={getStepNumber('virtual')}
+                    selectedMode={selectedMode}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             <div id="section-branding">
-              <BrandingSection
-                form={form}
-                isOpen={openSections.branding}
-                onToggle={() => toggleSection('branding')}
-                stepNumber={getStepNumber('branding')}
-              />
+              <SectionErrorBoundary sectionName="Branding">
+                <BrandingSection
+                  form={form}
+                  isOpen={openSections.branding}
+                  onToggle={() => toggleSection('branding')}
+                  stepNumber={getStepNumber('branding')}
+                />
+              </SectionErrorBoundary>
             </div>
 
             <div id="section-media">
-              <MediaSection
-                isOpen={openSections.media}
-                onToggle={() => toggleSection('media')}
-                stepNumber={getStepNumber('media')}
-                images={eventImages}
-                onImagesChange={setEventImages}
-                isSubmitting={isSubmitting}
-              />
+              <SectionErrorBoundary sectionName="Media">
+                <MediaSection
+                  isOpen={openSections.media}
+                  onToggle={() => toggleSection('media')}
+                  stepNumber={getStepNumber('media')}
+                  images={eventImages}
+                  onImagesChange={setEventImages}
+                  isSubmitting={isSubmitting}
+                />
+              </SectionErrorBoundary>
             </div>
 
             <div id="section-faqs">
-              <FAQsSection
-                isOpen={openSections.faqs}
-                onToggle={() => toggleSection('faqs')}
-                stepNumber={getStepNumber('faqs')}
-                faqs={eventFaqs}
-                onFaqsChange={setEventFaqs}
-                isSubmitting={isSubmitting}
-              />
+              <SectionErrorBoundary sectionName="FAQs">
+                <FAQsSection
+                  isOpen={openSections.faqs}
+                  onToggle={() => toggleSection('faqs')}
+                  stepNumber={getStepNumber('faqs')}
+                  faqs={eventFaqs}
+                  onFaqsChange={setEventFaqs}
+                  isSubmitting={isSubmitting}
+                />
+              </SectionErrorBoundary>
             </div>
 
             <div id="section-cta">
-              <CTASection
-                form={form}
-                isOpen={openSections.cta}
-                onToggle={() => toggleSection('cta')}
-                stepNumber={getStepNumber('cta')}
-              />
+              <SectionErrorBoundary sectionName="Call to Action">
+                <CTASection
+                  form={form}
+                  isOpen={openSections.cta}
+                  onToggle={() => toggleSection('cta')}
+                  stepNumber={getStepNumber('cta')}
+                />
+              </SectionErrorBoundary>
             </div>
 
             {/* Form Actions */}

@@ -13,12 +13,14 @@ export interface SectionProgress {
 interface SectionProgressIndicatorProps {
   sections: SectionProgress[];
   onSectionClick?: (sectionId: string) => void;
+  compact?: boolean;
   className?: string;
 }
 
 export function SectionProgressIndicator({
   sections,
   onSectionClick,
+  compact = false,
   className,
 }: SectionProgressIndicatorProps) {
   const totalRequired = sections.filter(s => s.required).length;
@@ -57,22 +59,23 @@ export function SectionProgressIndicator({
                   type="button"
                   onClick={() => onSectionClick?.(section.id)}
                   className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200",
+                    "flex items-center justify-center rounded-full transition-all duration-200",
                     "hover:ring-2 hover:ring-offset-2 hover:ring-primary/50",
                     "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+                    compact ? "w-6 h-6 min-w-[24px] min-h-[24px]" : "w-8 h-8 min-w-[32px] min-h-[32px]",
                     section.status === 'complete' && "bg-primary text-primary-foreground",
                     section.status === 'partial' && "bg-primary/20 text-primary border-2 border-primary/50",
                     section.status === 'empty' && "bg-muted text-muted-foreground",
                     section.status === 'error' && "bg-destructive text-destructive-foreground",
                   )}
-                  aria-label={`${section.label}: ${section.status}`}
+                  aria-label={`Go to ${section.label} section. Status: ${section.status}${section.required ? ', required' : ', optional'}`}
                 >
                   {section.status === 'complete' ? (
-                    <Check className="h-4 w-4" />
+                    <Check className={cn(compact ? "h-3 w-3" : "h-4 w-4")} aria-hidden="true" />
                   ) : section.status === 'error' ? (
-                    <AlertCircle className="h-4 w-4" />
+                    <AlertCircle className={cn(compact ? "h-3 w-3" : "h-4 w-4")} aria-hidden="true" />
                   ) : (
-                    <span className="text-xs font-medium">{index + 1}</span>
+                    <span className={cn("font-medium", compact ? "text-[10px]" : "text-xs")}>{index + 1}</span>
                   )}
                 </button>
               </TooltipTrigger>

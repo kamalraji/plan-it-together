@@ -3,6 +3,7 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { 
@@ -266,7 +267,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     content: value,
     editable: !disabled,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Sanitize HTML output before passing to parent
+      const rawHtml = editor.getHTML();
+      const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a', 'h2', 'h3', 'blockquote', 'hr'],
+        ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+      });
+      onChange(sanitizedHtml);
     },
     onBlur: () => {
       onBlur?.();

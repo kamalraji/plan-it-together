@@ -27,7 +27,7 @@ const phoneRegex = /^[\d\s\-+()]{7,20}$/;
 // Reusable Field Schemas
 // ============================================
 
-/** Optional URL with friendly error */
+/** Optional URL with HTTPS enforcement and friendly error */
 const optionalUrl = z
   .string()
   .trim()
@@ -35,6 +35,10 @@ const optionalUrl = z
   .refine(
     val => !val || val === '' || z.string().url().safeParse(val).success,
     { message: 'Please enter a valid URL (e.g., https://example.com)' }
+  )
+  .refine(
+    val => !val || val === '' || val.startsWith('https://') || val.startsWith('data:image'),
+    { message: 'URL must use HTTPS for security' }
   )
   .transform(val => val || undefined);
 

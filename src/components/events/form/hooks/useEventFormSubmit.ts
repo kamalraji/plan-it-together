@@ -1,12 +1,19 @@
 /**
  * Event Form Submit Hook
  * Handles form submission logic for create and edit modes
+ * 
+ * Industrial Features:
+ * - Optimistic toast feedback
+ * - Query cache invalidation via eventQueryKeys
+ * - Proper error handling with rollback
  */
 import { useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { EventFormValues } from '@/lib/event-form-schema';
+import { eventQueryKeys } from '@/lib/query-keys/events';
 import { 
   buildEventPayload, 
   buildVenueInsertPayload, 
@@ -35,11 +42,17 @@ export const useEventFormSubmit = ({
   setServerError,
 }: UseEventFormSubmitOptions) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
+  const queryClient = useQueryClient();
 
   const onSubmit = useCallback(async (values: EventFormValues): Promise<FormSubmitResult> => {
     setServerError(null);
+
+    // Show optimistic feedback immediately
+    const optimisticToast = toast({
+      title: mode === 'create' ? 'Creating event...' : 'Saving changes...',
+      description: 'This will only take a moment',
+    });
 
     try {
       setIsSubmitting(true);
@@ -157,25 +170,41 @@ export const useEventFormSubmit = ({
         onClearDraft?.();
       }
 
+      // Dismiss optimistic toast and show success
+      if (optimisticToast?.id) {
+        dismiss(optimisticToast.id);
+      }
+
+      // Invalidate related queries for cache consistency
+      queryClient.invalidateQueries({ queryKey: eventQueryKeys.lists() });
+      if (eventId) {
+        queryClient.invalidateQueries({ queryKey: eventQueryKeys.detail(eventId) });
+      }
+      if (createdEventId) {
+        queryClient.invalidateQueries({ queryKey: eventQueryKeys.detail(createdEventId) });
+      }
+
       toast({
-        title: mode === 'create' ? 'Event draft saved' : 'Event updated',
+        title: mode === 'create' ? 'Event draft saved!' : 'Event updated!',
         description:
           mode === 'create'
-            ? 'Your event has been saved as a draft. Next, create a workspace to manage and publish it.'
+            ? 'Your event has been saved. Choose what to do next.'
             : 'Your changes have been saved.',
       });
 
-      // Navigate after success
-      if (mode === 'create') {
-        const currentPath = location.pathname;
-        const basePath = currentPath.replace(/\/events\/create$/, '');
-        navigate(`${basePath}/events/new/${createdEventId}/workspaces`, { replace: true });
-      } else {
+      // For edit mode, navigate after success
+      // For create mode, return result and let parent show dialog
+      if (mode === 'edit') {
         navigate(listPath, { replace: true });
       }
 
       return { success: true, eventId: createdEventId || eventId };
     } catch (err: unknown) {
+      // Dismiss optimistic toast
+      if (optimisticToast?.id) {
+        dismiss(optimisticToast.id);
+      }
+      
       const errorMessage = err instanceof Error ? err.message : 'Please try again.';
       logger.error('Failed to save event', err);
       setServerError(errorMessage);
@@ -188,7 +217,7 @@ export const useEventFormSubmit = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [mode, eventId, listPath, pendingTiers, onClearDraft, setIsSubmitting, setServerError, navigate, location.pathname, toast]);
+  }, [mode, eventId, listPath, pendingTiers, onClearDraft, setIsSubmitting, setServerError, navigate, toast, dismiss, queryClient]);
 
   return { onSubmit };
 };
