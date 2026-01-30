@@ -30,6 +30,7 @@ import { CertificateVerification } from '../certificates';
 
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import PricingPage from '@/pages/PricingPage';
 import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
 
@@ -48,6 +49,7 @@ const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPort
 const HelpPage = lazy(() => import('../help/HelpPage'));
 const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
 const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
+const OnboardingPage = lazy(() => import('../../pages/OnboardingPage'));
 
 // Loading fallback for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -435,16 +437,23 @@ const ProfileService = () => {
 const RootLandingRoute: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
+  const { isCompleted: onboardingCompleted, isLoading: onboardingLoading } = useOnboardingStatus();
 
   if (authLoading) {
     return <RouteLoadingFallback />;
   }
 
   if (isAuthenticated) {
-    // Wait for org data before redirecting
-    if (orgLoading) {
+    // Wait for onboarding and org data before redirecting
+    if (onboardingLoading || orgLoading) {
       return <RouteLoadingFallback />;
     }
+    
+    // Redirect to onboarding if not completed
+    if (!onboardingCompleted) {
+      return <Navigate to="/onboarding/welcome" replace />;
+    }
+    
     return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
   }
 
@@ -528,6 +537,16 @@ export const AppRouter: React.FC = () => {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Onboarding wizard for new users */}
+            <Route
+              path="/onboarding/welcome"
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <OnboardingPage />
+                </Suspense>
+              }
+            />
 
             {/* Organizer onboarding - appears for new organizers */}
             <Route

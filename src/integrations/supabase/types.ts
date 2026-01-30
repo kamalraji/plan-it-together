@@ -10525,6 +10525,42 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          event_interests: string[] | null
+          expected_event_types: string[] | null
+          id: string
+          looking_for: string[] | null
+          notification_frequency: string | null
+          team_size: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_interests?: string[] | null
+          expected_event_types?: string[] | null
+          id?: string
+          looking_for?: string[] | null
+          notification_frequency?: string | null
+          team_size?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_interests?: string[] | null
+          expected_event_types?: string[] | null
+          id?: string
+          looking_for?: string[] | null
+          notification_frequency?: string | null
+          team_size?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
@@ -10533,10 +10569,14 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           email: string | null
+          experience_level: string | null
           full_name: string | null
           github_url: string | null
           id: string
+          job_title: string | null
           linkedin_url: string | null
+          onboarding_completed_at: string | null
+          onboarding_step: number | null
           organization: string | null
           phone: string | null
           portfolio_accent_color: string | null
@@ -10559,10 +10599,14 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           email?: string | null
+          experience_level?: string | null
           full_name?: string | null
           github_url?: string | null
           id: string
+          job_title?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_step?: number | null
           organization?: string | null
           phone?: string | null
           portfolio_accent_color?: string | null
@@ -10585,10 +10629,14 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           email?: string | null
+          experience_level?: string | null
           full_name?: string | null
           github_url?: string | null
           id?: string
+          job_title?: string | null
           linkedin_url?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_step?: number | null
           organization?: string | null
           phone?: string | null
           portfolio_accent_color?: string | null
