@@ -10,6 +10,7 @@ import { AuthLayout } from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useSeo } from '@/hooks/useSeo';
 import { fetchPrimaryOrganizationForUser } from '@/hooks/usePrimaryOrganization';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -315,6 +316,19 @@ export function LoginForm() {
                 <span>Sign in</span>
               )}
             </motion.button>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            {/* Google Sign In */}
+            <GoogleSignInButton label="Sign in with Google" />
           </form>
         </motion.div>
       </div>

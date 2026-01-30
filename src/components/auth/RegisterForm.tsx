@@ -8,6 +8,7 @@ import { UserRole } from '../../types';
 import { motion } from 'framer-motion';
 import { AuthLayout } from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -288,6 +289,19 @@ export function RegisterForm() {
                 </div>
               </motion.div>
             )}
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            {/* Google Sign Up */}
+            <GoogleSignInButton label="Sign up with Google" />
           </form>
         </motion.div>
       </div>
