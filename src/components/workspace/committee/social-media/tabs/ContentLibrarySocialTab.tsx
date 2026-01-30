@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Image, Video, FileText, Upload, Search, Grid, List, Trash2, Eye, Copy, MoreVertical, FolderOpen } from 'lucide-react';
+import { Image, Video, FileText, Upload, Search, Grid, List, Trash2, Eye, Copy, MoreVertical, FolderOpen, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { useContentAssets } from '@/hooks/useContentAssets';
 
 interface ContentLibrarySocialTabProps {
   workspaceId: string;
@@ -17,7 +18,7 @@ const CONTENT_TYPES = [
   { id: 'all', label: 'All Types', icon: Grid },
   { id: 'image', label: 'Images', icon: Image },
   { id: 'video', label: 'Videos', icon: Video },
-  { id: 'text', label: 'Text Posts', icon: FileText },
+  { id: 'document', label: 'Documents', icon: FileText },
 ];
 
 const CATEGORIES = [
@@ -29,24 +30,16 @@ const CATEGORIES = [
   { id: 'promotional', label: 'Promotional' },
 ];
 
-// Mock content library items (would be from a dedicated table in production)
-const MOCK_ASSETS = [
-  { id: '1', name: 'Brand Logo Light', type: 'image', category: 'brand', url: '/placeholder.svg', usedIn: 5, createdAt: new Date('2024-01-15') },
-  { id: '2', name: 'Event Banner', type: 'image', category: 'event', url: '/placeholder.svg', usedIn: 3, createdAt: new Date('2024-01-20') },
-  { id: '3', name: 'Product Showcase', type: 'video', category: 'product', url: '/placeholder.svg', usedIn: 2, createdAt: new Date('2024-01-25') },
-  { id: '4', name: 'Campaign Graphics', type: 'image', category: 'campaign', url: '/placeholder.svg', usedIn: 8, createdAt: new Date('2024-02-01') },
-  { id: '5', name: 'Promotional Template', type: 'image', category: 'promotional', url: '/placeholder.svg', usedIn: 12, createdAt: new Date('2024-02-05') },
-  { id: '6', name: 'Brand Story', type: 'video', category: 'brand', url: '/placeholder.svg', usedIn: 1, createdAt: new Date('2024-02-10') },
-];
-
-export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
+export function ContentLibrarySocialTab({ workspaceId }: ContentLibrarySocialTabProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const { assets, isLoading, stats, deleteAsset } = useContentAssets(workspaceId);
+
   // Filter assets
-  const filteredAssets = MOCK_ASSETS.filter(asset => {
+  const filteredAssets = assets.filter(asset => {
     if (typeFilter !== 'all' && asset.type !== typeFilter) return false;
     if (categoryFilter !== 'all' && asset.category !== categoryFilter) return false;
     if (searchQuery && !asset.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -61,16 +54,22 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
     }
   };
 
-  const handleCopyAsset = (assetName: string) => {
-    toast.success(`${assetName} copied to clipboard`);
+  const handleCopyAsset = (assetUrl: string, assetName: string) => {
+    navigator.clipboard.writeText(assetUrl);
+    toast.success(`${assetName} URL copied to clipboard`);
   };
 
-  const stats = {
-    total: MOCK_ASSETS.length,
-    images: MOCK_ASSETS.filter(a => a.type === 'image').length,
-    videos: MOCK_ASSETS.filter(a => a.type === 'video').length,
-    totalUses: MOCK_ASSETS.reduce((sum, a) => sum + a.usedIn, 0),
+  const handleDeleteAsset = (assetId: string) => {
+    deleteAsset.mutate(assetId);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -108,8 +107,8 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-emerald-500">{stats.totalUses}</div>
-            <p className="text-sm text-muted-foreground">Times Used</p>
+            <div className="text-2xl font-bold text-emerald-500">{stats.documents}</div>
+            <p className="text-sm text-muted-foreground">Documents</p>
           </CardContent>
         </Card>
       </div>
@@ -221,7 +220,7 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
                     <Button variant="secondary" size="sm">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="secondary" size="sm" onClick={() => handleCopyAsset(asset.name)}>
+                    <Button variant="secondary" size="sm" onClick={() => handleCopyAsset(asset.url, asset.name)}>
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
@@ -229,8 +228,8 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
                 <CardContent className="p-3">
                   <p className="font-medium text-sm truncate">{asset.name}</p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-                    <Badge variant="outline" className="capitalize text-xs">{asset.category}</Badge>
-                    <span>Used {asset.usedIn}x</span>
+                    <Badge variant="outline" className="capitalize text-xs">{asset.category || 'uncategorized'}</Badge>
+                    <span>{format(new Date(asset.createdAt), 'MMM d')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -259,12 +258,12 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
                         <TypeIcon className="h-3.5 w-3.5" />
                         <span className="capitalize">{asset.type}</span>
                         <span>•</span>
-                        <Badge variant="outline" className="capitalize text-xs">{asset.category}</Badge>
+                        <Badge variant="outline" className="capitalize text-xs">{asset.category || 'uncategorized'}</Badge>
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground text-right">
-                      <p>Used {asset.usedIn} times</p>
-                      <p>{format(asset.createdAt, 'MMM d, yyyy')}</p>
+                      <p>{asset.sizeBytes ? `${Math.round(asset.sizeBytes / 1024)} KB` : 'N/A'}</p>
+                      <p>{format(new Date(asset.createdAt), 'MMM d, yyyy')}</p>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -277,11 +276,14 @@ export function ContentLibrarySocialTab(_props: ContentLibrarySocialTabProps) {
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleCopyAsset(asset.name)}>
+                        <DropdownMenuItem onClick={() => handleCopyAsset(asset.url, asset.name)}>
                           <Copy className="h-4 w-4 mr-2" />
                           Copy URL
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => handleDeleteAsset(asset.id)}
+                        >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
