@@ -18471,6 +18471,10 @@ export type Database = {
         Args: { p_event_id: string }
         Returns: boolean
       }
+      can_view_registration: {
+        Args: { _registration_id: string; _user_id?: string }
+        Returns: boolean
+      }
       check_ai_matching_eligibility: {
         Args: { target_user_id: string }
         Returns: Json
@@ -19111,7 +19115,7 @@ export type Database = {
         Returns: boolean
       }
       is_event_organizer: {
-        Args: { _event_id: string; _user_id: string }
+        Args: { _event_id: string; _user_id?: string }
         Returns: boolean
       }
       is_event_registered_attendee: {
@@ -19152,6 +19156,10 @@ export type Database = {
       mask_anonymous_author: {
         Args: { is_anonymous: boolean; post_author_id: string }
         Returns: string
+      }
+      owns_event_draft: {
+        Args: { _draft_id: string; _user_id?: string }
+        Returns: boolean
       }
       recalculate_zone_ranks: {
         Args: { p_event_id: string }
