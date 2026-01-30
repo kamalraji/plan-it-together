@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Globe, MapPin, Users, Clock, ArrowRight, Zap, XCircle, CheckCircle, Calendar } from "lucide-react";
@@ -63,33 +64,35 @@ const statusConfig: Record<EventStatus, { icon: typeof Clock; label: string; cla
   cancelled: { icon: XCircle, label: "Cancelled", className: "bg-destructive/20 text-destructive cursor-not-allowed" },
 };
 
-export function FlagshipEventCard({ event }: { event: FlagshipEvent }) {
-  const status = getEventStatus(event);
-  const startDate = new Date(event.start_date);
-  const { timeLeft, isExpired } = useCountdown(status === "register_now" || status === "coming_soon" ? startDate : null);
-  
-  const ModeIcon = modeConfig[event.mode].icon;
-  const StatusIcon = statusConfig[status].icon;
-  const bannerUrl = event.branding?.bannerUrl;
-  const eventLink = event.landing_page_slug ? `/e/${event.landing_page_slug}` : `/events/${event.id}`;
-  const isClickable = status === "register_now" || status === "coming_soon" || status === "live";
-  
-  // Prefetch event data on hover for faster navigation
-  const { prefetchBySlug } = usePrefetchEvent();
-  
-  const handleMouseEnter = () => {
-    if (event.landing_page_slug) {
-      prefetchBySlug(event.landing_page_slug);
-    }
-  };
+export const FlagshipEventCard = forwardRef<HTMLDivElement, { event: FlagshipEvent }>(
+  function FlagshipEventCard({ event }, ref) {
+    const status = getEventStatus(event);
+    const startDate = new Date(event.start_date);
+    const { timeLeft, isExpired } = useCountdown(status === "register_now" || status === "coming_soon" ? startDate : null);
+    
+    const ModeIcon = modeConfig[event.mode].icon;
+    const StatusIcon = statusConfig[status].icon;
+    const bannerUrl = event.branding?.bannerUrl;
+    const eventLink = event.landing_page_slug ? `/e/${event.landing_page_slug}` : `/events/${event.id}`;
+    const isClickable = status === "register_now" || status === "coming_soon" || status === "live";
+    
+    // Prefetch event data on hover for faster navigation
+    const { prefetchBySlug } = usePrefetchEvent();
+    
+    const handleMouseEnter = () => {
+      if (event.landing_page_slug) {
+        prefetchBySlug(event.landing_page_slug);
+      }
+    };
 
-  return (
-    <motion.div
-      whileHover={{ y: -4, scale: 1.01 }}
-      transition={{ duration: 0.2 }}
-      className="group relative h-full rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all duration-300"
-      onMouseEnter={handleMouseEnter}
-    >
+    return (
+      <motion.div
+        ref={ref}
+        whileHover={{ y: -4, scale: 1.01 }}
+        transition={{ duration: 0.2 }}
+        className="group relative h-full rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all duration-300"
+        onMouseEnter={handleMouseEnter}
+      >
       {/* Banner Image */}
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
         {bannerUrl ? (
@@ -194,5 +197,6 @@ export function FlagshipEventCard({ event }: { event: FlagshipEvent }) {
         </Button>
       </div>
     </motion.div>
-  );
-}
+    );
+  }
+);
