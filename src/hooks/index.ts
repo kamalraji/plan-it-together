@@ -43,6 +43,31 @@ export * from './it';
 // Committee hooks (shared dashboard hooks only - specific committees have their own imports)
 export * from './committee';
 
+// Mobile & Responsiveness
+export { useIsMobile } from './use-mobile';
+export { 
+  useSwipeGesture, 
+  useLongPress, 
+  useSwipeAction, 
+  usePinchZoom 
+} from './useTouchGestures';
+
+// URL & Navigation
+export { useUrlState } from './useUrlState';
+export { useDeepLink } from './useDeepLink';
+
+// Event Registration Management
+export { 
+  useEventRegistrations, 
+  useEventRegistrationStats,
+  useUpdateRegistrationStatus,
+  useBulkUpdateRegistrations,
+  exportRegistrationsToCSV,
+} from './useEventRegistrations';
+
+// Workspace & Approvals
+export { useApprovalMutations } from './useApprovalMutations';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';
