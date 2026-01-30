@@ -233,6 +233,37 @@ export function PublicEventPage() {
     );
   }
 
+  // Prefer GrapesJS-built landing page when available (full page replacement)
+  if (event.landing_page_data && (event.landing_page_data as any).html) {
+    const lp = event.landing_page_data as any as { 
+      html: string; 
+      css?: string | null; 
+      meta?: { title?: string; description?: string } 
+    };
+
+    // Sanitize HTML and CSS to prevent XSS attacks
+    const sanitizedHTML = sanitizeLandingPageHTML(lp.html);
+    const sanitizedCSS = lp.css ? sanitizeLandingPageCSS(lp.css) : null;
+
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <SkipLink href="#main-content" />
+        <main id="main-content" className="flex-1">
+          <section className="border-b border-border bg-background">
+            {/* Inject sanitized GrapesJS CSS into the page scope */}
+            {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
+            <div
+              className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+              dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+            />
+          </section>
+        </main>
+        <GlobalFooter />
+        <CookieConsentBanner />
+      </div>
+    );
+  }
+
   const org = event.organizations as any;
   const branding = (event.branding as any) || {};
 
@@ -413,25 +444,6 @@ export function PublicEventPage() {
               </CardContent>
             </Card>
 
-            {/* Render custom landing page if available (sanitized to prevent XSS) */}
-            {event.landing_page_data && (event.landing_page_data as any).html && (
-              <Card id="custom-content">
-                <CardContent className="pt-6">
-                  {(event.landing_page_data as any).css && (
-                    <style
-                      dangerouslySetInnerHTML={{ 
-                        __html: sanitizeLandingPageCSS((event.landing_page_data as any).css) 
-                      }}
-                    />
-                  )}
-                  <div
-                    dangerouslySetInnerHTML={{ 
-                      __html: sanitizeLandingPageHTML((event.landing_page_data as any).html) 
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Sidebar */}
