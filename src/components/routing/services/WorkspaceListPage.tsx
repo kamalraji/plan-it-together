@@ -238,18 +238,16 @@ export const WorkspaceListPage: React.FC = () => {
     ? [
         {
           label: 'Archive Selected',
-          action: (selectedItems: Workspace[]) => {
-            console.log('Archive workspaces:', selectedItems);
-            // Implement bulk archive logic
+          action: (_selectedItems: Workspace[]) => {
+            // TODO: Implement bulk archive logic
           },
           icon: 'archive',
           confirmationRequired: true,
         },
         {
           label: 'Delete Selected',
-          action: (selectedItems: Workspace[]) => {
-            console.log('Delete workspaces:', selectedItems);
-            // Implement bulk delete logic
+          action: (_selectedItems: Workspace[]) => {
+            // TODO: Implement bulk delete logic
           },
           icon: 'trash',
           confirmationRequired: true,
@@ -266,14 +264,14 @@ export const WorkspaceListPage: React.FC = () => {
         },
         {
           label: 'Import Workspace',
-          action: () => console.log('Import workspace'),
+          action: () => { /* TODO: Implement import */ },
           variant: 'secondary' as const,
         },
       ]
     : [];
 
 
-  const handleDeleteWorkspace = async (workspaceId: string) => {
+  const handleDeleteWorkspace = async (_workspaceId: string) => {
     const confirmed = await confirm({
       title: 'Delete Workspace',
       description: 'Are you sure you want to delete this workspace? This action cannot be undone.',
@@ -281,7 +279,6 @@ export const WorkspaceListPage: React.FC = () => {
       variant: 'danger',
     });
     if (!confirmed) return;
-    console.log('Delete workspace:', workspaceId);
     // TODO: Wire to backend delete endpoint and refresh list via React Query
   };
 

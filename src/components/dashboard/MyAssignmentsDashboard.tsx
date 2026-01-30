@@ -74,7 +74,6 @@ function AssignmentCard({ assignment }: { assignment: MyAssignment }) {
       className="group p-4 border border-border/50 rounded-xl bg-card hover:bg-muted/30 hover:border-border transition-all cursor-pointer"
       onClick={() => {
         // TODO: Navigate to task/checklist detail
-        console.log('Navigate to:', assignment);
       }}
     >
       <div className="flex items-start gap-3">
