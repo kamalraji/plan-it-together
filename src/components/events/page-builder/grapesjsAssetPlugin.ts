@@ -44,7 +44,6 @@ export function assetUploadPlugin(editor: Editor, options: { eventId?: string } 
         });
 
       if (error) {
-        console.error('Upload error:', error);
         return null;
       }
 
@@ -54,8 +53,7 @@ export function assetUploadPlugin(editor: Editor, options: { eventId?: string } 
         .getPublicUrl(data.path);
 
       return urlData.publicUrl;
-    } catch (err) {
-      console.error('Upload failed:', err);
+    } catch (_err) {
       return null;
     }
   }

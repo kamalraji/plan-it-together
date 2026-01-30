@@ -36,7 +36,6 @@ export function useChildWorkspaceMembers({ workspaceId, eventId }: UseChildWorks
         .eq(eventId ? 'event_id' : 'id', eventId || workspaceId);
 
       if (wsError) {
-        console.error('Error fetching workspaces:', wsError);
         throw wsError;
       }
 
@@ -73,7 +72,6 @@ export function useChildWorkspaceMembers({ workspaceId, eventId }: UseChildWorks
         .eq('status', 'ACTIVE');
 
       if (tmError) {
-        console.error('Error fetching team members:', tmError);
         throw tmError;
       }
 
@@ -89,7 +87,6 @@ export function useChildWorkspaceMembers({ workspaceId, eventId }: UseChildWorks
         .in('id', userIds);
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 

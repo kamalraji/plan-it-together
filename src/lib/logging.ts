@@ -37,7 +37,7 @@ export function initLogging() {
 
   const dsn = getSentryDsn();
   if (!dsn) {
-    console.info('[logging] Sentry DSN not configured; falling back to console-only logging.');
+    // Sentry DSN not configured; falling back to console-only logging
     initialized = true;
     return;
   }
@@ -78,7 +78,7 @@ export function setLoggingUserContext(user: LoggingUserContext | null, auth?: Lo
 
 export function captureError(error: unknown, extra?: LoggingExtraContext) {
   if (!initialized) {
-    console.error('[logging] Error captured (Sentry disabled):', error, extra);
+    // Error captured but Sentry is disabled - silently ignore
     return;
   }
 

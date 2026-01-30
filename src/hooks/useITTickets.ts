@@ -195,7 +195,6 @@ export function useITTickets(workspaceId: string) {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching IT tickets:', error);
         throw error;
       }
 
@@ -275,8 +274,7 @@ export function useITTickets(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey });
       toast.success('IT ticket created successfully');
     },
-    onError: (error) => {
-      console.error('Error creating IT ticket:', error);
+    onError: (_error) => {
       toast.error('Failed to create IT ticket');
     },
   });
@@ -333,8 +331,7 @@ export function useITTickets(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey });
       toast.success('Ticket updated successfully');
     },
-    onError: (error) => {
-      console.error('Error updating IT ticket:', error);
+    onError: (_error) => {
       toast.error('Failed to update ticket');
     },
   });
@@ -353,8 +350,7 @@ export function useITTickets(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey });
       toast.success('Ticket deleted successfully');
     },
-    onError: (error) => {
-      console.error('Error deleting IT ticket:', error);
+    onError: (_error) => {
       toast.error('Failed to delete ticket');
     },
   });
@@ -384,8 +380,7 @@ export function useITTickets(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey });
       toast.warning('Ticket escalated');
     },
-    onError: (error) => {
-      console.error('Error escalating ticket:', error);
+    onError: (_error) => {
       toast.error('Failed to escalate ticket');
     },
   });
@@ -415,8 +410,7 @@ export function useITTickets(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey });
       toast.success('Ticket resolved');
     },
-    onError: (error) => {
-      console.error('Error resolving ticket:', error);
+    onError: (_error) => {
       toast.error('Failed to resolve ticket');
     },
   });

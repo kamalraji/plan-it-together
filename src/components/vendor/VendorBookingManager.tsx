@@ -105,9 +105,8 @@ const VendorBookingManager: React.FC<VendorBookingManagerProps> = ({ vendorId })
       queryClient.invalidateQueries({ queryKey: ['vendor-bookings', vendorId] });
       toast.success('Booking updated successfully');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update booking');
-      console.error(error);
     },
   });
 

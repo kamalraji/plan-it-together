@@ -192,9 +192,8 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('Section created');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to create section');
-      console.error(error);
     },
   });
 
@@ -212,9 +211,8 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('Section deleted');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to delete section');
-      console.error(error);
     },
   });
 
@@ -246,9 +244,8 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('Item added');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to add item');
-      console.error(error);
     },
   });
 
@@ -271,9 +268,8 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update item');
-      console.error(error);
     },
   });
 
@@ -291,9 +287,8 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('Item deleted');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to delete item');
-      console.error(error);
     },
   });
 
@@ -316,7 +311,6 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to update item');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
     }
@@ -331,7 +325,6 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to assign item');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('Item assigned');
@@ -352,7 +345,6 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to reset items');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['tech-check', workspaceId] });
       toast.success('All items reset');
@@ -384,7 +376,6 @@ export function useTechCheck(workspaceId: string, eventId?: string) {
         .single();
 
       if (sectionError) {
-        console.error('Failed to create section:', sectionError);
         continue;
       }
 

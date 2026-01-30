@@ -27,12 +27,12 @@ export const PortfolioPreviewCard: React.FC<PortfolioPreviewCardProps> = ({
           .maybeSingle();
 
         if (error) {
-          console.error('Failed to load portfolio preview', error);
+          // Silently handle - will show empty state
         } else if (data) {
           setProfile(data as PublicPortfolioProfile);
         }
-      } catch (err) {
-        console.error('Unexpected error loading portfolio preview', err);
+      } catch (_err) {
+        // Silently handle - will show empty state
       } finally {
         setIsLoading(false);
       }

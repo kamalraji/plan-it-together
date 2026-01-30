@@ -250,9 +250,8 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['support-tickets', workspaceId] });
       toast.success('Ticket created');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to create ticket');
-      console.error(error);
     },
   });
 
@@ -288,9 +287,8 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['support-tickets', workspaceId] });
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update ticket');
-      console.error(error);
     },
   });
 
@@ -311,7 +309,6 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to assign ticket');
-      console.error(error);
       return;
     }
 
@@ -347,7 +344,6 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to update status');
-      console.error(error);
       return;
     }
 
@@ -376,7 +372,6 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to update priority');
-      console.error(error);
       return;
     }
 
@@ -408,7 +403,6 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to escalate ticket');
-      console.error(error);
       return;
     }
 
@@ -437,7 +431,6 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to add comment');
-      console.error(error);
       return;
     }
 
@@ -458,9 +451,8 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['support-tickets', workspaceId] });
       toast.success('Ticket deleted');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to delete ticket');
-      console.error(error);
     },
   });
 
