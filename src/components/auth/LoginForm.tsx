@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,9 +18,12 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const RESEND_COOLDOWN_SECONDS = 60;
+
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
@@ -44,8 +47,20 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-  const handleResendConfirmation = async () => {
-    if (!pendingEmail) return;
+
+  // Countdown timer for rate limiting
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleResendConfirmation = useCallback(async () => {
+    if (!pendingEmail || resendCooldown > 0) return;
     
     setIsResending(true);
     try {
@@ -65,8 +80,10 @@ export function LoginForm() {
           title: 'Email sent',
           description: 'A new confirmation email has been sent to your inbox.',
         });
+        // Start cooldown after successful send
+        setResendCooldown(RESEND_COOLDOWN_SECONDS);
       }
-    } catch (err) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -75,7 +92,7 @@ export function LoginForm() {
     } finally {
       setIsResending(false);
     }
-  };
+  }, [pendingEmail, resendCooldown, toast]);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -202,14 +219,16 @@ export function LoginForm() {
                     <button
                       type="button"
                       onClick={handleResendConfirmation}
-                      disabled={isResending}
-                      className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                      disabled={isResending || resendCooldown > 0}
+                      className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isResending ? (
                         <>
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2" />
                           Sending...
                         </>
+                      ) : resendCooldown > 0 ? (
+                        `Resend in ${resendCooldown}s`
                       ) : (
                         'Resend confirmation email'
                       )}
