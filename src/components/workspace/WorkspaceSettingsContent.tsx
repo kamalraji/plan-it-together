@@ -76,8 +76,7 @@ export function WorkspaceSettingsContent({
 
       if (error) throw error;
       toast.success('Workspace settings saved');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
+    } catch (_error) {
       toast.error('Failed to save settings');
     } finally {
       setIsSaving(false);
@@ -96,8 +95,7 @@ export function WorkspaceSettingsContent({
 
       if (error) throw error;
       toast.success('Workspace archived');
-    } catch (error) {
-      console.error('Failed to archive workspace:', error);
+    } catch (_error) {
       toast.error('Failed to archive workspace');
     }
   };
@@ -114,8 +112,7 @@ export function WorkspaceSettingsContent({
 
       if (error) throw error;
       toast.success('Workspace restored');
-    } catch (error) {
-      console.error('Failed to restore workspace:', error);
+    } catch (_error) {
       toast.error('Failed to restore workspace');
     }
   };
@@ -129,8 +126,7 @@ export function WorkspaceSettingsContent({
 
       if (error) throw error;
       toast.success('Workspace deleted');
-    } catch (error) {
-      console.error('Failed to delete workspace:', error);
+    } catch (_error) {
       toast.error('Failed to delete workspace');
     }
   };

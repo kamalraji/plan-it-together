@@ -69,8 +69,7 @@ export function useTaskApprovalPolicies(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['task-approval-policies', workspaceId] });
       toast.success('Approval policy created');
     },
-    onError: (error) => {
-      console.error('Failed to create policy:', error);
+    onError: (_error) => {
       toast.error('Failed to create approval policy');
     },
   });
@@ -107,8 +106,7 @@ export function useTaskApprovalPolicies(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['task-approval-policies', workspaceId] });
       toast.success('Approval policy updated');
     },
-    onError: (error) => {
-      console.error('Failed to update policy:', error);
+    onError: (_error) => {
       toast.error('Failed to update approval policy');
     },
   });
@@ -127,8 +125,7 @@ export function useTaskApprovalPolicies(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['task-approval-policies', workspaceId] });
       toast.success('Approval policy deleted');
     },
-    onError: (error) => {
-      console.error('Failed to delete policy:', error);
+    onError: (_error) => {
       toast.error('Failed to delete approval policy');
     },
   });
@@ -147,8 +144,7 @@ export function useTaskApprovalPolicies(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['task-approval-policies', workspaceId] });
       toast.success(isEnabled ? 'Policy enabled' : 'Policy disabled');
     },
-    onError: (error) => {
-      console.error('Failed to toggle policy:', error);
+    onError: (_error) => {
       toast.error('Failed to update policy');
     },
   });
@@ -182,7 +178,7 @@ function mapPolicyFromDb(row: Record<string, unknown>): TaskApprovalPolicy {
       approvalChain = chainData as ApprovalLevel[];
     }
   } catch {
-    console.warn('Failed to parse approval chain');
+    // Failed to parse approval chain - use empty default
   }
 
   return {
