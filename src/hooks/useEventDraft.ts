@@ -18,6 +18,15 @@ interface DraftState {
   synced: boolean;
 }
 
+/**
+ * useEventDraft - Manages draft persistence with optimistic updates
+ * 
+ * Features:
+ * - Optimistic local storage updates for instant feedback
+ * - Background server sync with retry logic
+ * - Debounced autosave to reduce write frequency
+ * - Conflict resolution (local unsynced > server)
+ */
 export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseEventDraftOptions) {
   // Call useAuth unconditionally - EventFormPage is always inside AuthProvider via ConsoleRoute
   const { user } = useAuth();
@@ -25,24 +34,39 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasDraft, setHasDraft] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const syncIntervalRef = useRef<NodeJS.Timeout>();
   const isInitializedRef = useRef(false);
+  const lastSavedDataRef = useRef<string>(''); // For optimistic comparison
 
   const getLocalKey = useCallback(() => {
     return `${DRAFT_STORAGE_KEY}-${organizationId}-${eventId || 'new'}`;
   }, [organizationId, eventId]);
 
-  // Save draft to localStorage
+  // Optimistic save to localStorage - instant feedback
   const saveToLocal = useCallback((data: Record<string, any>) => {
+    // Optimistic update: immediately show saved state
+    const dataString = JSON.stringify(data);
+    
+    // Skip if no actual changes (optimistic deduplication)
+    if (dataString === lastSavedDataRef.current) {
+      return;
+    }
+    
     const draft: DraftState = {
       data,
       savedAt: Date.now(),
       synced: false,
     };
-    localStorage.setItem(getLocalKey(), JSON.stringify(draft));
+    
+    // Optimistic: update state immediately before storage write
     setLastSaved(new Date());
     setHasDraft(true);
+    lastSavedDataRef.current = dataString;
+    
+    // Then persist to storage
+    localStorage.setItem(getLocalKey(), JSON.stringify(draft));
   }, [getLocalKey]);
 
   // Load draft from localStorage
@@ -64,12 +88,14 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
     setHasDraft(false);
   }, [getLocalKey]);
 
-  // Sync draft to server
+  // Sync draft to server with status tracking
   const syncToServer = useCallback(async (data: Record<string, any>) => {
     if (!user?.id || !organizationId) return;
 
+    setSyncStatus('syncing');
+    
     try {
-      await supabase
+      const { error } = await supabase
         .from('event_drafts')
         .upsert({
           user_id: user.id,
@@ -80,14 +106,22 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
           onConflict: 'user_id,organization_id,event_id'
         });
 
+      if (error) {
+        setSyncStatus('error');
+        return;
+      }
+
       // Mark local draft as synced
       const local = loadFromLocal();
       if (local) {
         local.synced = true;
         localStorage.setItem(getLocalKey(), JSON.stringify(local));
       }
+      
+      setSyncStatus('synced');
     } catch (_error) {
-      // Silently fail - server sync is optional
+      // Track error state but don't interrupt UX - local save succeeded
+      setSyncStatus('error');
     }
   }, [user?.id, organizationId, eventId, loadFromLocal, getLocalKey]);
 
@@ -239,5 +273,6 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
     isSaving,
     lastSaved,
     hasDraft,
+    syncStatus, // Expose sync status for UI feedback
   };
 }

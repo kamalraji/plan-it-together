@@ -50,6 +50,8 @@ import {
 } from '@/hooks/useEventRegistrations';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
+import { RegistrationMobileCard } from './RegistrationMobileCard';
+import { LiveRegion, useLiveAnnouncement } from '@/components/accessibility/LiveRegion';
 
 interface RegistrationManagementTabProps {
   eventId: string;
@@ -69,6 +71,7 @@ export const RegistrationManagementTab: React.FC<RegistrationManagementTabProps>
   canManage,
 }) => {
   const { toast } = useToast();
+  const { message: announcement, announce } = useLiveAnnouncement();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isExporting, setIsExporting] = useState(false);
 
@@ -171,6 +174,9 @@ export const RegistrationManagementTab: React.FC<RegistrationManagementTabProps>
 
   return (
     <div className="space-y-6">
+      {/* Accessibility: Live region for status announcements */}
+      <LiveRegion message={announcement} priority="polite" />
+      
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard label="Total" value={stats?.total ?? 0} />
@@ -329,21 +335,45 @@ export const RegistrationManagementTab: React.FC<RegistrationManagementTabProps>
           </div>
         )}
 
-        {/* Registration Rows */}
+        {/* Registration Rows - Desktop: Table, Mobile: Cards */}
         {!isLoading && registrations.length > 0 && (
-          <div className="divide-y divide-border">
-            {registrations.map((registration) => (
-              <RegistrationRow
-                key={registration.id}
-                registration={registration}
-                isSelected={selectedIds.has(registration.id)}
-                onSelect={() => toggleSelection(registration.id)}
-                onStatusChange={(status) => updateStatus.mutate({ registrationId: registration.id, status })}
-                canManage={canManage}
-                isUpdating={updateStatus.isPending}
-              />
-            ))}
-          </div>
+          <>
+            {/* Mobile Card View */}
+            <div className="sm:hidden">
+              {registrations.map((registration) => (
+                <RegistrationMobileCard
+                  key={registration.id}
+                  registration={registration}
+                  isSelected={selectedIds.has(registration.id)}
+                  onSelect={() => toggleSelection(registration.id)}
+                  onStatusChange={(status) => {
+                    updateStatus.mutate({ registrationId: registration.id, status });
+                    announce(`Status updated for ${registration.user?.fullName || 'registration'}`);
+                  }}
+                  canManage={canManage}
+                  isUpdating={updateStatus.isPending}
+                />
+              ))}
+            </div>
+            
+            {/* Desktop Table View */}
+            <div className="hidden sm:block divide-y divide-border">
+              {registrations.map((registration) => (
+                <RegistrationRow
+                  key={registration.id}
+                  registration={registration}
+                  isSelected={selectedIds.has(registration.id)}
+                  onSelect={() => toggleSelection(registration.id)}
+                  onStatusChange={(status) => {
+                    updateStatus.mutate({ registrationId: registration.id, status });
+                    announce(`Status updated for ${registration.user?.fullName || 'registration'}`);
+                  }}
+                  canManage={canManage}
+                  isUpdating={updateStatus.isPending}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

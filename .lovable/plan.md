@@ -7,9 +7,13 @@
 |-------|--------|-----------|
 | 1. Security Hardening | ✅ Done | Helper functions created, extensions schema ready |
 | 2. URL Navigation | ✅ Done | EventSettingsTab, EventAnalyticsTab, EventOpsConsole updated |
-| 5. Accessibility | ✅ Done | LiveRegion added to analytics and ops console |
+| 4. Optimistic Updates | ✅ Done | useEventDraft now has optimistic local saves with sync status |
+| 5. Accessibility | ✅ Done | LiveRegion added to analytics, ops console, and registration management |
+| 6. Responsiveness | ✅ Done | RegistrationMobileCard created for mobile-optimized registration views |
+| 8. Code Quality | ✅ Done | Analytics charts extracted to modular components |
 | 9. Query Key Factory | ✅ Done | src/lib/query-keys/events.ts created |
-| 3-4, 6-8, 10 | 🔲 Pending | Ready for next iteration |
+| 3, 7, 10 | 🔲 Pending | Workflows, settings propagation, error handling |
+
 
 ## Executive Summary
 
