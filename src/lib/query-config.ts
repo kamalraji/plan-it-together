@@ -72,6 +72,14 @@ export const queryKeys = {
     milestones: (id: string) => [...queryKeys.workspaces.detail(id), 'milestones'] as const,
     checklists: (id: string) => [...queryKeys.workspaces.detail(id), 'checklists'] as const,
     userWorkspaces: (workspaceId: string) => [...queryKeys.workspaces.all, 'user', workspaceId] as const,
+    // New: Committee and department specific
+    committeeStats: (id: string) => [...queryKeys.workspaces.detail(id), 'committee-stats'] as const,
+    departmentStats: (id: string) => [...queryKeys.workspaces.detail(id), 'department-stats'] as const,
+    contentAssets: (id: string) => [...queryKeys.workspaces.detail(id), 'content-assets'] as const,
+    sponsors: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsors'] as const,
+    campaigns: (id: string) => [...queryKeys.workspaces.detail(id), 'campaigns'] as const,
+    timesheets: (id: string) => [...queryKeys.workspaces.detail(id), 'timesheets'] as const,
+    escalations: (id: string) => [...queryKeys.workspaces.detail(id), 'escalations'] as const,
   },
 
   // Organization-related queries

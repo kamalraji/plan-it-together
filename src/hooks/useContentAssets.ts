@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { queryKeys, queryPresets } from '@/lib/query-config';
 
 export interface ContentAsset {
   id: string;
@@ -34,11 +35,12 @@ interface UpdateAssetInput {
 
 /**
  * Hook for managing workspace content assets
+ * Uses centralized query key factory for cache consistency
  */
 export function useContentAssets(workspaceId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const queryKey = ['workspace-content-assets', workspaceId];
+  const queryKey = queryKeys.workspaces.contentAssets(workspaceId);
 
   // Fetch all assets for the workspace
   const {
@@ -47,6 +49,7 @@ export function useContentAssets(workspaceId: string) {
     error,
   } = useQuery({
     queryKey,
+    ...queryPresets.standard,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspace_content_assets')

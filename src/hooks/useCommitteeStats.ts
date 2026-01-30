@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TaskStatus } from '@/types';
+import { queryKeys, queryPresets } from '@/lib/query-config';
 
 export interface CommitteeStats {
   totalTasks: number;
@@ -16,12 +17,13 @@ export interface CommitteeStats {
 
 /**
  * Hook for fetching real committee statistics from workspace data
+ * Uses centralized query key factory for cache consistency
  */
 export function useCommitteeStats(workspaceId: string) {
-  const queryKey = ['committee-stats', workspaceId];
 
   return useQuery({
-    queryKey,
+    queryKey: queryKeys.workspaces.committeeStats(workspaceId),
+    ...queryPresets.dynamic,
     queryFn: async (): Promise<CommitteeStats> => {
       const now = new Date().toISOString();
       const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
