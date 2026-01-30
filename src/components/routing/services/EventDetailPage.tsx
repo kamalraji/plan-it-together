@@ -23,6 +23,8 @@ import { supabase } from '@/integrations/supabase/looseClient';
 import { slugify } from '@/lib/workspaceNavigation';
 import { EventSettingsTab } from '@/components/events/settings';
 import { EventStatusActions } from '@/components/events/publish';
+import { RegistrationManagementTab } from '@/components/events/registration';
+import { EventAnalyticsTab } from '@/components/events/analytics';
 
 // Extended event type for internal use
 interface EventWithSlug extends Event {
@@ -164,7 +166,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       : []),
   ];
 
-  const tabs = [
+  const tabs: Array<{ id: string; label: string; badge?: string; component?: React.FC<{ event: Event }> }> = [
     {
       id: 'overview',
       label: 'Overview',
@@ -174,7 +176,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       id: 'registrations',
       label: 'Registrations',
       badge: '156',
-      component: RegistrationsTab,
+      // Component handled specially in render
     },
     ...(canManage
       ? [
@@ -191,7 +193,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         {
           id: 'settings',
           label: 'Settings',
-          component: SettingsTab,
+          // Component handled specially in render
         },
       ]
       : [
@@ -326,9 +328,20 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               );
             }
             
+            // Special handling for registrations tab to pass canManage
+            if (tab.id === 'registrations') {
+              return (
+                <div key={tab.id}>
+                  <RegistrationsTab event={event} canManage={canManage} />
+                </div>
+              );
+            }
+            
+            if (!tab.component) return null;
+            const TabComponent = tab.component;
             return (
               <div key={tab.id}>
-                <tab.component event={event} />
+                <TabComponent event={event} />
               </div>
             );
           })}
@@ -408,21 +421,13 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
   </div>
 );
 
-const RegistrationsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Registration Management</h3>
-    <p className="text-sm text-muted-foreground">Registration management functionality will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
+const RegistrationsTab: React.FC<{ event: Event; canManage: boolean }> = ({ event, canManage }) => (
+  <RegistrationManagementTab eventId={event.id} canManage={canManage} />
 );
 
 
 const AnalyticsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Analytics</h3>
-    <p className="text-sm text-muted-foreground">Event analytics and reporting will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
+  <EventAnalyticsTab eventId={event.id} />
 );
 
 const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
@@ -482,13 +487,6 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
   );
 };
 
-const SettingsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Settings</h3>
-    <p className="text-sm text-muted-foreground">Event settings and configuration will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
-);
 
 export default EventDetailPage;
 
