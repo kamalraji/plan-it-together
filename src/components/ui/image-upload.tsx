@@ -110,7 +110,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           description: 'Your image has been uploaded successfully.',
         });
       } catch (error) {
-        console.error('Upload error:', error);
         toast({
           title: 'Upload failed',
           description: error instanceof Error ? error.message : 'Failed to upload image.',

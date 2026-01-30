@@ -76,8 +76,7 @@ export function useManualRegistration(eventId: string | null) {
       }).filter(tier => tier.isWithinSaleWindow);
 
       setTicketTiers(tiersWithAvailability);
-    } catch (error) {
-      console.error('Error fetching ticket tiers:', error);
+    } catch (_error) {
       toast.error('Failed to load ticket types');
     } finally {
       setIsLoading(false);
@@ -186,7 +185,7 @@ export function useManualRegistration(eventId: string | null) {
         .eq('id', data.ticketTierId);
 
       if (updateError) {
-        console.error('Failed to update sold count:', updateError);
+        // Non-critical - continue
       }
 
       // Update promo code usage if applied
@@ -204,8 +203,8 @@ export function useManualRegistration(eventId: string | null) {
               .update({ current_uses: (promoData.current_uses || 0) + 1 })
               .eq('id', data.promoCodeId);
           }
-        } catch (err) {
-          console.warn('Failed to increment promo code usage:', err);
+        } catch (_err) {
+          // Non-critical - continue
         }
       }
 
@@ -229,8 +228,7 @@ export function useManualRegistration(eventId: string | null) {
               registrationId: registration.id
             }
           });
-        } catch (emailError) {
-          console.warn('Failed to send confirmation email:', emailError);
+        } catch (_emailError) {
           // Don't fail the registration if email fails
         }
       }
@@ -239,8 +237,7 @@ export function useManualRegistration(eventId: string | null) {
       await fetchTicketTiers();
 
       return true;
-    } catch (error) {
-      console.error('Error creating registration:', error);
+    } catch (_error) {
       toast.error('Failed to add attendee');
       return false;
     } finally {
@@ -296,15 +293,13 @@ export function useManualRegistration(eventId: string | null) {
           });
 
           sent++;
-        } catch (error) {
-          console.error(`Failed to send invitation to ${email}:`, error);
+        } catch (_error) {
           failed++;
         }
       }
 
       return { sent, failed };
-    } catch (error) {
-      console.error('Error sending bulk invitations:', error);
+    } catch (_error) {
       return { sent, failed: data.emails.length - sent };
     } finally {
       setIsSubmitting(false);
@@ -341,8 +336,7 @@ export function useManualRegistration(eventId: string | null) {
       }
 
       return { success, failed, errors };
-    } catch (error) {
-      console.error('Bulk import error:', error);
+    } catch (_error) {
       return { success, failed: attendees.length - success, errors: [...errors, 'Unexpected error'] };
     } finally {
       setIsSubmitting(false);

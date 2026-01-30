@@ -150,8 +150,7 @@ export function useAssignPageResponsibility() {
       queryClient.invalidateQueries({ queryKey: ['workspace-page-responsibility', variables.workspaceId] });
       toast.success('Page building responsibility assigned successfully');
     },
-    onError: (error) => {
-      console.error('Failed to assign responsibility:', error);
+    onError: (_error) => {
       toast.error('Failed to assign responsibility');
     },
   });
@@ -177,8 +176,7 @@ export function useRevokePageResponsibility() {
       queryClient.invalidateQueries({ queryKey: ['workspace-page-responsibility'] });
       toast.success('Responsibility revoked');
     },
-    onError: (error) => {
-      console.error('Failed to revoke responsibility:', error);
+    onError: (_error) => {
       toast.error('Failed to revoke responsibility');
     },
   });

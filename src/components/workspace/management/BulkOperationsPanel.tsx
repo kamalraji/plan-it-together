@@ -50,8 +50,7 @@ export function BulkOperationsPanel({
 
       queryClient.invalidateQueries({ queryKey: ['all-workspaces-management', eventId] });
       onClearSelection();
-    } catch (error) {
-      console.error('Error archiving workspaces:', error);
+    } catch (_error) {
       toast({
         title: 'Archive Failed',
         description: 'Failed to archive workspaces. Please try again.',
@@ -80,8 +79,7 @@ export function BulkOperationsPanel({
 
       queryClient.invalidateQueries({ queryKey: ['all-workspaces-management', eventId] });
       onClearSelection();
-    } catch (error) {
-      console.error('Error deleting workspaces:', error);
+    } catch (_error) {
       toast({
         title: 'Delete Failed',
         description: 'Failed to delete workspaces. Please try again.',

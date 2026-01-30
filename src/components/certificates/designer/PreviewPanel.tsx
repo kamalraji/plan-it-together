@@ -90,8 +90,8 @@ export function PreviewPanel({
       });
       
       previewFabricRef.current.renderAll();
-    } catch (error) {
-      console.error('Failed to render preview:', error);
+    } catch (_error) {
+      // Silently handle render failures - preview will show previous state
     } finally {
       setIsRendering(false);
     }

@@ -37,8 +37,7 @@ export function useOffline() {
             pendingMessages: pendingMessages.length
           }));
         }
-      } catch (error) {
-        console.error('Failed to initialize offline services:', error);
+      } catch (_error) {
         setState(prev => ({ ...prev, isInitialized: true }));
       }
     };
@@ -79,8 +78,8 @@ export function useOffline() {
         pendingUpdates: pendingUpdates.length,
         pendingMessages: pendingMessages.length
       }));
-    } catch (error) {
-      console.error('Failed to sync pending data:', error);
+    } catch (_error) {
+      // Sync failures are expected when offline
     }
   }, []);
 
@@ -116,9 +115,7 @@ export function useOffline() {
           tag: 'offline-task-update'
         });
       }
-    } catch (error) {
-      console.error('Failed to save task update:', error);
-      
+    } catch (_error) {
       // Save for offline sync as fallback
       await offlineService.saveTaskUpdate(workspaceId, taskId, updateData);
       
@@ -159,9 +156,7 @@ export function useOffline() {
 
         return tempId;
       }
-    } catch (error) {
-      console.error('Failed to save message:', error);
-      
+    } catch (_error) {
       // Save for offline sync as fallback
       const tempId = await offlineService.saveOfflineMessage(channelId, content);
       
@@ -178,8 +173,8 @@ export function useOffline() {
   const cacheData = useCallback(async (key: string, data: any, ttl?: number) => {
     try {
       await offlineService.cacheData(key, data, ttl);
-    } catch (error) {
-      console.error('Failed to cache data:', error);
+    } catch (_error) {
+      // Caching failures are non-critical
     }
   }, []);
 
@@ -187,8 +182,7 @@ export function useOffline() {
   const getCachedData = useCallback(async (key: string) => {
     try {
       return await offlineService.getCachedData(key);
-    } catch (error) {
-      console.error('Failed to get cached data:', error);
+    } catch (_error) {
       return null;
     }
   }, []);
@@ -202,8 +196,8 @@ export function useOffline() {
         pendingUpdates: 0,
         pendingMessages: 0
       }));
-    } catch (error) {
-      console.error('Failed to clear offline data:', error);
+    } catch (_error) {
+      // Clear failures are non-critical
     }
   }, []);
 
@@ -211,8 +205,7 @@ export function useOffline() {
   const getStorageUsage = useCallback(async () => {
     try {
       return await offlineService.getStorageUsage();
-    } catch (error) {
-      console.error('Failed to get storage usage:', error);
+    } catch (_error) {
       return null;
     }
   }, []);

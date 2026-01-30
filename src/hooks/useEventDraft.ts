@@ -86,8 +86,8 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
         local.synced = true;
         localStorage.setItem(getLocalKey(), JSON.stringify(local));
       }
-    } catch (error) {
-      console.error('Failed to sync event draft to server:', error);
+    } catch (_error) {
+      // Silently fail - server sync is optional
     }
   }, [user?.id, organizationId, eventId, loadFromLocal, getLocalKey]);
 
@@ -137,8 +137,8 @@ export function useEventDraft({ organizationId, eventId, onDraftRestored }: UseE
       }
 
       await query;
-    } catch (error) {
-      console.error('Failed to clear event draft from server:', error);
+    } catch (_error) {
+      // Silently fail - draft cleanup is not critical
     }
   }, [user?.id, organizationId, eventId]);
 
