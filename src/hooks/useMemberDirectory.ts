@@ -58,7 +58,7 @@ export function useMemberDirectory({ eventId }: UseMemberDirectoryOptions) {
         .from('workspace_team_members')
         .select('user_id, role, workspace_id, status')
         .in('workspace_id', workspaceIds)
-        .or('status.ilike.active,status.eq.ACTIVE');
+        .eq('status', 'ACTIVE');
 
       if (tmError) {
         throw tmError;
