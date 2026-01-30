@@ -377,7 +377,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         <TaskManagementInterface
           tasks={tasks || []}
           teamMembers={teamMembers || []}
-          onTaskEdit={(task) => console.log('Edit task:', task)}
+          onTaskEdit={() => { /* TODO: Implement task edit modal */ }}
           onTaskDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
           onTaskStatusChange={(taskId, status) => updateTaskStatusMutation.mutate({ taskId, status })}
           onCreateTask={() => createTaskMutation.mutate()}
@@ -430,8 +430,8 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         <WorkspaceTemplateManagement
           workspaceId={workspaceId}
           mode="library"
-          onTemplateApplied={(template) => console.log('Template applied:', template)}
-          onTemplateCreated={(template) => console.log('Template created:', template)}
+          onTemplateApplied={() => {}}
+          onTemplateCreated={() => {}}
         />
       ) : null,
     },

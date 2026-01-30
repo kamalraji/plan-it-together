@@ -365,9 +365,9 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
               teamMembers={teamMembers}
               workspaceId={workspace.id}
               roleScope={activeRoleSpace}
-              onTaskEdit={(task) => {
+              onTaskEdit={(_task) => {
                 if (!permissions.canManageTasks) return;
-                console.log('Edit task:', task);
+                // TODO: Implement task edit modal
               }}
               onTaskDelete={actions.handleTaskDelete}
               onTaskStatusChange={actions.handleTaskStatusChange}
@@ -401,8 +401,8 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
           <WorkspaceTemplateManagement
             workspaceId={workspace.id}
             mode="library"
-            onTemplateApplied={(template) => console.log('Template applied:', template)}
-            onTemplateCreated={(template) => console.log('Template created:', template)}
+            onTemplateApplied={() => {}}
+            onTemplateCreated={() => {}}
           />
         )}
 

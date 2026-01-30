@@ -440,7 +440,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                               <PencilIcon className="h-4 w-4" />
                             </Link>
                             <button
-                              onClick={() => console.log('Delete event', event.id)}
+                              onClick={() => { /* TODO: Implement delete event */ }}
                               className="text-destructive hover:text-destructive/80"
                               title="Delete Event"
                             >
@@ -503,7 +503,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                         <PencilIcon className="h-4 w-4" />
                       </Link>
                       <button
-                        onClick={() => console.log('Delete event', event.id)}
+                        onClick={() => { /* TODO: Implement delete event */ }}
                         className="text-destructive hover:text-destructive/80"
                         title="Delete Event"
                       >
