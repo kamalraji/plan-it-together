@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory } from '../../types';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useTouchDrag } from '@/hooks/useTouchDrag';
 import { SkeletonKanbanBoard } from '@/components/ui/skeleton-patterns';
+import { LiveRegion, useLiveAnnouncement } from '@/components/accessibility/LiveRegion';
 import { GripVertical, Calendar, Link2, Pencil, Trash2 } from 'lucide-react';
 
 interface TaskKanbanBoardProps {
@@ -73,6 +74,17 @@ export function TaskKanbanBoard({
   const [draggedTask, setDraggedTask] = useState<WorkspaceTask | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  
+  // Keyboard navigation state
+  const [focusedColumnIndex, setFocusedColumnIndex] = useState(0);
+  const [focusedTaskIndex, setFocusedTaskIndex] = useState(0);
+  const [isKeyboardDragging, setIsKeyboardDragging] = useState(false);
+  const [keyboardDraggedTask, setKeyboardDraggedTask] = useState<WorkspaceTask | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const taskRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  
+  // Live announcements for screen readers
+  const { message: liveMessage, announce } = useLiveAnnouncement();
 
   // Touch drag support for mobile
   const { touchHandlers, isDraggingItem, isDropTarget, dropZoneProps } = useTouchDrag<WorkspaceTask>({
@@ -80,6 +92,7 @@ export function TaskKanbanBoard({
       const newStatus = dropTarget as TaskStatus;
       if (task.status !== newStatus && onTaskStatusChange) {
         onTaskStatusChange(task.id, newStatus);
+        announce(`Task "${task.title}" moved to ${KANBAN_COLUMNS.find(c => c.status === newStatus)?.title || newStatus}`);
       }
     },
   });
@@ -129,7 +142,8 @@ export function TaskKanbanBoard({
   const handleDragStart = useCallback((e: React.DragEvent, task: WorkspaceTask) => {
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = 'move';
-  }, []);
+    announce(`Picked up task "${task.title}". Use arrow keys to navigate, Space to drop`);
+  }, [announce]);
 
   const handleDragEnd = useCallback(() => {
     setDraggedTask(null);
@@ -152,9 +166,123 @@ export function TaskKanbanBoard({
 
     if (draggedTask && draggedTask.status !== status && onTaskStatusChange) {
       onTaskStatusChange(draggedTask.id, status);
+      announce(`Task "${draggedTask.title}" moved to ${KANBAN_COLUMNS.find(c => c.status === status)?.title || status}`);
     }
     setDraggedTask(null);
-  }, [draggedTask, onTaskStatusChange]);
+  }, [draggedTask, onTaskStatusChange, announce]);
+
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const currentColumn = KANBAN_COLUMNS[focusedColumnIndex];
+    const currentTasks = tasksByStatus[currentColumn.status];
+    
+    switch (e.key) {
+      case 'ArrowRight':
+        e.preventDefault();
+        if (isKeyboardDragging && keyboardDraggedTask) {
+          // Move task to next column
+          const nextColumnIndex = Math.min(focusedColumnIndex + 1, KANBAN_COLUMNS.length - 1);
+          const nextColumn = KANBAN_COLUMNS[nextColumnIndex];
+          announce(`Over ${nextColumn.title} column`);
+          setFocusedColumnIndex(nextColumnIndex);
+        } else {
+          const nextIndex = Math.min(focusedColumnIndex + 1, KANBAN_COLUMNS.length - 1);
+          setFocusedColumnIndex(nextIndex);
+          setFocusedTaskIndex(0);
+          announce(`${KANBAN_COLUMNS[nextIndex].title} column, ${tasksByStatus[KANBAN_COLUMNS[nextIndex].status].length} tasks`);
+        }
+        break;
+        
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (isKeyboardDragging && keyboardDraggedTask) {
+          const prevColumnIndex = Math.max(focusedColumnIndex - 1, 0);
+          const prevColumn = KANBAN_COLUMNS[prevColumnIndex];
+          announce(`Over ${prevColumn.title} column`);
+          setFocusedColumnIndex(prevColumnIndex);
+        } else {
+          const prevIndex = Math.max(focusedColumnIndex - 1, 0);
+          setFocusedColumnIndex(prevIndex);
+          setFocusedTaskIndex(0);
+          announce(`${KANBAN_COLUMNS[prevIndex].title} column, ${tasksByStatus[KANBAN_COLUMNS[prevIndex].status].length} tasks`);
+        }
+        break;
+        
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isKeyboardDragging && currentTasks.length > 0) {
+          const nextTaskIndex = Math.min(focusedTaskIndex + 1, currentTasks.length - 1);
+          setFocusedTaskIndex(nextTaskIndex);
+          const task = currentTasks[nextTaskIndex];
+          announce(`Task: ${task.title}, priority ${task.priority}`);
+        }
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault();
+        if (!isKeyboardDragging && currentTasks.length > 0) {
+          const prevTaskIndex = Math.max(focusedTaskIndex - 1, 0);
+          setFocusedTaskIndex(prevTaskIndex);
+          const task = currentTasks[prevTaskIndex];
+          announce(`Task: ${task.title}, priority ${task.priority}`);
+        }
+        break;
+        
+      case ' ':
+        e.preventDefault();
+        if (isKeyboardDragging && keyboardDraggedTask) {
+          // Drop the task
+          const targetColumn = KANBAN_COLUMNS[focusedColumnIndex];
+          if (keyboardDraggedTask.status !== targetColumn.status && onTaskStatusChange) {
+            onTaskStatusChange(keyboardDraggedTask.id, targetColumn.status);
+            announce(`Dropped "${keyboardDraggedTask.title}" in ${targetColumn.title} column`);
+          } else {
+            announce('Task dropped in same column');
+          }
+          setIsKeyboardDragging(false);
+          setKeyboardDraggedTask(null);
+        } else if (currentTasks.length > 0) {
+          // Pick up the task
+          const task = currentTasks[focusedTaskIndex];
+          setKeyboardDraggedTask(task);
+          setIsKeyboardDragging(true);
+          announce(`Picked up "${task.title}". Use Left/Right arrows to move between columns, Space to drop, Escape to cancel`);
+        }
+        break;
+        
+      case 'Escape':
+        if (isKeyboardDragging) {
+          e.preventDefault();
+          setIsKeyboardDragging(false);
+          setKeyboardDraggedTask(null);
+          announce('Drag cancelled');
+        }
+        break;
+        
+      case 'Enter':
+        e.preventDefault();
+        if (!isKeyboardDragging && currentTasks.length > 0) {
+          const task = currentTasks[focusedTaskIndex];
+          onTaskClick?.(task);
+          announce(`Opening task: ${task.title}`);
+        }
+        break;
+    }
+  }, [focusedColumnIndex, focusedTaskIndex, isKeyboardDragging, keyboardDraggedTask, tasksByStatus, onTaskStatusChange, onTaskClick, announce]);
+  
+  // Focus the currently selected task
+  useEffect(() => {
+    const currentColumn = KANBAN_COLUMNS[focusedColumnIndex];
+    const currentTasks = tasksByStatus[currentColumn.status];
+    if (currentTasks.length > 0 && focusedTaskIndex < currentTasks.length) {
+      const taskId = currentTasks[focusedTaskIndex].id;
+      const taskElement = taskRefs.current.get(taskId);
+      if (taskElement && document.activeElement === boardRef.current) {
+        // Only scroll into view, don't steal focus
+        taskElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [focusedColumnIndex, focusedTaskIndex, tasksByStatus]);
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
@@ -235,12 +363,23 @@ export function TaskKanbanBoard({
         </div>
       </div>
 
+      {/* Live Region for screen reader announcements */}
+      <LiveRegion message={liveMessage} priority="polite" />
+      
+      {/* Keyboard instructions */}
+      <div className="sr-only" aria-live="polite">
+        Use arrow keys to navigate. Space to pick up or drop a task. Enter to open task details. Escape to cancel dragging.
+      </div>
+
       {/* Kanban Board */}
       <div className="p-4 sm:p-6 overflow-x-auto">
         <div 
+          ref={boardRef}
           className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 min-h-96"
-          role="region"
-          aria-label="Task board with drag and drop"
+          role="application"
+          aria-label="Task board. Use arrow keys to navigate between columns and tasks. Space to drag and drop. Enter to open task."
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
         >
           {KANBAN_COLUMNS.map((column) => {
             const columnDropProps = dropZoneProps(column.status);
@@ -282,12 +421,18 @@ export function TaskKanbanBoard({
                       <p className="text-sm text-muted-foreground">No tasks</p>
                     </div>
                   ) : (
-                    tasksByStatus[column.status].map((task) => {
-                      const isDragging = draggedTask?.id === task.id || isDraggingItem(task);
+                    tasksByStatus[column.status].map((task, taskIndex) => {
+                      const isDragging = draggedTask?.id === task.id || isDraggingItem(task) || keyboardDraggedTask?.id === task.id;
+                      const colIndex = KANBAN_COLUMNS.findIndex(c => c.status === column.status);
+                      const isFocused = focusedColumnIndex === colIndex && focusedTaskIndex === taskIndex;
                       
                       return (
                         <div
                           key={task.id}
+                          ref={(el) => {
+                            if (el) taskRefs.current.set(task.id, el);
+                            else taskRefs.current.delete(task.id);
+                          }}
                           role="listitem"
                           draggable
                           onDragStart={(e) => handleDragStart(e, task)}
@@ -297,9 +442,11 @@ export function TaskKanbanBoard({
                           onTouchEnd={touchHandlers.onTouchEnd}
                           className={`bg-card rounded-lg p-3 shadow-sm border-l-4 ${getPriorityColor(task.priority)} 
                             cursor-move hover:shadow-md transition-all touch-manipulation select-none
-                            min-h-[44px] ${isDragging ? 'opacity-50 scale-95' : ''}`}
+                            min-h-[44px] ${isDragging ? 'opacity-50 scale-95' : ''} 
+                            ${isFocused ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                           onClick={() => onTaskClick?.(task)}
-                          aria-label={`Task: ${task.title}. Priority: ${task.priority}. Status: ${column.title}`}
+                          aria-label={`Task: ${task.title}. Priority: ${task.priority}. Status: ${column.title}${isFocused ? '. Currently focused' : ''}`}
+                          aria-grabbed={isDragging}
                         >
                           {/* Drag Handle for touch */}
                           <div className="flex items-start gap-2 mb-2">
