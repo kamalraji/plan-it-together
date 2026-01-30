@@ -85,7 +85,6 @@ export const LegacyWorkspaceRedirect: React.FC = () => {
     // Find the target workspace
     const targetWorkspace = workspaces.find(ws => ws.id === workspaceId);
     if (!targetWorkspace) {
-      console.warn('[LegacyRedirect] Workspace not found:', workspaceId);
       return;
     }
 
@@ -101,7 +100,6 @@ export const LegacyWorkspaceRedirect: React.FC = () => {
     const hierarchy = buildHierarchyChain(workspaceId, workspaceData);
     
     if (hierarchy.length === 0) {
-      console.warn('[LegacyRedirect] Could not build hierarchy for workspace:', workspaceId);
       return;
     }
 
@@ -122,7 +120,6 @@ export const LegacyWorkspaceRedirect: React.FC = () => {
       }
     );
 
-    console.log('[LegacyRedirect] Redirecting:', location.pathname + location.search, '->', newUrl);
     navigate(newUrl, { replace: true });
     setRedirectAttempted(true);
   }, [orgSlug, event, workspaces, workspaceId, tab, taskId, sectionId, roleSpace, navigate, location, redirectAttempted]);
