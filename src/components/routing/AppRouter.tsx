@@ -35,6 +35,8 @@ import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import PricingPage from '@/pages/PricingPage';
 import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
+import { PrivacyPolicyPage, TermsOfServicePage, CookiePolicyPage, SecurityPage } from '@/components/legal';
+import { PublicHelpPage } from '@/components/help';
 
 // Lazy-loaded components for better bundle splitting
 // Heavy/role-specific components only downloaded when needed
@@ -480,6 +482,15 @@ export const AppRouter: React.FC = () => {
              {/* Thittam1Hub-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
              <Route path="/pricing" element={<PricingPage />} />
+             
+             {/* Legal pages */}
+             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+             <Route path="/terms" element={<TermsOfServicePage />} />
+             <Route path="/cookies" element={<CookiePolicyPage />} />
+             <Route path="/security" element={<SecurityPage />} />
+             
+             {/* Public help - accessible without auth */}
+             <Route path="/help" element={<PublicHelpPage />} />
              
              {/* Dev tools */}
              <Route path="/dev/illustrations" element={<IllustrationGalleryPage />} />
