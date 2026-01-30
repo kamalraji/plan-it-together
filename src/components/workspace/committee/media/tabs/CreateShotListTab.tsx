@@ -434,10 +434,10 @@ export function CreateShotListTab({ workspaceId }: CreateShotListTabProps) {
                             <SelectItem value="published">Published</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(shot)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(shot)} aria-label="Edit shot">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(shot.id)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(shot.id)} aria-label="Delete shot">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

@@ -101,7 +101,7 @@ const AttendflowLanding = () => {
         </div>
       </header>
 
-      <main>
+      <main id="main-content">
         {/* Hero Carousel */}
         <HeroCarousel />
 
