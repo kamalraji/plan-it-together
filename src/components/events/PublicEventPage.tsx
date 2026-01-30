@@ -16,6 +16,8 @@ import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitiz
 import { getTierSaleStatus, TicketTier } from '@/types/ticketTier';
 import { SkipLink } from '@/components/accessibility';
 import { AccessibilityBadges, EventCountdown, EventSocialLinks } from './shared';
+import { GlobalFooter } from '@/components/layout/GlobalFooter';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   INR: '₹',
@@ -528,6 +530,9 @@ export function PublicEventPage() {
         </div>
         </section>
       </main>
+      
+      <GlobalFooter />
+      <CookieConsentBanner />
     </div>
   );
 }

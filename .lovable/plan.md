@@ -26,6 +26,8 @@ All phases have been implemented successfully.
 - **PublicPageLayout.tsx**: Wrapper with SkipLink, header, footer, cookie consent
 - **PricingPage**: Wrapped with PublicPageLayout
 - **ParticipantEventsPage**: Wrapped with PublicPageLayout
+- **EventLandingPage**: Added GlobalFooter + CookieConsentBanner + SkipLink
+- **PublicEventPage**: Added GlobalFooter + CookieConsentBanner
 
 ### ✅ Phase 4: Route Registration
 - Added routes: `/privacy`, `/terms`, `/cookies`, `/security`, `/help`

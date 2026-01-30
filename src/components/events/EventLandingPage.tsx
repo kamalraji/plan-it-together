@@ -12,6 +12,8 @@ import { Ticket } from 'lucide-react';
 import type { TicketTier } from '@/types/ticketTier';
 import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/types/ticketTier';
 import { SkipLink } from '@/components/accessibility';
+import { GlobalFooter } from '@/components/layout/GlobalFooter';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 
 type TabType = 'overview' | 'schedule' | 'prizes' | 'sponsors';
 
@@ -247,15 +249,20 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     const sanitizedCSS = lp.css ? sanitizeLandingPageCSS(lp.css) : null;
 
     return (
-      <div className="min-h-screen bg-background">
-        <section className="border-b border-border bg-background">
-          {/* Inject sanitized GrapesJS CSS into the page scope */}
-          {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
-          <div
-            className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
-          />
-        </section>
+      <div className="min-h-screen bg-background flex flex-col">
+        <SkipLink href="#main-content" />
+        <main id="main-content" className="flex-1">
+          <section className="border-b border-border bg-background">
+            {/* Inject sanitized GrapesJS CSS into the page scope */}
+            {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
+            <div
+              className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+              dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+            />
+          </section>
+        </main>
+        <GlobalFooter />
+        <CookieConsentBanner />
       </div>
     );
   }
@@ -868,6 +875,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
           </div>
         </div>
       )}
+      
+      <GlobalFooter />
+      <CookieConsentBanner />
     </div>
   );
 }
