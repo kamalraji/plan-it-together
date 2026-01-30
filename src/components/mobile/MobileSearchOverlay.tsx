@@ -212,6 +212,7 @@ export const MobileSearchOverlay: React.FC<MobileSearchOverlayProps> = ({
                 <Input
                   ref={inputRef}
                   type="text"
+                  autoComplete="off"
                   placeholder="Search events, workspaces, members..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

@@ -141,6 +141,7 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
                 </label>
                 <input
                   type="text"
+                  autoComplete="off"
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value)}
                   className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"

@@ -131,7 +131,8 @@ export function AddVolunteerModal({
                   </FormLabel>
                   <FormControl>
                     <Input 
-                      type="email" 
+                      type="email"
+                      autoComplete="email"
                       placeholder="team-member@example.com" 
                       {...field} 
                     />
