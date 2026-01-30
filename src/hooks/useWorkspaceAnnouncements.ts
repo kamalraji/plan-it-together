@@ -130,8 +130,8 @@ export function useWorkspaceAnnouncements(workspaceId: string | undefined) {
               })
               .eq('id', result.id);
           }
-        } catch (e) {
-          console.error('Email sending failed:', e);
+        } catch (_e) {
+          // Email sending failed silently
         }
       }
 

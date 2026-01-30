@@ -237,7 +237,6 @@ export const IDCardCanvas = forwardRef<IDCardCanvasRef, IDCardCanvasProps>(
         
         fabricRef.current.renderAll();
       } catch (error) {
-        console.error('Failed to load image:', error);
         throw error;
       }
     }, [getCurrentDimensions]);
@@ -261,7 +260,6 @@ export const IDCardCanvas = forwardRef<IDCardCanvasRef, IDCardCanvasProps>(
         fabricRef.current.setActiveObject(img);
         fabricRef.current.renderAll();
       } catch (error) {
-        console.error('Failed to add QR placeholder:', error);
         throw error;
       }
     }, [getCurrentDimensions]);
@@ -284,7 +282,6 @@ export const IDCardCanvas = forwardRef<IDCardCanvasRef, IDCardCanvasProps>(
         fabricRef.current.setActiveObject(img);
         fabricRef.current.renderAll();
       } catch (error) {
-        console.error('Failed to add photo placeholder:', error);
         throw error;
       }
     }, []);

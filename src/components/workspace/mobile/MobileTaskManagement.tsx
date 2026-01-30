@@ -225,8 +225,7 @@ export function MobileTaskManagement({
         });
 
         toast.success('Location check-in successful!');
-      } catch (error) {
-        console.error('Location check-in failed:', error);
+      } catch (_error) {
         toast.error('Failed to get location. Please ensure location services are enabled.');
       }
     } else {
@@ -259,8 +258,7 @@ export function MobileTaskManagement({
           });
 
           toast.success('Photo uploaded successfully!');
-        } catch (error) {
-          console.error('Photo upload failed:', error);
+        } catch (_error) {
           toast.error('Failed to upload photo. Please try again.');
         }
       }

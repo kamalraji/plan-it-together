@@ -49,8 +49,7 @@ export function useNotifications(userId?: string) {
             isInitialized: true,
           }));
         }
-      } catch (error) {
-        console.error('Failed to initialize notifications:', error);
+      } catch (_error) {
         setState((prev) => ({
           ...prev,
           isInitialized: true,
@@ -81,7 +80,6 @@ export function useNotifications(userId?: string) {
           .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
-          console.error('Failed to load notification preferences:', error.message);
           return;
         }
 
@@ -95,7 +93,6 @@ export function useNotifications(userId?: string) {
             .single();
 
           if (insertError) {
-            console.error('Failed to create default notification preferences:', insertError.message);
             return;
           }
 
@@ -103,8 +100,8 @@ export function useNotifications(userId?: string) {
         }
 
         setState((prev) => ({ ...prev, preferences: prefs }));
-      } catch (err) {
-        console.error('Unexpected error loading notification preferences:', err);
+      } catch (_err) {
+        // Loading notification preferences failed silently
       }
     };
 
@@ -119,8 +116,7 @@ export function useNotifications(userId?: string) {
       const permission = await notificationService.requestPermission();
       setState((prev) => ({ ...prev, permission }));
       return permission;
-    } catch (error) {
-      console.error('Failed to request notification permission:', error);
+    } catch (_error) {
       return 'denied';
     }
   }, []);
@@ -138,8 +134,7 @@ export function useNotifications(userId?: string) {
       }));
 
       return isSubscribed;
-    } catch (error) {
-      console.error('Failed to subscribe to push notifications:', error);
+    } catch (_error) {
       return false;
     }
   }, []);
@@ -154,8 +149,7 @@ export function useNotifications(userId?: string) {
       }
 
       return success;
-    } catch (error) {
-      console.error('Failed to unsubscribe from push notifications:', error);
+    } catch (_error) {
       return false;
     }
   }, []);
@@ -181,8 +175,8 @@ export function useNotifications(userId?: string) {
           data: options?.data,
           requireInteraction: options?.requireInteraction,
         });
-      } catch (error) {
-        console.error('Failed to show notification:', error);
+      } catch (_error) {
+        // Show notification failed silently
       }
     },
     [],
@@ -209,15 +203,14 @@ export function useNotifications(userId?: string) {
           .maybeSingle();
 
         if (error) {
-          console.error('Failed to update notification preferences:', error.message);
           return;
         }
 
         if (data) {
           setState((prev) => ({ ...prev, preferences: data }));
         }
-      } catch (err) {
-        console.error('Unexpected error updating notification preferences:', err);
+      } catch (_err) {
+        // Updating notification preferences failed silently
       }
     },
     [userId, state.preferences],
@@ -228,8 +221,8 @@ export function useNotifications(userId?: string) {
       try {
         if (!shouldSendForWorkspace()) return;
         await notificationService.notifyTaskAssignment(taskTitle, assigneeName, workspaceId);
-      } catch (error) {
-        console.error('Failed to send task assignment notification:', error);
+      } catch (_error) {
+        // Task assignment notification failed silently
       }
     },
     [state.preferences],
@@ -240,8 +233,8 @@ export function useNotifications(userId?: string) {
       try {
         if (!shouldSendForWorkspace()) return;
         await notificationService.notifyTaskDeadline(taskTitle, hoursUntilDeadline, workspaceId);
-      } catch (error) {
-        console.error('Failed to send task deadline notification:', error);
+      } catch (_error) {
+        // Task deadline notification failed silently
       }
     },
     [state.preferences],
@@ -252,8 +245,8 @@ export function useNotifications(userId?: string) {
       try {
         if (!shouldSendForWorkspace()) return;
         await notificationService.notifyNewMessage(senderName, channelName, workspaceId);
-      } catch (error) {
-        console.error('Failed to send new message notification:', error);
+      } catch (_error) {
+        // New message notification failed silently
       }
     },
     [state.preferences],
@@ -264,8 +257,8 @@ export function useNotifications(userId?: string) {
       try {
         if (!shouldSendForWorkspace()) return;
         await notificationService.notifyTeamInvitation(workspaceName, inviterName);
-      } catch (error) {
-        console.error('Failed to send team invitation notification:', error);
+      } catch (_error) {
+        // Team invitation notification failed silently
       }
     },
     [state.preferences],

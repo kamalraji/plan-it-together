@@ -176,8 +176,7 @@ export function useTrainingSessions(workspaceId: string) {
       toast.success('Training session created');
       queryClient.invalidateQueries({ queryKey: ['training-sessions', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error creating training session:', error);
+    onError: (_error) => {
       toast.error('Failed to create training session');
     },
   });
@@ -210,8 +209,7 @@ export function useTrainingSessions(workspaceId: string) {
       toast.success('Training session updated');
       queryClient.invalidateQueries({ queryKey: ['training-sessions', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error updating training session:', error);
+    onError: (_error) => {
       toast.error('Failed to update training session');
     },
   });
@@ -236,8 +234,7 @@ export function useTrainingSessions(workspaceId: string) {
       toast.success('Training session deleted');
       queryClient.invalidateQueries({ queryKey: ['training-sessions', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error deleting training session:', error);
+    onError: (_error) => {
       toast.error('Failed to delete training session');
     },
   });
@@ -273,8 +270,7 @@ export function useTrainingSessions(workspaceId: string) {
       toast.success('Training session marked as complete');
       queryClient.invalidateQueries({ queryKey: ['training-sessions', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error completing session:', error);
+    onError: (_error) => {
       toast.error('Failed to complete session');
     },
   });
@@ -296,8 +292,7 @@ export function useTrainingSessions(workspaceId: string) {
       toast.success('Enrolled in training');
       queryClient.invalidateQueries({ queryKey: ['training-sessions', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error enrolling:', error);
+    onError: (_error) => {
       toast.error('Failed to enroll');
     },
   });

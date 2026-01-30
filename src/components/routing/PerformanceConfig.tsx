@@ -249,8 +249,8 @@ export const usePerformanceMetrics = () => {
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
       observer.observe({ entryTypes: ['layout-shift'] });
       observer.observe({ entryTypes: ['first-input'] });
-    } catch (error) {
-      console.warn('Some performance metrics not supported:', error);
+    } catch (_error) {
+      // Some performance metrics not supported
     }
 
     return () => observer.disconnect();
@@ -288,13 +288,8 @@ export const PerformanceWarnings: React.FC = () => {
       newWarnings.push('First Input Delay is high (>100ms)');
     }
 
+    // Performance warnings handled silently in production
     setWarnings(newWarnings);
-
-    // Log warnings in development
-    if (newWarnings.length > 0 && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.warn('Performance warnings:', newWarnings);
-      console.log('Recommendations:', recommendations);
-    }
   }, [metrics, recommendations, config.monitoring.logPerformanceWarnings]);
 
   // Only show in development

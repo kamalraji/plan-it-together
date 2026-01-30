@@ -50,7 +50,6 @@ export const OrganizationDirectory: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading organizations directory', error);
         setOrganizations([]);
       } else {
         const withFollowers: DirectoryOrganization[] = (data ?? []).map((org: any) => ({

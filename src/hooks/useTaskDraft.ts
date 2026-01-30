@@ -77,8 +77,8 @@ export function useTaskDraft({ workspaceId, onDraftRestored }: UseTaskDraftOptio
         local.synced = true;
         localStorage.setItem(getLocalKey(), JSON.stringify(local));
       }
-    } catch (error) {
-      console.error('Failed to sync draft to server:', error);
+    } catch (_error) {
+      // Sync draft to server failed silently
     }
   }, [user?.id, workspaceId, loadFromLocal, getLocalKey]);
 
@@ -113,8 +113,8 @@ export function useTaskDraft({ workspaceId, onDraftRestored }: UseTaskDraftOptio
         .delete()
         .eq('user_id', user.id)
         .eq('workspace_id', workspaceId);
-    } catch (error) {
-      console.error('Failed to clear draft from server:', error);
+    } catch (_error) {
+      // Clear draft from server failed silently
     }
   }, [user?.id, workspaceId]);
 

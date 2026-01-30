@@ -125,11 +125,9 @@ export const WorkspaceCreatePage: React.FC = () => {
         navigate(hierarchicalUrl, { replace: true });
       } else {
         // Non-org context fallback
-        console.warn('[WorkspaceCreatePage] No org context, redirecting to dashboard');
         navigate('/dashboard', { replace: true });
       }
     } catch (error: any) {
-      console.error('Failed to create workspace', error);
       if (error?.message?.includes('already has a root workspace')) {
         setFormErrors({
           eventId: error.message,

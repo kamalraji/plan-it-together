@@ -118,7 +118,6 @@ export function useScoringRubrics(workspaceId: string) {
       if (context?.previous) {
         queryClient.setQueryData(['scoring-rubrics', workspaceId], context.previous);
       }
-      console.error('Error creating rubric:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to create rubric');
     },
     onSuccess: () => {
@@ -174,11 +173,10 @@ export function useScoringRubrics(workspaceId: string) {
 
       return { previous };
     },
-    onError: (error, _, context) => {
+    onError: (_error, _, context) => {
       if (context?.previous) {
         queryClient.setQueryData(['scoring-rubrics', workspaceId], context.previous);
       }
-      console.error('Error updating rubric:', error);
       toast.error('Failed to update rubric');
     },
     onSuccess: () => {
@@ -209,11 +207,10 @@ export function useScoringRubrics(workspaceId: string) {
 
       return { previous };
     },
-    onError: (error, _, context) => {
+    onError: (_error, _, context) => {
       if (context?.previous) {
         queryClient.setQueryData(['scoring-rubrics', workspaceId], context.previous);
       }
-      console.error('Error deleting rubric:', error);
       toast.error('Failed to delete rubric');
     },
     onSuccess: () => {
@@ -246,11 +243,10 @@ export function useScoringRubrics(workspaceId: string) {
 
       return { previous };
     },
-    onError: (error, _, context) => {
+    onError: (_error, _, context) => {
       if (context?.previous) {
         queryClient.setQueryData(['scoring-rubrics', workspaceId], context.previous);
       }
-      console.error('Error toggling rubric:', error);
       toast.error('Failed to update rubric status');
     },
     onSuccess: (_, { isActive }) => {
@@ -287,8 +283,7 @@ export function useScoringRubrics(workspaceId: string) {
       toast.success('Rubric duplicated');
       queryClient.invalidateQueries({ queryKey: ['scoring-rubrics', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error duplicating rubric:', error);
+    onError: (_error) => {
       toast.error('Failed to duplicate rubric');
     },
   });

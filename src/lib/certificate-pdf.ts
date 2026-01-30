@@ -291,8 +291,8 @@ export async function replaceQRPlaceholders(
         // Remove old and add new
         canvas.remove(obj);
         canvas.add(newImg);
-      } catch (error) {
-        console.error('Failed to replace QR placeholder:', error);
+      } catch (_error) {
+        // QR placeholder replacement failed silently
       }
     }
   }

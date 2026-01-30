@@ -47,8 +47,8 @@ export function RealtimeMessageComposer({
     try {
       await onSendMessage(message.trim());
       setMessage('');
-    } catch (error) {
-      console.error('Failed to send message:', error);
+    } catch (_error) {
+      // Send message failed silently
     } finally {
       setIsSending(false);
     }

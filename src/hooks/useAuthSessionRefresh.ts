@@ -22,11 +22,8 @@ export function useAuthSessionRefresh(onLogout: () => void, refreshIntervalMs = 
     const refresh = async () => {
       try {
         await api.post('/auth/refresh-token');
-      } catch (error) {
+      } catch (_error) {
         // If refresh fails, api.ts will surface 401s and emit auth:logout if applicable.
-        if (import.meta.env.DEV) {
-          console.warn('[useAuthSessionRefresh] Refresh failed', error);
-        }
       }
     };
 

@@ -132,7 +132,6 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
           });
 
         if (error) {
-          console.error('Upload error:', error);
           toast({
             title: 'Upload failed',
             description: `Failed to upload ${file.name}.`,
@@ -161,8 +160,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
           description: `${newImages.length} image(s) added to gallery.`,
         });
       }
-    } catch (error) {
-      console.error('Upload error:', error);
+    } catch (_error) {
       toast({
         title: 'Upload failed',
         description: 'An error occurred while uploading images.',

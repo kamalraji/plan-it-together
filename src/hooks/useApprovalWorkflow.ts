@@ -82,7 +82,6 @@ export function useBudgetApprovals(workspaceId: string | undefined) {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Budget requests query error:', error);
         return [];
       }
 
@@ -236,7 +235,6 @@ export function useResourceApprovals(workspaceId: string | undefined) {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Resource requests query error:', error);
         return [];
       }
 

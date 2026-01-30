@@ -339,7 +339,6 @@ export function useExportList({ eventId, workspaceId }: UseExportListOptions) {
       });
 
     } catch (error) {
-      console.error('Export error:', error);
       toast.error('Export failed', {
         description: error instanceof Error ? error.message : 'Unknown error occurred',
       });

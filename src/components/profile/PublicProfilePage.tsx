@@ -38,7 +38,6 @@ export const PublicProfilePage: React.FC = () => {
           .rpc('get_public_portfolio', { _user_id: userId });
 
         if (queryError) {
-          console.error('Error loading public profile:', queryError.message);
           setError('Unable to load profile.');
         } else if (!data || (Array.isArray(data) && data.length === 0)) {
           setError('Profile not found or is private.');

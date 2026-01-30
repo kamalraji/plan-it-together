@@ -85,8 +85,8 @@ export function ParticipantDashboard() {
         if (isOrganizerSignup && user.role === 'PARTICIPANT') {
           setShowOrganizerBanner(true);
         }
-      } catch (error) {
-        console.warn('Failed to read auth metadata for organizer banner', error);
+      } catch (_error) {
+        // Failed to read auth metadata silently
       }
     };
 

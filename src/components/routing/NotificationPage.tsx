@@ -152,7 +152,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
     ]);
 
     if (error) {
-      console.error('Failed to seed notifications:', error.message);
+      // Seed notifications failed silently
     }
   };
 

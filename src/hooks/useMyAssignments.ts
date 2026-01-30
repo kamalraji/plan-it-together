@@ -55,7 +55,6 @@ export function useMyAssignments(eventId?: string) {
         .order('due_date', { ascending: true, nullsFirst: false });
 
       if (tasksError) {
-        console.error('Error fetching tasks:', tasksError);
         throw tasksError;
       }
 
@@ -68,7 +67,6 @@ export function useMyAssignments(eventId?: string) {
         .order('due_date', { ascending: true, nullsFirst: false });
 
       if (checklistsError) {
-        console.error('Error fetching checklists:', checklistsError);
         throw checklistsError;
       }
 

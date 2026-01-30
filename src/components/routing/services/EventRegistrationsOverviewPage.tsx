@@ -89,7 +89,6 @@ export const EventRegistrationsOverviewPage: React.FC = () => {
         const { data: rows, error, count } = await query;
 
         if (error) {
-          console.error('Error loading registrations overview', error);
           throw error;
         }
 

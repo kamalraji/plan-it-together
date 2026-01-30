@@ -100,8 +100,8 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         await navigator.clipboard.writeText(qrCodeData.qrCode);
         alert('QR code copied to clipboard!');
       }
-    } catch (error) {
-      console.error('Error sharing QR code:', error);
+    } catch (_error) {
+      // Share QR code failed silently
     }
   };
 

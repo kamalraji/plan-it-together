@@ -89,8 +89,8 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
             const data: RealTimeData = JSON.parse(event.data);
             setRealTimeData(data);
             setHistoricalData(prev => [...prev.slice(-29), data]); // Keep last 30 data points
-          } catch (err) {
-            console.error('Failed to parse WebSocket message:', err);
+          } catch (_err) {
+            // Parse WebSocket message failed silently
           }
         };
 
@@ -100,13 +100,11 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           setTimeout(connectWebSocket, 3000);
         };
 
-        ws.onerror = (err) => {
-          console.error('WebSocket error:', err);
+        ws.onerror = (_err) => {
           setError('Connection error');
           setIsConnected(false);
         };
-      } catch (err) {
-        console.error('Failed to connect WebSocket:', err);
+      } catch (_err) {
         setError('Failed to establish real-time connection');
       }
     };
@@ -141,7 +139,6 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           setHistoricalData(prev => [...prev.slice(-29), data]);
           setError(null);
         } catch (err) {
-          console.error('Polling error:', err);
           setError(err instanceof Error ? err.message : 'Failed to fetch data');
         }
       }, refreshInterval * 1000);

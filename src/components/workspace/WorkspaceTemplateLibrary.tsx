@@ -40,8 +40,7 @@ export function WorkspaceTemplateLibrary({
       setLoading(true);
       const response = await api.get('/api/workspace-templates');
       setTemplates(response.data);
-    } catch (error) {
-      console.error('Error fetching templates:', error);
+    } catch (_error) {
       setError('Failed to load templates');
     } finally {
       setLoading(false);

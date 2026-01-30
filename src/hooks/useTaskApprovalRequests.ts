@@ -161,8 +161,7 @@ export function useTaskApprovalRequests(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks'] });
       toast.success('Approval request submitted');
     },
-    onError: (error) => {
-      console.error('Failed to create approval request:', error);
+    onError: (_error) => {
       toast.error('Failed to submit approval request');
     },
   });
@@ -287,8 +286,7 @@ export function useTaskApprovalRequests(workspaceId: string | undefined) {
         toast.success('Task approval rejected');
       }
     },
-    onError: (error) => {
-      console.error('Failed to submit decision:', error);
+    onError: (_error) => {
       toast.error('Failed to submit decision');
     },
   });
@@ -328,8 +326,7 @@ export function useTaskApprovalRequests(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['task-approval-requests'] });
       toast.success('Approval delegated');
     },
-    onError: (error) => {
-      console.error('Failed to delegate:', error);
+    onError: (_error) => {
       toast.error('Failed to delegate approval');
     },
   });
@@ -364,8 +361,7 @@ export function useTaskApprovalRequests(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks'] });
       toast.success('Approval request cancelled');
     },
-    onError: (error) => {
-      console.error('Failed to cancel:', error);
+    onError: (_error) => {
       toast.error('Failed to cancel approval request');
     },
   });

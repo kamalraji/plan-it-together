@@ -91,8 +91,8 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
 
       const data = await response.json();
       setMessages(data.data);
-    } catch (err: any) {
-      console.error('Failed to fetch messages:', err);
+    } catch (_err: any) {
+      // Fetch messages failed silently
     }
   };
 

@@ -220,8 +220,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
       }
 
       handleDesignerClose();
-    } catch (error) {
-      console.error('Error saving template:', error);
+    } catch (_error) {
       toast.error('Failed to save template');
     }
   };
@@ -280,8 +279,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
       });
 
       toast.success(`Generated ${attendeesToGenerate.length} ID cards successfully!`);
-    } catch (error) {
-      console.error('Failed to generate cards:', error);
+    } catch (_error) {
       setGenerationProgress({
         current: 0,
         total: 0,

@@ -77,8 +77,8 @@ export function CustomTemplateManager({
           createdAt: t.created_at,
         }))
       );
-    } catch (err) {
-      console.error('Failed to fetch custom templates:', err);
+    } catch (_err) {
+      // Fetch templates failed silently
     } finally {
       setLoading(false);
     }
@@ -117,7 +117,6 @@ export function CustomTemplateManager({
         .single();
 
       if (error) {
-        console.error('Failed to save template:', error);
         throw error;
       }
 
@@ -142,7 +141,6 @@ export function CustomTemplateManager({
       setNewTemplateName('');
       setSelectedIcon('📌');
     } catch (err: any) {
-      console.error('Template save error:', err);
       setError(err.message || 'Failed to save template');
     } finally {
       setSaving(false);
@@ -158,8 +156,8 @@ export function CustomTemplateManager({
 
       if (error) throw error;
       setTemplates((prev) => prev.filter((t) => t.id !== templateId));
-    } catch (err) {
-      console.error('Failed to delete template:', err);
+    } catch (_err) {
+      // Delete template failed silently
     }
   };
 

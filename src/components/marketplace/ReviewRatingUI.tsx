@@ -316,8 +316,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, 
       toast({ title: 'Review submitted', description: 'Thank you for your feedback!' });
       onReviewSubmitted();
       onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to submit review:', error);
+    } catch (_error) {
       toast({ title: 'Error', description: 'Failed to submit review. Please try again.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);

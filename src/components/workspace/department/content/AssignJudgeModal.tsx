@@ -142,8 +142,7 @@ export function AssignJudgeModal({ open, onOpenChange, eventId }: AssignJudgeMod
       onOpenChange(false);
       setSelectedJudgeId('');
       setSelectedSubmissions([]);
-    } catch (error) {
-      console.error('Error assigning judge:', error);
+    } catch (_error) {
       toast.error('Failed to assign submissions');
     } finally {
       setIsSubmitting(false);

@@ -54,8 +54,7 @@ export function useWorkspaceSettings(workspaceId: string | undefined) {
         // No settings exist yet, use defaults
         setSettings({ ...DEFAULT_SETTINGS, workspace_id: workspaceId });
       }
-    } catch (error) {
-      console.error('Failed to fetch workspace settings:', error);
+    } catch (_error) {
       setSettings({ ...DEFAULT_SETTINGS, workspace_id: workspaceId });
     } finally {
       setIsLoading(false);
@@ -88,8 +87,7 @@ export function useWorkspaceSettings(workspaceId: string | undefined) {
         });
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Failed to save setting:', error);
+    } catch (_error) {
       toast.error('Failed to save setting');
       // Revert on error
       fetchSettings();

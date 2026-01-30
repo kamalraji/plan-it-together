@@ -14,11 +14,8 @@ try {
 
   const root = createRoot(rootElement);
   root.render(<App />);
-} catch (error) {
-  // Only log critical startup errors
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Startup error:', error);
-  }
+} catch (_error) {
+  // Critical startup error - show fallback UI
   
   const rootElement = document.getElementById('root');
   if (rootElement) {

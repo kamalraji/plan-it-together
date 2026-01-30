@@ -66,7 +66,6 @@ export function WorkspaceTemplateRating({
       });
       onRatingSubmitted();
     } catch (error: any) {
-      console.error('Error submitting rating:', error);
       setError(error.response?.data?.message || 'Failed to submit rating');
     } finally {
       setLoading(false);

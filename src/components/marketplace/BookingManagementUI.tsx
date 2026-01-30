@@ -61,8 +61,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
       await api.patch(`/marketplace/bookings/${bookingId}/accept-quote`);
       toast({ title: 'Quote accepted', description: 'The quote has been accepted successfully.' });
       refetch();
-    } catch (error) {
-      console.error('Failed to accept quote:', error);
+    } catch (_error) {
       toast({ title: 'Error', description: 'Failed to accept quote. Please try again.', variant: 'destructive' });
     }
   };
@@ -74,8 +73,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
       await api.patch(`/marketplace/bookings/${bookingId}/cancel`);
       toast({ title: 'Booking cancelled', description: 'The booking has been cancelled.' });
       refetch();
-    } catch (error) {
-      console.error('Failed to cancel booking:', error);
+    } catch (_error) {
       toast({ title: 'Error', description: 'Failed to cancel booking. Please try again.', variant: 'destructive' });
     }
   };
@@ -300,8 +298,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ booking, open, onOpenChange
       setNewMessage('');
       onMessageSent();
       toast({ title: 'Message sent', description: 'Your message has been sent.' });
-    } catch (error) {
-      console.error('Failed to send message:', error);
+    } catch (_error) {
       toast({ title: 'Error', description: 'Failed to send message. Please try again.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);

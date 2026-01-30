@@ -84,8 +84,8 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
     try {
       await navigator.clipboard.writeText(shareUrl);
       alert('Public link copied to clipboard');
-    } catch (err) {
-      console.error('Failed to copy link', err);
+    } catch (_err) {
+      // Failed to copy link silently
     }
   };
 

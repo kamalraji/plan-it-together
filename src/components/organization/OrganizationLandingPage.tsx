@@ -96,8 +96,8 @@ export function OrganizationLandingPage({ slug }: OrganizationLandingPageProps) 
         document.head.appendChild(script);
       }
       script.textContent = JSON.stringify(jsonLd);
-    } catch (seoError) {
-      console.warn('Unable to set SEO metadata for organization page', seoError);
+    } catch (_seoError) {
+      // SEO metadata injection failed silently
     }
   }, [organization]);
 

@@ -173,7 +173,6 @@ export const DesignCanvas = forwardRef<DesignCanvasRef, DesignCanvasProps>(
         
         fabricRef.current.renderAll();
       } catch (error) {
-        console.error('Failed to load image:', error);
         throw error;
       }
     }, []);
@@ -197,7 +196,6 @@ export const DesignCanvas = forwardRef<DesignCanvasRef, DesignCanvasProps>(
         fabricRef.current.setActiveObject(img);
         fabricRef.current.renderAll();
       } catch (error) {
-        console.error('Failed to add QR placeholder:', error);
         throw error;
       }
     }, []);
