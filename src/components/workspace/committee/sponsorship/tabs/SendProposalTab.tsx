@@ -190,6 +190,7 @@ export function SendProposalTab({ workspace }: SendProposalTabProps) {
           <Input
             id="contact_email"
             type="email"
+            autoComplete="email"
             value={formData.contact_email}
             onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
             placeholder="john@acme.com"

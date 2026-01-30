@@ -95,6 +95,7 @@ export function ProfileCompletion() {
               <input
                 {...register('name')}
                 type="text"
+                autoComplete="name"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Enter your full name"
               />
@@ -122,6 +123,7 @@ export function ProfileCompletion() {
               <input
                 {...register('organization')}
                 type="text"
+                autoComplete="organization"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your company, school, or organization"
               />
@@ -134,6 +136,7 @@ export function ProfileCompletion() {
               <input
                 {...register('phone')}
                 type="tel"
+                autoComplete="tel"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your phone number"
               />
@@ -146,6 +149,7 @@ export function ProfileCompletion() {
               <input
                 {...register('website')}
                 type="url"
+                autoComplete="url"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="https://your-website.com"
               />
@@ -163,6 +167,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.linkedin')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="LinkedIn profile URL"
                 />
@@ -175,6 +180,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.twitter')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="Twitter profile URL"
                 />
@@ -187,6 +193,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.github')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="GitHub profile URL"
                 />

@@ -563,6 +563,7 @@ export function ParticipantDashboard() {
                   <label className="block text-xs font-medium text-muted-foreground mb-1">Search events</label>
                   <input
                     type="text"
+                    autoComplete="off"
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);

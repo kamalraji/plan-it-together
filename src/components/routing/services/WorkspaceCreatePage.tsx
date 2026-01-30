@@ -183,6 +183,7 @@ export const WorkspaceCreatePage: React.FC = () => {
             <input
               id="workspace-name"
               type="text"
+              autoComplete="off"
               value={formValues.name}
               onChange={handleChange('name')}
               className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
@@ -247,6 +248,7 @@ export const WorkspaceCreatePage: React.FC = () => {
               <input
                 id="event-id"
                 type="text"
+                autoComplete="off"
                 value={formValues.eventId}
                 onChange={handleChange('eventId')}
                 className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"

@@ -383,6 +383,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <input
                   type="text"
+                  autoComplete="off"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
