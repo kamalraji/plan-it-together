@@ -90,20 +90,20 @@ export const ExampleServiceDashboard: React.FC = () => {
       label: 'Create Event',
       description: 'Start a new event',
       icon: PlusIcon,
-      action: () => console.log('Create event'),
+      action: () => { /* Create event handler */ },
       variant: 'primary' as const,
     },
     {
       label: 'Manage Users',
       description: 'User management',
       icon: UserIcon,
-      action: () => console.log('Manage users'),
+      action: () => { /* Manage users handler */ },
     },
     {
       label: 'View Calendar',
       description: 'Event calendar',
       icon: CalendarIcon,
-      action: () => console.log('View calendar'),
+      action: () => { /* View calendar handler */ },
     },
   ];
 
@@ -112,8 +112,8 @@ export const ExampleServiceDashboard: React.FC = () => {
       service="Event Management"
       widgets={widgets}
       quickActions={quickActions}
-      onRefresh={() => console.log('Refreshing dashboard')}
-      onCustomizeLayout={() => console.log('Customize layout')}
+      onRefresh={() => { /* Refresh dashboard */ }}
+      onCustomizeLayout={() => { /* Customize layout */ }}
     />
   );
 };
@@ -207,12 +207,12 @@ export const ExampleResourceListPage: React.FC = () => {
   const bulkActions = [
     {
       label: 'Publish',
-      action: (items: any[]) => console.log('Publishing', items),
+      action: (_items: any[]) => { /* Publish handler */ },
       variant: 'primary' as const,
     },
     {
       label: 'Archive',
-      action: (items: any[]) => console.log('Archiving', items),
+      action: (_items: any[]) => { /* Archive handler */ },
       confirmationRequired: true,
       variant: 'danger' as const,
     },
@@ -229,9 +229,9 @@ export const ExampleResourceListPage: React.FC = () => {
       bulkActions={bulkActions}
       searchable={true}
       exportable={true}
-      onCreateNew={() => console.log('Create new event')}
-      onRefresh={() => console.log('Refresh events')}
-      onRowClick={(event) => console.log('View event', event)}
+      onCreateNew={() => { /* Create new event */ }}
+      onRefresh={() => { /* Refresh events */ }}
+      onRowClick={(_event) => { /* View event */ }}
     />
   );
 };
@@ -277,13 +277,13 @@ export const ExampleResourceDetailPage: React.FC = () => {
   const actions = [
     {
       label: 'Edit Event',
-      action: () => console.log('Edit event'),
+      action: () => { /* Edit event */ },
       icon: PencilIcon,
       variant: 'primary' as const,
     },
     {
       label: 'Delete Event',
-      action: () => console.log('Delete event'),
+      action: () => { /* Delete event */ },
       icon: TrashIcon,
       variant: 'danger' as const,
       confirmationRequired: true,
@@ -299,7 +299,7 @@ export const ExampleResourceDetailPage: React.FC = () => {
       breadcrumbs={breadcrumbs}
       tabs={tabs}
       actions={actions}
-      onRefresh={() => console.log('Refresh event')}
+      onRefresh={() => { /* Refresh event */ }}
     />
   );
 };
@@ -319,12 +319,12 @@ export const ExamplePageHeader: React.FC = () => {
   const actions = [
     {
       label: 'Export Data',
-      action: () => console.log('Export data'),
+      action: () => { /* Export data */ },
       variant: 'secondary' as const,
     },
     {
       label: 'Create Report',
-      action: () => console.log('Create report'),
+      action: () => { /* Create report */ },
       variant: 'primary' as const,
       icon: PlusIcon,
     },
@@ -370,7 +370,7 @@ export const ExamplePageHeader: React.FC = () => {
         { label: 'Last 30 days', value: 'last30days' },
         { label: 'Last 90 days', value: 'last90days' },
       ],
-      onChange: (value: string) => console.log('Period changed:', value),
+      onChange: (_value: string) => { /* Period change handler */ },
     },
   ];
 
