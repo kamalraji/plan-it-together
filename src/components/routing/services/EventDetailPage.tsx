@@ -25,6 +25,7 @@ import { EventSettingsTab } from '@/components/events/settings';
 import { EventStatusActions } from '@/components/events/publish';
 import { RegistrationManagementTab } from '@/components/events/registration';
 import { EventAnalyticsTab } from '@/components/events/analytics';
+import { RichTextDisplay } from '@/components/ui/rich-text-display';
 
 // Extended event type for internal use
 interface EventWithSlug extends Event {
@@ -355,7 +356,11 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
 const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
   <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
     <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Description</h3>
-    <p className="text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed">{event.description || 'No description provided.'}</p>
+    <RichTextDisplay 
+      content={event.description} 
+      fallback="No description provided."
+      className="text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed"
+    />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       <div className="rounded-lg bg-muted/30 p-4">

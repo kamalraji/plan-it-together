@@ -6,6 +6,7 @@ import { useCountdown } from "@/hooks/useCountdown";
 import { usePrefetchEvent } from "@/hooks/usePrefetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { RichTextDisplay } from "@/components/ui/rich-text-display";
 import { format } from "date-fns";
 
 interface EventBranding {
@@ -152,9 +153,11 @@ export const FlagshipEventCard = forwardRef<HTMLDivElement, { event: FlagshipEve
 
         {/* Description */}
         {event.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {event.description}
-          </p>
+          <RichTextDisplay 
+            content={event.description} 
+            lineClamp={2}
+            className="text-sm text-muted-foreground"
+          />
         )}
 
         {/* Date */}

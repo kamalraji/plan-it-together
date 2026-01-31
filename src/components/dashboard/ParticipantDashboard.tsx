@@ -10,6 +10,7 @@ import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 import { preferenceStorage } from '@/lib/storage';
+import { RichTextDisplay, stripHtmlTags } from '@/components/ui/rich-text-display';
 
 interface Registration {
   id: string;
@@ -240,7 +241,7 @@ export function ParticipantDashboard() {
     const query = searchTerm.toLowerCase();
     return (
       registration.event.name.toLowerCase().includes(query) ||
-      registration.event.description.toLowerCase().includes(query)
+      stripHtmlTags(registration.event.description).toLowerCase().includes(query)
     );
   });
 
@@ -644,9 +645,10 @@ export function ParticipantDashboard() {
                           </summary>
 
                           <div className="px-4 pt-3 pb-4 space-y-3 text-xs">
-                            <p className="text-muted-foreground">
-                              {registration.event.description}
-                            </p>
+                            <RichTextDisplay
+                              content={registration.event.description}
+                              className="text-muted-foreground"
+                            />
                             <div className="space-y-2">
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Start</span>
@@ -778,9 +780,10 @@ export function ParticipantDashboard() {
                         <div className="p-4 sm:p-6">
                           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 sm:gap-6">
                             <div className="flex-1">
-                              <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">
-                                {registration.event.description}
-                              </p>
+                              <RichTextDisplay
+                                content={registration.event.description}
+                                className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4"
+                              />
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                                 <div className="space-y-2">
@@ -1048,9 +1051,11 @@ export function ParticipantDashboard() {
                     <h4 className="text-sm font-semibold text-foreground mb-1">
                       {registration.event.name}
                     </h4>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                      {registration.event.description}
-                    </p>
+                    <RichTextDisplay
+                      content={registration.event.description}
+                      lineClamp={2}
+                      className="text-xs text-muted-foreground mb-2"
+                    />
                     <p className="text-xs text-muted-foreground mb-3">
                       {new Date(registration.event.startDate).toLocaleDateString()} •{' '}
                       {registration.event.mode.toLowerCase()}

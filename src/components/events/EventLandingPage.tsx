@@ -14,6 +14,7 @@ import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/typ
 import { SkipLink } from '@/components/accessibility';
 import { GlobalFooter } from '@/components/layout/GlobalFooter';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
+import { RichTextDisplay } from '@/components/ui/rich-text-display';
 
 type TabType = 'overview' | 'schedule' | 'prizes' | 'sponsors';
 
@@ -308,7 +309,10 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               />
             )}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4">{event.name}</h1>
-            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-primary-foreground/90">{event.description}</p>
+            <RichTextDisplay 
+              content={event.description} 
+              className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-primary-foreground/90 [&_p]:text-primary-foreground/90"
+            />
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-8 text-sm sm:text-base">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/15 backdrop-blur-sm">
