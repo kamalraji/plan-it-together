@@ -227,9 +227,10 @@ export function OnboardingWizard() {
       } else {
         navigate('/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Onboarding error:', error);
-      toast.error('Something went wrong. Please try again.');
+      const errorMessage = error?.message || error?.error_description || 'Something went wrong. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
