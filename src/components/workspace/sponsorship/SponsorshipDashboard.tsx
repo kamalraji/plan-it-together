@@ -95,12 +95,12 @@ export function SponsorshipDashboard({
       </div>
 
       {/* Proposal Pipeline - Full Width */}
-      <ProposalPipeline />
+      <ProposalPipeline workspaceId={workspace.id} />
 
       {/* Deliverables and Benefits */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DeliverableTracker />
-        <BenefitsManager />
+        <DeliverableTracker workspaceId={workspace.id} />
+        <BenefitsManager workspaceId={workspace.id} />
       </div>
 
       {/* Task Summary with Mini-Map */}
@@ -118,7 +118,7 @@ export function SponsorshipDashboard({
       </div>
 
       {/* Sponsor Communications */}
-      <SponsorCommunications />
+      <SponsorCommunications workspaceId={workspace.id} />
 
       {/* Team Members */}
       <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />

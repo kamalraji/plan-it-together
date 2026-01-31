@@ -1,64 +1,64 @@
 import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardCheck, Check, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { ClipboardCheck, Check, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
+import { useVolunteerTimesheets } from '@/hooks/useVolunteerTimesheets';
 
 interface ApproveTimesheetsTabProps {
   workspace: Workspace;
 }
 
-interface TimesheetEntry {
-  id: string;
-  volunteerName: string;
-  shiftName: string;
-  date: string;
-  hoursLogged: number;
-  status: 'pending' | 'approved' | 'rejected';
-  notes?: string;
-}
-
-const mockTimesheets: TimesheetEntry[] = [
-  { id: '1', volunteerName: 'Alice Johnson', shiftName: 'Morning Registration', date: '2024-01-10', hoursLogged: 4.5, status: 'pending' },
-  { id: '2', volunteerName: 'Bob Smith', shiftName: 'Afternoon Support', date: '2024-01-10', hoursLogged: 5, status: 'pending' },
-  { id: '3', volunteerName: 'Carol Davis', shiftName: 'Evening Setup', date: '2024-01-09', hoursLogged: 3.5, status: 'pending' },
-  { id: '4', volunteerName: 'David Wilson', shiftName: 'Morning Registration', date: '2024-01-09', hoursLogged: 4, status: 'approved' },
-  { id: '5', volunteerName: 'Emma Brown', shiftName: 'Afternoon Support', date: '2024-01-08', hoursLogged: 4.5, status: 'approved' },
-];
-
-export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheetsTabProps) {
-  const [timesheets, setTimesheets] = useState(mockTimesheets);
+export function ApproveTimesheetsTab({ workspace }: ApproveTimesheetsTabProps) {
   const [selectedTab, setSelectedTab] = useState('pending');
 
-  const pendingCount = timesheets.filter(t => t.status === 'pending').length;
-  const approvedCount = timesheets.filter(t => t.status === 'approved').length;
-  const totalHoursPending = timesheets.filter(t => t.status === 'pending').reduce((acc, t) => acc + t.hoursLogged, 0);
+  const {
+    timesheets,
+    isLoading,
+    pendingTimesheets,
+    approvedTimesheets,
+    rejectedTimesheets,
+    stats,
+    processTimesheet,
+    bulkApprove,
+  } = useVolunteerTimesheets(workspace.id);
 
   const handleApprove = (id: string) => {
-    setTimesheets(prev => prev.map(t => t.id === id ? { ...t, status: 'approved' as const } : t));
-    toast.success('Timesheet approved');
+    processTimesheet.mutate({ timesheetId: id, approved: true });
   };
 
   const handleReject = (id: string) => {
-    setTimesheets(prev => prev.map(t => t.id === id ? { ...t, status: 'rejected' as const } : t));
-    toast.success('Timesheet rejected');
+    processTimesheet.mutate({ timesheetId: id, approved: false });
   };
 
   const handleApproveAll = () => {
-    setTimesheets(prev => prev.map(t => t.status === 'pending' ? { ...t, status: 'approved' as const } : t));
-    toast.success('All pending timesheets approved');
+    const pendingIds = pendingTimesheets.map(t => t.id);
+    if (pendingIds.length > 0) {
+      bulkApprove.mutate(pendingIds);
+    }
   };
 
-  const filteredTimesheets = timesheets.filter(t => {
-    if (selectedTab === 'pending') return t.status === 'pending';
-    if (selectedTab === 'approved') return t.status === 'approved';
-    if (selectedTab === 'rejected') return t.status === 'rejected';
-    return true;
-  });
+  const getFilteredTimesheets = () => {
+    switch (selectedTab) {
+      case 'pending': return pendingTimesheets;
+      case 'approved': return approvedTimesheets;
+      case 'rejected': return rejectedTimesheets;
+      default: return timesheets;
+    }
+  };
+
+  const filteredTimesheets = getFilteredTimesheets();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -73,13 +73,14 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
             Review and approve volunteer time entries
           </p>
         </div>
-        {pendingCount > 0 && (
+        {stats.pending > 0 && (
           <Button 
             className="bg-emerald-500 hover:bg-emerald-600 text-white"
             onClick={handleApproveAll}
+            disabled={bulkApprove.isPending}
           >
             <Check className="h-4 w-4 mr-2" />
-            Approve All ({pendingCount})
+            Approve All ({stats.pending})
           </Button>
         )}
       </div>
@@ -88,25 +89,25 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
+            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
             <div className="text-xs text-muted-foreground">Pending Review</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{approvedCount}</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.approved}</div>
             <div className="text-xs text-muted-foreground">Approved</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-rose-500/10 to-rose-600/5 border-rose-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-rose-600">{totalHoursPending}h</div>
+            <div className="text-2xl font-bold text-rose-600">{stats.pendingHours.toFixed(1)}h</div>
             <div className="text-xs text-muted-foreground">Hours Pending</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{timesheets.length}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
             <div className="text-xs text-muted-foreground">Total Entries</div>
           </CardContent>
         </Card>
@@ -118,8 +119,8 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
           <TabsTrigger value="pending" className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4" />
             Pending
-            {pendingCount > 0 && (
-              <Badge variant="secondary" className="ml-1">{pendingCount}</Badge>
+            {stats.pending > 0 && (
+              <Badge variant="secondary" className="ml-1">{stats.pending}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="approved" className="flex items-center gap-2">
@@ -159,15 +160,15 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
                         <div>
                           <p className="font-medium">{timesheet.volunteerName}</p>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{timesheet.shiftName}</span>
+                            <span>{timesheet.shiftName || 'General Shift'}</span>
                             <span className="text-muted-foreground/50">•</span>
-                            <span>{new Date(timesheet.date).toLocaleDateString()}</span>
+                            <span>{new Date(timesheet.checkInTime).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="font-bold">{timesheet.hoursLogged}h</p>
+                          <p className="font-bold">{timesheet.hoursLogged.toFixed(1)}h</p>
                           <p className="text-xs text-muted-foreground">logged</p>
                         </div>
                         {timesheet.status === 'pending' ? (
@@ -177,6 +178,7 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
                               variant="outline"
                               className="text-red-600 hover:text-red-700 hover:bg-red-50"
                               onClick={() => handleReject(timesheet.id)}
+                              disabled={processTimesheet.isPending}
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -184,6 +186,7 @@ export function ApproveTimesheetsTab({ workspace: _workspace }: ApproveTimesheet
                               size="sm" 
                               className="bg-emerald-500 hover:bg-emerald-600"
                               onClick={() => handleApprove(timesheet.id)}
+                              disabled={processTimesheet.isPending}
                             >
                               <Check className="h-4 w-4" />
                             </Button>

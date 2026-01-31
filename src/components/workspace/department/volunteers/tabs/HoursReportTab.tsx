@@ -1,39 +1,56 @@
 import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Clock, Download, BarChart3 } from 'lucide-react';
+import { Clock, Download, BarChart3, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useVolunteerHoursReport } from '@/hooks/useVolunteerTimesheets';
 
 interface HoursReportTabProps {
   workspace: Workspace;
 }
 
-interface VolunteerHours {
-  id: string;
-  name: string;
-  totalHours: number;
-  shiftsCompleted: number;
-  avgHoursPerShift: number;
-  rank: number;
-}
-
-const mockHoursData: VolunteerHours[] = [
-  { id: '1', name: 'Alice Johnson', totalHours: 48, shiftsCompleted: 12, avgHoursPerShift: 4, rank: 1 },
-  { id: '2', name: 'Bob Smith', totalHours: 40, shiftsCompleted: 10, avgHoursPerShift: 4, rank: 2 },
-  { id: '3', name: 'Carol Davis', totalHours: 36, shiftsCompleted: 9, avgHoursPerShift: 4, rank: 3 },
-  { id: '4', name: 'David Wilson', totalHours: 32, shiftsCompleted: 8, avgHoursPerShift: 4, rank: 4 },
-  { id: '5', name: 'Emma Brown', totalHours: 28, shiftsCompleted: 7, avgHoursPerShift: 4, rank: 5 },
-];
-
-export function HoursReportTab({ workspace: _workspace }: HoursReportTabProps) {
+export function HoursReportTab({ workspace }: HoursReportTabProps) {
   const [dateRange, setDateRange] = useState('this-month');
 
-  const totalHours = mockHoursData.reduce((acc, v) => acc + v.totalHours, 0);
-  const totalShifts = mockHoursData.reduce((acc, v) => acc + v.shiftsCompleted, 0);
-  const avgHours = totalHours / mockHoursData.length;
+  // Calculate date range for filtering
+  const getDateRange = () => {
+    const now = new Date();
+    const end = new Date();
+    let start: Date;
+
+    switch (dateRange) {
+      case 'this-week':
+        start = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case 'this-month':
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case 'last-month':
+        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        end.setDate(0); // Last day of previous month
+        break;
+      default:
+        start = new Date(0); // All time
+    }
+
+    return { start, end };
+  };
+
+  const { volunteerHours, stats, isLoading } = useVolunteerHoursReport(
+    workspace.id,
+    dateRange !== 'all-time' ? getDateRange() : undefined
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,25 +88,25 @@ export function HoursReportTab({ workspace: _workspace }: HoursReportTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-rose-500/10 to-rose-600/5 border-rose-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-rose-600">{totalHours}</div>
+            <div className="text-2xl font-bold text-rose-600">{stats.totalHours.toFixed(1)}</div>
             <div className="text-xs text-muted-foreground">Total Hours</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{totalShifts}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.totalShifts}</div>
             <div className="text-xs text-muted-foreground">Shifts Completed</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{avgHours.toFixed(1)}</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.avgHoursPerVolunteer.toFixed(1)}</div>
             <div className="text-xs text-muted-foreground">Avg Hours/Person</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{mockHoursData.length}</div>
+            <div className="text-2xl font-bold text-purple-600">{stats.activeVolunteers}</div>
             <div className="text-xs text-muted-foreground">Active Volunteers</div>
           </CardContent>
         </Card>
@@ -129,43 +146,50 @@ export function HoursReportTab({ workspace: _workspace }: HoursReportTabProps) {
           <CardDescription>Hours logged by each volunteer</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {mockHoursData.map(volunteer => (
-              <div
-                key={volunteer.id}
-                className="flex items-center justify-between p-4 rounded-lg border"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 text-center font-bold text-muted-foreground">
-                    #{volunteer.rank}
+          {volunteerHours.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Clock className="h-10 w-10 mx-auto mb-3 opacity-50" />
+              <p>No hours logged for this period</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {volunteerHours.map(volunteer => (
+                <div
+                  key={volunteer.id}
+                  className="flex items-center justify-between p-4 rounded-lg border"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 text-center font-bold text-muted-foreground">
+                      #{volunteer.rank}
+                    </div>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-rose-500/10 text-rose-600">
+                        {volunteer.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{volunteer.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {volunteer.shiftsCompleted} shifts completed
+                      </p>
+                    </div>
                   </div>
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-rose-500/10 text-rose-600">
-                      {volunteer.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{volunteer.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {volunteer.shiftsCompleted} shifts completed
-                    </p>
+                  <div className="flex items-center gap-6">
+                    <div className="text-right">
+                      <p className="font-bold text-lg">{volunteer.totalHours.toFixed(1)}h</p>
+                      <p className="text-xs text-muted-foreground">
+                        ~{volunteer.avgHoursPerShift.toFixed(1)}h/shift
+                      </p>
+                    </div>
+                    <Progress 
+                      value={volunteerHours[0] ? (volunteer.totalHours / volunteerHours[0].totalHours) * 100 : 0}
+                      className="w-24 h-2"
+                    />
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="font-bold text-lg">{volunteer.totalHours}h</p>
-                    <p className="text-xs text-muted-foreground">
-                      ~{volunteer.avgHoursPerShift}h/shift
-                    </p>
-                  </div>
-                  <Progress 
-                    value={(volunteer.totalHours / mockHoursData[0].totalHours) * 100}
-                    className="w-24 h-2"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
