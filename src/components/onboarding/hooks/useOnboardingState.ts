@@ -42,11 +42,44 @@ export const organizerPreferencesSchema = z.object({
   teamSize: z.enum(['solo', 'small', 'medium', 'large']).optional(),
 });
 
+// Organization setup schemas for onboarding
+export const createOrganizationSetupSchema = z.object({
+  action: z.literal('create'),
+  name: z.string().trim().min(1, 'Organization name is required').max(200),
+  slug: z.string()
+    .min(3, 'URL handle must be at least 3 characters')
+    .max(50, 'URL handle must be less than 50 characters')
+    .regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens'),
+  category: z.enum(['COLLEGE', 'COMPANY', 'INDUSTRY', 'NON_PROFIT']),
+  description: z.string().max(1000).optional(),
+  website: z.string().url().optional().or(z.literal('')),
+  email: z.string().email().optional().or(z.literal('')),
+});
+
+export const joinOrganizationSetupSchema = z.object({
+  action: z.literal('join'),
+  organizationId: z.string().uuid(),
+  organizationName: z.string(),
+});
+
+export const skipOrganizationSetupSchema = z.object({
+  action: z.literal('skip'),
+});
+
+export const organizationSetupSchema = z.discriminatedUnion('action', [
+  createOrganizationSetupSchema,
+  joinOrganizationSetupSchema,
+  skipOrganizationSetupSchema,
+]);
+
+export type OrganizationSetupData = z.infer<typeof organizationSetupSchema>;
+
 export interface OnboardingData {
   role: SelectedRole | null;
   basicProfile: z.infer<typeof basicProfileSchema> | null;
   participantAbout: z.infer<typeof participantAboutSchema> | null;
   organizerAbout: z.infer<typeof organizerAboutSchema> | null;
+  organizationSetup: OrganizationSetupData | null;
   connectivity: z.infer<typeof connectivitySchema> | null;
   participantPreferences: z.infer<typeof participantPreferencesSchema> | null;
   organizerPreferences: z.infer<typeof organizerPreferencesSchema> | null;
@@ -66,6 +99,7 @@ const initialData: OnboardingData = {
   basicProfile: null,
   participantAbout: null,
   organizerAbout: null,
+  organizationSetup: null,
   connectivity: null,
   participantPreferences: null,
   organizerPreferences: null,
