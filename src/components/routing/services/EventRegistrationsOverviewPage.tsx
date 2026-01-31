@@ -70,10 +70,71 @@ export const EventRegistrationsOverviewPage: React.FC = () => {
     } | null;
   };
 
+  // For non-admins, we need to filter registrations to only events they can access
+  const isAdmin = user?.role === 'SUPER_ADMIN';
+
   const { data, isLoading } = useQuery<{ rows: RegistrationRow[]; total: number }>(
     {
-      queryKey: ['event-registrations-overview', statusFilter, page, pageSize],
+      queryKey: ['event-registrations-overview', statusFilter, page, pageSize, user?.id, isAdmin],
       queryFn: async () => {
+        if (!user?.id) {
+          return { rows: [], total: 0 };
+        }
+
+        // Admins can see all registrations; organizers need scoped access
+        if (!isAdmin) {
+          // Step 1: Get user's organization IDs
+          const { data: memberships } = await supabase
+            .from('organization_memberships')
+            .select('organization_id')
+            .eq('user_id', user.id)
+            .eq('status', 'ACTIVE');
+
+          const userOrgIds = (memberships ?? []).map((m: { organization_id: string }) => m.organization_id);
+
+          // Step 2: Get event IDs the user can access (owner or org member)
+          let eventsQuery = supabase.from('events').select('id');
+          
+          if (userOrgIds.length > 0) {
+            eventsQuery = eventsQuery.or(`owner_id.eq.${user.id},organization_id.in.(${userOrgIds.join(',')})`);
+          } else {
+            eventsQuery = eventsQuery.eq('owner_id', user.id);
+          }
+
+          const { data: accessibleEvents } = await eventsQuery;
+          const accessibleEventIds = (accessibleEvents ?? []).map((e: { id: string }) => e.id);
+
+          if (accessibleEventIds.length === 0) {
+            return { rows: [], total: 0 };
+          }
+
+          // Step 3: Query registrations filtered to accessible events
+          let query = supabase
+            .from('registrations')
+            .select('id, event_id, user_id, status, created_at, events(name, start_date)', {
+              count: 'exact',
+            })
+            .in('event_id', accessibleEventIds)
+            .order('created_at', { ascending: false })
+            .range((page - 1) * pageSize, page * pageSize - 1);
+
+          if (statusFilter !== 'all') {
+            query = query.eq('status', statusFilter as Enums<'registration_status'>);
+          }
+
+          const { data: rows, error, count } = await query;
+
+          if (error) {
+            throw error;
+          }
+
+          return {
+            rows: (rows ?? []) as RegistrationRow[],
+            total: count ?? 0,
+          };
+        }
+
+        // Admin path: query all registrations
         let query = supabase
           .from('registrations')
           .select('id, event_id, user_id, status, created_at, events(name, start_date)', {
@@ -97,7 +158,7 @@ export const EventRegistrationsOverviewPage: React.FC = () => {
           total: count ?? 0,
         };
       },
-      enabled: canViewRegistrations,
+      enabled: canViewRegistrations && !!user?.id,
     },
   );
 
