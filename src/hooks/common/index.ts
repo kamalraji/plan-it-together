@@ -51,3 +51,6 @@ export { useIDCardGeneration } from '../useIDCardGeneration';
 
 // Contingency
 export { useContingency } from '../useContingency';
+
+// Debounce
+export { useDebounce } from './useDebounce';

@@ -8,6 +8,7 @@ import { WizardProgress } from './components/WizardProgress';
 import { RoleSelectionStep } from './steps/RoleSelectionStep';
 import { BasicProfileStep } from './steps/BasicProfileStep';
 import { AboutYouStep } from './steps/AboutYouStep';
+import { OrganizationSetupStep, type OrganizationSetupData } from './steps/OrganizationSetupStep';
 import { ConnectivityStep } from './steps/ConnectivityStep';
 import { PreferencesStep } from './steps/PreferencesStep';
 import {
@@ -20,6 +21,7 @@ import {
   participantPreferencesSchema,
   organizerPreferencesSchema,
 } from './hooks/useOnboardingState';
+import { useCreateOrganization, useRequestJoinOrganization } from '@/hooks/useOrganization';
 import { z } from 'zod';
 
 type BasicProfileData = z.infer<typeof basicProfileSchema>;
@@ -33,6 +35,11 @@ export function OnboardingWizard() {
   const navigate = useNavigate();
   const { user, refreshUserRoles } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOrgSubmitting, setIsOrgSubmitting] = useState(false);
+  const [createdOrgSlug, setCreatedOrgSlug] = useState<string | null>(null);
+
+  const createOrganization = useCreateOrganization();
+  const requestJoinOrganization = useRequestJoinOrganization();
 
   const {
     currentStep,
@@ -62,6 +69,46 @@ export function OnboardingWizard() {
     }
     nextStep();
   }, [data.role, updateData, nextStep]);
+
+  // Handle organization setup for organizers (step 2)
+  const handleOrganizationSetupSubmit = useCallback(async (orgData: OrganizationSetupData) => {
+    setIsOrgSubmitting(true);
+    
+    try {
+      if (orgData.action === 'create') {
+        // Create organization via edge function
+        const result = await createOrganization.mutateAsync({
+          name: orgData.name,
+          slug: orgData.slug,
+          category: orgData.category,
+          description: orgData.description,
+          website: orgData.website || undefined,
+          email: orgData.email || undefined,
+        });
+        
+        setCreatedOrgSlug(result.slug);
+        updateData('organizationSetup', orgData);
+        toast.success('Organization created successfully!');
+        nextStep();
+      } else if (orgData.action === 'join') {
+        // Request to join organization
+        await requestJoinOrganization.mutateAsync(orgData.organizationId);
+        updateData('organizationSetup', orgData);
+        toast.success('Join request sent! You\'ll be notified when approved.');
+        nextStep();
+      }
+    } catch (error: any) {
+      // Error already handled by mutation hooks
+      console.error('Organization setup error:', error);
+    } finally {
+      setIsOrgSubmitting(false);
+    }
+  }, [createOrganization, requestJoinOrganization, updateData, nextStep]);
+
+  const handleOrganizationSetupSkip = useCallback(() => {
+    updateData('organizationSetup', { action: 'skip' });
+    nextStep();
+  }, [updateData, nextStep]);
 
   const handleConnectivitySubmit = useCallback((connectivityData: ConnectivityData) => {
     updateData('connectivity', connectivityData);
@@ -112,9 +159,6 @@ export function OnboardingWizard() {
         profileUpdate.bio = data.participantAbout.bio;
         profileUpdate.skills = data.participantAbout.skills;
         profileUpdate.experience_level = data.participantAbout.experienceLevel;
-      } else if (data.role === 'organizer' && data.organizerAbout) {
-        profileUpdate.organization = data.organizerAbout.organization;
-        profileUpdate.job_title = data.organizerAbout.jobTitle;
       }
 
       // Update user profile
@@ -167,9 +211,19 @@ export function OnboardingWizard() {
 
       toast.success('Welcome to Thittam1Hub! 🎉');
 
-      // Navigate based on role
+      // Navigate based on role and organization setup
       if (data.role === 'organizer') {
-        navigate('/onboarding/organization');
+        const orgSetup = data.organizationSetup;
+        if (createdOrgSlug) {
+          // Created an organization - go to org dashboard
+          navigate(`/${createdOrgSlug}/dashboard`);
+        } else if (orgSetup?.action === 'join') {
+          // Requested to join - go to main dashboard with pending status
+          navigate('/dashboard');
+        } else {
+          // Skipped - go to organization setup page
+          navigate('/onboarding/organization');
+        }
       } else {
         navigate('/dashboard');
       }
@@ -179,7 +233,7 @@ export function OnboardingWizard() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, data, updateData, clearProgress, refreshUserRoles, navigate]);
+  }, [user, data, createdOrgSlug, updateData, clearProgress, refreshUserRoles, navigate]);
 
   if (!isInitialized) {
     return (
@@ -189,8 +243,11 @@ export function OnboardingWizard() {
     );
   }
 
+  // Step labels differ by role
   const stepLabels = data.role
-    ? ['Role', 'Profile', 'About', 'Connect', 'Preferences']
+    ? data.role === 'organizer'
+      ? ['Role', 'Profile', 'Organization', 'Connect', 'Preferences']
+      : ['Role', 'Profile', 'About', 'Connect', 'Preferences']
     : ['Role'];
 
   return (
@@ -232,14 +289,26 @@ export function OnboardingWizard() {
             />
           )}
 
-          {currentStep === 2 && data.role && (
+          {/* Step 2: Different for participants vs organizers */}
+          {currentStep === 2 && data.role === 'participant' && (
             <AboutYouStep
               key="about"
               role={data.role}
               participantData={data.participantAbout}
-              organizerData={data.organizerAbout}
+              organizerData={null}
               onSubmit={handleAboutSubmit}
               onBack={prevStep}
+            />
+          )}
+
+          {currentStep === 2 && data.role === 'organizer' && (
+            <OrganizationSetupStep
+              key="organization"
+              data={data.organizationSetup}
+              onSubmit={handleOrganizationSetupSubmit}
+              onSkip={handleOrganizationSetupSkip}
+              onBack={prevStep}
+              isSubmitting={isOrgSubmitting}
             />
           )}
 
