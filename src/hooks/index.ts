@@ -81,6 +81,19 @@ export {
   useTaskRealtimeUpdates 
 } from './useActivityFeed';
 
+// Escalation Workflow
+export { 
+  useEscalationWorkflow,
+  useEscalationRules,
+  useOverdueItems,
+  useEscalateItem,
+  getSLAStatus,
+  type EscalationRule,
+  type OverdueItem,
+  type EscalationLevel,
+  type EscalationStatus,
+} from './useEscalationWorkflow';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';

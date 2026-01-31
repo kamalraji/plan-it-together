@@ -27,6 +27,8 @@ export { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
 export { WorkspacePermissionGuard, PermissionBadge } from './WorkspacePermissionGuard';
 export { WorkspaceRBACInfo } from './WorkspaceRBACInfo';
 export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
+export { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
+export { ActivityFeedWidget } from './ActivityFeedWidget';
 
 // Mobile Components
 export * from './mobile';
