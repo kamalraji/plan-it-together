@@ -291,20 +291,24 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const handleContinueEditing = useCallback(() => {
     setShowPostCreate(false);
     if (createdEventId) {
-      const currentPath = location.pathname;
-      const basePath = currentPath.replace(/\/events\/create$/, '');
-      navigate(`${basePath}/events/${createdEventId}/edit`, { replace: true });
+      // Use correct event edit path based on org context
+      const editPath = orgSlug
+        ? `/${orgSlug}/eventmanagement/${createdEventId}/edit`
+        : `/dashboard/eventmanagement/${createdEventId}/edit`;
+      navigate(editPath, { replace: true });
     }
-  }, [createdEventId, location.pathname, navigate]);
+  }, [createdEventId, orgSlug, navigate]);
 
   const handleCreateWorkspace = useCallback(() => {
     setShowPostCreate(false);
     if (createdEventId) {
-      const currentPath = location.pathname;
-      const basePath = currentPath.replace(/\/events\/create$/, '');
-      navigate(`${basePath}/events/new/${createdEventId}/workspaces`, { replace: true });
+      // Use correct workspace create path with event pre-selection
+      const workspacePath = orgSlug 
+        ? `/${orgSlug}/workspaces/create/${createdEventId}`
+        : `/dashboard/workspaces/create/${createdEventId}`;
+      navigate(workspacePath, { replace: true });
     }
-  }, [createdEventId, location.pathname, navigate]);
+  }, [createdEventId, orgSlug, navigate]);
 
   const handleViewEvent = useCallback(() => {
     setShowPostCreate(false);
