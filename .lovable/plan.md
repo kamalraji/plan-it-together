@@ -1,131 +1,263 @@
 
-# Fix: Event Registrations Data Isolation
+# Integrate Organization Create/Join into Organizer Onboarding
 
-## Problem Identified
-The Registrations Overview page (`/console/events/registrations`) is showing registrations for **all events** across the platform, not just events owned by or belonging to the current organizer. This is a **data isolation security issue**.
+## Overview
 
-## Two-Layer Fix Required
+Currently, when a new organizer completes the 5-step onboarding wizard, they are redirected to `/onboarding/organization` (OrganizerOnboardingPage) which shows a checklist but requires them to navigate away to create or join an organization. This creates a fragmented experience.
 
-### 1. Database Layer: Strengthen RLS Policy
-The current RLS policy on `registrations` allows any organizer to view all registrations. This needs to be scoped to event ownership.
-
-**Current Policy:**
-```sql
-has_role(auth.uid(), 'organizer') OR ...
-```
-
-**Fixed Policy:**
-```sql
--- Organizers can only view registrations for their own events
--- (via event ownership or organization membership)
-EXISTS (
-  SELECT 1 FROM events e
-  WHERE e.id = registrations.event_id
-  AND (
-    e.owner_id = auth.uid()
-    OR EXISTS (
-      SELECT 1 FROM organization_memberships om
-      WHERE om.organization_id = e.organization_id
-      AND om.user_id = auth.uid()
-      AND om.status = 'ACTIVE'
-      AND om.role IN ('OWNER', 'ADMIN', 'MEMBER')
-    )
-  )
-)
-```
-
-### 2. Application Layer: Add Event Ownership Filter
-Update `EventRegistrationsOverviewPage.tsx` to filter registrations by events the user owns or belongs to.
-
-**Changes:**
-- Filter registrations to only show those from events where:
-  - User is the event owner (`events.owner_id`), OR
-  - User is an active member of the event's organization
+This plan integrates the organization creation/joining directly into the onboarding wizard as a new step, providing a seamless single-flow experience that follows industrial best practices.
 
 ---
 
-## Implementation Steps
+## Current Flow Analysis
 
-### Step 1: Create Migration for RLS Policy Update
-Create a new migration that:
-1. Drops the existing overly permissive organizer SELECT policy on `registrations`
-2. Creates a new scoped policy that checks event ownership via `owner_id` or organization membership
+```text
+Step 0: Role Selection (participant/organizer)
+Step 1: Basic Profile (name, username, avatar)
+Step 2: About You (organization name text field, job title, org type)
+Step 3: Connectivity (social links - skippable)
+Step 4: Preferences (event types, team size)
+        ↓
+[Submit] → Redirect to /onboarding/organization
+        ↓
+OrganizerOnboardingPage (checklist with links to create/join)
+```
 
-### Step 2: Update Application Query
-Modify `EventRegistrationsOverviewPage.tsx`:
-1. Fetch user's organization IDs first
-2. Build a query that filters registrations to:
-   - Events where `owner_id` matches current user, OR
-   - Events where `organization_id` is in user's organizations
-3. This provides defense-in-depth (app filter + RLS)
-
-### Step 3: Verify Access Control
-Ensure Super Admins retain full access while Organizers are properly scoped.
+**Problem**: The "About You" step (Step 2) asks for "organization name" as a simple text field, but this doesn't actually create or link to a real organization entity in the database.
 
 ---
 
-## Files to Modify
+## Proposed Solution
 
-| File | Change |
-|------|--------|
-| `supabase/migrations/[new]_fix_registrations_rls.sql` | New migration to fix RLS policy |
-| `src/components/routing/services/EventRegistrationsOverviewPage.tsx` | Add ownership filter to query |
+Replace the organizer's "About You" step (Step 2) with an enhanced "Organization Setup" step that provides:
+
+1. **Two-tab interface**: "Create New" or "Join Existing"
+2. **Create New tab**: Full organization creation form (name, slug, category, description, etc.)
+3. **Join Existing tab**: Search and request to join existing organizations
+4. **Skip option**: Allow organizers to skip and complete organization setup later
+
+### Updated Flow
+
+```text
+Step 0: Role Selection (participant/organizer)
+Step 1: Basic Profile (name, username, avatar)
+Step 2: Organization Setup (CREATE or JOIN) ← NEW ENHANCED STEP
+Step 3: Connectivity (social links - skippable)
+Step 4: Preferences (event types, team size)
+        ↓
+[Submit] → Direct to org dashboard or participant dashboard
+```
+
+---
+
+## Implementation Plan
+
+### Phase 1: Create OrganizationSetupStep Component
+
+**New file**: `src/components/onboarding/steps/OrganizationSetupStep.tsx`
+
+This component will feature:
+
+- **Tabbed UI** using Radix Tabs for "Create New" vs "Join Existing"
+- **Create New Tab**:
+  - Organization name (required)
+  - URL slug with auto-generation from name
+  - Category selector (College, Company, Industry, Non-profit)
+  - Description (optional)
+  - Contact details (optional)
+  - Real-time slug availability check
+- **Join Existing Tab**:
+  - Search input with debounced queries
+  - Organization results list with status indicators
+  - "Request to Join" buttons
+  - Pending/Active membership status display
+- **Skip option**: "I'll set this up later" button
+
+**Accessibility features**:
+- ARIA labels for all form controls
+- Focus management between tabs
+- LiveRegion announcements for async operations
+- Keyboard navigation support
+
+**Validation**:
+- Zod schema for create form validation
+- Real-time slug uniqueness check
+- Clear error messaging
+
+### Phase 2: Update Onboarding State Hook
+
+**File**: `src/components/onboarding/hooks/useOnboardingState.ts`
+
+Changes:
+- Add `organizationSetup` field to `OnboardingData` interface
+- Add new Zod schema `organizationSetupSchema` with discriminated union:
+  - `{ action: 'create', data: CreateOrganizationDTO }`
+  - `{ action: 'join', organizationId: string }`
+  - `{ action: 'skip' }`
+- Update step labels for organizer flow
+
+### Phase 3: Update OnboardingWizard
+
+**File**: `src/components/onboarding/OnboardingWizard.tsx`
+
+Changes:
+- Replace `AboutYouStep` for organizers with `OrganizationSetupStep`
+- Add `handleOrganizationSetupSubmit` callback that:
+  - If "create": Calls `create-organization` edge function
+  - If "join": Calls `requestJoinOrganization` service
+  - If "skip": Proceeds without organization action
+- Store created/joined organization reference for final navigation
+- Update final navigation logic:
+  - Created org → `/${org.slug}/dashboard`
+  - Joined org (pending) → `/dashboard` with notification about pending approval
+  - Skipped → `/onboarding/organization` (existing checklist page)
+
+### Phase 4: Backend Integration
+
+**Reuse existing infrastructure**:
+- `create-organization` edge function (already exists)
+- `useCreateOrganization` hook (already exists)
+- `useRequestJoinOrganization` hook (already exists)
+- `useSearchOrganizations` hook (already exists)
+- `useMyOrganizationMemberships` hook (already exists)
+
+**No new edge functions needed** - all required APIs are already available.
+
+### Phase 5: Skip Flow Enhancement
+
+If organizer skips organization setup:
+- Store flag in localStorage to remind them later
+- Show subtle reminder banner on dashboard
+- Existing `/onboarding/organization` checklist remains available
 
 ---
 
 ## Technical Details
 
-### Migration SQL
-```sql
--- Drop overly permissive organizer policy
-DROP POLICY IF EXISTS "Organizers view registrations" ON public.registrations;
+### New Zod Schema for Organization Setup
 
--- Create properly scoped policy for organizers
-CREATE POLICY "Organizers view registrations for owned events"
-ON public.registrations
-FOR SELECT
-TO authenticated
-USING (
-  -- User's own registrations
-  user_id = auth.uid()
-  -- OR admin access
-  OR has_role(auth.uid(), 'admin')
-  -- OR organizer for this specific event
-  OR EXISTS (
-    SELECT 1 FROM public.events e
-    WHERE e.id = registrations.event_id
-    AND (
-      e.owner_id = auth.uid()
-      OR EXISTS (
-        SELECT 1 FROM public.organization_memberships om
-        WHERE om.organization_id = e.organization_id
-        AND om.user_id = auth.uid()
-        AND om.status = 'ACTIVE'
-      )
-    )
-  )
-);
+```typescript
+export const createOrganizationSetupSchema = z.object({
+  action: z.literal('create'),
+  name: z.string().trim().min(1, 'Organization name is required').max(200),
+  slug: z.string().regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens'),
+  category: z.enum(['COLLEGE', 'COMPANY', 'INDUSTRY', 'NON_PROFIT']),
+  description: z.string().max(1000).optional(),
+  website: z.string().url().optional().or(z.literal('')),
+  email: z.string().email().optional().or(z.literal('')),
+});
+
+export const joinOrganizationSetupSchema = z.object({
+  action: z.literal('join'),
+  organizationId: z.string().uuid(),
+  organizationName: z.string(), // For display/confirmation
+});
+
+export const skipOrganizationSetupSchema = z.object({
+  action: z.literal('skip'),
+});
+
+export const organizationSetupSchema = z.discriminatedUnion('action', [
+  createOrganizationSetupSchema,
+  joinOrganizationSetupSchema,
+  skipOrganizationSetupSchema,
+]);
 ```
 
-### Application Query Update
-```typescript
-// Get user's accessible events via ownership or org membership
-const { data: accessibleEventIds } = await supabase
-  .from('events')
-  .select('id')
-  .or(`owner_id.eq.${user.id},organization_id.in.(${userOrgIds.join(',')})`);
+### Component Structure
 
-// Then filter registrations to those events
-let query = supabase
-  .from('registrations')
-  .select('id, event_id, user_id, status, created_at, events(name, start_date)', { count: 'exact' })
-  .in('event_id', accessibleEventIds)
-  // ... rest of query
+```typescript
+interface OrganizationSetupStepProps {
+  data: OrganizationSetupData | null;
+  onSubmit: (data: OrganizationSetupData) => void;
+  onSkip: () => void;
+  onBack: () => void;
+  isSubmitting: boolean;
+}
+```
+
+### Slug Auto-Generation
+
+```typescript
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 50);
+}
 ```
 
 ---
 
-## Security Impact
-- **Before**: Any organizer could see all registrations across the platform
-- **After**: Organizers only see registrations for events they own or belong to via organization membership
-- **Super Admins**: Retain full access (unchanged)
+## Files to Create/Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `src/components/onboarding/steps/OrganizationSetupStep.tsx` | CREATE | New component with create/join tabs |
+| `src/components/onboarding/hooks/useOnboardingState.ts` | MODIFY | Add organizationSetup schema and data field |
+| `src/components/onboarding/OnboardingWizard.tsx` | MODIFY | Integrate OrganizationSetupStep, update handlers |
+| `src/components/onboarding/index.ts` | MODIFY | Export new component if needed |
+
+---
+
+## UI/UX Considerations
+
+### Create New Tab Design
+- Clean form layout matching existing onboarding aesthetic
+- Gradient header consistent with wizard branding
+- Auto-generated slug preview with edit capability
+- Category visual selector (optional enhancement)
+
+### Join Existing Tab Design
+- Prominent search input
+- Clear status badges (Joined, Pending, Available)
+- One-click request to join
+- Inline loading states
+
+### Mobile Responsiveness
+- Stacked layout for tabs on mobile
+- Full-width form controls
+- Touch-friendly tap targets (min 44px)
+
+### Error Handling
+- Inline field validation errors
+- Toast notifications for API errors
+- Retry capability for failed requests
+- Clear messaging for duplicate slugs
+
+---
+
+## Security Considerations
+
+- Organization creation requires authenticated user (enforced by edge function)
+- Slug uniqueness validated server-side
+- Join requests create PENDING memberships (not auto-approved)
+- RLS policies on organizations table control visibility
+- No sensitive data exposed in search results
+
+---
+
+## Testing Checklist
+
+- [ ] Create organization with valid data
+- [ ] Create organization with duplicate slug (should show error)
+- [ ] Join existing organization
+- [ ] Join already-joined organization (should show "Joined" status)
+- [ ] Skip organization setup
+- [ ] Navigate back and forward between steps
+- [ ] Mobile responsive layout
+- [ ] Keyboard navigation
+- [ ] Screen reader accessibility
+
+---
+
+## Rollback Strategy
+
+If issues arise:
+1. Revert to using original `AboutYouStep` for organizers
+2. Keep redirect to `/onboarding/organization` for organization setup
+3. No database changes required (uses existing tables/policies)
+
