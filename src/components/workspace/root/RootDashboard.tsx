@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Workspace, WorkspaceRole } from '@/types';
 import { useRootDashboard, getDepartmentColor } from '@/hooks/useRootDashboard';
 import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
+import { useWorkspacePresence } from '@/hooks/useWorkspacePresence';
+import { useAuth } from '@/hooks/useAuth';
+import { ActiveNowBadge } from '../presence';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { DelegationProgressDashboard } from '../checklists/DelegationProgressDashboard';
 import { AllPendingApprovalsWidget } from '../approvals/AllPendingApprovalsWidget';
@@ -34,9 +38,22 @@ export function RootDashboard({
   userRole, 
 }: RootDashboardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data, isLoading } = useRootDashboard(workspace.eventId);
   const [delegationsOpen, setDelegationsOpen] = useState(true);
   const rbac = useWorkspaceRBAC(userRole || null);
+
+  // Real-time subscriptions for live updates
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
+
+  // Workspace presence tracking
+  const { totalActive } = useWorkspacePresence({
+    workspaceId: workspace.id,
+    userId: user?.id,
+    userName: user?.name || user?.email || 'User',
+    currentView: 'root-dashboard',
+    enabled: !!user?.id,
+  });
 
   const handleDepartmentClick = (workspaceId: string) => {
     const basePath = orgSlug ? `/${orgSlug}/workspaces` : '/workspaces';
@@ -69,6 +86,7 @@ export function RootDashboard({
               <TrendingUp className="h-4 w-4 text-primary" />
               Department Performance
             </h3>
+            <ActiveNowBadge count={totalActive} variant="pill" />
           </div>
 
           {/* Department cards: 1 col on mobile, 2 cols on sm+, with responsive gaps */}

@@ -10,6 +10,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TimeTracker } from './TimeTracker';
 import { TimesheetView } from './TimesheetView';
 import { WorkloadReport } from './WorkloadReport';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
+import { useWorkspacePresence } from '@/hooks/useWorkspacePresence';
+import { OnlineUsersWidget } from '../presence';
 
 interface TeamDashboardProps {
   workspace: Workspace;
@@ -28,6 +31,18 @@ export function TeamDashboard({
   const { user } = useAuth();
   const { workload, isLoading: isWorkloadLoading } = useTeamWorkload(workspace.id);
   const { progress, isLoading: isProgressLoading } = usePersonalProgress(workspace.id, user?.id);
+
+  // Real-time subscriptions for live updates
+  useRealtimeDashboard({ workspaceId: workspace.id });
+
+  // Workspace presence tracking
+  const { onlineUsers } = useWorkspacePresence({
+    workspaceId: workspace.id,
+    userId: user?.id,
+    userName: user?.name || user?.email || 'User',
+    currentView: 'team-dashboard',
+    enabled: !!user?.id,
+  });
 
   return (
     <div className="space-y-6">
@@ -141,8 +156,11 @@ export function TeamDashboard({
         <WorkloadReport workspaceId={workspace.id} />
       </section>
 
-      <section id="team-stats">
-        <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={10} />
+      <section id="team-stats" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={10} />
+        </div>
+        <OnlineUsersWidget users={onlineUsers} maxDisplay={8} />
       </section>
     </div>
   );
