@@ -1,4 +1,5 @@
 import { Workspace } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
@@ -29,6 +30,9 @@ export function CateringDashboard({
   onViewTasks,
 }: CateringDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
+  
+  // Enable real-time updates
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({

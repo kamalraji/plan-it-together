@@ -22,7 +22,7 @@
   - `workspace_team_members` - Added availability_status, capacity_hours, current_workload_hours
   - `workspace_tasks` - Added estimated_hours, actual_hours_logged
 
-**Phase 5 - Real-Time Integration (NEW - COMPLETE):**
+**Phase 5 - Real-Time Integration (COMPLETE):**
 - ✅ Created `useRealtimeDashboard` hook - Unified real-time subscriptions for all dashboard data
 - ✅ Created `useWorkspacePresence` hook - Workspace-level presence with heartbeat mechanism
 - ✅ Created `useRealtimeNotifications` hook - Toast notifications for assignments, mentions, escalations
@@ -30,8 +30,14 @@
   - `OnlineUsersWidget` - Shows active users grouped by status
   - `PresenceAvatar` - Avatar with online status indicator
   - `ActiveNowBadge` - Compact badge showing active count
-- ✅ Updated `RootDashboard` with real-time subscriptions and presence
-- ✅ Updated `TeamDashboard` with real-time subscriptions and OnlineUsersWidget
+- ✅ Updated all dashboards with real-time subscriptions:
+  - `RootDashboard` - Real-time + presence
+  - `TeamDashboard` - Real-time + presence
+  - `CommitteeDashboard` - Real-time subscriptions
+  - `CateringDashboard` - Real-time subscriptions
+  - `TechDepartmentDashboard` - Real-time subscriptions
+  - `OperationsDepartmentDashboard` - Real-time subscriptions
+  - `VolunteersDepartmentDashboard` - Real-time subscriptions
 - ✅ Refactored `WorkspaceCommunication` - Replaced broken API calls with Supabase queries
 - ✅ Created `EnhancedMessageThread` - Full real-time messaging with:
   - WebSocket-based message updates (no polling)

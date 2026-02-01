@@ -1,4 +1,5 @@
 import { Workspace } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { VolunteersDeptStatsCards } from './VolunteersDeptStatsCards';
 import { VolunteersDeptCommitteePanel } from './VolunteersDeptCommitteePanel';
 import { VolunteersDeptOverview } from './VolunteersDeptOverview';
@@ -27,6 +28,9 @@ export function VolunteersDepartmentDashboard({
   onViewTasks,
 }: VolunteersDepartmentDashboardProps) {
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+  
+  // Enable real-time updates
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch child committees count
   const { data: committees = [] } = useQuery({
