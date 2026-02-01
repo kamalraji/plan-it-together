@@ -1,317 +1,352 @@
 
 # Comprehensive Workspace Gap Analysis Report
-## Phase 6 Update: Industry Standards Alignment
+## Industry Standards Alignment - February 2026 Update
 
 ---
 
 ## Executive Summary
 
-After extensive analysis of the workspace codebase against industry best practices, I identified **52 gaps** across 9 categories. This analysis compares the current implementation against modern SaaS platforms (Asana, Monday.com, Slack, ClickUp) and identifies critical fixes, missing workflows, and enhancement opportunities.
+After thorough analysis of the workspace codebase against industry best practices (Asana, Monday.com, Slack, ClickUp, Jira), I identified **47 gaps** across **10 categories**. This report identifies critical fixes, missing workflows, broken connections, and enhancement opportunities required to achieve production-ready status.
 
 ---
 
-## 1. Critical Issues: Remaining Legacy API Calls
+## 1. Legacy API Calls Still Present (CRITICAL)
 
-Despite previous refactoring, **17 files** still contain broken `api.get()`/`api.post()` calls that reference non-existent backend endpoints:
+**Severity**: Critical - These files reference non-existent REST endpoints and will fail at runtime.
 
-| Category | Files Affected | Priority |
-|----------|---------------|----------|
-| Workspace | `WorkspaceTemplateManagement.tsx`, `MessageSearch.tsx` | Critical |
-| Organization | `OrganizationAdminManagement.tsx` | Critical |
-| Marketplace | `VendorShortlist.tsx`, `EventMarketplaceIntegration.tsx`, `BookingManagementUI.tsx` | High |
-| Dashboard | `ParticipantDashboard.tsx`, `OrganizerDashboard.tsx` | High |
-| Events | `PrivateEventAccess.tsx` | Medium |
-| Communication | `EmailComposer.tsx`, `CommunicationHistory.tsx` | Medium |
+| File | Legacy Calls | Required Fix |
+|------|-------------|--------------|
+| `VendorCoordination.tsx` | `api.get('/marketplace/bookings/...')`, `api.post`, `api.patch` | Replace with Supabase queries to vendor-related tables |
+| `BookingManagementUI.tsx` | `api.get`, `api.patch` for bookings | Replace with Supabase mutations |
+| `useVendorStatus.ts` | `api.get('/vendors/profile/...')` | Replace with direct Supabase query to vendor profiles |
+| `useAuthSessionRefresh.ts` | `api.post('/auth/refresh-token')` | Replace with `supabase.auth.refreshSession()` |
+| `CommunicationHistory.tsx` | `api.get('/communications/events/...')` | Replace with Supabase query |
+| `EventListPage.tsx` | `api.get('/events/templates')` | Replace with Supabase query |
+| `ReviewRatingUI.tsx` | `api.get`, `api.post` for reviews | Replace with Supabase operations |
+| `ProfileCompletion.tsx` | `api.put('/auth/profile')` | Replace with Supabase profiles update |
 
-### Required Actions:
-1. Replace all `api.get()` calls with direct Supabase queries
-2. Replace all `api.post()` calls with Supabase mutations or edge function invocations
-3. Update `MessageSearch.tsx` to use Supabase full-text search
-
----
-
-## 2. Missing Real-Time Subscriptions
-
-Several dashboards use `useTaskRealtimeUpdates` instead of the full `useRealtimeDashboard` hook:
-
-| Dashboard | Current Hook | Required Hook |
-|-----------|-------------|---------------|
-| DepartmentDashboard (generic) | None | `useRealtimeDashboard` |
-| ContentDepartmentDashboard | `useTaskRealtimeUpdates` | `useRealtimeDashboard` |
-| GrowthDepartmentDashboard | `useTaskRealtimeUpdates` | `useRealtimeDashboard` |
-| FinanceDepartmentDashboard | `useTaskRealtimeUpdates` | `useRealtimeDashboard` |
-
-The `useRealtimeDashboard` hook provides broader coverage (tasks, milestones, budget_requests, activities) vs `useTaskRealtimeUpdates` which only covers tasks.
-
-### Required Actions:
-1. Replace `useTaskRealtimeUpdates` with `useRealtimeDashboard` in all department dashboards
-2. Add `useRealtimeDashboard` to the generic `DepartmentDashboard.tsx`
+**Total: 8 files with 15+ broken API calls**
 
 ---
 
-## 3. Escalation Workflow UI Missing
+## 2. Real-Time Coverage Analysis
 
-**Database tables exist** (`escalation_rules`, `escalation_history`) and the `useEscalationWorkflow` hook is implemented, but there is **no UI component** to manage escalation rules:
+### Status: GOOD - Most dashboards upgraded
 
-### Database Schema (Already Exists):
+All major department dashboards now use `useRealtimeDashboard`:
+- RootDashboard
+- DepartmentDashboard (generic)
+- FinanceDepartmentDashboard
+- GrowthDepartmentDashboard
+- ContentDepartmentDashboard
+- OperationsDepartmentDashboard
+- VolunteersDepartmentDashboard
+- TechDepartmentDashboard
+- CommitteeDashboard
+- TeamDashboard
+- CateringDashboard
+
+### Gap: Missing real-time in committee-specific dashboards
+
+The following committee dashboards need `useRealtimeDashboard` integration:
+
+| Dashboard | Current State |
+|-----------|---------------|
+| `MediaDashboard.tsx` | No real-time hook |
+| `SocialMediaDashboard.tsx` | No real-time hook |
+| `MarketingDashboard.tsx` | No real-time hook |
+| `CommunicationDashboard.tsx` | No real-time hook |
+| `ContentDashboard.tsx` (committee) | No real-time hook |
+
+---
+
+## 3. Escalation Workflow Status
+
+### Database: COMPLETE
 ```
-escalation_rules:
+escalation_rules table:
 - id, workspace_id, item_type
 - trigger_after_hours, sla_hours
 - escalate_to, escalation_path
 - notify_roles, notification_channels
 - is_active, auto_reassign, created_by
 
-escalation_history:
+escalation_history table:
 - id, item_type, item_id, workspace_id
 - escalated_from, escalated_to, escalation_level
 - reason, sla_status
 - resolved_at, resolved_by, resolution_notes
 ```
 
-### Files to Create:
-| File | Purpose |
-|------|---------|
-| `src/components/workspace/escalation/EscalationRulesManager.tsx` | CRUD UI for SLA/escalation rules |
-| `src/components/workspace/escalation/EscalationHistoryPanel.tsx` | Audit trail with resolution tracking |
-| `src/components/workspace/escalation/OverdueItemsWidget.tsx` | Dashboard widget showing SLA breaches |
-| `src/components/workspace/escalation/index.ts` | Barrel exports |
+### Hooks: COMPLETE
+- `useEscalationWorkflow` - Full implementation with rules, overdue items, auto-escalate
 
-### Integration Points:
-- Add `EscalationRulesManager` to workspace settings tab
-- Add `OverdueItemsWidget` to ROOT dashboard for event-wide oversight
-- Add `EscalationHistoryPanel` to approval management views
+### UI Components: COMPLETE
+- `EscalationRulesManager.tsx`
+- `EscalationHistoryPanel.tsx`
+- `OverdueItemsWidget.tsx`
 
----
+### Gap: Integration Points Missing
 
-## 4. Template Integration Gaps
-
-Per `IMPLEMENTATION_CHECKLIST.md`, template integration is incomplete:
-
-### Current State:
-- `workspace_templates` table does **NOT exist** in the database
-- `WorkspaceTemplateLibrary.tsx` uses hardcoded mock data
-- Template selection is not connected to event creation wizard
-- No post-event feedback collection for templates
-
-### Required Actions:
-1. Create `workspace_templates` table via migration:
-   ```sql
-   CREATE TABLE workspace_templates (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     name TEXT NOT NULL,
-     description TEXT,
-     industry_type TEXT,
-     event_type TEXT,
-     complexity TEXT,
-     event_size_min INT,
-     event_size_max INT,
-     effectiveness DECIMAL,
-     usage_count INT DEFAULT 0,
-     structure JSONB,
-     metadata JSONB,
-     is_public BOOLEAN DEFAULT true,
-     created_by UUID REFERENCES auth.users(id),
-     created_at TIMESTAMPTZ DEFAULT now()
-   );
-   ```
-2. Connect template selection to event creation wizard
-3. Pass `template_id` to `workspace-provision` edge function
-4. Trigger `WorkspaceTemplateRating` after event completion
+| Integration Point | Status | Action Required |
+|------------------|--------|-----------------|
+| Add to Workspace Settings Tab | Missing | Add `EscalationRulesManager` to settings |
+| Add to ROOT Dashboard | Missing | Add `OverdueItemsWidget` widget |
+| Add to Approval Views | Missing | Add `EscalationHistoryPanel` |
+| Cron job for auto-escalation | Missing | Schedule `process-automation-rules` to check escalations |
 
 ---
 
-## 5. Mobile Experience Gaps
+## 4. Template System Status
 
-### 5.1 Touch Target Compliance
-Industry standard requires minimum 48x48px touch targets. Current mobile components use smaller targets:
-
-| Component | Issue |
-|-----------|-------|
-| `MobileWorkspaceDashboard` | Quick action buttons are 5x5 icons |
-| `MobileNavigation` | Bottom nav icons at 5x5 |
-| `MobileTaskSummary` | List items lack proper padding |
-
-### 5.2 Missing Pull-to-Refresh
-No pull-to-refresh implementation exists. This is a standard gesture on all mobile lists.
-
-**Solution**: Create `usePullToRefresh` hook using touch events + refetch pattern:
-```typescript
-export function usePullToRefresh(refetchFn: () => Promise<void>) {
-  // Track touch start/move/end
-  // Trigger refetchFn when pulled past threshold
-}
+### Database: COMPLETE
+```
+workspace_templates table exists with:
+- id, name, description
+- industry_type, event_type, complexity
+- event_size_min, event_size_max
+- effectiveness, usage_count
+- structure (JSONB), metadata (JSONB)
+- is_public, created_by, created_at
 ```
 
-### 5.3 Offline Queue Not Connected
-The `useOffline` hook and `offlineService` exist but have gaps:
-- Uses non-existent REST API endpoints (`/api/workspaces/...`)
-- Not integrated with mobile components
-- No visual feedback for pending sync items
+### Static Templates: COMPLETE
+- `ENHANCED_WORKSPACE_TEMPLATES` in `workspaceTemplates.ts` - 1000+ lines of templates
 
-### 5.4 Missing Mobile Communication Tab
-`MobileWorkspaceDashboard` has Events/Email/Analytics tabs but **no Communication tab** for team messaging.
+### Gap: Event Creation Integration
+
+Per IMPLEMENTATION_CHECKLIST.md (lines 101-121):
+
+| Task | Status | Action Required |
+|------|--------|-----------------|
+| Template selection in event wizard | NOT DONE | Add `WorkspaceTemplateLibrary` to event creation |
+| Pass template_id to provisioning | NOT DONE | Update event creation to include template selection |
+| Post-event template feedback | NOT DONE | Add `WorkspaceTemplateRating` to event completion flow |
 
 ---
 
-## 6. Communication System Gaps
+## 5. Communication System Gaps
 
-### 6.1 Legacy MessageThread Still Exists
-`communication/MessageThread.tsx` still uses `api.get()` and should be deprecated in favor of `EnhancedMessageThread`.
-
-### 6.2 Missing Thread Replies
-Database schema for `channel_messages` does **NOT** have `parent_message_id` column. Threading is not supported.
-
-**Required Migration**:
-```sql
-ALTER TABLE channel_messages 
-ADD COLUMN parent_message_id UUID REFERENCES channel_messages(id),
-ADD COLUMN reply_count INT DEFAULT 0;
-
-CREATE INDEX idx_channel_messages_parent ON channel_messages(parent_message_id);
+### Database Schema: COMPLETE
+```
+channel_messages now has:
+- parent_message_id (UUID) - for threading
+- reply_count (INTEGER) - for reply counts
+- message_reactions table exists
 ```
 
-### 6.3 Missing Message Reactions
-No `reactions` support in the schema. Industry standard (Slack, Teams) requires emoji reactions.
+### UI Components Status:
 
-**Required Migration**:
-```sql
-CREATE TABLE message_reactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  message_id UUID REFERENCES channel_messages(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id),
-  emoji TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(message_id, user_id, emoji)
-);
-```
+| Component | Status | Notes |
+|-----------|--------|-------|
+| `EnhancedMessageThread.tsx` | Complete | Full real-time, typing indicators, @mentions |
+| `MessageThread.tsx` | Deprecated | Legacy, uses backup system |
+| `MobileWorkspaceCommunication.tsx` | Complete | Added to mobile dashboard |
+| `RealtimeMessageThread.tsx` | Complete | Alternative implementation |
 
----
+### Gap: Thread Replies UI Not Implemented
 
-## 7. Analytics & Reporting Gaps
+While database supports threading (`parent_message_id`), the UI does not yet:
+1. Display replies under parent messages
+2. Allow users to reply to specific messages
+3. Show "View X replies" expansion
 
-### 7.1 PDF Export Not Functional
-`WorkspaceAnalyticsDashboard.tsx` shows a toast saying "PDF export requires additional setup". However, `jspdf` is already installed and used elsewhere (certificates, ID cards).
+### Gap: Reactions UI Not Implemented
 
-**Fix**: Integrate existing `src/lib/export-utils.ts` PDF generation into the analytics dashboard.
-
-### 7.2 Scheduled Reports Not Processing
-The `scheduled_reports` table exists and `useScheduledReports` hook is implemented, but there is **no cron job** to actually process scheduled reports.
-
-**Required Edge Function**: `process-scheduled-reports`
-- Query `scheduled_reports WHERE next_run_at <= now() AND is_active = true`
-- Generate reports using `workspace-reports` edge function
-- Store in Supabase Storage
-- Send notification to `created_by` user
-- Update `next_run_at` based on frequency
+`message_reactions` table exists but:
+1. No emoji picker in message thread
+2. No reaction display under messages
+3. No reaction aggregation (e.g., "👍 3")
 
 ---
 
-## 8. Security & RBAC Gaps
+## 6. Mobile Experience Gaps
 
-### 8.1 Missing Permission Checks
-| Component | Has RBAC Check | Needs Check |
-|-----------|---------------|-------------|
-| `AutomationRulesPanel.tsx` | No | Yes - restrict to LEAD+ |
-| `IntegrationManager.tsx` | No | Yes - restrict to MANAGER+ |
-| Escalation UI (when created) | N/A | Yes - restrict to MANAGER+ |
+### Completed:
+- Pull-to-refresh hook (`usePullToRefresh.ts`)
+- 48px touch targets in `MobileWorkspaceDashboard.tsx`
+- Communication tab added to mobile
+- `useOffline.ts` refactored to use Supabase
 
-**Pattern to Apply**:
-```typescript
-const rbac = useWorkspaceRBAC(userRole);
-if (!rbac.isLeadOrAbove) {
-  return <AccessDeniedMessage />;
-}
-```
+### Outstanding Issues:
 
----
+| Component | Issue | Fix Required |
+|-----------|-------|--------------|
+| `MobileNavigation.tsx` | Verify 48px touch targets | Audit and update if needed |
+| `MobileTaskSummary.tsx` | List items may lack padding | Verify 48px row heights |
+| `MobileTeamManagement.tsx.backup` | Still has legacy `api.get` | Confirm main file is refactored |
 
-## 9. Automation Enhancements
+### Gap: Offline Visual Feedback
 
-### 9.1 Missing Trigger Types
-The `process-automation-rules` edge function handles:
-- STATUS_CHANGED, UPDATE_PRIORITY, SEND_NOTIFICATION, ADD_TAG, REMOVE_TAG, SET_BLOCKED, AUTO_ASSIGN
-
-**Missing industry-standard triggers**:
-- `WORKLOAD_THRESHOLD` - Auto-reassign when member exceeds capacity
-- `SLA_BREACH` - Trigger escalation when deadline missed
-- `DEADLINE_APPROACHING` - Send reminders at 7d, 3d, 1d before due
-
-### 9.2 No Escalation Integration
-Automation rules should be able to trigger escalation workflow when SLA is breached.
+`useOffline` hook works but:
+1. No visible "offline mode" banner in mobile UI
+2. No sync progress indicator
+3. No pending items count display
 
 ---
 
-## Implementation Plan
+## 7. RBAC Enforcement Status
 
-### Sprint 1: Critical Fixes (Week 1)
-1. Fix remaining 17 files with broken API calls
-2. Replace `MessageThread` with `EnhancedMessageThread` everywhere
-3. Add `useRealtimeDashboard` to all department dashboards
-4. Add RBAC checks to `AutomationRulesPanel` and `IntegrationManager`
+### Completed:
+- `AutomationRulesPanel.tsx` - Requires LEAD+ (line 52)
+- `IntegrationManager.tsx` - Requires MANAGER+ (line 61)
 
-### Sprint 2: Escalation & Templates (Week 2)
-1. Create Escalation UI components (Manager, History, Widget)
-2. Create `workspace_templates` table migration
-3. Connect template selection to event creation
-4. Create `process-scheduled-reports` edge function
+### Gap: Escalation UI RBAC
 
-### Sprint 3: Mobile Polish (Week 3)
-1. Audit and fix all touch targets (min 48px)
-2. Implement `usePullToRefresh` hook
-3. Add Communication tab to `MobileWorkspaceDashboard`
-4. Fix `useOffline` to use Supabase instead of REST API
+When escalation components are integrated:
+- `EscalationRulesManager` should require MANAGER+
+- `EscalationHistoryPanel` should require LEAD+ to view, MANAGER+ to resolve
 
-### Sprint 4: Advanced Features (Week 4)
-1. Add `parent_message_id` for threaded replies
-2. Add message reactions table and UI
-3. Integrate PDF export in analytics
-4. Add new automation trigger types
+---
+
+## 8. Analytics & Reporting Gaps
+
+### PDF Export: COMPLETE
+`WorkspaceAnalyticsDashboard.tsx` now uses `jsPDF` and `jspdf-autotable` for local PDF generation.
+
+### Scheduled Reports: COMPLETE
+- `scheduled_reports` table exists
+- `process-scheduled-reports` edge function implemented
+- Handles daily/weekly/biweekly/monthly/quarterly frequencies
+
+### Gap: Cron Job Not Configured
+
+The `process-scheduled-reports` function exists but needs to be:
+1. Deployed to Supabase
+2. Configured with a pg_cron schedule (e.g., daily at 9 AM)
+
+### Gap: Report History UI
+
+`report_history` table referenced in edge function but:
+1. No UI to view past generated reports
+2. No download links for stored reports
+
+---
+
+## 9. Automation System Gaps
+
+### Current Triggers Supported:
+- STATUS_CHANGED
+- UPDATE_PRIORITY
+- SEND_NOTIFICATION
+- ADD_TAG, REMOVE_TAG
+- SET_BLOCKED
+- AUTO_ASSIGN
+
+### Missing Industry-Standard Triggers:
+
+| Trigger | Use Case | Priority |
+|---------|----------|----------|
+| `WORKLOAD_THRESHOLD` | Auto-reassign when member exceeds capacity | Medium |
+| `SLA_BREACH` | Trigger escalation when deadline missed | High |
+| `DEADLINE_APPROACHING` | Send reminders at 7d, 3d, 1d before due | High |
+| `APPROVAL_PENDING_TOO_LONG` | Escalate stale approvals | Medium |
+
+---
+
+## 10. Workspace Tab & Feature Gaps
+
+### Available Tabs per Workspace Type:
+
+| Tab | ROOT | DEPT | COMMITTEE | TEAM |
+|-----|------|------|-----------|------|
+| Overview | Yes | Yes | Yes | Yes |
+| Tasks | Yes | Yes | Yes | Yes |
+| Team | Yes | Yes | Yes | Yes |
+| Communication | Partial | Partial | Yes | Yes |
+| Analytics | Yes | Yes | Limited | No |
+| Reports | Yes | Yes | No | No |
+| Approvals | Yes | Yes | Yes | Limited |
+| Settings | Yes | Yes | Yes | Limited |
+| Escalation | Missing | Missing | N/A | N/A |
+| Templates | Limited | No | No | No |
+
+### Gap: Escalation Tab for ROOT/DEPARTMENT
+
+Need to add escalation management to workspace settings or as dedicated tab for ROOT and DEPARTMENT levels.
+
+### Gap: Template Management Tab
+
+`WorkspaceTemplateManagement.tsx` exists but is not integrated into any workspace view.
+
+---
+
+## Implementation Roadmap
+
+### Sprint 1: Critical API Fixes (Days 1-3)
+1. Fix 8 files with legacy API calls
+2. Configure auth session refresh with Supabase
+3. Refactor vendor coordination to use Supabase
+
+### Sprint 2: Real-Time & Integration (Days 4-6)
+1. Add `useRealtimeDashboard` to 5 committee dashboards
+2. Integrate escalation components into workspace settings
+3. Add `OverdueItemsWidget` to ROOT dashboard
+
+### Sprint 3: Template & Event Integration (Days 7-9)
+1. Add template selection to event creation wizard
+2. Connect template_id to workspace provisioning
+3. Add post-event template rating flow
+
+### Sprint 4: Communication Enhancements (Days 10-12)
+1. Implement thread replies UI in message thread
+2. Add emoji reactions picker and display
+3. Add reaction aggregation
+
+### Sprint 5: Mobile & Offline (Days 13-14)
+1. Add offline mode banner
+2. Implement sync progress indicator
+3. Final touch target audit
+
+### Sprint 6: Automation & Reporting (Days 15-16)
+1. Add SLA_BREACH and DEADLINE_APPROACHING triggers
+2. Configure pg_cron for scheduled reports
+3. Build report history viewer UI
 
 ---
 
 ## Files Summary
 
-### To Create:
-| File | Category |
-|------|----------|
-| `src/components/workspace/escalation/EscalationRulesManager.tsx` | Escalation |
-| `src/components/workspace/escalation/EscalationHistoryPanel.tsx` | Escalation |
-| `src/components/workspace/escalation/OverdueItemsWidget.tsx` | Escalation |
-| `src/components/workspace/escalation/index.ts` | Escalation |
-| `src/hooks/usePullToRefresh.ts` | Mobile |
-| `supabase/functions/process-scheduled-reports/index.ts` | Automation |
+### Files Requiring Critical Fixes (8):
+1. `src/components/marketplace/VendorCoordination.tsx`
+2. `src/components/marketplace/BookingManagementUI.tsx`
+3. `src/components/marketplace/ReviewRatingUI.tsx`
+4. `src/components/communication/CommunicationHistory.tsx`
+5. `src/components/routing/services/EventListPage.tsx`
+6. `src/components/profile/ProfileCompletion.tsx`
+7. `src/hooks/useVendorStatus.ts`
+8. `src/hooks/useAuthSessionRefresh.ts`
 
-### To Modify:
-| File | Changes |
-|------|---------|
-| `WorkspaceTemplateManagement.tsx` | Replace api.post with Supabase |
-| `MessageSearch.tsx` | Replace api.get with Supabase full-text search |
-| `OrganizationAdminManagement.tsx` | Replace api calls with Supabase |
-| `DepartmentDashboard.tsx` | Add useRealtimeDashboard |
-| `ContentDepartmentDashboard.tsx` | Replace useTaskRealtimeUpdates with useRealtimeDashboard |
-| `GrowthDepartmentDashboard.tsx` | Replace useTaskRealtimeUpdates with useRealtimeDashboard |
-| `FinanceDepartmentDashboard.tsx` | Replace useTaskRealtimeUpdates with useRealtimeDashboard |
-| `AutomationRulesPanel.tsx` | Add RBAC check |
-| `IntegrationManager.tsx` | Add RBAC check |
-| `MobileWorkspaceDashboard.tsx` | Add Communication tab, fix touch targets |
-| `useOffline.ts` | Replace fetch calls with Supabase |
-| `WorkspaceAnalyticsDashboard.tsx` | Integrate PDF export |
+### Files Requiring Real-Time Addition (5):
+1. `src/components/workspace/media/MediaDashboard.tsx`
+2. `src/components/workspace/social-media/SocialMediaDashboard.tsx`
+3. `src/components/workspace/marketing/MarketingDashboard.tsx`
+4. `src/components/workspace/communication/CommunicationDashboard.tsx`
+5. `src/components/workspace/content/ContentDashboard.tsx`
 
-### Database Migrations Required:
-1. Create `workspace_templates` table
-2. Add `parent_message_id` and `reply_count` to `channel_messages`
-3. Create `message_reactions` table
+### New Files to Create (4):
+1. Thread replies component for communication
+2. Emoji reactions component for communication
+3. Offline mode banner component
+4. Report history viewer component
+
+### Integration Points to Add (6):
+1. EscalationRulesManager to workspace settings
+2. OverdueItemsWidget to ROOT dashboard
+3. Template selection to event creation
+4. Template rating to event completion
+5. Cron schedule for process-scheduled-reports
+6. Escalation tab to workspace navigation
 
 ---
 
 ## Success Metrics
 
-1. Zero broken API calls in workspace components
-2. 100% real-time coverage using `useRealtimeDashboard` on all dashboards
-3. All mobile touch targets >= 48px
-4. Escalation UI fully functional with history tracking
-5. Template integration connected to event creation
-6. Scheduled reports processing automatically via cron
-7. PDF export working for analytics reports
-8. Thread replies and reactions in communication
+1. Zero broken API calls in production code
+2. 100% real-time coverage on all dashboards
+3. Escalation workflow fully integrated and visible
+4. Template selection available during event creation
+5. Thread replies and reactions functional
+6. Scheduled reports processing automatically
+7. Mobile offline experience with visual feedback
+8. All touch targets meet 48px minimum
