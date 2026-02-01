@@ -5,7 +5,6 @@ import { Event, EventStatus, EventMode, EventTemplate } from '../../../types';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
-import api from '@/lib/api';
 import { useOptionalOrganization } from '@/components/organization/OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -84,13 +83,36 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
     enabled: filterBy !== 'templates',
   });
 
-  // Load event templates for the gallery view
+  // Load event templates from workspace_templates table
   const { data: templates = [] } = useQuery<EventTemplate[]>({
     queryKey: ['event-templates'],
     enabled: filterBy === 'templates',
     queryFn: async () => {
-      const response = await api.get('/events/templates');
-      return response.data.templates as EventTemplate[];
+      const { data, error } = await supabase
+        .from('workspace_templates')
+        .select('id, name, description, event_type, industry_type, metadata')
+        .eq('is_public', true)
+        .order('usage_count', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      return (data || []).map((row: {
+        id: string;
+        name: string;
+        description: string | null;
+        event_type: string | null;
+        industry_type: string | null;
+        metadata: Record<string, unknown> | null;
+      }) => ({
+        id: row.id,
+        name: row.name,
+        description: row.description || '',
+        category: row.industry_type || row.event_type || 'General',
+        defaultMode: EventMode.OFFLINE,
+        defaultDuration: 8,
+        suggestedCapacity: (row.metadata as any)?.suggestedCapacity || 100,
+      })) as EventTemplate[];
     },
   });
 
@@ -421,30 +443,29 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                           {new Date(event.startDate).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {event.capacity || 'Unlimited'}
+                          {event.capacity || '—'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <div className="flex items-center space-x-3">
                             <Link
                               to={eventDetailPath(event.id)}
                               className="text-primary hover:text-primary/80"
-                              title="View Event"
+                              title="View"
                             >
-                              <EyeIcon className="h-4 w-4" />
+                              <EyeIcon className="h-5 w-5" />
                             </Link>
                             <Link
                               to={eventEditPath(event.id)}
                               className="text-muted-foreground hover:text-foreground"
-                              title="Edit Event"
+                              title="Edit"
                             >
-                              <PencilIcon className="h-4 w-4" />
+                              <PencilIcon className="h-5 w-5" />
                             </Link>
                             <button
-                              onClick={() => { /* TODO: Implement delete event */ }}
                               className="text-destructive hover:text-destructive/80"
-                              title="Delete Event"
+                              title="Delete"
                             >
-                              <TrashIcon className="h-4 w-4" />
+                              <TrashIcon className="h-5 w-5" />
                             </button>
                           </div>
                         </td>
@@ -453,90 +474,102 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                   </tbody>
                 </table>
               </div>
+
+              {filteredEvents.length === 0 && (
+                <div className="text-center py-12">
+                  <EventHosting className="mx-auto h-32 w-32 text-muted-foreground/40 mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No events found</h3>
+                  <p className="text-muted-foreground mb-6">
+                    {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL'
+                      ? 'Try adjusting your filters.'
+                      : 'Get started by creating your first event.'}
+                  </p>
+                  <button
+                    onClick={() => navigate(createPath)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
+                  >
+                    <PlusIcon className="h-5 w-5 mr-2" />
+                    Create Event
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="bg-card rounded-lg border border-border p-6 hover:shadow-md transition-shadow"
+                  className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-medium text-foreground truncate">{event.name}</h3>
-                    <div className="flex items-center space-x-2 ml-2">
-                      {getStatusBadge(event.status)}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-medium text-foreground truncate">
+                          {event.name}
+                        </h3>
+                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                          {event.description}
+                        </p>
+                      </div>
+                      <div className="ml-3 flex flex-col gap-1">
+                        {getStatusBadge(event.status)}
+                        {getModeBadge(event.mode)}
+                      </div>
                     </div>
-                  </div>
 
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{event.description}</p>
+                    <div className="space-y-2 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center justify-between">
+                        <span>Start Date</span>
+                        <span className="font-medium text-foreground">
+                          {new Date(event.startDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {event.capacity && (
+                        <div className="flex items-center justify-between">
+                          <span>Capacity</span>
+                          <span className="font-medium text-foreground">{event.capacity}</span>
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Mode:</span>
-                      {getModeBadge(event.mode)}
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Start Date:</span>
-                      <span className="text-foreground">
-                        {new Date(event.startDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Capacity:</span>
-                      <span className="text-foreground">{event.capacity || 'Unlimited'}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <Link
-                      to={`/console/events/${event.id}`}
-                      className="text-primary hover:text-primary/80 text-sm font-medium"
-                    >
-                      View Details
-                    </Link>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-end space-x-2 pt-4 border-t border-border">
                       <Link
-                        to={`/console/events/${event.id}/edit`}
-                        className="text-muted-foreground hover:text-foreground"
-                        title="Edit Event"
+                        to={eventDetailPath(event.id)}
+                        className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-md"
                       >
-                        <PencilIcon className="h-4 w-4" />
+                        <EyeIcon className="h-4 w-4 mr-1" />
+                        View
                       </Link>
-                      <button
-                        onClick={() => { /* TODO: Implement delete event */ }}
-                        className="text-destructive hover:text-destructive/80"
-                        title="Delete Event"
+                      <Link
+                        to={eventEditPath(event.id)}
+                        className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-md"
                       >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
+                        <PencilIcon className="h-4 w-4 mr-1" />
+                        Edit
+                      </Link>
                     </div>
                   </div>
                 </div>
               ))}
-            </div>
-          )}
 
-          {/* Empty State */}
-          {filterBy !== 'templates' && filteredEvents.length === 0 && (
-            <div className="text-center py-12 flex flex-col items-center">
-              {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL' ? (
-                <ThinkingPerson size="sm" showBackground={false} />
-              ) : (
-                <EventHosting size="sm" showBackground={false} />
+              {filteredEvents.length === 0 && (
+                <div className="col-span-full text-center py-12">
+                  <ThinkingPerson className="mx-auto h-32 w-32 text-muted-foreground/40 mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No events found</h3>
+                  <p className="text-muted-foreground mb-6">
+                    {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL'
+                      ? 'Try adjusting your filters.'
+                      : 'Get started by creating your first event.'}
+                  </p>
+                  <button
+                    onClick={() => navigate(createPath)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
+                  >
+                    <PlusIcon className="h-5 w-5 mr-2" />
+                    Create Event
+                  </button>
+                </div>
               )}
-              <h3 className="text-lg font-medium text-foreground mb-2 mt-4">No events found</h3>
-              <p className="text-muted-foreground mb-6">
-                {searchQuery || statusFilter !== 'ALL' || modeFilter !== 'ALL'
-                  ? 'Try adjusting your search criteria or filters.'
-                  : 'Get started by creating your first event.'}
-              </p>
-              <Link
-                to={createPath}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-              >
-                <PlusIcon className="h-4 w-4 mr-2" />
-                Create Event
-              </Link>
             </div>
           )}
         </div>
@@ -544,5 +577,3 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
     </div>
   );
 };
-
-export default EventListPage;

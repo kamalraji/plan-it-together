@@ -1,21 +1,64 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
-import { CommunicationLog } from '../../types';
+import { supabase } from '@/integrations/supabase/client';
+
+interface CommunicationLogData {
+  id: string;
+  eventId: string;
+  senderId: string;
+  subject: string;
+  status: 'SENT' | 'FAILED' | 'PARTIAL';
+  recipientCount: number;
+  sender: {
+    name: string;
+    email: string;
+  };
+  sentAt: string;
+  event?: {
+    id: string;
+    name: string;
+  };
+}
 
 interface CommunicationHistoryProps {
   eventId: string;
 }
 
 export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
-  const [selectedLog, setSelectedLog] = useState<CommunicationLog | null>(null);
+  const [selectedLog, setSelectedLog] = useState<CommunicationLogData | null>(null);
 
-  // Fetch communication logs (Requirements 8.4)
+  // Fetch communication logs from activity_feed_events (Requirements 8.4)
   const { data: logs, isLoading, error } = useQuery({
     queryKey: ['communication-logs', eventId],
     queryFn: async () => {
-      const response = await api.get(`/communications/events/${eventId}/logs`);
-      return response.data.data as CommunicationLog[];
+      const { data, error } = await supabase
+        .from('activity_feed_events')
+        .select('id, title, description, activity_type, created_at, user_id, metadata')
+        .eq('event_id', eventId)
+        .in('activity_type', ['EMAIL_SENT', 'NOTIFICATION_SENT', 'ANNOUNCEMENT', 'BROADCAST'])
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Map to CommunicationLogData format
+      return (data || []).map(row => ({
+        id: row.id,
+        eventId: eventId,
+        senderId: row.user_id || '',
+        subject: row.title,
+        status: 'SENT' as const,
+        recipientCount: (row.metadata as any)?.recipientCount || 1,
+        sender: {
+          name: (row.metadata as any)?.senderName || 'System',
+          email: (row.metadata as any)?.senderEmail || '',
+        },
+        sentAt: row.created_at,
+        event: {
+          id: eventId,
+          name: (row.metadata as any)?.eventName || 'Event',
+        },
+      })) as CommunicationLogData[];
     },
   });
 
@@ -24,8 +67,32 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
     queryKey: ['communication-log', selectedLog?.id],
     queryFn: async () => {
       if (!selectedLog?.id) return null;
-      const response = await api.get(`/communications/logs/${selectedLog.id}`);
-      return response.data.data as CommunicationLog;
+      
+      const { data, error } = await supabase
+        .from('activity_feed_events')
+        .select('id, title, description, activity_type, created_at, user_id, metadata')
+        .eq('id', selectedLog.id)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        eventId: eventId,
+        senderId: data.user_id || '',
+        subject: data.title,
+        status: 'SENT' as const,
+        recipientCount: (data.metadata as any)?.recipientCount || 1,
+        sender: {
+          name: (data.metadata as any)?.senderName || 'System',
+          email: (data.metadata as any)?.senderEmail || '',
+        },
+        sentAt: data.created_at,
+        event: {
+          id: eventId,
+          name: (data.metadata as any)?.eventName || 'Event',
+        },
+      } as CommunicationLogData;
     },
     enabled: !!selectedLog?.id,
   });
