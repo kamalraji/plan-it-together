@@ -49,7 +49,6 @@ export function OrganizerDashboard() {
   const organization = useCurrentOrganization();
   const [activeTab, setActiveTab] = useState<'events' | 'workspaces' | 'analytics'>('events');
   const [isChecklistOpen, setIsChecklistOpen] = useState(true);
-  const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
   const { isHealthy } = useApiHealth();
   
   // Fetch events directly from Supabase
@@ -347,7 +346,7 @@ export function OrganizerDashboard() {
         )}
 
         {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
-        {isProfileIncomplete}
+        {/* Profile Completion Prompt placeholder */}
 
         {activeTab === 'events' && (
           <motion.div
@@ -375,10 +374,8 @@ export function OrganizerDashboard() {
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
                 {events.map((event, index) => {
                   const startDate = new Date(event.startDate);
-                  const endDate = new Date(event.endDate);
                   const isLive = event.status === 'ONGOING';
                   const isDraft = event.status === 'DRAFT';
-                  const isPublished = event.status === 'PUBLISHED';
 
                   return (
                     <motion.div

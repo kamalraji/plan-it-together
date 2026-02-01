@@ -51,7 +51,7 @@ export function WorkspaceTemplateManagement({
     // Update template usage count
     await supabase
       .from('workspace_templates')
-      .update({ usage_count: (template.usageCount || 0) + 1 })
+      .update({ usage_count: (template.usage_count || 0) + 1 })
       .eq('id', template.id);
 
     return data;

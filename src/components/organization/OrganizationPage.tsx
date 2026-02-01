@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Organization, Event, User } from '../../types';
@@ -75,10 +75,16 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
           description: org.description || '',
           category: org.category || 'OTHER',
           verificationStatus: org.verification_status || 'PENDING',
-          branding: org.branding || {},
-          socialLinks: org.social_links || {},
-          followerCount: org.follower_count || 0,
+          branding: {
+            logoUrl: org.logo_url || undefined,
+            bannerUrl: org.banner_url || undefined,
+          },
+          socialLinks: {},
+          pageUrl: `/${org.slug}`,
+          followerCount: 0,
           eventCount: (events || []).length,
+          createdAt: org.created_at,
+          updatedAt: org.created_at, // Use created_at as fallback since updated_at may not exist
         } as Organization,
         events: (events || []).map(e => ({
           id: e.id,
@@ -105,22 +111,16 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
           .from('followers')
           .insert({
             follower_id: currentUser.id,
-            organization_id: organizationId,
+            following_id: organizationId,
           });
         if (error) throw error;
-
-        // Update follower count
-        await supabase.rpc('increment_follower_count', { org_id: organizationId });
       } else {
         const { error } = await supabase
           .from('followers')
           .delete()
           .eq('follower_id', currentUser.id)
-          .eq('organization_id', organizationId);
+          .eq('following_id', organizationId);
         if (error) throw error;
-
-        // Decrement follower count
-        await supabase.rpc('decrement_follower_count', { org_id: organizationId });
       }
     },
     onSuccess: (_, follow) => {

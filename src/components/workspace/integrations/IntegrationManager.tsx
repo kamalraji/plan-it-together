@@ -24,10 +24,11 @@ import { Plus, MoreVertical, Trash2, Send, Link2, Hash, MessageSquare, ShieldAle
 import { useWorkspaceIntegrations, WorkspaceIntegration, Platform } from '@/hooks/useWorkspaceIntegrations';
 import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
 import { AddIntegrationModal } from './AddIntegrationModal';
+import { WorkspaceRole } from '@/types';
 
 interface IntegrationManagerProps {
   workspaceId: string;
-  userRole?: string;
+  userRole?: WorkspaceRole;
 }
 
 const platformIcons: Record<Platform, React.ReactNode> = {
@@ -56,7 +57,7 @@ export function IntegrationManager({ workspaceId, userRole }: IntegrationManager
   const [deleteConfirm, setDeleteConfirm] = useState<WorkspaceIntegration | null>(null);
 
   // RBAC check - require MANAGER+ for integration management
-  const rbac = useWorkspaceRBAC(userRole);
+  const rbac = useWorkspaceRBAC(userRole ?? null);
   const canManageIntegrations = rbac.isManagerOrAbove;
 
   const {
