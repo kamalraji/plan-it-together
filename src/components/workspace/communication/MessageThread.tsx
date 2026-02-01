@@ -1,0 +1,243 @@
+import { useState, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { WorkspaceChannel, SendMessageDTO } from '../../../types';
+import { MessageComposer } from './MessageComposer';
+
+interface MessageData {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string | null;
+  sentAt: string;
+  editedAt: string | null;
+  attachments: any[] | null;
+}
+
+interface MessageThreadProps {
+  channel: WorkspaceChannel;
+  onSendMessage?: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
+  isSending: boolean;
+}
+
+export function MessageThread({ channel, onSendMessage, isSending }: MessageThreadProps) {
+  const [messages, setMessages] = useState<MessageData[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+
+  // Fetch channel messages using Supabase
+  const { data: messageHistory, isLoading } = useQuery({
+    queryKey: ['channel-messages', channel.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('channel_messages')
+        .select('id, content, sender_id, sender_name, created_at, edited_at, attachments')
+        .eq('channel_id', channel.id)
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      return (data || []).map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        senderId: msg.sender_id,
+        senderName: msg.sender_name,
+        sentAt: msg.created_at,
+        editedAt: msg.edited_at,
+        attachments: msg.attachments as any[] | null
+      })) as MessageData[];
+    },
+  });
+
+  // Set up real-time subscription for new messages
+  useEffect(() => {
+    const subscription = supabase
+      .channel(`messages:${channel.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'channel_messages',
+          filter: `channel_id=eq.${channel.id}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['channel-messages', channel.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [channel.id, queryClient]);
+
+  // Update messages when data changes
+  useEffect(() => {
+    if (messageHistory) {
+      setMessages(messageHistory);
+    }
+  }, [messageHistory]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const formatMessageTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInHours < 168) { // 7 days
+      return date.toLocaleDateString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-card border border-border rounded-lg">
+      {/* Channel Header */}
+      <div className="px-4 py-3 border-b border-border bg-muted/50 rounded-t-lg">
+        <div className="flex items-center space-x-2">
+          <div>
+            <h3 className="font-medium text-foreground">#{channel.name}</h3>
+            {channel.description && (
+              <p className="text-sm text-muted-foreground">{channel.description}</p>
+            )}
+          </div>
+          {channel.isPrivate && (
+            <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full">
+              🔒 Private
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-muted-foreground text-3xl mb-2">💭</div>
+            <p className="text-muted-foreground">No messages yet</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Be the first to start the conversation in #{channel.name}
+            </p>
+          </div>
+        ) : (
+          messages.map((message, index) => {
+            const prevMessage = index > 0 ? messages[index - 1] : null;
+            const showSenderInfo = !prevMessage || prevMessage.senderId !== message.senderId;
+            const timeDiff = prevMessage 
+              ? new Date(message.sentAt).getTime() - new Date(prevMessage.sentAt).getTime()
+              : 0;
+            const showTimeGap = timeDiff > 5 * 60 * 1000; // 5 minutes
+
+            return (
+              <div key={message.id}>
+                {showTimeGap && (
+                  <div className="text-center my-4">
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                      {formatMessageTime(message.sentAt)}
+                    </span>
+                  </div>
+                )}
+                
+                <div className={`flex space-x-3 ${showSenderInfo ? 'mt-4' : 'mt-1'}`}>
+                  {showSenderInfo ? (
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
+                      {(message.senderName || message.senderId).charAt(0).toUpperCase()}
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100">
+                        {formatMessageTime(message.sentAt)}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex-1 min-w-0 group">
+                    {showSenderInfo && (
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-foreground">
+                          {message.senderName || `User ${message.senderId.slice(-4)}`}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatMessageTime(message.sentAt)}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="text-foreground text-sm leading-relaxed">
+                      {message.content.startsWith('**Task Update**:') ? (
+                        <div className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-400 p-3 rounded">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="text-blue-600 dark:text-blue-400 font-medium text-xs">TASK UPDATE</span>
+                          </div>
+                          <p>{message.content.replace('**Task Update**: ', '')}</p>
+                        </div>
+                      ) : (
+                        <p>{message.content}</p>
+                      )}
+                    </div>
+
+                    {/* Attachments */}
+                    {message.attachments && message.attachments.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {message.attachments.map((attachment: any, idx: number) => (
+                          <div key={idx} className="flex items-center space-x-2 text-sm">
+                            <span className="text-muted-foreground">📎</span>
+                            <a
+                              href={attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80 underline"
+                            >
+                              {attachment.filename}
+                            </a>
+                            <span className="text-muted-foreground text-xs">
+                              ({Math.round(attachment.size / 1024)}KB)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {message.editedAt && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        (edited {formatMessageTime(message.editedAt)})
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Message Composer */}
+      <div className="border-t border-border p-4">
+        <MessageComposer
+          onSendMessage={onSendMessage}
+          isSending={isSending}
+          placeholder={`Message #${channel.name}`}
+          allowPriority={channel.type !== 'ANNOUNCEMENT'}
+        />
+      </div>
+    </div>
+  );
+}
