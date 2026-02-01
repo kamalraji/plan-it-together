@@ -3,6 +3,7 @@ import { SendMessageDTO } from '../../../types';
 
 interface MessageComposerProps {
   onSendMessage?: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
+  onTyping?: () => void;
   isSending: boolean;
   placeholder?: string;
   allowPriority?: boolean;
