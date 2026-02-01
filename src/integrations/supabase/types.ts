@@ -1661,6 +1661,8 @@ export type Database = {
           is_encrypted: boolean | null
           message_type: string | null
           nonce: string | null
+          parent_message_id: string | null
+          reply_count: number | null
           sender_id: string
           sender_key_id: string | null
           sender_name: string | null
@@ -1678,6 +1680,8 @@ export type Database = {
           is_encrypted?: boolean | null
           message_type?: string | null
           nonce?: string | null
+          parent_message_id?: string | null
+          reply_count?: number | null
           sender_id: string
           sender_key_id?: string | null
           sender_name?: string | null
@@ -1695,6 +1699,8 @@ export type Database = {
           is_encrypted?: boolean | null
           message_type?: string | null
           nonce?: string | null
+          parent_message_id?: string | null
+          reply_count?: number | null
           sender_id?: string
           sender_key_id?: string | null
           sender_name?: string | null
@@ -1706,6 +1712,13 @@ export type Database = {
             columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
             referencedColumns: ["id"]
           },
         ]
