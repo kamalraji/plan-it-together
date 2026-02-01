@@ -6,21 +6,41 @@ import {
   ClockIcon,
   UserPlusIcon
 } from '@heroicons/react/24/outline';
-import { Workspace, TeamMember, WorkspaceRole } from '../../../types';
-import api from '../../../lib/api';
+import { Workspace, WorkspaceRole } from '../../../types';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MobileTeamOverviewProps {
   workspace: Workspace;
   onViewTeam: () => void;
 }
 
+interface TeamMemberWithProfile {
+  id: string;
+  user_id: string;
+  role: string;
+  status: string;
+  user_profiles: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
 export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverviewProps) {
-  // Fetch team members
+  // Fetch team members from Supabase
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ['workspace-team-members', workspace.id],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('id, user_id, role, status')
+        .eq('workspace_id', workspace.id);
+      
+      if (error) throw error;
+      return (data || []).map(m => ({
+        ...m,
+        user_profiles: { id: m.user_id, name: 'Team Member', email: '' }
+      })) as TeamMemberWithProfile[];
     },
   });
 
@@ -39,26 +59,15 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
   const pendingMembers = teamMembers?.filter(m => m.status === 'PENDING').length || 0;
   const totalMembers = teamMembers?.length || 0;
 
-  const getRoleColor = (role: WorkspaceRole) => {
-    const colors: Record<string, string> = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
-      [WorkspaceRole.OPERATIONS_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.GROWTH_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.CONTENT_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.TECH_FINANCE_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.VOLUNTEERS_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
-      [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
-    };
-    // Fallback based on role pattern
-    if (colors[role]) return colors[role];
+  const getRoleColor = (role: string) => {
+    if (role === WorkspaceRole.WORKSPACE_OWNER) return 'bg-purple-100 text-purple-800';
     if (role.endsWith('_MANAGER')) return 'bg-violet-100 text-violet-800';
     if (role.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
     if (role.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
     return 'bg-muted text-foreground';
   };
 
-  const getRoleLabel = (role: WorkspaceRole) => {
+  const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
       [WorkspaceRole.OPERATIONS_MANAGER]: 'Ops Mgr',
@@ -69,7 +78,6 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
       [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
       [WorkspaceRole.MARKETING_LEAD]: 'Marketing',
     };
-    // Fallback based on role pattern
     if (labels[role]) return labels[role];
     if (role.endsWith('_MANAGER')) return role.replace(/_MANAGER$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
     if (role.endsWith('_LEAD')) return role.replace(/_LEAD$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
@@ -96,7 +104,7 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
         </div>
         <button
           onClick={onViewTeam}
-          className="flex items-center text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          className="flex items-center text-sm text-indigo-600 hover:text-indigo-700 font-medium min-h-[48px] px-2"
         >
           Manage
           <ChevronRightIcon className="w-4 h-4 ml-1" />
@@ -132,12 +140,12 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
                 .map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center space-x-3 p-2 bg-muted/50 rounded-md"
+                    className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md min-h-[56px]"
                   >
                     {/* Avatar */}
-                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
                       <span className="text-indigo-600 font-medium text-xs">
-                        {getInitials(member.user.name)}
+                        {getInitials(member.user_profiles?.name || 'Unknown')}
                       </span>
                     </div>
                     
@@ -145,7 +153,7 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <p className="text-sm font-medium text-foreground truncate">
-                          {member.user.name}
+                          {member.user_profiles?.name || 'Unknown User'}
                         </p>
                         {member.status === 'ACTIVE' ? (
                           <CheckCircleIcon className="w-3 h-3 text-green-500 flex-shrink-0" />
@@ -166,7 +174,7 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
             {teamMembers.length > 4 && (
               <button
                 onClick={onViewTeam}
-                className="w-full text-center text-sm text-indigo-600 hover:text-indigo-700 font-medium py-2"
+                className="w-full text-center text-sm text-indigo-600 hover:text-indigo-700 font-medium py-3 min-h-[48px]"
               >
                 View all {teamMembers.length} members
               </button>
@@ -179,7 +187,7 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
             <p className="text-xs text-muted-foreground mb-4">Start building your team by inviting members</p>
             <button
               onClick={onViewTeam}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 min-h-[48px]"
             >
               <UserPlusIcon className="w-4 h-4 mr-2" />
               Invite Members

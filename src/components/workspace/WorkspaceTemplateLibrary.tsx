@@ -1,7 +1,23 @@
-import { useState, useEffect } from 'react';
-import { WorkspaceTemplate } from '../../types/workspace-template';
-import api from '../../lib/api';
+import { useState, useMemo } from 'react';
 import { ThinkingPerson } from '@/components/illustrations';
+
+interface WorkspaceTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  complexity: string;
+  event_size_min: number;
+  event_size_max: number;
+  usage_count: number;
+  average_rating: number;
+  structure: {
+    roles?: string[];
+    taskCategories?: string[];
+    channels?: string[];
+  } | null;
+  created_at: string;
+}
 
 interface WorkspaceTemplateLibraryProps {
   onTemplateSelect?: (template: WorkspaceTemplate) => void;
@@ -18,36 +34,17 @@ export function WorkspaceTemplateLibrary({
   eventSize,
   eventCategory 
 }: WorkspaceTemplateLibraryProps) {
-  const [templates, setTemplates] = useState<WorkspaceTemplate[]>([]);
-  const [filteredTemplates, setFilteredTemplates] = useState<WorkspaceTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedComplexity, setSelectedComplexity] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'usage' | 'created'>('rating');
 
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
+  // Use mock templates for now (table not in schema)
+  const templates: WorkspaceTemplate[] = [];
+  const isLoading = false;
+  const error = null;
 
-  useEffect(() => {
-    filterAndSortTemplates();
-  }, [templates, searchTerm, selectedCategory, selectedComplexity, sortBy, eventSize, eventCategory]);
-
-  const fetchTemplates = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/api/workspace-templates');
-      setTemplates(response.data);
-    } catch (_error) {
-      setError('Failed to load templates');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterAndSortTemplates = () => {
+  const filteredTemplates = useMemo(() => {
     let filtered = [...templates];
 
     // Apply search filter
@@ -71,7 +68,7 @@ export function WorkspaceTemplateLibrary({
     // Apply event size filter if provided
     if (eventSize) {
       filtered = filtered.filter(template => 
-        eventSize >= template.eventSizeMin && eventSize <= template.eventSizeMax
+        eventSize >= template.event_size_min && eventSize <= template.event_size_max
       );
     }
 
@@ -86,18 +83,18 @@ export function WorkspaceTemplateLibrary({
         case 'name':
           return a.name.localeCompare(b.name);
         case 'rating':
-          return b.averageRating - a.averageRating;
+          return b.average_rating - a.average_rating;
         case 'usage':
-          return b.usageCount - a.usageCount;
+          return b.usage_count - a.usage_count;
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         default:
           return 0;
       }
     });
 
-    setFilteredTemplates(filtered);
-  };
+    return filtered;
+  }, [templates, searchTerm, selectedCategory, selectedComplexity, sortBy, eventSize, eventCategory]);
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
@@ -149,7 +146,7 @@ export function WorkspaceTemplateLibrary({
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -167,7 +164,7 @@ export function WorkspaceTemplateLibrary({
             </svg>
           </div>
           <div className="ml-3">
-            <p className="text-sm text-red-800">{error}</p>
+            <p className="text-sm text-red-800">Failed to load templates</p>
           </div>
         </div>
       </div>
@@ -281,15 +278,15 @@ export function WorkspaceTemplateLibrary({
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Team Size:</span>
-                  <span className="text-foreground">{template.eventSizeMin}-{template.eventSizeMax} people</span>
+                  <span className="text-foreground">{template.event_size_min}-{template.event_size_max} people</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Used:</span>
-                  <span className="text-foreground">{template.usageCount} times</span>
+                  <span className="text-foreground">{template.usage_count} times</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Rating:</span>
-                  {renderStars(template.averageRating)}
+                  {renderStars(template.average_rating)}
                 </div>
               </div>
 
