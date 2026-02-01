@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { ThinkingPerson } from '@/components/illustrations';
 
-interface WorkspaceTemplate {
+// Local template type for library display (simpler than full WorkspaceTemplate)
+export interface LibraryTemplate {
   id: string;
   name: string;
   description: string;
@@ -20,8 +21,8 @@ interface WorkspaceTemplate {
 }
 
 interface WorkspaceTemplateLibraryProps {
-  onTemplateSelect?: (template: WorkspaceTemplate) => void;
-  onTemplatePreview?: (template: WorkspaceTemplate) => void;
+  onTemplateSelect?: (template: LibraryTemplate) => void;
+  onTemplatePreview?: (template: LibraryTemplate) => void;
   showActions?: boolean;
   eventSize?: number;
   eventCategory?: string;
@@ -40,7 +41,7 @@ export function WorkspaceTemplateLibrary({
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'usage' | 'created'>('rating');
 
   // Use mock templates for now (table not in schema)
-  const templates: WorkspaceTemplate[] = [];
+  const templates: LibraryTemplate[] = [];
   const isLoading = false;
   const error = null;
 

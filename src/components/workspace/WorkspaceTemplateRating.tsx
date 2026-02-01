@@ -20,8 +20,8 @@ interface RatingData {
 }
 
 export function WorkspaceTemplateRating({ 
-  templateId, 
-  workspaceId, 
+  templateId: _templateId, 
+  workspaceId: _workspaceId, 
   onRatingSubmitted, 
   onCancel 
 }: WorkspaceTemplateRatingProps) {
