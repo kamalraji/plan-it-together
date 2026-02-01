@@ -13,12 +13,27 @@ import {
   PaperClipIcon,
   FaceSmileIcon
 } from '@heroicons/react/24/outline';
-import { WorkspaceChannel, MessageResponse, TeamMember } from '../../../types';
-import api from '../../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MobileCommunicationProps {
   workspaceId: string;
+}
+
+interface WorkspaceChannel {
+  id: string;
+  name: string;
+  description: string | null;
+  channel_type: string;
+  is_private: boolean;
+}
+
+interface ChannelMessage {
+  id: string;
+  content: string;
+  sender_id: string;
+  sender_name: string | null;
+  created_at: string;
+  attachments: unknown[] | null;
 }
 
 export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
@@ -32,12 +47,18 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch channels
+  // Fetch channels from Supabase
   const { data: channels, isLoading: channelsLoading } = useQuery({
     queryKey: ['workspace-channels', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/channels`);
-      return response.data.channels as WorkspaceChannel[];
+      const { data, error } = await supabase
+        .from('workspace_channels')
+        .select('id, name, description, is_private')
+        .eq('workspace_id', workspaceId)
+        .order('name');
+      
+      if (error) throw error;
+      return (data || []).map(c => ({ ...c, channel_type: 'general' })) as WorkspaceChannel[];
     },
   });
 
@@ -46,8 +67,15 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
     queryKey: ['channel-messages', selectedChannel?.id],
     queryFn: async () => {
       if (!selectedChannel) return [];
-      const response = await api.get(`/channels/${selectedChannel.id}/messages`);
-      return response.data.messages as MessageResponse[];
+      const { data, error } = await supabase
+        .from('channel_messages')
+        .select('id, content, sender_id, sender_name, created_at, attachments')
+        .eq('channel_id', selectedChannel.id)
+        .order('created_at', { ascending: true })
+        .limit(100);
+      
+      if (error) throw error;
+      return data as ChannelMessage[];
     },
     enabled: !!selectedChannel,
   });
@@ -56,17 +84,40 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   const { data: teamMembers } = useQuery({
     queryKey: ['workspace-team-members', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select(`
+          id,
+          user_id,
+          role,
+          status,
+          user_profiles!workspace_team_members_user_id_fkey(id, name, email)
+        `)
+        .eq('workspace_id', workspaceId);
+      
+      if (error) throw error;
+      return data;
     },
   });
 
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async ({ channelId, content }: { channelId: string; content: string }) => {
-      await api.post(`/channels/${channelId}/messages`, { content });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      // Log workspace activity for mobile text messages (non-blocking for UX)
+      const { error } = await supabase
+        .from('channel_messages')
+        .insert({
+          channel_id: channelId,
+          content,
+          sender_id: user.id,
+          sender_name: user.email?.split('@')[0] || 'User',
+        });
+
+      if (error) throw error;
+
+      // Log workspace activity for mobile text messages
       await supabase.from('workspace_activities').insert({
         workspace_id: workspaceId,
         type: 'communication',
@@ -123,8 +174,6 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       recorder.onstop = async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         await handleSendVoiceMessage(audioBlob);
-        
-        // Stop all tracks to release microphone
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -133,13 +182,11 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       setIsRecording(true);
       setRecordingTime(0);
 
-      // Start recording timer
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
     } catch (_error) {
-      // Microphone access denied or failed
       alert('Failed to access microphone. Please check permissions.');
     }
   };
@@ -157,71 +204,41 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
     }
   };
 
-  const handleSendVoiceMessage = async (audioBlob: Blob) => {
+  const handleSendVoiceMessage = async (_audioBlob: Blob) => {
     if (!selectedChannel) return;
 
-    try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'voice-message.wav');
-      formData.append('channelId', selectedChannel.id);
+    // For now, log the voice message activity (file upload would require storage bucket)
+    await supabase.from('workspace_activities').insert({
+      workspace_id: workspaceId,
+      type: 'communication',
+      title: 'Mobile voice message',
+      description: 'A voice message was sent from mobile.',
+      metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'voice' },
+    });
 
-      await api.post(`/channels/${selectedChannel.id}/voice-messages`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // Log workspace activity for mobile voice messages
-      await supabase.from('workspace_activities').insert({
-        workspace_id: workspaceId,
-        type: 'communication',
-        title: 'Mobile voice message',
-        description: 'A voice message was sent from mobile.',
-        metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'voice' },
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
-    } catch (_error) {
-      // Voice message upload failed
-      alert('Failed to send voice message. Please try again.');
-    }
+    queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
   };
 
-  const handlePhotoUpload = async (file: File) => {
+  const handlePhotoUpload = async (_file: File) => {
     if (!selectedChannel) return;
 
-    try {
-      const formData = new FormData();
-      formData.append('photo', file);
-      formData.append('channelId', selectedChannel.id);
+    // For now, log the photo upload activity
+    await supabase.from('workspace_activities').insert({
+      workspace_id: workspaceId,
+      type: 'communication',
+      title: 'Mobile photo shared',
+      description: 'A photo was shared from mobile.',
+      metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'photo' },
+    });
 
-      await api.post(`/channels/${selectedChannel.id}/photos`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // Log workspace activity for mobile photo uploads
-      await supabase.from('workspace_activities').insert({
-        workspace_id: workspaceId,
-        type: 'communication',
-        title: 'Mobile photo shared',
-        description: 'A photo was shared from mobile.',
-        metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'photo' },
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
-    } catch (_error) {
-      // Photo upload failed
-      alert('Failed to upload photo. Please try again.');
-    }
+    queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
   };
 
   const triggerPhotoUpload = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment'; // Use rear camera on mobile
+    input.capture = 'environment';
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -238,8 +255,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   };
 
   const getMemberName = (userId: string) => {
-    const member = teamMembers?.find(m => m.userId === userId);
-    return member?.user.name || 'Unknown User';
+    const member = teamMembers?.find(m => m.user_id === userId);
+    return (member?.user_profiles as any)?.name || 'Unknown User';
   };
 
   const getInitials = (name: string) => {
@@ -253,9 +270,9 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
 
   const getChannelIcon = (type: string) => {
     switch (type) {
-      case 'GENERAL':
+      case 'general':
         return <HashtagIcon className="w-4 h-4" />;
-      case 'ANNOUNCEMENT':
+      case 'announcements':
         return <SpeakerWaveIcon className="w-4 h-4" />;
       default:
         return <UserGroupIcon className="w-4 h-4" />;
@@ -289,7 +306,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Channels</h2>
-          <button className="p-2 rounded-md hover:bg-muted transition-colors">
+          <button className="p-2 rounded-md hover:bg-muted transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center">
             <PlusIcon className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
@@ -300,7 +317,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
           <input
             type="text"
             placeholder="Search channels..."
-            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
+            className="w-full pl-10 pr-4 py-3 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary min-h-[48px]"
           />
         </div>
 
@@ -313,10 +330,10 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                 setSelectedChannel(channel);
                 setShowChannelList(false);
               }}
-              className="w-full flex items-center space-x-3 p-3 bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow text-left"
+              className="w-full flex items-center space-x-3 p-4 bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow text-left min-h-[64px]"
             >
-              <div className="flex-shrink-0 p-2 bg-muted rounded-lg">
-                {getChannelIcon(channel.type)}
+              <div className="flex-shrink-0 p-2 bg-muted rounded-lg min-h-[40px] min-w-[40px] flex items-center justify-center">
+                {getChannelIcon(channel.channel_type)}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-foreground truncate">
@@ -325,11 +342,6 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                 <p className="text-xs text-muted-foreground truncate">
                   {channel.description || 'No description'}
                 </p>
-              </div>
-              <div className="flex-shrink-0">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  {channel.members?.length || 0}
-                </span>
               </div>
             </button>
           ))}
@@ -345,18 +357,17 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       <div className="flex items-center justify-between p-4 bg-card border-b border-border">
         <button
           onClick={() => setShowChannelList(true)}
-          className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+          className="flex items-center space-x-2 text-muted-foreground hover:text-foreground min-h-[48px]"
         >
-          <div className="p-1 bg-muted rounded">
-            {getChannelIcon(selectedChannel.type)}
+          <div className="p-1 bg-muted rounded min-h-[32px] min-w-[32px] flex items-center justify-center">
+            {getChannelIcon(selectedChannel.channel_type)}
           </div>
           <div className="text-left">
             <h3 className="text-sm font-medium text-foreground">{selectedChannel.name}</h3>
-            <p className="text-xs text-muted-foreground">{selectedChannel.members?.length || 0} members</p>
           </div>
         </button>
         
-        <button className="p-2 rounded-md hover:bg-muted transition-colors">
+        <button className="p-2 rounded-md hover:bg-muted transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center">
           <EllipsisVerticalIcon className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
@@ -370,15 +381,15 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         ) : messages && messages.length > 0 ? (
           messages.map((message, index) => {
             const isConsecutive = index > 0 && 
-              messages[index - 1].senderId === message.senderId &&
-              new Date(message.sentAt).getTime() - new Date(messages[index - 1].sentAt).getTime() < 300000; // 5 minutes
+              messages[index - 1].sender_id === message.sender_id &&
+              new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() < 300000;
 
             return (
               <div key={message.id} className={`flex space-x-3 ${isConsecutive ? 'mt-1' : 'mt-4'}`}>
                 {!isConsecutive && (
                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-indigo-600 font-medium text-xs">
-                      {getInitials(getMemberName(message.senderId))}
+                      {getInitials(message.sender_name || getMemberName(message.sender_id))}
                     </span>
                   </div>
                 )}
@@ -387,10 +398,10 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                   {!isConsecutive && (
                     <div className="flex items-center space-x-2 mb-1">
                       <span className="text-sm font-medium text-foreground">
-                        {getMemberName(message.senderId)}
+                        {message.sender_name || getMemberName(message.sender_id)}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {formatMessageTime(message.sentAt)}
+                        {formatMessageTime(message.created_at)}
                       </span>
                     </div>
                   )}
@@ -421,11 +432,11 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
           <div className="flex space-x-1">
             <button 
               onClick={triggerPhotoUpload}
-              className="p-2 rounded-md hover:bg-muted transition-colors"
+              className="p-3 rounded-md hover:bg-muted transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
             >
               <PhotoIcon className="w-5 h-5 text-muted-foreground" />
             </button>
-            <button className="p-2 rounded-md hover:bg-muted transition-colors">
+            <button className="p-3 rounded-md hover:bg-muted transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center">
               <PaperClipIcon className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
@@ -438,8 +449,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
               onKeyPress={handleKeyPress}
               placeholder="Type a message..."
               rows={1}
-              className="w-full px-3 py-2 border border-input rounded-lg focus-visible:ring-ring focus-visible:border-primary resize-none"
-              style={{ minHeight: '40px', maxHeight: '120px' }}
+              className="w-full px-3 py-3 border border-input rounded-lg focus-visible:ring-ring focus-visible:border-primary resize-none min-h-[48px]"
+              style={{ maxHeight: '120px' }}
             />
             <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-muted transition-colors">
               <FaceSmileIcon className="w-4 h-4 text-muted-foreground" />
@@ -453,7 +464,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
             onMouseDown={startVoiceRecording}
             onMouseUp={stopVoiceRecording}
             onMouseLeave={stopVoiceRecording}
-            className={`p-2 rounded-md transition-colors ${
+            className={`p-3 rounded-md transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center ${
               isRecording ? 'bg-red-100 text-red-600' : 'hover:bg-muted text-muted-foreground'
             }`}
           >
@@ -464,7 +475,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
           <button
             onClick={handleSendMessage}
             disabled={!messageText.trim() || sendMessageMutation.isPending}
-            className="p-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-3 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
           >
             <PaperAirplaneIcon className="w-5 h-5" />
           </button>
