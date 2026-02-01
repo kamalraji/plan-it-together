@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,12 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, MoreVertical, Trash2, Send, Link2, Hash, MessageSquare } from 'lucide-react';
+import { Plus, MoreVertical, Trash2, Send, Link2, Hash, MessageSquare, ShieldAlert } from 'lucide-react';
 import { useWorkspaceIntegrations, WorkspaceIntegration, Platform } from '@/hooks/useWorkspaceIntegrations';
+import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
 import { AddIntegrationModal } from './AddIntegrationModal';
 
 interface IntegrationManagerProps {
   workspaceId: string;
+  userRole?: string;
 }
 
 const platformIcons: Record<Platform, React.ReactNode> = {
@@ -48,9 +51,13 @@ const platformNames: Record<Platform, string> = {
   webhook: 'Webhook',
 };
 
-export function IntegrationManager({ workspaceId }: IntegrationManagerProps) {
+export function IntegrationManager({ workspaceId, userRole }: IntegrationManagerProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<WorkspaceIntegration | null>(null);
+
+  // RBAC check - require MANAGER+ for integration management
+  const rbac = useWorkspaceRBAC(userRole);
+  const canManageIntegrations = rbac.isManagerOrAbove;
 
   const {
     integrations,
@@ -62,6 +69,7 @@ export function IntegrationManager({ workspaceId }: IntegrationManagerProps) {
   } = useWorkspaceIntegrations(workspaceId);
 
   const handleToggleActive = (integration: WorkspaceIntegration) => {
+    if (!canManageIntegrations) return;
     updateIntegration.mutate({
       id: integration.id,
       is_active: !integration.is_active,
@@ -69,11 +77,28 @@ export function IntegrationManager({ workspaceId }: IntegrationManagerProps) {
   };
 
   const handleDelete = () => {
-    if (deleteConfirm) {
+    if (deleteConfirm && canManageIntegrations) {
       deleteIntegration.mutate(deleteConfirm.id);
       setDeleteConfirm(null);
     }
   };
+
+  // Access restriction for non-managers
+  if (!canManageIntegrations) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert>
+            <ShieldAlert className="h-4 w-4" />
+            <AlertTitle>Access Restricted</AlertTitle>
+            <AlertDescription>
+              Integration management requires Manager permissions or above. Contact your workspace admin for access.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (

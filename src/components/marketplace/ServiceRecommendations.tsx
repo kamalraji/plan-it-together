@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ServiceListing {
   id: string;
@@ -50,27 +50,105 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Fetch event details for context
+  // Fetch event details from Supabase
   const { data: event } = useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
-      const response = await api.get(`/events/${eventId}`);
-      return response.data.event as Event;
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          id,
+          name,
+          mode,
+          start_date,
+          end_date,
+          capacity
+        `)
+        .eq('id', eventId)
+        .single();
+
+      if (error) throw error;
+
+      // Fetch venue separately
+      const { data: venues } = await supabase
+        .from('event_venues')
+        .select('address, city, state')
+        .eq('event_id', eventId)
+        .limit(1);
+
+      const venue = venues?.[0];
+
+      return {
+        id: data.id,
+        name: data.name,
+        mode: data.mode as 'OFFLINE' | 'ONLINE' | 'HYBRID',
+        startDate: data.start_date,
+        endDate: data.end_date,
+        capacity: data.capacity,
+        venue: venue ? {
+          address: venue.address || '',
+          city: venue.city || '',
+          state: venue.state || '',
+        } : undefined,
+      } as Event;
     },
   });
 
-  // Fetch recommended services based on event details
+  // Fetch recommended services from Supabase
   const { data: recommendations, isLoading } = useQuery({
     queryKey: ['service-recommendations', eventId, selectedCategory],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('eventId', eventId);
+      let query = supabase
+        .from('service_listings')
+        .select(`
+          id,
+          title,
+          description,
+          category,
+          pricing_type,
+          base_price,
+          currency,
+          is_featured,
+          vendor:vendor_profiles (
+            id,
+            business_name,
+            verification_status,
+            rating,
+            review_count
+          )
+        `)
+        .eq('is_active', true)
+        .order('is_featured', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(12);
+
       if (selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
+        query = query.eq('category', selectedCategory);
       }
-      
-      const response = await api.get(`/marketplace/services/recommendations?${params.toString()}`);
-      return response.data.services as ServiceListing[];
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data || []).map((s: any) => ({
+        id: s.id,
+        vendorId: s.vendor?.id || '',
+        title: s.title,
+        description: s.description || '',
+        category: s.category,
+        pricing: {
+          type: s.pricing_type || 'CUSTOM_QUOTE',
+          basePrice: s.base_price,
+          currency: s.currency || 'USD',
+        },
+        vendor: {
+          id: s.vendor?.id || '',
+          businessName: s.vendor?.business_name || 'Unknown Vendor',
+          verificationStatus: s.vendor?.verification_status || 'PENDING',
+          rating: s.vendor?.rating || 0,
+          reviewCount: s.vendor?.review_count || 0,
+        },
+        featured: s.is_featured || false,
+      })) as ServiceListing[];
     },
   });
 
