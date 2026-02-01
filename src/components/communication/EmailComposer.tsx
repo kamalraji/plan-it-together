@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   BulkEmailDTO, 
   EmailTemplate, 
@@ -11,6 +11,7 @@ import {
 } from '../../types';
 import { RecipientSegmentation } from './RecipientSegmentation';
 import { EmailTemplates } from './EmailTemplates';
+import { toast } from 'sonner';
 
 interface EmailComposerProps {
   eventId: string;
@@ -40,49 +41,83 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
   const watchedSubject = watch('subject');
   const watchedBody = watch('body');
 
-  // Fetch email templates (Requirements 8.1, 8.3)
+  // Fetch email templates from Supabase
   const { data: templates, isLoading: templatesLoading } = useQuery({
     queryKey: ['email-templates', eventId],
     queryFn: async () => {
-      const response = await api.get(`/communications/templates?eventId=${eventId}`);
-      return response.data.data as EmailTemplate[];
+      const { data, error } = await supabase
+        .from('email_templates')
+        .select('*')
+        .or(`event_id.eq.${eventId},event_id.is.null`)
+        .order('name');
+
+      if (error) throw error;
+
+      return (data || []).map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        subject: t.subject,
+        body: t.body,
+        variables: t.variables || [],
+        category: t.category,
+        eventId: t.event_id,
+      })) as EmailTemplate[];
     },
   });
 
-  // Preview recipients mutation (Requirements 8.2, 8.5)
+  // Preview recipients mutation using Supabase
   const previewRecipientsMutation = useMutation({
     mutationFn: async (criteria: SegmentCriteria) => {
-      const response = await api.post('/communications/segment-recipients', {
-        eventId,
-        segmentCriteria: criteria
-      });
-      return response.data.data as RecipientPreview;
+      // Build query based on segment criteria
+      let query = supabase
+        .from('registrations')
+        .select('id, user_id, user:user_profiles(id, email, full_name)')
+        .eq('event_id', eventId);
+
+      if ((criteria as any).status) {
+        query = query.eq('status', (criteria as any).status);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const recipients = (data || []).map((r: any) => ({
+        id: r.user_id,
+        email: r.user?.email || '',
+        name: r.user?.full_name || '',
+      }));
+
+      return {
+        count: recipients.length,
+        recipients: recipients,
+      } as RecipientPreview;
     },
     onSuccess: (data) => {
       setRecipientPreview(data);
     },
   });
 
-  // Send bulk email mutation (Requirements 8.1, 8.3)
+  // Send bulk email mutation using edge function
   const sendEmailMutation = useMutation({
     mutationFn: async (emailData: BulkEmailDTO) => {
-      const response = await api.post('/communications/send-bulk-email', emailData);
-      return response.data.data as BulkEmailResult;
+      const { data, error } = await supabase.functions.invoke('send-bulk-email', {
+        body: emailData,
+      });
+
+      if (error) throw error;
+      return data as BulkEmailResult;
     },
     onSuccess: (result) => {
-      // Show success message
-      alert(`Email sent successfully to ${result.successCount} recipients!`);
-      // Reset form
+      toast.success(`Email sent successfully to ${result.successCount} recipients!`);
       reset();
       setSelectedTemplate(null);
       setSegmentCriteria({});
       setRecipientPreview(null);
       setShowPreview(false);
-      // Invalidate communication history to refresh
       queryClient.invalidateQueries({ queryKey: ['communication-logs', eventId] });
     },
     onError: (error: any) => {
-      alert(`Failed to send email: ${error.response?.data?.error?.message || error.message}`);
+      toast.error(`Failed to send email: ${error.message}`);
     },
   });
 
@@ -105,7 +140,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
 
   const onSubmit = (data: EmailFormData) => {
     if (!recipientPreview || recipientPreview.count === 0) {
-      alert('Please select recipients before sending the email.');
+      toast.error('Please select recipients before sending the email.');
       return;
     }
 
