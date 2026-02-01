@@ -1,4 +1,5 @@
 import { Workspace } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { TechDepartmentStatsCards } from './TechDepartmentStatsCards';
 import { CommitteeConnectionsPanel } from './CommitteeConnectionsPanel';
 import { TechInfrastructureOverview } from './TechInfrastructureOverview';
@@ -27,6 +28,9 @@ export function TechDepartmentDashboard({
   onViewTasks,
 }: TechDepartmentDashboardProps) {
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+  
+  // Enable real-time updates
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch child committees count
   const { data: committees = [] } = useQuery({
