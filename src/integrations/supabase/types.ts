@@ -3505,39 +3505,107 @@ export type Database = {
         }
         Relationships: []
       }
+      escalation_history: {
+        Row: {
+          created_at: string
+          escalated_from: string | null
+          escalated_to: string | null
+          escalation_level: number
+          id: string
+          item_id: string
+          item_type: string
+          reason: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          sla_status: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalation_level?: number
+          id?: string
+          item_id: string
+          item_type: string
+          reason?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sla_status?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalation_level?: number
+          id?: string
+          item_id?: string
+          item_type?: string
+          reason?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sla_status?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalation_history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escalation_rules: {
         Row: {
+          auto_reassign: boolean | null
           created_at: string
           created_by: string | null
           escalate_to: string
+          escalation_path: string[] | null
           id: string
           is_active: boolean
           item_type: string
+          notification_channels: string[] | null
           notify_roles: string[] | null
+          sla_hours: number | null
           trigger_after_hours: number
           updated_at: string
           workspace_id: string
         }
         Insert: {
+          auto_reassign?: boolean | null
           created_at?: string
           created_by?: string | null
           escalate_to?: string
+          escalation_path?: string[] | null
           id?: string
           is_active?: boolean
           item_type: string
+          notification_channels?: string[] | null
           notify_roles?: string[] | null
+          sla_hours?: number | null
           trigger_after_hours?: number
           updated_at?: string
           workspace_id: string
         }
         Update: {
+          auto_reassign?: boolean | null
           created_at?: string
           created_by?: string | null
           escalate_to?: string
+          escalation_path?: string[] | null
           id?: string
           is_active?: boolean
           item_type?: string
+          notification_channels?: string[] | null
           notify_roles?: string[] | null
+          sla_hours?: number | null
           trigger_after_hours?: number
           updated_at?: string
           workspace_id?: string
@@ -8810,6 +8878,62 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_reports: {
+        Row: {
+          created_at: string
+          created_by: string
+          format: string
+          frequency: string
+          id: string
+          include_children: boolean | null
+          is_active: boolean | null
+          last_run_at: string | null
+          next_run_at: string | null
+          recipients: string[] | null
+          report_type: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          format: string
+          frequency: string
+          id?: string
+          include_children?: boolean | null
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          recipients?: string[] | null
+          report_type: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          format?: string
+          frequency?: string
+          id?: string
+          include_children?: boolean | null
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          recipients?: string[] | null
+          report_type?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_reports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scores: {
         Row: {
           comments: string | null
@@ -10056,6 +10180,59 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
+          },
+        ]
+      }
+      stakeholders: {
+        Row: {
+          category: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          organization: string | null
+          phone: string | null
+          priority: string
+          role: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          priority?: string
+          role?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          organization?: string | null
+          phone?: string | null
+          priority?: string
+          role?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stakeholders_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -15598,6 +15775,50 @@ export type Database = {
           },
         ]
       }
+      workspace_presence: {
+        Row: {
+          created_at: string
+          current_activity: string | null
+          id: string
+          last_seen_at: string
+          metadata: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_activity?: string | null
+          id?: string
+          last_seen_at?: string
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          current_activity?: string | null
+          id?: string
+          last_seen_at?: string
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_presence_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_press_releases: {
         Row: {
           attachments: Json | null
@@ -17545,6 +17766,7 @@ export type Database = {
       }
       workspace_tasks: {
         Row: {
+          actual_hours_logged: number | null
           approval_policy_id: string | null
           approval_status: string | null
           assigned_by: string | null
@@ -17575,6 +17797,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          actual_hours_logged?: number | null
           approval_policy_id?: string | null
           approval_status?: string | null
           assigned_by?: string | null
@@ -17605,6 +17828,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          actual_hours_logged?: number | null
           approval_policy_id?: string | null
           approval_status?: string | null
           assigned_by?: string | null
@@ -17787,6 +18011,9 @@ export type Database = {
       }
       workspace_team_members: {
         Row: {
+          availability_status: string | null
+          capacity_hours: number | null
+          current_workload_hours: number | null
           id: string
           joined_at: string
           left_at: string | null
@@ -17796,6 +18023,9 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          availability_status?: string | null
+          capacity_hours?: number | null
+          current_workload_hours?: number | null
           id?: string
           joined_at?: string
           left_at?: string | null
@@ -17805,6 +18035,9 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          availability_status?: string | null
+          capacity_hours?: number | null
+          current_workload_hours?: number | null
           id?: string
           joined_at?: string
           left_at?: string | null
