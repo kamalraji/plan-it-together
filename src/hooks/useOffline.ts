@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { offlineService } from '../services/offlineService';
 import { notificationService } from '../services/notificationService';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface OfflineState {
   isOnline: boolean;
@@ -87,17 +88,15 @@ export function useOffline() {
   const saveTaskUpdate = useCallback(async (workspaceId: string, taskId: string, updateData: any) => {
     try {
       if (state.isOnline) {
-        // Try to update immediately if online
-        const response = await fetch(`/api/workspaces/${workspaceId}/tasks/${taskId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData)
-        });
+        // Try to update immediately via Supabase if online
+        const { error } = await supabase
+          .from('workspace_tasks')
+          .update(updateData)
+          .eq('id', taskId)
+          .eq('workspace_id', workspaceId);
 
-        if (!response.ok) {
-          throw new Error('Network request failed');
+        if (error) {
+          throw new Error(error.message);
         }
       } else {
         // Save for offline sync
@@ -130,21 +129,26 @@ export function useOffline() {
   const saveMessage = useCallback(async (channelId: string, content: string): Promise<string> => {
     try {
       if (state.isOnline) {
-        // Try to send immediately if online
-        const response = await fetch(`/api/channels/${channelId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ content })
-        });
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
 
-        if (!response.ok) {
-          throw new Error('Network request failed');
+        // Try to send immediately via Supabase if online
+        const { data, error } = await supabase
+          .from('channel_messages')
+          .insert({
+            channel_id: channelId,
+            content,
+            sender_id: user.id,
+          })
+          .select('id')
+          .single();
+
+        if (error) {
+          throw new Error(error.message);
         }
 
-        const result = await response.json();
-        return result.message.id;
+        return data.id;
       } else {
         // Save for offline sync
         const tempId = await offlineService.saveOfflineMessage(channelId, content);
