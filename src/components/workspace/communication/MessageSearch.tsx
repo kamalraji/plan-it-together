@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { WorkspaceChannel, MessageResponse } from '../../../types';
-import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
+import { WorkspaceChannel } from '../../../types';
+
+interface MessageResult {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string | null;
+  channelId: string;
+  sentAt: string;
+  attachments: any[] | null;
+}
 
 interface MessageSearchProps {
   workspaceId: string;
@@ -11,22 +21,38 @@ interface MessageSearchProps {
 export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<MessageResponse[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Search messages
-  const { isLoading, refetch } = useQuery({
+  // Get channel IDs for this workspace
+  const channelIds = channels.map(c => c.id);
+
+  // Search messages using Supabase full-text search
+  const { data: searchResults = [], isLoading, refetch } = useQuery({
     queryKey: ['search-messages', workspaceId, searchQuery, selectedChannelId],
     queryFn: async () => {
-      if (!searchQuery.trim()) return [];
+      if (!searchQuery.trim() || channelIds.length === 0) return [];
       
-      const params = new URLSearchParams({
-        query: searchQuery.trim(),
-        ...(selectedChannelId && { channelId: selectedChannelId }),
-      });
-      
-      const response = await api.get(`/workspaces/${workspaceId}/messages/search?${params}`);
-      return response.data.messages as MessageResponse[];
+      let query = supabase
+        .from('channel_messages')
+        .select('id, content, sender_id, sender_name, channel_id, created_at, attachments')
+        .in('channel_id', selectedChannelId ? [selectedChannelId] : channelIds)
+        .ilike('content', `%${searchQuery.trim()}%`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      return (data || []).map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        senderId: msg.sender_id,
+        senderName: msg.sender_name,
+        channelId: msg.channel_id,
+        sentAt: msg.created_at,
+        attachments: msg.attachments as any[] | null
+      })) as MessageResult[];
     },
     enabled: false, // Only run when manually triggered
   });
@@ -36,8 +62,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
     if (!searchQuery.trim()) return;
     
     setHasSearched(true);
-    const { data } = await refetch();
-    setSearchResults(data || []);
+    await refetch();
   };
 
   const formatMessageTime = (dateString: string) => {
@@ -55,12 +80,6 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
     return channel ? `#${channel.name}` : 'Unknown Channel';
   };
 
-  const getChannelIcon = (channelId: string) => {
-    const channel = channels.find(ch => ch.id === channelId);
-    if (!channel) return '';
-    return '';
-  };
-
   const highlightSearchTerm = (text: string, query: string) => {
     if (!query.trim()) return text;
     
@@ -69,7 +88,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <mark key={index} className="bg-yellow-200 px-1 rounded">
+        <mark key={index} className="bg-yellow-200 dark:bg-yellow-900/50 px-1 rounded">
           {part}
         </mark>
       ) : (
@@ -99,7 +118,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for messages, keywords, or phrases..."
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent bg-background"
             />
           </div>
 
@@ -110,7 +129,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
             <select
               value={selectedChannelId}
               onChange={(e) => setSelectedChannelId(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent bg-background"
             >
               <option value="">All channels</option>
               {channels.map((channel) => (
@@ -125,11 +144,11 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
             <button
               type="submit"
               disabled={isLoading || !searchQuery.trim()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:bg-primary/50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
                   <span>Searching...</span>
                 </>
               ) : (
@@ -147,7 +166,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
       <div>
         {isLoading && (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Searching messages...</p>
           </div>
         )}
@@ -193,22 +212,19 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
                 {searchResults.map((message) => (
                   <div key={message.id} className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                        {message.senderId.charAt(0).toUpperCase()}
+                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
+                        {(message.senderName || message.senderId).charAt(0).toUpperCase()}
                       </div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
                           <span className="font-medium text-foreground">
-                            User {message.senderId.slice(-4)}
+                            {message.senderName || `User ${message.senderId.slice(-4)}`}
                           </span>
                           <span className="text-muted-foreground">in</span>
-                          <div className="flex items-center space-x-1">
-                            <span>{getChannelIcon(message.channelId)}</span>
-                            <span className="text-indigo-600 font-medium">
-                              {getChannelName(message.channelId)}
-                            </span>
-                          </div>
+                          <span className="text-primary font-medium">
+                            {getChannelName(message.channelId)}
+                          </span>
                           <span className="text-muted-foreground">•</span>
                           <span className="text-sm text-muted-foreground">
                             {formatMessageTime(message.sentAt)}
@@ -217,9 +233,9 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
                         
                         <div className="text-foreground leading-relaxed">
                           {message.content.startsWith('**Task Update**:') ? (
-                            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                            <div className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-400 p-3 rounded">
                               <div className="flex items-center space-x-2 mb-1">
-                                <span className="text-blue-600 font-medium text-xs">TASK UPDATE</span>
+                                <span className="text-blue-600 dark:text-blue-400 font-medium text-xs">TASK UPDATE</span>
                               </div>
                               <p>{highlightSearchTerm(message.content.replace('**Task Update**: ', ''), searchQuery)}</p>
                             </div>
@@ -231,14 +247,14 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
                         {/* Attachments */}
                         {message.attachments && message.attachments.length > 0 && (
                           <div className="mt-3 space-y-2">
-                            {message.attachments.map((attachment, idx) => (
+                            {message.attachments.map((attachment: any, idx: number) => (
                               <div key={idx} className="flex items-center space-x-2 text-sm">
                                 <span className="text-muted-foreground text-xs uppercase">Attachment</span>
                                 <a
                                   href={attachment.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-indigo-600 hover:text-indigo-700 underline"
+                                  className="text-primary hover:text-primary/80 underline"
                                 >
                                   {attachment.filename}
                                 </a>

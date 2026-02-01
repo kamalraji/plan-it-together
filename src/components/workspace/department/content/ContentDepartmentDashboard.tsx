@@ -13,7 +13,7 @@ import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
 import { ActivityFeedWidget } from '../../ActivityFeedWidget';
 
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
-import { useTaskRealtimeUpdates } from '@/hooks/useActivityFeed';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 
 import { ContentStatsConnected } from './ContentStatsConnected';
 import { ContentCommitteeHub } from './ContentCommitteeHub';
@@ -41,8 +41,8 @@ export function ContentDepartmentDashboard({
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
 
-  // Enable real-time task updates
-  useTaskRealtimeUpdates(workspace.id);
+  // Enable real-time updates for tasks, activities, milestones, budget_requests
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Modal states
   const [createContentOpen, setCreateContentOpen] = useState(false);
