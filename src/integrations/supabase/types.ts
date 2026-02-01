@@ -114,6 +114,62 @@ export type Database = {
           },
         ]
       }
+      ad_channels: {
+        Row: {
+          clicks: number
+          conversions: number
+          created_at: string
+          date: string
+          icon: string | null
+          id: string
+          impressions: number
+          metadata: Json | null
+          name: string
+          spend: number
+          trend: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          date?: string
+          icon?: string | null
+          id?: string
+          impressions?: number
+          metadata?: Json | null
+          name: string
+          spend?: number
+          trend?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          date?: string
+          icon?: string | null
+          id?: string
+          impressions?: number
+          metadata?: Json | null
+          name?: string
+          spend?: number
+          trend?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_channels_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -837,6 +893,56 @@ export type Database = {
             columns: ["booth_id"]
             isOneToOne: false
             referencedRelation: "sponsor_booths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      branding_assets: {
+        Row: {
+          asset_type: string
+          created_at: string
+          downloads: number
+          file_size: string | null
+          file_url: string | null
+          format: string | null
+          id: string
+          name: string
+          updated_at: string
+          uploaded_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          asset_type: string
+          created_at?: string
+          downloads?: number
+          file_size?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          uploaded_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string
+          downloads?: number
+          file_size?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "branding_assets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -6273,6 +6379,151 @@ export type Database = {
           },
         ]
       }
+      media_coverage_assignments: {
+        Row: {
+          coverage_id: string
+          created_at: string
+          crew_id: string
+          id: string
+        }
+        Insert: {
+          coverage_id: string
+          created_at?: string
+          crew_id: string
+          id?: string
+        }
+        Update: {
+          coverage_id?: string
+          created_at?: string
+          crew_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_coverage_assignments_coverage_id_fkey"
+            columns: ["coverage_id"]
+            isOneToOne: false
+            referencedRelation: "media_coverage_schedule"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_coverage_assignments_crew_id_fkey"
+            columns: ["crew_id"]
+            isOneToOne: false
+            referencedRelation: "media_crew"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_coverage_schedule: {
+        Row: {
+          coverage_type: string
+          created_at: string
+          end_time: string
+          event_name: string
+          id: string
+          location: string | null
+          notes: string | null
+          priority: string
+          start_time: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          coverage_type?: string
+          created_at?: string
+          end_time: string
+          event_name: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          start_time: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          coverage_type?: string
+          created_at?: string
+          end_time?: string
+          event_name?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          start_time?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_coverage_schedule_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_crew: {
+        Row: {
+          assignment: string | null
+          avatar_url: string | null
+          created_at: string
+          crew_type: string
+          email: string | null
+          equipment: string[] | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assignment?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          crew_type: string
+          email?: string | null
+          equipment?: string[] | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assignment?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          crew_type?: string
+          email?: string | null
+          equipment?: string[] | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_crew_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_slots: {
         Row: {
           booked_at: string | null
@@ -7602,6 +7853,65 @@ export type Database = {
           sharer_id?: string
         }
         Relationships: []
+      }
+      press_credentials: {
+        Row: {
+          access_level: string
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          credential_type: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          outlet: string
+          requested_at: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          access_level?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          credential_type: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          outlet: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          access_level?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          credential_type?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          outlet?: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_credentials_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       privacy_consents: {
         Row: {
