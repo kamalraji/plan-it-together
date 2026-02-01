@@ -65,15 +65,15 @@ export function MediaDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
-          <CoverageSchedule />
+          <CoverageSchedule workspaceId={workspace.id} />
           <MediaAssetGallery workspaceId={workspace.id} />
           <DeliverableTracker />
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
-          <PhotographerRoster />
-          <PressCredentialManager />
+          <PhotographerRoster workspaceId={workspace.id} />
+          <PressCredentialManager workspaceId={workspace.id} />
         </div>
       </div>
 

@@ -92,7 +92,7 @@ export function MarketingDashboard({
       <MarketingCalendar />
 
       {/* Ad Performance */}
-      <AdPerformancePanel />
+      <AdPerformancePanel workspaceId={workspace.id} />
 
       {/* Task Summary with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -111,7 +111,7 @@ export function MarketingDashboard({
       {/* Audience Insights and Branding Assets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AudienceInsights />
-        <BrandingAssetsManager />
+        <BrandingAssetsManager workspaceId={workspace.id} />
       </div>
 
       {/* Team Members */}

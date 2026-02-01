@@ -1,62 +1,18 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Plus, MapPin } from 'lucide-react';
+import { Camera, Plus, MapPin, Loader2 } from 'lucide-react';
+import { useMediaCrew, MediaCrew } from '@/hooks/useMediaData';
 
-interface Photographer {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
-  type: 'photographer' | 'videographer' | 'drone';
-  assignment: string;
-  status: 'on_duty' | 'off_duty' | 'break';
-  equipment: string[];
+interface PhotographerRosterProps {
+  workspaceId: string;
 }
 
-export function PhotographerRoster() {
-  const [crew] = useState<Photographer[]>([
-    {
-      id: '1',
-      name: 'Arjun Mehta',
-      email: 'arjun@example.com',
-      type: 'photographer',
-      assignment: 'Main Stage',
-      status: 'on_duty',
-      equipment: ['Canon R5', '24-70mm', 'Flash'],
-    },
-    {
-      id: '2',
-      name: 'Priya Nair',
-      email: 'priya@example.com',
-      type: 'videographer',
-      assignment: 'Roaming - Hall A',
-      status: 'on_duty',
-      equipment: ['Sony A7S III', 'Gimbal', 'Wireless Mic'],
-    },
-    {
-      id: '3',
-      name: 'Rahul Singh',
-      email: 'rahul@example.com',
-      type: 'drone',
-      assignment: 'Aerial Coverage',
-      status: 'break',
-      equipment: ['DJI Mavic 3', 'Extra Batteries'],
-    },
-    {
-      id: '4',
-      name: 'Sneha Patel',
-      email: 'sneha@example.com',
-      type: 'photographer',
-      assignment: 'VIP Lounge',
-      status: 'on_duty',
-      equipment: ['Nikon Z9', '70-200mm', 'Reflector'],
-    },
-  ]);
+export function PhotographerRoster({ workspaceId }: PhotographerRosterProps) {
+  const { crew, isLoading } = useMediaCrew(workspaceId);
 
-  const getTypeConfig = (type: Photographer['type']) => {
+  const getTypeConfig = (type: MediaCrew['crew_type']) => {
     switch (type) {
       case 'photographer':
         return { label: 'Photo', color: 'bg-blue-100 text-blue-800' };
@@ -64,10 +20,12 @@ export function PhotographerRoster() {
         return { label: 'Video', color: 'bg-purple-100 text-purple-800' };
       case 'drone':
         return { label: 'Drone', color: 'bg-amber-100 text-amber-800' };
+      case 'audio':
+        return { label: 'Audio', color: 'bg-emerald-100 text-emerald-800' };
     }
   };
 
-  const getStatusColor = (status: Photographer['status']) => {
+  const getStatusColor = (status: MediaCrew['status']) => {
     switch (status) {
       case 'on_duty':
         return 'bg-green-100 text-green-800';
@@ -82,6 +40,16 @@ export function PhotographerRoster() {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
+  if (isLoading) {
+    return (
+      <Card className="border-border/50">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-border/50">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -95,47 +63,57 @@ export function PhotographerRoster() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
-        {crew.map((member) => {
-          const typeConfig = getTypeConfig(member.type);
+        {crew.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No crew members added yet
+          </p>
+        ) : (
+          crew.map((member) => {
+            const typeConfig = getTypeConfig(member.crew_type);
 
-          return (
-            <div key={member.id} className="p-3 rounded-lg bg-muted/30 space-y-2">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={member.avatarUrl} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {getInitials(member.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-foreground">{member.name}</p>
-                      <Badge className={typeConfig.color} variant="secondary">
-                        {typeConfig.label}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      {member.assignment}
+            return (
+              <div key={member.id} className="p-3 rounded-lg bg-muted/30 space-y-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={member.avatar_url} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {getInitials(member.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground">{member.name}</p>
+                        <Badge className={typeConfig.color} variant="secondary">
+                          {typeConfig.label}
+                        </Badge>
+                      </div>
+                      {member.assignment && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3" />
+                          {member.assignment}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-                <Badge className={getStatusColor(member.status)} variant="secondary">
-                  {member.status.replace('_', ' ')}
-                </Badge>
-              </div>
-
-              <div className="flex flex-wrap gap-1">
-                {member.equipment.map((eq) => (
-                  <Badge key={eq} variant="outline" className="text-xs">
-                    {eq}
+                  <Badge className={getStatusColor(member.status)} variant="secondary">
+                    {member.status.replace('_', ' ')}
                   </Badge>
-                ))}
+                </div>
+
+                {member.equipment && member.equipment.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {member.equipment.map((eq) => (
+                      <Badge key={eq} variant="outline" className="text-xs">
+                        {eq}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </CardContent>
     </Card>
   );

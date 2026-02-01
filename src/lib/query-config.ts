@@ -163,6 +163,15 @@ export const queryKeys = {
     assets: (workspaceId: string) => ['media-assets', workspaceId] as const,
     content: (workspaceId: string) => ['content-items', workspaceId] as const,
     speakers: (workspaceId: string) => ['speakers', workspaceId] as const,
+    crew: (workspaceId: string) => ['media-crew', workspaceId] as const,
+    coverageSchedule: (workspaceId: string) => ['coverage-schedule', workspaceId] as const,
+    pressCredentials: (workspaceId: string) => ['press-credentials', workspaceId] as const,
+  },
+
+  // Marketing-related queries
+  marketing: {
+    adChannels: (workspaceId: string) => ['ad-channels', workspaceId] as const,
+    brandingAssets: (workspaceId: string) => ['branding-assets', workspaceId] as const,
   },
 
   // Tasks queries
