@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { WorkspaceTemplate } from '../../types/workspace-template';
+import { LibraryTemplate } from './WorkspaceTemplateLibrary';
 
 interface WorkspaceTemplatePreviewProps {
-  template: WorkspaceTemplate;
+  template: LibraryTemplate;
   onClose: () => void;
-  onUseTemplate?: (template: WorkspaceTemplate) => void;
+  onUseTemplate?: (template: LibraryTemplate) => void;
 }
 
 export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: WorkspaceTemplatePreviewProps) {
@@ -60,19 +60,20 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
     );
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case 'high':
-      case 'urgent':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-muted text-foreground';
-    }
-  };
+  // Note: getPriorityColor can be re-enabled when task details are available
+  // const getPriorityColor = (priority: string) => {
+  //   switch (priority.toLowerCase()) {
+  //     case 'high':
+  //     case 'urgent':
+  //       return 'bg-red-100 text-red-800';
+  //     case 'medium':
+  //       return 'bg-yellow-100 text-yellow-800';
+  //     case 'low':
+  //       return 'bg-green-100 text-green-800';
+  //     default:
+  //       return 'bg-muted text-foreground';
+  //   }
+  // };
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },
@@ -98,9 +99,9 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                 </span>
                 <span className="text-sm text-muted-foreground">{template.category}</span>
                 <span className="text-sm text-muted-foreground">
-                  {template.eventSizeMin}-{template.eventSizeMax} people
+                  {template.event_size_min}-{template.event_size_max} people
                 </span>
-                {renderStars(template.averageRating)}
+                {renderStars(template.average_rating)}
               </div>
             </div>
           </div>
@@ -145,140 +146,100 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                 <div className="bg-muted/50 rounded-lg p-4">
                   <h4 className="font-medium text-foreground mb-2">Team Structure</h4>
                   <div className="text-sm text-muted-foreground">
-                    <p>{template.structure.roles?.length || 0} role types</p>
-                    <p>{template.structure.roles?.reduce((sum, role) => sum + role.count, 0) || 0} total positions</p>
+                    <p>{template.structure?.roles?.length || 0} role types</p>
+                    <p>Multiple positions available</p>
                   </div>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-4">
                   <h4 className="font-medium text-foreground mb-2">Task Organization</h4>
                   <div className="text-sm text-muted-foreground">
-                    <p>{template.structure.taskCategories?.length || 0} categories</p>
-                    <p>{template.structure.taskCategories?.reduce((sum, cat) => sum + cat.tasks.length, 0) || 0} total tasks</p>
+                    <p>{template.structure?.taskCategories?.length || 0} categories</p>
+                    <p>Pre-defined task structure</p>
                   </div>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-4">
                   <h4 className="font-medium text-foreground mb-2">Communication</h4>
                   <div className="text-sm text-muted-foreground">
-                    <p>{template.structure.channels?.length || 0} channels</p>
-                    <p>{template.structure.milestones?.length || 0} milestones</p>
+                    <p>{template.structure?.channels?.length || 0} channels</p>
+                    <p>Team collaboration ready</p>
                   </div>
                 </div>
               </div>
 
-              {template.effectiveness && (
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-foreground mb-2">Effectiveness Metrics</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Avg. Completion Rate:</span>
-                      <p className="font-medium">{template.effectiveness.avgCompletionRate || 'N/A'}%</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Team Satisfaction:</span>
-                      <p className="font-medium">{template.effectiveness.avgTeamSatisfaction || 'N/A'}/5</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Success Rate:</span>
-                      <p className="font-medium">{template.effectiveness.successRate || 'N/A'}%</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Times Used:</span>
-                      <p className="font-medium">{template.usageCount}</p>
-                    </div>
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h4 className="font-medium text-foreground mb-2">Usage Statistics</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Times Used:</span>
+                    <p className="font-medium">{template.usage_count}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Average Rating:</span>
+                    <p className="font-medium">{template.average_rating.toFixed(1)}/5</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Team Size:</span>
+                    <p className="font-medium">{template.event_size_min}-{template.event_size_max}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Complexity:</span>
+                    <p className="font-medium">{template.complexity}</p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           {activeTab === 'roles' && (
             <div className="space-y-4">
-              {template.structure.roles?.map((role, index) => (
-                <div key={index} className="border border-border rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-foreground">{role.role.replace(/_/g, ' ')}</h4>
-                    <span className="bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-1 rounded">
-                      {role.count} {role.count === 1 ? 'person' : 'people'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">{role.description}</p>
-                  <div>
-                    <h5 className="text-sm font-medium text-foreground mb-1">Permissions:</h5>
-                    <div className="flex flex-wrap gap-1">
-                      {role.permissions.map((permission, permIndex) => (
-                        <span
-                          key={permIndex}
-                          className="bg-muted text-foreground text-xs px-2 py-1 rounded"
-                        >
-                          {permission.replace(/_/g, ' ')}
-                        </span>
-                      ))}
+              {template.structure?.roles?.length ? (
+                template.structure.roles.map((role, index) => (
+                  <div key={index} className="border border-border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-foreground">{role.replace(/_/g, ' ')}</h4>
                     </div>
+                    <p className="text-sm text-muted-foreground">Team member role for workspace organization</p>
                   </div>
-                </div>
-              )) || <p className="text-muted-foreground">No role information available.</p>}
+                ))
+              ) : (
+                <p className="text-muted-foreground">No role information available.</p>
+              )}
             </div>
           )}
 
           {activeTab === 'tasks' && (
             <div className="space-y-6">
-              {template.structure.taskCategories?.map((category, index) => (
-                <div key={index}>
-                  <h4 className="font-medium text-foreground mb-3">{category.category}</h4>
-                  <div className="space-y-2">
-                    {category.tasks.map((task, taskIndex) => (
-                      <div key={taskIndex} className="border border-border rounded-lg p-3">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-medium text-foreground">{task.title}</h5>
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                            <span className="text-xs text-muted-foreground">{task.estimatedHours}h</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
-                      </div>
-                    ))}
+              {template.structure?.taskCategories?.length ? (
+                template.structure.taskCategories.map((category, index) => (
+                  <div key={index} className="border border-border rounded-lg p-4">
+                    <h4 className="font-medium text-foreground mb-2">{category}</h4>
+                    <p className="text-sm text-muted-foreground">Pre-defined task category for event organization</p>
                   </div>
-                </div>
-              )) || <p className="text-muted-foreground">No task information available.</p>}
+                ))
+              ) : (
+                <p className="text-muted-foreground">No task information available.</p>
+              )}
             </div>
           )}
 
           {activeTab === 'channels' && (
             <div className="space-y-4">
-              {template.structure.channels?.map((channel, index) => (
-                <div key={index} className="border border-border rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-foreground">#{channel.name}</h4>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                      {channel.type.replace(/_/g, ' ')}
-                    </span>
+              {template.structure?.channels?.length ? (
+                template.structure.channels.map((channel, index) => (
+                  <div key={index} className="border border-border rounded-lg p-4">
+                    <h4 className="font-medium text-foreground">#{channel}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">Communication channel for team collaboration</p>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">{channel.description}</p>
-                  <div className="text-xs text-muted-foreground">
-                    Members: {channel.members.join(', ') || 'All team members'}
-                  </div>
-                </div>
-              )) || <p className="text-muted-foreground">No channel information available.</p>}
+                ))
+              ) : (
+                <p className="text-muted-foreground">No channel information available.</p>
+              )}
             </div>
           )}
 
           {activeTab === 'timeline' && (
             <div className="space-y-4">
-              {template.structure.milestones?.map((milestone, index) => (
-                <div key={index} className="flex items-start space-x-4 border-l-2 border-indigo-200 pl-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-indigo-600 text-sm font-medium">{milestone.daysFromStart}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-foreground">{milestone.name}</h4>
-                    <p className="text-sm text-muted-foreground">{milestone.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Day {milestone.daysFromStart} from event start</p>
-                  </div>
-                </div>
-              )) || <p className="text-muted-foreground">No timeline information available.</p>}
+              <p className="text-muted-foreground">Timeline milestones will be created based on your event dates when you apply this template.</p>
             </div>
           )}
         </div>

@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { WorkspaceTemplateLibrary } from './WorkspaceTemplateLibrary';
+import { WorkspaceTemplateLibrary, LibraryTemplate } from './WorkspaceTemplateLibrary';
 import { WorkspaceTemplateCreation } from './WorkspaceTemplateCreation';
 import { WorkspaceTemplatePreview } from './WorkspaceTemplatePreview';
 import { WorkspaceTemplateRating } from './WorkspaceTemplateRating';
 import { IndustryTemplateBrowser } from './templates/IndustryTemplateBrowser';
-import { WorkspaceTemplate } from '../../types/workspace-template';
 import { supabase } from '@/integrations/supabase/client';
 import api from '../../lib/api';
 
 interface WorkspaceTemplateManagementProps {
   workspaceId?: string;
   mode: 'library' | 'create' | 'apply';
-  onTemplateApplied?: (template: WorkspaceTemplate) => void;
-  onTemplateCreated?: (template: WorkspaceTemplate) => void;
+  onTemplateApplied?: (template: LibraryTemplate) => void;
+  onTemplateCreated?: (template: LibraryTemplate) => void;
 }
 
 export function WorkspaceTemplateManagement({
@@ -23,13 +22,13 @@ export function WorkspaceTemplateManagement({
 }: WorkspaceTemplateManagementProps) {
   const [currentMode, setCurrentMode] = useState(mode);
   const [libraryTab, setLibraryTab] = useState<'workspace' | 'tasks'>('workspace');
-  const [selectedTemplate, setSelectedTemplate] = useState<WorkspaceTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<LibraryTemplate | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showRating, setShowRating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTemplateSelect = async (template: WorkspaceTemplate) => {
+  const handleTemplateSelect = async (template: LibraryTemplate) => {
     if (currentMode === 'apply' && workspaceId) {
       try {
         setLoading(true);
@@ -45,17 +44,17 @@ export function WorkspaceTemplateManagement({
     }
   };
 
-  const handleTemplatePreview = (template: WorkspaceTemplate) => {
+  const handleTemplatePreview = (template: LibraryTemplate) => {
     setSelectedTemplate(template);
     setShowPreview(true);
   };
 
-  const handleTemplateCreated = (template: WorkspaceTemplate) => {
+  const handleTemplateCreated = (template: LibraryTemplate) => {
     onTemplateCreated?.(template);
     setCurrentMode('library');
   };
 
-  const handleUseTemplate = async (template: WorkspaceTemplate) => {
+  const handleUseTemplate = async (template: LibraryTemplate) => {
     if (workspaceId) {
       try {
         setLoading(true);
