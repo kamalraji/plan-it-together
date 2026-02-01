@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,29 +53,23 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<CompletedBooking | null>(null);
 
-  // Fetch existing reviews
+  // Placeholder: vendor_reviews table doesn't exist yet
   const { data: reviews, isLoading: reviewsLoading, refetch: refetchReviews } = useQuery({
     queryKey: ['organizer-reviews', eventId],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (eventId) params.append('eventId', eventId);
-
-      const response = await api.get(`/marketplace/reviews/organizer?${params.toString()}`);
-      return response.data.reviews as VendorReview[];
+      // Placeholder until vendor_reviews table exists
+      console.log('Reviews - tables not yet implemented', { eventId });
+      return [] as VendorReview[];
     },
   });
 
-  // Fetch completed bookings without reviews
+  // Placeholder: completed bookings without reviews
   const { data: pendingReviews, isLoading: pendingLoading, refetch: refetchPending } = useQuery({
     queryKey: ['pending-reviews', eventId],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (eventId) params.append('eventId', eventId);
-      params.append('status', 'COMPLETED');
-      params.append('withoutReview', 'true');
-
-      const response = await api.get(`/marketplace/bookings/organizer?${params.toString()}`);
-      return response.data.bookings as CompletedBooking[];
+      // Placeholder until vendor_bookings table exists
+      console.log('Pending reviews - tables not yet implemented', { eventId });
+      return [] as CompletedBooking[];
     },
   });
 
@@ -307,7 +300,8 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, 
     setIsSubmitting(true);
 
     try {
-      await api.post('/marketplace/reviews', {
+      // Placeholder: would insert into vendor_reviews table
+      console.log('Submit review:', {
         bookingId: booking.id,
         vendorId: booking.vendor.id,
         ...reviewData
@@ -410,7 +404,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, 
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isSubmitting ? 'Submitting...' : 'Submit Review'}
+              Submit Review
             </Button>
           </div>
         </form>
