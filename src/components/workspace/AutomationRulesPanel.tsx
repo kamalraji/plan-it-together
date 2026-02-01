@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAutomationRules } from '@/hooks/useAutomationRules';
+import { useWorkspaceRBAC } from '@/hooks/useWorkspaceRBAC';
 import { AutomationRule, TRIGGER_INFO, ACTION_INFO, AUTOMATION_PRESETS } from '@/lib/automationTypes';
 import { AutomationRuleBuilder } from './AutomationRuleBuilder';
 import { Button } from '@/components/ui/button';
@@ -8,16 +9,19 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   Zap, Plus, Trash2, Settings2, History, ArrowRight,
   Clock, Link, RefreshCw, CheckSquare, AlertTriangle, UserPlus, UserMinus,
-  Bell, UserCheck, Flag, Tag, XCircle, Ban
+  Bell, UserCheck, Flag, Tag, XCircle, Ban, ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { WorkspaceRole } from '@/types';
 
 interface AutomationRulesPanelProps {
   workspaceId: string;
+  userRole?: WorkspaceRole | null;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -37,11 +41,15 @@ const iconMap: Record<string, React.ReactNode> = {
   Ban: <Ban className="h-4 w-4" />,
 };
 
-export function AutomationRulesPanel({ workspaceId }: AutomationRulesPanelProps) {
+export function AutomationRulesPanel({ workspaceId, userRole = null }: AutomationRulesPanelProps) {
   const { rules, isLoading, executionLogs, toggleRule, deleteRule, createRule, isCreating } = useAutomationRules(workspaceId);
+  const rbac = useWorkspaceRBAC(userRole);
   const [showBuilder, setShowBuilder] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('rules');
+
+  // Check if user has permission to manage automation rules (LEAD+ required)
+  const canManageRules = rbac.isLeadOrAbove;
 
   const handleCreateFromPreset = (preset: typeof AUTOMATION_PRESETS[0]) => {
     createRule({
@@ -56,6 +64,20 @@ export function AutomationRulesPanel({ workspaceId }: AutomationRulesPanelProps)
 
   const enabledCount = rules.filter(r => r.isEnabled).length;
   const recentSuccessCount = executionLogs.filter(l => l.success).length;
+
+  // Permission denied view
+  if (!canManageRules) {
+    return (
+      <Alert variant="destructive" className="bg-destructive/10 border-destructive/20">
+        <ShieldAlert className="h-4 w-4" />
+        <AlertTitle>Access Restricted</AlertTitle>
+        <AlertDescription>
+          You need Lead-level permissions or above to manage automation rules. 
+          Contact your workspace manager for access.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   if (isLoading) {
     return (

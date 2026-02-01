@@ -18222,6 +18222,63 @@ export type Database = {
           },
         ]
       }
+      workspace_templates: {
+        Row: {
+          complexity: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          effectiveness: number | null
+          event_size_max: number | null
+          event_size_min: number | null
+          event_type: string | null
+          id: string
+          industry_type: string | null
+          is_public: boolean | null
+          metadata: Json | null
+          name: string
+          structure: Json | null
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          effectiveness?: number | null
+          event_size_max?: number | null
+          event_size_min?: number | null
+          event_type?: string | null
+          id?: string
+          industry_type?: string | null
+          is_public?: boolean | null
+          metadata?: Json | null
+          name: string
+          structure?: Json | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          effectiveness?: number | null
+          event_size_max?: number | null
+          event_size_min?: number | null
+          event_type?: string | null
+          id?: string
+          industry_type?: string | null
+          is_public?: boolean | null
+          metadata?: Json | null
+          name?: string
+          structure?: Json | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       workspace_ticket_activities: {
         Row: {
           activity_type: string

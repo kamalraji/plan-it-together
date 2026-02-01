@@ -1,6 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { User, OrganizationAdmin, Organization } from '../../types';
-import api from '../../lib/api';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Organization } from '../../types';
+
+interface OrganizationAdmin {
+  id: string;
+  userId: string;
+  role: 'ADMIN' | 'OWNER' | 'ORGANIZER' | 'VIEWER';
+  addedAt: string;
+  status: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
 
 interface OrganizationAdminManagementProps {
   organization: Organization;
@@ -18,67 +31,133 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
   currentUser,
   onUpdate
 }) => {
-  const [admins, setAdmins] = useState<OrganizationAdmin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [inviteForm, setInviteForm] = useState<InviteAdminForm>({
     email: '',
     role: 'ADMIN'
   });
   const [showInviteForm, setShowInviteForm] = useState(false);
-  const [inviting, setInviting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAdmins();
-  }, [organization.id]);
+  // Fetch admins using Supabase organization_memberships table
+  const { data: admins = [], isLoading } = useQuery({
+    queryKey: ['organization-admins', organization.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organization_memberships')
+        .select(`
+          id,
+          user_id,
+          role,
+          status,
+          created_at,
+          user_profiles (
+            id,
+            display_name,
+            email
+          )
+        `)
+        .eq('organization_id', organization.id)
+        .in('role', ['ADMIN', 'OWNER'])
+        .eq('status', 'ACTIVE')
+        .order('created_at', { ascending: false });
 
-  const fetchAdmins = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/organizations/${organization.id}/admins`);
-      setAdmins(response.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch admins');
-    } finally {
-      setLoading(false);
+      if (error) throw error;
+
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        userId: row.user_id,
+        role: row.role as 'ADMIN' | 'OWNER',
+        status: row.status,
+        addedAt: row.created_at,
+        user: {
+          name: row.user_profiles?.display_name || 'Unknown',
+          email: row.user_profiles?.email || ''
+        }
+      })) as OrganizationAdmin[];
+    },
+  });
+
+  // Invite admin mutation
+  const inviteMutation = useMutation({
+    mutationFn: async (form: InviteAdminForm) => {
+      // First find user by email
+      const { data: userProfile, error: userError } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('email', form.email.toLowerCase())
+        .single();
+
+      if (userError || !userProfile) {
+        throw new Error('User not found with that email address');
+      }
+
+      // Check if already a member
+      const { data: existing } = await supabase
+        .from('organization_memberships')
+        .select('id')
+        .eq('organization_id', organization.id)
+        .eq('user_id', userProfile.id)
+        .single();
+
+      if (existing) {
+        throw new Error('User is already a member of this organization');
+      }
+
+      // Add as member
+      const { error: insertError } = await supabase
+        .from('organization_memberships')
+        .insert({
+          organization_id: organization.id,
+          user_id: userProfile.id,
+          role: form.role,
+          status: 'ACTIVE'
+        });
+
+      if (insertError) throw insertError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organization-admins', organization.id] });
+      setInviteForm({ email: '', role: 'ADMIN' });
+      setShowInviteForm(false);
+      setError(null);
+      onUpdate?.();
+    },
+    onError: (err: Error) => {
+      setError(err.message);
     }
-  };
+  });
+
+  // Remove admin mutation
+  const removeMutation = useMutation({
+    mutationFn: async (adminId: string) => {
+      const { error } = await supabase
+        .from('organization_memberships')
+        .delete()
+        .eq('id', adminId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organization-admins', organization.id] });
+      onUpdate?.();
+    },
+    onError: (err: Error) => {
+      setError(err.message);
+    }
+  });
 
   const handleInviteAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteForm.email.trim()) return;
-
-    try {
-      setInviting(true);
-      setError(null);
-      
-      await api.post(`/organizations/${organization.id}/admins/invite`, {
-        email: inviteForm.email,
-        role: inviteForm.role
-      });
-
-      setInviteForm({ email: '', role: 'ADMIN' });
-      setShowInviteForm(false);
-      await fetchAdmins();
-      onUpdate?.();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to invite admin');
-    } finally {
-      setInviting(false);
-    }
+    setError(null);
+    inviteMutation.mutate(inviteForm);
   };
 
   const handleRemoveAdmin = async (adminId: string) => {
     if (!confirm('Are you sure you want to remove this admin?')) return;
-
-    try {
-      setError(null);
-      await api.delete(`/organizations/${organization.id}/admins/${adminId}`);
-      await fetchAdmins();
-      onUpdate?.();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to remove admin');
-    }
+    setError(null);
+    removeMutation.mutate(adminId);
   };
 
   const canManageAdmins = () => {
@@ -86,7 +165,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
     return currentUserAdmin?.role === 'OWNER' || currentUser.role === 'SUPER_ADMIN';
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-card rounded-lg shadow p-6">
         <div className="animate-pulse">
@@ -108,7 +187,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
           {canManageAdmins() && (
             <button
               onClick={() => setShowInviteForm(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus-visible:ring-ring"
             >
               Invite Admin
             </button>
@@ -118,7 +197,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
 
       <div className="p-6">
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
             {error}
           </div>
         )}
@@ -137,7 +216,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   id="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
+                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary px-3 py-2 border bg-background"
                   placeholder="admin@example.com"
                   required
                 />
@@ -151,7 +230,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   id="role"
                   value={inviteForm.role}
                   onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value as 'ADMIN' | 'OWNER' })}
-                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
+                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary px-3 py-2 border bg-background"
                 >
                   <option value="ADMIN">Admin</option>
                   <option value="OWNER">Owner</option>
@@ -161,10 +240,10 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
               <div className="flex space-x-3">
                 <button
                   type="submit"
-                  disabled={inviting}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  disabled={inviteMutation.isPending}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
-                  {inviting ? 'Inviting...' : 'Send Invitation'}
+                  {inviteMutation.isPending ? 'Inviting...' : 'Send Invitation'}
                 </button>
                 <button
                   type="button"
@@ -201,8 +280,8 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   <div className="text-right">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       admin.role === 'OWNER' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-blue-100 text-blue-800'
+                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
+                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                     }`}>
                       {admin.role}
                     </span>
@@ -214,7 +293,8 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   {canManageAdmins() && admin.userId !== currentUser.id && (
                     <button
                       onClick={() => handleRemoveAdmin(admin.id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                      disabled={removeMutation.isPending}
+                      className="text-destructive hover:text-destructive/80 text-sm font-medium disabled:opacity-50"
                     >
                       Remove
                     </button>
@@ -226,9 +306,9 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
         </div>
 
         {/* Permissions Info */}
-        <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-          <h4 className="text-sm font-medium text-blue-900 mb-2">Admin Roles & Permissions</h4>
-          <div className="text-sm text-blue-800 space-y-1">
+        <div className="mt-6 bg-primary/5 p-4 rounded-lg border border-primary/10">
+          <h4 className="text-sm font-medium text-foreground mb-2">Admin Roles & Permissions</h4>
+          <div className="text-sm text-muted-foreground space-y-1">
             <p><strong>Owner:</strong> Full access to organization settings, events, and team management</p>
             <p><strong>Admin:</strong> Can manage events and view analytics, but cannot modify organization settings or manage other admins</p>
           </div>
