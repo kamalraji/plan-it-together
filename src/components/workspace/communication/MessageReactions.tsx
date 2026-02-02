@@ -2,117 +2,34 @@
  * Message Reactions Component
  * Displays emoji reactions and allows adding/removing reactions
  * 
- * Uses localStorage for reactions until a dedicated message_reactions table is created.
- * This provides a functional UI that can be migrated to database storage later.
+ * Uses Supabase message_reactions table for persistence.
  */
-import { useState, useCallback, useEffect } from 'react';
+import { useState } from 'react';
+import { useMessageReactions, AggregatedReaction } from '@/hooks/useMessageReactions';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { SmilePlus } from 'lucide-react';
+import { SmilePlus, Loader2 } from 'lucide-react';
 
 interface MessageReactionsProps {
   messageId: string;
   compact?: boolean;
 }
 
-interface StoredReaction {
-  emoji: string;
-  users: { id: string; name: string }[];
-}
-
-interface AggregatedReaction {
-  emoji: string;
-  count: number;
-  users: { id: string; name: string }[];
-  userReacted: boolean;
-}
-
 // Common emoji reactions
 const QUICK_EMOJIS = ['👍', '❤️', '🎉', '😂', '😮', '😢', '🔥', '👏', '🙌', '✅', '👀', '💯'];
-
-// Storage key for reactions
-const REACTIONS_STORAGE_KEY = 'message_reactions';
-
-// Helper to get/set reactions from localStorage
-const getStoredReactions = (messageId: string): StoredReaction[] => {
-  try {
-    const stored = localStorage.getItem(REACTIONS_STORAGE_KEY);
-    if (!stored) return [];
-    const allReactions = JSON.parse(stored) as Record<string, StoredReaction[]>;
-    return allReactions[messageId] || [];
-  } catch {
-    return [];
-  }
-};
-
-const setStoredReactions = (messageId: string, reactions: StoredReaction[]) => {
-  try {
-    const stored = localStorage.getItem(REACTIONS_STORAGE_KEY);
-    const allReactions = stored ? JSON.parse(stored) : {};
-    allReactions[messageId] = reactions;
-    localStorage.setItem(REACTIONS_STORAGE_KEY, JSON.stringify(allReactions));
-  } catch {
-    // Silently fail if localStorage is not available
-  }
-};
 
 export function MessageReactions({ messageId, compact = false }: MessageReactionsProps) {
   const { user } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [reactions, setReactions] = useState<StoredReaction[]>([]);
+  const { aggregatedReactions, toggleReaction, isToggling, isLoading } = useMessageReactions(messageId);
 
-  // Load reactions on mount
-  useEffect(() => {
-    setReactions(getStoredReactions(messageId));
-  }, [messageId]);
-
-  // Aggregate reactions for display
-  const aggregatedReactions: AggregatedReaction[] = reactions.map((reaction) => ({
-    emoji: reaction.emoji,
-    count: reaction.users.length,
-    users: reaction.users,
-    userReacted: reaction.users.some((u) => u.id === user?.id),
-  }));
-
-  // Toggle reaction
-  const handleReactionClick = useCallback(
-    (emoji: string) => {
-      if (!user) return;
-
-      const userName = user.name || user.email?.split('@')[0] || 'User';
-      const currentReactions = [...reactions];
-      
-      // Find if this emoji already exists
-      const existingReactionIndex = currentReactions.findIndex((r) => r.emoji === emoji);
-
-      if (existingReactionIndex >= 0) {
-        const existingReaction = currentReactions[existingReactionIndex];
-        const userIndex = existingReaction.users.findIndex((u) => u.id === user.id);
-
-        if (userIndex >= 0) {
-          // Remove user from reaction
-          existingReaction.users.splice(userIndex, 1);
-          if (existingReaction.users.length === 0) {
-            // Remove the entire reaction if no users left
-            currentReactions.splice(existingReactionIndex, 1);
-          }
-        } else {
-          // Add user to reaction
-          existingReaction.users.push({ id: user.id, name: userName });
-        }
-      } else {
-        // Create new reaction with this emoji
-        currentReactions.push({ emoji, users: [{ id: user.id, name: userName }] });
-      }
-
-      setReactions(currentReactions);
-      setStoredReactions(messageId, currentReactions);
-      setPickerOpen(false);
-    },
-    [reactions, user, messageId]
-  );
+  const handleReactionClick = async (emoji: string) => {
+    if (!user) return;
+    await toggleReaction(emoji);
+    setPickerOpen(false);
+  };
 
   // Get tooltip text for reaction
   const getReactionTooltip = (reaction: AggregatedReaction) => {
@@ -128,6 +45,14 @@ export function MessageReactions({ messageId, compact = false }: MessageReaction
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-1">
+        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-1 flex-wrap">
       {/* Existing reactions */}
@@ -135,9 +60,10 @@ export function MessageReactions({ messageId, compact = false }: MessageReaction
         <button
           key={reaction.emoji}
           onClick={() => handleReactionClick(reaction.emoji)}
+          disabled={isToggling}
           title={getReactionTooltip(reaction)}
           className={cn(
-            'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors',
+            'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors disabled:opacity-50',
             reaction.userReacted
               ? 'bg-primary/20 border border-primary/40 hover:bg-primary/30'
               : 'bg-muted border border-border hover:bg-muted/80',
@@ -169,7 +95,8 @@ export function MessageReactions({ messageId, compact = false }: MessageReaction
               <button
                 key={emoji}
                 onClick={() => handleReactionClick(emoji)}
-                className="p-1.5 hover:bg-muted rounded transition-colors text-lg"
+                disabled={isToggling}
+                className="p-1.5 hover:bg-muted rounded transition-colors text-lg disabled:opacity-50"
               >
                 {emoji}
               </button>
