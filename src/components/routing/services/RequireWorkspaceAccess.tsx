@@ -24,7 +24,7 @@ export const RequireWorkspaceAccess: React.FC<RequireWorkspaceAccessProps> = ({
   }
 
   if (error || !canView || (requireManage && !canManage)) {
-    return <Navigate to="/console/workspaces" replace />;
+    return <Navigate to="/dashboard/workspaces" replace />;
   }
 
   return <>{children}</>;

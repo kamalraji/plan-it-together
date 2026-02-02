@@ -21,27 +21,27 @@ export const BookingListPage: React.FC = () => {
   const pageActions = [
     {
       label: 'Browse Services',
-      action: () => navigate('/console/marketplace/services'),
+      action: () => navigate('/marketplace/services'),
       icon: MagnifyingGlassIcon,
       variant: 'primary' as const,
     },
     {
       label: 'Vendor Dashboard',
-      action: () => navigate('/console/marketplace/vendors'),
+      action: () => navigate('/marketplace/vendors'),
       icon: BuildingStorefrontIcon,
       variant: 'secondary' as const,
     },
   ];
 
   const breadcrumbs = [
-    { label: 'Marketplace', href: '/console/marketplace' },
-    { label: 'Bookings', href: '/console/marketplace/bookings' },
+    { label: 'Marketplace', href: '/marketplace' },
+    { label: 'Bookings', href: '/marketplace/bookings' },
   ];
 
   if (bookingId) {
     breadcrumbs.push({
       label: `Booking ${bookingId}`,
-      href: `/console/marketplace/bookings/${bookingId}`,
+      href: `/marketplace/bookings/${bookingId}`,
     });
   }
 

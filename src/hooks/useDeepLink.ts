@@ -99,7 +99,7 @@ export function useDeepLink() {
     
     const base = orgSlug 
       ? `/${orgSlug}/eventmanagement/${eventId}`
-      : `/console/events/${eventId}`;
+      : `/dashboard/eventmanagement/${eventId}`;
     const query = params.toString() ? `?${params}` : '';
     
     return `${base}${query}`;

@@ -100,7 +100,7 @@ export const EventService: React.FC = () => {
       />
 
       {/* Redirect unknown routes to dashboard */}
-      <Route path="*" element={<Navigate to="/console/events" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard/eventmanagement" replace />} />
     </Routes>
   );
 };
