@@ -1,24 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, isSameDay, parseISO } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MarketingEvent {
   id: string;
   title: string;
-  date: string;
-  type: 'campaign' | 'content' | 'email' | 'social' | 'deadline';
+  date: Date;
+  type: 'campaign' | 'content' | 'email' | 'social' | 'deadline' | 'task';
 }
 
-const mockEvents: MarketingEvent[] = [
-  { id: '1', title: 'Early Bird Campaign Ends', date: '2025-01-15', type: 'deadline' },
-  { id: '2', title: 'Newsletter Send', date: '2025-01-10', type: 'email' },
-  { id: '3', title: 'Speaker Reveal Post', date: '2025-01-08', type: 'social' },
-  { id: '4', title: 'Blog: Event Preview', date: '2025-01-12', type: 'content' },
-  { id: '5', title: 'Paid Campaign Launch', date: '2025-01-05', type: 'campaign' },
-  { id: '6', title: 'Influencer Collab Post', date: '2025-01-18', type: 'social' },
-];
+interface MarketingCalendarProps {
+  workspaceId?: string;
+}
 
 const typeColors: Record<MarketingEvent['type'], string> = {
   campaign: 'bg-pink-500',
@@ -26,10 +23,62 @@ const typeColors: Record<MarketingEvent['type'], string> = {
   email: 'bg-emerald-500',
   social: 'bg-purple-500',
   deadline: 'bg-red-500',
+  task: 'bg-orange-500',
 };
 
-export function MarketingCalendar() {
+export function MarketingCalendar({ workspaceId }: MarketingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  // Fetch workspace tasks as calendar events
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ['marketing-calendar-tasks', workspaceId, format(currentMonth, 'yyyy-MM')],
+    queryFn: async () => {
+      if (!workspaceId) return [];
+      
+      const monthStart = startOfMonth(currentMonth);
+      const monthEnd = endOfMonth(currentMonth);
+      
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .select('id, title, due_date, priority, status')
+        .eq('workspace_id', workspaceId)
+        .gte('due_date', monthStart.toISOString())
+        .lte('due_date', monthEnd.toISOString())
+        .order('due_date', { ascending: true });
+      
+      if (error) throw error;
+      return (data || []).filter(t => t.due_date !== null);
+    },
+    enabled: !!workspaceId,
+  });
+
+  // Convert tasks to calendar events
+  const events: MarketingEvent[] = tasks
+    .filter(task => task.due_date)
+    .map(task => {
+      let type: MarketingEvent['type'] = 'task';
+      const titleLower = task.title.toLowerCase();
+      
+      // Determine type based on title keywords
+      if (titleLower.includes('campaign') || titleLower.includes('ad ') || titleLower.includes('ads')) {
+        type = 'campaign';
+      } else if (titleLower.includes('content') || titleLower.includes('blog') || titleLower.includes('article')) {
+        type = 'content';
+      } else if (titleLower.includes('email') || titleLower.includes('newsletter')) {
+        type = 'email';
+      } else if (titleLower.includes('social') || titleLower.includes('post') || titleLower.includes('twitter') || titleLower.includes('instagram')) {
+        type = 'social';
+      } else if (task.priority === 'URGENT' || titleLower.includes('deadline')) {
+        type = 'deadline';
+      }
+      
+      return {
+        id: task.id,
+        title: task.title,
+        date: parseISO(task.due_date!),
+        type,
+      };
+    });
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -39,8 +88,7 @@ export function MarketingCalendar() {
   const startDay = monthStart.getDay();
 
   const getEventsForDate = (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return mockEvents.filter((e) => e.date === dateStr);
+    return events.filter((e) => isSameDay(e.date, date));
   };
 
   return (
@@ -49,6 +97,7 @@ export function MarketingCalendar() {
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-indigo-600" />
           <CardTitle className="text-lg font-semibold">Marketing Calendar</CardTitle>
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -95,6 +144,10 @@ export function MarketingCalendar() {
             <div className="w-3 h-3 rounded-full bg-red-500" />
             <span className="text-muted-foreground">Deadline</span>
           </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-full bg-orange-500" />
+            <span className="text-muted-foreground">Task</span>
+          </div>
         </div>
 
         {/* Calendar Grid */}
@@ -116,7 +169,7 @@ export function MarketingCalendar() {
 
           {/* Day cells */}
           {days.map((day) => {
-            const events = getEventsForDate(day);
+            const dayEvents = getEventsForDate(day);
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isTodayDate = isToday(day);
 
@@ -135,7 +188,7 @@ export function MarketingCalendar() {
                   {format(day, 'd')}
                 </div>
                 <div className="space-y-0.5 overflow-hidden">
-                  {events.slice(0, 2).map((event) => (
+                  {dayEvents.slice(0, 2).map((event) => (
                     <div
                       key={event.id}
                       className={`text-[10px] px-1 py-0.5 rounded truncate text-white ${typeColors[event.type]}`}
@@ -144,9 +197,9 @@ export function MarketingCalendar() {
                       {event.title}
                     </div>
                   ))}
-                  {events.length > 2 && (
+                  {dayEvents.length > 2 && (
                     <div className="text-[10px] text-muted-foreground px-1">
-                      +{events.length - 2} more
+                      +{dayEvents.length - 2} more
                     </div>
                   )}
                 </div>
@@ -154,6 +207,14 @@ export function MarketingCalendar() {
             );
           })}
         </div>
+
+        {/* Empty state */}
+        {!isLoading && events.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No marketing tasks scheduled this month</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

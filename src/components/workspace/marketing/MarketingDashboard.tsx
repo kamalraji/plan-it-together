@@ -94,7 +94,7 @@ export function MarketingDashboard({
       </div>
 
       {/* Marketing Calendar - Full Width */}
-      <MarketingCalendar />
+      <MarketingCalendar workspaceId={workspace.id} />
 
       {/* Ad Performance */}
       <AdPerformancePanel workspaceId={workspace.id} />
