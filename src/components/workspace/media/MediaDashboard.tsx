@@ -26,27 +26,10 @@ export function MediaDashboard({
   // Enable real-time updates for media committee data
   useMediaCommitteeRealtime({ workspaceId: workspace.id });
 
-  // Mock stats - in production, fetch from database
-  const stats = {
-    photographers: 4,
-    videographers: 2,
-    pressCredentials: 12,
-    mediaAssets: 248,
-    coverageHours: 16,
-    deliverables: 6,
-  };
-
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <MediaStatsCards
-        photographers={stats.photographers}
-        videographers={stats.videographers}
-        pressCredentials={stats.pressCredentials}
-        mediaAssets={stats.mediaAssets}
-        coverageHours={stats.coverageHours}
-        deliverables={stats.deliverables}
-      />
+      <MediaStatsCards workspaceId={workspace.id} />
 
       {/* Quick Actions */}
       <MediaQuickActions workspaceId={workspace.id} onViewTasks={onViewTasks} />

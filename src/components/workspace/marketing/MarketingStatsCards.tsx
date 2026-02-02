@@ -1,49 +1,77 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Megaphone, Users, TrendingUp, DollarSign } from 'lucide-react';
+import { useMarketingStats } from '@/hooks/useStatsData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MarketingStatsCardsProps {
-  activeCampaigns: number;
-  totalReach: number;
-  conversionRate: number;
-  adSpend: number;
+  workspaceId: string;
 }
 
-export function MarketingStatsCards({
-  activeCampaigns,
-  totalReach,
-  conversionRate,
-  adSpend,
-}: MarketingStatsCardsProps) {
+export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
+  const { data, isLoading } = useMarketingStats(workspaceId);
+
   const stats = [
     {
       label: 'Active Campaigns',
-      value: activeCampaigns.toString(),
+      value: data?.activeCampaigns?.toString() ?? '0',
       icon: Megaphone,
       color: 'text-pink-600',
-      bgColor: 'bg-pink-50',
+      bgColor: 'bg-pink-50 dark:bg-pink-500/10',
     },
     {
       label: 'Total Reach',
-      value: totalReach >= 1000 ? `${(totalReach / 1000).toFixed(1)}K` : totalReach.toString(),
+      value: data?.totalReach
+        ? data.totalReach >= 1000000
+          ? `${(data.totalReach / 1000000).toFixed(1)}M`
+          : data.totalReach >= 1000
+            ? `${(data.totalReach / 1000).toFixed(1)}K`
+            : data.totalReach.toString()
+        : '0',
       icon: Users,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-blue-50 dark:bg-blue-500/10',
     },
     {
       label: 'Conversion Rate',
-      value: `${conversionRate}%`,
+      value: `${data?.conversionRate ?? 0}%`,
       icon: TrendingUp,
       color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
     {
       label: 'Ad Spend',
-      value: `$${adSpend >= 1000 ? `${(adSpend / 1000).toFixed(1)}K` : adSpend}`,
+      value: `$${
+        data?.adSpend
+          ? data.adSpend >= 1000
+            ? `${(data.adSpend / 1000).toFixed(1)}K`
+            : data.adSpend
+          : 0
+      }`,
       icon: DollarSign,
       color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
+      bgColor: 'bg-amber-50 dark:bg-amber-500/10',
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-12" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

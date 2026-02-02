@@ -1,18 +1,63 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Users, Clock, MapPin } from 'lucide-react';
+import { useEventStats } from '@/hooks/useStatsData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface EventStatsCardsProps {
-  workspaceId?: string;
+  workspaceId: string;
+  eventId?: string;
 }
 
-export function EventStatsCards(_props: EventStatsCardsProps) {
-  // Mock data - would be connected to real data
+export function EventStatsCards({ workspaceId, eventId }: EventStatsCardsProps) {
+  const { data, isLoading } = useEventStats(workspaceId, eventId);
+
   const stats = [
-    { label: 'Schedule Items', value: 24, icon: Calendar, change: '+3 today' },
-    { label: 'VIP Guests', value: 12, icon: Users, change: 'All confirmed' },
-    { label: 'Hours to Event', value: 72, icon: Clock, change: 'On track' },
-    { label: 'Venue Zones', value: 8, icon: MapPin, change: '6 ready' },
+    {
+      label: 'Schedule Items',
+      value: data?.scheduleItems ?? 0,
+      icon: Calendar,
+      change: data?.scheduleItems ? `${data.scheduleItems} total` : 'No items',
+    },
+    {
+      label: 'VIP Guests',
+      value: data?.vipGuests ?? 0,
+      icon: Users,
+      change: data?.vipGuests ? 'Confirmed' : 'None yet',
+    },
+    {
+      label: 'Hours to Event',
+      value: data?.hoursToEvent ?? 0,
+      icon: Clock,
+      change: data?.hoursToEvent && data.hoursToEvent > 0 ? 'Countdown' : 'Event passed',
+    },
+    {
+      label: 'Venue Zones',
+      value: data?.venueZones ?? 0,
+      icon: MapPin,
+      change: data?.venueZones ? 'Configured' : 'Not set',
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-10" />
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-3 w-12" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
