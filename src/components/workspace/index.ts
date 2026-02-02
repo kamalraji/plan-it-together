@@ -37,6 +37,10 @@ export { VirtualizedTaskList } from './VirtualizedTaskList';
 export { GoalSettingDialog } from './GoalSettingDialog';
 export { DashboardExportButton } from './DashboardExportButton';
 export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+export { OfflineSyncIndicator } from './OfflineSyncIndicator';
+
+// Drag and Drop Components
+export * from './dnd';
 
 // Mobile Components
 export * from './mobile';

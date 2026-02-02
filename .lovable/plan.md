@@ -368,14 +368,21 @@ Existing mobile components:
 
 ### Phase 3: UX Polish (Week 5-6) 🔄 IN PROGRESS
 9. ✅ Add virtual scrolling to task lists - `VirtualizedTaskList` component created
-10. Implement full offline mode with IndexedDB
+10. ✅ Implement full offline mode with IndexedDB - `offlineDB`, `useOfflineSync`, `useOfflineTasks`, `OfflineSyncIndicator`
 11. ✅ Accessibility audit and fixes (WCAG 2.1 AA) - Skip links in App.tsx, SkipLinks, FocusTrap, VisuallyHidden, LiveRegion
-12. Mobile optimization pass
+12. ✅ Mobile optimization pass - Advanced DnD components for touch
 
 **New Components Created (Phase 3):**
 - `src/components/workspace/VirtualizedTaskList.tsx` - Virtual scrolling for large task lists
 - `src/components/accessibility/SkipLinks.tsx` - Multiple skip links component
 - `src/components/accessibility/VisuallyHidden.tsx` - Screen reader only content
+- `src/lib/offline/indexedDB.ts` - IndexedDB wrapper for offline storage
+- `src/hooks/useOfflineSync.ts` - Offline sync queue management
+- `src/hooks/useOfflineTasks.ts` - Offline-capable task CRUD
+- `src/components/workspace/OfflineSyncIndicator.tsx` - Sync status UI
+- `src/components/workspace/dnd/DragToAssign.tsx` - Drag tasks to member avatars
+- `src/components/workspace/dnd/CrossWorkspaceDrop.tsx` - Move tasks between workspaces
+- `src/components/workspace/dnd/DraggableTaskCard.tsx` - Draggable task cards
 
 ### Phase 4: Scale & Enterprise (Week 7-8) ✅ COMPLETED
 13. ✅ Internationalization infrastructure - react-i18next setup with English translations
@@ -403,10 +410,11 @@ Existing mobile components:
 | Mobile swipe gestures | MobileTaskCard | High | ✅ Done |
 | Automation execution | Hook + Edge Function | High | ✅ Done |
 | Virtual scrolling | VirtualizedTaskList | Medium | ✅ Done |
-| Offline mode | Full architecture | Medium | Pending |
+| Offline mode | IndexedDB + sync | Medium | ✅ Done |
 | i18n setup | react-i18next | Medium | ✅ Done |
 | Accessibility fixes | Multiple components | Medium | ✅ Done |
-| Advanced DnD | 3 features | Low | Pending |
+| Advanced DnD | DragToAssign, CrossWorkspace | Low | ✅ Done |
+| Advanced DnD | DragToAssign, CrossWorkspace | Low | ✅ Done |
 | Scheduled exports | ScheduledReportManager | Low | ✅ Done |
 | Field-level audit | useFieldAuditLog | Medium | ✅ Done |
 | Rate limiting | useRateLimit hooks | Medium | ✅ Done |
