@@ -332,8 +332,14 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
                 onViewTasks={actions.handleViewTasks}
                 onDelegateRole={() => actions.setActiveTab('role-management')}
                 onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
-                onRequestBudget={() => {}}
-                onRequestResource={() => {}}
+                onRequestBudget={() => {
+                  const el = document.getElementById('budget');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                onRequestResource={() => {
+                  const el = document.getElementById('resources');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
               />
             ) : workspace.workspaceType === WorkspaceType.TEAM ? (
               <TeamDashboard 
@@ -341,8 +347,14 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
                 orgSlug={orgSlug}
                 userRole={permissions.currentMember?.role as WorkspaceRole}
                 onViewTasks={actions.handleViewTasks}
-                onLogHours={() => {}}
-                onSubmitForApproval={() => {}}
+                onLogHours={() => {
+                  const el = document.getElementById('time-tracking');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                onSubmitForApproval={() => {
+                  const el = document.getElementById('time-tracking');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
               />
             ) : (
               /* Fallback for legacy workspaces without workspace_type */
