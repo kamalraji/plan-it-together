@@ -105,6 +105,14 @@ export {
 // Bulk Operations
 export { useBulkTaskOperations } from './useBulkTaskOperations';
 
+// Undo/Redo System
+export {
+  useUndoRedo,
+  createTaskStatusUndoAction,
+  createTaskDeleteUndoAction,
+  createBulkOperationUndoAction,
+} from './useUndoRedo';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';

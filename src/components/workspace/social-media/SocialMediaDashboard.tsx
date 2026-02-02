@@ -114,16 +114,16 @@ export function SocialMediaDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
-          <PlatformManager />
+          <PlatformManager workspaceId={workspace.id} />
           <ContentCalendar />
-          <HashtagTracker />
+          <HashtagTracker workspaceId={workspace.id} />
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
-          <EngagementTracker />
-          <InfluencerTracker />
-          <ContentLibrary />
+          <EngagementTracker workspaceId={workspace.id} />
+          <InfluencerTracker workspaceId={workspace.id} />
+          <ContentLibrary workspaceId={workspace.id} />
         </div>
       </div>
 
