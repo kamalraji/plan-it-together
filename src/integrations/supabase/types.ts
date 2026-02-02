@@ -21036,6 +21036,7 @@ export type Database = {
           sent_at: string
         }[]
       }
+      slugify: { Args: { text: string }; Returns: string }
       store_youtube_oauth_tokens: {
         Args: {
           p_access_token: string
