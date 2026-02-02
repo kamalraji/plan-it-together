@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { TablesInsert } from '@/integrations/supabase/types';
 import { optimisticHelpers } from './useOptimisticMutation';
+import { useAutomationTrigger } from './useAutomationTrigger';
 
 interface UseWorkspaceMutationsProps {
   workspaceId: string | undefined;
@@ -24,6 +25,7 @@ export function useWorkspaceMutations({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { onStatusChange, onTaskCreated } = useAutomationTrigger();
   const queryKey = ['workspace-tasks', workspaceId];
 
   // Create task with optimistic update
@@ -88,14 +90,20 @@ export function useWorkspaceMutations({
         variant: 'destructive',
       });
     },
+    onSuccess: (data) => {
+      // Trigger automation for task creation
+      if (data?.id && workspaceId) {
+        onTaskCreated(data.id, workspaceId);
+      }
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
     },
   });
 
-  // Update task status with optimistic update
+  // Update task status with optimistic update and automation trigger
   const updateTaskStatusMutation = useMutation({
-    mutationFn: async ({ taskId, status }: { taskId: string; status: TaskStatus }) => {
+    mutationFn: async ({ taskId, status, oldStatus }: { taskId: string; status: TaskStatus; oldStatus?: TaskStatus }) => {
       const { error } = await supabase
         .from('workspace_tasks')
         .update({ status })
@@ -103,7 +111,7 @@ export function useWorkspaceMutations({
         .eq('workspace_id', workspaceId as string);
 
       if (error) throw error;
-      return { taskId, status };
+      return { taskId, status, oldStatus };
     },
     onMutate: async ({ taskId, status }) => {
       await queryClient.cancelQueries({ queryKey });
@@ -125,6 +133,12 @@ export function useWorkspaceMutations({
         description: error.message,
         variant: 'destructive',
       });
+    },
+    onSuccess: ({ taskId, status, oldStatus }) => {
+      // Trigger automation for status change
+      if (workspaceId && oldStatus && oldStatus !== status) {
+        onStatusChange(taskId, workspaceId, oldStatus, status);
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -233,8 +247,8 @@ export function useWorkspaceMutations({
   return {
     createTask: () => createTaskMutation.mutate(),
     isCreatingTask: createTaskMutation.isPending,
-    updateTaskStatus: (taskId: string, status: TaskStatus) =>
-      updateTaskStatusMutation.mutate({ taskId, status }),
+    updateTaskStatus: (taskId: string, status: TaskStatus, oldStatus?: TaskStatus) =>
+      updateTaskStatusMutation.mutate({ taskId, status, oldStatus }),
     isUpdatingTaskStatus: updateTaskStatusMutation.isPending,
     deleteTask: (taskId: string) => deleteTaskMutation.mutate(taskId),
     isDeletingTask: deleteTaskMutation.isPending,

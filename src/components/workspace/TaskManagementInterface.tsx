@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority, TaskCategory } from '../../types';
 import { TaskList } from './TaskList';
@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { TaskSuggestion } from '@/hooks/useTaskAISuggestions';
+import { useTaskFiles } from '@/hooks/useTaskFiles';
+import { useTaskProgressMutation } from '@/hooks/useTaskProgressMutation';
 
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
@@ -441,19 +443,14 @@ export function TaskManagementInterface({
 
       {/* Task Detail Modal */}
       {selectedTask && (
-        <TaskDetailView
+        <TaskDetailViewWrapper
           task={selectedTask}
           teamMembers={teamMembers}
+          workspaceId={workspaceId}
           onTaskUpdate={() => {
             queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
           }}
           onStatusChange={onTaskStatusChange}
-          onProgressUpdate={() => {}}
-          onCommentAdd={() => {}}
-          onCommentEdit={() => {}}
-          onCommentDelete={() => {}}
-          onFileUpload={() => {}}
-          onFileDelete={() => {}}
           onClose={handleTaskDetailClose}
         />
       )}
@@ -472,5 +469,74 @@ export function TaskManagementInterface({
         isLoading={createTaskMutation.isPending || updateTaskMutation.isPending}
       />
     </div>
+  );
+}
+
+/**
+ * Wrapper component for TaskDetailView that wires up file and progress callbacks
+ */
+interface TaskDetailViewWrapperProps {
+  task: WorkspaceTask;
+  teamMembers: TeamMember[];
+  workspaceId?: string;
+  onTaskUpdate: () => void;
+  onStatusChange?: (taskId: string, status: TaskStatus) => void;
+  onClose: () => void;
+}
+
+function TaskDetailViewWrapper({
+  task,
+  teamMembers,
+  workspaceId,
+  onTaskUpdate,
+  onStatusChange,
+  onClose,
+}: TaskDetailViewWrapperProps) {
+  const { files, uploadFiles, deleteFile } = useTaskFiles(task.id);
+  const { updateProgress } = useTaskProgressMutation({ workspaceId });
+
+  const handleProgressUpdate = useCallback(
+    (_taskId: string, progress: number) => {
+      updateProgress(task.id, progress);
+      onTaskUpdate();
+    },
+    [updateProgress, task.id, onTaskUpdate]
+  );
+
+  const handleFileUpload = useCallback(
+    (_taskId: string, fileList: FileList) => {
+      uploadFiles(fileList);
+    },
+    [uploadFiles]
+  );
+
+  const handleFileDelete = useCallback(
+    (fileId: string) => {
+      deleteFile(fileId);
+    },
+    [deleteFile]
+  );
+
+  // Map TaskFile[] to the format expected by TaskDetailView
+  const mappedFiles = files.map((f) => ({
+    id: f.id,
+    name: f.name,
+    url: f.url,
+    size: f.size,
+    uploadedBy: f.uploadedByName,
+    uploadedAt: f.uploadedAt,
+  }));
+
+  return (
+    <TaskDetailView
+      task={task}
+      teamMembers={teamMembers}
+      files={mappedFiles}
+      onStatusChange={onStatusChange}
+      onProgressUpdate={handleProgressUpdate}
+      onFileUpload={handleFileUpload}
+      onFileDelete={handleFileDelete}
+      onClose={onClose}
+    />
   );
 }
