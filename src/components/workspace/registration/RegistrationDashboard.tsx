@@ -10,6 +10,7 @@ import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { MilestoneTimeline } from '../committee/MilestoneTimeline';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -119,6 +120,12 @@ export function RegistrationDashboard({
           <CheckInMonitor workspaceId={workspace.id} />
           <TicketTypeBreakdown workspaceId={workspace.id} />
         </div>
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Timeline */}

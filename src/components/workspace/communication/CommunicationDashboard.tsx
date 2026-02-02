@@ -11,7 +11,7 @@ import { EmailCampaignTracker } from './EmailCampaignTracker';
 import { MessagingChannels } from './MessagingChannels';
 import { PressReleaseTracker } from './PressReleaseTracker';
 import { StakeholderDirectory } from './StakeholderDirectory';
-import { OverdueItemsWidget } from '../escalation';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useCommunicationCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface CommunicationDashboardProps {
@@ -93,8 +93,11 @@ export function CommunicationDashboard({
       {/* Announcement Manager */}
       <AnnouncementManager />
 
-      {/* Overdue Items */}
-      <OverdueItemsWidget workspaceId={workspace.id} />
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Email Campaigns - Full Width */}
       <EmailCampaignTracker />

@@ -11,7 +11,7 @@ import { AdPerformancePanel } from './AdPerformancePanel';
 import { BrandingAssetsManager } from './BrandingAssetsManager';
 import { MarketingCalendar } from './MarketingCalendar';
 import { AudienceInsights } from './AudienceInsights';
-import { OverdueItemsWidget } from '../escalation';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useMarketingCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface MarketingDashboardProps {
@@ -92,8 +92,11 @@ export function MarketingDashboard({
       {/* Campaign Tracker */}
       <CampaignTracker />
 
-      {/* Overdue Items */}
-      <OverdueItemsWidget workspaceId={workspace.id} />
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Marketing Calendar - Full Width */}
       <MarketingCalendar />

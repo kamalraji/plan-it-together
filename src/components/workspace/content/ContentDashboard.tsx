@@ -12,7 +12,7 @@ import { MediaAssetsLibrary } from './MediaAssetsLibrary';
 import { BlogArticleTracker } from './BlogArticleTracker';
 import { PageBuilderStatusCard } from './PageBuilderStatusCard';
 import { PublicationPipeline } from './PublicationPipeline';
-import { OverdueItemsWidget } from '../escalation';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useContentCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface ContentDashboardProps {
@@ -92,8 +92,11 @@ export function ContentDashboard({
       {/* Social Media */}
       <SocialMediaTracker />
 
-      {/* Overdue Items */}
-      <OverdueItemsWidget workspaceId={workspace.id} />
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Content Calendar - Full Width */}
       <ContentCalendar />

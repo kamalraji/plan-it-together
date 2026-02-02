@@ -9,7 +9,7 @@ import { DeliverableTracker } from './DeliverableTracker';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
-import { OverdueItemsWidget } from '../escalation';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useMediaCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface MediaDashboardProps {
@@ -66,8 +66,11 @@ export function MediaDashboard({
         />
       </div>
 
-      {/* Overdue Items */}
-      <OverdueItemsWidget workspaceId={workspace.id} />
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
