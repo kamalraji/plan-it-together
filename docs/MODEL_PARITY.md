@@ -3,7 +3,7 @@ llm_metadata:
   purpose: TypeScript to Dart model mappings
   last_updated: 2026-02-02
   related_files:
-    - apps/web/src/integrations/supabase/types.ts
+    - src/integrations/supabase/types.ts
     - apps/mobile/lib/models/
 ---
 
