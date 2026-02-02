@@ -1,12 +1,13 @@
 /**
  * Workspace Provision Edge Function
- * Auto-provisions core workspaces when an event is published
+ * Auto-provisions core workspaces AND default channels when an event is published
  * 
  * Creates:
  * - ROOT workspace (if not exists)
  * - Registration Committee
  * - Operations Department
  * - Communications Committee
+ * - Default participant channels (announcements, general, help-support, networking)
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
@@ -18,6 +19,17 @@ interface WorkspaceTemplate {
   workspaceType: "ROOT" | "DEPARTMENT" | "COMMITTEE";
   description: string;
   icon?: string;
+}
+
+interface ChannelTemplate {
+  name: string;
+  description: string;
+  type: "general" | "announcement" | "private" | "task";
+  isParticipantChannel: boolean;
+  participantCanWrite: boolean;
+  autoJoinOnRegistration: boolean;
+  sortOrder: number;
+  icon: string;
 }
 
 const WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
@@ -47,11 +59,132 @@ const WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
   },
 ];
 
+// Default channels to create for participant communication
+const DEFAULT_CHANNEL_TEMPLATES: ChannelTemplate[] = [
+  {
+    name: "announcements",
+    description: "Official event announcements from organizers",
+    type: "announcement",
+    isParticipantChannel: true,
+    participantCanWrite: false,
+    autoJoinOnRegistration: true,
+    sortOrder: 1,
+    icon: "megaphone",
+  },
+  {
+    name: "general",
+    description: "Open discussion for all participants",
+    type: "general",
+    isParticipantChannel: true,
+    participantCanWrite: true,
+    autoJoinOnRegistration: true,
+    sortOrder: 2,
+    icon: "message-circle",
+  },
+  {
+    name: "help-support",
+    description: "Get help from event organizers and volunteers",
+    type: "general",
+    isParticipantChannel: true,
+    participantCanWrite: true,
+    autoJoinOnRegistration: true,
+    sortOrder: 3,
+    icon: "help-circle",
+  },
+  {
+    name: "networking",
+    description: "Connect and network with other participants",
+    type: "general",
+    isParticipantChannel: true,
+    participantCanWrite: true,
+    autoJoinOnRegistration: true,
+    sortOrder: 4,
+    icon: "users",
+  },
+];
+
 interface ProvisionRequest {
   eventId: string;
   organizationId: string;
   requestedBy: string;
   skipExisting?: boolean;
+  createDefaultChannels?: boolean;
+}
+
+interface CreatedChannel {
+  id: string;
+  name: string;
+  type: string;
+  isParticipantChannel: boolean;
+}
+
+async function createDefaultChannels(
+  // deno-lint-ignore no-explicit-any
+  supabase: any,
+  workspaceId: string,
+  createdBy: string
+): Promise<CreatedChannel[]> {
+  const createdChannels: CreatedChannel[] = [];
+
+  for (const template of DEFAULT_CHANNEL_TEMPLATES) {
+    // Check if channel already exists
+    const { data: existing } = await supabase
+      .from("workspace_channels")
+      .select("id")
+      .eq("workspace_id", workspaceId)
+      .eq("name", template.name)
+      .single();
+
+    if (existing) {
+      console.log(`Channel ${template.name} already exists, skipping`);
+      continue;
+    }
+
+    const { data: channel, error } = await supabase
+      .from("workspace_channels")
+      .insert({
+        workspace_id: workspaceId,
+        name: template.name,
+        description: template.description,
+        type: template.type,
+        is_private: false,
+        is_participant_channel: template.isParticipantChannel,
+        participant_permissions: {
+          can_read: true,
+          can_write: template.participantCanWrite,
+        },
+        auto_join_on_registration: template.autoJoinOnRegistration,
+        created_by: createdBy,
+        metadata: {
+          icon: template.icon,
+          sortOrder: template.sortOrder,
+          autoProvisioned: true,
+        },
+      })
+      .select("id, name, type, is_participant_channel")
+      .single();
+
+    if (error) {
+      console.error(`Failed to create channel ${template.name}:`, error);
+      continue;
+    }
+
+    createdChannels.push({
+      id: channel.id as string,
+      name: channel.name as string,
+      type: channel.type as string,
+      isParticipantChannel: channel.is_participant_channel as boolean,
+    });
+
+    // Add the creator as a channel member
+    await supabase.from("channel_members").insert({
+      channel_id: channel.id,
+      user_id: createdBy,
+      user_name: null, // Will be fetched by the app
+    });
+  }
+
+  return createdChannels;
 }
 
 Deno.serve(async (req) => {
@@ -70,7 +203,13 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     
     const body: ProvisionRequest = await req.json();
-    const { eventId, organizationId, requestedBy, skipExisting = true } = body;
+    const { 
+      eventId, 
+      organizationId, 
+      requestedBy, 
+      skipExisting = true,
+      createDefaultChannels: shouldCreateChannels = true 
+    } = body;
 
     if (!eventId || !organizationId || !requestedBy) {
       return new Response(
@@ -112,6 +251,7 @@ Deno.serve(async (req) => {
     const createdWorkspaces: Array<{ id: string; name: string; type: string }> = [];
     const skippedWorkspaces: string[] = [];
     let rootWorkspaceId: string | null = null;
+    let createdChannels: CreatedChannel[] = [];
 
     // Create workspaces in order (ROOT first)
     for (const template of WORKSPACE_TEMPLATES) {
@@ -119,7 +259,7 @@ Deno.serve(async (req) => {
       if (skipExisting && existingTypes.has(template.workspaceType)) {
         skippedWorkspaces.push(template.name);
         
-        // Still need to capture ROOT workspace ID for parent reference
+        // Still need to capture ROOT workspace ID for parent reference and channel creation
         if (template.workspaceType === "ROOT") {
           const existing = existingWorkspaces?.find(w => w.workspace_type === "ROOT");
           if (existing) rootWorkspaceId = existing.id;
@@ -179,6 +319,11 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Create default channels for the ROOT workspace
+    if (shouldCreateChannels && rootWorkspaceId) {
+      createdChannels = await createDefaultChannels(supabase, rootWorkspaceId, requestedBy);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -186,6 +331,7 @@ Deno.serve(async (req) => {
         created: createdWorkspaces,
         skipped: skippedWorkspaces,
         rootWorkspaceId,
+        channels: createdChannels,
       }),
       {
         status: 200,
