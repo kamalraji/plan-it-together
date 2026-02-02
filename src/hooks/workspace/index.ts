@@ -36,6 +36,8 @@ export { useWorkspaceRBAC } from '../useWorkspaceRBAC';
 export { useWorkspaceChannels } from '../useWorkspaceChannels';
 export { useChannelPresence } from '../useChannelPresence';
 export { useRealtimeMessages } from '../useRealtimeMessages';
+export { useScheduledMessages } from '../useScheduledMessages';
+export { useParticipantChannels, useMyParticipantChannels } from '../useParticipantChannels';
 
 // Approvals
 export { useWorkspaceApprovals } from '../useWorkspaceApprovals';

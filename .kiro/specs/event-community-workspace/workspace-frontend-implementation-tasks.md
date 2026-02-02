@@ -95,7 +95,8 @@ Add a timeline view that surfaces recent workspace activity (tasks, messages, te
 
 - [x] Embed `WorkspaceCollaborationTimeline` into appropriate pages:
   - [x] Overview tab of `WorkspaceDashboard`
-  - [ ] Optionally as a sidebar/secondary panel in task and communication tabs
+  - [x] Optionally as a sidebar/secondary panel in task and communication tabs
+  - [x] Added MessageDeliveryAnalytics, ChannelModerationTools, ScheduledMessageComposer to WorkspaceCommunication
 
 ---
 
