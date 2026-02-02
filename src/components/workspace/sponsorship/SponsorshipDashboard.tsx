@@ -13,6 +13,7 @@ import { BenefitsManager } from './BenefitsManager';
 import { SponsorshipQuickActions } from './SponsorshipQuickActions';
 import { SponsorCommunications } from './SponsorCommunications';
 import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { useSponsorshipCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface SponsorshipDashboardProps {
   workspace: Workspace;
@@ -68,6 +69,9 @@ export function SponsorshipDashboard({
 
   const tasksCompleted = tasks.filter(t => t.status === 'DONE').length;
 
+  // Enable real-time updates for sponsorship committee data
+  useSponsorshipCommitteeRealtime({ workspaceId: workspace.id });
+
   return (
     <div className="space-y-6">
       {/* Committee Header */}
@@ -80,12 +84,7 @@ export function SponsorshipDashboard({
       />
 
       {/* Sponsorship Stats */}
-      <SponsorshipStatsCards
-        totalSponsors={12}
-        totalRevenue={125000}
-        pendingProposals={5}
-        deliverablesDue={8}
-      />
+      <SponsorshipStatsCards workspaceId={workspace.id} />
 
       {/* Quick Actions and Sponsor Tracker */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
