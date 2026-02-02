@@ -298,10 +298,11 @@ Need to add escalation management to workspace settings or as dedicated tab for 
 2. ✅ Implement sync progress indicator (`SyncProgressIndicator.tsx`, `CompactSyncIndicator`)
 3. ✅ Integrated into `MobileAppShell` and `MobileHeader`
 
-### Sprint 6: Automation & Reporting (Days 15-16)
-1. Add SLA_BREACH and DEADLINE_APPROACHING triggers
-2. Configure pg_cron for scheduled reports
-3. Build report history viewer UI
+### Sprint 6: Automation & Reporting (Days 15-16) ✅ COMPLETE
+1. ✅ Add SLA_BREACH and DEADLINE_APPROACHING triggers to `automationTypes.ts`
+2. ✅ Created `check-deadlines` edge function for scheduled deadline monitoring
+3. ✅ Built `ReportHistoryViewer` component for viewing scheduled reports
+4. Note: pg_cron configuration requires manual setup in Supabase dashboard
 
 ---
 
