@@ -54,7 +54,7 @@ const HelpPage = lazy(() => import('../help/HelpPage'));
 const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
 const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
 const OnboardingPage = lazy(() => import('../../pages/OnboardingPage'));
-
+const EventChannelsPage = lazy(() => import('../../pages/participant/EventChannelsPage'));
 // Loading fallback for lazy-loaded routes
 const RouteLoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/95">
@@ -564,6 +564,11 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
             <Route path="/event/:slug" element={<PublicEventPage />} />
+            <Route path="/event/:eventId/channels" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <EventChannelsPage />
+              </Suspense>
+            } />
             {/* Backward compatibility redirect from old /e/:slug to /event/:slug */}
             <Route path="/e/:slug" element={<SlugRedirect />} />
 

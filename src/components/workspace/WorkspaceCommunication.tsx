@@ -13,9 +13,14 @@ import { ChannelList } from './communication/ChannelList';
 import { EnhancedMessageThread } from './communication/EnhancedMessageThread';
 import { BroadcastComposer } from './communication/BroadcastComposer';
 import { MessageSearch } from './communication/MessageSearch';
+import { ParticipantChannelManager } from './communication/ParticipantChannelManager';
+import { ScheduledMessageComposer } from './communication/ScheduledMessageComposer';
+import { MessageDeliveryAnalytics } from './communication/MessageDeliveryAnalytics';
+import { ChannelModerationTools } from './communication/ChannelModerationTools';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 /**
  * WorkspaceCommunication Component (Refactored)
@@ -34,7 +39,7 @@ export function WorkspaceCommunication({
   teamMembers,
   roleScope,
 }: WorkspaceCommunicationProps) {
-  const [activeTab, setActiveTab] = useState<'channels' | 'broadcast' | 'search'>('channels');
+  const [activeTab, setActiveTab] = useState<'channels' | 'broadcast' | 'search' | 'participants' | 'scheduled' | 'analytics' | 'moderation'>('channels');
   const [selectedChannel, setSelectedChannel] = useState<WorkspaceChannel | null>(null);
   const [showCreateChannel, setShowCreateChannel] = useState(false);
   const queryClient = useQueryClient();
@@ -253,77 +258,120 @@ export function WorkspaceCommunication({
               </p>
             </div>
           )}
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { key: 'channels', label: 'Channels' },
-              { key: 'broadcast', label: 'Broadcast', disabled: !canBroadcast },
-              { key: 'search', label: 'Search' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => !tab.disabled && setActiveTab(tab.key as any)}
-                disabled={tab.disabled}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.key
-                    ? 'border-primary text-primary'
-                    : tab.disabled
-                      ? 'border-transparent text-muted-foreground/40 cursor-not-allowed'
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                  }`}
-              >
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
+          
+          {/* Main Tabs */}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="channels">Channels</TabsTrigger>
+              <TabsTrigger value="broadcast" disabled={!canBroadcast}>Broadcast</TabsTrigger>
+              <TabsTrigger value="search">Search</TabsTrigger>
+              {canBroadcast && (
+                <>
+                  <TabsTrigger value="participants">Participants</TabsTrigger>
+                  <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                  <TabsTrigger value="moderation">Moderation</TabsTrigger>
+                </>
+              )}
+            </TabsList>
 
-      {/* Content */}
-      <div className="p-6">
-        {activeTab === 'channels' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
-            {/* Channel List */}
-            <div className="lg:col-span-1">
-              <ChannelList
-                channels={scopedChannels}
-                selectedChannel={selectedChannel}
-                onChannelSelect={handleChannelSelect}
-                onCreateChannel={() => setShowCreateChannel(true)}
-                showCreateChannel={showCreateChannel}
-                onCreateChannelSubmit={handleCreateChannel}
-                onCancelCreate={() => setShowCreateChannel(false)}
-                isCreating={createChannelMutation.isPending}
-              />
-            </div>
+            <TabsContent value="channels">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
+                {/* Channel List */}
+                <div className="lg:col-span-1">
+                  <ChannelList
+                    channels={scopedChannels}
+                    selectedChannel={selectedChannel}
+                    onChannelSelect={handleChannelSelect}
+                    onCreateChannel={() => setShowCreateChannel(true)}
+                    showCreateChannel={showCreateChannel}
+                    onCreateChannelSubmit={handleCreateChannel}
+                    onCancelCreate={() => setShowCreateChannel(false)}
+                    isCreating={createChannelMutation.isPending}
+                  />
+                </div>
 
-            {/* Enhanced Message Thread with real-time */}
-            <div className="lg:col-span-2">
-              {selectedChannel ? (
-                <EnhancedMessageThread
-                  channel={selectedChannel}
-                  isSending={false}
+                {/* Enhanced Message Thread with real-time */}
+                <div className="lg:col-span-2">
+                  {selectedChannel ? (
+                    <EnhancedMessageThread
+                      channel={selectedChannel}
+                      isSending={false}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-muted/20 rounded-lg">
+                      <div className="text-center">
+                        <p className="text-muted-foreground">Select a channel to start messaging</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="broadcast">
+              {canBroadcast && (
+                <BroadcastComposer
+                  workspace={workspace}
+                  onSendBroadcast={handleSendBroadcast}
+                  isSending={sendBroadcastMutation.isPending}
                 />
-              ) : (
-                <div className="flex items-center justify-center h-full bg-muted/20 rounded-lg">
-                  <div className="text-center">
-                    <p className="text-muted-foreground">Select a channel to start messaging</p>
-                  </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="search">
+              <MessageSearch workspaceId={workspaceId} channels={scopedChannels} />
+            </TabsContent>
+
+            <TabsContent value="participants">
+              {canBroadcast && workspace?.event_id && selectedChannel && (
+                <ParticipantChannelManager
+                  eventId={workspace.event_id}
+                  workspaceId={workspaceId}
+                />
+              )}
+              {canBroadcast && !selectedChannel && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Select a channel from the Channels tab to manage participants</p>
                 </div>
               )}
-            </div>
-          </div>
-        )}
+              {canBroadcast && !workspace?.event_id && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Participant management requires an event-linked workspace</p>
+                </div>
+              )}
+            </TabsContent>
 
-        {activeTab === 'broadcast' && canBroadcast && (
-          <BroadcastComposer
-            workspace={workspace}
-            onSendBroadcast={handleSendBroadcast}
-            isSending={sendBroadcastMutation.isPending}
-          />
-        )}
+            <TabsContent value="scheduled">
+              {canBroadcast && selectedChannel && (
+                <ScheduledMessageComposer
+                  channelId={selectedChannel.id}
+                  channelName={selectedChannel.name}
+                />
+              )}
+              {canBroadcast && !selectedChannel && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Select a channel from the Channels tab to schedule messages</p>
+                </div>
+              )}
+            </TabsContent>
 
-        {activeTab === 'search' && (
-          <MessageSearch workspaceId={workspaceId} channels={scopedChannels} />
-        )}
+            <TabsContent value="analytics">
+              {canBroadcast && (
+                <MessageDeliveryAnalytics workspaceId={workspaceId} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="moderation">
+              {canBroadcast && (
+                <ChannelModerationTools
+                  workspaceId={workspaceId}
+                  channelId={selectedChannel?.id}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
