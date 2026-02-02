@@ -6,7 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Workspace } from '@/types';
 import { WorkspaceTab } from './WorkspaceSidebar';
 import { GlobalTimerWidget } from './GlobalTimerWidget';
-
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { useGlobalKeyboardShortcuts } from '@/hooks/useGlobalKeyboardShortcuts';
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
  * wires the three-line menu to the Shadcn sidebar for workspace routes.
@@ -60,11 +61,22 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const [activeTaskTitle, _setActiveTaskTitle] = useState<string | undefined>();
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
 
+  // Global keyboard shortcuts
+  useGlobalKeyboardShortcuts({
+    onShowShortcuts: () => setShowShortcuts(true),
+    onNewTask: () => onTabChange('tasks'),
+    onSearch: () => {
+      // Focus search input if available
+      const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
+      searchInput?.focus();
+    },
+  });
   return (
     <SidebarProvider defaultOpen={true} className="flex-col">
       {/* Global console header fixed at the top */}
@@ -101,6 +113,12 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
             taskTitle={activeTaskTitle}
           />
         )}
+        
+        {/* Keyboard Shortcuts Dialog */}
+        <KeyboardShortcutsDialog 
+          open={showShortcuts} 
+          onOpenChange={setShowShortcuts} 
+        />
       </div>
     </SidebarProvider>
   );

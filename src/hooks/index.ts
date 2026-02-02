@@ -94,6 +94,17 @@ export {
   type EscalationStatus,
 } from './useEscalationWorkflow';
 
+// Global Keyboard Shortcuts
+export {
+  useGlobalKeyboardShortcuts,
+  formatShortcutKey,
+  GLOBAL_SHORTCUTS,
+  type KeyboardShortcut,
+} from './useGlobalKeyboardShortcuts';
+
+// Bulk Operations
+export { useBulkTaskOperations } from './useBulkTaskOperations';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';
