@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock, RefreshCw, FileStack } from 'lucide-react';
+import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock, RefreshCw, FileStack, AlertTriangle } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { Workspace, WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { TimeLogsView } from './TimeLogsView';
 import { WeeklyTimeReport } from './WeeklyTimeReport';
 import { RecurringTasksPanel } from './RecurringTasksPanel';
 import { IndustryTemplateBrowser } from './templates/IndustryTemplateBrowser';
+import { EscalationRulesManager, EscalationHistoryPanel } from './escalation';
 import { useAuth } from '@/hooks/useAuth';
 import {
   AlertDialog,
@@ -31,7 +32,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'recurring' | 'templates' | 'danger';
+type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'escalation' | 'time-tracking' | 'recurring' | 'templates' | 'danger';
 
 interface WorkspaceSettingsContentProps {
   workspace: Workspace;
@@ -132,17 +133,27 @@ export function WorkspaceSettingsContent({
   };
 
   const isArchived = workspace.status === 'ARCHIVED';
+  const showEscalationTab = workspace.workspaceType === 'ROOT' || workspace.workspaceType === 'DEPARTMENT';
 
-  const tabs = [
+  const baseTabs = [
     { id: 'general' as const, label: 'General', icon: Palette },
     { id: 'notifications' as const, label: 'Notifications', icon: Bell },
     { id: 'permissions' as const, label: 'Permissions', icon: Shield },
     { id: 'automations' as const, label: 'Automations', icon: Zap },
+  ];
+
+  const escalationTab = { id: 'escalation' as const, label: 'Escalation', icon: AlertTriangle };
+
+  const additionalTabs = [
     { id: 'time-tracking' as const, label: 'Time Tracking', icon: Clock },
     { id: 'recurring' as const, label: 'Recurring Tasks', icon: RefreshCw },
     { id: 'templates' as const, label: 'Task Templates', icon: FileStack },
     { id: 'danger' as const, label: 'Danger Zone', icon: Trash2 },
   ];
+
+  const tabs = showEscalationTab 
+    ? [...baseTabs, escalationTab, ...additionalTabs]
+    : [...baseTabs, ...additionalTabs];
 
   if (!canManageSettings) {
     return (
@@ -434,6 +445,13 @@ export function WorkspaceSettingsContent({
               <div className="rounded-xl border border-border bg-card p-6">
                 <AutomationRulesPanel workspaceId={workspace.id} />
               </div>
+            </div>
+          )}
+
+          {activeTab === 'escalation' && showEscalationTab && (
+            <div className="space-y-6">
+              <EscalationRulesManager workspaceId={workspace.id} />
+              <EscalationHistoryPanel workspaceId={workspace.id} />
             </div>
           )}
 
