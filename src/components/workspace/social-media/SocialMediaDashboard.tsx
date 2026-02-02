@@ -11,7 +11,7 @@ import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
-import { OverdueItemsWidget } from '../escalation';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSocialMediaCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
@@ -104,8 +104,11 @@ export function SocialMediaDashboard({
       {/* Quick Actions */}
       <SocialMediaQuickActions />
 
-      {/* Overdue Items */}
-      <OverdueItemsWidget workspaceId={workspace.id} />
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

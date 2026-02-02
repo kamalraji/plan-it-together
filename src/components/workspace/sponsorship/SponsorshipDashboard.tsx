@@ -12,6 +12,7 @@ import { DeliverableTracker } from './DeliverableTracker';
 import { BenefitsManager } from './BenefitsManager';
 import { SponsorshipQuickActions } from './SponsorshipQuickActions';
 import { SponsorCommunications } from './SponsorCommunications';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface SponsorshipDashboardProps {
   workspace: Workspace;
@@ -101,6 +102,12 @@ export function SponsorshipDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DeliverableTracker workspaceId={workspace.id} />
         <BenefitsManager workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Task Summary with Mini-Map */}
