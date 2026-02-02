@@ -49,6 +49,11 @@ interface RoleBasedActionsProps {
   onScheduleMeeting?: () => void;
   onReportIssue?: () => void;
   onViewProgress?: () => void;
+  onBroadcastMessage?: () => void;
+  onReviewBudgets?: () => void;
+  onSetGoals?: () => void;
+  onMarkComplete?: () => void;
+  onTeamChat?: () => void;
   className?: string;
   variant?: 'compact' | 'full';
 }
@@ -377,6 +382,11 @@ export function RoleBasedActions({
   onScheduleMeeting,
   onReportIssue,
   onViewProgress,
+  onBroadcastMessage,
+  onReviewBudgets,
+  onSetGoals,
+  onMarkComplete,
+  onTeamChat,
   className,
   variant = 'full',
 }: RoleBasedActionsProps) {
@@ -391,15 +401,15 @@ export function RoleBasedActions({
     'invite-manager': onInviteMember,
     'view-analytics': onViewAnalytics || onViewReport,
     'manage-settings': onManageSettings,
-    'broadcast-message': undefined, // Placeholder for future implementation
+    'broadcast-message': onBroadcastMessage,
     
     // L2 Department actions
     'create-committee': onCreateSubWorkspace,
     'delegate-dept': onDelegateRole,
     'invite-lead': onInviteMember,
     'view-dept-report': onViewReport,
-    'review-budgets': undefined, // Placeholder
-    'set-dept-goals': undefined, // Placeholder
+    'review-budgets': onReviewBudgets,
+    'set-dept-goals': onSetGoals,
     
     // L3 Committee actions
     'create-team': onCreateSubWorkspace,
@@ -415,8 +425,8 @@ export function RoleBasedActions({
     'submit-timesheet': onSubmitForApproval,
     'view-tasks': onCreateTask,
     'report-issue': onReportIssue,
-    'mark-complete': undefined, // Placeholder
-    'team-chat': undefined, // Placeholder
+    'mark-complete': onMarkComplete,
+    'team-chat': onTeamChat,
   };
 
   // Get level-specific actions

@@ -8,6 +8,7 @@ import { WorkspaceTab } from './WorkspaceSidebar';
 import { GlobalTimerWidget } from './GlobalTimerWidget';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { useGlobalKeyboardShortcuts } from '@/hooks/useGlobalKeyboardShortcuts';
+import { CommandPalette } from '@/components/ui/command-palette';
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
  * wires the three-line menu to the Shadcn sidebar for workspace routes.
@@ -62,6 +63,7 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
   const { user, logout } = useAuth();
   const [activeTaskTitle, _setActiveTaskTitle] = useState<string | undefined>();
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -71,11 +73,7 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
   useGlobalKeyboardShortcuts({
     onShowShortcuts: () => setShowShortcuts(true),
     onNewTask: () => onTabChange('tasks'),
-    onSearch: () => {
-      // Focus search input if available
-      const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
-      searchInput?.focus();
-    },
+    onSearch: () => setShowCommandPalette(true),
   });
   return (
     <SidebarProvider defaultOpen={true} className="flex-col">
@@ -118,6 +116,14 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
         <KeyboardShortcutsDialog 
           open={showShortcuts} 
           onOpenChange={setShowShortcuts} 
+        />
+        
+        {/* Command Palette (Ctrl+K) */}
+        <CommandPalette
+          open={showCommandPalette}
+          onOpenChange={setShowCommandPalette}
+          workspaceId={workspace.id}
+          orgSlug={orgSlug}
         />
       </div>
     </SidebarProvider>
