@@ -9,6 +9,8 @@ import { DeliverableTracker } from './DeliverableTracker';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { OverdueItemsWidget } from '../escalation';
+import { useMediaCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface MediaDashboardProps {
   workspace: Workspace;
@@ -21,6 +23,9 @@ export function MediaDashboard({
   orgSlug,
   onViewTasks,
 }: MediaDashboardProps) {
+  // Enable real-time updates for media committee data
+  useMediaCommitteeRealtime({ workspaceId: workspace.id });
+
   // Mock stats - in production, fetch from database
   const stats = {
     photographers: 4,
@@ -60,6 +65,9 @@ export function MediaDashboard({
           showLabels={false}
         />
       </div>
+
+      {/* Overdue Items */}
+      <OverdueItemsWidget workspaceId={workspace.id} />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
