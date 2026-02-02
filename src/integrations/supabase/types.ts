@@ -581,6 +581,53 @@ export type Database = {
           },
         ]
       }
+      approval_delegations: {
+        Row: {
+          created_at: string
+          delegate_id: string
+          delegator_id: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          reason: string | null
+          start_date: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          delegate_id: string
+          delegator_id: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          start_date?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          delegate_id?: string
+          delegator_id?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          start_date?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_delegations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approval_request_comments: {
         Row: {
           content: string
