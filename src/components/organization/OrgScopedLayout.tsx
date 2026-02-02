@@ -1,4 +1,4 @@
-import React, { useCallback, Suspense, lazy } from 'react';
+import React, { useCallback, Suspense, lazy, useState } from 'react';
 import { Navigate, Route, Routes, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,10 +19,10 @@ import { OrgMarketplacePage } from '@/components/routing/services/OrgMarketplace
 import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 import { OrgScopedBreadcrumbs } from './OrgScopedBreadcrumbs';
 import { UserRole } from '@/types';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileAppShell } from '@/components/mobile/MobileAppShell';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { MyAssignmentsDashboard } from '@/components/dashboard/MyAssignmentsDashboard';
+import { OfflineModeBanner } from '@/components/mobile/shared/OfflineModeBanner';
+import { useOffline } from '@/hooks/useOffline';
 
 // Lazy-load admin components - only downloaded when SUPER_ADMIN accesses admin routes
 const AdminLayout = lazy(() => import('@/components/admin/AdminLayout'));
@@ -74,13 +74,25 @@ export const OrgScopedLayout: React.FC = () => {
   const { data: memberOrganizations, isLoading: orgsLoading } = useMyMemberOrganizations();
   const { data: organization, isLoading: orgLoading } = useOrganizationBySlug(orgSlug || '');
   const { data: userPrimaryOrg } = usePrimaryOrganization();
-  const isMobile = useIsMobile();
+  
+  // Offline mode state
+  const { isOnline, pendingUpdates, pendingMessages, syncPendingData } = useOffline();
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const isLoadingAny = isLoading || orgsLoading || orgLoading;
 
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
+
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      await syncPendingData();
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [syncPendingData]);
 
   // Check if current route is the page builder (needs fullscreen)
   const isPageBuilder = location.pathname.includes('/page-builder');
@@ -105,7 +117,7 @@ export const OrgScopedLayout: React.FC = () => {
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   if (isLoadingAny) {
-    return <DashboardSkeleton showSidebar={!isMobile} showHeader={true} />;
+    return <DashboardSkeleton showSidebar={true} showHeader={true} />;
   }
 
   if (!isAuthenticated || !user || !organization || !orgSlug) {
@@ -175,71 +187,24 @@ export const OrgScopedLayout: React.FC = () => {
     );
   }
 
-  // Render mobile layout on small screens
-  if (isMobile) {
-    return (
-      <OrganizationProvider value={{ organization }}>
-        <MobileAppShell
-          organization={organization}
-          user={{
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            avatarUrl: (user as any).avatarUrl || (user as any).avatar_url,
-          }}
-        >
-          {/* Mobile renders the same routes as desktop, just wrapped in mobile shell */}
-          <Routes>
-            <Route path="dashboard" element={<OrganizerDashboard />} />
-            <Route path="my-assignments" element={<MyAssignmentsDashboard />} />
-            <Route path="settings" element={<Navigate to="settings/dashboard" replace />} />
-            <Route path="settings/dashboard" element={<OrgSettingsDashboard />} />
-            <Route path="settings/story" element={<OrgStorySettingsPage />} />
-            <Route path="eventmanagement/*" element={<EventService />} />
-            <Route path="workspaces/*" element={<WorkspaceService />} />
-            <Route path="templates" element={<OrgTemplatesPage />} />
-            <Route path="marketplace" element={<OrgMarketplacePage />} />
-            <Route path="organizations/*" element={<OrganizationService />} />
-            <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
-            <Route path="team" element={<OrganizationTeamManagement />} />
-            {isSuperAdmin && (
-              <Route path="admin" element={
-                <Suspense fallback={<AdminLoadingFallback />}>
-                  <AdminLayout />
-                </Suspense>
-              }>
-                <Route index element={
-                  <Suspense fallback={<AdminLoadingFallback />}>
-                    <AdminDashboard />
-                  </Suspense>
-                } />
-                <Route path="users" element={
-                  <Suspense fallback={<AdminLoadingFallback />}>
-                    <AdminUserRolesPage />
-                  </Suspense>
-                } />
-                <Route path="roles-diagram" element={
-                  <Suspense fallback={<AdminLoadingFallback />}>
-                    <RolesDiagramPage />
-                  </Suspense>
-                } />
-              </Route>
-            )}
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </MobileAppShell>
-      </OrganizationProvider>
-    );
-  }
-
   return (
     <OrganizationProvider value={{ organization }}>
       <SidebarProvider defaultOpen={false} className="flex-col">
         {/* Global console header fixed at the top */}
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
+        {/* Offline Mode Banner - visible on all screen sizes */}
+        <OfflineModeBanner
+          isOnline={isOnline}
+          pendingUpdates={pendingUpdates}
+          pendingMessages={pendingMessages}
+          isSyncing={isSyncing}
+          onSync={handleSync}
+          className="fixed top-16 left-0 right-0 z-40"
+        />
+
         {/* Sidebar + content, padded so it sits below the fixed header */}
-        <div className="relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden mt-16">
+        <div className={`relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden mt-16 ${!isOnline || (pendingUpdates + pendingMessages) > 0 ? 'pt-10' : ''}`}>
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
           <div className="relative flex w-full h-full">
             <OrganizationSidebar />
