@@ -94,7 +94,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           },
           validation: {
             type: 'url_contains',
-            target: '/console/events'
+            target: '/dashboard/eventmanagement'
           },
           hints: ['Look for the calendar icon in the sidebar', 'The Events section is under the main navigation']
         },
@@ -109,7 +109,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           },
           validation: {
             type: 'url_contains',
-            target: '/console/events/create'
+            target: '/dashboard/eventmanagement/create'
           },
           hints: ['Look for a blue "Create Event" button', 'It should be prominently displayed on the events page']
         },
@@ -154,7 +154,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           },
           validation: {
             type: 'url_contains',
-            target: '/console/workspaces'
+            target: '/dashboard/workspaces'
           }
         },
         {
@@ -196,7 +196,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           },
           validation: {
             type: 'url_contains',
-            target: '/console/marketplace'
+            target: '/marketplace'
           }
         }
       ]

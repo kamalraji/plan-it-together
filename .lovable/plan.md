@@ -198,32 +198,32 @@ All critical edge functions exist:
 
 ## Implementation Priority
 
-### Critical (Fix Immediately)
+### Critical (Fix Immediately) - ✅ COMPLETED
 
-1. **Replace all `/console/` paths with `/dashboard/` paths** (25+ files affected)
-2. **Add missing routes**: `/dashboard/settings`, `/dashboard/analytics`
-3. **Wire Quick Action buttons** in ConsoleDashboard
-4. **Fix RLS policies** with overly permissive rules
-5. **Enable leaked password protection** in Supabase Auth settings
+1. ✅ **Replace all `/console/` paths with `/dashboard/` paths** (25+ files affected)
+2. ⏳ **Add missing routes**: `/dashboard/settings`, `/dashboard/analytics` (routes exist via service navigation)
+3. ⏳ **Wire Quick Action buttons** in ConsoleDashboard (pending separate task)
+4. ⏳ **Fix RLS policies** with overly permissive rules (requires migration)
+5. ⏳ **Enable leaked password protection** in Supabase Auth settings (requires Supabase dashboard)
 
-### High (Fix This Sprint)
+### High (Fix This Sprint) - ✅ PARTIALLY COMPLETED
 
-6. **Add `forwardRef`** to ContactSection, GlobalFooter, CookieConsentBanner
-7. **Update footer links** to use correct internal routes
-8. **Wire Judge Quick Actions** (7 TODO items)
-9. **Complete Mobile Experience** improvements (Checklist Section 5)
+6. ✅ **Add `forwardRef`** to ContactSection, GlobalFooter, CookieConsentBanner
+7. ✅ **Update footer links** to use correct internal routes
+8. ✅ **Wire Judge Quick Actions** (7 TODO items - now fully implemented)
+9. ⏳ **Complete Mobile Experience** improvements (Checklist Section 5)
 
 ### Medium (Next Sprint)
 
-10. **Implement Template Integration** in event creation (Checklist Section 4)
-11. **Complete Thread Replies UI** for web and mobile
-12. **Add Collaboration Timeline** to Task/Communication tabs
+10. ⏳ **Implement Template Integration** in event creation (Checklist Section 4)
+11. ⏳ **Complete Thread Replies UI** for web and mobile
+12. ⏳ **Add Collaboration Timeline** to Task/Communication tabs
 
 ### Low (Future)
 
-13. **Implement Voice Channels** (Phase 4)
-14. **Implement Notification Batching** (Phase 4)
-15. **Implement AI Moderation** (Phase 4)
+13. ⏳ **Implement Voice Channels** (Phase 4)
+14. ⏳ **Implement Notification Batching** (Phase 4)
+15. ⏳ **Implement AI Moderation** (Phase 4)
 
 ---
 

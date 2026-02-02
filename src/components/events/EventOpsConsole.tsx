@@ -53,12 +53,12 @@ export const EventOpsConsole: React.FC = () => {
 
   const handleOpenVolunteerConsole = () => {
     if (!eventId) return;
-    navigate(`/console/events/${eventId}/check-in`);
+    navigate(`/dashboard/eventmanagement/${eventId}/check-in`);
   };
 
   const handleViewEventDetails = () => {
     if (!eventId) return;
-    navigate(`/console/events/${eventId}`);
+    navigate(`/dashboard/eventmanagement/${eventId}`);
   };
 
   if (!eventId) {
@@ -85,8 +85,8 @@ export const EventOpsConsole: React.FC = () => {
         title="Event-Day Ops Console"
         subtitle="Monitor live check-ins, print badges, and coordinate volunteers for this event."
         breadcrumbs={[
-          { label: 'Events', href: '/console/events' },
-          { label: `Event ${eventId}`, href: `/console/events/${eventId}` },
+          { label: 'Events', href: '/dashboard/eventmanagement' },
+          { label: `Event ${eventId}`, href: `/dashboard/eventmanagement/${eventId}` },
           { label: 'Ops Console', current: true },
         ]}
         actions={[

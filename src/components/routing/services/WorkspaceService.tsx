@@ -154,7 +154,7 @@ export const WorkspaceService: React.FC = () => {
       <Route path=":workspaceId" element={<WorkspaceDetailPage />} />
 
       {/* Redirect unknown routes to dashboard */}
-      <Route path="*" element={<Navigate to="/console/workspaces" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard/workspaces" replace />} />
     </Routes>
   );
 };

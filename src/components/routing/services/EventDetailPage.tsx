@@ -87,7 +87,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Event not found or access denied</h1>
-          <Link to="/console/events/list" className="text-indigo-600 hover:text-indigo-800">
+          <Link to="/dashboard/eventmanagement/list" className="text-indigo-600 hover:text-indigo-800">
             Back to events
           </Link>
         </div>
@@ -124,13 +124,13 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Edit Landing Page',
-          action: () => navigate(`/console/events/${eventId}/page-builder`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/page-builder`),
           icon: PaintBrushIcon,
           variant: 'primary' as const,
         },
         {
           label: 'Edit Event',
-          action: () => navigate(`/console/events/${eventId}/edit`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/edit`),
           icon: PencilIcon,
           variant: 'secondary' as const,
         },
@@ -158,7 +158,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Open Ops Console',
-          action: () => navigate(`/console/events/${eventId}/ops`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/ops`),
           icon: UsersIcon,
           variant: 'secondary' as const,
         },
@@ -206,8 +206,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   ];
 
   const breadcrumbs = [
-    { label: 'Events', href: '/console/events/list' },
-    { label: event.name, href: `/console/events/${eventId}` },
+    { label: 'Events', href: '/dashboard/eventmanagement/list' },
+    { label: event.name, href: `/dashboard/eventmanagement/${eventId}` },
   ];
 
   return (

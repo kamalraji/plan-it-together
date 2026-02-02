@@ -56,7 +56,7 @@ export const OrganizationAnalyticsPage: React.FC = () => {
           <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
           <p className="text-muted-foreground mb-4">The organization you are looking for does not exist.</p>
           <Link
-            to="/console/organizations"
+            to="/dashboard/organizations"
             className="text-blue-600 hover:text-blue-500 font-medium"
           >
             ← Back to Organizations
@@ -76,7 +76,7 @@ export const OrganizationAnalyticsPage: React.FC = () => {
           <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
           <p className="text-muted-foreground mb-4">You don't have permission to view analytics for this organization.</p>
           <Link
-            to={`/console/organizations/${organizationId}`}
+            to={`/dashboard/organizations/${organizationId}`}
             className="text-blue-600 hover:text-blue-500 font-medium"
           >
             ← Back to Organization
@@ -89,25 +89,25 @@ export const OrganizationAnalyticsPage: React.FC = () => {
   const pageActions = [
     {
       label: 'View Organization',
-      action: () => navigate(`/console/organizations/${organizationId}`),
+      action: () => navigate(`/dashboard/organizations/${organizationId}`),
       variant: 'secondary' as const,
     },
     {
       label: 'Manage Members',
-      action: () => navigate(`/console/organizations/${organizationId}/members`),
+      action: () => navigate(`/dashboard/organizations/${organizationId}/members`),
       variant: 'secondary' as const,
     },
     {
       label: 'Organization Settings',
-      action: () => navigate(`/console/organizations/${organizationId}/settings`),
+      action: () => navigate(`/dashboard/organizations/${organizationId}/settings`),
       variant: 'secondary' as const,
     },
   ];
 
   const breadcrumbs = [
-    { label: 'Organizations', href: '/console/organizations' },
-    { label: organization.name, href: `/console/organizations/${organizationId}` },
-    { label: 'Analytics', href: `/console/organizations/${organizationId}/analytics` },
+    { label: 'Organizations', href: '/dashboard/organizations' },
+    { label: organization.name, href: `/dashboard/organizations/${organizationId}` },
+    { label: 'Analytics', href: `/dashboard/organizations/${organizationId}/analytics` },
   ];
 
   return (

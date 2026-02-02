@@ -249,8 +249,8 @@ export const CommunicationPage: React.FC = () => {
         subtitle={`${stats.total} messages, ${stats.unread} unread`}
         actions={pageActions}
         breadcrumbs={[
-          { label: 'Console', href: '/console' },
-          { label: 'Communications', href: '/console/communications' },
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Communications', href: '/dashboard/communications' },
         ]}
         tabs={tabs.map(tab => ({
           id: tab.id,
