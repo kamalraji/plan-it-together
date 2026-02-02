@@ -1,348 +1,416 @@
 
 # Comprehensive Workspace Features Gap Analysis
-
-This analysis identifies gaps, missing implementations, placeholder data, and areas needing enhancement across all workspace-related features compared to industry standards.
+## Industrial Standards Comparison & Enhancement Roadmap
 
 ---
 
 ## Executive Summary
 
-The workspace system has a solid architectural foundation with 15+ specialized committee dashboards, cross-workspace approval workflows, and real-time subscriptions. However, significant gaps exist between current implementations and production-ready functionality. Key areas requiring attention include:
+After extensive codebase analysis, this document identifies **gaps, missing functions, incomplete workflows, and enhancement opportunities** across the workspace system. The analysis compares current implementations against industrial best practices for enterprise project management and team collaboration platforms.
 
-- **43% of committee widgets use hardcoded/mock data** instead of database-backed functionality
-- **12+ quick action handlers** are stubbed with empty callbacks (`() => {}`)
-- **Missing escalation integration** on 6 committee dashboards
-- **No real-time subscriptions** on 5 committee types
-- **Template workflow incomplete** - event creation integration pending
+**Current State Assessment:**
+- **Architecture**: Solid foundation with 15+ specialized committee dashboards, hierarchical workspace system (L1-L4), and RBAC permissions
+- **Database**: 200+ tables with comprehensive schema for workspaces, tasks, teams, and specialized committee functions
+- **Real-time**: Committee-specific real-time hooks implemented across most dashboards
+- **Core Features**: Task management, approvals, escalation, time tracking, and communication all present
+
+**Primary Gap Categories Identified:**
+1. **Stubbed Callback Handlers** (6 action placeholders without implementation)
+2. **Incomplete Industry-Standard Features** (search, offline mode, audit improvements)
+3. **Mobile UX Gaps** (touch gestures, offline sync)
+4. **Workflow Automation Gaps** (triggers not fully wired)
+5. **Accessibility & Internationalization** (missing WCAG compliance, no i18n)
+6. **Performance Optimization** (missing virtual scrolling, lazy loading patterns)
 
 ---
 
-## Category 1: Hardcoded/Mock Data Components (HIGH PRIORITY)
+## Category 1: Stubbed Action Handlers (Critical Priority)
 
-These components display static data instead of fetching from Supabase:
+### Identified Placeholders in RoleBasedActions.tsx
 
-| Component | Location | Issue | Enhancement |
-|-----------|----------|-------|-------------|
-| `PlatformManager` | `social-media/` | Static array of 6 platforms with fake follower counts | Create `social_media_accounts` table, connect via hook |
-| `AudienceInsights` | `marketing/` | Hardcoded age groups, locations, industries | Integrate with event registration demographics |
-| `HashtagTracker` | `social-media/` | Static hashtag array with mock metrics | Create `hashtag_tracking` table with real analytics |
-| `MediaAssetGallery` | `media/` | useState with static asset array | Connect to Supabase Storage + metadata table |
-| `ContentLibrary` | `social-media/` | Mock content items | Use `content_assets` table already defined |
-| `EngagementTracker` | `social-media/` | Static engagement metrics | Connect to platform APIs or manual entry |
-| `InfluencerTracker` | `social-media/` | Hardcoded influencer list | Create `influencer_partnerships` table |
-| `MarketingCalendar` | `marketing/` | Static calendar events | Connect to existing task system with calendar view |
-| `TechnicalStatsCards` | `technical/` | No workspaceId prop, uses static data | Add props and database queries |
+The `actionHandlers` mapping (lines 387-420) contains 6 undefined placeholders:
 
-### Recommended Implementation Pattern
+| Action ID | Purpose | Missing Implementation |
+|-----------|---------|------------------------|
+| `broadcast-message` | Send announcement to all teams | Need `BroadcastMessageDialog` component + `useBroadcastMessage` hook |
+| `review-budgets` | Approve/reject budget requests | Should navigate to Approvals tab with budget filter |
+| `set-dept-goals` | Define department KPIs | Need `GoalSettingDialog` or link to existing `GoalTracker` |
+| `mark-complete` | Quick complete current task | Need task context + status mutation |
+| `team-chat` | Quick message to team | Should open Communication tab or inline chat |
+| `undefined` handlers | Various actions return `undefined` | Need conditional rendering or actual handlers |
+
+### Technical Implementation Required
 ```text
-Current (Mock):
-const [data] = useState([{ id: '1', name: 'Mock Item' }]);
+Files to modify:
+- src/components/workspace/RoleBasedActions.tsx
+- src/components/workspace/WorkspaceDashboard.tsx (wire missing callbacks)
 
-Target (Database-Connected):
-const { data, isLoading } = useQuery({
-  queryKey: ['feature-data', workspaceId],
-  queryFn: async () => {
-    const { data } = await supabase
-      .from('feature_table')
-      .select('*')
-      .eq('workspace_id', workspaceId);
-    return data;
-  },
-});
+New components needed:
+- BroadcastMessageDialog.tsx
+- QuickChatPanel.tsx (embeddable sidebar)
 ```
 
 ---
 
-## Category 2: Empty/Stubbed Callback Handlers (HIGH PRIORITY)
+## Category 2: Missing Industry-Standard Features
 
-These handlers are defined but have no implementation:
+### 2.1 Global Search (Partially Implemented)
 
-### WorkspaceDashboard.tsx (Lines 335-345)
-```text
-onRequestBudget={() => {}}     // Should open BudgetRequestDialog
-onRequestResource={() => {}}   // Should open ResourceRequestDialog
-onLogHours={() => {}}          // Should open TimeTracker modal
-onSubmitForApproval={() => {}} // Should trigger approval workflow
-onDelegateRole={() => {}}      // Should open RoleDelegationModal
-```
+**Current State:**
+- `useGlobalKeyboardShortcuts` has `Ctrl+K` for search
+- `onSearch` callback is optional and often undefined
+- No unified search component exists
 
-### MediaQuickActions.tsx (Lines 24-69)
-```text
-- Add Crew: onClick: () => { /* TODO: Open add crew dialog */ }
-- Upload Media: onClick: () => { /* TODO: Open media upload dialog */ }
-- Photo Brief: onClick: () => { /* TODO: Navigate to photo brief */ }
-- Video Brief: onClick: () => { /* TODO: Navigate to video brief */ }
-- Export Assets: onClick: () => { /* TODO: Trigger export */ }
-- Share Gallery: onClick: () => { /* TODO: Open share dialog */ }
-- Print Report: onClick: () => { /* TODO: Open print dialog */ }
-- Shot List: onClick: () => { /* TODO: Navigate to shot list */ }
-```
+**Industry Standard (Notion/Linear/Asana):**
+- Command palette with fuzzy search
+- Search across tasks, members, messages, files
+- Recent items and quick actions
 
-### Recommended Fix
-Connect each callback to existing modal components or create new ones:
-```text
-onClick: () => setShowAddCrewModal(true)
-// Modal uses useMediaCrew hook for database operations
-```
+**Gap:** Need `CommandPalette` component using cmdk (already installed)
 
----
+### 2.2 Offline Mode / PWA Support
 
-## Category 3: Missing Real-Time Subscriptions
+**Current State:**
+- `useOffline.ts` and `useNetworkStatus.ts` exist but are basic
+- No service worker for offline caching
+- No IndexedDB fallback for task mutations
 
-Dashboards without real-time updates (missing `useCommitteeRealtime` integration):
+**Industry Standard:**
+- Optimistic updates with queue for sync
+- Local-first data layer (e.g., TinyBase, PowerSync)
+- Background sync when connection restored
 
-| Dashboard | Missing Hook | Tables to Subscribe |
-|-----------|--------------|---------------------|
-| `LogisticsDashboard` | `useLogisticsCommitteeRealtime` | `workspace_logistics`, `workspace_transport_schedules` |
-| `FinanceDashboard` | `useFinanceCommitteeRealtime` | `workspace_expenses`, `workspace_invoices`, `workspace_budget_requests` |
-| `RegistrationDashboard` | `useRegistrationCommitteeRealtime` | `event_registrations`, `check_ins` |
-| `SponsorshipDashboard` | `useSponsorshipCommitteeRealtime` | `sponsors`, `sponsor_deliverables` |
-| `VolunteersDashboard` | `useVolunteersCommitteeRealtime` | `volunteer_shifts`, `volunteer_applications` |
-| `TechnicalDashboard` | `useTechnicalCommitteeRealtime` | `support_tickets`, `equipment` |
+**Gap:** Full offline-capable architecture missing
 
-### Implementation Template
-```text
-// Add to useCommitteeRealtime.ts
-export function useLogisticsCommitteeRealtime(options) {
-  // Subscribe to: workspace_logistics, workspace_transport_schedules
-  // Invalidate: ['logistics-shipments'], ['transport-schedules']
-}
-```
+### 2.3 Advanced Audit Trail
 
----
+**Current State:**
+- `WorkspaceAuditLog` component exists
+- `admin_audit_logs` table in database
+- Basic activity tracking
 
-## Category 4: Missing Escalation & Overdue Widget Integration
+**Industry Standard:**
+- Detailed field-level change tracking
+- Exportable audit reports
+- Configurable retention policies
+- Role-based audit visibility
 
-Dashboards without escalation management (industry standard for task oversight):
+**Gap:** Field-level diffing, export functionality incomplete
 
-| Dashboard | Has OverdueItemsWidget | Has EscalationRulesManager |
-|-----------|------------------------|---------------------------|
-| `LogisticsDashboard` | No | No |
-| `FinanceDashboard` | No | No |
-| `CateringDashboard` | No | No |
-| `VolunteersDashboard` | No | No |
-| `EventDashboard` | No | No |
-| `TechnicalDashboard` | No | No |
-| `FacilityDashboard` | No | No |
+### 2.4 Advanced Notifications
 
-### Dashboards WITH Escalation (Good Examples)
-- `RegistrationDashboard`
-- `MarketingDashboard`
-- `SocialMediaDashboard`
-- `SponsorshipDashboard`
-- `MediaDashboard`
+**Current State:**
+- `useNotifications.ts` with push support
+- `notificationService` for local notifications
+- Preference management
+
+**Industry Standard:**
+- Notification digest (daily/weekly summaries)
+- @mention aggregation
+- Snooze functionality
+- Desktop app integration (Electron)
+
+**Gap:** Digest mode, snooze, aggregation missing
 
 ---
 
-## Category 5: Template Workflow Gaps (Per IMPLEMENTATION_CHECKLIST.md)
+## Category 3: Workflow & Automation Gaps
 
-Incomplete template integration items from checklist:
+### 3.1 Automation Rule Execution
 
-| Task | Status | Gap |
-|------|--------|-----|
-| Template selection during event creation | Pending | No `WorkspaceTemplateLibrary` in event creation wizard |
-| Passing template choice to provisioning | Pending | Template ID not stored in event creation form state |
-| Post-event template feedback | Pending | `WorkspaceTemplateRating` not surfaced after events complete |
-| Template filters (event size/type/duration) | Pending | Filter UI not implemented in template selector |
+**Current State:**
+- `useAutomationRules.ts` provides CRUD for rules
+- `workspace_automation_rules` table exists
+- `automation_execution_logs` for tracking
 
----
+**Missing Implementation:**
+- No actual trigger evaluation engine
+- Rules are stored but not executed
+- No scheduler for time-based triggers
 
-## Category 6: Communication System Gaps
+**Industry Standard (Zapier/n8n pattern):**
+- Real-time trigger listeners (database triggers or polling)
+- Action execution engine
+- Conditional branching
+- Multi-step workflows
 
-### Missing Database Support for Reactions
-From project memory: "Emoji reactions currently persist via localStorage as a functional fallback until database support for message reactions is implemented."
+**Gap:** Need Edge Function or database trigger for rule execution
 
-**Required Enhancement:**
-- Create `message_reactions` table in Supabase
-- Update `useRealtimeMessages` hook to persist reactions
-- Remove localStorage fallback
+### 3.2 Approval Workflow State Machine
 
-### Missing Thread Integration
-Per checklist: "Optionally embed as sidebar/secondary panel in Task and Communication tabs" - Not implemented.
+**Current State:**
+- `ApprovalsTabContent` with incoming/outgoing tabs
+- `useApprovalWorkflow` hook
+- Multiple approval types (budget, resource, task)
 
----
+**Missing:**
+- No visual workflow builder
+- No multi-step approval chains (sequential approvers)
+- No auto-escalation on timeout (partially in `EscalationRulesManager`)
 
-## Category 7: Committee-Specific Quick Actions Missing
+**Industry Standard:**
+- Configurable approval chains
+- Parallel vs sequential approval
+- Delegation with expiry
+- SLA tracking
 
-Several dashboards lack the standardized `QuickActions` component pattern:
+### 3.3 Template Workflow Integration
 
-| Dashboard | Has QuickActions Component |
-|-----------|---------------------------|
-| `CateringDashboard` | Yes (CateringQuickActions) |
-| `FinanceDashboard` | No - Missing |
-| `LogisticsDashboard` | Yes (LogisticsQuickActions) - But not used in dashboard |
-| `EventDashboard` | Yes (EventQuickActions) - But not used in dashboard |
-| `VolunteersDashboard` | Yes (VolunteerQuickActions) - But not used in dashboard |
+**Current State:**
+- `WorkspaceTemplateManagement`, `TemplateImportWizard` exist
+- `IndustryTemplateBrowser` for browsing
 
----
-
-## Category 8: Approval Workflow Connection Gaps
-
-The approval system (`useApprovalWorkflow`) is implemented but not connected in all dashboards:
-
-### Connected:
-- `FinanceDashboard` via `BudgetApprovalQueue`
-- `ApprovalsTabContent` (standalone tab)
-
-### Not Connected:
-- Committee dashboards don't show pending approvals requiring their action
-- No approval badge/counter in workspace navigation
-- No notification system for new approval requests
+**Pending (from IMPLEMENTATION_CHECKLIST.md):**
+- Template selection during event creation wizard: NOT WIRED
+- Post-event template feedback: NOT SURFACED
+- Template filtering by event type/size: PARTIAL
 
 ---
 
-## Category 9: Stats Cards Using Static Data
+## Category 4: UI/UX Enhancement Gaps
 
-Several stats cards display hardcoded numbers instead of querying the database:
+### 4.1 Drag-and-Drop Enhancements
 
-| Component | Static Values | Should Query |
-|-----------|---------------|--------------|
-| `SponsorshipStatsCards` | Props: `totalSponsors={12}, totalRevenue={125000}` | `sponsors` table |
-| `MarketingStatsCards` | Props: `activeCampaigns={5}, totalReach={45200}` | `marketing_campaigns` table |
-| `MediaStatsCards` | Props from parent with static values | `media_crew`, `press_credentials` tables |
+**Current State:**
+- Kanban board has basic DnD
+- Gantt chart exists (`TaskGanttChart`)
+- No cross-workspace task movement
+
+**Industry Standard (Monday.com/ClickUp):**
+- Drag tasks between workspaces
+- Drag to assign (drop on member avatar)
+- Gantt bar resize for date changes
+- Timeline drag for scheduling
+
+**Gap:** Advanced DnD interactions missing
+
+### 4.2 Bulk Operations Integration
+
+**Current State:**
+- `BulkTaskActions` component fully implemented
+- Status change, priority change, delete with confirmation
+
+**Missing Integration:**
+- Not connected to `TaskList` or `TaskKanbanBoard`
+- No bulk assign functionality
+- No bulk tag/label application
+
+**Gap:** Wire `BulkTaskActions` into task views
+
+### 4.3 Data Export Improvements
+
+**Current State:**
+- `WorkspaceReportExport` component exists
+- `DashboardExportButton` on some dashboards
+- PDF via jspdf (installed)
+
+**Industry Standard:**
+- Scheduled report generation (weekly email)
+- Custom report builder
+- Multiple formats (PDF, CSV, Excel, JSON)
+- Branded exports with organization logo
+
+**Gap:** Scheduled exports, custom builder missing
 
 ---
 
-## Category 10: Missing Industry-Standard Features
+## Category 5: Mobile Experience Gaps
 
-### 10.1 Bulk Operations
-- No bulk task assignment
-- No bulk status change
-- No bulk delete with confirmation
+### 5.1 Mobile Component Inventory
 
-### 10.2 Export/Report Capabilities
-- `WorkspaceReportExport` exists but not connected to all dashboards
-- No PDF export for individual committee reports
-- No scheduled report generation
+Existing mobile components:
+- `MobileTaskManagement`, `MobileTaskList`, `MobileTaskCard`
+- `MobileCommunication`, `MobileTeamManagement`
+- `MobileWorkspaceAnalytics`, `MobileSettings`
 
-### 10.3 Keyboard Shortcuts
-- Task management lacks keyboard navigation
-- No global shortcuts for common actions
+### 5.2 Missing Mobile Features
 
-### 10.4 Undo/Redo
-- No undo for task deletions
-- No undo for status changes
+| Feature | Status | Gap |
+|---------|--------|-----|
+| Swipe actions on tasks | `useSwipeGesture` exists | Not integrated into task cards |
+| Pull-to-refresh | `usePullToRefresh` exists | Needs wider integration |
+| Touch-friendly Kanban | Basic | Cards too small, no haptic feedback |
+| Offline task editing | Missing | Need IndexedDB queue |
+| Camera integration | Missing | For media uploads, QR scanning |
+| Biometric auth | Missing | Industry standard for mobile |
 
-### 10.5 Drag-and-Drop Enhancements
-- Kanban board has drag-drop but no cross-workspace task movement
-- No drag-to-assign functionality
-- No timeline/Gantt drag-resize for tasks
+### 5.3 Responsive Breakpoint Issues
+
+- Some dialogs overflow on small screens
+- Tab navigation cramped on mobile
+- Charts not optimized for touch
 
 ---
 
-## Category 11: Tab Workflows Not Fully Wired
+## Category 6: Accessibility & Internationalization
 
-Committee tabs exist but some lack full database connectivity:
+### 6.1 Accessibility (WCAG 2.1 AA)
 
-| Tab Component | Database Connected | Missing |
-|---------------|-------------------|---------|
-| `TrackShipmentTab` | Yes | - |
-| `AddEquipmentTab` | Yes | - |
-| `ScheduleTransportTab` | Yes | - |
-| `CreateChecklistTab` | Partial | Checklist templates not loading from DB |
-| `GenerateReportTab` | Yes | Export to PDF not implemented (TODO comment) |
-| `VIPTrackerTab` | Partial | VIP contacts hardcoded |
-| `RunOfShowTab` | Yes | - |
+**Current State:**
+- Radix UI components provide baseline a11y
+- Some aria-labels present
+
+**Gaps:**
+- No skip-to-content links
+- Focus management incomplete in modals
+- Color contrast not verified
+- No screen reader announcements for dynamic updates
+- Keyboard navigation incomplete in custom components
+
+### 6.2 Internationalization (i18n)
+
+**Current State:**
+- No i18n library installed
+- All strings hardcoded in English
+
+**Industry Standard:**
+- react-i18next or FormatJS
+- Separate translation files
+- RTL support for Arabic/Hebrew
+- Date/number formatting by locale
+
+**Gap:** Complete i18n infrastructure missing
+
+---
+
+## Category 7: Performance Optimization Gaps
+
+### 7.1 Large List Rendering
+
+**Current State:**
+- `TaskList` renders all tasks
+- No virtualization
+
+**Industry Standard:**
+- Virtual scrolling for 100+ items
+- `react-window` or `@tanstack/react-virtual`
+
+### 7.2 Query Optimization
+
+**Current State:**
+- Multiple individual queries per dashboard
+- Some N+1 patterns
+
+**Improvements Needed:**
+- Aggregate queries where possible
+- Query batching with `Promise.all`
+- Stale-while-revalidate caching
+
+### 7.3 Bundle Size
+
+**Current State:**
+- Large dependency list (fabric, grapesjs, recharts)
+- No apparent code splitting
+
+**Improvements:**
+- Dynamic imports for heavy components
+- Route-based code splitting
+- Tree-shaking verification
+
+---
+
+## Category 8: Security & Data Integrity Gaps
+
+### 8.1 Row Level Security
+
+**Recommendation:** Run security scan to verify RLS policies on all workspace tables
+
+### 8.2 Input Validation
+
+**Current State:**
+- Zod schemas in some forms
+- `useFormValidation` hook exists
+
+**Gaps:**
+- Not all forms use validation
+- Server-side validation in Edge Functions incomplete
+
+### 8.3 Rate Limiting
+
+**Current State:**
+- No apparent client-side throttling
+- Supabase has basic limits
+
+**Industry Standard:**
+- Debounced search inputs
+- Request throttling for bulk operations
+- Optimistic UI with retry logic
 
 ---
 
 ## Implementation Priority Matrix
 
-### Phase 1: Critical (Week 1-2) ✅ COMPLETED
-1. ✅ Replace all mock data components with database queries
-2. ✅ Wire empty callback handlers to existing modals/dialogs
-3. ✅ Add escalation widgets to remaining 7 dashboards
+### Phase 1: Critical Fixes (Week 1-2)
+1. Wire stubbed action handlers in `RoleBasedActions.tsx`
+2. Integrate `BulkTaskActions` into `TaskList` and `TaskKanbanBoard`
+3. Create `CommandPalette` for global search (`Ctrl+K`)
+4. Add missing mobile swipe gesture integration
 
-### Phase 2: High (Week 3-4) ✅ COMPLETED
-4. ✅ Create missing real-time hooks for 6 committee types
-5. ✅ Connect stats cards to actual database aggregations
-6. ✅ Implement message reactions database table
+### Phase 2: Workflow Completion (Week 3-4)
+5. Implement automation rule execution engine (Edge Function)
+6. Wire template selection into event creation wizard
+7. Add multi-step approval chain support
+8. Complete scheduled report generation
 
-### Phase 3: Medium (Week 5-6) ✅ COMPLETED
-7. ✅ Complete template workflow integration with event creation
-8. ✅ Add bulk operations to task management
-9. ✅ Implement export functionality for all dashboards
+### Phase 3: UX Polish (Week 5-6)
+9. Add virtual scrolling to task lists
+10. Implement full offline mode with IndexedDB
+11. Accessibility audit and fixes (WCAG 2.1 AA)
+12. Mobile optimization pass
 
-### Phase 4: Enhancement (Week 7-8) ✅ COMPLETED
-10. ✅ Add keyboard shortcuts (useGlobalKeyboardShortcuts + KeyboardShortcutsDialog)
-11. ✅ Implement undo/redo for critical operations (useUndoRedo hook)
-12. Enhanced drag-and-drop functionality (partially - basic DnD exists)
+### Phase 4: Scale & Enterprise (Week 7-8)
+13. Internationalization infrastructure (react-i18next)
+14. Advanced audit trail with field-level tracking
+15. Performance optimization (code splitting, query batching)
+16. Security hardening (rate limiting, input sanitization)
 
 ---
 
 ## Technical Debt Summary
 
-| Category | Original Count | Status |
-|----------|----------------|--------|
-| Mock data components | 9 | ✅ Resolved |
-| Empty callbacks | 12+ | ✅ Resolved |
-| Missing real-time | 6 hooks | ✅ Resolved |
-| Missing escalation | 7 dashboards | ✅ Resolved |
-| Template integration | 4 items | ✅ Resolved |
-| Database schema gaps | 3 tables | ✅ Resolved |
-
-**All technical debt items have been addressed.**
-
----
-
-## Final Fixes Applied (Latest Session - 2026-02-02)
-
-1. **Added real-time hooks to dashboards:**
-   - `SponsorshipDashboard` → `useSponsorshipCommitteeRealtime`
-   - `RegistrationDashboard` → `useRegistrationCommitteeRealtime`
-
-2. **Connected SponsorshipStatsCards to database:**
-   - Created `useSponsorshipStats` hook in `useStatsData.ts`
-   - Queries `workspace_sponsors` and `workspace_sponsor_deliverables` tables
-   - Replaced hardcoded props with live data
+| Category | Items | Priority |
+|----------|-------|----------|
+| Stubbed callbacks | 6 handlers | Critical |
+| Missing bulk actions integration | 1 component | High |
+| Command palette | 1 component | High |
+| Automation execution | 1 Edge Function | High |
+| Virtual scrolling | 2-3 lists | Medium |
+| Offline mode | Full architecture | Medium |
+| i18n setup | Infrastructure | Medium |
+| Accessibility fixes | Multiple components | Medium |
+| Advanced DnD | 3 features | Low |
+| Scheduled exports | 1 feature | Low |
 
 ---
 
-## Database Schema Additions (Already Created)
+## Files Requiring Updates
 
-```text
-1. social_media_accounts (for PlatformManager)
-   - id, workspace_id, platform, handle, followers, engagement_rate, connected
+### High Priority
+1. `src/components/workspace/RoleBasedActions.tsx` - Wire remaining handlers
+2. `src/components/workspace/TaskList.tsx` - Add bulk actions, virtual scroll
+3. `src/components/workspace/TaskKanbanBoard.tsx` - Add bulk actions
+4. `src/components/workspace/WorkspaceDashboard.tsx` - Pass missing callbacks
 
-2. hashtag_tracking (for HashtagTracker)
-   - id, workspace_id, tag, uses_count, reach, trend, is_primary
+### Medium Priority
+5. `src/components/workspace/mobile/*.tsx` - Swipe gestures, offline
+6. `src/hooks/useAutomationRules.ts` - Execution engine hook
+7. Create `src/components/ui/command-palette.tsx`
+8. Create `supabase/functions/automation-executor/` - Rule execution
 
-3. message_reactions (for Communication)
-   - id, message_id, user_id, emoji, created_at
-```
-
----
-
-## Files Updated (All Complete) ✅
-
-### High Priority (Mock to Real) - DONE
-1. ✅ `src/components/workspace/social-media/PlatformManager.tsx` - Uses `useSocialMediaAccounts` hook
-2. ✅ `src/components/workspace/marketing/AudienceInsights.tsx` - Uses `useAudienceDemographics` hook
-3. ✅ `src/components/workspace/social-media/HashtagTracker.tsx` - Uses `useHashtags` hook with CRUD
-4. ✅ `src/components/workspace/media/MediaAssetGallery.tsx` - Connected to database
-5. ✅ `src/components/workspace/WorkspaceDashboard.tsx` - Callbacks wired
-
-### Medium Priority (Add Escalation) - DONE
-6. ✅ `LogisticsDashboard` - Has `OverdueItemsWidget` + `EscalationRulesManager`
-7. ✅ `FinanceDashboard` - Has `OverdueItemsWidget` + `EscalationRulesManager`
-8. ✅ `CateringDashboard` - Has `OverdueItemsWidget` + `EscalationRulesManager`
-9. ✅ `VolunteersDashboard` - Has `OverdueItemsWidget` + `EscalationRulesManager`
-10. ✅ All other dashboards updated
-
-### Medium Priority (Add Real-time) - DONE
-11. ✅ `useLogisticsCommitteeRealtime` - Created and integrated
-12. ✅ `useFinanceCommitteeRealtime` - Created and integrated
-13. ✅ `useRegistrationCommitteeRealtime` - Created and integrated
-14. ✅ `useSponsorshipCommitteeRealtime` - Created and integrated
-15. ✅ `useVolunteersCommitteeRealtime` - Created and integrated
+### Low Priority
+9. All form components - i18n string extraction
+10. All list components - Accessibility aria-live regions
+11. Heavy components - Dynamic import wrappers
 
 ---
 
-## Final Status: 100% COMPLETE
+## Recommendations for Modern Best Practices
 
-All identified gaps have been fixed. The workspace system now has:
-- Full database connectivity for all components
-- Real-time subscriptions on all committee dashboards
-- Escalation widgets across all dashboards
-- All database tables created (`social_media_accounts`, `hashtag_tracking`, `message_reactions`, `audience_demographics`)
+1. **Adopt Optimistic Updates**: Use `useOptimisticMutation` pattern more widely
+2. **Implement Feature Flags**: For gradual rollout of new features
+3. **Add Telemetry**: Track user flows to identify UX bottlenecks
+4. **Create Design System Docs**: Document component usage patterns
+5. **Establish Testing Strategy**: Unit tests for hooks, E2E for critical paths
+6. **Consider State Management**: Zustand or Jotai for complex cross-component state
 
+This comprehensive analysis provides a roadmap for bringing the workspace system to full industrial-standard compliance while maintaining the existing solid architectural foundation.
