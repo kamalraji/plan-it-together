@@ -21,3 +21,9 @@ export { ChannelParticipantList } from './ChannelParticipantList';
 export { ScheduledMessageComposer } from './ScheduledMessageComposer';
 export { MessageDeliveryAnalytics } from './MessageDeliveryAnalytics';
 export { ChannelModerationTools } from './ChannelModerationTools';
+
+// New industrial-standard components
+export { UnifiedCommunicationHub } from './UnifiedCommunicationHub';
+export { BroadcastComposerDialog } from './BroadcastComposerDialog';
+export { ChannelCategoryManager } from './ChannelCategoryManager';
+export { CommunicationAnalyticsPanel } from './CommunicationAnalyticsPanel';

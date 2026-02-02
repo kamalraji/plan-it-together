@@ -1695,6 +1695,53 @@ export type Database = {
           },
         ]
       }
+      channel_analytics: {
+        Row: {
+          active_participants: string[] | null
+          channel_id: string
+          created_at: string | null
+          date: string
+          id: string
+          message_count: number | null
+          peak_hour: number | null
+          reaction_count: number | null
+          thread_count: number | null
+          unique_senders: number | null
+        }
+        Insert: {
+          active_participants?: string[] | null
+          channel_id: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          message_count?: number | null
+          peak_hour?: number | null
+          reaction_count?: number | null
+          thread_count?: number | null
+          unique_senders?: number | null
+        }
+        Update: {
+          active_participants?: string[] | null
+          channel_id?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          message_count?: number | null
+          peak_hour?: number | null
+          reaction_count?: number | null
+          thread_count?: number | null
+          unique_senders?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_analytics_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channel_members: {
         Row: {
           channel_id: string
@@ -1814,6 +1861,59 @@ export type Database = {
           },
         ]
       }
+      channel_moderation_actions: {
+        Row: {
+          action: string
+          channel_id: string
+          created_at: string | null
+          duration_minutes: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          moderator_id: string
+          reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          channel_id: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          moderator_id: string
+          reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          channel_id?: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          moderator_id?: string
+          reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_moderation_actions_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channel_notification_settings: {
         Row: {
           channel_id: string
@@ -1853,6 +1953,42 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           vibration_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      channel_templates: {
+        Row: {
+          category: string
+          channels: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          channels?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          channels?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -9363,6 +9499,38 @@ export type Database = {
           },
         ]
       }
+      session_channels: {
+        Row: {
+          auto_created: boolean | null
+          channel_id: string
+          created_at: string | null
+          id: string
+          session_id: string
+        }
+        Insert: {
+          auto_created?: boolean | null
+          channel_id: string
+          created_at?: string | null
+          id?: string
+          session_id: string
+        }
+        Update: {
+          auto_created?: boolean | null
+          channel_id?: string
+          created_at?: string | null
+          id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_channels_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_feedback: {
         Row: {
           content_rating: number | null
@@ -13338,6 +13506,92 @@ export type Database = {
           },
         ]
       }
+      workspace_broadcasts: {
+        Row: {
+          channel_ids: string[] | null
+          content: string
+          created_at: string | null
+          delivery_stats: Json | null
+          event_id: string | null
+          id: string
+          priority: string | null
+          scheduled_for: string | null
+          send_push: boolean | null
+          sender_id: string
+          sent_at: string | null
+          status: string | null
+          target_audience: Json | null
+          title: string | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          channel_ids?: string[] | null
+          content: string
+          created_at?: string | null
+          delivery_stats?: Json | null
+          event_id?: string | null
+          id?: string
+          priority?: string | null
+          scheduled_for?: string | null
+          send_push?: boolean | null
+          sender_id: string
+          sent_at?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          title?: string | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          channel_ids?: string[] | null
+          content?: string
+          created_at?: string | null
+          delivery_stats?: Json | null
+          event_id?: string | null
+          id?: string
+          priority?: string | null
+          scheduled_for?: string | null
+          send_push?: boolean | null
+          sender_id?: string
+          sent_at?: string | null
+          status?: string | null
+          target_audience?: Json | null
+          title?: string | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_broadcasts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_broadcasts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_broadcasts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "workspace_broadcasts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_budget_categories: {
         Row: {
           allocated: number
@@ -13548,6 +13802,47 @@ export type Database = {
           },
         ]
       }
+      workspace_channel_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_collapsed: boolean | null
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_collapsed?: boolean | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_collapsed?: boolean | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_channel_categories_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_channel_templates: {
         Row: {
           auto_create_on_provision: boolean | null
@@ -13593,6 +13888,7 @@ export type Database = {
       workspace_channels: {
         Row: {
           auto_join_on_registration: boolean | null
+          category_id: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -13610,6 +13906,7 @@ export type Database = {
         }
         Insert: {
           auto_join_on_registration?: boolean | null
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -13627,6 +13924,7 @@ export type Database = {
         }
         Update: {
           auto_join_on_registration?: boolean | null
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -13643,6 +13941,13 @@ export type Database = {
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_channels_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channel_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_channels_template_id_fkey"
             columns: ["template_id"]
