@@ -2,110 +2,35 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   ExternalLink, 
   TrendingUp, 
   TrendingDown, 
   Minus,
   Settings,
-  BarChart3
+  BarChart3,
+  RefreshCw
 } from 'lucide-react';
+import { useSocialMediaAccounts, DEFAULT_PLATFORMS, type SocialMediaAccount } from '@/hooks/useSocialMediaData';
 
-interface Platform {
-  id: string;
-  name: string;
-  icon: string;
-  handle: string;
-  followers: number;
-  engagement: number;
-  trend: 'up' | 'down' | 'stable';
-  postsThisWeek: number;
-  postsGoal: number;
-  color: string;
-  connected: boolean;
+interface PlatformManagerProps {
+  workspaceId?: string;
 }
 
-export function PlatformManager() {
-  const platforms: Platform[] = [
-    {
-      id: 'twitter',
-      name: 'Twitter/X',
-      icon: '𝕏',
-      handle: '@eventname',
-      followers: 12450,
-      engagement: 4.8,
-      trend: 'up',
-      postsThisWeek: 18,
-      postsGoal: 21,
-      color: 'bg-sky-500',
-      connected: true,
-    },
-    {
-      id: 'instagram',
-      name: 'Instagram',
-      icon: '📷',
-      handle: '@eventname_official',
-      followers: 28500,
-      engagement: 7.2,
-      trend: 'up',
-      postsThisWeek: 12,
-      postsGoal: 14,
-      color: 'bg-pink-500',
-      connected: true,
-    },
-    {
-      id: 'linkedin',
-      name: 'LinkedIn',
-      icon: '💼',
-      handle: 'Event Name',
-      followers: 8200,
-      engagement: 3.1,
-      trend: 'stable',
-      postsThisWeek: 6,
-      postsGoal: 7,
-      color: 'bg-blue-600',
-      connected: true,
-    },
-    {
-      id: 'facebook',
-      name: 'Facebook',
-      icon: '📘',
-      handle: 'Event Name Page',
-      followers: 15800,
-      engagement: 2.4,
-      trend: 'down',
-      postsThisWeek: 8,
-      postsGoal: 10,
-      color: 'bg-indigo-500',
-      connected: true,
-    },
-    {
-      id: 'tiktok',
-      name: 'TikTok',
-      icon: '🎵',
-      handle: '@eventname',
-      followers: 5400,
-      engagement: 9.5,
-      trend: 'up',
-      postsThisWeek: 4,
-      postsGoal: 7,
-      color: 'bg-foreground/80',
-      connected: true,
-    },
-    {
-      id: 'youtube',
-      name: 'YouTube',
-      icon: '▶️',
-      handle: 'Event Name Channel',
-      followers: 3200,
-      engagement: 5.8,
-      trend: 'stable',
-      postsThisWeek: 2,
-      postsGoal: 3,
-      color: 'bg-red-600',
-      connected: false,
-    },
-  ];
+export function PlatformManager({ workspaceId }: PlatformManagerProps) {
+  const { data: platforms, isLoading, error } = useSocialMediaAccounts(workspaceId);
+
+  // Use default platforms as fallback when no data exists
+  const displayPlatforms: SocialMediaAccount[] = platforms && platforms.length > 0 
+    ? platforms 
+    : DEFAULT_PLATFORMS.map((p, i) => ({
+        ...p,
+        id: `default-${i}`,
+        workspace_id: workspaceId || '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-emerald-500" />;
@@ -118,6 +43,54 @@ export function PlatformManager() {
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            Platform Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-3 rounded-lg border border-border/50">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-xl" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            Platform Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6 text-muted-foreground">
+            <p>Failed to load platforms</p>
+            <Button variant="outline" size="sm" className="mt-2" onClick={() => window.location.reload()}>
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -134,7 +107,7 @@ export function PlatformManager() {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {platforms.map((platform) => (
+        {displayPlatforms.map((platform) => (
           <div 
             key={platform.id} 
             className={`p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors ${
@@ -143,7 +116,7 @@ export function PlatformManager() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${platform.color} flex items-center justify-center text-white text-lg`}>
+                <div className={`w-10 h-10 rounded-xl ${platform.color || 'bg-muted'} flex items-center justify-center text-white text-lg`}>
                   {platform.icon}
                 </div>
                 <div>
@@ -164,7 +137,7 @@ export function PlatformManager() {
                 <div className="flex items-center gap-1.5">
                   {getTrendIcon(platform.trend)}
                   <Badge variant="secondary" className="text-xs">
-                    {platform.engagement}%
+                    {platform.engagement_rate}%
                   </Badge>
                 </div>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -173,9 +146,9 @@ export function PlatformManager() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Progress value={(platform.postsThisWeek / platform.postsGoal) * 100} className="h-1.5 flex-1" />
+              <Progress value={(platform.posts_this_week / platform.posts_goal) * 100} className="h-1.5 flex-1" />
               <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {platform.postsThisWeek}/{platform.postsGoal} posts
+                {platform.posts_this_week}/{platform.posts_goal} posts
               </span>
             </div>
           </div>

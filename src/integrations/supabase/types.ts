@@ -697,6 +697,50 @@ export type Database = {
           },
         ]
       }
+      audience_demographics: {
+        Row: {
+          color: string | null
+          created_at: string
+          demographic_type: string
+          id: string
+          label: string
+          sort_order: number | null
+          updated_at: string
+          value: number
+          workspace_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          demographic_type: string
+          id?: string
+          label: string
+          sort_order?: number | null
+          updated_at?: string
+          value?: number
+          workspace_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          demographic_type?: string
+          id?: string
+          label?: string
+          sort_order?: number | null
+          updated_at?: string
+          value?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_demographics_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auto_reply_logs: {
         Row: {
           id: string
@@ -5680,6 +5724,53 @@ export type Database = {
           },
         ]
       }
+      hashtag_tracking: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          last_updated_at: string | null
+          reach: number | null
+          tag: string
+          trend: string | null
+          updated_at: string
+          uses_count: number | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          last_updated_at?: string | null
+          reach?: number | null
+          tag: string
+          trend?: string | null
+          updated_at?: string
+          uses_count?: number | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          last_updated_at?: string | null
+          reach?: number | null
+          tag?: string
+          trend?: string | null
+          updated_at?: string
+          uses_count?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hashtag_tracking_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       icebreaker_answers: {
         Row: {
           answer: string
@@ -9463,6 +9554,80 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "social_analytics_sync_log_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_media_accounts: {
+        Row: {
+          access_token_encrypted: string | null
+          color: string | null
+          connected: boolean | null
+          created_at: string
+          engagement_rate: number | null
+          followers: number | null
+          handle: string
+          icon: string | null
+          id: string
+          last_synced_at: string | null
+          name: string
+          platform: string
+          posts_goal: number | null
+          posts_this_week: number | null
+          refresh_token_encrypted: string | null
+          token_expires_at: string | null
+          trend: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          access_token_encrypted?: string | null
+          color?: string | null
+          connected?: boolean | null
+          created_at?: string
+          engagement_rate?: number | null
+          followers?: number | null
+          handle: string
+          icon?: string | null
+          id?: string
+          last_synced_at?: string | null
+          name: string
+          platform: string
+          posts_goal?: number | null
+          posts_this_week?: number | null
+          refresh_token_encrypted?: string | null
+          token_expires_at?: string | null
+          trend?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          access_token_encrypted?: string | null
+          color?: string | null
+          connected?: boolean | null
+          created_at?: string
+          engagement_rate?: number | null
+          followers?: number | null
+          handle?: string
+          icon?: string | null
+          id?: string
+          last_synced_at?: string | null
+          name?: string
+          platform?: string
+          posts_goal?: number | null
+          posts_this_week?: number | null
+          refresh_token_encrypted?: string | null
+          token_expires_at?: string | null
+          trend?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_media_accounts_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
