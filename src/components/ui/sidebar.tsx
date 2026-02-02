@@ -162,7 +162,7 @@ const Sidebar = React.forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden border-r border-sidebar-border"
+          className="w-[--sidebar-width] p-0 text-sidebar-foreground [&>button]:hidden border-r border-sidebar-border/50"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -170,7 +170,15 @@ const Sidebar = React.forwardRef<
           }
           side={side}
         >
-          <div className="flex h-full w-full flex-col bg-sidebar">{children}</div>
+          {/* Glassmorphic mobile sidebar with solid background */}
+          <div className="flex h-full w-full flex-col bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-sidebar/90">
+            {/* Subtle gradient overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+            {/* Content */}
+            <div className="relative flex h-full w-full flex-col">
+              {children}
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
     );
@@ -210,11 +218,19 @@ const Sidebar = React.forwardRef<
         )}
         {...props}
       >
+        {/* Glassmorphic desktop sidebar */}
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+          className="relative flex h-full w-full flex-col bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-sidebar/90 group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border/50 group-data-[variant=floating]:shadow-xl"
         >
-          {children}
+          {/* Subtle gradient overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none rounded-[inherit]" />
+          {/* Inner glow border effect */}
+          <div className="absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/10 pointer-events-none" />
+          {/* Content */}
+          <div className="relative flex h-full w-full flex-col">
+            {children}
+          </div>
         </div>
       </div>
     </div>

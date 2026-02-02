@@ -276,7 +276,7 @@ export const OrganizationSidebar: React.FC = () => {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="border-r border-border/20 bg-gradient-to-b from-sidebar via-sidebar to-sidebar/95 backdrop-blur-xl"
+      className="border-r border-border/30"
     >
       <SidebarHeader className="p-0">
         <SidebarHeaderContent 
