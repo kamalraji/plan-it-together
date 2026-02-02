@@ -437,3 +437,378 @@ export function useContentCommitteeRealtime(options: UseCommitteeRealtimeOptions
 
   return { refresh };
 }
+
+/**
+ * Logistics Committee Real-Time Hook
+ * Subscribes to shipments, transport schedules, equipment, and venue logistics
+ */
+export function useLogisticsCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `logistics-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Logistics-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_logistics',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['logistics-shipments', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_transport_schedules',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['transport-schedules', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_equipment',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['logistics-equipment', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['logistics-shipments', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['transport-schedules', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['logistics-equipment', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
+
+/**
+ * Finance Committee Real-Time Hook
+ * Subscribes to expenses, invoices, and budget requests
+ */
+export function useFinanceCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `finance-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Finance-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_expenses',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['workspace-expenses', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['expense-tracker', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_invoices',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['workspace-invoices', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workspace_budget_requests',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['budget-requests', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['budget-approval-queue', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['workspace-expenses', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['workspace-invoices', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['budget-requests', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
+
+/**
+ * Registration Committee Real-Time Hook
+ * Subscribes to event registrations and check-ins
+ */
+export function useRegistrationCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `registration-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Registration-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'event_registrations',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['event-registrations', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['registration-stats', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'check_ins',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['check-ins', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['check-in-stats', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['event-registrations', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['check-ins', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
+
+/**
+ * Sponsorship Committee Real-Time Hook
+ * Subscribes to sponsors and sponsor deliverables
+ */
+export function useSponsorshipCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `sponsorship-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Sponsorship-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'sponsors',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['sponsors', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['sponsorship-stats', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'sponsor_deliverables',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['sponsor-deliverables', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['sponsors', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['sponsor-deliverables', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
+
+/**
+ * Volunteers Committee Real-Time Hook
+ * Subscribes to volunteer shifts and applications
+ */
+export function useVolunteersCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `volunteers-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Volunteers-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'volunteer_shifts',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['volunteer-schedule', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'volunteer_applications',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['volunteer-applications', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['volunteer-roster', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'volunteer_check_ins',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['volunteer-check-ins', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['volunteer-applications', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['volunteer-check-ins', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
+
+/**
+ * Technical Committee Real-Time Hook
+ * Subscribes to support tickets and equipment
+ */
+export function useTechnicalCommitteeRealtime(options: UseCommitteeRealtimeOptions) {
+  const { workspaceId, enabled = true } = options;
+  const queryClient = useQueryClient();
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  const base = useCommitteeRealtimeBase(options);
+
+  useEffect(() => {
+    if (!enabled || !workspaceId) return;
+
+    const channelName = `technical-realtime:${workspaceId}`;
+    channelRef.current = supabase.channel(channelName);
+
+    // Technical-specific tables
+    channelRef.current
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'support_tickets',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['support-tickets', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['ticket-queue', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'equipment',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['equipment', workspaceId] });
+        queryClient.invalidateQueries({ queryKey: ['equipment-inventory', workspaceId] });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'live_streams',
+        filter: `workspace_id=eq.${workspaceId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['live-streams', workspaceId] });
+      });
+
+    channelRef.current.subscribe();
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, [workspaceId, enabled, queryClient]);
+
+  const refresh = useCallback(() => {
+    base.refresh();
+    queryClient.invalidateQueries({ queryKey: ['support-tickets', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['equipment', workspaceId] });
+    queryClient.invalidateQueries({ queryKey: ['live-streams', workspaceId] });
+  }, [base, queryClient, workspaceId]);
+
+  return { refresh };
+}
