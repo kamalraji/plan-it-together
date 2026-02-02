@@ -10,3 +10,4 @@ export { BrandingSection } from './BrandingSection';
 export { MediaSection } from './MediaSection';
 export { FAQsSection } from './FAQsSection';
 export { CTASection } from './CTASection';
+export { TemplateSection, type SelectedTemplate } from './TemplateSection';

@@ -58,6 +58,8 @@ import {
   MediaSection,
   FAQsSection,
   CTASection,
+  TemplateSection,
+  type SelectedTemplate,
 } from '@/components/events/form/sections';
 
 // Hooks
@@ -107,6 +109,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [eventImages, setEventImages] = useState<EventImage[]>([]);
   const [eventFaqs, setEventFaqs] = useState<EventFAQ[]>([]);
   const [pendingTiers, setPendingTiers] = useState<QuickTier[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<SelectedTemplate | null>(null);
 
   // Form initialization
   const form = useForm<EventFormValues>({
@@ -217,7 +220,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     const conditionalSteps = [];
     if (showVenueSection) conditionalSteps.push('venue');
     if (showVirtualSection) conditionalSteps.push('virtual');
-    const allSteps = [...baseSteps, ...conditionalSteps, 'branding', 'media', 'faqs', 'cta'];
+    const allSteps = [...baseSteps, ...conditionalSteps, 'branding', 'template', 'media', 'faqs', 'cta'];
     return allSteps.indexOf(section) + 1;
   };
 
@@ -229,7 +232,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     { id: 'venue', label: 'Venue', status: showVenueSection ? calculateSectionStatus('venue', formValues, formState.errors, sectionFieldMap) : 'complete', required: showVenueSection },
     { id: 'virtual', label: 'Virtual', status: showVirtualSection ? calculateSectionStatus('virtual', formValues, formState.errors, sectionFieldMap) : 'complete', required: showVirtualSection },
     { id: 'branding', label: 'Branding', status: calculateSectionStatus('branding', formValues, formState.errors, sectionFieldMap), required: false },
-  ], [formValues, formState.errors, showVenueSection, showVirtualSection]);
+    { id: 'template', label: 'Template', status: selectedTemplate ? 'complete' : 'empty', required: false },
+  ], [formValues, formState.errors, showVenueSection, showVirtualSection, selectedTemplate]);
 
   // Section click handler with URL hash update
   const handleSectionClick = useCallback((sectionId: string) => {
@@ -302,13 +306,14 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const handleCreateWorkspace = useCallback(() => {
     setShowPostCreate(false);
     if (createdEventId) {
-      // Use correct workspace create path with event pre-selection
+      // Use correct workspace create path with event pre-selection and template if selected
+      const templateParam = selectedTemplate ? `&templateId=${selectedTemplate.id}` : '';
       const workspacePath = orgSlug 
-        ? `/${orgSlug}/workspaces/create/${createdEventId}`
-        : `/dashboard/workspaces/create/${createdEventId}`;
+        ? `/${orgSlug}/workspaces/create/${createdEventId}?source=event${templateParam}`
+        : `/dashboard/workspaces/create/${createdEventId}?source=event${templateParam}`;
       navigate(workspacePath, { replace: true });
     }
-  }, [createdEventId, orgSlug, navigate]);
+  }, [createdEventId, orgSlug, navigate, selectedTemplate]);
 
   const handleViewEvent = useCallback(() => {
     setShowPostCreate(false);
@@ -331,6 +336,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       <PostCreateOptionsDialog
         open={showPostCreate}
         eventName={createdEventName}
+        selectedTemplate={selectedTemplate}
         onContinueEditing={handleContinueEditing}
         onCreateWorkspace={handleCreateWorkspace}
         onViewEvent={handleViewEvent}
@@ -449,6 +455,20 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                   isOpen={openSections.branding}
                   onToggle={() => toggleSection('branding')}
                   stepNumber={getStepNumber('branding')}
+                />
+              </SectionErrorBoundary>
+            </div>
+
+            <div id="section-template">
+              <SectionErrorBoundary sectionName="Template">
+                <TemplateSection
+                  isOpen={openSections.template}
+                  onToggle={() => toggleSection('template')}
+                  stepNumber={getStepNumber('template')}
+                  selectedTemplate={selectedTemplate}
+                  onTemplateSelect={setSelectedTemplate}
+                  eventCategory={formValues.category}
+                  eventCapacity={formValues.capacity ? parseInt(formValues.capacity, 10) : undefined}
                 />
               </SectionErrorBoundary>
             </div>

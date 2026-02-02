@@ -11,11 +11,21 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Pencil, Users, Eye, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Pencil, Users, Eye, ArrowRight, LayoutTemplate } from 'lucide-react';
+
+interface SelectedTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  complexity?: string;
+}
 
 interface PostCreateOptionsDialogProps {
   open: boolean;
   eventName?: string;
+  selectedTemplate?: SelectedTemplate | null;
   onContinueEditing: () => void;
   onCreateWorkspace: () => void;
   onViewEvent: () => void;
@@ -24,6 +34,7 @@ interface PostCreateOptionsDialogProps {
 export const PostCreateOptionsDialog: React.FC<PostCreateOptionsDialogProps> = ({
   open,
   eventName,
+  selectedTemplate,
   onContinueEditing,
   onCreateWorkspace,
   onViewEvent,
@@ -52,6 +63,15 @@ export const PostCreateOptionsDialog: React.FC<PostCreateOptionsDialogProps> = (
           </DialogDescription>
         </DialogHeader>
 
+        {/* Template Selected Badge */}
+        {selectedTemplate && (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <LayoutTemplate className="h-4 w-4 text-primary" />
+            <span className="text-sm text-muted-foreground">Template selected:</span>
+            <Badge variant="secondary">{selectedTemplate.name}</Badge>
+          </div>
+        )}
+
         <div className="grid gap-3 py-4">
           {/* Primary action: Create Workspace */}
           <Button
@@ -63,7 +83,9 @@ export const PostCreateOptionsDialog: React.FC<PostCreateOptionsDialogProps> = (
               <div className="text-left">
                 <div className="font-medium">Create Workspace</div>
                 <div className="text-xs text-primary-foreground/70">
-                  Set up teams and publish your event
+                  {selectedTemplate 
+                    ? `Use "${selectedTemplate.name}" template` 
+                    : 'Set up teams and publish your event'}
                 </div>
               </div>
             </div>
