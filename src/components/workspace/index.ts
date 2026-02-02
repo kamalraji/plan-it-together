@@ -33,6 +33,7 @@ export { PostEventRatingPrompt } from './PostEventRatingPrompt';
 export { BulkTaskActions } from './BulkTaskActions';
 export { TaskListWithBulkActions } from './TaskListWithBulkActions';
 export { BroadcastMessageDialog } from './BroadcastMessageDialog';
+export { VirtualizedTaskList } from './VirtualizedTaskList';
 export { GoalSettingDialog } from './GoalSettingDialog';
 export { DashboardExportButton } from './DashboardExportButton';
 export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
