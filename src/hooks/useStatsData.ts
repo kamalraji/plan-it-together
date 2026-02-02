@@ -207,3 +207,50 @@ export function useEventStats(workspaceId: string, eventId?: string) {
     ...queryPresets.standard,
   });
 }
+
+// Sponsorship Stats Hook
+export function useSponsorshipStats(workspaceId: string) {
+  return useQuery({
+    queryKey: ['sponsorship-stats', workspaceId],
+    queryFn: async () => {
+      // Fetch active sponsors count
+      const { count: totalSponsors } = await supabase
+        .from('workspace_sponsors')
+        .select('*', { count: 'exact', head: true })
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'confirmed');
+
+      // Fetch total revenue from confirmed sponsors
+      const { data: sponsors } = await supabase
+        .from('workspace_sponsors')
+        .select('contract_value')
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'confirmed');
+
+      const totalRevenue = sponsors?.reduce((sum, s) => sum + (s.contract_value || 0), 0) ?? 0;
+
+      // Fetch pending proposals count
+      const { count: pendingProposals } = await supabase
+        .from('workspace_sponsors')
+        .select('*', { count: 'exact', head: true })
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'pending');
+
+      // Fetch deliverables due count
+      const { count: deliverablesDue } = await supabase
+        .from('workspace_sponsor_deliverables')
+        .select('*', { count: 'exact', head: true })
+        .eq('workspace_id', workspaceId)
+        .eq('status', 'pending');
+
+      return {
+        totalSponsors: totalSponsors ?? 0,
+        totalRevenue,
+        pendingProposals: pendingProposals ?? 0,
+        deliverablesDue: deliverablesDue ?? 0,
+      };
+    },
+    enabled: !!workspaceId,
+    ...queryPresets.standard,
+  });
+}

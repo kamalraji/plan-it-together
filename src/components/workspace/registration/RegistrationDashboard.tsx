@@ -13,6 +13,7 @@ import { MilestoneTimeline } from '../committee/MilestoneTimeline';
 import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useRegistrationCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface RegistrationDashboardProps {
   workspace: Workspace;
@@ -77,6 +78,9 @@ export function RegistrationDashboard({
   });
 
   const tasksCompleted = tasks.filter(t => t.status === 'DONE').length;
+
+  // Enable real-time updates for registration committee data
+  useRegistrationCommitteeRealtime({ workspaceId: workspace.id });
 
   return (
     <div className="space-y-6">
