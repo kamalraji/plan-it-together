@@ -7,7 +7,9 @@ import { MobileQuickActionsSheet } from './MobileQuickActionsSheet';
 import { MobileSearchOverlay } from './MobileSearchOverlay';
 import { MobileHomePage } from './MobileHomePage';
 import { PullToRefresh } from './shared/PullToRefresh';
+import { OfflineModeBanner } from './shared/OfflineModeBanner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useOffline } from '@/hooks/useOffline';
 
 export type MobileTab = 'home' | 'events' | 'workspaces' | 'analytics' | 'search';
 
@@ -38,6 +40,14 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
   const [activeTab, setActiveTab] = useState<MobileTab>('home');
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  
+  const { 
+    isOnline, 
+    pendingUpdates, 
+    pendingMessages, 
+    syncPendingData 
+  } = useOffline();
 
   // Determine if we're on a specific route that should show its content directly
   const isOnSpecificRoute = () => {
@@ -126,6 +136,15 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
     });
   }, [queryClient, organization.id]);
 
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      await syncPendingData();
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [syncPendingData]);
+
   // Determine if we're on the home/dashboard route
   const isOnHomeRoute = () => {
     const path = location.pathname;
@@ -157,11 +176,29 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
       {/* Fixed Header */}
       <MobileHeader 
         organization={organization} 
-        user={user} 
+        user={user}
+        isOnline={isOnline}
+        pendingCount={pendingUpdates + pendingMessages}
+        isSyncing={isSyncing}
+      />
+
+      {/* Offline Mode Banner */}
+      <OfflineModeBanner
+        isOnline={isOnline}
+        pendingUpdates={pendingUpdates}
+        pendingMessages={pendingMessages}
+        isSyncing={isSyncing}
+        onSync={handleSync}
+        className="fixed top-16 left-0 right-0 z-40"
       />
 
       {/* Scrollable Content Area with Pull to Refresh */}
-      <PullToRefresh onRefresh={handleRefresh} className="flex-1 pt-16 pb-20 overflow-y-auto">
+      <PullToRefresh 
+        onRefresh={handleRefresh} 
+        className={`flex-1 pb-20 overflow-y-auto ${
+          !isOnline || (pendingUpdates + pendingMessages) > 0 ? 'pt-24' : 'pt-16'
+        }`}
+      >
         {renderContent()}
       </PullToRefresh>
 
