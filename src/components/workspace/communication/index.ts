@@ -22,9 +22,14 @@ export { ScheduledMessageComposer } from './ScheduledMessageComposer';
 export { MessageDeliveryAnalytics } from './MessageDeliveryAnalytics';
 export { ChannelModerationTools } from './ChannelModerationTools';
 
-// New industrial-standard components
+// Industrial-standard communication hub components
 export { UnifiedCommunicationHub } from './UnifiedCommunicationHub';
 export { BroadcastComposerDialog } from './BroadcastComposerDialog';
 export { ChannelCategoryManager } from './ChannelCategoryManager';
 export { CommunicationAnalyticsPanel } from './CommunicationAnalyticsPanel';
 export { ModerationToolsPanel } from './ModerationToolsPanel';
+
+// Phase 3: Permission, scheduling, and engagement components
+export { ChannelPermissionsEditor } from './ChannelPermissionsEditor';
+export { ScheduledBroadcastsManager } from './ScheduledBroadcastsManager';
+export { ParticipantEngagementMetrics } from './ParticipantEngagementMetrics';
