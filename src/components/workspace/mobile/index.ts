@@ -1,6 +1,8 @@
-export { MobileWorkspaceDashboard } from './MobileWorkspaceDashboard';
-export { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
-export { MobileNavigation } from './MobileNavigation';
+// Mobile workspace components
+// Note: MobileWorkspaceDashboard has been deprecated in favor of the unified 
+// ResponsiveWorkspaceDashboard which uses a single responsive layout.
+
+// These components may still be useful for mobile-optimized task views
 export { MobileTaskSummary } from './MobileTaskSummary';
 export { MobileTeamOverview } from './MobileTeamOverview';
 export { MobileTaskManagement } from './MobileTaskManagement';
