@@ -37,25 +37,27 @@ export const SidebarServiceItem: React.FC<SidebarServiceItemProps> = ({
 
   return (
     <div className="group/service">
+      {/* Main service button - 44px minimum touch target */}
       <button
         onClick={onToggle}
         className={cn(
-          'w-full flex items-center justify-between px-3 py-2.5 rounded-2xl transition-all duration-300',
+          'w-full flex items-center justify-between px-3 py-3 min-h-[44px] rounded-2xl transition-all duration-300',
           'hover:bg-gradient-to-r hover:from-primary/8 hover:to-primary/4',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+          'active:scale-[0.98]', // Touch feedback
           isActive && 'bg-gradient-to-r from-primary/12 to-primary/6 shadow-sm'
         )}
       >
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300',
+              'relative flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 flex-shrink-0',
               isActive
                 ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25'
                 : 'bg-muted/50 text-muted-foreground group-hover/service:bg-primary/15 group-hover/service:text-primary'
             )}
           >
-            <Icon className="h-[18px] w-[18px]" />
+            <Icon className="h-5 w-5" />
             {isActive && (
               <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-white/10 to-transparent" />
             )}
@@ -99,8 +101,9 @@ export const SidebarServiceItem: React.FC<SidebarServiceItemProps> = ({
                     transition={{ delay: index * 0.03, duration: 0.15 }}
                     onClick={() => navigate(action.path)}
                     className={cn(
-                      "w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl transition-all duration-200 text-left group/action",
-                      "hover:bg-muted/60",
+                      // 44px minimum touch target for mobile accessibility
+                      "w-full flex items-center gap-3 px-3 py-3 min-h-[44px] text-sm rounded-xl transition-all duration-200 text-left group/action",
+                      "hover:bg-muted/60 active:scale-[0.98]",
                       isActionActive 
                         ? "bg-primary/10 text-primary font-medium" 
                         : "text-foreground/80",
@@ -108,7 +111,7 @@ export const SidebarServiceItem: React.FC<SidebarServiceItemProps> = ({
                     )}
                   >
                     <action.icon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 group-hover/action:scale-110",
+                      "h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover/action:scale-110",
                       isActionActive || action.primary ? "text-primary" : "text-muted-foreground"
                     )} />
                     <span className="truncate flex-1">{action.title}</span>
