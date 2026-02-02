@@ -16,6 +16,7 @@ import { EventTimeline } from './EventTimeline';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface EventDashboardProps {
   workspace: Workspace;
@@ -119,6 +120,12 @@ export function EventDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RunOfShowChecklist workspaceId={workspace.id} />
         <EventTimeline workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Goals & Milestones */}

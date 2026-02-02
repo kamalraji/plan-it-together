@@ -6,6 +6,7 @@ import { MilestoneTimeline, GoalTracker, BudgetRequestForm, ResourceRequestForm,
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useLogisticsCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LogisticsStatsCards } from './LogisticsStatsCards';
@@ -13,6 +14,7 @@ import { ShipmentTracker } from './ShipmentTracker';
 import { EquipmentManager } from './EquipmentManager';
 import { TransportSchedule } from './TransportSchedule';
 import { VenueLogistics } from './VenueLogistics';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface LogisticsDashboardProps {
   workspace: Workspace;
@@ -26,6 +28,9 @@ export function LogisticsDashboard({
   onViewTasks,
 }: LogisticsDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time updates for logistics committee data
+  useLogisticsCommitteeRealtime({ workspaceId: workspace.id });
 
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['logistics-team-members', workspace.id],
@@ -104,6 +109,12 @@ export function LogisticsDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TransportSchedule workspaceId={workspace.id} />
         <VenueLogistics workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Milestones and Goals */}

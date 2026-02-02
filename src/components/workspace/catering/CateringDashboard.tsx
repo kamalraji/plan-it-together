@@ -17,6 +17,7 @@ import { InventoryTracker } from './InventoryTracker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface CateringDashboardProps {
   workspace: Workspace;
@@ -124,6 +125,12 @@ export function CateringDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <VendorManagement workspaceId={workspace.id} />
         <InventoryTracker workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Goals & Milestones */}
