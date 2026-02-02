@@ -1,371 +1,205 @@
 
-# Comprehensive Workspace Gap Analysis Report
-## Industry Standards Alignment - February 2026 Update
+# Plan: Unify Mobile and Desktop Experience
 
----
+## Overview
+Remove the dedicated mobile app shell, bottom navigation, mobile header, and mobile home screen. Mobile users will see the exact same layout as desktop, with the responsive sidebar handling navigation across all screen sizes. This follows the modern **"responsive-first" design pattern** where a single responsive layout adapts to all screen sizes rather than maintaining separate mobile and desktop codebases.
 
-## Executive Summary
+## Rationale (Industry Best Practices)
 
-After thorough analysis of the workspace codebase against industry best practices (Asana, Monday.com, Slack, ClickUp, Jira), I identified **47 gaps** across **10 categories**. This report identifies critical fixes, missing workflows, broken connections, and enhancement opportunities required to achieve production-ready status.
+1. **Single Source of Truth**: Maintaining separate mobile/desktop layouts doubles maintenance effort and creates feature drift over time
+2. **Consistent UX**: Users moving between devices experience the same interface, reducing cognitive load
+3. **Sidebar-Based Navigation**: Modern web apps (Notion, Linear, Slack) use collapsible sidebars that work on all screen sizes
+4. **Touch-Friendly Desktop Components**: Shadcn UI components are already built with touch targets in mind
+5. **Progressive Enhancement**: The existing Sidebar component already handles mobile via `offcanvas` mode
 
----
+## Current Mobile-Specific Components to Remove
 
-## 1. Legacy API Calls Still Present (CRITICAL)
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `MobileAppShell` | `src/components/mobile/` | Wrapper with mobile header, bottom nav, FAB |
+| `MobileHeader` | `src/components/mobile/` | Fixed top bar with org logo, sync status |
+| `MobileBottomNav` | `src/components/mobile/` | 5-tab bottom navigation |
+| `MobileFAB` | `src/components/mobile/` | Floating action button for quick actions |
+| `MobileHomePage` | `src/components/mobile/` | Dedicated mobile home dashboard |
+| `MobileQuickActionsSheet` | `src/components/mobile/` | Bottom sheet for quick actions |
+| `MobileSearchOverlay` | `src/components/mobile/` | Full-screen search overlay |
+| `MobileWorkspaceDashboard` | `src/components/workspace/mobile/` | Dedicated mobile workspace view |
 
-**Severity**: Critical - These files reference non-existent REST endpoints and will fail at runtime.
+## Components to Keep (Useful Across All Devices)
 
-| File | Legacy Calls | Required Fix |
-|------|-------------|--------------|
-| `VendorCoordination.tsx` | `api.get('/marketplace/bookings/...')`, `api.post`, `api.patch` | Replace with Supabase queries to vendor-related tables |
-| `BookingManagementUI.tsx` | `api.get`, `api.patch` for bookings | Replace with Supabase mutations |
-| `useVendorStatus.ts` | `api.get('/vendors/profile/...')` | Replace with direct Supabase query to vendor profiles |
-| `useAuthSessionRefresh.ts` | `api.post('/auth/refresh-token')` | Replace with `supabase.auth.refreshSession()` |
-| `CommunicationHistory.tsx` | `api.get('/communications/events/...')` | Replace with Supabase query |
-| `EventListPage.tsx` | `api.get('/events/templates')` | Replace with Supabase query |
-| `ReviewRatingUI.tsx` | `api.get`, `api.post` for reviews | Replace with Supabase operations |
-| `ProfileCompletion.tsx` | `api.put('/auth/profile')` | Replace with Supabase profiles update |
-
-**Total: 8 files with 15+ broken API calls**
-
----
-
-## 2. Real-Time Coverage Analysis
-
-### Status: GOOD - Most dashboards upgraded
-
-All major department dashboards now use `useRealtimeDashboard`:
-- RootDashboard
-- DepartmentDashboard (generic)
-- FinanceDepartmentDashboard
-- GrowthDepartmentDashboard
-- ContentDepartmentDashboard
-- OperationsDepartmentDashboard
-- VolunteersDepartmentDashboard
-- TechDepartmentDashboard
-- CommitteeDashboard
-- TeamDashboard
-- CateringDashboard
-
-### Gap: Missing real-time in committee-specific dashboards
-
-The following committee dashboards need `useRealtimeDashboard` integration:
-
-| Dashboard | Current State |
+| Component | Reason to Keep |
 |-----------|---------------|
-| `MediaDashboard.tsx` | No real-time hook |
-| `SocialMediaDashboard.tsx` | No real-time hook |
-| `MarketingDashboard.tsx` | No real-time hook |
-| `CommunicationDashboard.tsx` | No real-time hook |
-| `ContentDashboard.tsx` (committee) | No real-time hook |
+| `OfflineModeBanner` | Network status indicator works on all devices |
+| `SyncProgressIndicator` | Useful for showing sync status everywhere |
+| `PullToRefresh` | Can be conditionally used on touch devices |
+| `MobileSkeleton` | Skeleton patterns are reusable |
+
+## Implementation Steps
+
+### Step 1: Update OrgScopedLayout
+Remove the mobile-specific conditional branch that renders `MobileAppShell`. All screen sizes will use the same `SidebarProvider` + `ConsoleHeader` + `OrganizationSidebar` layout.
+
+**File**: `src/components/organization/OrgScopedLayout.tsx`
+- Remove the `isMobile` check (line 179-232) that conditionally renders `MobileAppShell`
+- Remove the `useIsMobile` hook import
+- Remove the `MobileAppShell` import
+- The existing desktop layout already handles mobile via the Sidebar's `offcanvas` mode
+
+### Step 2: Update ResponsiveWorkspaceDashboard
+Remove the mobile/desktop conditional rendering. Always render `WorkspaceDashboard`.
+
+**File**: `src/components/workspace/ResponsiveWorkspaceDashboard.tsx`
+- Remove the `isMobile` state and screen size detection
+- Remove the `MobileWorkspaceDashboard` import
+- Always return `WorkspaceDashboard` (it's already responsive via Tailwind)
+
+### Step 3: Enhance Desktop Sidebar for Mobile
+Ensure the existing sidebar works well on small screens with proper touch targets and offcanvas behavior.
+
+**File**: `src/components/organization/OrganizationSidebar.tsx`
+- Already configured with `collapsible="offcanvas"` which slides in from the left on mobile
+- Verify touch targets are minimum 44x44px on interactive elements
+
+### Step 4: Enhance ConsoleHeader for Mobile
+Ensure the header displays well on small screens.
+
+**File**: `src/components/routing/ConsoleHeader.tsx`
+- Already has responsive padding and sizing (`px-3 sm:px-4 lg:px-6`)
+- Already hides text labels on mobile, shows icons only
+- Already has mobile-friendly touch targets
+
+### Step 5: Add Offline Banner to Desktop Layout
+Move the offline indicator from mobile shell to the main layout so all users see network status.
+
+**File**: `src/components/organization/OrgScopedLayout.tsx`
+- Import `OfflineModeBanner` and `useOffline` hook
+- Add the banner below the header in the desktop layout
+
+### Step 6: Clean Up Mobile Directory (Optional)
+Components can be deprecated but kept for reference, or moved to a `deprecated/` folder.
+
+**Files to mark as deprecated/remove**:
+- `src/components/mobile/MobileAppShell.tsx`
+- `src/components/mobile/MobileHeader.tsx`
+- `src/components/mobile/MobileBottomNav.tsx`
+- `src/components/mobile/MobileFAB.tsx`
+- `src/components/mobile/MobileHomePage.tsx`
+- `src/components/mobile/MobileQuickActionsSheet.tsx`
+- `src/components/mobile/MobileSearchOverlay.tsx`
+- `src/components/mobile/home/*` (all home-specific components)
+- `src/components/workspace/mobile/MobileWorkspaceDashboard.tsx`
+- `src/components/workspace/mobile/MobileWorkspaceHeader.tsx`
+- `src/components/workspace/mobile/MobileNavigation.tsx`
+
+### Step 7: Update Exports
+Update the barrel exports to remove deprecated mobile components.
+
+**Files**:
+- `src/components/mobile/index.ts`
+- `src/components/workspace/mobile/index.ts`
 
 ---
 
-## 3. Escalation Workflow Status
+## Technical Details
 
-### Database: COMPLETE
+### Before (Mobile)
+```text
++---------------------------+
+|     MobileHeader          | <- fixed top
++---------------------------+
+|                           |
+|    MobileHomePage         |
+|    or children            |
+|                           |
++---------------------------+
+|      MobileFAB            | <- floating
++---------------------------+
+|   MobileBottomNav         | <- fixed bottom
++---------------------------+
 ```
-escalation_rules table:
-- id, workspace_id, item_type
-- trigger_after_hours, sla_hours
-- escalate_to, escalation_path
-- notify_roles, notification_channels
-- is_active, auto_reassign, created_by
 
-escalation_history table:
-- id, item_type, item_id, workspace_id
-- escalated_from, escalated_to, escalation_level
-- reason, sla_status
-- resolved_at, resolved_by, resolution_notes
+### After (Unified - Same as Desktop)
+```text
++---------------------------+
+|     ConsoleHeader         | <- fixed top with hamburger
++---------------------------+
+| Sidebar |                 |
+| (slide) |    Content      |
+| (touch  |    (SidebarInset)|
+|  open)  |                 |
++---------------------------+
 ```
 
-### Hooks: COMPLETE
-- `useEscalationWorkflow` - Full implementation with rules, overdue items, auto-escalate
+### Sidebar Behavior by Screen Size
+- **Desktop (≥768px)**: Sidebar collapsed by default, expands on hover/click
+- **Mobile (<768px)**: Sidebar hidden, slides in via hamburger menu (offcanvas mode)
+- **Touch Detection**: No longer forces mobile view, relies on viewport width only
 
-### UI Components: COMPLETE
-- `EscalationRulesManager.tsx`
-- `EscalationHistoryPanel.tsx`
-- `OverdueItemsWidget.tsx`
-
-### Gap: Integration Points Missing
-
-| Integration Point | Status | Action Required |
-|------------------|--------|-----------------|
-| Add to Workspace Settings Tab | Missing | Add `EscalationRulesManager` to settings |
-| Add to ROOT Dashboard | Missing | Add `OverdueItemsWidget` widget |
-| Add to Approval Views | Missing | Add `EscalationHistoryPanel` |
-| Cron job for auto-escalation | Missing | Schedule `process-automation-rules` to check escalations |
+### Key Tailwind Breakpoints Used
+- `sm:` (640px) - Small text adjustments
+- `md:` (768px) - Primary mobile/desktop breakpoint
+- `lg:` (1024px) - Wider layouts
 
 ---
 
-## 4. Template System Status
+## Files to Modify
 
-### Database: COMPLETE
-```
-workspace_templates table exists with:
-- id, name, description
-- industry_type, event_type, complexity
-- event_size_min, event_size_max
-- effectiveness, usage_count
-- structure (JSONB), metadata (JSONB)
-- is_public, created_by, created_at
-```
+1. **`src/components/organization/OrgScopedLayout.tsx`**
+   - Remove mobile conditional branch
+   - Add offline banner to unified layout
 
-### Static Templates: COMPLETE
-- `ENHANCED_WORKSPACE_TEMPLATES` in `workspaceTemplates.ts` - 1000+ lines of templates
+2. **`src/components/workspace/ResponsiveWorkspaceDashboard.tsx`**
+   - Simplify to always render desktop component
 
-### Gap: Event Creation Integration
+3. **`src/components/mobile/index.ts`**
+   - Remove deprecated exports, keep useful shared components
 
-Per IMPLEMENTATION_CHECKLIST.md (lines 101-121):
-
-| Task | Status | Action Required |
-|------|--------|-----------------|
-| Template selection in event wizard | NOT DONE | Add `WorkspaceTemplateLibrary` to event creation |
-| Pass template_id to provisioning | NOT DONE | Update event creation to include template selection |
-| Post-event template feedback | NOT DONE | Add `WorkspaceTemplateRating` to event completion flow |
+4. **`src/components/workspace/mobile/index.ts`**
+   - Remove MobileWorkspaceDashboard export
 
 ---
 
-## 5. Communication System Gaps
+## Files to Delete (or Move to Deprecated)
 
-### Database Schema: COMPLETE
-```
-channel_messages now has:
-- parent_message_id (UUID) - for threading
-- reply_count (INTEGER) - for reply counts
-- message_reactions table exists
-```
-
-### UI Components Status:
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| `EnhancedMessageThread.tsx` | Complete | Full real-time, typing indicators, @mentions |
-| `MessageThread.tsx` | Deprecated | Legacy, uses backup system |
-| `MobileWorkspaceCommunication.tsx` | Complete | Added to mobile dashboard |
-| `RealtimeMessageThread.tsx` | Complete | Alternative implementation |
-
-### Gap: Thread Replies UI Not Implemented
-
-While database supports threading (`parent_message_id`), the UI does not yet:
-1. Display replies under parent messages
-2. Allow users to reply to specific messages
-3. Show "View X replies" expansion
-
-### Gap: Reactions UI Not Implemented
-
-`message_reactions` table exists but:
-1. No emoji picker in message thread
-2. No reaction display under messages
-3. No reaction aggregation (e.g., "👍 3")
+- `src/components/mobile/MobileAppShell.tsx`
+- `src/components/mobile/MobileHeader.tsx`
+- `src/components/mobile/MobileBottomNav.tsx`
+- `src/components/mobile/MobileFAB.tsx`
+- `src/components/mobile/MobileHomePage.tsx`
+- `src/components/mobile/MobileQuickActionsSheet.tsx`
+- `src/components/mobile/MobileSearchOverlay.tsx`
+- `src/components/mobile/home/` (entire directory)
+- `src/components/workspace/mobile/MobileWorkspaceDashboard.tsx`
+- `src/components/workspace/mobile/MobileWorkspaceHeader.tsx`
+- `src/components/workspace/mobile/MobileNavigation.tsx`
+- `src/components/workspace/mobile/MobileWorkspaceDashboardSkeleton.tsx`
 
 ---
 
-## 6. Mobile Experience Gaps
+## Components to Keep
 
-### Completed:
-- Pull-to-refresh hook (`usePullToRefresh.ts`)
-- 48px touch targets in `MobileWorkspaceDashboard.tsx`
-- Communication tab added to mobile
-- `useOffline.ts` refactored to use Supabase
-
-### Outstanding Issues:
-
-| Component | Issue | Fix Required |
-|-----------|-------|--------------|
-| `MobileNavigation.tsx` | Verify 48px touch targets | Audit and update if needed |
-| `MobileTaskSummary.tsx` | List items may lack padding | Verify 48px row heights |
-| `MobileTeamManagement.tsx.backup` | Still has legacy `api.get` | Confirm main file is refactored |
-
-### Gap: Offline Visual Feedback
-
-`useOffline` hook works but:
-1. No visible "offline mode" banner in mobile UI
-2. No sync progress indicator
-3. No pending items count display
+| Component | New Location | Reason |
+|-----------|-------------|--------|
+| `OfflineModeBanner` | `src/components/mobile/shared/` | Useful for all devices |
+| `SyncProgressIndicator` | `src/components/mobile/shared/` | Useful for all devices |
+| `PullToRefresh` | `src/components/mobile/shared/` | Optional touch enhancement |
+| `MobileSkeleton` | `src/components/mobile/shared/` | Reusable loading states |
 
 ---
 
-## 7. RBAC Enforcement Status
+## Hooks to Keep/Modify
 
-### Completed:
-- `AutomationRulesPanel.tsx` - Requires LEAD+ (line 52)
-- `IntegrationManager.tsx` - Requires MANAGER+ (line 61)
-
-### Gap: Escalation UI RBAC
-
-When escalation components are integrated:
-- `EscalationRulesManager` should require MANAGER+
-- `EscalationHistoryPanel` should require LEAD+ to view, MANAGER+ to resolve
+| Hook | Action |
+|------|--------|
+| `useIsMobile` | Keep for conditional touch enhancements (not for layout switching) |
+| `useMobileHomeData` | Remove (was for mobile home page) |
+| `useOffline` | Keep (useful everywhere) |
 
 ---
 
-## 8. Analytics & Reporting Gaps
+## Risk Mitigation
 
-### PDF Export: COMPLETE
-`WorkspaceAnalyticsDashboard.tsx` now uses `jsPDF` and `jspdf-autotable` for local PDF generation.
-
-### Scheduled Reports: COMPLETE
-- `scheduled_reports` table exists
-- `process-scheduled-reports` edge function implemented
-- Handles daily/weekly/biweekly/monthly/quarterly frequencies
-
-### Gap: Cron Job Not Configured
-
-The `process-scheduled-reports` function exists but needs to be:
-1. Deployed to Supabase
-2. Configured with a pg_cron schedule (e.g., daily at 9 AM)
-
-### Gap: Report History UI
-
-`report_history` table referenced in edge function but:
-1. No UI to view past generated reports
-2. No download links for stored reports
-
----
-
-## 9. Automation System Gaps
-
-### Current Triggers Supported:
-- STATUS_CHANGED
-- UPDATE_PRIORITY
-- SEND_NOTIFICATION
-- ADD_TAG, REMOVE_TAG
-- SET_BLOCKED
-- AUTO_ASSIGN
-
-### Missing Industry-Standard Triggers:
-
-| Trigger | Use Case | Priority |
-|---------|----------|----------|
-| `WORKLOAD_THRESHOLD` | Auto-reassign when member exceeds capacity | Medium |
-| `SLA_BREACH` | Trigger escalation when deadline missed | High |
-| `DEADLINE_APPROACHING` | Send reminders at 7d, 3d, 1d before due | High |
-| `APPROVAL_PENDING_TOO_LONG` | Escalate stale approvals | Medium |
-
----
-
-## 10. Workspace Tab & Feature Gaps
-
-### Available Tabs per Workspace Type:
-
-| Tab | ROOT | DEPT | COMMITTEE | TEAM |
-|-----|------|------|-----------|------|
-| Overview | Yes | Yes | Yes | Yes |
-| Tasks | Yes | Yes | Yes | Yes |
-| Team | Yes | Yes | Yes | Yes |
-| Communication | Partial | Partial | Yes | Yes |
-| Analytics | Yes | Yes | Limited | No |
-| Reports | Yes | Yes | No | No |
-| Approvals | Yes | Yes | Yes | Limited |
-| Settings | Yes | Yes | Yes | Limited |
-| Escalation | Missing | Missing | N/A | N/A |
-| Templates | Limited | No | No | No |
-
-### Gap: Escalation Tab for ROOT/DEPARTMENT
-
-Need to add escalation management to workspace settings or as dedicated tab for ROOT and DEPARTMENT levels.
-
-### Gap: Template Management Tab
-
-`WorkspaceTemplateManagement.tsx` exists but is not integrated into any workspace view.
-
----
-
-## Implementation Roadmap
-
-### Sprint 1: Critical API Fixes (Days 1-3) ✅ COMPLETE
-1. ✅ All 8 files already refactored to use Supabase with placeholder patterns
-2. ✅ Auth session refresh uses `supabase.auth.refreshSession()`
-3. ✅ Vendor coordination uses Supabase queries with TODO placeholders for missing tables
-
-### Sprint 2: Real-Time & Integration (Days 4-6) ✅ COMPLETE
-1. ✅ All 5 committee dashboards have real-time hooks:
-   - `MediaDashboard` → `useMediaCommitteeRealtime`
-   - `SocialMediaDashboard` → `useSocialMediaCommitteeRealtime`
-   - `MarketingDashboard` → `useMarketingCommitteeRealtime`
-   - `CommunicationDashboard` → `useCommunicationCommitteeRealtime`
-   - `ContentDashboard` → `useContentCommitteeRealtime`
-2. ✅ Escalation components (`OverdueItemsWidget`, `EscalationRulesManager`) integrated into all committee dashboards
-3. ✅ ROOT dashboard includes escalation widgets
-
-### Sprint 3: Template & Event Integration (Days 7-9) ✅ COMPLETE
-1. ✅ Add template selection to event creation wizard (`TemplateSection.tsx`)
-2. ✅ Connect template_id to workspace provisioning (via URL params)
-3. ✅ Add post-event template rating flow (`PostEventRatingPrompt.tsx`)
-
-### Sprint 4: Communication Enhancements (Days 10-12) ✅ COMPLETE
-1. ✅ Implement thread replies UI in message thread (`ThreadReplyPanel.tsx`, `ThreadIndicator`)
-2. ✅ Add emoji reactions picker and display (`MessageReactions.tsx`, `EmojiPicker`)
-3. ✅ Add reaction aggregation (localStorage-based until DB table is created)
-
-### Sprint 5: Mobile & Offline (Days 13-14) ✅ COMPLETE
-1. ✅ Add offline mode banner (`OfflineModeBanner.tsx`)
-2. ✅ Implement sync progress indicator (`SyncProgressIndicator.tsx`, `CompactSyncIndicator`)
-3. ✅ Integrated into `MobileAppShell` and `MobileHeader`
-
-### Sprint 6: Automation & Reporting (Days 15-16) ✅ COMPLETE
-1. ✅ Add SLA_BREACH and DEADLINE_APPROACHING triggers to `automationTypes.ts`
-2. ✅ Created `check-deadlines` edge function for scheduled deadline monitoring
-3. ✅ Built `ReportHistoryViewer` component for viewing scheduled reports
-4. Note: pg_cron configuration requires manual setup in Supabase dashboard
-
----
-
-## 🎉 ALL SPRINTS COMPLETE
-
-All 6 sprints from the implementation roadmap have been completed. The workspace system now includes:
-- ✅ Full Supabase integration (no legacy API calls)
-- ✅ Real-time updates on all dashboards
-- ✅ Escalation workflow with rules and history
-- ✅ Template selection during event creation
-- ✅ Threaded messaging with emoji reactions
-- ✅ Mobile offline mode with sync indicators
-- ✅ SLA breach and deadline automation triggers
-
----
-
-## Files Summary
-
-### Files Requiring Critical Fixes (8):
-1. `src/components/marketplace/VendorCoordination.tsx`
-2. `src/components/marketplace/BookingManagementUI.tsx`
-3. `src/components/marketplace/ReviewRatingUI.tsx`
-4. `src/components/communication/CommunicationHistory.tsx`
-5. `src/components/routing/services/EventListPage.tsx`
-6. `src/components/profile/ProfileCompletion.tsx`
-7. `src/hooks/useVendorStatus.ts`
-8. `src/hooks/useAuthSessionRefresh.ts`
-
-### Files Requiring Real-Time Addition (5):
-1. `src/components/workspace/media/MediaDashboard.tsx`
-2. `src/components/workspace/social-media/SocialMediaDashboard.tsx`
-3. `src/components/workspace/marketing/MarketingDashboard.tsx`
-4. `src/components/workspace/communication/CommunicationDashboard.tsx`
-5. `src/components/workspace/content/ContentDashboard.tsx`
-
-### New Files to Create (4):
-1. Thread replies component for communication
-2. Emoji reactions component for communication
-3. Offline mode banner component
-4. Report history viewer component
-
-### Integration Points to Add (6):
-1. EscalationRulesManager to workspace settings
-2. OverdueItemsWidget to ROOT dashboard
-3. Template selection to event creation
-4. Template rating to event completion
-5. Cron schedule for process-scheduled-reports
-6. Escalation tab to workspace navigation
-
----
-
-## Success Metrics
-
-1. Zero broken API calls in production code
-2. 100% real-time coverage on all dashboards
-3. Escalation workflow fully integrated and visible
-4. Template selection available during event creation
-5. Thread replies and reactions functional
-6. Scheduled reports processing automatically
-7. Mobile offline experience with visual feedback
-8. All touch targets meet 48px minimum
+1. **Testing**: After implementation, test on multiple viewport sizes (320px, 375px, 768px, 1024px, 1440px)
+2. **Touch Targets**: Verify all interactive elements maintain 44x44px minimum touch targets
+3. **Navigation**: Ensure hamburger menu is discoverable on mobile
+4. **Gradual Rollout**: Keep mobile components in codebase (commented/deprecated) until verified
