@@ -1,13 +1,1 @@
 project_id = "ltsniuflqfahdcirrmjh"
-
-[functions.workspace-channels]
-verify_jwt = false
-
-[functions.workspace-analytics]
-verify_jwt = false
-
-[functions.workspace-reports]
-verify_jwt = false
-
-[functions.channel-messages]
-verify_jwt = false
