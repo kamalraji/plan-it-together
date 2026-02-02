@@ -36,7 +36,7 @@ export function TechnicalDashboard({
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <TechnicalStatsCards />
+      <TechnicalStatsCards workspaceId={workspace.id} eventId={workspace.eventId} />
 
       {/* Quick Actions */}
       <TechnicalQuickActions />
