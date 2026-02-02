@@ -29,6 +29,7 @@ export { WorkspaceRBACInfo } from './WorkspaceRBACInfo';
 export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
 export { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
 export { ActivityFeedWidget } from './ActivityFeedWidget';
+export { PostEventRatingPrompt } from './PostEventRatingPrompt';
 
 // Mobile Components
 export * from './mobile';

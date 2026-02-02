@@ -283,10 +283,10 @@ Need to add escalation management to workspace settings or as dedicated tab for 
 2. Integrate escalation components into workspace settings
 3. Add `OverdueItemsWidget` to ROOT dashboard
 
-### Sprint 3: Template & Event Integration (Days 7-9)
-1. Add template selection to event creation wizard
-2. Connect template_id to workspace provisioning
-3. Add post-event template rating flow
+### Sprint 3: Template & Event Integration (Days 7-9) ✅ COMPLETE
+1. ✅ Add template selection to event creation wizard (`TemplateSection.tsx`)
+2. ✅ Connect template_id to workspace provisioning (via URL params)
+3. ✅ Add post-event template rating flow (`PostEventRatingPrompt.tsx`)
 
 ### Sprint 4: Communication Enhancements (Days 10-12)
 1. Implement thread replies UI in message thread
