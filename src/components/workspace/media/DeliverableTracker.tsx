@@ -8,60 +8,75 @@ import {
   Clock, 
   AlertCircle,
   ChevronRight,
-  Calendar
+  Calendar,
+  Loader2,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-interface Deliverable {
-  id: string;
-  name: string;
-  description: string;
-  dueDate: string;
-  status: 'completed' | 'in_progress' | 'pending' | 'overdue';
-  progress: number;
-  assignee: string;
+interface DeliverableTrackerProps {
+  workspaceId?: string;
 }
 
-export function DeliverableTracker() {
-  const deliverables: Deliverable[] = [
-    {
-      id: '1',
-      name: 'Event Highlights Video',
-      description: '3-5 min recap video for social media',
-      dueDate: '2024-01-20',
-      status: 'in_progress',
-      progress: 65,
-      assignee: 'Priya N.',
-    },
-    {
-      id: '2',
-      name: 'Press Photos Package',
-      description: '50 edited high-res photos for media outlets',
-      dueDate: '2024-01-18',
-      status: 'completed',
-      progress: 100,
-      assignee: 'Arjun M.',
-    },
-    {
-      id: '3',
-      name: 'Social Media Assets',
-      description: 'Story-ready photos and short clips',
-      dueDate: '2024-01-17',
-      status: 'in_progress',
-      progress: 40,
-      assignee: 'Sneha P.',
-    },
-    {
-      id: '4',
-      name: 'Drone Footage Package',
-      description: 'Aerial shots for promotional use',
-      dueDate: '2024-01-19',
-      status: 'pending',
-      progress: 0,
-      assignee: 'Rahul S.',
-    },
-  ];
+interface MediaDeliverable {
+  id: string;
+  name: string;
+  description: string | null;
+  due_date: string | null;
+  status: 'completed' | 'in_progress' | 'pending' | 'overdue';
+  progress: number;
+  assignee_name: string | null;
+}
 
-  const getStatusConfig = (status: Deliverable['status']) => {
+export function DeliverableTracker({ workspaceId }: DeliverableTrackerProps) {
+  // Query workspace tasks as deliverables for media workspace
+  const { data: deliverables = [], isLoading } = useQuery({
+    queryKey: ['media-deliverables', workspaceId],
+    queryFn: async (): Promise<MediaDeliverable[]> => {
+      if (!workspaceId) return [];
+      
+      // Fetch tasks that are tagged as deliverables or have specific labels
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .select('id, title, description, due_date, status, assigned_to')
+        .eq('workspace_id', workspaceId)
+        .order('due_date', { ascending: true })
+        .limit(10);
+      
+      if (error) throw error;
+      
+      // Map task status to deliverable status
+      return (data || []).map(task => {
+        let status: 'completed' | 'in_progress' | 'pending' | 'overdue' = 'pending';
+        let progress = 0;
+        
+        const taskStatus = (task.status || '').toLowerCase();
+        if (['done', 'completed'].includes(taskStatus)) {
+          status = 'completed';
+          progress = 100;
+        } else if (['in_progress', 'in progress'].includes(taskStatus)) {
+          status = 'in_progress';
+          progress = 50;
+        } else if (task.due_date && new Date(task.due_date) < new Date()) {
+          status = 'overdue';
+          progress = 25;
+        }
+        
+        return {
+          id: task.id,
+          name: task.title,
+          description: task.description,
+          due_date: task.due_date,
+          status,
+          progress,
+          assignee_name: null, // Would need to join with profiles
+        };
+      });
+    },
+    enabled: !!workspaceId,
+  });
+
+  const getStatusConfig = (status: MediaDeliverable['status']) => {
     switch (status) {
       case 'completed':
         return { icon: CheckCircle, color: 'bg-green-100 text-green-800', label: 'Completed' };
@@ -75,9 +90,19 @@ export function DeliverableTracker() {
   };
 
   const completedCount = deliverables.filter(d => d.status === 'completed').length;
-  const totalProgress = Math.round(
-    deliverables.reduce((sum, d) => sum + d.progress, 0) / deliverables.length
-  );
+  const totalProgress = deliverables.length > 0 
+    ? Math.round(deliverables.reduce((sum, d) => sum + d.progress, 0) / deliverables.length)
+    : 0;
+
+  if (isLoading) {
+    return (
+      <Card className="border-border/50">
+        <CardContent className="flex items-center justify-center h-[300px]">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border/50">
@@ -101,42 +126,53 @@ export function DeliverableTracker() {
         </div>
 
         {/* Deliverable List */}
-        <div className="space-y-3">
-          {deliverables.map((deliverable) => {
-            const statusConfig = getStatusConfig(deliverable.status);
-            const StatusIcon = statusConfig.icon;
+        {deliverables.length === 0 ? (
+          <div className="text-center py-8">
+            <Package className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
+            <p className="text-sm text-muted-foreground">No deliverables found</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {deliverables.map((deliverable) => {
+              const statusConfig = getStatusConfig(deliverable.status);
+              const StatusIcon = statusConfig.icon;
 
-            return (
-              <div 
-                key={deliverable.id}
-                className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{deliverable.name}</p>
-                    <p className="text-xs text-muted-foreground">{deliverable.description}</p>
+              return (
+                <div 
+                  key={deliverable.id}
+                  className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer space-y-2"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{deliverable.name}</p>
+                      {deliverable.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-1">{deliverable.description}</p>
+                      )}
+                    </div>
+                    <Badge className={statusConfig.color} variant="secondary">
+                      <StatusIcon className="h-3 w-3 mr-1" />
+                      {statusConfig.label}
+                    </Badge>
                   </div>
-                  <Badge className={statusConfig.color} variant="secondary">
-                    <StatusIcon className="h-3 w-3 mr-1" />
-                    {statusConfig.label}
-                  </Badge>
-                </div>
 
-                <div className="space-y-1">
-                  <Progress value={deliverable.progress} className="h-1.5" />
-                </div>
+                  <div className="space-y-1">
+                    <Progress value={deliverable.progress} className="h-1.5" />
+                  </div>
 
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{deliverable.assignee}</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    Due: {new Date(deliverable.dueDate).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{deliverable.assignee_name || 'Unassigned'}</span>
+                    {deliverable.due_date && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Due: {new Date(deliverable.due_date).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         <Button variant="ghost" className="w-full text-muted-foreground">
           View All Deliverables

@@ -31,7 +31,11 @@ type ModalType =
   | 'report' 
   | null;
 
-export function OperationsQuickActions() {
+interface OperationsQuickActionsProps {
+  workspaceId?: string;
+}
+
+export function OperationsQuickActions({ workspaceId }: OperationsQuickActionsProps) {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   const actions = [
@@ -140,7 +144,8 @@ export function OperationsQuickActions() {
       />
       <LogisticsStatusModal 
         open={activeModal === 'logistics'} 
-        onOpenChange={(open) => !open && setActiveModal(null)} 
+        onOpenChange={(open) => !open && setActiveModal(null)}
+        workspaceId={workspaceId}
       />
       <CateringUpdateModal 
         open={activeModal === 'catering'} 
@@ -156,7 +161,8 @@ export function OperationsQuickActions() {
       />
       <IncidentReportModal 
         open={activeModal === 'incident'} 
-        onOpenChange={(open) => !open && setActiveModal(null)} 
+        onOpenChange={(open) => !open && setActiveModal(null)}
+        workspaceId={workspaceId}
       />
       <TeamRosterModal 
         open={activeModal === 'roster'} 
