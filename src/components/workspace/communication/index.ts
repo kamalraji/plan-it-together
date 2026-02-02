@@ -27,3 +27,4 @@ export { UnifiedCommunicationHub } from './UnifiedCommunicationHub';
 export { BroadcastComposerDialog } from './BroadcastComposerDialog';
 export { ChannelCategoryManager } from './ChannelCategoryManager';
 export { CommunicationAnalyticsPanel } from './CommunicationAnalyticsPanel';
+export { ModerationToolsPanel } from './ModerationToolsPanel';

@@ -38,6 +38,12 @@ verify_jwt = false
 verify_jwt = false
 
 # ============= COMMUNICATION =============
+[functions.broadcast-message]
+verify_jwt = false
+
+[functions.session-channel-sync]
+verify_jwt = false
+
 [functions.send-push-notification]
 verify_jwt = false
 
