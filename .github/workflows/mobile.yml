@@ -4,16 +4,16 @@ on:
   push:
     branches: [main, master]
     paths:
-      - 'flutter-participant-mobile-app/**'
+      - 'apps/mobile/**'
       - 'supabase/**'
   pull_request:
     branches: [main, master]
     paths:
-      - 'flutter-participant-mobile-app/**'
+      - 'apps/mobile/**'
 
 defaults:
   run:
-    working-directory: flutter-participant-mobile-app
+    working-directory: apps/mobile
 
 jobs:
   analyze:

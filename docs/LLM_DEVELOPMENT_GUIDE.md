@@ -20,7 +20,7 @@ This guide provides structured context for AI-assisted development across both t
 |--------|---------|------------|
 | **Purpose** | Organizer dashboard for event management | Participant app for attendees |
 | **Framework** | React 18 + TypeScript | Flutter 3.4+ / Dart |
-| **Location** | `apps/web/` | `apps/mobile/` |
+| **Location** | `src/` (root for Lovable compatibility) | `apps/mobile/` |
 | **State Management** | TanStack Query + Zustand | Provider + ChangeNotifier |
 | **Routing** | React Router v7 | GoRouter |
 | **UI Framework** | Tailwind CSS + shadcn/ui | Material Design + Custom Widgets |
@@ -29,7 +29,7 @@ This guide provides structured context for AI-assisted development across both t
 
 | App | Entry Point | Router | State Store |
 |-----|-------------|--------|-------------|
-| Web | `apps/web/src/main.tsx` | `src/components/routing/AppRouter.tsx` | TanStack Query |
+| Web | `src/main.tsx` | `src/components/routing/AppRouter.tsx` | TanStack Query |
 | Mobile | `apps/mobile/lib/main.dart` | `lib/nav.dart` | Provider |
 
 ### Shared Backend (Supabase)
@@ -39,7 +39,7 @@ This guide provides structured context for AI-assisted development across both t
 | Edge Functions | `supabase/functions/` | API endpoints for both apps |
 | Migrations | `supabase/migrations/` | Database schema changes |
 | Config | `supabase/config.toml` | Function configuration |
-| TypeScript Types | `apps/web/src/integrations/supabase/types.ts` | Auto-generated types |
+| TypeScript Types | `src/integrations/supabase/types.ts` | Auto-generated types |
 | Dart Models | `apps/mobile/lib/models/` | Hand-written data classes |
 
 ---
@@ -50,17 +50,17 @@ This guide provides structured context for AI-assisted development across both t
 
 ```
 /
+├── src/                        # React Organizer Web App (root for Lovable)
+│   ├── components/             # UI Components (shadcn-based)
+│   ├── hooks/                  # React Hooks (data fetching, state)
+│   ├── pages/                  # Route pages
+│   ├── lib/                    # Utilities
+│   └── integrations/           # Supabase client
+│
+├── public/                     # Static assets (web)
+├── package.json                # Web app dependencies
+│
 ├── apps/
-│   ├── web/                    # React Organizer Web App
-│   │   ├── src/
-│   │   │   ├── components/     # UI Components (shadcn-based)
-│   │   │   ├── hooks/          # React Hooks (data fetching, state)
-│   │   │   ├── pages/          # Route pages
-│   │   │   ├── lib/            # Utilities
-│   │   │   └── integrations/   # Supabase client
-│   │   ├── public/             # Static assets
-│   │   └── package.json
-│   │
 │   └── mobile/                 # Flutter Participant Mobile App
 │       ├── lib/
 │       │   ├── models/         # Data classes

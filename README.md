@@ -4,19 +4,22 @@ React web app (organizers) + Flutter mobile app (participants) sharing a unified
 
 ## Structure
 
-- `src/` - React Organizer Web App
-- `flutter-participant-mobile-app/` - Flutter Participant Mobile App  
-- `supabase/` - Shared Backend (69 Edge Functions)
-- `docs/` - Cross-platform documentation
+```
+/
+├── src/                    # React Organizer Web App (Lovable-hosted)
+├── apps/mobile/            # Flutter Participant Mobile App
+├── supabase/               # Shared Backend (69 Edge Functions)
+└── docs/                   # Cross-platform documentation
+```
 
 ## Quick Start
 
 ```bash
-# Web App
+# Web App (root level for Lovable compatibility)
 bun install && bun run dev
 
 # Mobile App
-cd flutter-participant-mobile-app && flutter pub get && flutter run
+cd apps/mobile && flutter pub get && flutter run
 ```
 
 ## Documentation
