@@ -288,10 +288,10 @@ Need to add escalation management to workspace settings or as dedicated tab for 
 2. ✅ Connect template_id to workspace provisioning (via URL params)
 3. ✅ Add post-event template rating flow (`PostEventRatingPrompt.tsx`)
 
-### Sprint 4: Communication Enhancements (Days 10-12)
-1. Implement thread replies UI in message thread
-2. Add emoji reactions picker and display
-3. Add reaction aggregation
+### Sprint 4: Communication Enhancements (Days 10-12) ✅ COMPLETE
+1. ✅ Implement thread replies UI in message thread (`ThreadReplyPanel.tsx`, `ThreadIndicator`)
+2. ✅ Add emoji reactions picker and display (`MessageReactions.tsx`, `EmojiPicker`)
+3. ✅ Add reaction aggregation (localStorage-based until DB table is created)
 
 ### Sprint 5: Mobile & Offline (Days 13-14)
 1. Add offline mode banner

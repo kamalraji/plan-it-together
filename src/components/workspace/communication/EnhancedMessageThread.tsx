@@ -10,18 +10,29 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { WorkspaceChannel, SendMessageDTO } from '../../../types';
 import { MessageComposer } from './MessageComposer';
+import { MessageReactions } from './MessageReactions';
+import { ThreadReplyPanel, ThreadIndicator } from './ThreadReplyPanel';
 import { useRealtimeMessages, ChannelMessage } from '@/hooks/useRealtimeMessages';
 import { useChannelPresence } from '@/hooks/useChannelPresence';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { MessageSquare, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface EnhancedMessageThreadProps {
   channel: WorkspaceChannel;
   onSendMessage?: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
   isSending?: boolean;
 }
+
+// Note: MessageWithReplies will be used when parent_message_id column is added
+// interface MessageWithReplies extends ChannelMessage {
+//   replyCount?: number;
+//   latestReplyAt?: string;
+// }
 
 export function EnhancedMessageThread({ 
   channel, 
@@ -32,6 +43,8 @@ export function EnhancedMessageThread({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const [activeThreadMessage, setActiveThreadMessage] = useState<ChannelMessage | null>(null);
+  const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
 
   // Real-time messages hook
   const { 
@@ -247,10 +260,14 @@ export function EnhancedMessageThread({
                 </div>
               )}
               
-              <div className={cn(
-                "flex space-x-3 group hover:bg-muted/30 rounded px-2 py-1 -mx-2 transition-colors",
-                showSender ? 'mt-3' : 'mt-0.5'
-              )}>
+              <div 
+                className={cn(
+                  "flex space-x-3 group hover:bg-muted/30 rounded px-2 py-1 -mx-2 transition-colors relative",
+                  showSender ? 'mt-3' : 'mt-0.5'
+                )}
+                onMouseEnter={() => setHoveredMessageId(message.id)}
+                onMouseLeave={() => setHoveredMessageId(null)}
+              >
                 {showSender ? (
                   <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary text-sm">
@@ -320,7 +337,45 @@ export function EnhancedMessageThread({
                       ))}
                     </div>
                   )}
+
+                  {/* Reactions */}
+                  <div className="mt-1">
+                    <MessageReactions messageId={message.id} />
+                  </div>
+
+                  {/* Thread Reply Indicator - will show when replies exist */}
+                  <ThreadIndicator
+                    replyCount={0} 
+                    onClick={() => setActiveThreadMessage(message)}
+                  />
                 </div>
+
+                {/* Message Actions Toolbar (on hover) */}
+                {hoveredMessageId === message.id && (
+                  <div className="absolute -top-3 right-2 flex items-center gap-0.5 p-0.5 rounded-md bg-card border border-border shadow-sm">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={() => setActiveThreadMessage(message)}
+                      title="Reply in thread"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={() => {
+                        navigator.clipboard.writeText(message.content);
+                        toast.success('Copied to clipboard');
+                      }}
+                      title="Copy message"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))
@@ -365,6 +420,16 @@ export function EnhancedMessageThread({
         >
           ↓
         </button>
+      )}
+
+      {/* Thread Reply Panel */}
+      {activeThreadMessage && (
+        <div className="absolute right-0 top-0 bottom-0 w-80 z-10">
+          <ThreadReplyPanel
+            parentMessage={activeThreadMessage}
+            onClose={() => setActiveThreadMessage(null)}
+          />
+        </div>
       )}
     </div>
   );

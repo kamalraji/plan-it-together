@@ -11,3 +11,8 @@ export { MessagingChannels } from './MessagingChannels';
 export { PressReleaseTracker } from './PressReleaseTracker';
 export { CommunicationQuickActions } from './CommunicationQuickActions';
 export { StakeholderDirectory } from './StakeholderDirectory';
+export { EnhancedMessageThread } from './EnhancedMessageThread';
+export { RealtimeMessageThread } from './RealtimeMessageThread';
+export { MessageReactions, EmojiPicker } from './MessageReactions';
+export { ThreadReplyPanel, ThreadIndicator } from './ThreadReplyPanel';
+export { MessageActions } from './MessageActions';
