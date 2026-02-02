@@ -82,12 +82,7 @@ export function MarketingDashboard({
       />
 
       {/* Marketing Stats */}
-      <MarketingStatsCards
-        activeCampaigns={5}
-        totalReach={45200}
-        conversionRate={3.8}
-        adSpend={8500}
-      />
+      <MarketingStatsCards workspaceId={workspace.id} />
 
       {/* Campaign Tracker */}
       <CampaignTracker />
