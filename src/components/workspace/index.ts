@@ -30,6 +30,8 @@ export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
 export { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
 export { ActivityFeedWidget } from './ActivityFeedWidget';
 export { PostEventRatingPrompt } from './PostEventRatingPrompt';
+export { BulkTaskActions } from './BulkTaskActions';
+export { DashboardExportButton } from './DashboardExportButton';
 
 // Mobile Components
 export * from './mobile';
