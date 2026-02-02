@@ -21,7 +21,7 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
     queryKey: ['mobile-workspace-analytics', workspace.id],
     queryFn: async () => {
       // Fetch task statistics
-      const [totalRes, completedRes, overdueRes] = await Promise.all([
+      const [totalRes, completedRes, overdueRes, memberRes] = await Promise.all([
         supabase
           .from('workspace_tasks')
           .select('*', { count: 'exact', head: true })
@@ -30,23 +30,45 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
           .from('workspace_tasks')
           .select('*', { count: 'exact', head: true })
           .eq('workspace_id', workspace.id)
-          .eq('status', 'COMPLETED'),
+          .in('status', ['completed', 'done', 'COMPLETED']),
         supabase
           .from('workspace_tasks')
           .select('*', { count: 'exact', head: true })
           .eq('workspace_id', workspace.id)
-          .neq('status', 'COMPLETED')
+          .not('status', 'in', '("completed","done","COMPLETED")')
           .lt('due_date', new Date().toISOString()),
+        supabase
+          .from('workspace_team_members')
+          .select('*', { count: 'exact', head: true })
+          .eq('workspace_id', workspace.id),
       ]);
 
       const totalTasks = totalRes.count ?? 0;
       const completedTasks = completedRes.count ?? 0;
       const overdueTasks = overdueRes.count ?? 0;
-      const teamMembers = workspace.teamMembers?.length ?? 0;
+      const teamMembers = memberRes.count ?? workspace.teamMembers?.length ?? 0;
       const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-      // Mock weekly progress (in production, calculate from actual data)
-      const weeklyProgress = [65, 72, 68, 75, 80, 78, completionRate];
+      // Calculate weekly progress from actual task completion data
+      const weeklyProgress: number[] = [];
+      const today = new Date();
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Get tasks completed up to this date
+        const { count: completedByDate } = await supabase
+          .from('workspace_tasks')
+          .select('*', { count: 'exact', head: true })
+          .eq('workspace_id', workspace.id)
+          .in('status', ['completed', 'done', 'COMPLETED'])
+          .lte('updated_at', `${dateStr}T23:59:59`);
+        
+        const rate = totalTasks > 0 ? Math.round(((completedByDate ?? 0) / totalTasks) * 100) : 0;
+        weeklyProgress.push(rate);
+      }
 
       return {
         totalTasks,
