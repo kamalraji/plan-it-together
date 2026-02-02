@@ -13,6 +13,7 @@ import { useFinanceCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { DashboardExportButton } from '../DashboardExportButton';
 
 interface FinanceDashboardProps {
   workspace: Workspace;
@@ -84,13 +85,16 @@ export function FinanceDashboard({
   return (
     <div className="space-y-6">
       {/* Finance Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+        <DashboardExportButton workspaceId={workspace.id} dashboardType="finance" />
+      </div>
 
       {/* Financial Summary Cards */}
       <FinancialSummaryCards workspaceId={workspace.id} />

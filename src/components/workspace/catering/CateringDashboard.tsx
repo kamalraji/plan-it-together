@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { DashboardExportButton } from '../DashboardExportButton';
 
 interface CateringDashboardProps {
   workspace: Workspace;
@@ -81,13 +82,16 @@ export function CateringDashboard({
   return (
     <div className="space-y-6">
       {/* Catering Committee Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+        <DashboardExportButton workspaceId={workspace.id} dashboardType="catering" />
+      </div>
 
 
       {/* Catering Stats Overview */}

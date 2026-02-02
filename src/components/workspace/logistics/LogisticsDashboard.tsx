@@ -15,6 +15,7 @@ import { EquipmentManager } from './EquipmentManager';
 import { TransportSchedule } from './TransportSchedule';
 import { VenueLogistics } from './VenueLogistics';
 import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { DashboardExportButton } from '../DashboardExportButton';
 
 interface LogisticsDashboardProps {
   workspace: Workspace;
@@ -75,13 +76,16 @@ export function LogisticsDashboard({
   return (
     <div className="space-y-6">
       {/* Committee Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+        <DashboardExportButton workspaceId={workspace.id} dashboardType="logistics" />
+      </div>
 
       {/* Stats Overview */}
       <LogisticsStatsCards workspaceId={workspace.id} />
