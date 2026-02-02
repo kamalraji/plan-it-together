@@ -6,3 +6,6 @@ export { CoverageSchedule } from './CoverageSchedule';
 export { MediaAssetGallery } from './MediaAssetGallery';
 export { MediaQuickActions } from './MediaQuickActions';
 export { DeliverableTracker } from './DeliverableTracker';
+export { AddCrewModal } from './AddCrewModal';
+export { MediaUploadModal } from './MediaUploadModal';
+export { ShareGalleryModal } from './ShareGalleryModal';
