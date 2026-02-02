@@ -32,6 +32,7 @@ export { ActivityFeedWidget } from './ActivityFeedWidget';
 export { PostEventRatingPrompt } from './PostEventRatingPrompt';
 export { BulkTaskActions } from './BulkTaskActions';
 export { DashboardExportButton } from './DashboardExportButton';
+export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 
 // Mobile Components
 export * from './mobile';
