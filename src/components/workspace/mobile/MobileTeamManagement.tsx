@@ -9,9 +9,10 @@ import {
   ClockIcon,
   XCircleIcon,
   UserMinusIcon,
-  PencilIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
+import { MobileRoleEditor } from './MobileRoleEditor';
 import { Workspace, WorkspaceRole } from '../../../types';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
@@ -43,6 +44,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMemberWithProfile | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [memberToEditRole, setMemberToEditRole] = useState<TeamMemberWithProfile | null>(null);
   const queryClient = useQueryClient();
 
   // Fetch team members from Supabase
@@ -343,9 +345,10 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                 <div className="mt-4 pt-4 border-t border-border space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <button
+                      onClick={() => setMemberToEditRole(member)}
                       className="flex items-center justify-center px-3 py-3 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 min-h-[48px]"
                     >
-                      <PencilIcon className="w-4 h-4 mr-2" />
+                      <ShieldCheckIcon className="w-4 h-4 mr-2" />
                       Edit Role
                     </button>
                     <button
@@ -382,6 +385,17 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
         onConfirm={confirmRemoveMember}
         isLoading={removeTeamMemberMutation.isPending}
       />
+
+      {/* Mobile Role Editor */}
+      {memberToEditRole && (
+        <MobileRoleEditor
+          memberId={memberToEditRole.id}
+          currentRole={memberToEditRole.role}
+          memberName={memberToEditRole.user_profiles?.name || 'Team Member'}
+          workspaceId={workspace.id}
+          onClose={() => setMemberToEditRole(null)}
+        />
+      )}
     </div>
   );
 }

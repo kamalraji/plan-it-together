@@ -12,3 +12,8 @@ export { MobileTeamManagement } from './MobileTeamManagement';
 export { MobileCommunication } from './MobileCommunication';
 export { MobileSettings } from './MobileSettings';
 export { MobileFeaturesPanel } from './MobileFeaturesPanel';
+
+// New mobile-optimized components (Phase 3)
+export { MobileNavigation } from './MobileNavigation';
+export { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
+export { MobileRoleEditor } from './MobileRoleEditor';

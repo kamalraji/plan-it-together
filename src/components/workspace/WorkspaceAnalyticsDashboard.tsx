@@ -142,6 +142,25 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
       else if (completionRate < 50 || overdueTasks.length > 5) overallHealth = 'WARNING';
       else if (overdueTasks.length > 10 || blockedTasks.length > 5) overallHealth = 'CRITICAL';
 
+      // Calculate average completion time from real data (using updated_at as proxy for completion)
+      const completedWithDates = completedTasks.filter(t => t.created_at && t.updated_at);
+      let avgCompletionDays = 0;
+      if (completedWithDates.length > 0) {
+        const totalDays = completedWithDates.reduce((sum, task) => {
+          const created = new Date(task.created_at);
+          const completed = new Date(task.updated_at!);
+          return sum + (completed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+        }, 0);
+        avgCompletionDays = Math.round((totalDays / completedWithDates.length) * 10) / 10;
+      }
+
+      // Calculate collaboration score from real data
+      const uniqueAssignees = new Set(allTasks.filter(t => t.assigned_to).map(t => t.assigned_to)).size;
+      const participationRate = allMembers.length > 0 ? uniqueAssignees / allMembers.length : 0;
+      const distributionScore = participationRate * 40;
+      const activityScore = completionRate * 0.3;
+      const realCollaborationScore = Math.round(Math.min(100, distributionScore + activityScore * 100 + (allTasks.length > 5 ? 20 : 0)));
+
       return {
         taskMetrics: {
           totalTasks: allTasks.length,
@@ -150,13 +169,13 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
           overdueTasks: overdueTasks.length,
           blockedTasks: blockedTasks.length,
           completionRate,
-          averageCompletionTime: 3.5 // Placeholder
+          averageCompletionTime: avgCompletionDays
         },
         teamMetrics: {
           totalMembers: allMembers.length,
-          activeMembers: allMembers.length, // All considered active for now
+          activeMembers: allMembers.length,
           taskAssignments,
-          collaborationScore: 75 // Placeholder
+          collaborationScore: realCollaborationScore
         },
         timelineMetrics: {
           tasksCompletedOverTime: [], // Would need historical data
