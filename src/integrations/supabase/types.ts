@@ -7811,6 +7811,84 @@ export type Database = {
           },
         ]
       }
+      participant_channels: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          event_id: string
+          id: string
+          is_active: boolean | null
+          joined_at: string | null
+          left_at: string | null
+          permissions: Json | null
+          registration_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          permissions?: Json | null
+          registration_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          permissions?: Json | null
+          registration_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_channels_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_channels_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_channels_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_channels_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "participant_channels_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       password_history: {
         Row: {
           created_at: string | null
@@ -13470,44 +13548,108 @@ export type Database = {
           },
         ]
       }
+      workspace_channel_templates: {
+        Row: {
+          auto_create_on_provision: boolean | null
+          channel_type: string
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_participant_visible: boolean | null
+          name: string
+          participant_can_write: boolean | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_create_on_provision?: boolean | null
+          channel_type?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_participant_visible?: boolean | null
+          name: string
+          participant_can_write?: boolean | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_create_on_provision?: boolean | null
+          channel_type?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_participant_visible?: boolean | null
+          name?: string
+          participant_can_write?: boolean | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       workspace_channels: {
         Row: {
+          auto_join_on_registration: boolean | null
           created_at: string | null
           created_by: string | null
           description: string | null
           id: string
+          is_participant_channel: boolean | null
           is_private: boolean | null
+          max_participants: number | null
           metadata: Json | null
           name: string
+          participant_permissions: Json | null
+          template_id: string | null
           type: string | null
           updated_at: string | null
           workspace_id: string
         }
         Insert: {
+          auto_join_on_registration?: boolean | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          is_participant_channel?: boolean | null
           is_private?: boolean | null
+          max_participants?: number | null
           metadata?: Json | null
           name: string
+          participant_permissions?: Json | null
+          template_id?: string | null
           type?: string | null
           updated_at?: string | null
           workspace_id: string
         }
         Update: {
+          auto_join_on_registration?: boolean | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          is_participant_channel?: boolean | null
           is_private?: boolean | null
+          max_participants?: number | null
           metadata?: Json | null
           name?: string
+          participant_permissions?: Json | null
+          template_id?: string | null
           type?: string | null
           updated_at?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_channels_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channel_templates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_channels_workspace_id_fkey"
             columns: ["workspace_id"]
