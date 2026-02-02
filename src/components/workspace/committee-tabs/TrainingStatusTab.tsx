@@ -1,68 +1,66 @@
 import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { GraduationCap, CheckCircle, Clock, AlertTriangle, Plus, Search } from 'lucide-react';
+import { GraduationCap, CheckCircle, Clock, AlertTriangle, Plus, Search, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useTrainingModules, useVolunteerTrainingProgress, useTrainingStats } from '@/hooks/useTrainingModules';
 
 interface TrainingStatusTabProps {
   workspace: Workspace;
 }
 
-interface TrainingModule {
-  id: string;
-  name: string;
-  required: boolean;
-  completedCount: number;
-  totalCount: number;
-}
-
-interface VolunteerTraining {
-  id: string;
-  name: string;
-  email: string;
-  completedModules: number;
-  totalModules: number;
-  status: 'completed' | 'in_progress' | 'not_started';
-}
-
-// Mock data
-const mockModules: TrainingModule[] = [
-  { id: '1', name: 'Safety & Emergency Procedures', required: true, completedCount: 12, totalCount: 20 },
-  { id: '2', name: 'Customer Service Excellence', required: true, completedCount: 18, totalCount: 20 },
-  { id: '3', name: 'Event Operations Overview', required: true, completedCount: 15, totalCount: 20 },
-  { id: '4', name: 'First Aid Basics', required: false, completedCount: 8, totalCount: 20 },
-];
-
-const mockVolunteers: VolunteerTraining[] = [
-  { id: '1', name: 'Alice Johnson', email: 'alice@example.com', completedModules: 4, totalModules: 4, status: 'completed' },
-  { id: '2', name: 'Bob Smith', email: 'bob@example.com', completedModules: 3, totalModules: 4, status: 'in_progress' },
-  { id: '3', name: 'Carol Davis', email: 'carol@example.com', completedModules: 2, totalModules: 4, status: 'in_progress' },
-  { id: '4', name: 'David Wilson', email: 'david@example.com', completedModules: 0, totalModules: 4, status: 'not_started' },
-];
-
-export function TrainingStatusTab({ workspace: _workspace }: TrainingStatusTabProps) {
+export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'completed' | 'in_progress' | 'not_started'>('all');
 
-  const filteredVolunteers = mockVolunteers.filter(v => {
-    const matchesSearch = v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         v.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || v.status === selectedFilter;
+  const { data: modules = [], isLoading: modulesLoading, refetch: refetchModules, isFetching: fetchingModules } = useTrainingModules(workspace.id);
+  const { data: volunteers = [], isLoading: volunteersLoading, refetch: refetchVolunteers, isFetching: fetchingVolunteers } = useVolunteerTrainingProgress(workspace.id);
+  const stats = useTrainingStats(workspace.id);
+
+  const isLoading = modulesLoading || volunteersLoading;
+  const isFetching = fetchingModules || fetchingVolunteers;
+
+  const filteredVolunteers = volunteers.filter(v => {
+    const matchesSearch = v.volunteerName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Determine volunteer status
+    const status = v.percentComplete === 100 ? 'completed' : 
+                   v.inProgressModules > 0 ? 'in_progress' : 'not_started';
+    
+    const matchesFilter = selectedFilter === 'all' || status === selectedFilter;
     return matchesSearch && matchesFilter;
   });
 
-  const completedCount = mockVolunteers.filter(v => v.status === 'completed').length;
-  const inProgressCount = mockVolunteers.filter(v => v.status === 'in_progress').length;
-  const notStartedCount = mockVolunteers.filter(v => v.status === 'not_started').length;
+  const completedCount = volunteers.filter(v => v.percentComplete === 100).length;
+  const inProgressCount = volunteers.filter(v => v.inProgressModules > 0 && v.percentComplete < 100).length;
+  const notStartedCount = volunteers.filter(v => v.percentComplete === 0 && v.inProgressModules === 0).length;
 
-  const overallProgress = Math.round(
-    (mockVolunteers.reduce((acc, v) => acc + v.completedModules, 0) / 
-     mockVolunteers.reduce((acc, v) => acc + v.totalModules, 0)) * 100
-  );
+  const overallProgress = stats.averageCompletion;
+
+  const handleRefresh = () => {
+    refetchModules();
+    refetchVolunteers();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -77,10 +75,16 @@ export function TrainingStatusTab({ workspace: _workspace }: TrainingStatusTabPr
             Track volunteer training completion
           </p>
         </div>
-        <Button className="bg-amber-500 hover:bg-amber-600 text-white">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Module
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh} disabled={isFetching}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Module
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -115,30 +119,51 @@ export function TrainingStatusTab({ workspace: _workspace }: TrainingStatusTabPr
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Training Modules</CardTitle>
-          <CardDescription>Required and optional training for volunteers</CardDescription>
+          <CardDescription>
+            {modules.length > 0 
+              ? `${modules.filter(m => m.is_required).length} required, ${modules.filter(m => !m.is_required).length} optional`
+              : 'No training modules created yet'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {mockModules.map(module => (
-            <div key={module.id} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">{module.name}</span>
-                  {module.required && (
-                    <Badge variant="outline" className="text-xs border-red-500/30 text-red-600">
-                      Required
-                    </Badge>
-                  )}
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {module.completedCount}/{module.totalCount} completed
-                </span>
-              </div>
-              <Progress 
-                value={(module.completedCount / module.totalCount) * 100} 
-                className="h-2"
-              />
+          {modules.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <p>No training modules yet</p>
+              <p className="text-sm">Create modules to track volunteer training</p>
             </div>
-          ))}
+          ) : (
+            modules.map(module => {
+              // Calculate completion for this module
+              const completedVolunteers = volunteers.filter(v => 
+                v.modules.some(m => m.moduleId === module.id && m.status === 'completed')
+              ).length;
+              const totalVolunteers = volunteers.length || 1;
+              const completionPercent = Math.round((completedVolunteers / totalVolunteers) * 100);
+
+              return (
+                <div key={module.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">{module.name}</span>
+                      {module.is_required && (
+                        <Badge variant="outline" className="text-xs border-red-500/30 text-red-600">
+                          Required
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {completedVolunteers}/{totalVolunteers} completed
+                    </span>
+                  </div>
+                  <Progress 
+                    value={completionPercent} 
+                    className="h-2"
+                  />
+                </div>
+              );
+            })
+          )}
         </CardContent>
       </Card>
 
@@ -182,52 +207,66 @@ export function TrainingStatusTab({ workspace: _workspace }: TrainingStatusTabPr
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {filteredVolunteers.map(volunteer => (
-              <div
-                key={volunteer.id}
-                className="flex items-center justify-between p-3 rounded-lg border"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="text-xs bg-amber-500/10 text-amber-600">
-                      {volunteer.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-sm">{volunteer.name}</p>
-                    <p className="text-xs text-muted-foreground">{volunteer.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      {volunteer.completedModules}/{volunteer.totalModules} modules
-                    </p>
-                    <Progress 
-                      value={(volunteer.completedModules / volunteer.totalModules) * 100}
-                      className="h-1.5 w-24"
-                    />
-                  </div>
-                  <Badge 
-                    variant="outline"
-                    className={
-                      volunteer.status === 'completed' ? 'border-emerald-500/30 text-emerald-600' :
-                      volunteer.status === 'in_progress' ? 'border-blue-500/30 text-blue-600' :
-                      'border-red-500/30 text-red-600'
-                    }
+          {filteredVolunteers.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No volunteers found matching your criteria</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredVolunteers.map(volunteer => {
+                const status = volunteer.percentComplete === 100 ? 'completed' : 
+                               volunteer.inProgressModules > 0 ? 'in_progress' : 'not_started';
+
+                return (
+                  <div
+                    key={volunteer.volunteerId}
+                    className="flex items-center justify-between p-3 rounded-lg border"
                   >
-                    {volunteer.status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
-                    {volunteer.status === 'in_progress' && <Clock className="h-3 w-3 mr-1" />}
-                    {volunteer.status === 'not_started' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                    {volunteer.status === 'completed' ? 'Complete' :
-                     volunteer.status === 'in_progress' ? 'In Progress' :
-                     'Not Started'}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className="text-xs bg-amber-500/10 text-amber-600">
+                          {volunteer.volunteerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-sm">{volunteer.volunteerName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {volunteer.completedModules} of {volunteer.totalModules} modules
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm font-medium">
+                          {volunteer.percentComplete}%
+                        </p>
+                        <Progress 
+                          value={volunteer.percentComplete}
+                          className="h-1.5 w-24"
+                        />
+                      </div>
+                      <Badge 
+                        variant="outline"
+                        className={
+                          status === 'completed' ? 'border-emerald-500/30 text-emerald-600' :
+                          status === 'in_progress' ? 'border-blue-500/30 text-blue-600' :
+                          'border-red-500/30 text-red-600'
+                        }
+                      >
+                        {status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {status === 'in_progress' && <Clock className="h-3 w-3 mr-1" />}
+                        {status === 'not_started' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                        {status === 'completed' ? 'Complete' :
+                         status === 'in_progress' ? 'In Progress' :
+                         'Not Started'}
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
