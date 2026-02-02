@@ -3,11 +3,13 @@ import { TaskStatus, TaskPriority, TaskCategory, WorkspaceRole } from '@/types';
 // Trigger types
 export type AutomationTrigger = 
   | 'DUE_DATE_APPROACHING'    // X hours before due date
+  | 'DEADLINE_APPROACHING'    // Reminders at 7d, 3d, 1d before due
   | 'DEPENDENCY_COMPLETED'    // All blocking tasks completed
   | 'STATUS_CHANGED'          // Task status changed to specific value
   | 'TASK_CREATED'            // New task created matching conditions
   | 'SUBTASKS_COMPLETED'      // All subtasks marked complete
   | 'OVERDUE'                 // Task passed due date
+  | 'SLA_BREACH'              // SLA time limit exceeded
   | 'ASSIGNED'                // Task assigned to someone
   | 'UNASSIGNED';             // Task unassigned
 
@@ -24,6 +26,8 @@ export type AutomationAction =
 // Trigger configuration
 export interface TriggerConfig {
   hoursBeforeDue?: number;       // For DUE_DATE_APPROACHING
+  daysBeforeDue?: number[];      // For DEADLINE_APPROACHING (e.g., [7, 3, 1])
+  slaHours?: number;             // For SLA_BREACH
   fromStatus?: TaskStatus;       // For STATUS_CHANGED
   toStatus?: TaskStatus;         // For STATUS_CHANGED
 }
@@ -39,6 +43,8 @@ export interface ActionConfig {
   assignToRole?: WorkspaceRole;  // For AUTO_ASSIGN
   newPriority?: TaskPriority;    // For UPDATE_PRIORITY
   tag?: string;                  // For ADD_TAG / REMOVE_TAG
+  escalateTo?: string;           // For SLA_BREACH - user ID or role
+  escalationLevel?: number;      // For SLA_BREACH - escalation tier
 }
 
 // Filtering conditions
@@ -85,6 +91,11 @@ export const TRIGGER_INFO: Record<AutomationTrigger, { label: string; descriptio
     description: 'Triggers X hours before a task is due',
     icon: 'Clock',
   },
+  DEADLINE_APPROACHING: {
+    label: 'Deadline Reminders',
+    description: 'Sends reminders at 7, 3, and 1 day(s) before deadline',
+    icon: 'Calendar',
+  },
   DEPENDENCY_COMPLETED: {
     label: 'Dependencies Completed',
     description: 'Triggers when all blocking tasks are completed',
@@ -109,6 +120,11 @@ export const TRIGGER_INFO: Record<AutomationTrigger, { label: string; descriptio
     label: 'Task Overdue',
     description: 'Triggers when a task passes its due date',
     icon: 'AlertTriangle',
+  },
+  SLA_BREACH: {
+    label: 'SLA Breach',
+    description: 'Triggers when task exceeds SLA time limit',
+    icon: 'ShieldAlert',
   },
   ASSIGNED: {
     label: 'Task Assigned',
@@ -217,5 +233,41 @@ export const AUTOMATION_PRESETS: Array<{
     triggerConfig: { toStatus: TaskStatus.COMPLETED },
     actionType: 'CHANGE_STATUS',
     actionConfig: { newStatus: TaskStatus.REVIEW_REQUIRED },
+  },
+  {
+    name: 'SLA Breach Alert',
+    description: 'Notify managers when task exceeds 48-hour SLA',
+    triggerType: 'SLA_BREACH',
+    triggerConfig: { slaHours: 48 },
+    actionType: 'SEND_NOTIFICATION',
+    actionConfig: {
+      notificationTitle: 'SLA Breach Alert',
+      notificationMessage: 'A task has exceeded its SLA time limit and requires immediate attention',
+      notifyAssignees: true,
+      notifyCreator: true,
+    },
+  },
+  {
+    name: 'Deadline Countdown Reminders',
+    description: 'Send reminders at 7, 3, and 1 day(s) before deadline',
+    triggerType: 'DEADLINE_APPROACHING',
+    triggerConfig: { daysBeforeDue: [7, 3, 1] },
+    actionType: 'SEND_NOTIFICATION',
+    actionConfig: {
+      notificationTitle: 'Deadline Reminder',
+      notificationMessage: 'Task deadline is approaching',
+      notifyAssignees: true,
+    },
+  },
+  {
+    name: 'Auto-Escalate on SLA Breach',
+    description: 'Upgrade priority and notify when SLA is breached',
+    triggerType: 'SLA_BREACH',
+    triggerConfig: { slaHours: 24 },
+    actionType: 'UPDATE_PRIORITY',
+    actionConfig: { 
+      newPriority: TaskPriority.URGENT,
+      escalationLevel: 1,
+    },
   },
 ];
