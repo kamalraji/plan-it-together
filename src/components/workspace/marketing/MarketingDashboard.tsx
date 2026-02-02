@@ -11,6 +11,8 @@ import { AdPerformancePanel } from './AdPerformancePanel';
 import { BrandingAssetsManager } from './BrandingAssetsManager';
 import { MarketingCalendar } from './MarketingCalendar';
 import { AudienceInsights } from './AudienceInsights';
+import { OverdueItemsWidget } from '../escalation';
+import { useMarketingCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface MarketingDashboardProps {
   workspace: Workspace;
@@ -23,6 +25,8 @@ export function MarketingDashboard({
   orgSlug,
   onViewTasks,
 }: MarketingDashboardProps) {
+  // Enable real-time updates for marketing committee data
+  useMarketingCommitteeRealtime({ workspaceId: workspace.id });
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['marketing-team-members', workspace.id],
@@ -87,6 +91,9 @@ export function MarketingDashboard({
 
       {/* Campaign Tracker */}
       <CampaignTracker />
+
+      {/* Overdue Items */}
+      <OverdueItemsWidget workspaceId={workspace.id} />
 
       {/* Marketing Calendar - Full Width */}
       <MarketingCalendar />
