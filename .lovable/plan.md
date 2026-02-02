@@ -1,536 +1,509 @@
 
-# Comprehensive Workspace Analysis: Phase 4
-## Participant Communication & Industrial Standards Enhancement
+# Monorepo Restructure & LLM-Friendly Development Guide
+
+## Overview
+
+This plan addresses two critical needs:
+
+1. **Repository Restructure**: Consolidate duplicate Supabase backends into a single source of truth
+2. **LLM-Friendly Guide**: Create comprehensive documentation for AI-assisted development across both React web and Flutter mobile apps
 
 ---
 
-## Executive Summary
+## Current Problems Identified
 
-This analysis identifies **35+ enhancement opportunities** for bringing the workspace-participant communication system to industrial standards (Slack, Discord, Hopin, Whova, Eventbrite). The primary focus is establishing a complete workflow from participant registration through event channels with support for the Flutter mobile app.
+### Critical: Duplicate Supabase Infrastructure
+
+```
+Current Structure (PROBLEMATIC):
+/
+├── supabase/                              # Web app Supabase (214 migrations, 50 functions)
+│   ├── migrations/
+│   └── functions/
+│       └── (50 functions - workspace, channels, etc.)
+│
+└── flutter-participant-mobile-app/
+    └── supabase/                          # Mobile app Supabase (107 migrations, 19 functions)
+        ├── migrations/
+        └── functions/
+            └── (19 functions - agora, push, AI matching, etc.)
+```
+
+**Issues:**
+- Same `project_id = "ltsniuflqfahdcirrmjh"` in both `config.toml` files
+- Migrations in different folders will conflict when deployed
+- Functions are split across two folders (cannot deploy together)
+- LLM context is fragmented when making cross-platform changes
 
 ---
 
-## Current State Analysis
+## Phase 1: Repository Restructure
 
-### Existing Infrastructure
+### Target Structure
 
-**Workspace Communication (Complete)**
-- `workspace_channels` table with types: general, announcement, private, task
-- `channel_members` table for membership tracking
-- `channel_messages` table with realtime subscriptions
-- Edge functions: `workspace-channels`, `channel-messages` for CRUD
-- Presence tracking via `useChannelPresence` hook
-- Typing indicators, message reactions, threading support
+```
+/
+├── apps/
+│   ├── web/                               # React Organizer Web App
+│   │   ├── src/
+│   │   ├── public/
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   └── tsconfig.json
+│   │
+│   └── mobile/                            # Flutter Participant Mobile App
+│       ├── lib/
+│       ├── android/
+│       ├── ios/
+│       ├── web/
+│       └── pubspec.yaml
+│
+├── supabase/                              # SINGLE Supabase Backend (consolidated)
+│   ├── functions/                         # ALL edge functions (69 total)
+│   │   ├── _shared/
+│   │   ├── workspace-channels/
+│   │   ├── participant-channels-api/
+│   │   ├── agora-token/
+│   │   ├── send-push-notification/
+│   │   └── ... (all functions)
+│   ├── migrations/                        # ALL migrations (merged + deduplicated)
+│   └── config.toml                        # Single config
+│
+├── packages/                              # Shared code (future)
+│   └── api-contracts/                     # TypeScript types for API contracts
+│
+├── docs/                                  # Cross-platform documentation
+│   ├── LLM_DEVELOPMENT_GUIDE.md           # Master LLM reference
+│   ├── MODEL_PARITY.md                    # TypeScript <-> Dart models
+│   ├── EDGE_FUNCTION_REGISTRY.md          # All functions documented
+│   ├── WORKSPACE_CHANNEL_WORKFLOW.md      # Registration -> Channel flow
+│   └── ARCHITECTURE_OVERVIEW.md           # System architecture
+│
+├── .github/
+│   └── workflows/
+│       ├── web.yml                        # Web CI/CD (triggers on apps/web/**)
+│       ├── mobile.yml                     # Mobile CI/CD (triggers on apps/mobile/**)
+│       └── supabase.yml                   # Supabase CI/CD (triggers on supabase/**)
+│
+└── README.md                              # Monorepo overview
+```
 
-**Registration System (Complete)**
-- `registrations` table linking users to events
-- Status flow: PENDING → CONFIRMED → CANCELLED/WAITLISTED
-- `useEventRegistrations` hook with pagination and stats
-- Attendance records for check-in tracking
+### Migration Steps
 
-**Workspace Provisioning (Partial)**
-- Auto-provisioning on event publish via edge function
-- Creates ROOT, DEPARTMENT, COMMITTEE workspaces
-- **Gap**: No automatic channel creation during provisioning
-- **Gap**: No participant channel membership automation
+**Step 1.1: Create `apps/` directory structure**
+- Move `src/`, `public/`, `package.json`, `vite.config.ts`, `tsconfig.json` to `apps/web/`
+- Move `flutter-participant-mobile-app/` contents to `apps/mobile/`
+
+**Step 1.2: Consolidate Supabase folders**
+- Keep root `supabase/` as canonical
+- Merge functions from `flutter-participant-mobile-app/supabase/functions/` into `supabase/functions/`
+  - Functions to merge: `agora-token`, `send-push-notification`, `track-interaction`, `generate-profile-embedding`, `get-ai-matches`, `process-embedding-queue`, `analyze-profile-match`, etc. (19 functions)
+- Merge and deduplicate migrations (careful date ordering)
+
+**Step 1.3: Update config.toml**
+- Consolidate all function definitions into single `supabase/config.toml`
+
+**Step 1.4: Update import paths**
+- Update `apps/web/src/integrations/supabase/client.ts`
+- Update `apps/mobile/lib/supabase/supabase_config.dart`
+
+**Step 1.5: Update CI/CD workflows**
+- Modify `.github/workflows/ci.yml` to handle monorepo paths
 
 ---
 
-## Industrial Standard Analysis
+## Phase 2: LLM-Friendly Development Guide
 
-### How Leaders Handle Participant Channels
+### 2.1 Master Guide (`docs/LLM_DEVELOPMENT_GUIDE.md`)
 
-| Platform | Channel Creation | Participant Access | Best Practice |
-|----------|-----------------|-------------------|---------------|
-| **Slack** | Auto-creates #general on workspace creation | Invite-based membership | Hybrid: auto-create defaults + manual custom |
-| **Discord** | Auto-creates text/voice channels | Server invite links | Auto-create with templates |
-| **Hopin** | Auto-creates per-event areas | Registration-based access | Auto-provision on event creation |
-| **Whova** | Auto-creates networking areas | Registration-based | Auto + allow organizer customization |
-| **Eventbrite** | No built-in chat | N/A | N/A |
-
-### Recommended Approach: Hybrid Auto-Creation
-
-**Why Automatic Channel Creation is Better:**
-
-1. **Reduced Organizer Friction**: Organizers don't need to manually create basic channels
-2. **Consistent Experience**: Every workspace has standardized communication structure
-3. **Immediate Usability**: Channels ready the moment workspace is provisioned
-4. **Scalability**: Works for events with 10 or 10,000 participants
-5. **Best Practice Alignment**: Matches Slack, Discord, Hopin patterns
-
-**Recommended Default Channels (Auto-Created):**
-```text
-1. #announcements (type: announcement) - Read-only for participants, organizers can post
-2. #general (type: general) - Open discussion for all participants
-3. #help-support (type: general) - Q&A and support requests
-4. #networking (type: general) - Participant introductions and networking
-```
-
-**Organizer-Created Channels (Manual):**
-```text
-- #speakers-lounge (type: private) - Speakers only
-- #volunteers (type: private) - Volunteers only
-- #session-X (type: task) - Per-session discussions
-```
-
+```markdown
+---
+llm_metadata:
+  project: thittam1hub
+  apps: [react-web, flutter-mobile]
+  backend: supabase
+  version: 1.0.0
+  last_updated: 2026-02-02
 ---
 
-## Phase 4: Participant Communication Workflow
+# LLM Development Guide for Thittam1Hub
 
-### Complete Workflow Architecture
+## Quick Start for AI Assistants
 
-```text
-                    ┌─────────────────────────────────────────────────────────┐
-                    │                    REGISTRATION FLOW                     │
-                    └─────────────────────────────────────────────────────────┘
-                                              │
-                    ┌─────────────────────────▼─────────────────────────┐
-                    │  1. Participant registers for event (web/mobile)   │
-                    │     - Creates registration record                   │
-                    │     - Status: PENDING                               │
-                    └─────────────────────────┬─────────────────────────┘
-                                              │
-                    ┌─────────────────────────▼─────────────────────────┐
-                    │  2. Registration confirmed (payment/approval)       │
-                    │     - Status: CONFIRMED                             │
-                    │     - Triggers: auto-add to participant channels    │
-                    └─────────────────────────┬─────────────────────────┘
-                                              │
-                    ┌─────────────────────────▼─────────────────────────┐
-                    │  3. Participant added to event channels             │
-                    │     - #announcements (read-only)                    │
-                    │     - #general                                      │
-                    │     - #help-support                                 │
-                    │     - #networking                                   │
-                    └─────────────────────────┬─────────────────────────┘
-                                              │
-          ┌───────────────────────────────────┴───────────────────────────────────┐
-          │                                                                         │
-┌─────────▼─────────┐                                         ┌─────────▼─────────┐
-│   WEB APP ACCESS   │                                         │ FLUTTER APP ACCESS │
-│ - View channels    │                                         │ - View channels    │
-│ - Read messages    │                                         │ - Read messages    │
-│ - Post in allowed  │                                         │ - Push notifs      │
-└───────────────────┘                                         └───────────────────┘
-                                              │
-                    ┌─────────────────────────▼─────────────────────────┐
-                    │  4. Organizer sends message to channel              │
-                    │     - Real-time delivery via Supabase Realtime      │
-                    │     - Push notification to mobile app               │
-                    │     - Web notification via browser API              │
-                    └─────────────────────────────────────────────────────┘
+### Project Context
+- **Web App**: React/TypeScript organizer dashboard at `apps/web/`
+- **Mobile App**: Flutter participant app at `apps/mobile/`
+- **Backend**: Shared Supabase at `supabase/`
+
+### Key Entry Points
+| App | Entry | Router | State |
+|-----|-------|--------|-------|
+| Web | `apps/web/src/main.tsx` | `AppRouter.tsx` | TanStack Query + Zustand |
+| Mobile | `apps/mobile/lib/main.dart` | `nav.dart` (GoRouter) | Provider + ChangeNotifier |
+
+### Shared Backend
+| Resource | Location | Purpose |
+|----------|----------|---------|
+| Edge Functions | `supabase/functions/` | API endpoints |
+| Migrations | `supabase/migrations/` | Schema changes |
+| Types | `apps/web/src/integrations/supabase/types.ts` | TypeScript types |
+| Dart Models | `apps/mobile/lib/models/` | Dart data classes |
 ```
 
----
+### 2.2 Cross-Platform Patterns
 
-## Database Schema Enhancements
+```markdown
+## Pattern: Adding a Feature to Both Apps
 
-### New Tables Required
+### Step 1: Database Schema (if needed)
+File: `supabase/migrations/YYYYMMDD_feature_name.sql`
 
-**1. `participant_channels` - Links registrations to channels**
-```sql
-CREATE TABLE participant_channels (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  registration_id UUID NOT NULL REFERENCES registrations(id) ON DELETE CASCADE,
-  channel_id UUID NOT NULL REFERENCES workspace_channels(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES auth.users(id),
-  event_id UUID NOT NULL REFERENCES events(id),
-  permissions JSONB DEFAULT '{"can_read": true, "can_write": true}',
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  left_at TIMESTAMPTZ,
-  is_active BOOLEAN DEFAULT true,
-  UNIQUE(registration_id, channel_id)
-);
+### Step 2: Edge Function (shared API)
+File: `supabase/functions/feature-name/index.ts`
+- Follow template from `_shared/validation.ts`
+- Use CORS headers from `_shared/cors.ts`
+
+### Step 3: React Implementation
+Files:
+- Hook: `apps/web/src/hooks/useFeatureName.ts`
+- Component: `apps/web/src/components/feature/FeatureName.tsx`
+- Route: Add to `apps/web/src/components/routing/AppRouter.tsx`
+
+### Step 4: Flutter Implementation
+Files:
+- Model: `apps/mobile/lib/models/feature_name.dart`
+- Repository: `apps/mobile/lib/repositories/supabase_feature_repository.dart`
+- Service: `apps/mobile/lib/services/feature_service.dart`
+- Provider: `apps/mobile/lib/providers/feature_provider.dart`
+- Page: `apps/mobile/lib/pages/feature/feature_page.dart`
+- Route: Add to `apps/mobile/lib/nav.dart`
 ```
 
-**2. `workspace_channel_templates` - Default channel configurations**
-```sql
-CREATE TABLE workspace_channel_templates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  description TEXT,
-  channel_type TEXT NOT NULL DEFAULT 'general',
-  is_participant_visible BOOLEAN DEFAULT true,
-  participant_can_write BOOLEAN DEFAULT true,
-  auto_create_on_provision BOOLEAN DEFAULT true,
-  sort_order INTEGER DEFAULT 0,
-  icon TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+### 2.3 Model Parity Guide (`docs/MODEL_PARITY.md`)
 
--- Seed default templates
-INSERT INTO workspace_channel_templates (name, description, channel_type, participant_can_write, sort_order) VALUES
-  ('Announcements', 'Official event announcements', 'announcement', false, 1),
-  ('General', 'Open discussion for all participants', 'general', true, 2),
-  ('Help & Support', 'Get help from organizers', 'general', true, 3),
-  ('Networking', 'Connect with other participants', 'general', true, 4);
-```
+This document will map TypeScript interfaces to Dart classes for all shared data:
 
-**3. Update `workspace_channels` table**
-```sql
-ALTER TABLE workspace_channels ADD COLUMN IF NOT EXISTS
-  is_participant_channel BOOLEAN DEFAULT false,
-  participant_permissions JSONB DEFAULT '{"can_read": true, "can_write": true}',
-  max_participants INTEGER,
-  auto_join_on_registration BOOLEAN DEFAULT false;
-```
+```markdown
+## WorkspaceChannel
 
----
-
-## New Edge Functions Required
-
-### 1. `participant-channel-join` - Auto-add participants to channels
+### TypeScript (React)
 ```typescript
-// Trigger: When registration status changes to CONFIRMED
-// Actions:
-// 1. Find workspace for event
-// 2. Get all auto-join channels
-// 3. Add participant to channel_members
-// 4. Create participant_channels record
-// 5. Send welcome notification
+interface WorkspaceChannel {
+  id: string;
+  workspace_id: string;
+  name: string;
+  type: 'general' | 'announcement' | 'private' | 'task';
+  is_participant_channel: boolean;
+  participant_permissions: {
+    can_read: boolean;
+    can_write: boolean;
+  };
+  created_at: string;
+}
 ```
 
-### 2. `participant-channel-sync` - Bulk sync all participants
-```typescript
-// Use case: When organizer enables a new channel for participants
-// Actions:
-// 1. Get all confirmed registrations for event
-// 2. Bulk insert into channel_members
-// 3. Send batch notification
+### Dart (Flutter)
+```dart
+class WorkspaceChannel {
+  final String id;
+  final String workspaceId;
+  final String name;
+  final ChannelType type;
+  final bool isParticipantChannel;
+  final ChannelPermissions permissions;
+  final DateTime createdAt;
+
+  factory WorkspaceChannel.fromJson(Map<String, dynamic> json) => ...
+}
+```
 ```
 
-### 3. `participant-messages-api` - Public API for mobile app
-```typescript
-// Endpoints for Flutter app:
-// GET /messages?channelId=X&cursor=Y - List messages (read-only for announcements)
-// POST /messages - Send message (if permitted)
-// GET /channels - List participant-visible channels
-// PUT /read-receipt - Mark channel as read
-```
+### 2.4 Edge Function Registry (`docs/EDGE_FUNCTION_REGISTRY.md`)
 
----
+```markdown
+# Edge Function Registry
 
-## Frontend Components Required
-
-### Organizer-Side Components
-
-**1. `ParticipantChannelManager.tsx`**
-- Enable/disable participant access per channel
-- Set read-only vs read-write permissions
-- View participant count per channel
-- Bulk enable channels for all registrations
-
-**2. `ChannelParticipantList.tsx`**
-- View all participants in a channel
-- Remove participants individually
-- Invite specific participants
-
-**3. `ParticipantBroadcastComposer.tsx`**
-- Enhanced broadcast targeting participants
-- Schedule messages
-- Template-based announcements
-- Delivery confirmation tracking
-
-### Participant-Side Components (Web)
-
-**4. `ParticipantChannelView.tsx`**
-- Read-only view for announcement channels
-- Full participation in general channels
-- Mobile-responsive design
-
-**5. `ParticipantMessageList.tsx`**
-- Optimized for viewing organizer messages
-- Support for rich content (images, links, files)
-- Reaction support
-
----
-
-## Flutter Mobile App Integration
-
-### Required API Endpoints
-
-| Endpoint | Method | Purpose | Auth |
+## Workspace Functions (Web Only)
+| Function | Method | Purpose | Auth |
 |----------|--------|---------|------|
-| `/participant/channels` | GET | List accessible channels | JWT |
-| `/participant/channels/:id/messages` | GET | Paginated messages | JWT |
-| `/participant/channels/:id/messages` | POST | Send message (if allowed) | JWT |
-| `/participant/read-receipt` | PUT | Update read status | JWT |
-| `/participant/register-push` | POST | Register push token | JWT |
+| `workspace-provision` | POST | Auto-create workspace structure | JWT + Owner |
+| `workspace-channels` | GET/POST/PUT/DELETE | Channel CRUD | JWT + Workspace Role |
+| `channel-messages` | GET/POST | Message management | JWT + Channel Member |
+| `workspace-analytics` | GET | Dashboard metrics | JWT + Manager |
 
-### Push Notification Flow
+## Participant Functions (Mobile + Web)
+| Function | Method | Purpose | Auth |
+|----------|--------|---------|------|
+| `participant-channels-api` | GET | List participant channels | JWT |
+| `participant-messages-api` | GET/POST | Read/write messages | JWT |
+| `agora-token` | POST | RTC token for voice/video | JWT |
+| `send-push-notification` | POST | FCM/APNs delivery | Service Role |
 
-```text
-1. Organizer posts to #announcements
-2. Edge function triggers notification job
-3. For each participant in channel:
-   a. Check notification preferences
-   b. If push enabled, send via Firebase/APNs
-   c. Store in notifications table
-4. Flutter app receives push
-5. Opens to channel view on tap
+## AI Matching Functions (Mobile)
+| Function | Method | Purpose | Auth |
+|----------|--------|---------|------|
+| `track-interaction` | POST | Log user interactions | JWT |
+| `generate-profile-embedding` | POST | Create ML embeddings | Service Role |
+| `get-ai-matches` | GET | Retrieve match suggestions | JWT |
+| `analyze-profile-match` | POST | Deep match analysis | JWT |
 ```
 
-### Recommended Flutter Architecture
+### 2.5 Workspace Channel Workflow (`docs/WORKSPACE_CHANNEL_WORKFLOW.md`)
 
-```text
-lib/
-├── models/
-│   ├── channel.dart
-│   ├── message.dart
-│   └── participant.dart
-├── services/
-│   ├── channel_service.dart      // API calls
-│   ├── realtime_service.dart     // Supabase realtime
-│   └── notification_service.dart // Push handling
-├── providers/
-│   ├── channels_provider.dart    // State management
-│   └── messages_provider.dart
-├── screens/
-│   ├── channels_list_screen.dart
-│   ├── channel_detail_screen.dart
-│   └── message_detail_screen.dart
-└── widgets/
-    ├── message_bubble.dart
-    ├── channel_card.dart
-    └── announcement_banner.dart
+Complete documentation of the registration-to-channel flow:
+
+```markdown
+# Participant Communication Workflow
+
+## Flow Diagram
+
+```
+Participant Registration (Web/Mobile)
+        ↓
+    Status: PENDING
+        ↓
+Payment/Approval Complete
+        ↓
+    Status: CONFIRMED
+        ↓
+┌───────────────────────────────────┐
+│ Database Trigger Fires:           │
+│ auto_join_participant_channels()  │
+└───────────────────────────────────┘
+        ↓
+┌───────────────────────────────────┐
+│ Participant added to:             │
+│ - channel_members (for realtime)  │
+│ - participant_channels (for API)  │
+└───────────────────────────────────┘
+        ↓
+    ┌─────────┴─────────┐
+    ↓                   ↓
+┌───────┐           ┌────────┐
+│  Web  │           │ Mobile │
+│ Event │           │  App   │
+│ Page  │           │        │
+└───────┘           └────────┘
 ```
 
----
+## API Endpoints
 
-## Implementation Priority Matrix
-
-### Phase 4A: Core Infrastructure (Week 1)
-| # | Task | Priority | Status |
-|---|------|----------|--------|
-| 1 | Create `participant_channels` table | Critical | 🔲 |
-| 2 | Create `workspace_channel_templates` table | Critical | 🔲 |
-| 3 | Update `workspace_channels` schema | Critical | 🔲 |
-| 4 | Create `participant-channel-join` edge function | Critical | 🔲 |
-| 5 | Modify `workspace-provision` to auto-create default channels | High | 🔲 |
-
-### Phase 4B: Organizer Tools (Week 2)
-| # | Task | Priority | Status |
-|---|------|----------|--------|
-| 6 | Build `ParticipantChannelManager.tsx` | High | 🔲 |
-| 7 | Build `ChannelParticipantList.tsx` | High | 🔲 |
-| 8 | Update `WorkspaceCommunication.tsx` with participant toggle | High | 🔲 |
-| 9 | Add channel templates to workspace settings | Medium | 🔲 |
-
-### Phase 4C: Participant Web Experience (Week 3)
-| # | Task | Priority | Status |
-|---|------|----------|--------|
-| 10 | Build `ParticipantChannelView.tsx` | High | 🔲 |
-| 11 | Add participant channel route `/event/:id/channels` | High | 🔲 |
-| 12 | Integrate with registration confirmation flow | High | 🔲 |
-| 13 | Add notification preferences for participants | Medium | 🔲 |
-
-### Phase 4D: Mobile API (Week 4)
-| # | Task | Priority | Status |
-|---|------|----------|--------|
-| 14 | Create `participant-messages-api` edge function | Critical | 🔲 |
-| 15 | Create `participant-channels-api` edge function | Critical | 🔲 |
-| 16 | Add push notification registration endpoint | High | 🔲 |
-| 17 | Document API for Flutter team | High | 🔲 |
-
-### Phase 4E: Advanced Features (Week 5-6)
-| # | Task | Priority | Status |
-|---|------|----------|--------|
-| 18 | Scheduled message sending | Medium | 🔲 |
-| 19 | Message delivery analytics | Medium | 🔲 |
-| 20 | Channel moderation tools | Medium | 🔲 |
-| 21 | Participant blocking/muting | Low | 🔲 |
-
----
-
-## Technical Implementation Details
-
-### 1. Auto-Channel Creation on Workspace Provisioning
-
-**Update `useWorkspaceProvisioning.ts`:**
-```typescript
-// After creating ROOT workspace, create default channels
-const defaultChannels = [
-  { name: 'announcements', type: 'announcement', participantCanWrite: false },
-  { name: 'general', type: 'general', participantCanWrite: true },
-  { name: 'help-support', type: 'general', participantCanWrite: true },
-  { name: 'networking', type: 'general', participantCanWrite: true },
-];
-
-for (const channel of defaultChannels) {
-  await supabase.from('workspace_channels').insert({
-    workspace_id: rootWorkspace.id,
-    name: channel.name,
-    type: channel.type,
-    is_participant_channel: true,
-    participant_permissions: { can_read: true, can_write: channel.participantCanWrite },
-    auto_join_on_registration: true,
-    created_by: userId,
-  });
-}
+### Mobile: List Channels
 ```
+GET /participant-channels-api?eventId=uuid
 
-### 2. Registration Confirmation Trigger
-
-**Database trigger for auto-join:**
-```sql
-CREATE OR REPLACE FUNCTION auto_join_participant_channels()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Only trigger when status changes to CONFIRMED
-  IF NEW.status = 'CONFIRMED' AND (OLD.status IS NULL OR OLD.status != 'CONFIRMED') THEN
-    -- Find workspace for event
-    INSERT INTO channel_members (channel_id, user_id, user_name)
-    SELECT 
-      wc.id,
-      NEW.user_id,
-      (SELECT full_name FROM user_profiles WHERE id = NEW.user_id)
-    FROM workspace_channels wc
-    JOIN workspaces w ON wc.workspace_id = w.id
-    WHERE w.event_id = NEW.event_id
-      AND wc.auto_join_on_registration = true
-      AND wc.is_participant_channel = true
-    ON CONFLICT (channel_id, user_id) DO NOTHING;
-    
-    -- Also create participant_channels records
-    INSERT INTO participant_channels (registration_id, channel_id, user_id, event_id)
-    SELECT 
-      NEW.id,
-      wc.id,
-      NEW.user_id,
-      NEW.event_id
-    FROM workspace_channels wc
-    JOIN workspaces w ON wc.workspace_id = w.id
-    WHERE w.event_id = NEW.event_id
-      AND wc.auto_join_on_registration = true
-    ON CONFLICT DO NOTHING;
-  END IF;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER trigger_auto_join_channels
-AFTER INSERT OR UPDATE ON registrations
-FOR EACH ROW EXECUTE FUNCTION auto_join_participant_channels();
-```
-
-### 3. Flutter API Response Format
-
-**GET /participant/channels Response:**
-```json
+Response:
 {
-  "channels": [
-    {
-      "id": "uuid",
-      "name": "announcements",
-      "type": "announcement",
-      "description": "Official event announcements",
-      "canWrite": false,
-      "unreadCount": 3,
-      "lastMessage": {
-        "content": "Welcome to the event!",
-        "senderName": "Event Team",
-        "createdAt": "2026-02-02T10:00:00Z"
-      }
-    }
-  ],
-  "eventName": "Tech Conference 2026",
-  "eventId": "uuid"
+  "channels": [...],
+  "unread_total": 5
 }
 ```
 
----
+### Mobile: Get Messages
+```
+GET /participant-messages-api?channelId=uuid&limit=50&cursor=uuid
 
-## Security Considerations
+Response:
+{
+  "messages": [...],
+  "next_cursor": "uuid"
+}
+```
 
-### RLS Policies for Participant Channels
-
-```sql
--- Participants can only see channels they're members of
-CREATE POLICY "Participants can view their channels"
-ON workspace_channels FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1 FROM participant_channels pc
-    WHERE pc.channel_id = workspace_channels.id
-      AND pc.user_id = auth.uid()
-      AND pc.is_active = true
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM workspace_team_members wtm
-    WHERE wtm.workspace_id = workspace_channels.workspace_id
-      AND wtm.user_id = auth.uid()
-  )
-);
-
--- Participants can only send messages if permissions allow
-CREATE POLICY "Participants can send messages if allowed"
-ON channel_messages FOR INSERT
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM participant_channels pc
-    JOIN workspace_channels wc ON pc.channel_id = wc.id
-    WHERE pc.channel_id = channel_messages.channel_id
-      AND pc.user_id = auth.uid()
-      AND pc.is_active = true
-      AND (wc.participant_permissions->>'can_write')::boolean = true
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM workspace_team_members wtm
-    JOIN workspace_channels wc ON wtm.workspace_id = wc.workspace_id
-    WHERE wc.id = channel_messages.channel_id
-      AND wtm.user_id = auth.uid()
-  )
-);
+### Web: Organizer Broadcast
+```
+POST /channel-messages
+{
+  "channel_id": "uuid",
+  "content": "Welcome!",
+  "is_broadcast": true
+}
+```
 ```
 
 ---
 
-## Summary
+## Phase 3: CI/CD Updates
 
-### Key Decisions Made
+### 3.1 Web Workflow (`web.yml`)
 
-1. **Channel Creation**: Automatic creation of 4 default channels on workspace provisioning (announcements, general, help-support, networking)
+```yaml
+name: Web CI/CD
 
-2. **Participant Access**: Auto-join participants when registration is CONFIRMED via database trigger
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'supabase/**'
+  pull_request:
+    paths:
+      - 'apps/web/**'
 
-3. **Permission Model**: 
-   - Announcements: Read-only for participants
-   - General/Help/Networking: Read-write for participants
-   - Organizers have full control
+defaults:
+  run:
+    working-directory: apps/web
 
-4. **Mobile Integration**: REST API endpoints with JWT auth, Supabase Realtime for live updates, push notifications via Firebase/APNs
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run tsc --noEmit
+      - run: bun run vitest --run
+      - run: bun run build
+```
 
-### Files to Create/Modify
+### 3.2 Mobile Workflow (`mobile.yml`)
 
-**New Files:**
-- `supabase/migrations/xxx_participant_channels.sql`
-- `supabase/functions/participant-channels-api/index.ts`
-- `supabase/functions/participant-messages-api/index.ts`
-- `src/components/workspace/communication/ParticipantChannelManager.tsx`
-- `src/components/workspace/communication/ChannelParticipantList.tsx`
-- `src/components/participant/ParticipantChannelView.tsx`
-- `src/hooks/useParticipantChannels.ts`
-- `API_DOCUMENTATION.md` (for Flutter team)
+```yaml
+name: Mobile CI/CD
 
-**Files to Modify:**
-- `src/hooks/useWorkspaceProvisioning.ts` - Add default channel creation
-- `src/hooks/useWorkspaceChannels.ts` - Add participant channel support
-- `src/components/workspace/WorkspaceCommunication.tsx` - Add participant toggle
-- `supabase/functions/workspace-provision/index.ts` - Create default channels
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'supabase/**'
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
 
-### Estimated Effort
+defaults:
+  run:
+    working-directory: apps/mobile
 
-| Phase | Duration | Complexity |
-|-------|----------|------------|
-| 4A: Infrastructure | 1 week | High |
-| 4B: Organizer Tools | 1 week | Medium |
-| 4C: Participant Web | 1 week | Medium |
-| 4D: Mobile API | 1 week | High |
-| 4E: Advanced | 2 weeks | Medium |
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.7'
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web
+```
 
-**Total**: 6 weeks for complete implementation
+### 3.3 Supabase Workflow (`supabase.yml`)
 
-This plan ensures industrial-standard participant communication matching Slack, Discord, and Hopin patterns while providing a seamless experience for both the web platform and Flutter mobile app.
+```yaml
+name: Supabase CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+      - run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+      - run: supabase db push
+      - run: supabase functions deploy --all
+```
+
+---
+
+## Phase 4: File Consolidation Details
+
+### 4.1 Functions to Merge (from mobile to root)
+
+| Function | Current Location | Purpose | Used By |
+|----------|-----------------|---------|---------|
+| `agora-token` | mobile | RTC tokens | Mobile |
+| `analyze-profile-match` | mobile | AI matching | Mobile |
+| `check-password-breach` | mobile | Security | Mobile |
+| `export-user-data` | mobile | GDPR export | Mobile |
+| `generate-profile-embedding` | mobile | AI embeddings | Mobile |
+| `geo-anomaly-check` | mobile | Security | Mobile |
+| `get-ai-matches` | mobile | AI suggestions | Mobile |
+| `giphy-proxy` | mobile | GIF search | Mobile |
+| `link-preview` | mobile | URL previews | Mobile |
+| `login-alert` | mobile | Security | Mobile |
+| `organizer-application-notification` | mobile | Notifications | Mobile |
+| `process-embedding-queue` | mobile | AI background | Mobile |
+| `send-push-notification` | mobile | Push delivery | Mobile |
+| `send-session-reminders` | mobile | Reminders | Both |
+| `track-interaction` | mobile | Analytics | Mobile |
+| `track-material-download` | mobile | Analytics | Mobile |
+| `track-route-analytics` | mobile | Analytics | Mobile |
+| `trigger-chat-notification` | mobile | Chat alerts | Mobile |
+
+### 4.2 Migration Merge Strategy
+
+1. **Export both migration lists with timestamps**
+2. **Sort chronologically across both folders**
+3. **Identify duplicates** (same schema changes)
+4. **Create consolidated migration folder**
+5. **Test with `supabase db reset` locally**
+
+---
+
+## Deliverables Summary
+
+| Deliverable | Type | Priority |
+|-------------|------|----------|
+| `apps/web/` directory restructure | Restructure | High |
+| `apps/mobile/` directory restructure | Restructure | High |
+| Consolidated `supabase/` | Restructure | Critical |
+| `docs/LLM_DEVELOPMENT_GUIDE.md` | Documentation | High |
+| `docs/MODEL_PARITY.md` | Documentation | High |
+| `docs/EDGE_FUNCTION_REGISTRY.md` | Documentation | High |
+| `docs/WORKSPACE_CHANNEL_WORKFLOW.md` | Documentation | High |
+| Updated CI/CD workflows | Configuration | Medium |
+| Updated import paths | Code Changes | High |
+
+---
+
+## Implementation Order
+
+1. **Create documentation first** (non-breaking)
+   - LLM Development Guide
+   - Model Parity Reference
+   - Edge Function Registry
+
+2. **Restructure to apps/ directory** (breaking - coordinate)
+   - Create apps/web and apps/mobile
+   - Update all relative imports
+   - Update CI/CD paths
+
+3. **Consolidate Supabase** (critical - careful merge)
+   - Merge functions
+   - Merge migrations
+   - Update config.toml
+   - Deploy and verify
+
+4. **Verify cross-platform functionality**
+   - Test web app builds and deploys
+   - Test mobile app builds
+   - Test edge functions from both platforms
+
+---
+
+## Risk Mitigation
+
+| Risk | Mitigation |
+|------|------------|
+| Breaking imports | Create migration script, test locally first |
+| Migration conflicts | Test with fresh `supabase db reset` |
+| Function deployment failures | Deploy functions one-by-one, verify each |
+| Mobile build breaks | Test Flutter build before/after restructure |
+
+---
+
+## Next Steps
+
+Approve this plan to proceed with:
+1. Creating the LLM-friendly documentation (Phase 2)
+2. Creating the directory restructure (Phase 1)
+3. Consolidating Supabase infrastructure
+4. Updating CI/CD workflows (Phase 3)
