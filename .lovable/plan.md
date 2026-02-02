@@ -293,10 +293,10 @@ Need to add escalation management to workspace settings or as dedicated tab for 
 2. ✅ Add emoji reactions picker and display (`MessageReactions.tsx`, `EmojiPicker`)
 3. ✅ Add reaction aggregation (localStorage-based until DB table is created)
 
-### Sprint 5: Mobile & Offline (Days 13-14)
-1. Add offline mode banner
-2. Implement sync progress indicator
-3. Final touch target audit
+### Sprint 5: Mobile & Offline (Days 13-14) ✅ COMPLETE
+1. ✅ Add offline mode banner (`OfflineModeBanner.tsx`)
+2. ✅ Implement sync progress indicator (`SyncProgressIndicator.tsx`, `CompactSyncIndicator`)
+3. ✅ Integrated into `MobileAppShell` and `MobileHeader`
 
 ### Sprint 6: Automation & Reporting (Days 15-16)
 1. Add SLA_BREACH and DEADLINE_APPROACHING triggers

@@ -3,6 +3,7 @@ import { Bell } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { CompactSyncIndicator } from './shared/SyncProgressIndicator';
 
 interface MobileHeaderProps {
   organization: {
@@ -15,9 +16,18 @@ interface MobileHeaderProps {
     email?: string;
     avatarUrl?: string;
   };
+  isOnline?: boolean;
+  pendingCount?: number;
+  isSyncing?: boolean;
 }
 
-export const MobileHeader: React.FC<MobileHeaderProps> = ({ organization, user }) => {
+export const MobileHeader: React.FC<MobileHeaderProps> = ({ 
+  organization, 
+  user,
+  isOnline = true,
+  pendingCount = 0,
+  isSyncing = false,
+}) => {
   const navigate = useNavigate();
   
   const getUserInitials = () => {
@@ -53,8 +63,15 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ organization, user }
           </span>
         </div>
 
-        {/* Right: Notifications & Avatar */}
+        {/* Right: Sync Status, Notifications & Avatar */}
         <div className="flex items-center gap-2">
+          {/* Sync Status Indicator */}
+          <CompactSyncIndicator
+            isOnline={isOnline}
+            pendingCount={pendingCount}
+            isSyncing={isSyncing}
+          />
+          
           <Button
             variant="ghost"
             size="icon"
