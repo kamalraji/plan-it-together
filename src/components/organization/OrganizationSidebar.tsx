@@ -222,13 +222,14 @@ export const OrganizationSidebar: React.FC = () => {
 
     return (
       <div>
+        {/* Workspace button with 44px minimum touch target */}
         <button
           onClick={() => handleWorkspaceClick(workspace)}
           className={cn(
-            "w-full flex items-center gap-2 px-2.5 py-2 text-xs rounded-xl hover:bg-muted/50 transition-all duration-200 text-left group/ws",
+            "w-full flex items-center gap-3 px-3 py-3 min-h-[44px] text-sm rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all duration-200 text-left group/ws",
             isSelected ? "bg-primary/10 text-primary" : "text-foreground/80"
           )}
-          style={{ paddingLeft: `${10 + depth * 12}px` }}
+          style={{ paddingLeft: `${12 + depth * 12}px` }}
         >
           {hasChildren ? (
             <button
@@ -236,25 +237,27 @@ export const OrganizationSidebar: React.FC = () => {
                 e.stopPropagation();
                 setExpanded(!expanded);
               }}
-              className="p-0.5 hover:bg-muted-foreground/20 rounded-md flex-shrink-0"
+              // Expand button with 44px touch target
+              className="p-2 -m-1 hover:bg-muted-foreground/20 rounded-lg flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={expanded ? 'Collapse' : 'Expand'}
             >
               {expanded ? (
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               ) : (
-                <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
             </button>
           ) : (
-            <span className="w-4 flex-shrink-0" />
+            <span className="w-6 flex-shrink-0" />
           )}
           {expanded && hasChildren ? (
-            <FolderOpen className="h-3.5 w-3.5 text-primary/60 flex-shrink-0" />
+            <FolderOpen className="h-5 w-5 text-primary/60 flex-shrink-0" />
           ) : (
-            <Folder className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <Folder className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           )}
           <span className="truncate flex-1 group-hover/ws:text-foreground">{workspace.name}</span>
           {workspace.isOwner && (
-            <span className="text-[9px] px-1.5 py-0.5 bg-primary/10 text-primary rounded-full font-medium flex-shrink-0">
+            <span className="text-[10px] px-2 py-1 bg-primary/10 text-primary rounded-full font-medium flex-shrink-0">
               Owner
             </span>
           )}
@@ -313,8 +316,9 @@ export const OrganizationSidebar: React.FC = () => {
                   isActive={isDashboardActive}
                   tooltip="Dashboard"
                   className={cn(
-                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition-all duration-300',
+                    'group flex items-center gap-3 rounded-2xl px-3 py-3 min-h-[44px] text-sm transition-all duration-300',
                     'hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5',
+                    'active:scale-[0.98]', // Touch feedback
                     isDashboardActive && 'bg-gradient-to-r from-primary/15 to-primary/8 shadow-sm'
                   )}
                 >
@@ -328,13 +332,13 @@ export const OrganizationSidebar: React.FC = () => {
                   >
                     <div
                       className={cn(
-                        'flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300',
+                        'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 flex-shrink-0',
                         isDashboardActive
                           ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25'
                           : 'bg-muted/50 text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
                       )}
                     >
-                      <LayoutDashboard className="h-[18px] w-[18px]" />
+                      <LayoutDashboard className="h-5 w-5" />
                     </div>
                     {!isCollapsed && (
                       <div className="flex flex-col items-start animate-fade-in">
@@ -366,8 +370,9 @@ export const OrganizationSidebar: React.FC = () => {
                   isActive={currentPath.includes('/my-assignments')}
                   tooltip="My Assignments"
                   className={cn(
-                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition-all duration-300',
+                    'group flex items-center gap-3 rounded-2xl px-3 py-3 min-h-[44px] text-sm transition-all duration-300',
                     'hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5',
+                    'active:scale-[0.98]', // Touch feedback
                     currentPath.includes('/my-assignments') && 'bg-gradient-to-r from-primary/15 to-primary/8 shadow-sm'
                   )}
                 >
@@ -381,13 +386,13 @@ export const OrganizationSidebar: React.FC = () => {
                   >
                     <div
                       className={cn(
-                        'flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300',
+                        'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 flex-shrink-0',
                         currentPath.includes('/my-assignments')
                           ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25'
                           : 'bg-muted/50 text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
                       )}
                     >
-                      <CheckSquare className="h-[18px] w-[18px]" />
+                      <CheckSquare className="h-5 w-5" />
                     </div>
                     {!isCollapsed && (
                       <div className="flex flex-col items-start animate-fade-in">
