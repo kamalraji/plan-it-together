@@ -1,4 +1,4 @@
-import { WorkspaceTab } from '@/hooks/useWorkspaceShell';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 
 // ============================================
 // URL Logging & Debugging Configuration

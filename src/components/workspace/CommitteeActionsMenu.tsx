@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Workspace } from '@/types';
 import { cn } from '@/lib/utils';
 import { getCommitteeConfig, getCommitteeColors } from '@/lib/committeeConfig';
-import { WorkspaceTab } from './WorkspaceSidebar';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import {
   ChevronDown,
   ChevronRight,
