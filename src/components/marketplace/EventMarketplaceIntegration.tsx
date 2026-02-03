@@ -5,6 +5,8 @@ import ServiceRecommendations from './ServiceRecommendations';
 import VendorShortlist from './VendorShortlist';
 import VendorCoordination from './VendorCoordination';
 import ServiceDiscoveryUI from './ServiceDiscoveryUI';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ServiceListing {
   id: string;
@@ -35,6 +37,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
   eventId,
   eventName,
 }) => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'recommendations' | 'discover' | 'shortlist' | 'coordination'>('recommendations');
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceListing | null>(null);
@@ -47,35 +50,61 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
   });
   const queryClient = useQueryClient();
 
-  // Add to shortlist mutation - simplified (table may not exist)
+  // Add to shortlist mutation - wired to vendor_shortlist table
   const addToShortlistMutation = useMutation({
     mutationFn: async (serviceId: string) => {
-      // Placeholder - actual implementation would need vendor_shortlist table
-      console.log('Adding to shortlist:', serviceId, eventId);
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      const { error } = await supabase
+        .from('vendor_shortlist')
+        .insert({
+          user_id: user.id,
+          event_id: eventId,
+          service_id: serviceId,
+        });
+      
+      if (error) {
+        // Handle duplicate entry gracefully
+        if (error.code === '23505') {
+          throw new Error('Service already in shortlist');
+        }
+        throw error;
+      }
       return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendor-shortlist', eventId] });
       toast.success('Added to shortlist');
     },
-    onError: () => {
-      toast.error('Failed to add to shortlist');
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to add to shortlist');
     },
   });
 
-  // Create booking request mutation - simplified placeholder
+  // Create booking request mutation - wired to vendor_bookings table
   const createBookingMutation = useMutation({
     mutationFn: async (data: { serviceDate: string; requirements: string; budgetRange?: { min: number; max: number }; additionalNotes?: string }) => {
-      // Placeholder: vendor_quotes table may not exist in current schema
-      // This would normally insert into a bookings/quotes table
-      console.log('Booking request:', {
-        eventId,
-        vendorId: selectedService?.vendorId,
-        serviceDate: data.serviceDate,
-        requirements: data.requirements,
-        budgetMax: data.budgetRange?.max,
-        notes: data.additionalNotes,
-      });
+      if (!user?.id || !selectedService) throw new Error('Missing required data');
+      
+      const { error } = await supabase
+        .from('vendor_bookings')
+        .insert({
+          vendor_id: selectedService.vendorId,
+          service_id: selectedService.id,
+          organizer_id: user.id,
+          event_id: eventId,
+          event_name: eventName,
+          event_date: data.serviceDate,
+          requirements: data.requirements,
+          budget_min: data.budgetRange?.min || null,
+          budget_max: data.budgetRange?.max || null,
+          organizer_name: user.email?.split('@')[0] || 'Unknown',
+          organizer_email: user.email || '',
+          vendor_notes: data.additionalNotes || null,
+          status: 'pending',
+        });
+      
+      if (error) throw error;
       return { success: true };
     },
     onSuccess: () => {
