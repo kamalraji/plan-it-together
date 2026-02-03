@@ -1,5 +1,5 @@
 import { useSearchParams, useParams, useNavigate, useLocation } from 'react-router-dom';
-import { WorkspaceTab } from './useWorkspaceShell';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import { 
   parseWorkspaceUrl, 
   buildWorkspaceUrl as buildHierarchicalUrl,

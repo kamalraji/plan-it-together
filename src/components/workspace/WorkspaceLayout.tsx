@@ -4,7 +4,7 @@ import { WorkspaceSidebar } from './WorkspaceSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { Workspace } from '@/types';
-import { WorkspaceTab } from './WorkspaceSidebar';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import { GlobalTimerWidget } from './GlobalTimerWidget';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { useGlobalKeyboardShortcuts } from '@/hooks/useGlobalKeyboardShortcuts';

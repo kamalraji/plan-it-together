@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Workspace } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { WorkspaceTab } from './WorkspaceSidebar';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import {
   ChevronDown,
   ChevronRight,

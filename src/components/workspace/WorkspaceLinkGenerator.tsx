@@ -11,7 +11,7 @@ import {
   WorkspacePathSegment,
   DeepLinkParams,
 } from '@/lib/workspaceNavigation';
-import { WorkspaceTab } from '@/hooks/useWorkspaceShell';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import {
   Select,
   SelectContent,
