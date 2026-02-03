@@ -11598,6 +11598,67 @@ export type Database = {
           },
         ]
       }
+      thread_notifications: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          is_subscribed: boolean
+          last_read_at: string | null
+          thread_id: string
+          unread_count: number
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          is_subscribed?: boolean
+          last_read_at?: string | null
+          thread_id: string
+          unread_count?: number
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          is_subscribed?: boolean
+          last_read_at?: string | null
+          thread_id?: string
+          unread_count?: number
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_notifications_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_notifications_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_notifications_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       thread_read_status: {
         Row: {
           id: string
@@ -21836,6 +21897,7 @@ export type Database = {
         }
         Returns: string
       }
+      mark_thread_read: { Args: { p_thread_id: string }; Returns: undefined }
       mask_anonymous_author: {
         Args: { is_anonymous: boolean; post_author_id: string }
         Returns: string
@@ -21898,6 +21960,10 @@ export type Database = {
           access_id: string
           refresh_id: string
         }[]
+      }
+      subscribe_to_thread: {
+        Args: { p_channel_id: string; p_thread_id: string }
+        Returns: undefined
       }
       toggle_comment_like: { Args: { p_comment_id: string }; Returns: Json }
       update_icebreaker_streak: {

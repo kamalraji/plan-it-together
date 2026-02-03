@@ -1,5 +1,6 @@
 /**
  * ThreadNotifications - Unread thread tracking and notifications
+ * Now using the thread_notifications table for proper tracking
  */
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Check } from 'lucide-react';
@@ -16,11 +17,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 
 interface ThreadNotification {
   id: string;
   thread_id: string;
   thread_preview: string;
+  channel_id: string;
   channel_name: string;
   last_reply_by: string;
   last_reply_at: string | null;
@@ -37,61 +40,116 @@ export const ThreadNotifications: React.FC<ThreadNotificationsProps> = ({
   onOpenThread,
 }) => {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<ThreadNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // For now, we'll use mock data since we don't have a thread_notifications table
-  // In a real implementation, this would query a dedicated table
-  useEffect(() => {
-    if (!user || !workspaceId) return;
+  // Fetch unread thread notifications from the database
+  const { data: notifications = [], refetch } = useQuery({
+    queryKey: ['thread-notifications', workspaceId, user?.id],
+    queryFn: async () => {
+      if (!user?.id || !workspaceId) return [];
 
-    // This is a simplified implementation
-    // A full implementation would track which threads the user has participated in
-    // and show unread replies
-    const fetchUnreadThreads = async () => {
-      // Query messages where the user has replied in a thread
-      const { data: userReplies } = await supabase
-        .from('channel_messages')
-        .select('parent_message_id')
-        .eq('sender_id', user.id)
-        .not('parent_message_id', 'is', null)
-        .limit(50);
+      // Query thread_notifications with related thread and channel data
+      const { data: notificationData, error } = await supabase
+        .from('thread_notifications')
+        .select(`
+          id,
+          thread_id,
+          channel_id,
+          unread_count,
+          updated_at
+        `)
+        .eq('user_id', user.id)
+        .eq('workspace_id', workspaceId)
+        .eq('is_subscribed', true)
+        .gt('unread_count', 0)
+        .order('updated_at', { ascending: false })
+        .limit(20);
 
-      if (userReplies && userReplies.length > 0) {
-        const parentIds = [...new Set(userReplies.map((r) => r.parent_message_id).filter(Boolean))] as string[];
-        
-        // Get the parent messages with their reply counts
-        const { data: threads } = await supabase
-          .from('channel_messages')
-          .select('id, content, channel_id, reply_count, created_at, sender_name')
-          .in('id', parentIds)
-          .gt('reply_count', 0)
-          .order('created_at', { ascending: false })
-          .limit(10);
-
-        if (threads) {
-          setNotifications(
-            threads.map((thread) => ({
-              id: thread.id,
-              thread_id: thread.id,
-              thread_preview: thread.content.slice(0, 50) + (thread.content.length > 50 ? '...' : ''),
-              channel_name: 'Channel',
-              last_reply_by: thread.sender_name || 'Someone',
-              last_reply_at: thread.created_at,
-              unread_count: Math.max(0, (thread.reply_count || 0) - 1), // Simplified
-            }))
-          );
-        }
+      if (error) {
+        console.error('Error fetching thread notifications:', error);
+        return [];
       }
-    };
 
-    fetchUnreadThreads();
-  }, [user, workspaceId, isOpen]);
+      if (!notificationData?.length) return [];
+
+      // Get thread details (parent messages)
+      const threadIds = notificationData.map(n => n.thread_id);
+      const { data: threads } = await supabase
+        .from('channel_messages')
+        .select('id, content, sender_name, created_at')
+        .in('id', threadIds);
+
+      // Get channel names
+      const channelIds = [...new Set(notificationData.map(n => n.channel_id))];
+      const { data: channels } = await supabase
+        .from('workspace_channels')
+        .select('id, name')
+        .in('id', channelIds);
+
+      // Get latest reply for each thread
+      const { data: latestReplies } = await supabase
+        .from('channel_messages')
+        .select('parent_message_id, sender_name, created_at')
+        .in('parent_message_id', threadIds)
+        .order('created_at', { ascending: false });
+
+      // Build notification objects
+      const threadMap = new Map(threads?.map(t => [t.id, t]) || []);
+      const channelMap = new Map(channels?.map(c => [c.id, c]) || []);
+      const latestReplyMap = new Map<string, { sender_name: string; created_at: string }>();
+      
+      latestReplies?.forEach(reply => {
+        if (reply.parent_message_id && !latestReplyMap.has(reply.parent_message_id)) {
+          latestReplyMap.set(reply.parent_message_id, {
+            sender_name: reply.sender_name || 'Someone',
+            created_at: reply.created_at || ''
+          });
+        }
+      });
+
+      return notificationData.map(notification => {
+        const thread = threadMap.get(notification.thread_id);
+        const channel = channelMap.get(notification.channel_id);
+        const latestReply = latestReplyMap.get(notification.thread_id);
+
+        const threadContent = thread?.content || '';
+        return {
+          id: notification.id,
+          thread_id: notification.thread_id,
+          channel_id: notification.channel_id,
+          thread_preview: threadContent.slice(0, 50) + (threadContent.length > 50 ? '...' : ''),
+          channel_name: channel?.name || 'Channel',
+          last_reply_by: latestReply?.sender_name || thread?.sender_name || 'Someone',
+          last_reply_at: latestReply?.created_at || notification.updated_at,
+          unread_count: notification.unread_count,
+        };
+      }) as ThreadNotification[];
+    },
+    enabled: !!user?.id && !!workspaceId,
+    staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: true,
+  });
+
+  // Refetch when popover opens
+  useEffect(() => {
+    if (isOpen) {
+      refetch();
+    }
+  }, [isOpen, refetch]);
 
   const totalUnread = notifications.reduce((sum, n) => sum + n.unread_count, 0);
 
-  const handleMarkAllRead = () => {
-    setNotifications([]);
+  const handleMarkAllRead = async () => {
+    if (!user?.id) return;
+    
+    // Mark all threads as read in the database
+    const threadIds = notifications.map(n => n.thread_id);
+    for (const threadId of threadIds) {
+      await supabase.rpc('mark_thread_read', { p_thread_id: threadId });
+    }
+    
+    // Refetch to update the UI
+    refetch();
   };
 
   return (
