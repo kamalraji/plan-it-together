@@ -1,36 +1,72 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle, FileText, MessageSquare } from 'lucide-react';
-import { BookingStatus, BookingRequest, getStatusText, formatCategory } from './types';
+import { BookingStatus, getStatusText, formatCategory } from './types';
 import { useToast } from '@/hooks/use-toast';
 
 interface BookingManagementUIProps {
   eventId?: string;
 }
 
-const getStatusVariant = (status: BookingStatus) => {
+// Database booking type matching vendor_bookings table
+interface DatabaseBooking {
+  id: string;
+  vendor_id: string;
+  service_id: string | null;
+  organizer_id: string;
+  event_id: string | null;
+  event_name: string;
+  event_date: string;
+  event_location: string | null;
+  guest_count: number | null;
+  requirements: string | null;
+  budget_min: number | null;
+  budget_max: number | null;
+  quoted_price: number | null;
+  final_price: number | null;
+  status: string;
+  organizer_name: string;
+  organizer_email: string;
+  organizer_phone: string | null;
+  vendor_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  vendors?: {
+    id: string;
+    business_name: string;
+    verification_status: string;
+  };
+  vendor_services?: {
+    id: string;
+    name: string;
+    category: string;
+    base_price: number | null;
+    pricing_type: string;
+  } | null;
+}
+
+const getStatusVariant = (status: string) => {
   switch (status) {
-    case BookingStatus.PENDING:
-    case BookingStatus.VENDOR_REVIEWING:
+    case 'PENDING':
+    case 'VENDOR_REVIEWING':
       return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
-    case BookingStatus.QUOTE_SENT:
+    case 'QUOTE_SENT':
       return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-    case BookingStatus.QUOTE_ACCEPTED:
-    case BookingStatus.CONFIRMED:
+    case 'QUOTE_ACCEPTED':
+    case 'CONFIRMED':
       return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400';
-    case BookingStatus.IN_PROGRESS:
+    case 'IN_PROGRESS':
       return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
-    case BookingStatus.COMPLETED:
+    case 'COMPLETED':
       return 'bg-muted text-muted-foreground';
-    case BookingStatus.CANCELLED:
-    case BookingStatus.DISPUTED:
+    case 'CANCELLED':
+    case 'DISPUTED':
       return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
     default:
       return 'bg-muted text-muted-foreground';
@@ -39,43 +75,90 @@ const getStatusVariant = (status: BookingStatus) => {
 
 const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) => {
   const { toast } = useToast();
-  const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
-  const [statusFilter, setStatusFilter] = useState<BookingStatus | 'ALL'>('ALL');
-  const [showMessageModal, setShowMessageModal] = useState(false);
+  const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  // Placeholder: vendor_bookings table doesn't exist yet
-  // Return empty array until marketplace tables are created
-  const { data: bookings, isLoading, refetch } = useQuery({
+  // Fetch bookings from vendor_bookings table
+  const { data: bookings, isLoading } = useQuery({
     queryKey: ['organizer-bookings', eventId, statusFilter],
     queryFn: async () => {
-      // Placeholder until vendor_bookings table exists
-      console.log('Booking management - tables not yet implemented', { eventId, statusFilter });
-      return [] as BookingRequest[];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      let query = supabase
+        .from('vendor_bookings')
+        .select(`
+          *,
+          vendors (id, business_name, verification_status),
+          vendor_services (id, name, category, base_price, pricing_type)
+        `)
+        .eq('organizer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      if (statusFilter !== 'ALL') {
+        query = query.eq('status', statusFilter);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching bookings:', error);
+        return [];
+      }
+
+      return (data || []) as DatabaseBooking[];
     },
   });
 
-  const handleAcceptQuote = async (bookingId: string) => {
-    try {
-      // Placeholder: would update vendor_bookings table
-      console.log('Accept quote for booking:', bookingId);
+  // Accept quote mutation
+  const acceptQuoteMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await supabase
+        .from('vendor_bookings')
+        .update({ status: 'QUOTE_ACCEPTED', updated_at: new Date().toISOString() })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizer-bookings'] });
       toast({ title: 'Quote accepted', description: 'The quote has been accepted successfully.' });
-      refetch();
-    } catch (_error) {
+    },
+    onError: () => {
       toast({ title: 'Error', description: 'Failed to accept quote. Please try again.', variant: 'destructive' });
-    }
+    },
+  });
+
+  // Cancel booking mutation
+  const cancelBookingMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await supabase
+        .from('vendor_bookings')
+        .update({ status: 'CANCELLED', updated_at: new Date().toISOString() })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizer-bookings'] });
+      toast({ title: 'Booking cancelled', description: 'The booking has been cancelled.' });
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to cancel booking. Please try again.', variant: 'destructive' });
+    },
+  });
+
+  const handleAcceptQuote = (bookingId: string) => {
+    acceptQuoteMutation.mutate(bookingId);
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
+  const handleCancelBooking = (bookingId: string) => {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
-
-    try {
-      // Placeholder: would update vendor_bookings table
-      console.log('Cancel booking:', bookingId);
-      toast({ title: 'Booking cancelled', description: 'The booking has been cancelled.' });
-      refetch();
-    } catch (_error) {
-      toast({ title: 'Error', description: 'Failed to cancel booking. Please try again.', variant: 'destructive' });
-    }
+    cancelBookingMutation.mutate(bookingId);
   };
 
   return (
@@ -89,7 +172,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
               <Label className="text-sm text-muted-foreground whitespace-nowrap">Filter by status:</Label>
               <Select
                 value={statusFilter}
-                onValueChange={(value) => setStatusFilter(value as BookingStatus | 'ALL')}
+                onValueChange={setStatusFilter}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
@@ -122,117 +205,96 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="text-lg font-semibold text-foreground truncate">
-                        {booking.serviceListing.title}
+                        {booking.vendor_services?.name || booking.event_name}
                       </h3>
                       <Badge className={getStatusVariant(booking.status)}>
-                        {getStatusText(booking.status)}
+                        {getStatusText(booking.status as BookingStatus)}
                       </Badge>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
                       <div className="space-y-1">
                         <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">Vendor:</span> {booking.vendor.businessName}
-                          {booking.vendor.verificationStatus === 'VERIFIED' && (
+                          <span className="font-medium text-foreground">Vendor:</span> {booking.vendors?.business_name}
+                          {booking.vendors?.verification_status === 'verified' && (
                             <CheckCircle className="inline ml-1 h-4 w-4 text-emerald-500" />
                           )}
                         </p>
                         <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">Service Date:</span> {new Date(booking.serviceDate).toLocaleDateString()}
+                          <span className="font-medium text-foreground">Event Date:</span> {new Date(booking.event_date).toLocaleDateString()}
                         </p>
-                        <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">Category:</span> {formatCategory(booking.serviceListing.category)}
-                        </p>
+                        {booking.vendor_services?.category && (
+                          <p className="text-muted-foreground">
+                            <span className="font-medium text-foreground">Category:</span> {formatCategory(booking.vendor_services.category)}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-1">
-                        {booking.budgetRange && (
+                        {(booking.budget_min || booking.budget_max) && (
                           <p className="text-muted-foreground">
-                            <span className="font-medium text-foreground">Budget:</span> {booking.serviceListing.pricing.currency} {booking.budgetRange.min.toLocaleString()} - {booking.budgetRange.max.toLocaleString()}
+                            <span className="font-medium text-foreground">Budget:</span> ₹{booking.budget_min?.toLocaleString()} - ₹{booking.budget_max?.toLocaleString()}
                           </p>
                         )}
-                        {booking.quotedPrice && (
+                        {booking.quoted_price && (
                           <p className="text-muted-foreground">
-                            <span className="font-medium text-foreground">Quoted:</span> {booking.serviceListing.pricing.currency} {booking.quotedPrice.toLocaleString()}
+                            <span className="font-medium text-foreground">Quoted:</span> ₹{booking.quoted_price.toLocaleString()}
                           </p>
                         )}
-                        {booking.finalPrice && (
+                        {booking.final_price && (
                           <p className="text-muted-foreground">
-                            <span className="font-medium text-foreground">Final:</span> {booking.serviceListing.pricing.currency} {booking.finalPrice.toLocaleString()}
+                            <span className="font-medium text-foreground">Final:</span> ₹{booking.final_price.toLocaleString()}
                           </p>
                         )}
                         <p className="text-muted-foreground">
-                          <span className="font-medium text-foreground">Created:</span> {new Date(booking.createdAt).toLocaleDateString()}
+                          <span className="font-medium text-foreground">Created:</span> {new Date(booking.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mb-4">
-                      <p className="text-sm font-medium text-foreground mb-1">Requirements:</p>
-                      <p className="text-sm text-muted-foreground">{booking.requirements}</p>
-                    </div>
-
-                    {booking.additionalNotes && (
+                    {booking.requirements && (
                       <div className="mb-4">
-                        <p className="text-sm font-medium text-foreground mb-1">Additional Notes:</p>
-                        <p className="text-sm text-muted-foreground">{booking.additionalNotes}</p>
+                        <p className="text-sm font-medium text-foreground mb-1">Requirements:</p>
+                        <p className="text-sm text-muted-foreground">{booking.requirements}</p>
                       </div>
                     )}
 
-                    {/* Messages Preview */}
-                    {booking.messages.length > 0 && (
-                      <div className="p-3 bg-muted rounded-lg">
-                        <p className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    {booking.vendor_notes && (
+                      <div className="mb-4 p-3 bg-muted rounded-lg">
+                        <p className="text-sm font-medium text-foreground mb-1 flex items-center gap-2">
                           <MessageSquare className="h-4 w-4" />
-                          Recent Messages ({booking.messages.length})
+                          Vendor Notes
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                          <span className="font-medium">
-                            {booking.messages[booking.messages.length - 1].senderType === 'ORGANIZER' ? 'You' : booking.vendor.businessName}:
-                          </span>{' '}
-                          {booking.messages[booking.messages.length - 1].message.length > 100
-                            ? `${booking.messages[booking.messages.length - 1].message.substring(0, 100)}...`
-                            : booking.messages[booking.messages.length - 1].message
-                          }
-                        </p>
+                        <p className="text-sm text-muted-foreground">{booking.vendor_notes}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
                   <div className="flex lg:flex-col gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedBooking(booking);
-                        setShowMessageModal(true);
-                      }}
-                    >
-                      View Messages
-                    </Button>
-
-                    {booking.status === BookingStatus.QUOTE_SENT && (
+                    {booking.status === 'QUOTE_SENT' && (
                       <Button
                         size="sm"
                         className="bg-emerald-600 hover:bg-emerald-700"
                         onClick={() => handleAcceptQuote(booking.id)}
+                        disabled={acceptQuoteMutation.isPending}
                       >
                         Accept Quote
                       </Button>
                     )}
 
-                    {[BookingStatus.PENDING, BookingStatus.VENDOR_REVIEWING, BookingStatus.QUOTE_SENT].includes(booking.status) && (
+                    {['PENDING', 'VENDOR_REVIEWING', 'QUOTE_SENT'].includes(booking.status) && (
                       <Button
                         variant="outline"
                         size="sm"
                         className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
                         onClick={() => handleCancelBooking(booking.id)}
+                        disabled={cancelBookingMutation.isPending}
                       >
                         Cancel
                       </Button>
                     )}
 
-                    {booking.status === BookingStatus.COMPLETED && (
+                    {booking.status === 'COMPLETED' && (
                       <Button size="sm">
                         Leave Review
                       </Button>
@@ -255,110 +317,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
           </div>
         )}
       </div>
-
-      {/* Message Modal */}
-      {showMessageModal && selectedBooking && (
-        <MessageModal
-          booking={selectedBooking}
-          open={showMessageModal}
-          onOpenChange={(open) => {
-            setShowMessageModal(open);
-            if (!open) setSelectedBooking(null);
-          }}
-          onMessageSent={() => refetch()}
-        />
-      )}
     </div>
-  );
-};
-
-// Message Modal Component
-interface MessageModalProps {
-  booking: BookingRequest;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onMessageSent: () => void;
-}
-
-const MessageModal: React.FC<MessageModalProps> = ({ booking, open, onOpenChange, onMessageSent }) => {
-  const { toast } = useToast();
-  const [newMessage, setNewMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      // Placeholder: would insert into vendor_booking_messages table
-      console.log('Send message to booking:', booking.id, newMessage.trim());
-
-      setNewMessage('');
-      onMessageSent();
-      toast({ title: 'Message sent', description: 'Your message has been sent.' });
-    } catch (_error) {
-      toast({ title: 'Error', description: 'Failed to send message. Please try again.', variant: 'destructive' });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>{booking.serviceListing.title}</DialogTitle>
-          <p className="text-sm text-muted-foreground">{booking.vendor.businessName}</p>
-        </DialogHeader>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto py-4 space-y-4 min-h-[300px]">
-          {booking.messages.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">
-              No messages yet. Start the conversation!
-            </div>
-          ) : (
-            booking.messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.senderType === 'ORGANIZER' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.senderType === 'ORGANIZER'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground'
-                  }`}
-                >
-                  <p className="text-sm">{message.message}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.senderType === 'ORGANIZER' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                  }`}>
-                    {new Date(message.sentAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Message Input */}
-        <form onSubmit={handleSendMessage} className="flex gap-3 pt-4 border-t border-border">
-          <Input
-            type="text"
-            placeholder="Type your message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            className="flex-1"
-          />
-          <Button type="submit" disabled={isSubmitting || !newMessage.trim()}>
-            {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Send
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 };
 

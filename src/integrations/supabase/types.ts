@@ -12712,6 +12712,62 @@ export type Database = {
           },
         ]
       }
+      vendor_shortlist: {
+        Row: {
+          added_at: string
+          event_id: string
+          id: string
+          notes: string | null
+          service_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          service_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          service_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_shortlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_shortlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_shortlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "vendor_shortlist_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           address: string | null
