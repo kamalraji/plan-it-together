@@ -20,6 +20,8 @@ import { EventLandingPage } from '../events/EventLandingPage';
 import { PublicEventPage } from '../events/PublicEventPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
+import { SettingsPage } from './SettingsPage';
+import { AnalyticsPage } from './AnalyticsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
@@ -357,10 +359,16 @@ export const ConsoleDashboard = () => {
         <div className="mt-16 mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Quick Actions</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button 
+              onClick={() => navigate('/dashboard/eventmanagement/create')}
+              className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
               Create Event
             </button>
-            <button className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button 
+              onClick={() => navigate('/dashboard/workspaces')}
+              className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
               Join Workspace
             </button>
             <button
@@ -721,6 +729,22 @@ export const AppRouter: React.FC = () => {
                     <Suspense fallback={<RouteLoadingFallback />}>
                       <DashboardDataLab />
                     </Suspense>
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="settings/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SettingsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="analytics"
+                element={
+                  <ConsoleRoute>
+                    <AnalyticsPage />
                   </ConsoleRoute>
                 }
               />

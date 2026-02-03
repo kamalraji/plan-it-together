@@ -290,18 +290,54 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // TODO: Implement export
+                          // Export as formatted JSON file
                           const content = JSON.stringify(report.content, null, 2);
                           const blob = new Blob([content], { type: 'application/json' });
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement('a');
                           a.href = url;
                           a.download = `${report.title.replace(/\s+/g, '-')}.json`;
+                          document.body.appendChild(a);
                           a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
                         }}
                       >
                         <Download className="h-4 w-4 mr-1" />
-                        Export
+                        JSON
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // Export as CSV file
+                          const reportData = report.content as Record<string, unknown>;
+                          let csvContent = `Report: ${report.title}\n`;
+                          csvContent += `Generated: ${format(new Date(report.created_at), 'MMM d, yyyy h:mm a')}\n\n`;
+                          
+                          // Add stats sections
+                          Object.entries(reportData).forEach(([key, value]) => {
+                            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                              csvContent += `\n${key.toUpperCase()}\n`;
+                              Object.entries(value as Record<string, unknown>).forEach(([k, v]) => {
+                                csvContent += `${k},${v}\n`;
+                              });
+                            }
+                          });
+                          
+                          const blob = new Blob([csvContent], { type: 'text/csv' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${report.title.replace(/\s+/g, '-')}.csv`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        CSV
                       </Button>
                       <Button
                         variant="ghost"
