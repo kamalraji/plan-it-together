@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/calendar';
 import { StarIcon, MapPinIcon, ClockIcon, CheckCircleIcon, XCircleIcon, ShieldCheckIcon, CalendarIcon } from '@heroicons/react/24/solid';
+import { VendorReviews } from './VendorReviews';
 
 interface Vendor {
   id: string;
@@ -270,10 +271,16 @@ export const ServiceDetailPage: React.FC = () => {
                   </TabsContent>
                   
                   <TabsContent value="reviews" className="space-y-4 mt-4">
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>Reviews feature coming soon</p>
-                      <p className="text-sm mt-2">{service.review_count} verified reviews</p>
-                    </div>
+                    {service.vendor ? (
+                      <VendorReviews 
+                        vendorId={service.vendor.id} 
+                        vendorName={service.vendor.business_name} 
+                      />
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No vendor information available</p>
+                      </div>
+                    )}
                   </TabsContent>
                 </Tabs>
               </CardContent>

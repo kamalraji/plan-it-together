@@ -31,9 +31,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
   const imageUrl = service.media_urls?.[0];
   const isVerified = service.vendor?.verification_status === 'VERIFIED';
 
-  // Mock rating data
-  const rating = 4.2 + Math.random() * 0.7;
-  const reviewCount = Math.floor(Math.random() * 200) + 10;
+  // Real rating data from aggregated vendor reviews
+  const rating = service.avg_rating || 0;
+  const reviewCount = service.review_count || 0;
 
   return (
     <div className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
@@ -89,11 +89,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
 
         {/* Rating */}
         <div className="flex items-center gap-1.5 mb-2">
-          <div className="flex items-center gap-0.5 bg-emerald-600 text-white text-xs px-1.5 py-0.5 rounded">
-            <span className="font-medium">{rating.toFixed(1)}</span>
-            <Star className="w-3 h-3 fill-current" />
-          </div>
-          <span className="text-xs text-muted-foreground">({reviewCount})</span>
+          {reviewCount > 0 ? (
+            <>
+              <div className="flex items-center gap-0.5 bg-emerald-600 text-white text-xs px-1.5 py-0.5 rounded">
+                <span className="font-medium">{rating.toFixed(1)}</span>
+                <Star className="w-3 h-3 fill-current" />
+              </div>
+              <span className="text-xs text-muted-foreground">({reviewCount})</span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">No reviews yet</span>
+          )}
           {isVerified && (
             <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-200 text-blue-600 ml-auto">
               Assured
