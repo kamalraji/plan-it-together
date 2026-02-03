@@ -20,8 +20,8 @@ interface RatingData {
 }
 
 export function WorkspaceTemplateRating({ 
-  templateId: _templateId, 
-  workspaceId: _workspaceId, 
+  templateId, 
+  workspaceId, 
   onRatingSubmitted, 
   onCancel 
 }: WorkspaceTemplateRatingProps) {
@@ -35,13 +35,39 @@ export function WorkspaceTemplateRating({
   });
   const [error, setError] = useState<string | null>(null);
 
-  // Submit rating mutation (mock for now - tables not in schema)
+  // Submit rating mutation - now using real database
   const submitRatingMutation = useMutation({
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       
-      // Just return success since template tables not in schema yet
+      // Build review text with additional context
+      const reviewParts = [
+        ratingData.feedback,
+        `Team Satisfaction: ${ratingData.teamSatisfaction}/5`,
+        `Task Completion: ${ratingData.completionRate}%`,
+        `Event Successful: ${ratingData.eventSuccess ? 'Yes' : 'No'}`,
+        `Would Recommend: ${ratingData.wouldRecommend ? 'Yes' : 'No'}`
+      ].filter(Boolean);
+      
+      const review = reviewParts.join(' | ');
+      
+      // Upsert rating to workspace_template_ratings table
+      const { error: upsertError } = await supabase
+        .from('workspace_template_ratings')
+        .upsert({
+          template_id: templateId,
+          user_id: user.id,
+          workspace_id: workspaceId,
+          rating: ratingData.rating,
+          review: review,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'template_id,user_id'
+        });
+      
+      if (upsertError) throw upsertError;
+      
       return { success: true };
     },
     onSuccess: () => {
