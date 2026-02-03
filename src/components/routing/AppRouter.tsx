@@ -1,0 +1,787 @@
+import React, { useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/looseClient';
+import { AuthProvider, useAuth } from '../../hooks/useAuth';
+import { UserRole } from '../../types';
+import { ConsoleRoute } from './ConsoleRoute';
+import { ConsoleLayout } from './ConsoleLayout';
+import { NotFoundPage } from './NotFoundPage';
+import { SearchPage } from './SearchPage';
+import { NotificationPage } from './NotificationPage';
+import { CommunicationPage } from './CommunicationPage';
+import { LoginForm } from '../auth/LoginForm';
+import { RegisterForm } from '../auth/RegisterForm';
+import { AuthLayout } from '../auth/AuthLayout';
+import { DashboardRouter } from '../dashboard/DashboardRouter';
+import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
+import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
+import { EventLandingPage } from '../events/EventLandingPage';
+import { PublicEventPage } from '../events/PublicEventPage';
+import { ProfilePage } from '../profile/ProfilePage';
+import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
+import { SettingsPage } from './SettingsPage';
+import { AnalyticsPage } from './AnalyticsPage';
+import { PublicProfilePage } from '../profile/PublicProfilePage';
+import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
+import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
+import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
+import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
+import { CertificateVerification } from '../certificates';
+import { ForgotPasswordForm } from '../auth/ForgotPasswordForm';
+import { ResetPasswordForm } from '../auth/ResetPasswordForm';
+
+import Thittam1HubLanding from '@/pages/Thittam1HubLanding';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
+import PricingPage from '@/pages/PricingPage';
+import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
+import { PrivacyPolicyPage, TermsOfServicePage, CookiePolicyPage, SecurityPage } from '@/components/legal';
+import { PublicHelpPage } from '@/components/help';
+
+// Lazy-loaded components for better bundle splitting
+// Heavy/role-specific components only downloaded when needed
+const OrgScopedLayout = lazy(() => import('../organization/OrgScopedLayout'));
+const OrganizerDashboardLayout = lazy(() => import('../dashboard/OrganizerDashboardLayout'));
+const MarketplaceService = lazy(() => import('./services/MarketplaceService'));
+const OrganizationServiceComponent = lazy(() => import('./services').then(m => ({ default: m.OrganizationService })));
+const DashboardDataLab = lazy(() => import('../enhanced/DashboardDataLab'));
+const OrganizationRegistrationPage = lazy(() => import('../organization/OrganizationRegistrationPage'));
+const OrganizerOnboardingPage = lazy(() => import('../organization/OrganizerOnboardingPage'));
+const JoinOrganizationPage = lazy(() => import('../organization/JoinOrganizationPage'));
+const VendorPublicProfilePage = lazy(() => import('./services/VendorPublicProfilePage'));
+const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPortfolioPage'));
+const HelpPage = lazy(() => import('../help/HelpPage'));
+const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
+const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
+const OnboardingPage = lazy(() => import('../../pages/OnboardingPage'));
+const EventChannelsPage = lazy(() => import('../../pages/participant/EventChannelsPage'));
+// Loading fallback for lazy-loaded routes
+const RouteLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/95">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <p className="text-muted-foreground text-sm">Loading...</p>
+    </div>
+  </div>
+);
+
+
+// Create a query client instance with optimized settings for the console application
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+// Forgot Password page using shared AuthLayout
+const ForgotPasswordPage = () => {
+  return (
+    <AuthLayout>
+      <ForgotPasswordForm />
+    </AuthLayout>
+  );
+};
+
+// Password Reset page using shared AuthLayout
+const ResetPasswordPage = () => {
+  return (
+    <AuthLayout>
+      <ResetPasswordForm />
+    </AuthLayout>
+  );
+};
+
+
+// Redirect component for backward compatibility from /e/:slug to /event/:slug
+const SlugRedirect = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const queryString = searchParams.toString();
+  return <Navigate to={`/event/${slug}${queryString ? `?${queryString}` : ''}`} replace />;
+};
+
+// Types for unified dashboard metrics
+interface DashboardMetrics {
+  activeEvents: number;
+  draftEvents: number;
+  completedEvents: number;
+  totalRegistrations: number;
+  activeWorkspaces: number;
+  teamMembers: number;
+  availableServices: number;
+  activeBookings: number;
+  totalRevenue: number;
+}
+
+// Console Dashboard using real backend metrics
+export const ConsoleDashboard = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { data: metrics, isLoading, error } = useQuery<DashboardMetrics>({
+    queryKey: ['dashboard-metrics'],
+    queryFn: async () => {
+      // Ensure we have an authenticated user so RLS-scoped metrics work correctly
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!userData?.user) {
+        throw new Error('User not authenticated');
+      }
+
+      const [
+        activeEventsRes,
+        draftEventsRes,
+        completedEventsRes,
+        registrationsRes,
+        activeWorkspacesRes,
+        servicesRes,
+        activeBookingsRes,
+        revenueRes,
+      ] = await Promise.all([
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['PUBLISHED', 'ONGOING']),
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'DRAFT'),
+        supabase
+          .from('events')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'COMPLETED'),
+        supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('workspaces')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'ACTIVE'),
+        supabase
+          .from('services')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true),
+        supabase
+          .from('bookings')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['PENDING', 'CONFIRMED']),
+        supabase
+          .from('bookings')
+          .select('amount')
+          .eq('status', 'COMPLETED'),
+      ]);
+
+      if (activeEventsRes.error) throw activeEventsRes.error;
+      if (draftEventsRes.error) throw draftEventsRes.error;
+      if (completedEventsRes.error) throw completedEventsRes.error;
+      if (registrationsRes.error) throw registrationsRes.error;
+      if (activeWorkspacesRes.error) throw activeWorkspacesRes.error;
+      if (servicesRes.error) throw servicesRes.error;
+      if (activeBookingsRes.error) throw activeBookingsRes.error;
+      if (revenueRes.error) throw revenueRes.error;
+
+      const totalRevenue = (revenueRes.data ?? []).reduce(
+        (sum: number, row: { amount: number | null }) => sum + Number(row.amount ?? 0),
+        0,
+      );
+
+      return {
+        activeEvents: activeEventsRes.count ?? 0,
+        draftEvents: draftEventsRes.count ?? 0,
+        completedEvents: completedEventsRes.count ?? 0,
+        totalRegistrations: registrationsRes.count ?? 0,
+        activeWorkspaces: activeWorkspacesRes.count ?? 0,
+        teamMembers: 0, // Team metrics will be wired to dedicated tables later
+        availableServices: servicesRes.count ?? 0,
+        activeBookings: activeBookingsRes.count ?? 0,
+        totalRevenue,
+      } satisfies DashboardMetrics;
+    },
+  });
+
+  useEffect(() => {
+    document.title = 'Dashboard | Thittam1Hub';
+
+    const description =
+      'Unified dashboard for events, workspaces, marketplace activity, and registrations in Thittam1Hub.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.origin + '/dashboard');
+  }, []);
+
+  return (
+    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-cream to-lavender/20 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12 text-center py-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
+            Your Thittam1Hub Dashboard
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Live overview of your events, participants, and marketplace activity in one place.
+          </p>
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-coral" />
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-8 max-w-2xl mx-auto rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            Unable to load live metrics right now. Data cards below may be empty.
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Events Card */}
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-foreground">Event Management</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mb-6">Create, publish, and track your events and participants.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
+              <div className="flex justify-between">
+                <span>Active Events</span>
+                <span className="font-semibold text-coral">{metrics?.activeEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Draft Events</span>
+                <span className="font-semibold text-teal">{metrics?.draftEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Completed Events</span>
+                <span className="font-semibold text-sunny">{metrics?.completedEvents ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Registrations</span>
+                <span className="font-semibold text-foreground">{metrics?.totalRegistrations ?? 0}</span>
+              </div>
+            </div>
+            <button onClick={() => {
+              const orgSlugCandidate = location.pathname.split('/')[1];
+              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+                navigate(`/${orgSlugCandidate}/eventmanagement`);
+              } else {
+                navigate('/dashboard/eventmanagement');
+              }
+            }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              Go to Events
+            </button>
+          </div>
+
+          {/* Workspaces Card */}
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-foreground">Workspaces</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mb-6">Collaborate with your team on event prep and execution.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
+              <div className="flex justify-between">
+                <span>Active Workspaces</span>
+                <span className="font-semibold text-teal">{metrics?.activeWorkspaces ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Team Members</span>
+                <span className="font-semibold text-coral">{metrics?.teamMembers ?? 0}</span>
+              </div>
+            </div>
+            <button onClick={() => {
+              const orgSlugCandidate = location.pathname.split('/')[1];
+              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+                navigate(`/${orgSlugCandidate}/workspaces`);
+              } else {
+                navigate('/dashboard/workspaces');
+              }
+            }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              Go to Workspaces
+            </button>
+          </div>
+
+          {/* Marketplace Card */}
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-xl font-bold text-foreground">Marketplace</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mb-6">Discover and book verified vendors for your events.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
+              <div className="flex justify-between">
+                <span>Available Services</span>
+                <span className="font-semibold text-sunny">{metrics?.availableServices ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Active Bookings</span>
+                <span className="font-semibold text-coral">{metrics?.activeBookings ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Revenue</span>
+                <span className="font-semibold text-foreground">
+                  {metrics ? `$${metrics.totalRevenue.toLocaleString()}` : '$0'}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/marketplace')}
+              className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
+            >
+              Go to Marketplace
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-16 mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Quick Actions</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button 
+              onClick={() => navigate('/dashboard/eventmanagement/create')}
+              className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
+              Create Event
+            </button>
+            <button 
+              onClick={() => navigate('/dashboard/workspaces')}
+              className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
+              Join Workspace
+            </button>
+            <button
+              onClick={() => navigate('/marketplace')}
+              className="bg-card/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
+              Browse Services
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Profile service routes
+const ProfileService = () => {
+  return (
+    <Routes>
+      <Route index element={<ProfilePage />} />
+      <Route path="settings" element={<ProfileSettingsPage />} />
+      <Route path=":userId/public" element={<PublicProfilePage />} />
+      <Route path="*" element={<Navigate to="." replace />} />
+    </Routes>
+  );
+};
+
+const RootLandingRoute: React.FC = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
+  const { isCompleted: onboardingCompleted, isLoading: onboardingLoading } = useOnboardingStatus();
+
+  if (authLoading) {
+    return <RouteLoadingFallback />;
+  }
+
+  if (isAuthenticated) {
+    // Wait for onboarding and org data before redirecting
+    if (onboardingLoading || orgLoading) {
+      return <RouteLoadingFallback />;
+    }
+    
+    // Redirect to onboarding if not completed
+    if (!onboardingCompleted) {
+      return <Navigate to="/onboarding/welcome" replace />;
+    }
+    
+    return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
+  }
+
+  return <Thittam1HubLanding />;
+};
+
+const SupportService = () => {
+  // Get current context from URL or other means
+  const currentContext = window.location.pathname.includes('/events') ? 'events' :
+    window.location.pathname.includes('/workspaces') ? 'workspaces' :
+      window.location.pathname.includes('/marketplace') ? 'marketplace' :
+        undefined;
+
+  return (
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <HelpPage currentContext={currentContext} />
+    </Suspense>
+  );
+};
+
+const NotificationService = () => {
+  return <NotificationPage />;
+};
+
+const CommunicationService = () => {
+  return <CommunicationPage />;
+};
+
+const EmbedPortfolioRoute: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+
+  useEffect(() => {
+    document.title = 'Participant Portfolio Preview | Thittam1Hub';
+
+    const description =
+      'Compact public portfolio preview card for embedding participant profiles from Thittam1Hub.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
+  }, []);
+
+  if (!userId) return null;
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-md w-full p-4">
+        <PortfolioPreviewCard userId={userId} />
+      </div>
+    </main>
+  );
+};
+
+export const AppRouter: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+             {/* Thittam1Hub-style marketing landing at root */}
+             <Route path="/" element={<RootLandingRoute />} />
+             <Route path="/pricing" element={<PricingPage />} />
+             
+             {/* Legal pages */}
+             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+             <Route path="/terms" element={<TermsOfServicePage />} />
+             <Route path="/cookies" element={<CookiePolicyPage />} />
+             <Route path="/security" element={<SecurityPage />} />
+             
+             {/* Public help - accessible without auth */}
+             <Route path="/help" element={<PublicHelpPage />} />
+             
+             {/* Dev tools */}
+             <Route path="/dev/illustrations" element={<IllustrationGalleryPage />} />
+
+            {/* Public authentication routes */}
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Onboarding wizard for new users */}
+            <Route
+              path="/onboarding/welcome"
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <OnboardingPage />
+                </Suspense>
+              }
+            />
+
+            {/* Organizer onboarding - appears for new organizers */}
+            <Route
+              path="/dashboard/onboarding/organizer"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizerOnboardingPage />
+                  </Suspense>
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
+            <Route
+              path="/onboarding/organization"
+              element={
+                <ConsoleRoute requireEmailVerification={false}>
+                  <Navigate to="/dashboard/organizations/join" replace />
+                </ConsoleRoute>
+              }
+            />
+
+            <Route
+              path="/organizations/create"
+              element={
+                <ConsoleRoute requireEmailVerification={false}>
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizationRegistrationPage />
+                  </Suspense>
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Public certificate verification */}
+            <Route path="/verify" element={<CertificateVerification />} />
+            <Route path="/verify/:certificateId" element={<CertificateVerification />} />
+
+            {/* Payment success/callback */}
+            <Route path="/payment-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
+            <Route path="/registration-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
+
+            {/* Public event routes */}
+            <Route path="/events" element={<ParticipantEventsPage />} />
+            <Route path="/events/:eventId/*" element={<EventLandingPage />} />
+            <Route path="/event/:slug" element={<PublicEventPage />} />
+            <Route path="/event/:eventId/channels" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <EventChannelsPage />
+              </Suspense>
+            } />
+            {/* Backward compatibility redirect from old /e/:slug to /event/:slug */}
+            <Route path="/e/:slug" element={<SlugRedirect />} />
+
+            <Route path="/portfolio/:userId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <ParticipantPortfolioPage />
+              </Suspense>
+            } />
+            <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
+
+            {/* Public vendor profile */}
+            <Route path="/vendor/:vendorId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <VendorPublicProfilePage />
+              </Suspense>
+            } />
+
+            {/* Public organization landing by slug */}
+            <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
+            <Route
+              path="/:orgSlug/products"
+              element={<OrganizationProductsLandingPage />}
+            />
+
+            {/* Organization-scoped organizer console */}
+            <Route
+              path="/:orgSlug/*"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <GlobalErrorBoundary>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrgScopedLayout />
+                    </Suspense>
+                  </GlobalErrorBoundary>
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Organizer root dashboard (org-agnostic) */}
+            <Route
+              path="/organizer/dashboard"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <GlobalErrorBoundary>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizerDashboardLayout />
+                    </Suspense>
+                  </GlobalErrorBoundary>
+                </ConsoleRoute>
+              }
+            >
+              <Route index element={<OrganizerSpecificDashboard />} />
+            </Route>
+
+            {/* Dashboard routes - all protected with enhanced authentication */}
+            <Route
+              path="/dashboard"
+              element={
+                <ConsoleRoute>
+                  <GlobalErrorBoundary>
+                    <ConsoleLayout />
+                  </GlobalErrorBoundary>
+                </ConsoleRoute>
+              }
+            >
+              <Route index element={<DashboardRouter />} />
+              <Route path="home" element={<DashboardRouter />} />
+              <Route
+                path="followed-organizations"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <FollowedOrganizationsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="participant-events"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <ParticipantEventsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="organizations/join"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <JoinOrganizationPage />
+                    </Suspense>
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="organizations/*"
+                element={
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizationServiceComponent />
+                    </Suspense>
+                  </ConsoleRoute>
+                }
+              />
+              {/* Admin routes moved to /:orgSlug/admin - redirect legacy paths */}
+              <Route path="admin/*" element={<Navigate to="/dashboard" replace />} />
+              <Route
+                path="profile/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <ProfileService />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="support/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SupportService />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="notifications/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <NotificationService />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="communications/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <CommunicationService />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SearchPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="data-lab"
+                element={
+                  <ConsoleRoute>
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <DashboardDataLab />
+                    </Suspense>
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="settings/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SettingsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="analytics"
+                element={
+                  <ConsoleRoute>
+                    <AnalyticsPage />
+                  </ConsoleRoute>
+                }
+              />
+            </Route>
+
+            {/* Standalone Marketplace - public marketplace for browsing services */}
+            <Route
+              path="/marketplace/*"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN, UserRole.VENDOR]}>
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <MarketplaceService />
+                  </Suspense>
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Legacy console redirect */}
+            <Route path="/console/*" element={<Navigate to="/dashboard" replace />} />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin/generate-backgrounds"
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <GenerateBackgroundsPage />
+                </Suspense>
+              }
+            />
+
+            {/* 404 Not Found - must be last */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes >
+        </BrowserRouter >
+      </AuthProvider >
+    </QueryClientProvider >
+  );
+};
+
+export default AppRouter;
