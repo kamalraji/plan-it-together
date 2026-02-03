@@ -301,7 +301,7 @@ router.get('/leaderboard/:eventId', async (req: Request, res: Response) => {
 router.get(
   '/scores/:submissionId',
   authenticate,
-  authorize(['ORGANIZER', 'JUDGE']),
+  requireRole(['ORGANIZER', 'JUDGE']),
   async (req: Request, res: Response) => {
     try {
       const { submissionId } = req.params;
@@ -333,7 +333,7 @@ router.get(
 router.get(
   '/final-scores/:eventId',
   authenticate,
-  authorize(['ORGANIZER']),
+  requireRole(['ORGANIZER']),
   async (req: Request, res: Response) => {
     try {
       const { eventId } = req.params;

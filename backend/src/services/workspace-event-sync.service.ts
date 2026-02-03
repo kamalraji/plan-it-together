@@ -1,4 +1,4 @@
-import { PrismaClient, TaskStatus, TaskPriority, TaskCategory } from '@prisma/client';
+import { PrismaClient, TaskStatus, TaskPriority, EventStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -265,6 +265,7 @@ export class WorkspaceEventSyncService {
       throw new Error('Workspace not found');
     }
 
+    const now = new Date();
     const criticalThreshold = new Date();
     criticalThreshold.setHours(criticalThreshold.getHours() + 24); // 24 hours
 
@@ -404,7 +405,7 @@ export class WorkspaceEventSyncService {
    * Align existing tasks with event milestones
    */
   private async alignTasksWithMilestones(
-    _workspaceId: string,
+    workspaceId: string,
     milestones: EventMilestone[],
     existingTasks: any[]
   ): Promise<void> {
@@ -591,19 +592,19 @@ export class WorkspaceEventSyncService {
   /**
    * Get task category for milestone type
    */
-  private getCategoryForMilestoneType(type: string): TaskCategory {
-    const typeMap: Record<string, TaskCategory> = {
-      REGISTRATION_OPEN: TaskCategory.REGISTRATION,
-      REGISTRATION_CLOSE: TaskCategory.REGISTRATION,
-      VENUE_BOOKING: TaskCategory.LOGISTICS,
-      MARKETING_LAUNCH: TaskCategory.MARKETING,
-      FINAL_PREPARATIONS: TaskCategory.SETUP,
-      EVENT_START: TaskCategory.LOGISTICS,
-      EVENT_END: TaskCategory.LOGISTICS,
-      POST_EVENT_CLEANUP: TaskCategory.POST_EVENT,
+  private getCategoryForMilestoneType(type: string): string {
+    const typeMap: Record<string, string> = {
+      REGISTRATION_OPEN: 'REGISTRATION',
+      REGISTRATION_CLOSE: 'REGISTRATION',
+      VENUE_BOOKING: 'LOGISTICS',
+      MARKETING_LAUNCH: 'MARKETING',
+      FINAL_PREPARATIONS: 'SETUP',
+      EVENT_START: 'LOGISTICS',
+      EVENT_END: 'LOGISTICS',
+      POST_EVENT_CLEANUP: 'POST_EVENT',
     };
 
-    return typeMap[type] || TaskCategory.SETUP;
+    return typeMap[type] || 'SETUP';
   }
 
   /**
@@ -638,7 +639,7 @@ export class WorkspaceEventSyncService {
   /**
    * Calculate critical path for project management
    */
-  private calculateCriticalPath(tasks: any[], _milestones: EventMilestone[]): Array<{
+  private calculateCriticalPath(tasks: any[], milestones: EventMilestone[]): Array<{
     taskId: string;
     taskTitle: string;
     dueDate: Date;
@@ -675,20 +676,14 @@ export class WorkspaceEventSyncService {
   /**
    * Identify risk factors in the workspace
    */
-  private identifyRiskFactors(tasks: any[], _milestones: EventMilestone[]): Array<{
+  private identifyRiskFactors(tasks: any[], milestones: EventMilestone[]): Array<{
     type: 'OVERDUE_TASKS' | 'BLOCKED_CRITICAL' | 'RESOURCE_SHORTAGE' | 'DEPENDENCY_DELAY';
     severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     description: string;
     impact: string;
     mitigation: string[];
   }> {
-    const risks: Array<{
-      type: 'OVERDUE_TASKS' | 'BLOCKED_CRITICAL' | 'RESOURCE_SHORTAGE' | 'DEPENDENCY_DELAY';
-      severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-      description: string;
-      impact: string;
-      mitigation: string[];
-    }> = [];
+    const risks = [];
     const now = new Date();
 
     // Check for overdue tasks

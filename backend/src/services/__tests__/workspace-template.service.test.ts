@@ -1,54 +1,35 @@
 import { WorkspaceTemplateService } from '../workspace-template.service';
 import { WorkspaceRole, TaskCategory, TaskPriority } from '@prisma/client';
 
-jest.mock('@prisma/client', () => {
-  const mockPrisma = {
-    teamMember: {
-      findFirst: jest.fn(),
-    },
-    workspace: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      findMany: jest.fn(),
-    },
-    event: {
-      findUnique: jest.fn(),
-    },
-    workspaceChannel: {
-      create: jest.fn(),
-    },
-    workspaceTemplate: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      update: jest.fn(),
-    },
-    templateUsage: {
-      findMany: jest.fn(),
-      create: jest.fn(),
-    },
-    templateOrganizationShare: {
-      upsert: jest.fn(),
-    },
-    templateRating: {
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-    },
-    workspaceTask: {
-      create: jest.fn(),
-      deleteMany: jest.fn(),
-      update: jest.fn(),
-    },
-    organizationAdmin: {
-      findFirst: jest.fn(),
-    },
-  } as any;
+// Mock the prisma import
+const mockPrisma = {
+  teamMember: {
+    findFirst: jest.fn(),
+  },
+  workspace: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    findMany: jest.fn(),
+  },
+  event: {
+    findUnique: jest.fn(),
+  },
+  workspaceChannel: {
+    create: jest.fn(),
+  },
+  workspaceTask: {
+    create: jest.fn(),
+    deleteMany: jest.fn(),
+    update: jest.fn(),
+  },
+  organizationAdmin: {
+    findFirst: jest.fn(),
+  },
+} as any;
 
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-    WorkspaceRole: {
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn(() => mockPrisma),
+  WorkspaceRole: {
     WORKSPACE_OWNER: 'WORKSPACE_OWNER',
     TEAM_LEAD: 'TEAM_LEAD',
     EVENT_COORDINATOR: 'EVENT_COORDINATOR',
@@ -71,11 +52,7 @@ jest.mock('@prisma/client', () => {
     HIGH: 'HIGH',
     URGENT: 'URGENT',
   },
-  };
-});
-
-// Get reference to the mock for use in tests
-const mockPrisma = require('@prisma/client').PrismaClient();
+}));
 
 describe('WorkspaceTemplateService', () => {
   let service: WorkspaceTemplateService;
@@ -176,31 +153,6 @@ describe('WorkspaceTemplateService', () => {
       };
 
       mockPrisma.workspace.findUnique.mockResolvedValue(mockWorkspace);
-      mockPrisma.workspaceTemplate.create.mockResolvedValue({
-        id: 'template-1',
-        name: templateData.name,
-        description: templateData.description,
-        category: templateData.category,
-        eventSizeMin: 50,
-        eventSizeMax: 200,
-        complexity: templateData.complexity,
-        structure: {
-          roles: mockWorkspace.teamMembers,
-          taskCategories: ['SETUP', 'MARKETING'],
-          channels: mockWorkspace.channels,
-          milestones: []
-        },
-        metadata: {},
-        effectiveness: { completionRate: 0, usageCount: 0 },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        createdBy: userId,
-        organizationId: null,
-        isPublic: false,
-        usageCount: 0,
-        averageRating: 0,
-        ratingCount: 0
-      });
 
       const result = await service.createTemplateFromWorkspace(workspaceId, userId, templateData);
 
@@ -530,24 +482,6 @@ describe('WorkspaceTemplateService', () => {
         },
       ];
 
-      mockPrisma.templateUsage.findMany.mockResolvedValue([
-        {
-          id: 'usage-1',
-          templateId,
-          workspaceId: 'workspace-1',
-          eventId: 'event-1',
-          createdAt: new Date('2024-01-01'),
-          workspace: mockWorkspaces[0]
-        },
-        {
-          id: 'usage-2',
-          templateId,
-          workspaceId: 'workspace-2',
-          eventId: 'event-2',
-          createdAt: new Date('2024-02-01'),
-          workspace: mockWorkspaces[1]
-        }
-      ]);
       mockPrisma.workspace.findMany.mockResolvedValue(mockWorkspaces);
 
       // Mock private method
@@ -573,7 +507,6 @@ describe('WorkspaceTemplateService', () => {
     it('should throw error for template with no usage data', async () => {
       const templateId = 'template-1';
 
-      mockPrisma.templateUsage.findMany.mockResolvedValue([]);
       mockPrisma.workspace.findMany.mockResolvedValue([]);
 
       await expect(service.trackTemplateEffectiveness(templateId))
@@ -587,27 +520,6 @@ describe('WorkspaceTemplateService', () => {
       const organizationId = 'org-1';
       const userId = 'user-1';
 
-      mockPrisma.workspaceTemplate.findUnique.mockResolvedValue({
-        id: templateId,
-        name: 'Test Template',
-        description: 'Test description',
-        category: 'GENERAL',
-        eventSizeMin: 50,
-        eventSizeMax: 200,
-        complexity: 'SIMPLE',
-        structure: {},
-        metadata: {},
-        effectiveness: {},
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        createdBy: userId,
-        organizationId: null,
-        isPublic: false,
-        usageCount: 0,
-        averageRating: 0,
-        ratingCount: 0
-      });
-
       mockPrisma.organizationAdmin.findFirst.mockResolvedValue({
         id: 'admin-1',
         organizationId,
@@ -615,23 +527,14 @@ describe('WorkspaceTemplateService', () => {
         role: 'ADMIN',
       });
 
-      mockPrisma.templateOrganizationShare.upsert.mockResolvedValue({
-        id: 'share-1',
-        templateId,
-        organizationId,
-        sharedBy: userId,
-        sharedAt: new Date()
-      });
-
       // Mock console.log to verify the sharing action
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
       await service.shareTemplateWithOrganization(templateId, organizationId, userId);
 
-      expect(mockPrisma.workspaceTemplate.findUnique).toHaveBeenCalledWith({
-        where: { id: templateId }
-      });
-      expect(mockPrisma.templateOrganizationShare.upsert).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`Template ${templateId} shared with organization ${organizationId}`)
+      );
 
       consoleSpy.mockRestore();
     });
@@ -694,7 +597,7 @@ describe('WorkspaceTemplateService', () => {
       // Access private method
       const result = (service as any).calculateTemplateMatch(mockEvent, mockTemplate);
 
-      expect(result.matchScore).toBeLessThan(70); // Adjusted expectation
+      expect(result.matchScore).toBeLessThan(50);
       expect(result.customizationSuggestions).toContain('Consider reducing team size and task complexity');
     });
   });

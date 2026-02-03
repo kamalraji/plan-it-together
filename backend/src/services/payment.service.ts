@@ -1,6 +1,4 @@
 import { PrismaClient, PaymentStatus } from '@prisma/client';
-import { marketplaceConfigService } from './marketplace-config.service';
-
 const prisma = new PrismaClient();
 
 // Initialize Stripe (in production, use environment variables)
@@ -67,13 +65,12 @@ export class PaymentService {
    */
   async processPayment(paymentData: ProcessPaymentDTO): Promise<PaymentResult> {
     try {
-      // Calculate platform fee using marketplace configuration
+      // Verify booking exists and is in correct state
       const booking = await prisma.bookingRequest.findUnique({
         where: { id: paymentData.bookingId },
         include: {
           organizer: true,
           vendor: { include: { user: true } },
-          serviceListing: true,
         },
       });
 
@@ -85,14 +82,10 @@ export class PaymentService {
         throw new Error('Booking is not in a payable state');
       }
 
-      // Calculate platform fee based on service category
-      const feeCalculation = await marketplaceConfigService.calculatePlatformFee(
-        booking.serviceListing.category,
-        paymentData.amount
-      );
-
-      const platformFee = feeCalculation.fee;
-      const vendorPayout = feeCalculation.vendorPayout;
+      // Calculate platform fee (e.g., 5% of transaction)
+      const platformFeeRate = parseFloat(process.env.PLATFORM_FEE_RATE || '0.05');
+      const platformFee = paymentData.amount * platformFeeRate;
+      const vendorPayout = paymentData.amount - platformFee;
 
       let transactionId: string | undefined;
       let paymentStatus: PaymentStatus = PaymentStatus.PENDING;

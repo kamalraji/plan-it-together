@@ -1,184 +1,73 @@
-# Thittam1Hub
+# Welcome to your Lovable project
 
-A unified event management and publishing platform designed to centralize the planning, management, tracking, and publishing of community or organizational events and projects.
+## Project info
 
-## Project Structure
+**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
-```
-thittam1hub/
-├── backend/          # Node.js/Express/TypeScript backend
-│   ├── src/         # Source code
-│   ├── prisma/      # Prisma schema and migrations
-│   └── package.json
-├── frontend/         # React/TypeScript frontend
-│   ├── src/         # Source code
-│   └── package.json
-└── docker-compose.yml # Local development services
-```
+## How can I edit this code?
 
-## Prerequisites
+There are several ways of editing your application.
 
-- Node.js 18+ and npm
-- Docker and Docker Compose
-- PostgreSQL 14+ (via Docker)
+**Use Lovable**
 
-## Getting Started
+Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
 
-### 1. Start Development Services
+Changes made via Lovable will be committed automatically to this repo.
 
-Start PostgreSQL and Redis using Docker Compose:
+**Use your preferred IDE**
 
-```bash
-docker-compose up -d
-```
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-### 2. Backend Setup
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-```bash
-cd backend
+Follow these steps:
 
-# Install dependencies
-npm install
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-# Copy environment variables
-cp .env.example .env
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-# Generate Prisma client
-npm run prisma:generate
+# Step 3: Install the necessary dependencies.
+npm i
 
-# Run database migrations
-npm run prisma:migrate
-
-# Start development server
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-The backend API will be available at `http://localhost:3000`
+**Edit a file directly in GitHub**
 
-### 3. Frontend Setup
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-```bash
-cd frontend
+**Use GitHub Codespaces**
 
-# Install dependencies
-npm install
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-# Copy environment variables
-cp .env.example .env
+## What technologies are used for this project?
 
-# Start development server
-npm run dev
-```
+This project is built with:
 
-The frontend will be available at `http://localhost:5173`
-
-## Development
-
-### Backend Commands
-
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm test` - Run tests
-- `npm run lint` - Lint code
-- `npm run format` - Format code with Prettier
-- `npm run prisma:generate` - Generate Prisma client
-- `npm run prisma:migrate` - Run database migrations
-- `npm run prisma:studio` - Open Prisma Studio
-
-### Frontend Commands
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm test` - Run tests
-- `npm run lint` - Lint code
-- `npm run format` - Format code with Prettier
-
-## Technology Stack
-
-### Backend
-- Node.js with Express.js
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- JWT Authentication
-- Bcrypt for password hashing
-
-### Frontend
-- React 18
-- TypeScript
 - Vite
-- TanStack Query (React Query)
-- React Router
+- TypeScript
+- React
+- shadcn-ui
 - Tailwind CSS
-- React Hook Form
 
-### Development Services
-- PostgreSQL 15
-- Redis 7
+## How can I deploy this project?
 
-## Environment Variables
+Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
-### Backend (.env)
-See `backend/.env.example` for required environment variables.
+## Can I connect a custom domain to my Lovable project?
 
-### Frontend (.env)
-See `frontend/.env.example` for required environment variables.
+Yes, you can!
 
-## Payment System
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-**Current Status: Direct Payment Mode**
-
-The marketplace currently operates in **direct payment mode**, where organizers and vendors arrange payments outside the platform. Integrated payment processing is planned for future implementation.
-
-### How It Works
-
-1. **Organizer** creates booking after accepting vendor quote
-2. **Organizer** contacts vendor directly to arrange payment
-3. **Payment** is made using organizer and vendor's preferred method
-4. **Vendor** confirms payment received in the platform
-5. **Service** proceeds as normal
-
-### Supported Payment Methods
-
-Since payments are handled directly between parties, any payment method can be used:
-- Bank transfers
-- Credit cards (directly with vendor)
-- PayPal, Venmo, etc.
-- Cash (for local services)
-- Checks
-- Any other mutually agreed method
-
-### Benefits of Direct Payment
-
-- ✅ **Flexibility** - Use any payment method
-- ✅ **No platform fees** - No additional charges
-- ✅ **Vendor control** - Vendors manage their own payment processing
-- ✅ **Familiar process** - Similar to traditional business transactions
-
-### Future: Integrated Payments
-
-Integrated payment processing with escrow, automated payouts, and platform fees is planned for future implementation. This will be enabled via feature flags when ready.
-
-For more details, see:
-- `backend/PAYMENT_SYSTEM_STATUS.md` - Technical implementation details
-- `PAYMENT_WORKFLOW_GUIDE.md` - User workflow guide
-
-## Testing
-
-### Backend Tests
-```bash
-cd backend
-npm test
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
-
-## License
-
-MIT
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)

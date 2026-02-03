@@ -1,12 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { teamService } from '../services/team.service';
 import { authenticate } from '../middleware/auth.middleware';
-import { 
-  requireWorkspaceAccess, 
-  requireWorkspacePermission,
-  requireWorkspaceOwnerOrAdmin 
-} from '../middleware/workspace-access.middleware';
-import { auditTeamAction } from '../middleware/audit-logging.middleware';
 import { WorkspaceRole } from '@prisma/client';
 
 const router = Router();
@@ -18,7 +12,7 @@ router.use(authenticate);
  * POST /api/team/:workspaceId/invite
  * Invite a team member to workspace
  */
-router.post('/:workspaceId/invite', requireWorkspaceAccess, requireWorkspacePermission('team:invite'), auditTeamAction('invite_member'), async (req: Request, res: Response) => {
+router.post('/:workspaceId/invite', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user?.userId;
@@ -82,7 +76,7 @@ router.post('/:workspaceId/invite', requireWorkspaceAccess, requireWorkspacePerm
  * POST /api/team/:workspaceId/bulk-invite
  * Bulk invite team members to workspace
  */
-router.post('/:workspaceId/bulk-invite', requireWorkspaceAccess, requireWorkspacePermission('team:invite'), auditTeamAction('bulk_invite_members'), async (req: Request, res: Response) => {
+router.post('/:workspaceId/bulk-invite', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user?.userId;
@@ -134,7 +128,7 @@ router.post('/:workspaceId/bulk-invite', requireWorkspaceAccess, requireWorkspac
  * POST /api/team/accept-invitation
  * Accept team invitation
  */
-router.post('/accept-invitation', auditTeamAction('accept_invitation'), async (req: Request, res: Response) => {
+router.post('/accept-invitation', async (req: Request, res: Response) => {
   try {
     const { invitationToken } = req.body;
     const userId = req.user?.userId;
@@ -173,7 +167,7 @@ router.post('/accept-invitation', auditTeamAction('accept_invitation'), async (r
  * GET /api/team/:workspaceId/members
  * Get team members for workspace
  */
-router.get('/:workspaceId/members', requireWorkspaceAccess, auditTeamAction('list_members'), async (req: Request, res: Response) => {
+router.get('/:workspaceId/members', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user?.userId;
@@ -212,7 +206,7 @@ router.get('/:workspaceId/members', requireWorkspaceAccess, auditTeamAction('lis
  * PUT /api/team/:workspaceId/members/:teamMemberId/role
  * Update team member role
  */
-router.put('/:workspaceId/members/:teamMemberId/role', requireWorkspaceAccess, requireWorkspacePermission('team:manage_roles'), auditTeamAction('update_member_role'), async (req: Request, res: Response) => {
+router.put('/:workspaceId/members/:teamMemberId/role', async (req: Request, res: Response) => {
   try {
     const { workspaceId, teamMemberId } = req.params;
     const { role } = req.body;
@@ -263,7 +257,7 @@ router.put('/:workspaceId/members/:teamMemberId/role', requireWorkspaceAccess, r
  * DELETE /api/team/:workspaceId/members/:teamMemberId
  * Remove team member from workspace
  */
-router.delete('/:workspaceId/members/:teamMemberId', requireWorkspaceAccess, requireWorkspacePermission('team:remove'), auditTeamAction('remove_member'), async (req: Request, res: Response) => {
+router.delete('/:workspaceId/members/:teamMemberId', async (req: Request, res: Response) => {
   try {
     const { workspaceId, teamMemberId } = req.params;
     const userId = req.user?.userId;
@@ -305,7 +299,7 @@ router.delete('/:workspaceId/members/:teamMemberId', requireWorkspaceAccess, req
  * GET /api/team/:workspaceId/members/user/:userId
  * Get team member by user ID
  */
-router.get('/:workspaceId/members/user/:userId', requireWorkspaceAccess, auditTeamAction('get_member'), async (req: Request, res: Response) => {
+router.get('/:workspaceId/members/user/:userId', async (req: Request, res: Response) => {
   try {
     const { workspaceId, userId: targetUserId } = req.params;
     const userId = req.user?.userId;
@@ -345,213 +339,6 @@ router.get('/:workspaceId/members/user/:userId', requireWorkspaceAccess, auditTe
       error: {
         code: 'GET_MEMBER_ERROR',
         message: error instanceof Error ? error.message : 'Failed to get team member',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/team/:workspaceId/invitations
- * Get pending invitations for workspace
- */
-router.get('/:workspaceId/invitations', requireWorkspaceAccess, requireWorkspacePermission('team:invite'), auditTeamAction('list_invitations'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const invitations = await teamService.getPendingInvitations(workspaceId, userId);
-    
-    res.json({
-      success: true,
-      data: invitations,
-    });
-  } catch (error) {
-    console.error('Error getting pending invitations:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_INVITATIONS_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get pending invitations',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * POST /api/team/:workspaceId/invitations/:invitationId/resend
- * Resend team invitation
- */
-router.post('/:workspaceId/invitations/:invitationId/resend', requireWorkspaceAccess, requireWorkspacePermission('team:invite'), auditTeamAction('resend_invitation'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId, invitationId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const result = await teamService.resendInvitation(workspaceId, invitationId, userId);
-    
-    res.json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error('Error resending invitation:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'RESEND_INVITATION_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to resend invitation',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * DELETE /api/team/:workspaceId/invitations/:invitationId
- * Cancel team invitation
- */
-router.delete('/:workspaceId/invitations/:invitationId', requireWorkspaceAccess, requireWorkspacePermission('team:invite'), auditTeamAction('cancel_invitation'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId, invitationId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    await teamService.cancelInvitation(workspaceId, invitationId, userId);
-    
-    res.json({
-      success: true,
-      data: {
-        message: 'Invitation cancelled successfully',
-        invitationId,
-      },
-    });
-  } catch (error) {
-    console.error('Error cancelling invitation:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'CANCEL_INVITATION_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to cancel invitation',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/team/:workspaceId/members/:teamMemberId/activity
- * Get team member activity history
- */
-router.get('/:workspaceId/members/:teamMemberId/activity', requireWorkspaceAccess, auditTeamAction('view_member_activity'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId, teamMemberId } = req.params;
-    const { limit = '50', offset = '0' } = req.query;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const activity = await teamService.getTeamMemberActivity(
-      workspaceId,
-      teamMemberId,
-      userId,
-      {
-        limit: parseInt(limit as string, 10),
-        offset: parseInt(offset as string, 10),
-      }
-    );
-    
-    res.json({
-      success: true,
-      data: activity,
-    });
-  } catch (error) {
-    console.error('Error getting team member activity:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_MEMBER_ACTIVITY_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get team member activity',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/team/:workspaceId/roles
- * Get available workspace roles and their permissions
- */
-router.get('/:workspaceId/roles', requireWorkspaceAccess, auditTeamAction('list_roles'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const roles = await teamService.getWorkspaceRoles(workspaceId, userId);
-    
-    res.json({
-      success: true,
-      data: roles,
-    });
-  } catch (error) {
-    console.error('Error getting workspace roles:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_ROLES_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get workspace roles',
         timestamp: new Date().toISOString(),
       },
     });

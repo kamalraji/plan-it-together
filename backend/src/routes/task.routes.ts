@@ -1,11 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { taskService } from '../services/task.service';
 import { authenticate } from '../middleware/auth.middleware';
-import { 
-  requireWorkspaceAccess, 
-  requireWorkspacePermission 
-} from '../middleware/workspace-access.middleware';
-import { auditTaskAction } from '../middleware/audit-logging.middleware';
 import { TaskStatus, TaskPriority, TaskCategory } from '@prisma/client';
 
 const router = Router();
@@ -17,7 +12,7 @@ router.use(authenticate);
  * POST /api/task/:workspaceId
  * Create a new task
  */
-router.post('/:workspaceId', requireWorkspaceAccess, requireWorkspacePermission('task:create'), auditTaskAction('create_task'), async (req: Request, res: Response) => {
+router.post('/:workspaceId', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const taskData = req.body;
@@ -93,7 +88,7 @@ router.post('/:workspaceId', requireWorkspaceAccess, requireWorkspacePermission(
  * GET /api/task/:taskId
  * Get task by ID
  */
-router.get('/:taskId', auditTaskAction('view_task'), async (req: Request, res: Response) => {
+router.get('/:taskId', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const userId = req.user?.userId;
@@ -132,7 +127,7 @@ router.get('/:taskId', auditTaskAction('view_task'), async (req: Request, res: R
  * GET /api/task/workspace/:workspaceId
  * Get tasks for workspace
  */
-router.get('/workspace/:workspaceId', requireWorkspaceAccess, auditTaskAction('list_tasks'), async (req: Request, res: Response) => {
+router.get('/workspace/:workspaceId', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user?.userId;
@@ -187,7 +182,7 @@ router.get('/workspace/:workspaceId', requireWorkspaceAccess, auditTaskAction('l
  * PUT /api/task/:taskId
  * Update task
  */
-router.put('/:taskId', requireWorkspacePermission('task:update'), auditTaskAction('update_task'), async (req: Request, res: Response) => {
+router.put('/:taskId', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const updates = req.body;
@@ -263,7 +258,7 @@ router.put('/:taskId', requireWorkspacePermission('task:update'), auditTaskActio
  * POST /api/task/:taskId/assign
  * Assign task to team member
  */
-router.post('/:taskId/assign', requireWorkspacePermission('task:assign'), auditTaskAction('assign_task'), async (req: Request, res: Response) => {
+router.post('/:taskId/assign', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const assignment = req.body;
@@ -314,7 +309,7 @@ router.post('/:taskId/assign', requireWorkspacePermission('task:assign'), auditT
  * POST /api/task/:taskId/progress
  * Update task progress
  */
-router.post('/:taskId/progress', requireWorkspacePermission('task:update'), auditTaskAction('update_progress'), async (req: Request, res: Response) => {
+router.post('/:taskId/progress', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const progressUpdate = req.body;
@@ -390,7 +385,7 @@ router.post('/:taskId/progress', requireWorkspacePermission('task:update'), audi
  * DELETE /api/task/:taskId
  * Delete task
  */
-router.delete('/:taskId', requireWorkspacePermission('task:delete'), auditTaskAction('delete_task'), async (req: Request, res: Response) => {
+router.delete('/:taskId', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const userId = req.user?.userId;
@@ -432,7 +427,7 @@ router.delete('/:taskId', requireWorkspacePermission('task:delete'), auditTaskAc
  * GET /api/task/:taskId/dependencies
  * Get task dependencies
  */
-router.get('/:taskId/dependencies', auditTaskAction('view_dependencies'), async (req: Request, res: Response) => {
+router.get('/:taskId/dependencies', async (req: Request, res: Response) => {
   try {
     const { taskId } = req.params;
     const userId = req.user?.userId;
@@ -461,327 +456,6 @@ router.get('/:taskId/dependencies', auditTaskAction('view_dependencies'), async 
       error: {
         code: 'GET_DEPENDENCIES_ERROR',
         message: error instanceof Error ? error.message : 'Failed to get task dependencies',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * POST /api/task/:taskId/dependencies
- * Add task dependency
- */
-router.post('/:taskId/dependencies', requireWorkspacePermission('task:update'), auditTaskAction('add_dependency'), async (req: Request, res: Response) => {
-  try {
-    const { taskId } = req.params;
-    const { dependencyTaskId } = req.body;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    if (!dependencyTaskId) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_DEPENDENCY_TASK_ID',
-          message: 'Dependency task ID is required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const result = await taskService.addTaskDependency(taskId, dependencyTaskId, userId);
-    
-    res.json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error('Error adding task dependency:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'ADD_DEPENDENCY_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to add task dependency',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * DELETE /api/task/:taskId/dependencies/:dependencyTaskId
- * Remove task dependency
- */
-router.delete('/:taskId/dependencies/:dependencyTaskId', requireWorkspacePermission('task:update'), auditTaskAction('remove_dependency'), async (req: Request, res: Response) => {
-  try {
-    const { taskId, dependencyTaskId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    await taskService.removeTaskDependency(taskId, dependencyTaskId, userId);
-    
-    res.json({
-      success: true,
-      data: {
-        message: 'Task dependency removed successfully',
-        taskId,
-        dependencyTaskId,
-      },
-    });
-  } catch (error) {
-    console.error('Error removing task dependency:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'REMOVE_DEPENDENCY_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to remove task dependency',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/task/:taskId/comments
- * Get task comments
- */
-router.get('/:taskId/comments', auditTaskAction('view_comments'), async (req: Request, res: Response) => {
-  try {
-    const { taskId } = req.params;
-    const { limit = '50', offset = '0' } = req.query;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const comments = await taskService.getTaskComments(taskId, userId, {
-      limit: parseInt(limit as string, 10),
-      offset: parseInt(offset as string, 10),
-    });
-    
-    res.json({
-      success: true,
-      data: comments,
-    });
-  } catch (error) {
-    console.error('Error getting task comments:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_COMMENTS_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get task comments',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * POST /api/task/:taskId/comments
- * Add task comment
- */
-router.post('/:taskId/comments', requireWorkspacePermission('task:update'), auditTaskAction('add_comment'), async (req: Request, res: Response) => {
-  try {
-    const { taskId } = req.params;
-    const { content } = req.body;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    if (!content || content.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'EMPTY_COMMENT',
-          message: 'Comment content is required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const comment = await taskService.addTaskComment(taskId, userId, { content });
-    
-    res.status(201).json({
-      success: true,
-      data: comment,
-    });
-  } catch (error) {
-    console.error('Error adding task comment:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'ADD_COMMENT_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to add task comment',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/task/:taskId/history
- * Get task activity history
- */
-router.get('/:taskId/history', auditTaskAction('view_history'), async (req: Request, res: Response) => {
-  try {
-    const { taskId } = req.params;
-    const { limit = '50', offset = '0' } = req.query;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const history = await taskService.getTaskHistory(taskId, userId, {
-      limit: parseInt(limit as string, 10),
-      offset: parseInt(offset as string, 10),
-    });
-    
-    res.json({
-      success: true,
-      data: history,
-    });
-  } catch (error) {
-    console.error('Error getting task history:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_HISTORY_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get task history',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * GET /api/task/workspace/:workspaceId/templates
- * Get task templates for workspace
- */
-router.get('/workspace/:workspaceId/templates', requireWorkspaceAccess, auditTaskAction('list_templates'), async (req: Request, res: Response) => {
-  try {
-    const { workspaceId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const templates = await taskService.getTaskTemplates(workspaceId, userId);
-    
-    res.json({
-      success: true,
-      data: templates,
-    });
-  } catch (error) {
-    console.error('Error getting task templates:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'GET_TEMPLATES_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to get task templates',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
-});
-
-/**
- * POST /api/task/:taskId/template
- * Create template from task
- */
-router.post('/:taskId/template', requireWorkspacePermission('template:create'), auditTaskAction('create_template'), async (req: Request, res: Response) => {
-  try {
-    const { taskId } = req.params;
-    const { name, description } = req.body;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'User authentication required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    if (!name) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_TEMPLATE_NAME',
-          message: 'Template name is required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
-
-    const template = await taskService.createTaskTemplate(taskId, userId, { name, description });
-    
-    res.status(201).json({
-      success: true,
-      data: template,
-    });
-  } catch (error) {
-    console.error('Error creating task template:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'CREATE_TEMPLATE_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to create task template',
         timestamp: new Date().toISOString(),
       },
     });

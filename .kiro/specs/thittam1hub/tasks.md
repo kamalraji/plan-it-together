@@ -1098,12 +1098,10 @@
 
 - [x] 31.1 Create marketplace data models and database schema
 
-  - Define VendorProfile, ServiceListing, BookingRequest, VendorReview models in Prisma schema
+  - Define VendorProfile, ServiceListing, BookingRequest, VendorReview, PaymentRecord models in Prisma schema
   - Create marketplace-specific enums (ServiceCategory, BookingStatus, etc.)
   - Create database migrations for marketplace tables
   - _Requirements: 25.1, 26.1, 29.1, 30.1_
-  
-  **Note:** PaymentRecord and related financial models are planned for future implementation.
 
 - [ ]* 31.2 Write property test for vendor profile data persistence
   - **Property 52: Vendor profile data persistence**
@@ -1195,38 +1193,31 @@
 
 
 
-- [x] 33.3 Implement service agreement and booking management
+- [x] 33.3 Implement payment processing integration
 
-  - Build contract template system
-  - Implement booking status tracking
-  - Create booking modification workflow
-  - _Requirements: 29.1, 29.2, 29.5_
 
-- [ ]* 33.4 Write property test for booking management
-  - **Property 57: Booking management integrity**
-  - **Validates: Requirements 29.1, 29.2**
-
-- [ ] 33.5 Future Implementation: Payment Processing Integration
-
-  **Note:** This task is planned for future implementation and is not part of the current development phase.
-  
   - Integrate with payment gateway (Stripe/PayPal)
   - Create escrow management system
   - Build automated vendor payout system
-  - _Requirements: 29A.1, 29A.2, 29A.3_
+  - _Requirements: 29.3, 29.4_
 
-- [ ]* 33.6 Future Implementation: Payment Processing Property Tests
+- [ ]* 33.4 Write property test for payment processing integrity
+  - **Property 57: Payment processing integrity**
+  - **Validates: Requirements 29.3, 29.4**
 
-  **Note:** This task is planned for future implementation and is not part of the current development phase.
-  
-  - **Property 58: Payment processing integrity**
-  - **Validates: Requirements 29A.1, 29A.2**
 
-- [ ]* 33.7 Write unit tests for booking system
+- [x] 33.5 Create service agreement generation
+
+  - Build contract template system
+  - Implement digital signature workflow
+  - Create agreement management interface
+  - _Requirements: 29.2, 29.5_
+
+- [ ]* 33.6 Write unit tests for booking system
   - Test booking request creation and updates
+  - Test payment processing workflow
   - Test service agreement generation
-  - Test booking status management
-  - _Requirements: 29.1, 29.2, 29.5_
+  - _Requirements: 29.1, 29.2, 29.3_
 
 - [x] 34. Implement review and rating system
 

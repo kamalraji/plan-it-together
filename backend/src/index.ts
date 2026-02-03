@@ -13,23 +13,16 @@ import organizationRoutes from './routes/organization.routes';
 import discoveryRoutes from './routes/discovery.routes';
 import vendorRoutes from './routes/vendor.routes';
 import marketplaceRoutes from './routes/marketplace.routes';
-import marketplaceConfigRoutes from './routes/marketplace-config.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
-import featuresRoutes from './routes/features.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
 import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
-import workspaceApiRoutes from './routes/workspace-api.routes';
 import workspaceLifecycleRoutes from './routes/workspace-lifecycle.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import teamRoutes from './routes/team.routes';
 import taskRoutes from './routes/task.routes';
 import workspaceCommunicationRoutes from './routes/workspace-communication.routes';
-import workspaceTemplateRoutes from './routes/workspace-templates';
-import workspaceMarketplaceIntegrationRoutes from './routes/workspace-marketplace-integration.routes';
-import workspaceSecurityRoutes from './routes/workspace-security.routes';
-import workspaceConfigRoutes from './routes/workspace-config.routes';
 
 dotenv.config();
 
@@ -149,16 +142,10 @@ app.use('/api/vendors', vendorRoutes);
 // Marketplace routes
 app.use('/api/marketplace', marketplaceRoutes);
 
-// Marketplace Configuration routes
-app.use('/api/marketplace', marketplaceConfigRoutes);
-
 // Booking routes
 app.use('/api/bookings', bookingRoutes);
 
-// Features routes
-app.use('/api/features', featuresRoutes);
-
-// Payment routes (Feature flagged - Future Implementation)
+// Payment routes
 app.use('/api/payments', paymentRoutes);
 
 // Service Agreement routes
@@ -169,9 +156,6 @@ app.use('/api/reviews', reviewRoutes);
 
 // Event-Marketplace Integration routes
 app.use('/api/event-marketplace-integration', eventMarketplaceIntegrationRoutes);
-
-// Workspace API routes (consolidated)
-app.use('/api/workspace-api', workspaceApiRoutes);
 
 // Workspace Lifecycle routes
 app.use('/api/workspace-lifecycle', workspaceLifecycleRoutes);
@@ -187,18 +171,6 @@ app.use('/api/task', taskRoutes);
 
 // Workspace Communication routes
 app.use('/api/workspace-communication', workspaceCommunicationRoutes);
-
-// Workspace Template routes
-app.use('/api/workspace-templates', workspaceTemplateRoutes);
-
-// Workspace Marketplace Integration routes
-app.use('/api/workspace-marketplace-integration', workspaceMarketplaceIntegrationRoutes);
-
-// Workspace Security routes
-app.use('/api/workspace-security', workspaceSecurityRoutes);
-
-// Workspace Configuration routes
-app.use('/api/workspace-config', workspaceConfigRoutes);
 
 // Start server
 app.listen(PORT, () => {

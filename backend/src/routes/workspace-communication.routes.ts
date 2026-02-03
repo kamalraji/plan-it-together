@@ -1,11 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { workspaceCommunicationService } from '../services/workspace-communication.service';
 import { authenticate } from '../middleware/auth.middleware';
-import { 
-  requireWorkspaceAccess, 
-  requireWorkspacePermission 
-} from '../middleware/workspace-access.middleware';
-import { auditCommunicationAction } from '../middleware/audit-logging.middleware';
 import { ChannelType } from '@prisma/client';
 
 const router = Router();
@@ -17,7 +12,7 @@ router.use(authenticate);
  * POST /api/workspace-communication/:workspaceId/channels
  * Create a new communication channel
  */
-router.post('/:workspaceId/channels', requireWorkspaceAccess, requireWorkspacePermission('communication:manage_channels'), auditCommunicationAction('create_channel'), async (req: Request, res: Response) => {
+router.post('/:workspaceId/channels', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const channelData = req.body;
@@ -81,7 +76,7 @@ router.post('/:workspaceId/channels', requireWorkspaceAccess, requireWorkspacePe
  * GET /api/workspace-communication/:workspaceId/channels
  * Get channels for workspace
  */
-router.get('/:workspaceId/channels', requireWorkspaceAccess, auditCommunicationAction('list_channels'), async (req: Request, res: Response) => {
+router.get('/:workspaceId/channels', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const userId = req.user?.userId;
@@ -120,7 +115,7 @@ router.get('/:workspaceId/channels', requireWorkspaceAccess, auditCommunicationA
  * GET /api/workspace-communication/channels/:channelId
  * Get channel by ID
  */
-router.get('/channels/:channelId', auditCommunicationAction('view_channel'), async (req: Request, res: Response) => {
+router.get('/channels/:channelId', async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
     const userId = req.user?.userId;
@@ -159,7 +154,7 @@ router.get('/channels/:channelId', auditCommunicationAction('view_channel'), asy
  * POST /api/workspace-communication/channels/:channelId/messages
  * Send message to channel
  */
-router.post('/channels/:channelId/messages', requireWorkspacePermission('communication:send'), auditCommunicationAction('send_message'), async (req: Request, res: Response) => {
+router.post('/channels/:channelId/messages', async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
     const messageData = req.body;
@@ -211,7 +206,7 @@ router.post('/channels/:channelId/messages', requireWorkspacePermission('communi
  * GET /api/workspace-communication/channels/:channelId/messages
  * Get message history for channel
  */
-router.get('/channels/:channelId/messages', auditCommunicationAction('view_messages'), async (req: Request, res: Response) => {
+router.get('/channels/:channelId/messages', async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
     const { limit, before } = req.query;
@@ -259,7 +254,7 @@ router.get('/channels/:channelId/messages', auditCommunicationAction('view_messa
  * POST /api/workspace-communication/:workspaceId/broadcast
  * Send broadcast message to workspace
  */
-router.post('/:workspaceId/broadcast', requireWorkspaceAccess, requireWorkspacePermission('communication:broadcast'), auditCommunicationAction('send_broadcast'), async (req: Request, res: Response) => {
+router.post('/:workspaceId/broadcast', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const broadcastData = req.body;
@@ -336,7 +331,7 @@ router.post('/:workspaceId/broadcast', requireWorkspaceAccess, requireWorkspaceP
  * POST /api/workspace-communication/channels/:channelId/members
  * Add member to private channel
  */
-router.post('/channels/:channelId/members', requireWorkspacePermission('communication:manage_channels'), auditCommunicationAction('add_channel_member'), async (req: Request, res: Response) => {
+router.post('/channels/:channelId/members', async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
     const { memberId } = req.body;
@@ -391,7 +386,7 @@ router.post('/channels/:channelId/members', requireWorkspacePermission('communic
  * DELETE /api/workspace-communication/channels/:channelId/members/:memberId
  * Remove member from private channel
  */
-router.delete('/channels/:channelId/members/:memberId', requireWorkspacePermission('communication:manage_channels'), auditCommunicationAction('remove_channel_member'), async (req: Request, res: Response) => {
+router.delete('/channels/:channelId/members/:memberId', async (req: Request, res: Response) => {
   try {
     const { channelId, memberId } = req.params;
     const userId = req.user?.userId;
@@ -434,7 +429,7 @@ router.delete('/channels/:channelId/members/:memberId', requireWorkspacePermissi
  * GET /api/workspace-communication/:workspaceId/search
  * Search messages in workspace
  */
-router.get('/:workspaceId/search', requireWorkspaceAccess, auditCommunicationAction('search_messages'), async (req: Request, res: Response) => {
+router.get('/:workspaceId/search', async (req: Request, res: Response) => {
   try {
     const { workspaceId } = req.params;
     const { query, channelId } = req.query;

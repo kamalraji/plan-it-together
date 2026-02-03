@@ -221,7 +221,7 @@ describe('WorkspaceAnalyticsService', () => {
       expect(result.overdueTasks).toBe(1);
       expect(result.blockedTasks).toBe(1);
       expect(result.unassignedTasks).toBe(1);
-      expect(result.criticalDeadlines).toBe(3); // Overdue task + both tasks with tomorrow's date
+      expect(result.criticalDeadlines).toBe(2); // Both tasks with tomorrow's date
       expect(result.healthScore).toBeLessThan(100);
       expect(result.bottlenecks).toBeDefined();
     });

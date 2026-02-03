@@ -38,7 +38,7 @@ Thittam1Hub is a unified event management and publishing platform designed to ce
 - **Service Category**: Classification of event services (catering, venues, photography, entertainment, etc.)
 - **Vendor Profile**: A vendor's business page showcasing services, credentials, and portfolio
 - **Service Package**: A bundled offering combining multiple services with integrated pricing
-- **Marketplace Commission**: Platform fee charged on successful transactions between organizers and vendors (Future Implementation)
+- **Marketplace Commission**: Platform fee charged on successful transactions between organizers and vendors
 - **Vendor Verification**: Process to validate vendor credentials, licenses, and business legitimacy
 - **Service Agreement**: Contract between organizer and vendor facilitated through the platform
 - **Vendor Dashboard**: Interface for vendors to manage listings, bookings, analytics, and customer communications
@@ -491,31 +491,17 @@ Thittam1Hub is a unified event management and publishing platform designed to ce
 4. THE Thittam1Hub SHALL provide comparison tools allowing organizers to evaluate multiple vendors side-by-side with standardized criteria
 5. WHEN an organizer saves preferred vendors, THE Thittam1Hub SHALL create a vendor shortlist integrated with their event planning timeline
 
-### Requirement 29: Event Marketplace - Booking and Contract Management
+### Requirement 29: Event Marketplace - Booking and Transaction Management
 
-**User Story:** As an organizer, I want to book marketplace services with integrated contract management, so that I can secure vendors efficiently while maintaining clear agreements.
+**User Story:** As an organizer, I want to book marketplace services with integrated payment processing and contract management, so that I can secure vendors efficiently while maintaining financial transparency.
 
 #### Acceptance Criteria
 
 1. WHEN an organizer initiates a service booking, THE Thittam1Hub SHALL create a booking request with event details, service requirements, and timeline specifications
-2. WHEN a vendor accepts a booking, THE Thittam1Hub SHALL generate a service agreement with terms, deliverables, timeline, and cancellation policies
-3. WHEN a booking is confirmed, THE Thittam1Hub SHALL facilitate direct communication between organizer and vendor for payment arrangements outside the platform
-4. THE Thittam1Hub SHALL provide booking status tracking and milestone management without handling financial transactions
-5. WHEN booking modifications are requested, THE Thittam1Hub SHALL facilitate change management with approval workflows and agreement updates
-
-### Requirement 29A: Event Marketplace - Payment Processing (Future Implementation)
-
-**User Story:** As an organizer, I want integrated payment processing for marketplace services, so that transactions are secure and automated within the platform.
-
-**Note:** This requirement is planned for future implementation and is not part of the current development phase.
-
-#### Acceptance Criteria (Future Implementation)
-
-1. WHEN payment is processed, THE Thittam1Hub SHALL handle secure transactions, escrow management, and automated vendor payouts based on milestone completion
-2. THE Thittam1Hub SHALL support multiple payment methods including credit cards, bank transfers, and corporate accounts with invoice generation
-3. WHEN disputes arise, THE Thittam1Hub SHALL provide escrow protection and dispute resolution mechanisms
-4. THE Thittam1Hub SHALL calculate and collect platform commissions automatically from completed transactions
-5. WHEN generating financial reports, THE Thittam1Hub SHALL provide comprehensive transaction history and tax documentation
+2. WHEN a vendor accepts a booking, THE Thittam1Hub SHALL generate a service agreement with terms, deliverables, payment schedule, and cancellation policies
+3. WHEN payment is processed, THE Thittam1Hub SHALL handle secure transactions, escrow management, and automated vendor payouts based on milestone completion
+4. THE Thittam1Hub SHALL support multiple payment methods including credit cards, bank transfers, and corporate accounts with invoice generation
+5. WHEN booking modifications are requested, THE Thittam1Hub SHALL facilitate change management with automated approval workflows and cost adjustments
 
 ### Requirement 30: Event Marketplace - Review and Rating System
 

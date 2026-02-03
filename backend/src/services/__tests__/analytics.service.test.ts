@@ -32,12 +32,12 @@ describe('AnalyticsService', () => {
   describe('calculateRegistrationsOverTime', () => {
     it('should calculate registration counts grouped by date', async () => {
       const mockRegistrations = [
-        { createdAt: new Date('2024-01-01T10:00:00Z') },
-        { createdAt: new Date('2024-01-01T14:00:00Z') },
-        { createdAt: new Date('2024-01-02T10:00:00Z') },
-        { createdAt: new Date('2024-01-03T10:00:00Z') },
-        { createdAt: new Date('2024-01-03T15:00:00Z') },
-        { createdAt: new Date('2024-01-03T18:00:00Z') },
+        { registeredAt: new Date('2024-01-01T10:00:00Z') },
+        { registeredAt: new Date('2024-01-01T14:00:00Z') },
+        { registeredAt: new Date('2024-01-02T10:00:00Z') },
+        { registeredAt: new Date('2024-01-03T10:00:00Z') },
+        { registeredAt: new Date('2024-01-03T15:00:00Z') },
+        { registeredAt: new Date('2024-01-03T18:00:00Z') },
       ];
 
       (prisma.registration.findMany as jest.Mock).mockResolvedValue(mockRegistrations);

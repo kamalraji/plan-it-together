@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 export class WorkspaceService {
   /**
    * Provision a new workspace for an event
-   * Requirements: 1.1, 1.2, 1.3, 1.4
    */
   async provisionWorkspace(eventId: string, organizerId: string): Promise<WorkspaceResponse> {
     // Verify event exists and organizer owns it
@@ -31,7 +30,7 @@ export class WorkspaceService {
       throw new Error('Workspace already exists for this event');
     }
 
-    // Create workspace with default settings and provisioning status
+    // Create workspace with default settings
     const defaultSettings: WorkspaceSettings = {
       autoInviteOrganizer: true,
       defaultChannels: ['general', 'announcements', 'tasks'],
@@ -50,23 +49,21 @@ export class WorkspaceService {
       },
     });
 
-    // Auto-assign organizer as workspace owner with full privileges
-    const ownerPermissions = this.getDefaultPermissions(WorkspaceRole.WORKSPACE_OWNER);
+    // Auto-assign organizer as workspace owner
     await prisma.teamMember.create({
       data: {
         workspaceId: workspace.id,
         userId: organizerId,
         role: WorkspaceRole.WORKSPACE_OWNER,
         invitedBy: organizerId,
-        permissions: ownerPermissions,
-        status: 'ACTIVE',
+        permissions: this.getDefaultPermissions(WorkspaceRole.WORKSPACE_OWNER),
       },
     });
 
     // Create default channels
     await this.createDefaultChannels(workspace.id);
 
-    // Update workspace status to active after successful provisioning
+    // Update workspace status to active
     const updatedWorkspace = await prisma.workspace.update({
       where: { id: workspace.id },
       data: { status: WorkspaceStatus.ACTIVE },
@@ -86,9 +83,6 @@ export class WorkspaceService {
       },
     });
 
-    // Log successful provisioning
-    console.log(`Workspace ${workspace.id} successfully provisioned for event ${eventId} with owner ${organizerId}`);
-
     return this.mapWorkspaceToResponse(updatedWorkspace);
   }
 
@@ -96,14 +90,6 @@ export class WorkspaceService {
    * Get workspace by ID
    */
   async getWorkspace(workspaceId: string, userId: string): Promise<WorkspaceResponse> {
-    // Log access attempt for security audit
-    const { workspaceSecurityService } = await import('./workspace-security.service');
-    await workspaceSecurityService.logAccessAttempt(workspaceId, userId, {
-      resource: 'WORKSPACE',
-      resourceId: workspaceId,
-      accessType: 'READ',
-      success: true,
-    });
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       include: {
@@ -254,10 +240,9 @@ export class WorkspaceService {
   }
 
   /**
-   * Dissolve workspace (after event completion) with configurable retention
-   * Requirements: 10.2, 10.3
+   * Dissolve workspace (after event completion)
    */
-  async dissolveWorkspace(workspaceId: string, userId: string, retentionPeriodDays?: number): Promise<void> {
+  async dissolveWorkspace(workspaceId: string, userId: string): Promise<void> {
     // Verify user has permission to dissolve workspace
     await this.verifyWorkspacePermission(workspaceId, userId, 'MANAGE_WORKSPACE');
 
@@ -270,28 +255,10 @@ export class WorkspaceService {
       throw new Error('Workspace not found');
     }
 
-    // Check if event is completed or cancelled
+    // Check if event is completed
     const now = new Date();
-    const eventEnded = workspace.event.endDate < now;
-    const eventCompleted = workspace.event.status === 'COMPLETED';
-    const eventCancelled = workspace.event.status === 'CANCELLED';
-
-    if (!eventEnded && !eventCompleted && !eventCancelled) {
-      throw new Error('Cannot dissolve workspace before event completion or cancellation');
-    }
-
-    // Update retention period if provided
-    if (retentionPeriodDays !== undefined) {
-      const currentSettings = workspace.settings as any || {};
-      const updatedSettings = {
-        ...currentSettings,
-        retentionPeriodDays,
-      };
-
-      await prisma.workspace.update({
-        where: { id: workspaceId },
-        data: { settings: updatedSettings },
-      });
+    if (workspace.event.endDate > now && workspace.event.status !== 'COMPLETED') {
+      throw new Error('Cannot dissolve workspace before event completion');
     }
 
     // Update workspace status to winding down
@@ -302,20 +269,14 @@ export class WorkspaceService {
       },
     });
 
-    // Get the final retention period
-    const finalRetentionPeriod = retentionPeriodDays || (workspace.settings as any)?.retentionPeriodDays || 30;
-    
-    // Calculate dissolution date
+    // Schedule dissolution after retention period
+    const settings = workspace.settings as any as WorkspaceSettings;
+    const retentionPeriod = settings?.retentionPeriodDays || 30;
     const dissolutionDate = new Date();
-    dissolutionDate.setDate(dissolutionDate.getDate() + finalRetentionPeriod);
+    dissolutionDate.setDate(dissolutionDate.getDate() + retentionPeriod);
 
-    console.log(`Workspace ${workspaceId} will be dissolved on ${dissolutionDate.toISOString()} (${finalRetentionPeriod} days retention)`);
-
-    // For immediate dissolution in development, or schedule for production
-    if (finalRetentionPeriod === 0) {
-      await this.performDissolution(workspaceId);
-    }
-    // In production, this would be handled by a scheduled job
+    // For now, immediately dissolve (in production, this would be scheduled)
+    await this.performDissolution(workspaceId);
   }
 
   /**
@@ -351,8 +312,7 @@ export class WorkspaceService {
   }
 
   /**
-   * Check and process workspaces for automatic dissolution with configurable retention
-   * Requirements: 10.2, 10.3
+   * Check and process workspaces for automatic dissolution
    */
   async processAutomaticDissolution(): Promise<void> {
     // Find workspaces that should be dissolved
@@ -362,7 +322,6 @@ export class WorkspaceService {
         event: {
           OR: [
             { status: EventStatus.COMPLETED },
-            { status: EventStatus.CANCELLED },
             { endDate: { lt: new Date() } }
           ]
         }
@@ -370,29 +329,17 @@ export class WorkspaceService {
       include: { event: true },
     });
 
-    console.log(`Processing ${workspacesToDissolve.length} workspaces for automatic dissolution`);
-
     for (const workspace of workspacesToDissolve) {
-      try {
-        const settings = workspace.settings as any as WorkspaceSettings;
-        const retentionPeriod = settings?.retentionPeriodDays || 30;
-        
-        // Calculate dissolution date based on event end date + retention period
-        const dissolutionDate = new Date(workspace.event.endDate);
-        dissolutionDate.setDate(dissolutionDate.getDate() + retentionPeriod);
+      const settings = workspace.settings as any as WorkspaceSettings;
+      const retentionPeriod = settings?.retentionPeriodDays || 30;
+      
+      // Calculate dissolution date based on event end date
+      const dissolutionDate = new Date(workspace.event.endDate);
+      dissolutionDate.setDate(dissolutionDate.getDate() + retentionPeriod);
 
-        // Check if retention period has passed
-        const now = new Date();
-        if (now >= dissolutionDate) {
-          console.log(`Dissolving workspace ${workspace.id} - retention period of ${retentionPeriod} days has passed`);
-          await this.performDissolution(workspace.id);
-        } else {
-          const daysRemaining = Math.ceil((dissolutionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-          console.log(`Workspace ${workspace.id} scheduled for dissolution in ${daysRemaining} days`);
-        }
-      } catch (error) {
-        console.error(`Failed to process dissolution for workspace ${workspace.id}:`, error);
-        // Continue processing other workspaces
+      // Check if retention period has passed
+      if (new Date() >= dissolutionDate) {
+        await this.performDissolution(workspace.id);
       }
     }
   }
@@ -461,69 +408,23 @@ export class WorkspaceService {
   }
 
   /**
-   * Get comprehensive workspace status including lifecycle information
-   * Requirements: 1.1, 1.2, 1.3, 1.4, 10.1, 10.2, 10.3
+   * Apply workspace template
    */
-  async getWorkspaceStatus(workspaceId: string, userId: string): Promise<{
-    workspace: WorkspaceResponse;
-    lifecycle: {
-      status: WorkspaceStatus;
-      canTransitionTo: WorkspaceStatus[];
-      retentionPeriodDays: number;
-      scheduledDissolution?: Date;
-      daysUntilDissolution?: number;
-      eventStatus: string;
-      eventEndDate: Date;
-    };
-  }> {
-    const workspace = await this.getWorkspace(workspaceId, userId);
-    
-    const workspaceData = await prisma.workspace.findUnique({
+  async applyTemplate(workspaceId: string, templateId: string, userId: string): Promise<void> {
+    // Verify user has permission to manage workspace
+    await this.verifyWorkspacePermission(workspaceId, userId, 'MANAGE_WORKSPACE');
+
+    // For now, this is a placeholder - template system will be implemented later
+    // In a full implementation, this would:
+    // 1. Load template configuration
+    // 2. Create predefined roles and permissions
+    // 3. Create template tasks and categories
+    // 4. Set up template channels and communication structure
+
+    await prisma.workspace.update({
       where: { id: workspaceId },
-      include: { event: true },
+      data: { templateId },
     });
-
-    if (!workspaceData) {
-      throw new Error('Workspace not found');
-    }
-
-    // Determine possible transitions
-    const validTransitions: Record<WorkspaceStatus, WorkspaceStatus[]> = {
-      [WorkspaceStatus.PROVISIONING]: [WorkspaceStatus.ACTIVE],
-      [WorkspaceStatus.ACTIVE]: [WorkspaceStatus.WINDING_DOWN, WorkspaceStatus.DISSOLVED],
-      [WorkspaceStatus.WINDING_DOWN]: [WorkspaceStatus.DISSOLVED, WorkspaceStatus.ACTIVE],
-      [WorkspaceStatus.DISSOLVED]: [],
-    };
-
-    const canTransitionTo = validTransitions[workspaceData.status] || [];
-    const settings = workspaceData.settings as any;
-    const retentionPeriodDays = settings?.retentionPeriodDays || 30;
-
-    // Calculate scheduled dissolution if in winding down
-    let scheduledDissolution: Date | undefined;
-    let daysUntilDissolution: number | undefined;
-
-    if (workspaceData.status === WorkspaceStatus.WINDING_DOWN) {
-      scheduledDissolution = new Date(workspaceData.event.endDate);
-      scheduledDissolution.setDate(scheduledDissolution.getDate() + retentionPeriodDays);
-      
-      const now = new Date();
-      const timeDiff = scheduledDissolution.getTime() - now.getTime();
-      daysUntilDissolution = Math.max(0, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
-    }
-
-    return {
-      workspace,
-      lifecycle: {
-        status: workspaceData.status,
-        canTransitionTo,
-        retentionPeriodDays,
-        scheduledDissolution,
-        daysUntilDissolution,
-        eventStatus: workspaceData.event.status,
-        eventEndDate: workspaceData.event.endDate,
-      },
-    };
   }
 
   /**

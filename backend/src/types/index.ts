@@ -1008,10 +1008,6 @@ export interface TeamInvitationDTO {
   email: string;
   name?: string;
   role: 'WORKSPACE_OWNER' | 'TEAM_LEAD' | 'EVENT_COORDINATOR' | 'VOLUNTEER_MANAGER' | 'TECHNICAL_SPECIALIST' | 'MARKETING_LEAD' | 'GENERAL_VOLUNTEER';
-  customMessage?: string;
-  externalMember?: boolean;
-  bookingId?: string;
-  accessLevel?: 'FULL' | 'LIMITED' | 'TASK_SPECIFIC';
 }
 
 export interface BulkInvitationDTO {
@@ -1182,29 +1178,4 @@ export interface ChannelMessageHistory {
   channelId: string;
   messages: MessageResponse[];
   hasMore: boolean;
-}
-// Workspace Marketplace Integration types
-export interface TeamMemberServiceRecommendationDTO {
-  preferredCategories?: string[];
-  location?: string;
-  budgetRange?: {
-    min: number;
-    max: number;
-  };
-  verifiedOnly?: boolean;
-  limit?: number;
-}
-
-export interface WorkspaceMarketplaceIntegrationResponse {
-  success: boolean;
-  message: string;
-  data?: any;
-}
-
-// Extended ServiceListingResponse with recommendation data
-export interface EnhancedServiceListingResponse extends ServiceListingResponse {
-  recommendationScore?: number;
-  recommendationReason?: string;
-  suggestedRole?: string;
-  teamGapFilled?: boolean;
 }
