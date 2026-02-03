@@ -3644,6 +3644,121 @@ export type Database = {
         }
         Relationships: []
       }
+      document_collaborators: {
+        Row: {
+          created_at: string | null
+          document_id: string | null
+          id: string
+          permission: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          permission?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          permission?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_collaborators_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string
+          document_id: string | null
+          id: string
+          parent_comment_id: string | null
+          selection_range: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by: string
+          document_id?: string | null
+          id?: string
+          parent_comment_id?: string | null
+          selection_range?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          document_id?: string | null
+          id?: string
+          parent_comment_id?: string | null
+          selection_range?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_comments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "document_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_versions: {
+        Row: {
+          content: Json
+          created_at: string | null
+          created_by: string
+          document_id: string | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          content: Json
+          created_at?: string | null
+          created_by: string
+          document_id?: string | null
+          id?: string
+          version_number: number
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          created_by?: string
+          document_id?: string | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_templates: {
         Row: {
           body: string
@@ -6450,6 +6565,47 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_sync_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          integration_id: string | null
+          items_synced: number | null
+          metadata: Json | null
+          status: string
+          sync_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          items_synced?: number | null
+          metadata?: Json | null
+          status: string
+          sync_type: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          items_synced?: number | null
+          metadata?: Json | null
+          status?: string
+          sync_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_sync_logs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_external_integrations"
             referencedColumns: ["id"]
           },
         ]
@@ -13919,6 +14075,73 @@ export type Database = {
           },
         ]
       }
+      workspace_calendar_events: {
+        Row: {
+          created_at: string | null
+          event_end: string | null
+          event_start: string
+          event_title: string
+          event_url: string | null
+          external_event_id: string
+          id: string
+          integration_id: string | null
+          is_all_day: boolean | null
+          synced_at: string | null
+          task_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_end?: string | null
+          event_start: string
+          event_title: string
+          event_url?: string | null
+          external_event_id: string
+          id?: string
+          integration_id?: string | null
+          is_all_day?: boolean | null
+          synced_at?: string | null
+          task_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_end?: string | null
+          event_start?: string
+          event_title?: string
+          event_url?: string | null
+          external_event_id?: string
+          id?: string
+          integration_id?: string | null
+          is_all_day?: boolean | null
+          synced_at?: string | null
+          task_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_calendar_events_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_external_integrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_calendar_events_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_calendar_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_campaigns: {
         Row: {
           budget: number | null
@@ -14636,6 +14859,66 @@ export type Database = {
           },
         ]
       }
+      workspace_documents: {
+        Row: {
+          content: Json | null
+          cover_image_url: string | null
+          created_at: string | null
+          created_by: string
+          icon: string | null
+          id: string
+          is_archived: boolean | null
+          is_published: boolean | null
+          parent_document_id: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          content?: Json | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by: string
+          icon?: string | null
+          id?: string
+          is_archived?: boolean | null
+          is_published?: boolean | null
+          parent_document_id?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          content?: Json | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string
+          icon?: string | null
+          id?: string
+          is_archived?: boolean | null
+          is_published?: boolean | null
+          parent_document_id?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_documents_parent_document_id_fkey"
+            columns: ["parent_document_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_documents_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_email_campaigns: {
         Row: {
           clicked_count: number | null
@@ -15130,6 +15413,62 @@ export type Database = {
           },
         ]
       }
+      workspace_external_integrations: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          created_by: string
+          credentials: Json | null
+          id: string
+          integration_type: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          name: string
+          sync_error: string | null
+          sync_status: string | null
+          updated_at: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          created_by: string
+          credentials?: Json | null
+          id?: string
+          integration_type: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name: string
+          sync_error?: string | null
+          sync_status?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          created_by?: string
+          credentials?: Json | null
+          id?: string
+          integration_type?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          name?: string
+          sync_error?: string | null
+          sync_status?: string | null
+          updated_at?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_external_integrations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_facility_checks: {
         Row: {
           area: string
@@ -15246,6 +15585,67 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_gallery_reviews_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_github_links: {
+        Row: {
+          created_at: string | null
+          github_issue_number: number
+          github_issue_state: string | null
+          github_issue_url: string
+          github_repo: string
+          id: string
+          integration_id: string | null
+          synced_at: string | null
+          task_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          github_issue_number: number
+          github_issue_state?: string | null
+          github_issue_url: string
+          github_repo: string
+          id?: string
+          integration_id?: string | null
+          synced_at?: string | null
+          task_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          github_issue_number?: number
+          github_issue_state?: string | null
+          github_issue_url?: string
+          github_repo?: string
+          id?: string
+          integration_id?: string | null
+          synced_at?: string | null
+          task_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_github_links_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_external_integrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_github_links_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_github_links_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -19700,6 +20100,53 @@ export type Database = {
             columns: ["voice_channel_id"]
             isOneToOne: false
             referencedRelation: "workspace_voice_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_zapier_webhooks: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          name: string
+          trigger_count: number | null
+          trigger_event: string
+          webhook_url: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name: string
+          trigger_count?: number | null
+          trigger_event: string
+          webhook_url: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name?: string
+          trigger_count?: number | null
+          trigger_event?: string
+          webhook_url?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_zapier_webhooks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
