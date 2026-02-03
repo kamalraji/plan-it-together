@@ -1,472 +1,244 @@
 
-
-# Comprehensive Workspace Feature Analysis and Industrial Standards Enhancement Plan
-
-## Implementation Status
-
-### Phase 5: Core Enhancements ✅ COMPLETE
-- [x] **5.1 Voice/Video Huddles** - Database tables, edge function, React components, useVoiceChannel hook
-- [x] **5.2 Smart Notification Batching** - Database columns, preferences UI, digest view
-- [x] **5.3 Thread Replies UI Enhancement** - ThreadPanel, ThreadPreviewBadge, ThreadNotifications, MobileThreadView
-
-### Phase 6: AI & Intelligence ✅ COMPLETE
-- [x] **6.1 AI Content Assistant** - ai-content-assist edge function, AIAssistantPanel, SmartComposeInput, TaskSummarizer
-- [x] **6.2 Workload Balancing** - WorkloadBalancer, TeamCapacityChart, WorkloadForecast
-- [x] **6.3 AI-Powered Search** - semantic-search edge function, UnifiedSearchDialog, SearchResultsPanel, RecentSearches
-
-### Phase 7: Advanced Features ✅ COMPLETE
-- [x] **7.1 Custom Dashboards** - DashboardBuilder, WidgetLibrary, DashboardSelector
-- [x] **7.2 Forms & Intake System** - FormBuilder, FormRenderer, SubmissionsList
-- [x] **7.3 Enhanced Calendar View** - TaskCalendarView, CalendarMiniMap, CalendarDayDetail
-
-### Phase 8: P3 Features ✅ COMPLETE
-- [x] **8.1 Document Collaboration** - workspace_documents table, DocumentEditor (TipTap), DocumentSidebar, DocumentVersionHistory
-- [x] **8.2 External Integrations** - IntegrationsHub, ZapierWebhooksPanel, GitHubIntegrationCard, CalendarEventCard
-- [x] **8.3 Enhancement Layer** - TaskTimelineView, CommandPalette, useUndoRedo hook, TimeBudgetingPanel
-
----
+# Comprehensive Bug Identification and Navigation Analysis Report
 
 ## Executive Summary
 
-This analysis evaluates the current workspace implementation against industrial standards from leading platforms (Slack, Microsoft Teams, Asana, Monday.com, Notion, Discord, Hopin) and identifies enhancement opportunities to achieve a world-class workspace management system.
+This analysis covers broken links, improper navigation, partially implemented features, wrongly wired components, and security issues based on industry standards. The codebase is a large-scale event management platform (Thittam1Hub) with complex routing, Supabase backend, and extensive feature set.
 
 ---
 
-## Current Implementation Assessment
+## 1. BROKEN LINKS AND NAVIGATION ISSUES
 
-### Feature Completeness Matrix
+### Critical Broken Links
 
-| Category | Features Implemented | Completion |
-|----------|---------------------|------------|
-| **Core Workspace Structure** | 4-level hierarchy (Root/Dept/Committee/Team), RBAC with 30+ roles, workspace provisioning | 95% |
-| **Task Management** | List/Kanban/Gantt/Dependency views, AI suggestions, subtasks, time tracking, cross-workspace tasks | 90% |
-| **Communication** | Channels, broadcasts, real-time messaging, reactions, threads, moderation, scheduled messages | 90% |
-| **Analytics & Reporting** | Task metrics, team performance, health indicators, PDF/CSV export, scheduled reports | 85% |
-| **Automation** | Rule builder, 10+ trigger types, execution history, preset templates | 85% |
-| **Integrations** | Slack/Discord/Teams/Webhook, YouTube OAuth, external APIs | 80% |
-| **Presence & Collaboration** | Online users, active badges, real-time updates, collaboration timeline | 85% |
-| **Mobile Experience** | Responsive layouts, mobile-specific components, touch gestures | 75% |
-| **OKR/Goals** | Goal tracker with progress, status, categories | 70% |
-| **Templates** | Workspace templates, custom template builder, template library | 80% |
+| Location | Link | Issue | Severity |
+|----------|------|-------|----------|
+| `ParticipantDashboard.tsx:523` | `/discover` | Route does not exist in AppRouter | HIGH |
+| `ParticipantDashboard.tsx:398` | `/dashboard/team` | Route leads to 404 for participants (requires org context) | MEDIUM |
+| `ParticipantDashboard.tsx:392` | `/dashboard/eventmanagement/events` | Incorrect path structure | MEDIUM |
+| `NotFoundPage.tsx:87-94` | `/dashboard/support` | Should be `/dashboard/support/*` or `/help` | LOW |
+| `DashboardRouter.tsx:42` | `/onboarding/organization` | Redirects to `/dashboard/organizations/join` but path may be confusing | LOW |
 
-**Overall Industrial Alignment Score: 82%**
+### Navigation Pattern Issues
 
----
+1. **Inconsistent Dashboard Navigation**
+   - Participant dashboard links to organizer-specific routes (`/dashboard/team`, `/dashboard/eventmanagement`)
+   - Should check user role before showing these navigation options
 
-## Gap Analysis vs Industrial Standards
+2. **Org-Scoped vs Global Path Confusion**
+   - Multiple components use `${base}/...` pattern inconsistently
+   - Some hardcode `/dashboard/...` while others dynamically use `/${orgSlug}/...`
 
-### 1. Missing Features (Not Implemented)
-
-| Feature | Industry Standard | Impact | Priority |
-|---------|------------------|--------|----------|
-| **Voice/Video Huddles** | Slack Huddles, Discord Voice, Teams Meetings | High | P1 |
-| **Smart Notification Batching** | Slack digest, Gmail bundles | Medium | P1 |
-| **AI Content Assistant** | Notion AI, Asana AI, Monday AI | High | P2 |
-| **Workload Balancing View** | Asana Workload, Monday Resource Management | Medium | P2 |
-| **Custom Dashboards** | Monday.com custom dashboards, Notion databases | High | P2 |
-| **Forms & Intake System** | Monday.com forms, Asana forms | Medium | P3 |
-| **Document Collaboration** | Notion pages, Google Docs integration | High | P3 |
-| **SSO/SAML Authentication** | Enterprise standard | Medium | P3 |
-
-### 2. Partially Implemented Features
-
-| Feature | Current State | Gap | Priority |
-|---------|--------------|-----|----------|
-| **Thread Replies UI** | Backend complete, basic UI | Needs Slack-style side panel | P1 |
-| **Offline Mode** | Basic indicator present | Full offline task creation/sync | P2 |
-| **Recurring Tasks** | Table exists, basic form | Calendar integration, smart scheduling | P2 |
-| **Mobile Push Notifications** | Edge function exists | Deep linking, rich notifications | P2 |
-| **Search** | Basic task/member search | Full-text across messages, files, tasks | P2 |
-| **AI Moderation** | Manual moderation tools | Auto-flag, sentiment analysis | P3 |
-
-### 3. Enhancement Opportunities
-
-| Area | Current | Industrial Standard | Enhancement |
-|------|---------|-------------------|-------------|
-| **Task Views** | 4 views | 6+ views | Add Timeline (horizontal), Calendar view |
-| **Keyboard Navigation** | Basic shortcuts | Full vim-like navigation | Command palette enhancement |
-| **Bulk Operations** | Basic panel | Multi-select with batch actions | Enhance with undo/redo stack |
-| **Time Tracking** | Per-task tracking | Project budgets, estimates vs actuals | Add budgeting layer |
-| **Permissions** | Role-based | Fine-grained per-item permissions | Item-level overrides |
+3. **Missing Route Handlers**
+   - `/discover` route is referenced but not defined
+   - `/events/:eventId/*` wildcard may conflict with other event routes
 
 ---
 
-## Implementation Roadmap
+## 2. PARTIALLY IMPLEMENTED FEATURES
 
-### Phase 5: Core Enhancements (Weeks 1-3)
+### Database Tables Without Full UI Integration
 
-#### 5.1 Voice/Video Huddles
-**Extends existing Agora integration**
+Found via `console.log` placeholders in production code:
 
-```text
-Database Tables (New):
-- workspace_voice_channels (channel_id, agora_name, max_participants, is_stage_mode)
-- workspace_voice_sessions (session_id, started_at, ended_at, peak_participants)
-- workspace_voice_participants (user_id, joined_at, is_speaking, is_muted)
+| Component | Table/Feature | Status |
+|-----------|---------------|--------|
+| `BookingManagementUI.tsx` | `vendor_bookings` | Placeholder - table may not exist |
+| `VendorCoordination.tsx` | `vendor_bookings`, `vendor_deliverables` | Placeholder queries |
+| `VendorShortlist.tsx` | `vendor_shortlist` | Placeholder - returns mock data |
+| `EventMarketplaceIntegration.tsx` | `vendor_quotes` | Placeholder insert logic |
+| `BroadcastComposerDialog.tsx` | Push notifications | Logs instead of calling edge function |
 
-Components (New):
-- VoiceChannelWidget.tsx - Floating voice indicator
-- VoiceChannelRoom.tsx - Full voice UI with participant list
-- VoiceChannelControls.tsx - Mute/deafen/leave controls
+### Code with TODO/FIXME Markers
 
-Edge Function (New):
-- voice-channel-token - Generate Agora RTC tokens with permission checks
-```
+Found in 76 files with implementation notes:
 
-#### 5.2 Smart Notification Batching
+- `KnowledgeBase.tsx:191` - "TODO: Implement article rating mutation"
+- Various task status mappings incomplete
+- Checklist functionality marked as "hacky"
 
-```text
-Database Tables (New):
-- notification_queue (user_id, type, content, priority, batch_window)
-- notification_preferences (user_id, batch_enabled, batch_minutes, quiet_hours)
+---
 
-Edge Function (New):
-- notification-batch-processor - Scheduled function to batch and send
+## 3. SECURITY ISSUES (Supabase Linter Findings)
 
-Components (New):
-- NotificationPreferencesPanel.tsx - User preference editor
-- NotificationDigestView.tsx - Batched notification display
-```
+### Critical Security Warnings
 
-#### 5.3 Thread Replies UI Enhancement
+| Issue | Count | Description | Priority |
+|-------|-------|-------------|----------|
+| RLS Policy Always True | 4 | Overly permissive UPDATE/DELETE/INSERT policies | HIGH |
+| Function Search Path Mutable | 2 | Functions without search_path set | MEDIUM |
+| Extension in Public | 1 | Extension installed in public schema | MEDIUM |
+| Leaked Password Protection Disabled | 1 | Auth setting not enabled | MEDIUM |
+
+### Recommended Fixes
 
 ```text
-Components (New/Enhanced):
-- ThreadPanel.tsx - Slack-style slide-out panel
-- ThreadPreviewBadge.tsx - Inline reply count indicator
-- ThreadNotifications.tsx - Unread thread tracking
+1. Review RLS policies with `USING (true)` or `WITH CHECK (true)`
+   - These allow unrestricted access for non-SELECT operations
+   - Convert to proper user-scoped policies
 
-Mobile Enhancements:
-- ThreadRepliesPage.tsx - Full-screen thread view
-- Thread indicator badges in message bubbles
-```
+2. Set search_path for all functions:
+   SET search_path TO 'public', 'pg_temp';
 
-### Phase 6: AI & Intelligence (Weeks 4-6)
+3. Move extension from public schema:
+   CREATE EXTENSION ... WITH SCHEMA extensions;
 
-#### 6.1 AI Content Assistant
-
-```text
-Features:
-- Smart task description generation
-- Meeting notes summarization
-- Communication tone suggestions
-- Automatic categorization and tagging
-
-Edge Function (New):
-- ai-content-assist - OpenAI/Claude integration for suggestions
-
-Components (New):
-- AIAssistantPanel.tsx - Floating AI helper
-- SmartComposeInput.tsx - AI-enhanced text input
-- TaskSummarizer.tsx - AI task breakdown
-```
-
-#### 6.2 Workload Balancing View
-
-```text
-Components (New):
-- WorkloadBalancer.tsx - Visual workload distribution
-- TeamCapacityChart.tsx - Capacity vs assigned work
-- ResourceAllocationPanel.tsx - Drag-drop rebalancing
-- WorkloadForecast.tsx - Predicted overload alerts
-
-Database:
-- Add capacity_hours to workspace_team_members
-- Add estimated_hours to workspace_tasks
-```
-
-#### 6.3 AI-Powered Search
-
-```text
-Edge Functions (New):
-- semantic-search - Vector-based search across content
-- search-index-sync - Real-time index updates
-
-Components (New):
-- UnifiedSearchDialog.tsx - Search across all content types
-- SearchResultsPanel.tsx - Grouped results display
-- RecentSearches.tsx - Search history
-```
-
-### Phase 7: Advanced Features (Weeks 7-9)
-
-#### 7.1 Custom Dashboards
-
-```text
-Database Tables (New):
-- workspace_dashboards (id, workspace_id, name, layout, is_default)
-- workspace_dashboard_widgets (dashboard_id, widget_type, position, config)
-
-Components (New):
-- DashboardBuilder.tsx - Drag-drop dashboard creation
-- WidgetLibrary.tsx - Available widgets catalog
-- CustomWidget.tsx - Configurable widget wrapper
-- DashboardSelector.tsx - Switch between dashboards
-```
-
-#### 7.2 Forms & Intake System
-
-```text
-Database Tables (New):
-- workspace_forms (id, workspace_id, title, fields, settings)
-- workspace_form_submissions (form_id, submitted_by, responses, status)
-
-Components (New):
-- FormBuilder.tsx - Visual form designer
-- FormRenderer.tsx - Public form display
-- SubmissionsList.tsx - Manage submissions
-- FormToTaskAutomation.tsx - Auto-create tasks from submissions
-```
-
-#### 7.3 Enhanced Calendar View
-
-```text
-Components (New):
-- TaskCalendarView.tsx - Full calendar with task/deadline display
-- CalendarDayPopover.tsx - Day detail view
-- CalendarDragDrop.tsx - Reschedule by dragging
-- CalendarSync.tsx - External calendar integration
+4. Enable leaked password protection in Supabase Dashboard:
+   Authentication > Settings > Password strength
 ```
 
 ---
 
-## Database Schema Additions
+## 4. WRONGLY WIRED COMPONENTS
 
-### New Tables Required
+### Type Mismatches and Data Flow Issues
 
-```sql
--- Phase 5: Voice Channels
-CREATE TABLE workspace_voice_channels (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
-  channel_id UUID REFERENCES workspace_channels(id) ON DELETE CASCADE,
-  agora_channel_name TEXT NOT NULL,
-  max_participants INTEGER DEFAULT 50,
-  is_stage_mode BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+1. **WorkspaceListPage.tsx:436**
+   - Passing `undefined as any` to render function
+   - Type coercion masks potential runtime errors
 
-CREATE TABLE workspace_voice_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  voice_channel_id UUID REFERENCES workspace_voice_channels(id) ON DELETE CASCADE,
-  started_at TIMESTAMPTZ DEFAULT NOW(),
-  ended_at TIMESTAMPTZ,
-  peak_participants INTEGER DEFAULT 0
-);
+2. **ConsoleDashboard metrics**
+   - `teamMembers: 0` hardcoded - comment says "Team metrics will be wired to dedicated tables later"
+   - Dashboard shows incomplete data
 
-CREATE TABLE workspace_voice_participants (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  voice_session_id UUID REFERENCES workspace_voice_sessions(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL,
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  left_at TIMESTAMPTZ,
-  is_muted BOOLEAN DEFAULT false
-);
+3. **Event status mapping**
+   - Multiple files map status strings inconsistently
+   - `TODO` vs `in_progress` vs `IN_PROGRESS` casing issues
 
--- Phase 5: Notification Batching
-CREATE TABLE notification_queue (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL,
-  notification_type TEXT NOT NULL,
-  channel_id UUID REFERENCES workspace_channels(id),
-  content JSONB NOT NULL,
-  priority TEXT DEFAULT 'normal',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  batch_window_end TIMESTAMPTZ,
-  processed_at TIMESTAMPTZ
-);
+### Edge Function Dependencies
 
-CREATE TABLE notification_preferences (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID UNIQUE NOT NULL,
-  batch_enabled BOOLEAN DEFAULT true,
-  batch_window_minutes INTEGER DEFAULT 5,
-  quiet_hours_start TIME,
-  quiet_hours_end TIME,
-  channel_overrides JSONB DEFAULT '{}'
-);
+1. **agora-token function**
+   - Uses `https://esm.sh/agora-token@2.0.3` (recently fixed)
+   - Missing Agora credentials check could expose config errors
 
--- Phase 7: Custom Dashboards
-CREATE TABLE workspace_dashboards (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  layout JSONB NOT NULL DEFAULT '[]',
-  is_default BOOLEAN DEFAULT false,
-  created_by UUID NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE workspace_dashboard_widgets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  dashboard_id UUID REFERENCES workspace_dashboards(id) ON DELETE CASCADE,
-  widget_type TEXT NOT NULL,
-  position JSONB NOT NULL,
-  config JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Phase 7: Forms
-CREATE TABLE workspace_forms (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT,
-  fields JSONB NOT NULL DEFAULT '[]',
-  settings JSONB DEFAULT '{}',
-  is_published BOOLEAN DEFAULT false,
-  created_by UUID NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE workspace_form_submissions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  form_id UUID REFERENCES workspace_forms(id) ON DELETE CASCADE,
-  submitted_by UUID,
-  responses JSONB NOT NULL,
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
+2. **Missing CORS configuration**
+   - `supabase/functions/_shared/cors.ts` file not found (referenced as `security.ts` instead)
+   - `corsHeaders` imported from `security.ts`
 
 ---
 
-## Component Architecture
+## 5. NAVIGATION ARCHITECTURE ISSUES
 
-### New Component Hierarchy
+### Route Definition Gaps
 
 ```text
-src/components/workspace/
-├── voice/                         # NEW - Voice channel features
-│   ├── VoiceChannelWidget.tsx
-│   ├── VoiceChannelRoom.tsx
-│   ├── VoiceChannelControls.tsx
-│   └── VoiceParticipantList.tsx
-├── notifications/                 # ENHANCED
-│   ├── NotificationSnoozeMenu.tsx (existing)
-│   ├── NotificationPreferencesPanel.tsx    # NEW
-│   ├── NotificationDigestView.tsx          # NEW
-│   └── NotificationBatchSettings.tsx       # NEW
-├── ai/                            # NEW - AI features
-│   ├── AIAssistantPanel.tsx
-│   ├── SmartComposeInput.tsx
-│   ├── TaskSummarizer.tsx
-│   └── ContentSuggestions.tsx
-├── dashboards/                    # NEW - Custom dashboards
-│   ├── DashboardBuilder.tsx
-│   ├── WidgetLibrary.tsx
-│   ├── widgets/
-│   │   ├── TaskCountWidget.tsx
-│   │   ├── ChartWidget.tsx
-│   │   ├── TimelineWidget.tsx
-│   │   └── MembersWidget.tsx
-│   └── DashboardSelector.tsx
-├── forms/                         # NEW - Forms & intake
-│   ├── FormBuilder.tsx
-│   ├── FormRenderer.tsx
-│   ├── FieldEditor.tsx
-│   └── SubmissionsList.tsx
-├── calendar/                      # NEW - Calendar view
-│   ├── TaskCalendarView.tsx
-│   ├── CalendarDayPopover.tsx
-│   └── CalendarMiniMap.tsx
-└── workload/                      # NEW - Resource management
-    ├── WorkloadBalancer.tsx
-    ├── TeamCapacityChart.tsx
-    └── ResourceAllocationPanel.tsx
+Routes in use but not defined in AppRouter:
+- /discover (referenced in ParticipantDashboard)
+- /dashboard/team (should be org-scoped)
+- /marketplace/vendor/browse (referenced in FeaturedServices)
+
+Routes defined but may be unreachable:
+- /console/* (redirects to /dashboard)
+- /admin/* (under /dashboard, redirects to /dashboard)
+```
+
+### Sidebar Navigation Misalignment
+
+The `OrganizationSidebar.tsx` defines quick actions that don't align with actual routes:
+
+| Sidebar Action | Path | Actual Route |
+|----------------|------|--------------|
+| Browse Templates | `${base}/eventmanagement/templates` | Not explicitly defined |
+| Registrations | `${base}/eventmanagement/registrations` | Handled by EventService wildcard |
+| Browse Services | `${base}/marketplace?tab=discover` | Query param, may not work |
+
+---
+
+## 6. IMPLEMENTATION PRIORITIES
+
+### Phase 1: Critical Fixes (Immediate)
+
+1. **Remove broken `/discover` link** or add the route
+2. **Fix RLS policies** with overly permissive access
+3. **Add role-based link visibility** in ParticipantDashboard
+4. **Complete vendor booking table schema** or remove placeholder code
+
+### Phase 2: Navigation Cleanup (Short-term)
+
+1. **Audit all navigation paths** and create route constants file
+2. **Implement centralized route config** to prevent path mismatches
+3. **Add navigation tests** to catch broken links early
+4. **Fix org-scoped vs global path inconsistencies**
+
+### Phase 3: Feature Completion (Medium-term)
+
+1. **Wire vendor marketplace tables** properly
+2. **Implement push notification system**
+3. **Complete article rating feature** in KnowledgeBase
+4. **Add team member metrics** to dashboard
+
+---
+
+## 7. IMPLEMENTATION TASKS
+
+### Task List for Fixes
+
+```text
+[x] 1. Analyze codebase for broken links
+[x] 2. Identify security vulnerabilities via Supabase linter
+[x] 3. Find partially implemented features
+[x] 4. Document wrongly wired components
+[ ] 5. Fix /discover link issue
+[ ] 6. Fix RLS policies (4 overly permissive)
+[ ] 7. Add role-based navigation visibility
+[ ] 8. Create route constants file
+[ ] 9. Wire vendor booking tables
+[ ] 10. Enable leaked password protection
 ```
 
 ---
 
-## Edge Functions Required
+## 8. RECOMMENDED ROUTE CONSTANTS PATTERN
 
-### New Edge Functions
-
-| Function | Purpose | Trigger |
-|----------|---------|---------|
-| `voice-channel-token` | Generate Agora RTC tokens | API call |
-| `notification-batch-processor` | Batch and send notifications | Cron (every 2 min) |
-| `ai-content-assist` | Generate AI suggestions | API call |
-| `semantic-search` | Vector search across content | API call |
-| `search-index-sync` | Update search index | Webhook trigger |
-| `form-submission-handler` | Process form submissions | Webhook trigger |
-
----
-
-## Integration Enhancements
-
-### Current Integrations Status
-
-| Integration | Status | Enhancement Needed |
-|-------------|--------|-------------------|
-| Slack | Webhook only | Add OAuth for richer integration |
-| Discord | Webhook only | Add bot for bi-directional sync |
-| Teams | Webhook only | Add Graph API integration |
-| YouTube | Full OAuth | Add channel management |
-| Custom Webhooks | Full | Add retry logic, signature verification |
-
-### Proposed New Integrations
-
-| Integration | Purpose | Priority |
-|-------------|---------|----------|
-| Google Calendar | Sync deadlines, events | P2 |
-| Zoom | Meeting scheduling | P2 |
-| GitHub | Issue/PR sync | P3 |
-| Jira | Task sync | P3 |
-| Zapier | No-code automations | P3 |
+```typescript
+// src/lib/routes.ts
+export const ROUTES = {
+  // Public
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  EVENTS: '/events',
+  EVENT_DETAIL: (slug: string) => `/event/${slug}`,
+  
+  // Dashboard (authenticated)
+  DASHBOARD: '/dashboard',
+  DASHBOARD_PROFILE: '/dashboard/profile',
+  DASHBOARD_SETTINGS: '/dashboard/settings',
+  DASHBOARD_EVENTS: '/dashboard/participant-events',
+  
+  // Organization-scoped
+  ORG_DASHBOARD: (slug: string) => `/${slug}/dashboard`,
+  ORG_EVENTS: (slug: string) => `/${slug}/eventmanagement`,
+  ORG_WORKSPACES: (slug: string) => `/${slug}/workspaces`,
+  ORG_TEAM: (slug: string) => `/${slug}/team`,
+  
+  // Help (public and authenticated)
+  HELP: '/help',
+  HELP_CONTACT: '/help?intent=contact',
+} as const;
+```
 
 ---
 
-## Performance Optimizations
+## Technical Details
 
-### Current Performance Concerns
+### Files Requiring Changes
 
-1. **Large task lists** - Need virtualization (already have VirtualizedTaskList)
-2. **Real-time updates** - Supabase realtime channels (already implemented)
-3. **Analytics queries** - Need caching layer for complex calculations
+1. **src/components/dashboard/ParticipantDashboard.tsx**
+   - Lines 521-525: Remove or fix `/discover` link
+   - Lines 392-400: Add role checks before showing organizer links
 
-### Recommended Optimizations
+2. **src/components/routing/AppRouter.tsx**
+   - Add `/discover` route or redirect
+   - Clean up duplicate route patterns
 
-1. **Edge caching** for analytics (Redis/Supabase cache)
-2. **Lazy loading** for dashboard widgets
-3. **Background sync** for offline mode
-4. **WebSocket connection pooling** for real-time
+3. **Supabase RLS Policies**
+   - Review and restrict overly permissive policies
 
----
+4. **src/components/marketplace/*.tsx**
+   - Replace console.log placeholders with actual implementations or feature flags
 
-## Priority Implementation Order
+5. **src/components/routing/NotFoundPage.tsx**
+   - Line 87-94: Update support link paths
 
-| Priority | Feature | Effort | Business Impact |
-|----------|---------|--------|-----------------|
-| P1 | Smart Notification Batching | 1 week | Reduces notification fatigue |
-| P1 | Thread Replies UI Enhancement | 1 week | Improves conversation UX |
-| P1 | Voice/Video Huddles | 2 weeks | Enables real-time collaboration |
-| P2 | AI Content Assistant | 2 weeks | Increases productivity |
-| P2 | Workload Balancing View | 1 week | Prevents burnout, improves planning |
-| P2 | Custom Dashboards | 2 weeks | Personalized experience |
-| P2 | Calendar View | 1 week | Better timeline visualization |
-| P3 | Forms & Intake System | 2 weeks | Streamlines data collection |
-| P3 | Advanced Search | 2 weeks | Improves discoverability |
-| P3 | Document Collaboration | 3 weeks | Reduces context switching |
-
----
-
-## Summary
-
-The workspace system is highly mature at **82% industrial alignment**. The previous phases (1-4) successfully implemented:
-- Core 4-level hierarchy structure
-- Comprehensive task management with multiple views
-- Real-time communication with channels, broadcasts, and threads
-- Analytics and reporting
-- Automation rules
-- Mobile responsiveness
-
-**Key gaps to achieve 95%+ alignment:**
-1. Voice/Video capabilities (Slack Huddles equivalent)
-2. Smart notification batching
-3. AI-powered features (content assist, smart search)
-4. Custom dashboards
-5. Workload/resource management views
-
-This plan provides a clear roadmap to evolve from a great workspace system to an industry-leading platform.
-
+This analysis provides a comprehensive view of the codebase health and actionable items for improvement following industry best practices.
