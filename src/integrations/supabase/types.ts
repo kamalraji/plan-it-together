@@ -7308,10 +7308,46 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_batches: {
+        Row: {
+          batch_type: string
+          content_summary: Json
+          created_at: string | null
+          id: string
+          notification_count: number | null
+          read_at: string | null
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          batch_type: string
+          content_summary: Json
+          created_at?: string | null
+          id?: string
+          notification_count?: number | null
+          read_at?: string | null
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          batch_type?: string
+          content_summary?: Json
+          created_at?: string | null
+          id?: string
+          notification_count?: number | null
+          read_at?: string | null
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           achievements: boolean | null
           allow_urgent_in_quiet_hours: boolean | null
+          batch_enabled: boolean | null
+          batch_window_minutes: number | null
+          channel_overrides: Json | null
           chat_mute_until: string | null
           circle_invites: boolean | null
           connection_accepted: boolean | null
@@ -7319,12 +7355,15 @@ export type Database = {
           created_at: string
           custom_sound_enabled: boolean | null
           custom_sound_name: string | null
+          email_digest_enabled: boolean | null
+          email_digest_frequency: string | null
           email_security_alerts: boolean | null
           event_enabled: boolean
           high_match_online: boolean | null
           id: string
           marketplace_enabled: boolean
           organization_enabled: boolean
+          push_enabled: boolean | null
           quiet_hours_enabled: boolean | null
           quiet_hours_end: string | null
           quiet_hours_start: string | null
@@ -7340,6 +7379,9 @@ export type Database = {
         Insert: {
           achievements?: boolean | null
           allow_urgent_in_quiet_hours?: boolean | null
+          batch_enabled?: boolean | null
+          batch_window_minutes?: number | null
+          channel_overrides?: Json | null
           chat_mute_until?: string | null
           circle_invites?: boolean | null
           connection_accepted?: boolean | null
@@ -7347,12 +7389,15 @@ export type Database = {
           created_at?: string
           custom_sound_enabled?: boolean | null
           custom_sound_name?: string | null
+          email_digest_enabled?: boolean | null
+          email_digest_frequency?: string | null
           email_security_alerts?: boolean | null
           event_enabled?: boolean
           high_match_online?: boolean | null
           id?: string
           marketplace_enabled?: boolean
           organization_enabled?: boolean
+          push_enabled?: boolean | null
           quiet_hours_enabled?: boolean | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
@@ -7368,6 +7413,9 @@ export type Database = {
         Update: {
           achievements?: boolean | null
           allow_urgent_in_quiet_hours?: boolean | null
+          batch_enabled?: boolean | null
+          batch_window_minutes?: number | null
+          channel_overrides?: Json | null
           chat_mute_until?: string | null
           circle_invites?: boolean | null
           connection_accepted?: boolean | null
@@ -7375,12 +7423,15 @@ export type Database = {
           created_at?: string
           custom_sound_enabled?: boolean | null
           custom_sound_name?: string | null
+          email_digest_enabled?: boolean | null
+          email_digest_frequency?: string | null
           email_security_alerts?: boolean | null
           event_enabled?: boolean
           high_match_online?: boolean | null
           id?: string
           marketplace_enabled?: boolean
           organization_enabled?: boolean
+          push_enabled?: boolean | null
           quiet_hours_enabled?: boolean | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
@@ -7394,6 +7445,69 @@ export type Database = {
           workspace_enabled?: boolean
         }
         Relationships: []
+      }
+      notification_queue: {
+        Row: {
+          batch_id: string | null
+          batch_window_end: string | null
+          channel_id: string | null
+          content: Json
+          created_at: string | null
+          id: string
+          notification_type: string
+          priority: string | null
+          processed_at: string | null
+          source_id: string | null
+          source_type: string | null
+          user_id: string
+          workspace_id: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          batch_window_end?: string | null
+          channel_id?: string | null
+          content: Json
+          created_at?: string | null
+          id?: string
+          notification_type: string
+          priority?: string | null
+          processed_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          user_id: string
+          workspace_id?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          batch_window_end?: string | null
+          channel_id?: string | null
+          content?: Json
+          created_at?: string | null
+          id?: string
+          notification_type?: string
+          priority?: string | null
+          processed_at?: string | null
+          source_id?: string | null
+          source_type?: string | null
+          user_id?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_queue_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_queue_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -11300,6 +11414,80 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thread_read_status: {
+        Row: {
+          id: string
+          last_read_at: string | null
+          last_read_reply_id: string | null
+          parent_message_id: string
+          unread_count: number | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_read_at?: string | null
+          last_read_reply_id?: string | null
+          parent_message_id: string
+          unread_count?: number | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_read_at?: string | null
+          last_read_reply_id?: string | null
+          parent_message_id?: string
+          unread_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_read_status_last_read_reply_id_fkey"
+            columns: ["last_read_reply_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "thread_read_status_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thread_subscriptions: {
+        Row: {
+          id: string
+          is_muted: boolean | null
+          parent_message_id: string
+          subscribed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean | null
+          parent_message_id: string
+          subscribed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean | null
+          parent_message_id?: string
+          subscribed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thread_subscriptions_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "channel_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -19376,6 +19564,142 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_voice_channels: {
+        Row: {
+          agora_channel_name: string
+          channel_id: string | null
+          created_at: string | null
+          created_by: string
+          id: string
+          is_active: boolean | null
+          is_stage_mode: boolean | null
+          max_participants: number | null
+          name: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          agora_channel_name: string
+          channel_id?: string | null
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          is_stage_mode?: boolean | null
+          max_participants?: number | null
+          name: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          agora_channel_name?: string
+          channel_id?: string | null
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          is_stage_mode?: boolean | null
+          max_participants?: number | null
+          name?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_voice_channels_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_voice_channels_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_voice_participants: {
+        Row: {
+          id: string
+          is_deafened: boolean | null
+          is_muted: boolean | null
+          is_screen_sharing: boolean | null
+          is_speaking: boolean | null
+          joined_at: string | null
+          left_at: string | null
+          user_id: string
+          voice_session_id: string
+        }
+        Insert: {
+          id?: string
+          is_deafened?: boolean | null
+          is_muted?: boolean | null
+          is_screen_sharing?: boolean | null
+          is_speaking?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          user_id: string
+          voice_session_id: string
+        }
+        Update: {
+          id?: string
+          is_deafened?: boolean | null
+          is_muted?: boolean | null
+          is_screen_sharing?: boolean | null
+          is_speaking?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          user_id?: string
+          voice_session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_voice_participants_voice_session_id_fkey"
+            columns: ["voice_session_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_voice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_voice_sessions: {
+        Row: {
+          ended_at: string | null
+          id: string
+          peak_participants: number | null
+          started_at: string | null
+          total_duration_seconds: number | null
+          voice_channel_id: string
+        }
+        Insert: {
+          ended_at?: string | null
+          id?: string
+          peak_participants?: number | null
+          started_at?: string | null
+          total_duration_seconds?: number | null
+          voice_channel_id: string
+        }
+        Update: {
+          ended_at?: string | null
+          id?: string
+          peak_participants?: number | null
+          started_at?: string | null
+          total_duration_seconds?: number | null
+          voice_channel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_voice_sessions_voice_channel_id_fkey"
+            columns: ["voice_channel_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_voice_channels"
             referencedColumns: ["id"]
           },
         ]
