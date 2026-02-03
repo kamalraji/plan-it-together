@@ -618,7 +618,7 @@ export function ParticipantDashboard() {
                       Issued: {new Date(cert.issuedAt).toLocaleDateString()}
                     </p>
                     <Link
-                      to={`/certificates/${cert.id}`}
+                      to={`/verify/${cert.code}`}
                       className="text-xs text-primary hover:underline mt-2 inline-block"
                     >
                       View Certificate

@@ -15,6 +15,7 @@ export { MarketplaceService } from './MarketplaceService';
 export { MarketplaceListPage } from './MarketplaceListPage';
 export { VendorDashboardPage } from './VendorDashboardPage';
 export { BookingListPage } from './BookingListPage';
+export { BookingCreatePage } from './BookingCreatePage';
 export { MarketplacePage } from './MarketplacePage';
 export { VendorPage } from './VendorPage';
 

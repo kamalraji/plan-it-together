@@ -179,6 +179,11 @@ export const ConsoleDashboard = () => {
           .eq('status', 'COMPLETED'),
       ]);
 
+      // Fetch team member count from organization_members
+      const teamMembersRes = await supabase
+        .from('organization_members')
+        .select('*', { count: 'exact', head: true });
+
       if (activeEventsRes.error) throw activeEventsRes.error;
       if (draftEventsRes.error) throw draftEventsRes.error;
       if (completedEventsRes.error) throw completedEventsRes.error;
@@ -199,7 +204,7 @@ export const ConsoleDashboard = () => {
         completedEvents: completedEventsRes.count ?? 0,
         totalRegistrations: registrationsRes.count ?? 0,
         activeWorkspaces: activeWorkspacesRes.count ?? 0,
-        teamMembers: 0, // Team metrics will be wired to dedicated tables later
+        teamMembers: teamMembersRes.count ?? 0,
         availableServices: servicesRes.count ?? 0,
         activeBookings: activeBookingsRes.count ?? 0,
         totalRevenue,
