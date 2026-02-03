@@ -66,11 +66,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
     .filter(Boolean)
     .join(', ');
 
-  // Mock trust metrics (in real app, these would come from the service data)
+  // Real trust metrics from aggregated vendor reviews
   const trustMetrics = {
     isVerified: service.vendor?.verification_status === 'VERIFIED',
-    avgRating: 4.5, // Would come from actual data
-    reviewCount: 12, // Would come from actual data
+    avgRating: service.avg_rating || 0,
+    reviewCount: service.review_count || 0,
     responseTime: 'fast' as const,
   };
 
