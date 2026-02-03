@@ -9,6 +9,7 @@ import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 import { preferenceStorage } from '@/lib/storage';
+import { DASHBOARD_ROUTES, PUBLIC_ROUTES } from '@/lib/routes';
 
 interface Registration {
   id: string;
@@ -243,7 +244,7 @@ export function ParticipantDashboard() {
 
     if (isProfileIncomplete && !redirectDone) {
       sessionStorage.setItem('th1_profile_redirect_done', '1');
-      navigate('/dashboard/profile');
+      navigate(DASHBOARD_ROUTES.PROFILE);
     }
   }, [user, navigate, isProfileIncomplete]);
 
@@ -290,7 +291,7 @@ export function ParticipantDashboard() {
         <ol className="flex items-center gap-2 text-sm">
           <li>
             <Link 
-              to="/dashboard"
+              to={DASHBOARD_ROUTES.ROOT}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Home className="h-4 w-4" />
@@ -361,7 +362,7 @@ export function ParticipantDashboard() {
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate('/dashboard/organizations/join')}
+                onClick={() => navigate(DASHBOARD_ROUTES.JOIN_ORGANIZATION)}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
               >
                 Join or create organization
@@ -389,7 +390,7 @@ export function ParticipantDashboard() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => navigate('/dashboard/organizations/join')}
+                onClick={() => navigate(DASHBOARD_ROUTES.JOIN_ORGANIZATION)}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:bg-primary/90"
               >
                 Go to organization
@@ -417,7 +418,7 @@ export function ParticipantDashboard() {
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate('/dashboard/profile')}
+                onClick={() => navigate(DASHBOARD_ROUTES.PROFILE)}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
               >
                 Finish profile
@@ -549,7 +550,7 @@ export function ParticipantDashboard() {
                     </div>
                     <div className="mt-3 flex gap-2">
                       <Link
-                        to={`/events/${registration.event.id}`}
+                        to={PUBLIC_ROUTES.EVENT_DETAIL(registration.event.id)}
                         className="text-xs text-primary hover:underline"
                       >
                         View Event
@@ -618,7 +619,7 @@ export function ParticipantDashboard() {
                       Issued: {new Date(cert.issuedAt).toLocaleDateString()}
                     </p>
                     <Link
-                      to={`/verify/${cert.code}`}
+                      to={PUBLIC_ROUTES.VERIFY_CERTIFICATE_BY_ID(cert.code)}
                       className="text-xs text-primary hover:underline mt-2 inline-block"
                     >
                       View Certificate

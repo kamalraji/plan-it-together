@@ -208,6 +208,24 @@ export function requiresOrgContext(path: string): boolean {
   return orgOnlyPatterns.some(pattern => pattern.test(path));
 }
 
+/**
+ * Check if a user role can access a given route
+ * Returns true if access is allowed, false if the route is restricted
+ */
+export function canAccessRoute(route: string, userRole: string): boolean {
+  const organizerOnlyPatterns = [
+    '/organizer',
+    '/eventmanagement',
+    '/workspaces',
+    '/admin',
+  ];
+  
+  if (userRole === 'PARTICIPANT') {
+    return !organizerOnlyPatterns.some(pattern => route.includes(pattern));
+  }
+  return true;
+}
+
 // =============================================================================
 // ROUTE VALIDATION
 // =============================================================================
