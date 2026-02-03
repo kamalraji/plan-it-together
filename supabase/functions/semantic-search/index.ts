@@ -39,28 +39,27 @@ serve(async (req) => {
     const searchPromises: Promise<void>[] = [];
 
     if (types.includes('tasks')) {
-      searchPromises.push(
-        supabase
+      const taskPromise = (async () => {
+        const { data, error } = await supabase
           .from('workspace_tasks')
           .select('id, title, description, status, priority, due_date, assigned_to')
           .eq('workspace_id', workspaceId)
           .or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`)
-          .limit(limit)
-          .then(({ data, error }) => {
-            if (!error && data) {
-              results.tasks = data.map(t => ({
-                ...t,
-                type: 'task',
-                matchField: t.title?.toLowerCase().includes(query.toLowerCase()) ? 'title' : 'description',
-              }));
-            }
-          })
-      );
+          .limit(limit);
+        if (!error && data) {
+          results.tasks = data.map(t => ({
+            ...t,
+            type: 'task',
+            matchField: t.title?.toLowerCase().includes(query.toLowerCase()) ? 'title' : 'description',
+          }));
+        }
+      })();
+      searchPromises.push(taskPromise);
     }
 
     if (types.includes('messages')) {
-      searchPromises.push(
-        supabase
+      const messagePromise = (async () => {
+        const { data, error } = await supabase
           .from('channel_messages')
           .select(`
             id, content, created_at, sender_name,
@@ -69,29 +68,28 @@ serve(async (req) => {
             )
           `)
           .ilike('content', searchTerm)
-          .limit(limit)
-          .then(({ data, error }) => {
-            if (!error && data) {
-              // Filter to only messages from channels in this workspace
-              results.messages = data
-                .filter((m: any) => m.channel?.workspace_id === workspaceId)
-                .map((m: any) => ({
-                  id: m.id,
-                  content: m.content,
-                  created_at: m.created_at,
-                  sender_name: m.sender_name,
-                  channel_name: m.channel?.name,
-                  channel_id: m.channel?.id,
-                  type: 'message',
-                }));
-            }
-          })
-      );
+          .limit(limit);
+        if (!error && data) {
+          // Filter to only messages from channels in this workspace
+          results.messages = data
+            .filter((m: any) => m.channel?.workspace_id === workspaceId)
+            .map((m: any) => ({
+              id: m.id,
+              content: m.content,
+              created_at: m.created_at,
+              sender_name: m.sender_name,
+              channel_name: m.channel?.name,
+              channel_id: m.channel?.id,
+              type: 'message',
+            }));
+        }
+      })();
+      searchPromises.push(messagePromise);
     }
 
     if (types.includes('members')) {
-      searchPromises.push(
-        supabase
+      const memberPromise = (async () => {
+        const { data, error } = await supabase
           .from('workspace_team_members')
           .select(`
             id, role, status, user_id,
@@ -101,29 +99,28 @@ serve(async (req) => {
           `)
           .eq('workspace_id', workspaceId)
           .eq('status', 'ACTIVE')
-          .limit(limit)
-          .then(({ data, error }) => {
-            if (!error && data) {
-              // Filter by name/email match
-              results.members = data
-                .filter((m: any) => {
-                  const name = m.profile?.full_name?.toLowerCase() || '';
-                  const email = m.profile?.email?.toLowerCase() || '';
-                  const q = query.toLowerCase();
-                  return name.includes(q) || email.includes(q);
-                })
-                .map((m: any) => ({
-                  id: m.id,
-                  user_id: m.user_id,
-                  full_name: m.profile?.full_name,
-                  email: m.profile?.email,
-                  avatar_url: m.profile?.avatar_url,
-                  role: m.role,
-                  type: 'member',
-                }));
-            }
-          })
-      );
+          .limit(limit);
+        if (!error && data) {
+          // Filter by name/email match
+          results.members = data
+            .filter((m: any) => {
+              const name = m.profile?.full_name?.toLowerCase() || '';
+              const email = m.profile?.email?.toLowerCase() || '';
+              const q = query.toLowerCase();
+              return name.includes(q) || email.includes(q);
+            })
+            .map((m: any) => ({
+              id: m.id,
+              user_id: m.user_id,
+              full_name: m.profile?.full_name,
+              email: m.profile?.email,
+              avatar_url: m.profile?.avatar_url,
+              role: m.role,
+              type: 'member',
+            }));
+        }
+      })();
+      searchPromises.push(memberPromise);
     }
 
     await Promise.all(searchPromises);

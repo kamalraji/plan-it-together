@@ -225,3 +225,13 @@ verify_jwt = false
 
 [functions.send-webhook-notification]
 verify_jwt = false
+
+# ============= AI CONTENT ASSISTANCE =============
+[functions.ai-content-assist]
+verify_jwt = false
+
+[functions.semantic-search]
+verify_jwt = false
+
+[functions.voice-channel-token]
+verify_jwt = false
