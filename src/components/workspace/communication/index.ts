@@ -33,3 +33,6 @@ export { ModerationToolsPanel } from './ModerationToolsPanel';
 export { ChannelPermissionsEditor } from './ChannelPermissionsEditor';
 export { ScheduledBroadcastsManager } from './ScheduledBroadcastsManager';
 export { ParticipantEngagementMetrics } from './ParticipantEngagementMetrics';
+
+// Phase 5.3: Thread components
+export * from './threads';
