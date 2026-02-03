@@ -331,7 +331,7 @@ export const AdminUserRolesPage: React.FC = () => {
           </span>
           <div className="flex gap-2 flex-wrap">
             <Button asChild size="sm" variant="outline">
-              <Link to="/admin/roles-diagram">View role model & access matrix</Link>
+              <Link to="/thittam1hub/admin/roles-diagram">View role model & access matrix</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
               <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>
