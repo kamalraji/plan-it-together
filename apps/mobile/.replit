@@ -1,0 +1,105 @@
+modules = ["nodejs-20", "dart-3.10"]
+[agent]
+expertMode = true
+integrations = ["javascript_database:1.0.0"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["flutter"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Python Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Python Backend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Python Server Preview"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web Preview"
+
+[[workflows.workflow]]
+name = "Python 2"
+mode = "sequential"
+author = 49451404
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "flutter clean && flutter build web"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"python3 -m http.server\" 2>/dev/null; sleep 1"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd build/web && python3 -m http.server 8000 --bind 0.0.0.0"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd build/web && python3 -m http.server 5000 --bind 0.0.0.0"
+
+[[workflows.workflow]]
+name = "error log 300"
+mode = "sequential"
+author = 49451404
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''flutter build web -v 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tail -n 300 > flutter_llm_error.log'''
+
+[[workflows.workflow]]
+name = "error log 800"
+mode = "sequential"
+author = 49451404
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''flutter build web -v 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tail -n 800 > flutter_llm_error.log'''
+
+[[workflows.workflow]]
+name = "1600"
+mode = "sequential"
+author = 49451404
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''flutter build web -v 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tail -n 1600 > flutter_llm_error.log'''
+
+[[workflows.workflow]]
+name = "Web Preview"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 -m http.server 5000 --directory build/web"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
+[deployment]
+deploymentTarget = "static"
+build = ["flutter", "build", "web", "--release"]
+publicDir = "build/web"

@@ -10,7 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { 
+  SimpleTooltip as Tooltip, 
+  SimpleTooltipContent as TooltipContent, 
+  SimpleTooltipProvider as TooltipProvider, 
+  SimpleTooltipTrigger as TooltipTrigger 
+} from "@/components/ui/simple-tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -90,7 +95,8 @@ const SidebarProvider = React.forwardRef<
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.
-  const state = open ? "expanded" : "collapsed";
+  // On mobile, we always treat the sidebar as "expanded" so the Sheet shows full content.
+  const state: SidebarContext["state"] = isMobile ? "expanded" : open ? "expanded" : "collapsed";
 
   const contextValue = React.useMemo<SidebarContext>(
     () => ({
@@ -156,7 +162,7 @@ const Sidebar = React.forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className="w-[--sidebar-width] p-0 text-sidebar-foreground [&>button]:hidden border-r border-sidebar-border/50"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -164,7 +170,15 @@ const Sidebar = React.forwardRef<
           }
           side={side}
         >
-          <div className="flex h-full w-full flex-col">{children}</div>
+          {/* Glassmorphic mobile sidebar with solid background */}
+          <div className="flex h-full w-full flex-col bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-sidebar/90">
+            {/* Subtle gradient overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+            {/* Content */}
+            <div className="relative flex h-full w-full flex-col">
+              {children}
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
     );
@@ -192,7 +206,7 @@ const Sidebar = React.forwardRef<
       />
       <div
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed top-16 bottom-0 z-10 hidden w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -204,11 +218,19 @@ const Sidebar = React.forwardRef<
         )}
         {...props}
       >
+        {/* Glassmorphic desktop sidebar */}
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+          className="relative flex h-full w-full flex-col bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-sidebar/90 group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border/50 group-data-[variant=floating]:shadow-xl"
         >
-          {children}
+          {/* Subtle gradient overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none rounded-[inherit]" />
+          {/* Inner glow border effect */}
+          <div className="absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/10 pointer-events-none" />
+          {/* Content */}
+          <div className="relative flex h-full w-full flex-col">
+            {children}
+          </div>
         </div>
       </div>
     </div>
