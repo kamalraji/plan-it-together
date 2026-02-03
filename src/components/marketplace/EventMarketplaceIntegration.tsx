@@ -243,7 +243,18 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         {activeTab === 'shortlist' && (
           <VendorShortlist
             eventId={eventId}
-            onRequestQuote={(service) => handleRequestQuote({ ...service, vendorId: service.vendor.id })}
+            onRequestQuote={(service) => handleRequestQuote({ 
+              ...service, 
+              vendorId: service.vendor.id,
+              pricing: {
+                ...service.pricing,
+                type: service.pricing.type as 'FIXED' | 'HOURLY' | 'PER_PERSON' | 'CUSTOM_QUOTE'
+              },
+              vendor: {
+                ...service.vendor,
+                verificationStatus: service.vendor.verificationStatus as 'PENDING' | 'VERIFIED' | 'REJECTED'
+              }
+            })}
           />
         )}
 
