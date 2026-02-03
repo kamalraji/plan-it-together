@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -17,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
+import { toast } from 'sonner';
 import { TeamCollaboration } from '@/components/illustrations';
 
 /**
@@ -33,6 +34,7 @@ export const WorkspaceListPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { confirm, dialogProps } = useConfirmation();
+  const queryClient = useQueryClient();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkspaceStatus | 'all'>('all');
@@ -75,6 +77,62 @@ export const WorkspaceListPage: React.FC = () => {
         taskSummary: undefined,
         channels: [],
       })) as unknown) as Workspace[];
+    },
+  });
+
+  // Bulk archive mutation
+  const bulkArchiveMutation = useMutation({
+    mutationFn: async (workspaceIds: string[]) => {
+      const { error } = await supabase
+        .from('workspaces')
+        .update({ status: 'DISSOLVED' })
+        .in('id', workspaceIds);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
+      setSelectedWorkspaces([]);
+      toast.success('Workspaces archived successfully');
+    },
+    onError: () => {
+      toast.error('Failed to archive workspaces');
+    },
+  });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (workspaceIds: string[]) => {
+      const { error } = await supabase
+        .from('workspaces')
+        .delete()
+        .in('id', workspaceIds);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
+      setSelectedWorkspaces([]);
+      toast.success('Workspaces deleted successfully');
+    },
+    onError: () => {
+      toast.error('Failed to delete workspaces');
+    },
+  });
+
+  // Single delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (workspaceId: string) => {
+      const { error } = await supabase
+        .from('workspaces')
+        .delete()
+        .eq('id', workspaceId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
+      toast.success('Workspace deleted successfully');
+    },
+    onError: () => {
+      toast.error('Failed to delete workspace');
     },
   });
 
@@ -238,16 +296,16 @@ export const WorkspaceListPage: React.FC = () => {
     ? [
         {
           label: 'Archive Selected',
-          action: (_selectedItems: Workspace[]) => {
-            // TODO: Implement bulk archive logic
+          action: (selectedItems: Workspace[]) => {
+            bulkArchiveMutation.mutate(selectedItems.map(w => w.id));
           },
           icon: 'archive',
           confirmationRequired: true,
         },
         {
           label: 'Delete Selected',
-          action: (_selectedItems: Workspace[]) => {
-            // TODO: Implement bulk delete logic
+          action: (selectedItems: Workspace[]) => {
+            bulkDeleteMutation.mutate(selectedItems.map(w => w.id));
           },
           icon: 'trash',
           confirmationRequired: true,
@@ -271,7 +329,7 @@ export const WorkspaceListPage: React.FC = () => {
     : [];
 
 
-  const handleDeleteWorkspace = async (_workspaceId: string) => {
+  const handleDeleteWorkspace = async (workspaceId: string) => {
     const confirmed = await confirm({
       title: 'Delete Workspace',
       description: 'Are you sure you want to delete this workspace? This action cannot be undone.',
@@ -279,7 +337,7 @@ export const WorkspaceListPage: React.FC = () => {
       variant: 'danger',
     });
     if (!confirmed) return;
-    // TODO: Wire to backend delete endpoint and refresh list via React Query
+    deleteMutation.mutate(workspaceId);
   };
 
 
