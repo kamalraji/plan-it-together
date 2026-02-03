@@ -105,9 +105,33 @@ export function BroadcastComposerDialog({
 
         // Send push notification if enabled
         if (sendPush || priority === 'urgent') {
-          // This would call the send-push-notification edge function
-          // For now we just log it
-          console.log('Would send push notification for broadcast:', data.id);
+          try {
+            // Get all member user IDs from selected channels
+            const { data: channelMembers } = await supabase
+              .from('channel_members')
+              .select('user_id')
+              .in('channel_id', selectedChannels);
+            
+            const uniqueUserIds = [...new Set(channelMembers?.map(m => m.user_id) || [])];
+            
+            if (uniqueUserIds.length > 0) {
+              await supabase.functions.invoke('send-push-notification', {
+                body: {
+                  user_ids: uniqueUserIds,
+                  title: title || 'New Broadcast',
+                  body: content.substring(0, 200),
+                  data: {
+                    type: 'system',
+                    action_url: `/workspaces?workspaceId=${workspaceId}`,
+                  },
+                  priority: priority === 'urgent' ? 'high' : 'normal',
+                },
+              });
+            }
+          } catch (pushError) {
+            console.warn('Push notification failed:', pushError);
+            // Don't fail the broadcast if push fails
+          }
         }
       }
 
