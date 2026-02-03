@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   MagnifyingGlassIcon as Search, 
   ChevronRightIcon as ChevronRight, 
@@ -8,6 +10,7 @@ import {
   HandThumbDownIcon as ThumbsDown, 
   BookOpenIcon as BookOpen 
 } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 
 interface KnowledgeBaseProps {
   searchQuery?: string;
@@ -187,8 +190,51 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
     // Article view tracking handled by analytics
   };
 
-  const handleHelpfulClick = (_articleId: string, _helpful: boolean) => {
-    // TODO: Implement article rating mutation
+  // Article rating mutation
+  const rateArticleMutation = useMutation({
+    mutationFn: async ({ articleId, isHelpful }: { articleId: string; isHelpful: boolean }) => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser) {
+        throw new Error('Please log in to rate articles');
+      }
+
+      // Upsert the rating (update if exists, insert if not)
+      const { error } = await supabase
+        .from('article_ratings')
+        .upsert(
+          {
+            article_id: articleId,
+            user_id: currentUser.id,
+            is_helpful: isHelpful,
+          },
+          {
+            onConflict: 'article_id,user_id',
+          }
+        );
+
+      if (error) throw error;
+      return { articleId, isHelpful };
+    },
+    onSuccess: ({ isHelpful }) => {
+      toast.success(isHelpful ? 'Thanks for the positive feedback!' : 'Thanks for the feedback. We\'ll work to improve.');
+      
+      // Update local state to reflect the rating
+      if (selectedArticle) {
+        setSelectedArticle(prev => prev ? {
+          ...prev,
+          helpful: isHelpful ? prev.helpful + 1 : prev.helpful,
+          notHelpful: !isHelpful ? prev.notHelpful + 1 : prev.notHelpful,
+        } : null);
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to submit rating');
+    },
+  });
+
+  const handleHelpfulClick = (articleId: string, helpful: boolean) => {
+    rateArticleMutation.mutate({ articleId, isHelpful: helpful });
   };
 
   if (selectedArticle) {

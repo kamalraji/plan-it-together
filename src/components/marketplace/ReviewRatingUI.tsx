@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,14 +8,53 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Star, CheckCircle, ThumbsUp } from 'lucide-react';
-import { VendorReview, CompletedBooking, formatCategory } from './types';
+import { formatCategory } from './types';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReviewRatingUIProps {
   eventId?: string;
+}
+
+interface DatabaseReview {
+  id: string;
+  vendor_id: string;
+  reviewer_id: string;
+  event_id: string | null;
+  rating: number;
+  title: string | null;
+  review_text: string | null;
+  response_text: string | null;
+  response_at: string | null;
+  is_verified_booking: boolean;
+  helpful_count: number;
+  created_at: string;
+  updated_at: string;
+  vendors?: {
+    id: string;
+    business_name: string;
+    verification_status: string;
+  };
+}
+
+interface CompletedBooking {
+  id: string;
+  vendor_id: string;
+  event_name: string;
+  event_date: string;
+  final_price: number | null;
+  status: string;
+  vendors?: {
+    id: string;
+    business_name: string;
+    verification_status: string;
+  };
+  vendor_services?: {
+    id: string;
+    name: string;
+    category: string;
+  } | null;
 }
 
 // Star Rating Component
@@ -49,29 +89,133 @@ const StarRating: React.FC<{
 };
 
 const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'my-reviews' | 'pending-reviews'>('my-reviews');
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<CompletedBooking | null>(null);
 
-  // Placeholder: vendor_reviews table doesn't exist yet
-  const { data: reviews, isLoading: reviewsLoading, refetch: refetchReviews } = useQuery({
+  // Fetch user's reviews from vendor_reviews table
+  const { data: reviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ['organizer-reviews', eventId],
     queryFn: async () => {
-      // Placeholder until vendor_reviews table exists
-      console.log('Reviews - tables not yet implemented', { eventId });
-      return [] as VendorReview[];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      let query = supabase
+        .from('vendor_reviews')
+        .select(`
+          *,
+          vendors (id, business_name, verification_status)
+        `)
+        .eq('reviewer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        return [];
+      }
+
+      return (data || []) as DatabaseReview[];
     },
   });
 
-  // Placeholder: completed bookings without reviews
-  const { data: pendingReviews, isLoading: pendingLoading, refetch: refetchPending } = useQuery({
+  // Fetch completed bookings without reviews
+  const { data: pendingReviews, isLoading: pendingLoading } = useQuery({
     queryKey: ['pending-reviews', eventId],
     queryFn: async () => {
-      // Placeholder until vendor_bookings table exists
-      console.log('Pending reviews - tables not yet implemented', { eventId });
-      return [] as CompletedBooking[];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get completed bookings
+      let query = supabase
+        .from('vendor_bookings')
+        .select(`
+          id,
+          vendor_id,
+          event_name,
+          event_date,
+          final_price,
+          status,
+          vendors (id, business_name, verification_status),
+          vendor_services (id, name, category)
+        `)
+        .eq('organizer_id', user.id)
+        .eq('status', 'COMPLETED');
+
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      const { data: bookings, error } = await query;
+
+      if (error) {
+        console.error('Error fetching completed bookings:', error);
+        return [];
+      }
+
+      // Get existing reviews to filter out already-reviewed bookings
+      const { data: existingReviews } = await supabase
+        .from('vendor_reviews')
+        .select('vendor_id, event_id')
+        .eq('reviewer_id', user.id);
+
+      const reviewedVendorEvents = new Set(
+        (existingReviews || []).map(r => `${r.vendor_id}-${r.event_id}`)
+      );
+
+      // Filter out bookings that already have reviews
+      const pendingBookings = (bookings || []).filter(b => 
+        !reviewedVendorEvents.has(`${b.vendor_id}-${eventId}`)
+      );
+
+      return pendingBookings as CompletedBooking[];
     },
   });
+
+  // Submit review mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (reviewData: {
+      vendorId: string;
+      rating: number;
+      title: string;
+      reviewText: string;
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('vendor_reviews')
+        .insert({
+          vendor_id: reviewData.vendorId,
+          reviewer_id: user.id,
+          event_id: eventId || null,
+          rating: reviewData.rating,
+          title: reviewData.title,
+          review_text: reviewData.reviewText,
+          is_verified_booking: true,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizer-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-reviews'] });
+      toast({ title: 'Review submitted', description: 'Thank you for your feedback!' });
+      setShowReviewModal(false);
+      setSelectedBooking(null);
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to submit review. Please try again.', variant: 'destructive' });
+    },
+  });
+
 
   const handleWriteReview = (booking: CompletedBooking) => {
     setSelectedBooking(booking);
@@ -110,80 +254,54 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">
-                        {review.booking.serviceListing.title}
+                        {review.vendors?.business_name || 'Vendor'}
                       </h3>
-                      <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
-                        {review.vendor.businessName}
-                        {review.vendor.verificationStatus === 'VERIFIED' && (
-                          <CheckCircle className="h-4 w-4 text-emerald-500" />
-                        )}
-                      </p>
                       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
-                          {formatCategory(review.booking.serviceListing.category)}
-                        </Badge>
-                        <span>•</span>
-                        <span>{new Date(review.createdAt).toLocaleDateString()}</span>
-                        {review.verifiedPurchase && (
-                          <>
-                            <span>•</span>
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Verified Purchase</span>
-                          </>
+                        {review.is_verified_booking && (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                            <CheckCircle className="h-4 w-4" />
+                            Verified Purchase
+                          </span>
                         )}
+                        <span>•</span>
+                        <span>{new Date(review.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <StarRating rating={review.rating} size="md" />
                   </div>
 
                   <div className="mb-4">
-                    <h4 className="font-medium text-foreground mb-2">{review.title}</h4>
-                    <p className="text-muted-foreground">{review.comment}</p>
-                  </div>
-
-                  {/* Detailed Ratings */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-muted rounded-lg">
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Service Quality</p>
-                      <StarRating rating={review.serviceQuality} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Communication</p>
-                      <StarRating rating={review.communication} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Timeliness</p>
-                      <StarRating rating={review.timeliness} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Value</p>
-                      <StarRating rating={review.value} />
-                    </div>
+                    {review.title && (
+                      <h4 className="font-medium text-foreground mb-2">{review.title}</h4>
+                    )}
+                    {review.review_text && (
+                      <p className="text-muted-foreground">{review.review_text}</p>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm">
-                      <span className={review.wouldRecommend ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}>
-                        {review.wouldRecommend ? '✓ Would recommend' : '✗ Would not recommend'}
-                      </span>
-                      {review.helpful > 0 && (
+                      {review.helpful_count > 0 && (
                         <span className="text-muted-foreground flex items-center gap-1">
                           <ThumbsUp className="h-3.5 w-3.5" />
-                          {review.helpful} found this helpful
+                          {review.helpful_count} found this helpful
                         </span>
                       )}
                     </div>
                   </div>
 
                   {/* Vendor Response */}
-                  {review.vendorResponse && (
+                  {review.response_text && (
                     <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <div className="flex items-center mb-2">
-                        <span className="text-sm font-medium text-blue-900 dark:text-blue-300">Response from {review.vendor.businessName}</span>
-                        <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
-                          {new Date(review.vendorResponseAt!).toLocaleDateString()}
-                        </span>
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-300">Response from vendor</span>
+                        {review.response_at && (
+                          <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+                            {new Date(review.response_at).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-sm text-blue-800 dark:text-blue-200">{review.vendorResponse}</p>
+                      <p className="text-sm text-blue-800 dark:text-blue-200">{review.response_text}</p>
                     </div>
                   )}
                 </CardContent>
@@ -211,24 +329,26 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-foreground mb-2">
-                        {booking.serviceListing.title}
+                        {booking.vendor_services?.name || booking.event_name}
                       </h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
                         <p className="flex items-center gap-1">
-                          <span className="font-medium text-foreground">Vendor:</span> {booking.vendor.businessName}
-                          {booking.vendor.verificationStatus === 'VERIFIED' && (
+                          <span className="font-medium text-foreground">Vendor:</span> {booking.vendors?.business_name}
+                          {booking.vendors?.verification_status === 'verified' && (
                             <CheckCircle className="h-4 w-4 text-emerald-500" />
                           )}
                         </p>
-                        <p>
-                          <span className="font-medium text-foreground">Category:</span> {formatCategory(booking.serviceListing.category)}
-                        </p>
-                        <p>
-                          <span className="font-medium text-foreground">Service Date:</span> {new Date(booking.serviceDate).toLocaleDateString()}
-                        </p>
-                        {booking.finalPrice && (
+                        {booking.vendor_services?.category && (
                           <p>
-                            <span className="font-medium text-foreground">Final Price:</span> {booking.currency} {booking.finalPrice.toLocaleString()}
+                            <span className="font-medium text-foreground">Category:</span> {formatCategory(booking.vendor_services.category)}
+                          </p>
+                        )}
+                        <p>
+                          <span className="font-medium text-foreground">Service Date:</span> {new Date(booking.event_date).toLocaleDateString()}
+                        </p>
+                        {booking.final_price && (
+                          <p>
+                            <span className="font-medium text-foreground">Final Price:</span> ₹{booking.final_price.toLocaleString()}
                           </p>
                         )}
                       </div>
@@ -259,10 +379,8 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
             setShowReviewModal(open);
             if (!open) setSelectedBooking(null);
           }}
-          onReviewSubmitted={() => {
-            refetchReviews();
-            refetchPending();
-          }}
+          onSubmit={(data) => submitReviewMutation.mutate(data)}
+          isSubmitting={submitReviewMutation.isPending}
         />
       )}
     </div>
@@ -274,58 +392,30 @@ interface ReviewModalProps {
   booking: CompletedBooking;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onReviewSubmitted: () => void;
+  onSubmit: (data: { vendorId: string; rating: number; title: string; reviewText: string }) => void;
+  isSubmitting: boolean;
 }
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, onReviewSubmitted }) => {
-  const { toast } = useToast();
+const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, onSubmit, isSubmitting }) => {
   const [reviewData, setReviewData] = useState({
     rating: 5,
     title: '',
-    comment: '',
-    serviceQuality: 5,
-    communication: 5,
-    timeliness: 5,
-    value: 5,
-    wouldRecommend: true
+    reviewText: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRatingChange = (field: string, rating: number) => {
-    setReviewData(prev => ({ ...prev, [field]: rating }));
+  const handleRatingChange = (rating: number) => {
+    setReviewData(prev => ({ ...prev, rating }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Placeholder: would insert into vendor_reviews table
-      console.log('Submit review:', {
-        bookingId: booking.id,
-        vendorId: booking.vendor.id,
-        ...reviewData
-      });
-
-      toast({ title: 'Review submitted', description: 'Thank you for your feedback!' });
-      onReviewSubmitted();
-      onOpenChange(false);
-    } catch (_error) {
-      toast({ title: 'Error', description: 'Failed to submit review. Please try again.', variant: 'destructive' });
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit({
+      vendorId: booking.vendor_id,
+      rating: reviewData.rating,
+      title: reviewData.title,
+      reviewText: reviewData.reviewText,
+    });
   };
-
-  const RatingInput: React.FC<{ label: string; field: string; value: number }> = ({ label, field, value }) => (
-    <div className="space-y-2">
-      <Label className="text-sm">{label}</Label>
-      <div className="flex items-center gap-2">
-        <StarRating rating={value} interactive onChange={(r) => handleRatingChange(field, r)} />
-        <span className="text-sm text-muted-foreground">{value}/5</span>
-      </div>
-    </div>
-  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -336,15 +426,23 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, 
 
         {/* Service Summary */}
         <div className="bg-muted rounded-lg p-4 mb-4">
-          <h3 className="font-medium text-foreground mb-1">{booking.serviceListing.title}</h3>
-          <p className="text-sm text-muted-foreground">{booking.vendor.businessName}</p>
-          <p className="text-sm text-muted-foreground">Service Date: {new Date(booking.serviceDate).toLocaleDateString()}</p>
+          <h3 className="font-medium text-foreground mb-1">
+            {booking.vendor_services?.name || booking.event_name}
+          </h3>
+          <p className="text-sm text-muted-foreground">{booking.vendors?.business_name}</p>
+          <p className="text-sm text-muted-foreground">Service Date: {new Date(booking.event_date).toLocaleDateString()}</p>
         </div>
 
         {/* Review Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Overall Rating */}
-          <RatingInput label="Overall Rating" field="rating" value={reviewData.rating} />
+          <div className="space-y-2">
+            <Label className="text-sm">Overall Rating</Label>
+            <div className="flex items-center gap-2">
+              <StarRating rating={reviewData.rating} interactive onChange={handleRatingChange} />
+              <span className="text-sm text-muted-foreground">{reviewData.rating}/5</span>
+            </div>
+          </div>
 
           {/* Review Title */}
           <div className="space-y-2">
@@ -360,42 +458,15 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, 
 
           {/* Review Comment */}
           <div className="space-y-2">
-            <Label htmlFor="comment">Your Review *</Label>
+            <Label htmlFor="reviewText">Your Review *</Label>
             <Textarea
-              id="comment"
+              id="reviewText"
               required
               rows={4}
               placeholder="Share details about your experience with this vendor..."
-              value={reviewData.comment}
-              onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))}
+              value={reviewData.reviewText}
+              onChange={(e) => setReviewData(prev => ({ ...prev, reviewText: e.target.value }))}
             />
-          </div>
-
-          {/* Detailed Ratings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <RatingInput label="Service Quality" field="serviceQuality" value={reviewData.serviceQuality} />
-            <RatingInput label="Communication" field="communication" value={reviewData.communication} />
-            <RatingInput label="Timeliness" field="timeliness" value={reviewData.timeliness} />
-            <RatingInput label="Value for Money" field="value" value={reviewData.value} />
-          </div>
-
-          {/* Would Recommend */}
-          <div className="space-y-2">
-            <Label>Would you recommend this vendor?</Label>
-            <RadioGroup
-              value={reviewData.wouldRecommend ? 'yes' : 'no'}
-              onValueChange={(v) => setReviewData(prev => ({ ...prev, wouldRecommend: v === 'yes' }))}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="recommend-yes" />
-                <Label htmlFor="recommend-yes" className="cursor-pointer">Yes</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="recommend-no" />
-                <Label htmlFor="recommend-no" className="cursor-pointer">No</Label>
-              </div>
-            </RadioGroup>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
