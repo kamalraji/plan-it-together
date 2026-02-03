@@ -84,13 +84,13 @@ export const NotFoundPage: React.FC = () => {
             
             <div className="flex flex-col sm:flex-row sm:justify-center space-y-2 sm:space-y-0 sm:space-x-6">
               <Link
-                to="/help"
+                to="/dashboard/support"
                 className="text-sm text-teal hover:text-teal-light transition-colors font-medium"
               >
                 Help Center
               </Link>
               <Link
-                to="/help?intent=contact"
+                to="/dashboard/support"
                 className="text-sm text-teal hover:text-teal-light transition-colors font-medium"
               >
                 Contact Support

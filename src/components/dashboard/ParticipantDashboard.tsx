@@ -389,10 +389,16 @@ export function ParticipantDashboard() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => navigate('/dashboard/organizations/join')}
+                onClick={() => navigate('/dashboard/eventmanagement/events')}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:bg-primary/90"
               >
-                Go to organization
+                View events
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/team')}
+                className="inline-flex items-center rounded-md bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-secondary/90"
+              >
+                Manage team
               </button>
               <button
                 onClick={() => {
@@ -514,10 +520,10 @@ export function ParticipantDashboard() {
               <div className="text-center py-12 bg-card rounded-lg border border-border">
                 <p className="text-muted-foreground">No events found</p>
                 <Link
-                  to="/events"
+                  to="/discover"
                   className="text-primary hover:underline text-sm mt-2 inline-block"
                 >
-                  Browse events
+                  Discover events
                 </Link>
               </div>
             ) : (
