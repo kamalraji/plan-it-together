@@ -58,7 +58,7 @@ const mockNotifications: Notification[] = [
     category: 'event',
     timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
     read: false,
-    actionUrl: '/dashboard/events/annual-conference-2024',
+    actionUrl: '/dashboard/eventmanagement/annual-conference-2024',
     actionLabel: 'View Event',
     metadata: { eventId: 'annual-conference-2024', registrations: 500 }
   },

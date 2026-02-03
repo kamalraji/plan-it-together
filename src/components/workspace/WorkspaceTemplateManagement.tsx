@@ -4,6 +4,7 @@ import { WorkspaceTemplateCreation } from './WorkspaceTemplateCreation';
 import { WorkspaceTemplatePreview } from './WorkspaceTemplatePreview';
 import { WorkspaceTemplateRating } from './WorkspaceTemplateRating';
 import { WorkspaceTemplate } from '../../types/workspace-template';
+import { supabase } from '@/integrations/supabase/client';
 import api from '../../lib/api';
 
 interface WorkspaceTemplateManagementProps {
@@ -58,6 +59,16 @@ export function WorkspaceTemplateManagement({
       try {
         setLoading(true);
         await api.post(`/api/workspace-templates/${template.id}/apply/${workspaceId}`);
+
+        // Log workspace activity (non-blocking)
+        await supabase.from('workspace_activities').insert({
+          workspace_id: workspaceId,
+          type: 'template',
+          title: `Template "${template.name}" applied`,
+          description: 'Standard tasks, channels, and milestones were created from the template.',
+          metadata: { templateId: template.id, templateName: template.name },
+        });
+
         setShowPreview(false);
         onTemplateApplied?.(template);
       } catch (error) {

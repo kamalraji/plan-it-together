@@ -7,6 +7,8 @@ import {
   CheckCircleIcon,
   XCircleIcon
 } from '@heroicons/react/24/outline';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Workspace, TeamMember, WorkspaceRole } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
@@ -22,6 +24,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const [roleFilter, setRoleFilter] = useState<WorkspaceRole | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'inactive'>('all');
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Fetch team members with details
   const { data: teamMembers, isLoading } = useQuery({
@@ -56,6 +59,17 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
       queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
+      toast({
+        title: 'Team member removed',
+        description: 'The member has been removed from this workspace.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Failed to remove member',
+        description: 'Please try again or check your permissions.',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -63,10 +77,29 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const updateRoleMutation = useMutation({
     mutationFn: async ({ memberId, role }: { memberId: string; role: WorkspaceRole }) => {
       await api.patch(`/workspaces/${workspace.id}/team-members/${memberId}`, { role });
+      // Fire-and-forget activity log; errors here shouldn't block role update
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspace.id,
+        type: 'team',
+        title: 'Role updated for team member',
+        description: `Member role changed to ${role}`,
+        metadata: { memberId, role },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
       queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
+      toast({
+        title: 'Role updated',
+        description: 'The team member role has been updated successfully.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Failed to update role',
+        description: 'Please try again or check your permissions.',
+        variant: 'destructive',
+      });
     },
   });
 

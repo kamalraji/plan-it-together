@@ -10,6 +10,7 @@ import { ChannelList } from './communication/ChannelList';
 import { MessageThread } from './communication/MessageThread';
 import { BroadcastComposer } from './communication/BroadcastComposer';
 import { MessageSearch } from './communication/MessageSearch';
+import { supabase } from '@/integrations/supabase/client';
 import api from '../../lib/api';
 
 /**
@@ -68,6 +69,16 @@ export function WorkspaceCommunication({ workspaceId }: WorkspaceCommunicationPr
   const sendMessageMutation = useMutation({
     mutationFn: async ({ channelId, messageData }: { channelId: string; messageData: SendMessageDTO & { isPriority?: boolean } }) => {
       const response = await api.post(`/workspaces/channels/${channelId}/messages`, messageData);
+
+      // Log workspace activity (non-blocking)
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'communication',
+        title: 'New channel message',
+        description: messageData.content?.slice(0, 140) || 'A new message was posted in a channel.',
+        metadata: { channelId },
+      });
+
       return response.data.message;
     },
     onSuccess: () => {
@@ -79,6 +90,15 @@ export function WorkspaceCommunication({ workspaceId }: WorkspaceCommunicationPr
   const sendBroadcastMutation = useMutation({
     mutationFn: async (broadcastData: BroadcastMessageDTO & { isPriority?: boolean }) => {
       const response = await api.post(`/workspaces/${workspaceId}/broadcast`, broadcastData);
+
+      // Log workspace activity (non-blocking)
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'communication',
+        title: 'Broadcast sent to workspace',
+        description: broadcastData.content?.slice(0, 140) || 'A broadcast was sent to the workspace.',
+      });
+
       return response.data.messages;
     },
     onSuccess: () => {

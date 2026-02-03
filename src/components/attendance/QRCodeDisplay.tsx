@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { QRCodeData, Registration, AttendanceRecord } from '../../types';
 
 interface QRCodeDisplayProps {
@@ -14,32 +14,47 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 }) => {
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
-  // Fetch QR code data
   const { data: qrCodeData, isLoading, error } = useQuery<QRCodeData>({
-    queryKey: ['qr-code', registration.id],
+    queryKey: ['qr-code', registration.userId, registration.eventId],
     queryFn: async () => {
-      const response = await api.get(`/attendance/registrations/${registration.id}/qr-code`);
-      return response.data.data;
+      const { data, error } = await supabase.functions.invoke('attendance-qr', {
+        body: { eventId: registration.eventId },
+      });
+      if (error || !data?.success) {
+        throw error || new Error('Failed to load QR code');
+      }
+      return data.data as QRCodeData;
     },
   });
 
-  // Fetch attendance records to show check-in status
   const { data: attendanceRecords } = useQuery<AttendanceRecord[]>({
-    queryKey: ['attendance-records', registration.id],
+    queryKey: ['attendance-records', registration.eventId, registration.userId],
     queryFn: async () => {
-      const response = await api.get(`/attendance/registrations/${registration.id}`);
-      return response.data.data;
+      const { data, error } = await supabase.functions.invoke('attendance-report', {
+        body: { eventId: registration.eventId },
+      });
+      if (error || !data?.success) {
+        throw error || new Error('Failed to load attendance');
+      }
+      const report = data.data;
+      return (report.attendanceRecords || []).filter(
+        (r: any) => r.userId === registration.userId,
+      ) as AttendanceRecord[];
     },
+    enabled: !!registration,
   });
+  const qrImageUrl = qrCodeData
+    ? `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCodeData.qrCode)}&size=256x256`
+    : '';
 
   const handleDownload = async () => {
-    if (!qrCodeData) return;
+    if (!qrCodeData || !qrImageUrl) return;
 
     try {
       setDownloadError(null);
       
-      // Convert data URL to blob
-      const response = await fetch(qrCodeData.imageUrl);
+      // Fetch generated QR image for download
+      const response = await fetch(qrImageUrl);
       const blob = await response.blob();
       
       // Create download link
@@ -57,12 +72,12 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
   };
 
   const handleShare = async () => {
-    if (!qrCodeData) return;
+    if (!qrCodeData || !qrImageUrl) return;
 
     try {
       if (navigator.share) {
-        // Convert data URL to blob for sharing
-        const response = await fetch(qrCodeData.imageUrl);
+        // Fetch QR image as blob for sharing
+        const response = await fetch(qrImageUrl);
         const blob = await response.blob();
         const file = new File([blob], `${eventName}_qr_code.png`, { type: 'image/png' });
         
@@ -72,8 +87,8 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
           files: [file],
         });
       } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(qrCodeData.code);
+        // Fallback: copy raw QR code string to clipboard
+        await navigator.clipboard.writeText(qrCodeData.qrCode);
         alert('QR code copied to clipboard!');
       }
     } catch (error) {
@@ -157,7 +172,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         {/* QR Code Image */}
         <div className="bg-white border-2 border-gray-200 rounded-lg p-6 mb-6 inline-block">
           <img
-            src={qrCodeData.imageUrl}
+            src={qrImageUrl}
             alt="Event QR Code"
             className="w-64 h-64 mx-auto"
           />
@@ -177,7 +192,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">QR Code:</span>
-              <span className="font-mono text-gray-900 break-all">{qrCodeData.code}</span>
+              <span className="font-mono text-gray-900 break-all">{qrCodeData.qrCode}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Status:</span>

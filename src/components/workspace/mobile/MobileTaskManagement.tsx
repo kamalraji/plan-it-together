@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { WorkspaceTask, TaskStatus, TaskPriority, TeamMember } from '../../../types';
 import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MobileTaskManagementProps {
   workspaceId: string;
@@ -133,11 +134,21 @@ export function MobileTaskManagement({
         });
 
         const { latitude, longitude } = position.coords;
+        const timestamp = new Date().toISOString();
         
         // Update task with location check-in
         await api.patch(`/workspaces/${workspaceId}/tasks/${taskId}/checkin`, {
           location: { latitude, longitude },
-          timestamp: new Date().toISOString()
+          timestamp,
+        });
+
+        // Log workspace activity for mobile location check-ins
+        await supabase.from('workspace_activities').insert({
+          workspace_id: workspaceId,
+          type: 'task',
+          title: 'Mobile task check-in',
+          description: 'A mobile location check-in was recorded for a task.',
+          metadata: { taskId, latitude, longitude, timestamp, source: 'mobile', action: 'location_checkin' },
         });
 
         // Show success message
@@ -161,6 +172,15 @@ export function MobileTaskManagement({
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+      });
+
+      // Log workspace activity for mobile task photos
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'task',
+        title: 'Mobile task photo uploaded',
+        description: 'A photo was uploaded to a task from mobile.',
+        metadata: { taskId, source: 'mobile', action: 'photo_upload' },
       });
 
       // Refresh task data

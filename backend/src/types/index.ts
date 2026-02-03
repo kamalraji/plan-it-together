@@ -176,10 +176,12 @@ export interface QRCodeData {
   code: string;
   imageUrl: string;
   registrationId: string;
+  userId: string;
 }
 
 export interface CheckInDTO {
   qrCode: string;
+  eventId: string;
   sessionId?: string;
   volunteerId?: string;
 }

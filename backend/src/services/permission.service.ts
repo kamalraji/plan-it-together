@@ -41,7 +41,13 @@ export enum Permission {
 }
 
 /**
- * Role-based permission mapping
+ * Role-based permission mapping (application layer)
+ *
+ * NOTE: This mapping is for the Prisma UserRole enum used by the
+ * Node backend and frontend. When we need to interact with the
+ * Lovable Cloud / database-level roles (app_role: 'admin' | 'moderator' | 'user'),
+ * we use the dedicated helper in `role-mapping.service.ts` to keep
+ * that translation centralized and consistent.
  */
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.SUPER_ADMIN]: [

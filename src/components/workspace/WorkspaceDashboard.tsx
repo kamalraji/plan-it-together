@@ -13,6 +13,7 @@ import { WorkspaceAnalyticsDashboard } from './WorkspaceAnalyticsDashboard';
 import { WorkspaceReportExport } from './WorkspaceReportExport';
 import { WorkspaceTemplateManagement } from './WorkspaceTemplateManagement';
 import { EventMarketplaceIntegration } from '../marketplace';
+import { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
 import api from '../../lib/api';
 
 interface WorkspaceDashboardProps {
@@ -116,14 +117,15 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
             {/* Task Summary */}
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />
 
-            {/* Team Overview and Health Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <TeamMemberRoster
-                workspace={workspace}
-                showActions={false}
-                maxMembers={6}
-              />
-              <WorkspaceHealthMetrics workspace={workspace} />
+            {/* Timeline + Team Overview */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+              <div className="xl:col-span-2 space-y-8">
+                <WorkspaceCollaborationTimeline workspace={workspace} />
+              </div>
+              <div className="space-y-8">
+                <TeamMemberRoster workspace={workspace} showActions={false} maxMembers={6} />
+                <WorkspaceHealthMetrics workspace={workspace} />
+              </div>
             </div>
           </div>
         )}

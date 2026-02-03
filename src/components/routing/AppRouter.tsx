@@ -1,21 +1,28 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { EventService, MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
 import { DashboardDataLab } from '../enhanced/DashboardDataLab';
-
+import { DashboardRouter } from '../dashboard/DashboardRouter';
+import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
+import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
+import { EventLandingPage } from '../events/EventLandingPage';
+import { OrgScopedLayout } from '../organization/OrgScopedLayout';
+import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
+import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
+import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,7 +83,9 @@ interface DashboardMetrics {
 }
 
 // Console Dashboard using real backend metrics
-const ConsoleDashboard = () => {
+export const ConsoleDashboard = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { data: metrics, isLoading, error } = useQuery<DashboardMetrics>({
     queryKey: ['dashboard-metrics'],
     queryFn: async () => {
@@ -232,7 +241,14 @@ const ConsoleDashboard = () => {
                 <span className="font-semibold text-gray-900">{metrics?.totalRegistrations ?? 0}</span>
               </div>
             </div>
-            <button className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+            <button onClick={() => {
+      const orgSlugCandidate = location.pathname.split('/')[1];
+      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+        navigate(`/${orgSlugCandidate}/eventmanagement`);
+      } else {
+        navigate('/dashboard/eventmanagement');
+      }
+    }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Events
             </button>
           </div>
@@ -255,7 +271,14 @@ const ConsoleDashboard = () => {
                 <span className="font-semibold text-coral">{metrics?.teamMembers ?? 0}</span>
               </div>
             </div>
-            <button className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+            <button onClick={() => {
+      const orgSlugCandidate = location.pathname.split('/')[1];
+      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+        navigate(`/${orgSlugCandidate}/workspaces`);
+      } else {
+        navigate('/dashboard/workspaces');
+      }
+    }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Workspaces
             </button>
           </div>
@@ -463,7 +486,31 @@ export const AppRouter: React.FC = () => {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            
+
+            {/* Organizer onboarding */}
+            <Route
+              path="/onboarding/organization"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]} requireEmailVerification={false}>
+                  <OrganizationRegistrationPage />
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Public participant event listing */}
+            <Route path="/events" element={<ParticipantEventsPage />} />
+            <Route path="/events/:eventId/*" element={<EventLandingPage />} />
+
+            {/* Organization-scoped organizer console */}
+            <Route
+              path="/:orgSlug/*"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <OrgScopedLayout />
+                </ConsoleRoute>
+              }
+            />
+
             {/* Dashboard routes - all protected with enhanced authentication */}
             <Route
               path="/dashboard"
@@ -473,16 +520,31 @@ export const AppRouter: React.FC = () => {
                 </ConsoleRoute>
               }
             >
-              {/* Dashboard home - default route */}
-              <Route index element={<ConsoleDashboard />} />
-              <Route path="home" element={<ConsoleDashboard />} />
-              
+              <Route index element={<DashboardRouter />} />
+              <Route path="home" element={<DashboardRouter />} />
+              <Route
+                path="followed-organizations"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <FollowedOrganizationsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="participant-events"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <ParticipantEventsPage />
+                  </ConsoleRoute>
+                }
+              />
+
               {/* Service routes with role-based access control */}
               <Route 
-                path="events/*" 
+                path="eventmanagement/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <EventService />
+                    <Navigate to="/dashboard" replace />
                   </ConsoleRoute>
                 } 
               />
@@ -517,6 +579,22 @@ export const AppRouter: React.FC = () => {
                     <AnalyticsService />
                   </ConsoleRoute>
                 } 
+              />
+              <Route 
+                path="admin/users" 
+                element={
+                  <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
+                    <AdminUserRolesPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="admin/organizers"
+                element={
+                  <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
+                    <PendingOrganizersAdminPage />
+                  </ConsoleRoute>
+                }
               />
               <Route 
                 path="profile/*" 

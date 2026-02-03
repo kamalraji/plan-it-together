@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Event, 
@@ -13,7 +13,6 @@ import {
   EventVisibility,
   Organization
 } from '../../types';
-
 
 interface EventFormProps {
   event?: Event;
@@ -83,13 +82,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     },
   });
 
-  // Fetch user's organizations from Supabase (mapped to Organization type)
+  // Fetch user's organizations from Lovable Cloud (Requirements 19.1)
   const { data: organizations } = useQuery({
     queryKey: ['user-organizations'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('Organization')
-        .select('id, name, category, verificationStatus')
+        .from('organizations')
+        .select('id, name, category, verification_status')
         .order('name');
 
       if (error) {
@@ -97,12 +96,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
       }
 
       // Map Supabase rows into the minimal shape EventForm needs
-      return (data || []).map((org) => ({
+      return (data || []).map((org: any) => ({
         id: org.id,
         name: org.name,
         description: '',
         category: org.category,
-        verificationStatus: org.verificationStatus,
+        verificationStatus: org.verification_status,
         branding: {},
         socialLinks: {},
         pageUrl: '',
@@ -126,31 +125,31 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     return `${base}-${randomSuffix}`;
   };
 
-  // Create/Update event mutation using Supabase Event table
+  // Create/Update event mutation using Lovable Cloud
   const eventMutation = useMutation({
     mutationFn: async (data: CreateEventDTO) => {
       if (!user) {
         throw new Error('You must be logged in to manage events.');
       }
 
-      const payload = {
+      const payload: any = {
         name: data.name,
         description: data.description,
-        mode: data.mode as any,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        capacity: data.capacity ?? null,
-        registrationDeadline: data.registrationDeadline ?? null,
-        organizationId: data.organizationId || null,
-        visibility: data.visibility as any,
+        mode: data.mode,
+        start_date: data.startDate,
+        end_date: data.endDate,
+        capacity: data.capacity,
+        registration_deadline: data.registrationDeadline,
+        organization_id: data.organizationId || null,
+        visibility: data.visibility,
         branding: (data.branding || {}) as any,
         venue: (data.venue || null) as any,
-        virtualLinks: (data.virtualLinks || null) as any,
-      } as any;
+        virtual_links: (data.virtualLinks || null) as any,
+      };
 
       if (isEditing && event) {
         const { data: updated, error } = await supabase
-          .from('Event')
+          .from('events')
           .update(payload)
           .eq('id', event.id)
           .select('*')
@@ -159,14 +158,14 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         if (error) throw error;
         return updated;
       } else {
-        const insertPayload = {
+        const insertPayload: any = {
           ...(payload as any),
-          organizerId: user.id,
-          landingPageUrl: generateLandingPageSlug(data.name),
-        } as any;
+          organizer_id: user.id,
+          landing_page_url: generateLandingPageSlug(data.name),
+        };
 
         const { data: created, error } = await supabase
-          .from('Event')
+          .from('events')
           .insert(insertPayload)
           .select('*')
           .single();
@@ -175,7 +174,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         return created;
       }
     },
-    onSuccess: (newEvent: any) => {
+    onSuccess: (newEvent) => {
       queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
       navigate(`/events/${newEvent.id}`);
     },
@@ -201,16 +200,34 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     if (!event?.id) return;
 
     try {
-      const token = Math.random().toString(36).substring(2, 10);
+      let token: string;
+
+      if (typeof crypto !== 'undefined') {
+        if (typeof crypto.randomUUID === 'function') {
+          // Use UUID v4 for 128-bit entropy when available
+          token = crypto.randomUUID();
+        } else if (typeof crypto.getRandomValues === 'function') {
+          // Fallback: 16 random bytes encoded as hex (128 bits)
+          const array = new Uint8Array(16);
+          crypto.getRandomValues(array);
+          token = Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
+        } else {
+          // Absolute fallback if crypto is unavailable (older browsers)
+          token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        }
+      } else {
+        token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      }
+
       const { data: updated, error } = await supabase
-        .from('Event')
-        .update({ inviteLink: token })
+        .from('events')
+        .update({ invite_link: token })
         .eq('id', event.id)
-        .select('inviteLink')
+        .select('invite_link')
         .single();
 
       if (error) throw error;
-      setInviteLink(updated.inviteLink);
+      setInviteLink(updated.invite_link);
     } catch (error) {
       console.error('Failed to generate invite link:', error);
     }

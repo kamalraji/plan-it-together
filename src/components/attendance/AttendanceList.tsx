@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../../lib/api';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { AttendanceReport } from '../../types';
 
 interface AttendanceListProps {
@@ -21,28 +21,32 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'attended' | 'not_attended'>('all');
   const [showManualCheckIn, setShowManualCheckIn] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<string>('');
-  
-  useQueryClient();
 
-  // Fetch attendance report
   const { data: attendanceReport, isLoading, refetch } = useQuery<AttendanceReport>({
     queryKey: ['attendance-report', eventId, sessionId],
     queryFn: async () => {
-      const url = sessionId 
-        ? `/attendance/events/${eventId}/sessions/${sessionId}`
-        : `/attendance/events/${eventId}/report`;
-      const response = await api.get(url);
-      return response.data.data;
+      const { data, error } = await supabase.functions.invoke('attendance-report', {
+        body: { eventId, sessionId },
+      });
+      if (error || !data?.success) {
+        throw error || new Error('Failed to load attendance');
+      }
+      return data.data as AttendanceReport;
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 5000,
   });
 
-  // Manual check-in mutation
   const manualCheckInMutation = useMutation({
     mutationFn: async (data: ManualCheckInData) => {
-      const response = await api.post('/attendance/manual-check-in', data);
-      return response.data.data;
+      const { data: fnData, error } = await supabase.functions.invoke('attendance-manual-checkin', {
+        body: data,
+      });
+      if (error || !fnData?.success) {
+        throw error || new Error('Manual check-in failed');
+      }
+      return fnData.data;
     },
+
     onSuccess: () => {
       refetch();
       setShowManualCheckIn(false);

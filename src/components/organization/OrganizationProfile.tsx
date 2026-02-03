@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Building, MapPin, Globe, Mail, Phone, BadgeCheck, Users, Calendar } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/looseClient';
 
 interface OrganizationProfileProps {
   organizationId?: string;
@@ -26,7 +26,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
   const [user, setUser] = useState<any>(null);
 
   // Get current user
-  supabase.auth.getSession().then(({ data }) => {
+  supabase.auth.getSession().then(({ data }: any) => {
     setUser(data.session?.user || null);
   });
 
@@ -197,7 +197,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                 <Skeleton className="h-32 w-full" />
               </>
             ) : events && events.length > 0 ? (
-              events.map((event) => (
+              events.map((event: any) => (
                 <Card key={event.id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">

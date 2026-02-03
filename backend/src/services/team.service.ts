@@ -531,11 +531,33 @@ export class TeamService {
       joinedAt: member.joinedAt,
       leftAt: member.leftAt,
       user: member.user,
-      invitedBy: member.inviter ? {
-        id: member.inviter.id,
-        name: member.inviter.name,
-      } : undefined,
+      invitedBy: member.inviter
+        ? {
+            id: member.inviter.id,
+            name: member.inviter.name,
+          }
+        : undefined,
     };
+  }
+
+  /**
+   * Look up a user by email for team invitation flows
+   * Returns limited, non-sensitive fields only.
+   */
+  async findUserByEmail(email: string) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    return user;
   }
 }
 

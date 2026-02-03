@@ -1,1 +1,25 @@
-project_id = "edtybzdqfeiogxawhacd"
+project_id = "ltsniuflqfahdcirrmjh"
+
+[functions.admin-user-roles]
+verify_jwt = true
+
+[functions.approve-organizer]
+verify_jwt = true
+
+[functions.pending-organizers]
+verify_jwt = true
+
+[functions.create-organization]
+verify_jwt = false
+
+[functions.attendance-qr]
+verify_jwt = true
+
+[functions.attendance-checkin]
+verify_jwt = true
+
+[functions.attendance-report]
+verify_jwt = true
+
+[functions.attendance-manual-checkin]
+verify_jwt = true

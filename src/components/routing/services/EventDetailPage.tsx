@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
-import { Event, EventStatus, EventMode } from '../../../types';
+import { Event, EventStatus, EventMode, UserRole } from '../../../types';
 import {
   PencilIcon,
   ShareIcon,
@@ -12,6 +12,8 @@ import {
   GlobeAltIcon,
   CogIcon,
 } from '@heroicons/react/24/outline';
+import { AttendanceList } from '@/components/attendance';
+import { useAuth } from '@/hooks/useAuth';
 
 interface EventDetailPageProps {
   defaultTab?: string;
@@ -25,7 +27,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   const mockEvent: Event = {
     id: eventId || '1',
     name: 'Tech Innovation Summit 2024',
-    description: 'Annual technology innovation summit featuring the latest trends in AI, blockchain, and IoT. Join industry leaders, innovators, and tech enthusiasts for a day of learning, networking, and inspiration.',
+    description:
+      'Annual technology innovation summit featuring the latest trends in AI, blockchain, and IoT. Join industry leaders, innovators, and tech enthusiasts for a day of learning, networking, and inspiration.',
     mode: EventMode.HYBRID,
     startDate: '2024-03-15T09:00:00Z',
     endDate: '2024-03-15T17:00:00Z',
@@ -69,9 +72,11 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
 
     const config = modeConfig[mode];
     const IconComponent = config.icon;
-    
+
     return (
-      <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${config.color}`}
+      >
         <IconComponent className="h-3 w-3 mr-1" />
         {config.label}
       </span>
@@ -81,7 +86,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   const pageActions = [
     {
       label: 'Edit Event',
-      action: () => window.location.href = `/dashboard/events/${eventId}/edit`,
+      action: () => (window.location.href = `/dashboard/events/${eventId}/edit`),
       icon: PencilIcon,
       variant: 'primary' as const,
     },
@@ -122,6 +127,11 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       component: AnalyticsTab,
     },
     {
+      id: 'attendance',
+      label: 'Attendance',
+      component: AttendanceTab,
+    },
+    {
       id: 'settings',
       label: 'Settings',
       component: SettingsTab,
@@ -129,8 +139,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   ];
 
   const breadcrumbs = [
-    { label: 'Events', href: '/dashboard/events' },
-    { label: mockEvent.name, href: `/dashboard/events/${eventId}` },
+    { label: 'Events', href: '/dashboard/eventmanagement' },
+    { label: mockEvent.name, href: `/dashboard/eventmanagement/${eventId}` },
   ];
 
   return (
@@ -141,7 +151,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
           subtitle={`Event ID: ${eventId}`}
           breadcrumbs={breadcrumbs}
           actions={pageActions}
-          tabs={tabs.map(tab => ({
+          tabs={tabs.map((tab) => ({
             id: tab.id,
             label: tab.label,
             badge: tab.badge,
@@ -167,7 +177,9 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <CalendarIcon className="h-5 w-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">Start Date</p>
-                <p className="text-sm text-gray-600">{new Date(mockEvent.startDate).toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(mockEvent.startDate).toLocaleString()}
+                </p>
               </div>
             </div>
 
@@ -175,7 +187,9 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <CalendarIcon className="h-5 w-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">End Date</p>
-                <p className="text-sm text-gray-600">{new Date(mockEvent.endDate).toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(mockEvent.endDate).toLocaleString()}
+                </p>
               </div>
             </div>
 
@@ -192,10 +206,9 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <div>
                 <p className="text-sm font-medium text-gray-900">Registration</p>
                 <p className="text-sm text-gray-600">
-                  {mockEvent.registrationDeadline 
+                  {mockEvent.registrationDeadline
                     ? `Until ${new Date(mockEvent.registrationDeadline).toLocaleDateString()}`
-                    : 'Open'
-                  }
+                    : 'Open'}
                 </p>
               </div>
             </div>
@@ -204,13 +217,14 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
 
         {/* Tab Content */}
         <div className="mt-6">
-          {tabs.map(tab => (
-            activeTab === tab.id && (
-              <div key={tab.id}>
-                <tab.component event={mockEvent} />
-              </div>
-            )
-          ))}
+          {tabs.map(
+            (tab) =>
+              activeTab === tab.id && (
+                <div key={tab.id}>
+                  <tab.component event={mockEvent} />
+                </div>
+              ),
+          )}
         </div>
       </div>
     </div>
@@ -222,7 +236,7 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-6">
     <h3 className="text-lg font-medium text-gray-900 mb-4">Event Description</h3>
     <p className="text-gray-700 mb-6">{event.description}</p>
-    
+
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <h4 className="text-sm font-medium text-gray-900 mb-2">Event Details</h4>
@@ -233,7 +247,9 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
           </div>
           <div className="flex justify-between">
             <dt className="text-sm text-gray-500">Created:</dt>
-            <dd className="text-sm text-gray-900">{new Date(event.createdAt).toLocaleDateString()}</dd>
+            <dd className="text-sm text-gray-900">
+              {new Date(event.createdAt).toLocaleDateString()}
+            </dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-sm text-gray-500">Visibility:</dt>
@@ -241,14 +257,14 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
           </div>
         </dl>
       </div>
-      
+
       <div>
         <h4 className="text-sm font-medium text-gray-900 mb-2">Branding</h4>
         <dl className="space-y-2">
           <div className="flex justify-between">
             <dt className="text-sm text-gray-500">Primary Color:</dt>
             <dd className="flex items-center space-x-2">
-              <div 
+              <div
                 className="w-4 h-4 rounded border border-gray-300"
                 style={{ backgroundColor: event.branding?.primaryColor }}
               />
@@ -294,6 +310,61 @@ const AnalyticsTab: React.FC<{ event: Event }> = ({ event }) => (
     <p className="text-sm text-gray-500 mt-2">Event: {event.name}</p>
   </div>
 );
+
+const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
+  const { orgSlug } = useParams<{ orgSlug?: string }>();
+  const { user, isLoading } = useAuth();
+
+  const checkInPath = orgSlug
+    ? `/${orgSlug}/eventmanagement/${event.id}/check-in`
+    : `/dashboard/eventmanagement/${event.id}/check-in`;
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <p className="text-sm text-gray-600">Loading attendance data...</p>
+      </div>
+    );
+  }
+
+  const hasAccess =
+    user &&
+    (user.role === UserRole.SUPER_ADMIN ||
+      user.role === UserRole.ORGANIZER ||
+      user.role === UserRole.VOLUNTEER);
+
+  if (!hasAccess) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Restricted Access</h3>
+        <p className="text-sm text-gray-600">
+          Attendance analytics are only available to organizers and volunteers for this event.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-medium text-gray-900">Attendance</h3>
+          <p className="text-sm text-gray-600">
+            Live check-in data for participants attending this event.
+          </p>
+        </div>
+        <Link
+          to={checkInPath}
+          className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          Open check-in console
+        </Link>
+      </div>
+
+      <AttendanceList eventId={event.id} />
+    </div>
+  );
+};
 
 const SettingsTab: React.FC<{ event: Event }> = ({ event }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-6">

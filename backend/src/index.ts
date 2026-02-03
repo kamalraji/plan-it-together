@@ -17,12 +17,12 @@ import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
 import serviceAgreementRoutes from './routes/service-agreement.routes';
 import reviewRoutes from './routes/review.routes';
-import eventMarketplaceIntegrationRoutes from './routes/event-marketplace-integration.routes';
 import workspaceLifecycleRoutes from './routes/workspace-lifecycle.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import teamRoutes from './routes/team.routes';
 import taskRoutes from './routes/task.routes';
 import workspaceCommunicationRoutes from './routes/workspace-communication.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 
@@ -172,6 +172,8 @@ app.use('/api/task', taskRoutes);
 // Workspace Communication routes
 app.use('/api/workspace-communication', workspaceCommunicationRoutes);
 
+// Admin management routes
+app.use('/api/admin', adminRoutes);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

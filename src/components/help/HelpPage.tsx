@@ -225,7 +225,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ currentContext }) => {
               <h3 className="font-medium text-gray-900 mb-3">Quick Links</h3>
               <div className="space-y-2">
                 <a
-                  href="/dashboard/events/create"
+                  href="/dashboard/eventmanagement/create"
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />

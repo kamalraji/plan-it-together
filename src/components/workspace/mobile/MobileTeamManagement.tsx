@@ -14,6 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Workspace, TeamMember, WorkspaceRole } from '../../../types';
 import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MobileTeamManagementProps {
   workspace: Workspace;
@@ -41,6 +42,15 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   const removeTeamMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
       await api.delete(`/workspaces/${workspace.id}/team-members/${memberId}`);
+
+      // Log workspace activity for mobile member removals
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspace.id,
+        type: 'team',
+        title: 'Team member removed (mobile)',
+        description: 'A team member was removed from the workspace via mobile.',
+        metadata: { memberId, source: 'mobile', action: 'remove_member' },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });

@@ -7,12 +7,13 @@ function App() {
   return (
     <ErrorBoundary>
       <React.Fragment>
-        <div className="App">
+        <div className="App" data-app-root>
           <AppRouter />
         </div>
       </React.Fragment>
     </ErrorBoundary>
   );
 }
+
 
 export default App;

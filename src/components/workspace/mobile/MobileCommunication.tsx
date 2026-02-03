@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { WorkspaceChannel, MessageResponse, TeamMember } from '../../../types';
 import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MobileCommunicationProps {
   workspaceId: string;
@@ -64,6 +65,15 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   const sendMessageMutation = useMutation({
     mutationFn: async ({ channelId, content }: { channelId: string; content: string }) => {
       await api.post(`/channels/${channelId}/messages`, { content });
+
+      // Log workspace activity for mobile text messages (non-blocking for UX)
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'communication',
+        title: 'Mobile channel message',
+        description: content.slice(0, 140) || 'A new message was posted from mobile.',
+        metadata: { channelId, source: 'mobile', kind: 'text' },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel?.id] });
@@ -161,6 +171,15 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         },
       });
 
+      // Log workspace activity for mobile voice messages
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'communication',
+        title: 'Mobile voice message',
+        description: 'A voice message was sent from mobile.',
+        metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'voice' },
+      });
+
       queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
     } catch (error) {
       console.error('Failed to send voice message:', error);
@@ -180,6 +199,15 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+      });
+
+      // Log workspace activity for mobile photo uploads
+      await supabase.from('workspace_activities').insert({
+        workspace_id: workspaceId,
+        type: 'communication',
+        title: 'Mobile photo shared',
+        description: 'A photo was shared from mobile.',
+        metadata: { channelId: selectedChannel.id, source: 'mobile', kind: 'photo' },
       });
 
       queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });

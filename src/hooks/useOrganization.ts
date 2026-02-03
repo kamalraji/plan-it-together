@@ -15,6 +15,7 @@ const orgKeys = {
   analytics: (id: string) => [...orgKeys.detail(id), 'analytics'] as const,
   followed: (userId: string) => [...orgKeys.all, 'followed', userId] as const,
   isFollowing: (orgId: string, userId: string) => [...orgKeys.detail(orgId), 'following', userId] as const,
+  myOrganizations: ['organizations', 'mine'] as const,
 };
 
 /**
@@ -25,7 +26,23 @@ export function useCreateOrganization() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (data: CreateOrganizationDTO) => organizationService.createOrganization(data),
+    mutationFn: async (data: CreateOrganizationDTO) => {
+      const { supabase } = await import('@/integrations/supabase/looseClient');
+      const { data: result, error } = await supabase.functions.invoke('create-organization', {
+        body: data,
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to create organization');
+      }
+
+      const organization = (result as any)?.organization;
+      if (!organization) {
+        throw new Error('Organization was not returned from backend');
+      }
+
+      return organization as { id: string; slug: string };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orgKeys.lists() });
       toast({
@@ -265,5 +282,15 @@ export function useOrganizationAnalytics(organizationId: string) {
     queryKey: orgKeys.analytics(organizationId),
     queryFn: () => organizationService.getOrganizationAnalytics(organizationId),
     enabled: !!organizationId,
+  });
+}
+
+/**
+ * Hook to fetch organizations where the current user is an admin
+ */
+export function useMyOrganizations() {
+  return useQuery({
+    queryKey: orgKeys.myOrganizations,
+    queryFn: () => organizationService.getMyOrganizations(),
   });
 }

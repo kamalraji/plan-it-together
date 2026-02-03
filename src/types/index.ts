@@ -231,9 +231,21 @@ export interface WaitlistEntry {
 }
 
 export interface QRCodeData {
-  code: string;
-  imageUrl: string;
-  registrationId: string;
+  qrCode: string;
+  userId: string;
+  eventId: string;
+  profile?: {
+    fullName?: string | null;
+    organization?: string | null;
+  };
+  registration?: {
+    id: string;
+    status: RegistrationStatus;
+  } | null;
+  latestAttendance?: {
+    hasCheckedIn: boolean;
+    checkInTime?: string;
+  };
 }
 
 export interface AttendanceRecord {
@@ -258,7 +270,9 @@ export interface AttendanceReport {
     status: string;
     attended: boolean;
     checkInTime: string | null;
-    checkInMethod: string | null;
+    checkInMethod: 'QR_SCAN' | 'MANUAL' | null;
+    sessionId?: string | null;
+    volunteerId?: string | null;
   }>;
 }
 

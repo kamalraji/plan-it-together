@@ -63,7 +63,7 @@ const mockSearchAPI = async (
       title: 'Annual Tech Conference 2024',
       description: 'Large-scale technology conference with 500+ attendees, featuring keynotes from industry leaders',
       type: 'event',
-      url: '/dashboard/events/1',
+      url: '/dashboard/eventmanagement/1',
       icon: '📅',
       metadata: { 
         status: 'active', 

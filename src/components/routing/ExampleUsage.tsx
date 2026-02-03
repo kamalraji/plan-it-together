@@ -239,7 +239,7 @@ export const ExampleResourceListPage: React.FC = () => {
 // Example 3: Resource Detail Page
 export const ExampleResourceDetailPage: React.FC = () => {
   const breadcrumbs = [
-    { label: 'Events', href: '/dashboard/events' },
+    { label: 'Events', href: '/dashboard/eventmanagement' },
     { label: 'Tech Conference 2024', current: true },
   ];
 
@@ -312,7 +312,7 @@ export const ExamplePageHeader: React.FC = () => {
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Events', href: '/dashboard/events' },
+    { label: 'Events', href: '/dashboard/eventmanagement' },
     { label: 'Analytics', current: true },
   ];
 

@@ -11,19 +11,26 @@ const prisma = new PrismaClient();
 
 export class AttendanceService {
   /**
-   * Generate QR code image for a registration
+   * Generate QR code image for a registration, using the user's persistent QR code
    */
   async generateQRCode(registrationId: string): Promise<QRCodeData> {
     const registration = await prisma.registration.findUnique({
       where: { id: registrationId },
+      include: {
+        user: true,
+      },
     });
 
     if (!registration) {
       throw new Error('Registration not found');
     }
 
-    // Generate QR code as data URL
-    const qrCodeDataUrl = await QRCode.toDataURL(registration.qrCode, {
+    if (!registration.user.qrCode) {
+      throw new Error('User QR code not configured');
+    }
+
+    // Generate QR code as data URL from the user's QR code so it can be reused across events
+    const qrCodeDataUrl = await QRCode.toDataURL(registration.user.qrCode, {
       errorCorrectionLevel: 'H',
       type: 'image/png',
       width: 300,
@@ -31,23 +38,24 @@ export class AttendanceService {
     });
 
     return {
-      code: registration.qrCode,
+      code: registration.user.qrCode,
       imageUrl: qrCodeDataUrl,
       registrationId: registration.id,
+      userId: registration.user.id,
     };
   }
 
-  /**
-   * Check in a participant using QR code
+/**
+   * Check in a participant using user-specific QR code
    */
   async checkIn(checkInData: CheckInDTO): Promise<AttendanceRecord> {
-    const { qrCode, sessionId, volunteerId } = checkInData;
+    const { qrCode, sessionId, volunteerId, eventId } = checkInData;
 
-    // Validate QR code and get registration
-    const registration = await this.validateQRCode(qrCode);
+    // Validate QR code and get registration for this event
+    const registration = await this.validateQRCode(qrCode, eventId);
 
     if (!registration) {
-      throw new Error('Invalid QR code');
+      throw new Error('Invalid QR code for this event');
     }
 
     // Check if already checked in for this session
@@ -76,11 +84,16 @@ export class AttendanceService {
   }
 
   /**
-   * Validate a QR code
+   * Validate a user QR code for a specific event by finding the matching registration
    */
-  async validateQRCode(qrCode: string): Promise<any> {
-    const registration = await prisma.registration.findUnique({
-      where: { qrCode },
+  async validateQRCode(qrCode: string, eventId: string): Promise<any> {
+    const registration = await prisma.registration.findFirst({
+      where: {
+        eventId,
+        user: {
+          qrCode,
+        },
+      },
       include: {
         event: true,
         user: true,

@@ -1,5 +1,6 @@
 import { UserRole, UserStatus } from '@prisma/client';
 import prisma from '../config/database';
+import { syncUserAppRole } from './app-role-sync.service';
 
 export interface ProfileData {
   name?: string;
@@ -41,12 +42,15 @@ class OnboardingService {
     }
 
     // Update user status to ACTIVE
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         status: UserStatus.ACTIVE,
       },
     });
+
+    // Sync high-level app role into the Lovable Cloud user_roles table
+    await syncUserAppRole(updatedUser.id, updatedUser.role);
   }
 
   /**

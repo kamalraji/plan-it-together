@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import api from '../../lib/api';
-import { CheckInData, AttendanceRecord } from '../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AttendanceRecord } from '../../types';
 
 interface QRCodeScannerProps {
   eventId: string;
@@ -15,14 +15,17 @@ interface ScanResult {
   data?: AttendanceRecord;
   error?: string;
   participantInfo?: {
+    userId: string;
     name: string;
-    email: string;
+    email?: string;
+    organization?: string | null;
     registrationId: string;
+    qrCode: string;
   };
 }
 
 export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
-  eventId: _eventId,
+  eventId,
   sessionId,
   onScanSuccess,
   onScanError,
@@ -33,31 +36,40 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const [scanMode, setScanMode] = useState<'camera' | 'manual'>('camera');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const queryClient = useQueryClient();
 
-  // Validate QR code mutation
-  const validateQRMutation = useMutation({
+  const checkInMutation = useMutation<any, Error, string>({
     mutationFn: async (qrCode: string) => {
-      const response = await api.post('/attendance/validate-qr', { qrCode });
-      return response.data.data;
+      const { data, error } = await supabase.functions.invoke('attendance-checkin', {
+        body: { qrCode, eventId, sessionId },
+      });
+      if (error || !data?.success) {
+        throw error || new Error(data?.error || 'Check-in failed');
+      }
+      return data.data as any;
     },
-  });
+    onSuccess: (result: any, qrCodeUsed: string) => {
+      const attendance: AttendanceRecord = {
+        id: result.attendanceRecord.id,
+        registrationId: result.attendanceRecord.registration_id,
+        sessionId: result.attendanceRecord.session_id,
+        checkInTime: result.attendanceRecord.check_in_time,
+        checkInMethod: result.attendanceRecord.check_in_method,
+        volunteerId: result.attendanceRecord.volunteer_id,
+      };
 
-  // Check-in mutation
-  const checkInMutation = useMutation({
-    mutationFn: async (data: CheckInData) => {
-      const response = await api.post('/attendance/check-in', {
-        qrCode: data.qrCode,
-        sessionId: data.sessionId,
-      });
-      return response.data.data;
-    },
-    onSuccess: (result: AttendanceRecord) => {
-      setLastScanResult({
+      setLastScanResult(() => ({
         success: true,
-        data: result,
-      });
+        data: attendance,
+        participantInfo: {
+          qrCode: qrCodeUsed,
+          ...(result.participantInfo || {}),
+        },
+      }));
+      // Keep attendance lists fresh for organizers
+      queryClient.invalidateQueries({ queryKey: ['attendance-report', eventId, sessionId] });
       if (onScanSuccess) {
-        onScanSuccess(result);
+        onScanSuccess(attendance);
       }
     },
     onError: (error: any) => {
@@ -104,22 +116,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     if (!manualCode.trim()) return;
 
     try {
-      // First validate the QR code
-      const validation = await validateQRMutation.mutateAsync(manualCode.trim());
-      
-      if (validation.valid) {
-        // If valid, proceed with check-in
-        await checkInMutation.mutateAsync({
-          qrCode: manualCode.trim(),
-          sessionId,
-        });
-        setManualCode('');
-      } else {
-        setLastScanResult({
-          success: false,
-          error: 'Invalid QR code',
-        });
-      }
+      await checkInMutation.mutateAsync(manualCode.trim());
+      setManualCode('');
     } catch (error: any) {
       const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
       setLastScanResult({
@@ -130,13 +128,18 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   };
 
   // Simulate QR code detection (in a real app, you'd use a QR code library like qr-scanner)
-  const handleCameraCapture = () => {
-    // This is a placeholder for actual QR code scanning
-    // In a real implementation, you would use a library like qr-scanner or zxing-js
+  const handleCameraCapture = async () => {
     const mockQRCode = prompt('Enter QR code (for demo purposes):');
-    if (mockQRCode) {
-      handleManualScan();
-      setManualCode(mockQRCode);
+    if (!mockQRCode) return;
+
+    try {
+      await checkInMutation.mutateAsync(mockQRCode.trim());
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
+      setLastScanResult({
+        success: false,
+        error: errorMessage,
+      });
     }
   };
 
@@ -144,11 +147,104 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     if (scanMode === 'camera') {
       startCamera();
     }
-    
+
     return () => {
       stopCamera();
     };
   }, [scanMode]);
+
+  const handlePrintBadge = async () => {
+    if (!lastScanResult?.success || !lastScanResult.participantInfo) return;
+
+    const { userId, name, email, organization, registrationId, qrCode } = lastScanResult.participantInfo;
+
+    let roleLabel = 'Participant';
+    let trackLabel: string | undefined;
+
+    try {
+      if (userId) {
+        const { data: rolesData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+
+        if (rolesData && rolesData.length > 0) {
+          roleLabel = rolesData.map((r: any) => r.role).join(', ');
+        }
+      }
+
+      if (registrationId) {
+        const { data: registrationData } = await supabase
+          .from('registrations')
+          .select('form_responses')
+          .eq('id', registrationId)
+          .maybeSingle();
+
+        const formResponses = (registrationData as any)?.form_responses || {};
+        trackLabel =
+          formResponses.track ||
+          formResponses.Track ||
+          formResponses.track_name ||
+          formResponses.TrackName ||
+          undefined;
+      }
+    } catch (error) {
+      console.error('Error loading badge metadata:', error);
+    }
+
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
+      qrCode,
+    )}&size=256x256`;
+
+    const printWindow = window.open('', '_blank', 'width=600,height=400');
+    if (!printWindow) return;
+
+    const doc = printWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charSet="utf-8" />
+    <title>Event Badge</title>
+    <style>
+      body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .badge-wrapper { width: 320px; height: 200px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: row; border: 2px solid #111827; border-radius: 12px; margin: 24px auto; }
+      .badge-main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; margin-right: 12px; }
+      .badge-name { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+      .badge-email { font-size: 11px; color: #4B5563; margin-bottom: 4px; }
+      .badge-org { font-size: 12px; color: #1F2933; margin-bottom: 8px; }
+      .badge-label-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+      .badge-label { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; border: 1px solid #D1D5DB; color: #111827; }
+      .badge-label-role { background-color: #EEF2FF; border-color: #C7D2FE; color: #3730A3; }
+      .badge-label-track { background-color: #ECFEFF; border-color: #A5F3FC; color: #0369A1; }
+      .badge-footer { font-size: 10px; color: #6B7280; }
+      .badge-qr { width: 96px; height: 96px; border-radius: 8px; border: 1px solid #E5E7EB; padding: 4px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+      .badge-qr img { max-width: 100%; max-height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div class="badge-wrapper">
+      <div class="badge-main">
+        <div>
+          <div class="badge-name">${name || ''}</div>
+          ${email ? `<div class="badge-email">${email}</div>` : ''}
+          ${organization ? `<div class="badge-org">${organization}</div>` : ''}
+          <div class="badge-label-row">
+            <div class="badge-label badge-label-role">${roleLabel}</div>
+            ${trackLabel ? `<div class="badge-label badge-label-track">${trackLabel}</div>` : ''}
+          </div>
+        </div>
+        <div class="badge-footer">QR: ${qrCode}</div>
+      </div>
+      <div class="badge-qr">
+        <img src="${qrImageUrl}" alt="QR Code" />
+      </div>
+    </div>
+    <script>window.print();</script>
+  </body>
+</html>`);
+    doc.close();
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -294,9 +390,21 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 }
               </p>
               {lastScanResult.participantInfo && (
-                <div className="mt-2 text-sm text-green-700">
+                <div className="mt-2 text-sm text-green-700 space-y-1">
                   <p><strong>Name:</strong> {lastScanResult.participantInfo.name}</p>
-                  <p><strong>Email:</strong> {lastScanResult.participantInfo.email}</p>
+                  {lastScanResult.participantInfo.email && (
+                    <p><strong>Email:</strong> {lastScanResult.participantInfo.email}</p>
+                  )}
+                  {lastScanResult.participantInfo.organization && (
+                    <p><strong>Organization:</strong> {lastScanResult.participantInfo.organization}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handlePrintBadge}
+                    className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+                  >
+                    Print Badge
+                  </button>
                 </div>
               )}
             </div>
@@ -305,14 +413,14 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       )}
 
       {/* Loading States */}
-      {(validateQRMutation.isPending || checkInMutation.isPending) && (
+      {checkInMutation.isPending && (
         <div className="mb-6 flex items-center justify-center p-4 bg-blue-50 rounded-lg">
           <svg className="animate-spin h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
           <span className="text-blue-800">
-            {validateQRMutation.isPending ? 'Validating QR code...' : 'Processing check-in...'}
+            Processing check-in...
           </span>
         </div>
       )}

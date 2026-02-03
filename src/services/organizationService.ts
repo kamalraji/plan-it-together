@@ -1,7 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/looseClient';
 
-// Use loose typing here to keep the service compatible while
-// the Supabase schema and frontend models are being aligned.
 type Organization = any;
 type OrganizationAdmin = any;
 type Follow = any;
@@ -102,6 +100,26 @@ class OrganizationService {
 
     if (error) throw new Error(error.message);
     return organization;
+  }
+
+  /**
+   * Get organizations where the current user is the owner
+   */
+  async getMyOrganizations(): Promise<Organization[]> {
+    const { data: session } = await supabase.auth.getSession();
+    const user = session?.session?.user;
+
+    if (!user) {
+      throw new Error('Not authenticated');
+    }
+
+    const { data, error } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('owner_id', user.id);
+
+    if (error) throw new Error(error.message);
+    return data || [];
   }
 
   /**
@@ -320,7 +338,7 @@ class OrganizationService {
       .select('id')
       .eq('organization_id', organizationId);
 
-    const eventIds = (events || []).map(e => e.id);
+    const eventIds = (events || []).map((e: any) => e.id);
     
     let totalRegistrations = 0;
     if (eventIds.length > 0) {

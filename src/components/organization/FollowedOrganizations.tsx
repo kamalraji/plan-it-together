@@ -172,11 +172,19 @@ function FollowedOrganizationCard({
         )}
       </div>
 
-      {/* Placeholder Events Section */}
+      {/* Events Section */}
       <div className="p-6">
         <div className="text-center py-4 text-gray-500 flex flex-col items-center gap-2">
           <CalendarIcon className="h-6 w-6 text-gray-400" />
-          <p className="text-sm">Event feed from this organization will appear here.</p>
+          <p className="text-sm">
+            Event updates from this organization are available on their public page.
+          </p>
+          <Link
+            to={`/organizations/${organization.id}`}
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+          >
+            View upcoming events
+          </Link>
         </div>
       </div>
     </div>

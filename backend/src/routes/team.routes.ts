@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import { teamService } from '../services/team.service';
 import { authenticate } from '../middleware/auth.middleware';
 import { WorkspaceRole } from '@prisma/client';
@@ -7,6 +8,75 @@ const router = Router();
 
 // Apply authentication middleware to all routes
 router.use(authenticate);
+
+const userLookupSchema = z.object({
+  email: z.string().email('Invalid email format'),
+});
+
+/**
+ * GET /api/team/lookup-user
+ * Look up an existing user by email for invitation flows
+ */
+router.get('/lookup-user', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'User authentication required',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    const parseResult = userLookupSchema.safeParse({ email: req.query.email });
+
+    if (!parseResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_EMAIL',
+          message: 'A valid email address is required',
+          details: parseResult.error.errors,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    const user = await teamService.findUserByEmail(parseResult.data.email);
+
+    return res.json({
+      success: true,
+      data: user
+        ? {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            status: user.status,
+            createdAt: user.createdAt,
+          }
+        : null,
+      meta: {
+        exists: !!user,
+      },
+    });
+  } catch (error) {
+    console.error('Error looking up user by email:', error);
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'USER_LOOKUP_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to look up user by email',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+});
 
 /**
  * POST /api/team/:workspaceId/invite

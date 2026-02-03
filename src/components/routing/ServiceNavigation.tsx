@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ChevronRightIcon,
   XMarkIcon,
@@ -46,7 +46,7 @@ interface NavigationPreferences {
 }
 
 // Service navigation configuration with role-based access
-const serviceCategories: ServiceCategory[] = [
+const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
   {
     id: 'core',
     label: 'Core Services',
@@ -70,7 +70,7 @@ const serviceCategories: ServiceCategory[] = [
       {
         id: 'events',
         label: 'Events',
-        path: '/dashboard/events',
+        path: orgSlug ? `/${orgSlug}/eventmanagement` : '/dashboard/eventmanagement',
         icon: '📅',
         description: 'Create and manage events',
         roles: [UserRole.ORGANIZER, UserRole.SUPER_ADMIN],
@@ -93,7 +93,7 @@ const serviceCategories: ServiceCategory[] = [
       {
         id: 'workspaces',
         label: 'Workspaces',
-        path: '/dashboard/workspaces',
+        path: orgSlug ? `/${orgSlug}/workspaces` : '/dashboard/workspaces',
         icon: '💼',
         description: 'Team collaboration',
         roles: [UserRole.ORGANIZER, UserRole.VOLUNTEER, UserRole.SUPER_ADMIN],
@@ -123,7 +123,7 @@ const serviceCategories: ServiceCategory[] = [
       {
         id: 'analytics',
         label: 'Analytics',
-        path: '/dashboard/analytics',
+        path: orgSlug ? `/${orgSlug}/analytics` : '/dashboard/analytics',
         icon: '📊',
         description: 'Performance metrics',
         roles: [UserRole.ORGANIZER, UserRole.SUPER_ADMIN],
@@ -183,6 +183,29 @@ const serviceCategories: ServiceCategory[] = [
       },
     ],
   },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: '🛡️',
+    items: [
+      {
+        id: 'admin-users',
+        label: 'User Roles',
+        path: '/dashboard/admin/users',
+        icon: '👥',
+        description: 'Manage high-level app roles',
+        roles: [UserRole.SUPER_ADMIN],
+      },
+      {
+        id: 'admin-organizers',
+        label: 'Pending Organizers',
+        path: '/dashboard/admin/organizers',
+        icon: '📋',
+        description: 'Approve or reject organizer signups',
+        roles: [UserRole.SUPER_ADMIN],
+      },
+    ],
+  },
 ];
 
 export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
@@ -194,6 +217,9 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { orgSlug } = useParams<{ orgSlug?: string }>();
+  
+  const serviceCategories = getServiceCategories(orgSlug);
   
   // State for navigation preferences and search
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['core', 'management']);

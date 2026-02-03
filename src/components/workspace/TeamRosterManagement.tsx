@@ -310,26 +310,37 @@ export function TeamRosterManagement({
                   {/* Role */}
                   <div className="col-span-2">
                     {editingRole === member.id ? (
-                      <select
-                        value={member.role}
-                        onChange={(e) => handleRoleUpdate(member.id, e.target.value as WorkspaceRole)}
-                        onBlur={() => setEditingRole(null)}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                        autoFocus
-                      >
-                        {roleOptions.slice(1).map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                      <div>
+                        <label className="sr-only" htmlFor={`member-role-${member.id}`}>
+                          Role for {member.user.name}
+                        </label>
+                        <select
+                          id={`member-role-${member.id}`}
+                          value={member.role}
+                          onChange={(e) => handleRoleUpdate(member.id, e.target.value as WorkspaceRole)}
+                          onBlur={() => setEditingRole(null)}
+                          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          autoFocus
+                        >
+                          {roleOptions.slice(1).map(option => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Permissions: {getPermissionPreview(member.role).join(', ')}
+                        </p>
+                      </div>
                     ) : (
                       <div className="flex items-center space-x-2">
                         {getRoleBadge(member.role)}
                         {canEditMember(member) && (
                           <button
+                            type="button"
                             onClick={() => setEditingRole(member.id)}
                             className="p-1 text-gray-400 hover:text-gray-600"
+                            aria-label={`Edit role for ${member.user.name}`}
                           >
                             <PencilIcon className="w-3 h-3" />
                           </button>

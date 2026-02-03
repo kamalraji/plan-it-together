@@ -19,6 +19,7 @@ router.post(
     try {
       const checkInData: CheckInDTO = {
         qrCode: req.body.qrCode,
+        eventId: req.body.eventId,
         sessionId: req.body.sessionId,
         volunteerId: req.user?.userId,
       };
@@ -214,9 +215,9 @@ router.post(
   requirePermission(Permission.CHECK_IN_PARTICIPANTS),
   async (req: Request, res: Response) => {
     try {
-      const { qrCode } = req.body;
+      const { qrCode, eventId } = req.body;
 
-      const registration = await attendanceService.validateQRCode(qrCode);
+      const registration = await attendanceService.validateQRCode(qrCode, eventId);
 
       if (!registration) {
         return res.status(404).json({

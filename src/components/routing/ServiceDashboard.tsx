@@ -104,18 +104,18 @@ export const ServiceDashboard: React.FC<ServiceDashboardProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <PageHeader
           title={`${service} Dashboard`}
           subtitle={`Welcome to your ${service.toLowerCase()} dashboard`}
         />
         <div className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              <div key={i} className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-6 bg-muted rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -124,38 +124,44 @@ export const ServiceDashboard: React.FC<ServiceDashboardProps> = ({
       </div>
     );
   }
-
+ 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <PageHeader
         title={`${service} Dashboard`}
         subtitle={`Welcome to your ${service.toLowerCase()} dashboard`}
         actions={pageActions}
       />
-
+ 
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Quick Actions */}
         {quickActions.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-medium text-foreground mb-3 sm:mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {quickActions.map((action, index) => (
                 <button
                   key={index}
                   onClick={action.action}
-                  className={`p-4 rounded-lg border-2 border-dashed text-left hover:border-solid transition-all ${
+                  className={`p-4 sm:p-5 rounded-lg border-2 border-dashed text-left hover:border-solid transition-all ${
                     action.variant === 'primary'
-                      ? 'border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50'
-                      : 'border-gray-300 hover:border-gray-500 hover:bg-gray-50'
+                      ? 'border-primary/40 hover:border-primary hover:bg-primary/5'
+                      : 'border-border hover:border-foreground/40 hover:bg-muted'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <action.icon className={`h-6 w-6 ${
-                      action.variant === 'primary' ? 'text-indigo-600' : 'text-gray-600'
-                    }`} />
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <action.icon
+                      className={`h-5 w-5 sm:h-6 sm:w-6 ${
+                        action.variant === 'primary'
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
+                      }`}
+                    />
                     <div>
-                      <div className="font-medium text-gray-900">{action.label}</div>
-                      <div className="text-sm text-gray-500">{action.description}</div>
+                      <div className="text-sm font-medium text-foreground">{action.label}</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">
+                        {action.description}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -163,32 +169,32 @@ export const ServiceDashboard: React.FC<ServiceDashboardProps> = ({
             </div>
           </div>
         )}
-
+ 
         {/* Dashboard Widgets */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-fr">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 auto-rows-fr">
           {widgets.map((widget) => (
             <div
               key={widget.id}
-              className={`bg-white rounded-lg shadow ${getWidgetSizeClasses(widget.size)}`}
+              className={`bg-card rounded-lg border border-border ${getWidgetSizeClasses(widget.size)}`}
             >
               <DashboardWidget widget={widget} />
             </div>
           ))}
         </div>
-
+ 
         {/* Empty State */}
         {widgets.length === 0 && (
-          <div className="text-center py-12">
-            <ChartBarIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No widgets configured</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="text-center py-10 sm:py-12">
+            <ChartBarIcon className="mx-auto h-10 w-10 text-muted-foreground" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">No widgets configured</h3>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               Get started by adding some widgets to your dashboard.
             </p>
             {onCustomizeLayout && (
-              <div className="mt-6">
+              <div className="mt-5 sm:mt-6">
                 <button
                   onClick={onCustomizeLayout}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 >
                   <PlusIcon className="h-4 w-4 mr-2" />
                   Add Widget
@@ -201,28 +207,28 @@ export const ServiceDashboard: React.FC<ServiceDashboardProps> = ({
     </div>
   );
 };
-
+ 
 // Individual widget component
 const DashboardWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
   if (widget.loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+      <div className="p-4 sm:p-6">
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-3/4" />
+          <div className="h-6 bg-muted rounded w-1/2" />
         </div>
       </div>
     );
   }
-
+ 
   if (widget.error) {
     return (
-      <div className="p-6">
-        <div className="flex items-center space-x-2 text-red-600 mb-2">
+      <div className="p-4 sm:p-6">
+        <div className="flex items-center gap-2 text-destructive mb-2">
           <ExclamationTriangleIcon className="h-5 w-5" />
           <h3 className="font-medium">{widget.title}</h3>
         </div>
-        <p className="text-sm text-red-500">{widget.error}</p>
+        <p className="text-xs sm:text-sm text-destructive/80">{widget.error}</p>
       </div>
     );
   }

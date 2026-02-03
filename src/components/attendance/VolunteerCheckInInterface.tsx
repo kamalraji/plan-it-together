@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { QRCodeScanner } from './QRCodeScanner';
 import { AttendanceList } from './AttendanceList';
 import { Event, AttendanceRecord } from '../../types';
@@ -22,13 +22,51 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
   const [activeTab, setActiveTab] = useState<'scanner' | 'list'>('scanner');
   const [selectedSession, setSelectedSession] = useState<string>('');
   const [recentCheckIns, setRecentCheckIns] = useState<AttendanceRecord[]>([]);
+  const queryClient = useQueryClient();
 
-  // Fetch event details
-  const { data: event } = useQuery<Event>({
+  // Fetch event details from Supabase
+  const { data: event } = useQuery<Event | null>({
     queryKey: ['event', eventId],
     queryFn: async () => {
-      const response = await api.get(`/events/${eventId}`);
-      return response.data.data;
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', eventId)
+        .maybeSingle();
+
+      if (error || !data) {
+        throw error || new Error('Event not found');
+      }
+
+      // Map Supabase row (snake_case) to frontend Event shape (camelCase)
+      const mappedEvent: Event = {
+        id: data.id,
+        name: data.name,
+        description: data.description || '',
+        mode: data.mode as Event['mode'],
+        startDate: data.start_date,
+        endDate: data.end_date,
+        capacity: data.capacity ?? undefined,
+        registrationDeadline: undefined,
+        organizerId: data.organization_id || '',
+        organizationId: data.organization_id || undefined,
+        visibility: data.visibility as Event['visibility'],
+        inviteLink: undefined,
+        branding: { primaryColor: undefined, secondaryColor: undefined },
+        venue: undefined,
+        virtualLinks: undefined,
+        status: data.status as Event['status'],
+        landingPageUrl: '',
+        timeline: undefined,
+        agenda: undefined,
+        prizes: undefined,
+        sponsors: undefined,
+        organization: undefined,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      };
+
+      return mappedEvent;
     },
   });
 
@@ -44,12 +82,48 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
 
   const handleScanSuccess = (result: AttendanceRecord) => {
     // Add to recent check-ins
-    setRecentCheckIns(prev => [result, ...prev.slice(0, 4)]);
+    setRecentCheckIns((prev) => [result, ...prev.slice(0, 4)]);
   };
 
   const handleScanError = (error: string) => {
     console.error('Scan error:', error);
   };
+
+  // Realtime updates for recent check-ins and attendance list
+  useEffect(() => {
+    if (!eventId) return;
+
+    const channel = supabase
+      .channel(`attendance_events_${eventId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'attendance_records',
+          filter: `event_id=eq.${eventId}`,
+        },
+        (payload) => {
+          const newRecord = payload.new as any;
+          const attendance: AttendanceRecord = {
+            id: newRecord.id,
+            registrationId: newRecord.registration_id,
+            sessionId: newRecord.session_id,
+            checkInTime: newRecord.check_in_time,
+            checkInMethod: newRecord.check_in_method,
+            volunteerId: newRecord.volunteer_id,
+          };
+
+          setRecentCheckIns((prev) => [attendance, ...prev.slice(0, 4)]);
+          queryClient.invalidateQueries({ queryKey: ['attendance-report', eventId] });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [eventId, queryClient]);
 
   if (!event) {
     return (

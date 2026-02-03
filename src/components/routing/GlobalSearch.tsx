@@ -40,7 +40,7 @@ const mockSearchResults = (query: string): SearchResult[] => {
       title: 'Annual Conference 2024',
       description: 'Large-scale technology conference with 500+ attendees',
       type: 'event',
-      url: '/dashboard/events/1',
+      url: '/dashboard/eventmanagement/1',
       icon: '',
       metadata: { status: 'active', attendees: 523 }
     },
