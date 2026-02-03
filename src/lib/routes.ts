@@ -73,6 +73,16 @@ export const AUTH_ROUTES = {
 } as const;
 
 // =============================================================================
+// ADMIN ROUTES (require SUPER_ADMIN role)
+// =============================================================================
+
+export const ADMIN_ROUTES = {
+  GENERATE_BACKGROUNDS: '/admin/generate-backgrounds',
+  ROLES_DIAGRAM: '/admin/roles-diagram',
+  USER_ROLES: '/admin/user-roles',
+} as const;
+
+// =============================================================================
 // DASHBOARD ROUTES (authenticated participant/user dashboard)
 // =============================================================================
 
@@ -265,6 +275,7 @@ export const VALID_ROUTE_PREFIXES = [
 export default {
   PUBLIC: PUBLIC_ROUTES,
   AUTH: AUTH_ROUTES,
+  ADMIN: ADMIN_ROUTES,
   DASHBOARD: DASHBOARD_ROUTES,
   ORG: ORG_ROUTES,
   SERVICE: SERVICE_ROUTES,

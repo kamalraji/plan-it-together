@@ -214,7 +214,7 @@ export default function PaymentSuccess() {
               </Link>
             </Button>
             <Button className="flex-1" asChild>
-              <Link to="/my-registrations">
+              <Link to="/dashboard/participant-events">
                 <Ticket className="h-4 w-4 mr-2" />
                 My Tickets
               </Link>
