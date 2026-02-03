@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
 import { ThCard as AfCard } from '@/components/thittam1hub';
+import { AUTH_ROUTES, DASHBOARD_ROUTES, ORG_ROUTES } from '@/lib/routes';
 
 export function OrganizerSpecificDashboard() {
   const { user, logout } = useAuth();
@@ -75,13 +76,13 @@ export function OrganizerSpecificDashboard() {
 
             <div className="flex flex-wrap gap-2">
               <Link
-                to="/organizations/create"
+                to={AUTH_ROUTES.CREATE_ORGANIZATION}
                 className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-1.5 text-xs sm:text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Create organization
               </Link>
               <Link
-                to="/dashboard/organizations/join"
+                to={DASHBOARD_ROUTES.JOIN_ORGANIZATION}
                 className="inline-flex items-center justify-center rounded-full border border-border px-4 py-1.5 text-xs sm:text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Join existing organization
@@ -128,13 +129,13 @@ export function OrganizerSpecificDashboard() {
 
                   <div className="flex flex-col sm:flex-row gap-2 mt-1">
                     <Link
-                      to={`/${org.slug}/dashboard`}
+                      to={ORG_ROUTES.DASHBOARD(org.slug)}
                       className="flex-1 inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground text-xs sm:text-sm font-medium py-2 hover:bg-primary/90 transition-colors"
                     >
                       Open dashboard
                     </Link>
                     <Link
-                      to={`/${org.slug}/settings/dashboard`}
+                      to={ORG_ROUTES.SETTINGS(org.slug)}
                       className="flex-1 inline-flex items-center justify-center rounded-lg border border-border text-xs sm:text-sm font-medium py-2 text-foreground hover:bg-muted transition-colors"
                     >
                       Settings
