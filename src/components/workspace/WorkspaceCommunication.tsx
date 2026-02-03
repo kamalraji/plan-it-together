@@ -17,6 +17,7 @@ import { ParticipantChannelManager } from './communication/ParticipantChannelMan
 import { ScheduledMessageComposer } from './communication/ScheduledMessageComposer';
 import { MessageDeliveryAnalytics } from './communication/MessageDeliveryAnalytics';
 import { ChannelModerationTools } from './communication/ChannelModerationTools';
+import { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -39,7 +40,7 @@ export function WorkspaceCommunication({
   teamMembers,
   roleScope,
 }: WorkspaceCommunicationProps) {
-  const [activeTab, setActiveTab] = useState<'channels' | 'broadcast' | 'search' | 'participants' | 'scheduled' | 'analytics' | 'moderation'>('channels');
+  const [activeTab, setActiveTab] = useState<'channels' | 'broadcast' | 'search' | 'participants' | 'scheduled' | 'analytics' | 'moderation' | 'activity'>('channels');
   const [selectedChannel, setSelectedChannel] = useState<WorkspaceChannel | null>(null);
   const [showCreateChannel, setShowCreateChannel] = useState(false);
   const queryClient = useQueryClient();
@@ -261,10 +262,11 @@ export function WorkspaceCommunication({
           
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-            <TabsList className="mb-4">
+            <TabsList className="mb-4 flex-wrap">
               <TabsTrigger value="channels">Channels</TabsTrigger>
               <TabsTrigger value="broadcast" disabled={!canBroadcast}>Broadcast</TabsTrigger>
               <TabsTrigger value="search">Search</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
               {canBroadcast && (
                 <>
                   <TabsTrigger value="participants">Participants</TabsTrigger>
@@ -368,6 +370,29 @@ export function WorkspaceCommunication({
                   workspaceId={workspaceId}
                   channelId={selectedChannel?.id}
                 />
+              )}
+            </TabsContent>
+
+            <TabsContent value="activity">
+              {workspace && (
+                <WorkspaceCollaborationTimeline
+                  workspace={{
+                    id: workspace.id,
+                    name: workspace.name,
+                    eventId: workspace.event_id || '',
+                    workspaceType: (workspace.workspace_type as any) || 'ROOT',
+                    status: (workspace.status as any) || 'ACTIVE',
+                    teamMembers: [],
+                    channels: [],
+                    createdAt: workspace.created_at || new Date().toISOString(),
+                    updatedAt: workspace.updated_at || new Date().toISOString(),
+                  }}
+                />
+              )}
+              {!workspace && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Loading workspace activity...</p>
+                </div>
               )}
             </TabsContent>
           </Tabs>

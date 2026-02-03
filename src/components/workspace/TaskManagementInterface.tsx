@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority, TaskCategory } from '../../types';
+import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority, TaskCategory, Workspace } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
@@ -9,7 +9,8 @@ import { TaskFormModal } from './TaskFormModal';
 import { TaskFormData } from './TaskForm';
 import { TaskAISuggestionsPanel } from './TaskAISuggestionsPanel';
 import { TaskDependencyGraph } from './TaskDependencyGraph';
-import { LayoutList, Columns3, Plus, GitBranch, GanttChart } from 'lucide-react';
+import { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
+import { LayoutList, Columns3, Plus, GitBranch, GanttChart, History, PanelRightClose } from 'lucide-react';
 import { TaskGanttChart } from './gantt';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ interface TaskManagementInterfaceProps {
   onCreateTask?: () => void;
   isLoading?: boolean;
   initialTaskId?: string;
+  workspace?: Workspace;
 }
 
 type ViewMode = 'list' | 'kanban' | 'dependencies' | 'gantt';
@@ -57,11 +59,13 @@ export function TaskManagementInterface({
   onCreateTask,
   isLoading = false,
   initialTaskId,
+  workspace,
 }: TaskManagementInterfaceProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
+  const [showTimeline, setShowTimeline] = useState(false);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'ALL',
@@ -409,6 +413,20 @@ export function TaskManagementInterface({
             </button>
           </div>
 
+          {/* Timeline Toggle Button */}
+          {workspace && (
+            <Button
+              variant={showTimeline ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setShowTimeline(!showTimeline)}
+              className="hidden lg:flex"
+              title="Toggle activity timeline"
+            >
+              <History className="h-4 w-4 mr-1.5" />
+              Timeline
+            </Button>
+          )}
+
           {/* Create Task Button */}
           <Button onClick={handleCreateClick} size="sm" className="hidden sm:flex">
             <Plus className="h-4 w-4 mr-1.5" />
@@ -423,23 +441,43 @@ export function TaskManagementInterface({
       {/* Filters */}
       <TaskFilterBar filters={filters} onChange={handleFilterChange} teamMembers={teamMembers} />
 
-      {/* Task Views */}
-      {viewMode === 'list' && <TaskList {...commonProps} />}
-      {viewMode === 'kanban' && <TaskKanbanBoard {...commonProps} />}
-      {viewMode === 'dependencies' && (
-        <TaskDependencyGraph
-          tasks={filteredTasks}
-          selectedTaskId={selectedTask?.id}
-          onTaskClick={handleTaskClick}
-        />
-      )}
-      {viewMode === 'gantt' && workspaceId && (
-        <TaskGanttChart
-          tasks={filteredTasks}
-          workspaceId={workspaceId}
-          onTaskClick={handleTaskClick}
-        />
-      )}
+      {/* Task Views with optional Timeline Sidebar */}
+      <div className={cn("flex gap-4", showTimeline && workspace && "flex-col xl:flex-row")}>
+        <div className={cn("flex-1 min-w-0", showTimeline && workspace && "xl:flex-[3]")}>
+          {viewMode === 'list' && <TaskList {...commonProps} />}
+          {viewMode === 'kanban' && <TaskKanbanBoard {...commonProps} />}
+          {viewMode === 'dependencies' && (
+            <TaskDependencyGraph
+              tasks={filteredTasks}
+              selectedTaskId={selectedTask?.id}
+              onTaskClick={handleTaskClick}
+            />
+          )}
+          {viewMode === 'gantt' && workspaceId && (
+            <TaskGanttChart
+              tasks={filteredTasks}
+              workspaceId={workspaceId}
+              onTaskClick={handleTaskClick}
+            />
+          )}
+        </div>
+
+        {/* Collaboration Timeline Sidebar */}
+        {showTimeline && workspace && (
+          <div className="xl:flex-[1] xl:max-w-md relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -left-2 top-2 h-6 w-6 z-10 bg-background border shadow-sm hidden xl:flex"
+              onClick={() => setShowTimeline(false)}
+              title="Close timeline"
+            >
+              <PanelRightClose className="h-3 w-3" />
+            </Button>
+            <WorkspaceCollaborationTimeline workspace={workspace} />
+          </div>
+        )}
+      </div>
 
       {/* Task Detail Modal */}
       {selectedTask && (
