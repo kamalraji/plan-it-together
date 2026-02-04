@@ -1,5 +1,5 @@
 /**
- * Feature Flags System
+ * Production-Ready Feature Flags System
  * Enables gradual rollout of new features with user/group targeting
  */
 
@@ -26,7 +26,25 @@ type DefinedFlag = {
 
 // Define all feature flags here
 export const FEATURE_FLAGS = {
+  // ============================================
+  // Production Safety Flags
+  // ============================================
+  MAINTENANCE_MODE: {
+    key: 'maintenance_mode',
+    defaultValue: false,
+    description: 'Enable maintenance mode - shows maintenance page to all users',
+    rolloutPercentage: 0,
+  },
+  READ_ONLY_MODE: {
+    key: 'read_only_mode',
+    defaultValue: false,
+    description: 'Disable all write operations',
+    rolloutPercentage: 0,
+  },
+  
+  // ============================================
   // UI Features
+  // ============================================
   NEW_DASHBOARD_LAYOUT: {
     key: 'new_dashboard_layout',
     defaultValue: false,
@@ -39,8 +57,17 @@ export const FEATURE_FLAGS = {
     description: 'Enhanced dark mode with better contrast',
     rolloutPercentage: 100,
   },
+  NEW_EVENT_FORM: {
+    key: 'new_event_form',
+    defaultValue: false,
+    description: 'New streamlined event creation form',
+    rolloutPercentage: 0,
+    enabledForGroups: ['beta_testers', 'internal'],
+  },
   
+  // ============================================
   // Functionality Features
+  // ============================================
   AI_TASK_SUGGESTIONS: {
     key: 'ai_task_suggestions',
     defaultValue: false,
@@ -62,21 +89,52 @@ export const FEATURE_FLAGS = {
   ADVANCED_ANALYTICS: {
     key: 'advanced_analytics',
     defaultValue: false,
-    description: 'Advanced analytics dashboard',
+    description: 'Advanced analytics dashboard with detailed metrics',
     rolloutPercentage: 50,
-  },
-  
-  // Experimental
-  VOICE_COMMANDS: {
-    key: 'voice_commands',
-    defaultValue: false,
-    description: 'Voice command support for task management',
-    rolloutPercentage: 0,
   },
   BULK_IMPORT: {
     key: 'bulk_import',
     defaultValue: true,
     description: 'Bulk import from CSV/Excel',
+    rolloutPercentage: 100,
+  },
+  
+  // ============================================
+  // Experimental Features
+  // ============================================
+  VOICE_COMMANDS: {
+    key: 'voice_commands',
+    defaultValue: false,
+    description: 'Voice command support for task management',
+    rolloutPercentage: 0,
+    enabledForGroups: ['alpha_testers'],
+  },
+  AI_MATCHING: {
+    key: 'ai_matching',
+    defaultValue: false,
+    description: 'AI-powered attendee matching for networking',
+    rolloutPercentage: 0,
+  },
+  CANVAS_EDITOR: {
+    key: 'canvas_editor',
+    defaultValue: true,
+    description: 'Visual canvas editor for landing pages',
+    rolloutPercentage: 100,
+  },
+  
+  // ============================================
+  // Performance & Debugging
+  // ============================================
+  VERBOSE_LOGGING: {
+    key: 'verbose_logging',
+    defaultValue: false,
+    description: 'Enable verbose logging for debugging',
+    rolloutPercentage: 0,
+  },
+  PERFORMANCE_MONITORING: {
+    key: 'performance_monitoring',
+    defaultValue: true,
+    description: 'Enable performance monitoring',
     rolloutPercentage: 100,
   },
 } as const;
@@ -95,7 +153,7 @@ class FeatureFlagService {
     this.userId = userId;
     this.userGroups = groups;
     
-    // Load local overrides from localStorage (for development)
+    // Load local overrides from localStorage (for development/testing)
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('feature_flag_overrides');
       if (stored) {
@@ -109,6 +167,8 @@ class FeatureFlagService {
         }
       }
     }
+    
+    // Initialization complete
   }
 
   /**
@@ -144,6 +204,20 @@ class FeatureFlagService {
     }
     
     return Boolean(flag.defaultValue);
+  }
+
+  /**
+   * Check if maintenance mode is active
+   */
+  isMaintenanceMode(): boolean {
+    return this.isEnabled('MAINTENANCE_MODE');
+  }
+
+  /**
+   * Check if read-only mode is active
+   */
+  isReadOnlyMode(): boolean {
+    return this.isEnabled('READ_ONLY_MODE');
   }
 
   /**
@@ -197,6 +271,30 @@ class FeatureFlagService {
           enabled: this.isEnabled(key as FeatureFlagKey),
           description: flag.description,
         },
+      ])
+    );
+  }
+
+  /**
+   * Get flags by category
+   */
+  getFlagsByCategory(): Record<string, Array<{ key: string; enabled: boolean; description?: string }>> {
+    const categories: Record<string, string[]> = {
+      safety: ['MAINTENANCE_MODE', 'READ_ONLY_MODE'],
+      ui: ['NEW_DASHBOARD_LAYOUT', 'DARK_MODE_V2', 'NEW_EVENT_FORM'],
+      functionality: ['AI_TASK_SUGGESTIONS', 'OFFLINE_MODE', 'REALTIME_COLLABORATION', 'ADVANCED_ANALYTICS', 'BULK_IMPORT'],
+      experimental: ['VOICE_COMMANDS', 'AI_MATCHING', 'CANVAS_EDITOR'],
+      performance: ['VERBOSE_LOGGING', 'PERFORMANCE_MONITORING'],
+    };
+
+    return Object.fromEntries(
+      Object.entries(categories).map(([category, flags]) => [
+        category,
+        flags.map(key => ({
+          key,
+          enabled: this.isEnabled(key as FeatureFlagKey),
+          description: FEATURE_FLAGS[key as FeatureFlagKey]?.description,
+        })),
       ])
     );
   }
