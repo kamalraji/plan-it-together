@@ -227,3 +227,89 @@ code {
     --shadow-2xl: 0 28px 110px -32px hsl(221 83% 66% / 0.64);
   }
 }
+
+@layer components {
+  .af-grid-bg {
+    position: relative;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(circle at 0% 0%, hsl(var(--primary) / 0.18), transparent 55%),
+      radial-gradient(circle at 100% 0%, hsl(var(--accent) / 0.15), transparent 55%),
+      radial-gradient(circle at 15% 100%, hsl(var(--primary) / 0.22), transparent 55%),
+      linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background)) 40%, hsl(var(--card)) 100%);
+    background-attachment: fixed;
+  }
+
+  .af-grid-bg::before {
+    content: "";
+    position: fixed;
+    inset: auto 10% -25% 10%;
+    height: 320px;
+    background:
+      radial-gradient(circle at 20% 0%, hsl(var(--primary) / 0.35), transparent 60%),
+      radial-gradient(circle at 80% 0%, hsl(var(--accent) / 0.28), transparent 60%);
+    opacity: 0.75;
+    filter: blur(36px);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .af-hero-panel {
+    background: radial-gradient(circle at 0% 0%, hsl(var(--primary) / 0.35), transparent 55%),
+      radial-gradient(circle at 100% 0%, hsl(var(--accent) / 0.28), transparent 55%),
+      linear-gradient(to bottom right, hsl(var(--card) / 0.94), hsl(var(--card) / 0.9));
+    border-radius: 1.75rem;
+    box-shadow: 0 32px 120px hsl(var(--primary) / 0.45);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .af-hero-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.7), transparent 40%, hsl(var(--accent) / 0.6));
+    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .af-hero-orbit-row {
+    position: relative;
+  }
+
+  .hover-glow {
+    transition: transform 180ms ease-out, box-shadow 220ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out;
+    box-shadow: 0 0 0 1px hsl(var(--border));
+  }
+
+  .hover-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 45px -20px hsl(var(--accent) / 0.9);
+    border-color: hsl(var(--accent));
+    background-color: hsl(var(--card));
+  }
+
+  .af-floating {
+    animation: af-float 9s ease-in-out infinite;
+  }
+}
+
+@keyframes af-float {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0);
+  }
+  50% {
+    transform: translateY(-6px) translateZ(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .af-floating {
+    animation: none;
+  }
+}
+

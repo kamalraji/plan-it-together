@@ -71,6 +71,7 @@ export function ParticipantDashboard() {
     const stored = preferenceStorage.getString('organizer_summary_banner_dismissed');
     return stored !== '1';
   });
+  const [registrationsLoadTimedOut, setRegistrationsLoadTimedOut] = useState(false);
 
   const { isHealthy } = useApiHealth();
 
@@ -92,7 +93,11 @@ export function ParticipantDashboard() {
     void checkOrganizerSignup();
   }, [user]);
 
-  const { data: registrations, isLoading } = useQuery<Registration[]>({
+  const {
+    data: registrations,
+    isLoading: registrationsLoading,
+    error: registrationsError,
+  } = useQuery<Registration[]>({
     queryKey: ['participant-registrations'],
     queryFn: async () => {
       if (!user) {
@@ -100,7 +105,7 @@ export function ParticipantDashboard() {
       }
 
       // Fetch user registrations joined with events
-      const { data: rawRegistrations, error: registrationsError } = await supabase
+      const { data: rawRegistrations, error: registrationsErrorInner } = await supabase
         .from('registrations')
         .select(
           `id, status, created_at, updated_at,
@@ -108,8 +113,8 @@ export function ParticipantDashboard() {
         )
         .eq('user_id', user.id);
 
-      if (registrationsError) {
-        throw registrationsError;
+      if (registrationsErrorInner) {
+        throw registrationsErrorInner;
       }
 
       const registrationIds = (rawRegistrations ?? []).map((r: any) => r.id);
@@ -168,7 +173,22 @@ export function ParticipantDashboard() {
     refetchOnWindowFocus: false,
     enabled: isHealthy !== false,
   });
- 
+
+  useEffect(() => {
+    if (!registrationsLoading) {
+      setRegistrationsLoadTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setRegistrationsLoadTimedOut(true);
+    }, 15000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [registrationsLoading]);
+
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
@@ -206,7 +226,6 @@ export function ParticipantDashboard() {
   });
 
   const hasCompletedOrganizerOnboarding = !!organizerOnboardingStatus?.completed_at;
-
 
   const isProfileIncomplete = !user?.profileCompleted;
 
@@ -250,7 +269,9 @@ export function ParticipantDashboard() {
     currentPage * rowsPerPage,
   );
 
-  if (isLoading) {
+  const showRegistrationsSpinner = registrationsLoading && !registrationsError && !registrationsLoadTimedOut;
+
+  if (showRegistrationsSpinner) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />

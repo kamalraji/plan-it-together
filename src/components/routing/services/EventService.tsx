@@ -36,7 +36,6 @@ export const EventService: React.FC = () => {
 
       {/* Event List Page */}
       <Route path="list" element={<EventListPage />} />
-
       {/* Event Creation */}
       <Route path="create" element={<EventFormPage mode="create" />} />
 
@@ -107,7 +106,6 @@ export const EventService: React.FC = () => {
     </Routes>
   );
 };
-
 /**
  * Wrapper route that reads :eventId from params and delegates to RequireEventAccess.
  */

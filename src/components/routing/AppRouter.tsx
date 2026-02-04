@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
-import { AuthProvider } from '../../hooks/useAuth';
+import { AuthProvider, useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
@@ -34,6 +34,8 @@ import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashbo
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import AttendflowLanding from '@/pages/AttendflowLanding';
+import PricingPage from '@/pages/PricingPage';
+import AssetsGalleryPage from '@/pages/AssetsGalleryPage';
 
 
 // Create a query client instance with optimized settings for the console application
@@ -119,7 +121,10 @@ const ResetPasswordPage = () => {
   );
 };
 
-// Types for unified dashboard metrics
+const EventServiceLazy = lazy(() =>
+  import('./services/EventService').then((m) => ({ default: m.EventService })),
+);
+
 interface DashboardMetrics {
   activeEvents: number;
   draftEvents: number;
@@ -477,6 +482,16 @@ const ProfileService = () => {
   );
 };
 
+const RootLandingRoute: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <AttendflowLanding />;
+};
+
 const SupportService = () => {
   // Get current context from URL or other means
   const currentContext = window.location.pathname.includes('/events') ? 'events' :
@@ -501,8 +516,9 @@ export const AppRouter: React.FC = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Attendflow-style marketing landing at root */}
-            <Route path="/" element={<AttendflowLanding />} />
+             {/* Attendflow-style marketing landing at root */}
+             <Route path="/" element={<RootLandingRoute />} />
+             <Route path="/pricing" element={<PricingPage />} />
 
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
@@ -618,7 +634,9 @@ export const AppRouter: React.FC = () => {
                 path="eventmanagement/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <EventService />
+                    <Suspense fallback={<div className="p-6">Loading Event Management…</div>}>
+                      <EventServiceLazy />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
@@ -715,6 +733,14 @@ export const AppRouter: React.FC = () => {
                 element={
                   <ConsoleRoute>
                     <DashboardDataLab />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="assets"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <AssetsGalleryPage />
                   </ConsoleRoute>
                 }
               />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../../lib/api';
@@ -8,6 +8,7 @@ import { OrganizerOnboardingChecklist } from '../organization/OrganizerOnboardin
 import { supabase } from '@/integrations/supabase/client';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { useEventCreatePath } from '@/hooks/useEventCreatePath';
+import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
 
 interface Event {
@@ -35,6 +36,7 @@ export function OrganizerDashboard() {
     const [activeTab, setActiveTab] = useState<'events' | 'analytics'>('events');
     const [isChecklistOpen, setIsChecklistOpen] = useState(true);
     const [isAccessInfoOpen, setIsAccessInfoOpen] = useState(false);
+    const [metricsEnabled, setMetricsEnabled] = useState(false);
     const { isHealthy } = useApiHealth();
 
     // Check if profile completion is needed (Requirements 2.4, 2.5)
@@ -83,6 +85,11 @@ export function OrganizerDashboard() {
     });
 
     const eventCreatePath = useEventCreatePath();
+    const { listPath, eventDetailPath, eventEditPath } = useEventManagementPaths();
+
+    const eventAnalyticsOverviewPath = listPath.replace(/\/list$/, '/analytics');
+    const eventRegistrationsOverviewPath = listPath.replace(/\/list$/, '/registrations');
+    const eventManagementBasePath = listPath.replace(/\/list$/, '');
 
     const topWorkspaces = useMemo(() => {
         if (!workspaces) return [];
@@ -117,8 +124,18 @@ export function OrganizerDashboard() {
         },
     });
 
+    useEffect(() => {
+        if (!currentEvent) return;
+
+        const timer = window.setTimeout(() => {
+            setMetricsEnabled(true);
+        }, 500);
+
+        return () => window.clearTimeout(timer);
+    }, [currentEvent]);
+
     const { data: currentEventMetrics } = useQuery({
-        enabled: !!currentEvent,
+        enabled: !!currentEvent && metricsEnabled,
         queryKey: ['organizer-current-event-metrics', currentEvent?.id],
         queryFn: async () => {
             if (!currentEvent) return null;
@@ -220,6 +237,24 @@ export function OrganizerDashboard() {
 
                             <div className="flex flex-wrap items-center gap-2 justify-center xs:justify-end text-[11px] sm:text-xs text-muted-foreground">
                                 <span className="hidden sm:inline">Shortcuts:</span>
+                                <Link
+                                    to={listPath}
+                                    className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium"
+                                >
+                                    Manage events
+                                </Link>
+                                <Link
+                                    to={eventAnalyticsOverviewPath}
+                                    className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium"
+                                >
+                                    Event analytics
+                                </Link>
+                                <Link
+                                    to={eventRegistrationsOverviewPath}
+                                    className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium"
+                                >
+                                    Registrations
+                                </Link>
                                 <Link
                                     to={`/${organization.slug}/workspaces`}
                                     className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80 text-xs font-medium"
@@ -392,12 +427,41 @@ export function OrganizerDashboard() {
                                     {new Date(currentEvent.end_date).toLocaleDateString()}
                                 </p>
                             </div>
-                            <Link
-                                to={`/events/${currentEvent.id}`}
-                                className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80"
-                            >
-                                View event details
-                            </Link>
+                            <div className="flex flex-col items-end gap-2">
+                                <Link
+                                    to={`/events/${currentEvent.id}`}
+                                    className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80"
+                                >
+                                    View public page
+                                </Link>
+                                <div className="flex flex-wrap gap-2 justify-end text-[11px] sm:text-xs text-muted-foreground">
+                                    <span className="hidden sm:inline">Management tools:</span>
+                                    <Link
+                                        to={`${eventManagementBasePath}/${currentEvent.id}`}
+                                        className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80"
+                                    >
+                                        Open console
+                                    </Link>
+                                    <Link
+                                        to={`${eventManagementBasePath}/${currentEvent.id}/check-in`}
+                                        className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80"
+                                    >
+                                        Check-in
+                                    </Link>
+                                    <Link
+                                        to={`${eventManagementBasePath}/${currentEvent.id}/ops`}
+                                        className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80"
+                                    >
+                                        Day-of ops
+                                    </Link>
+                                    <Link
+                                        to={`${eventManagementBasePath}/${currentEvent.id}/page-builder`}
+                                        className="inline-flex items-center rounded-full px-3 py-1 bg-background/70 border border-border/60 text-foreground hover:bg-muted/80"
+                                    >
+                                        Page builder
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                             <div className="bg-background rounded-lg border border-border p-3 sm:p-4">
@@ -470,12 +534,20 @@ export function OrganizerDashboard() {
                     <div className="order-1">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
                             <h2 className="text-lg sm:text-2xl font-bold text-foreground">My Events</h2>
-                            <Link
-                                to={eventCreatePath}
-                                className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-primary/90 transition-colors"
-                            >
-                                Create New Event
-                            </Link>
+                            <div className="flex flex-wrap gap-2 justify-end">
+                                <Link
+                                    to={eventCreatePath}
+                                    className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-primary/90 transition-colors"
+                                >
+                                    Create New Event
+                                </Link>
+                                <Link
+                                    to={listPath}
+                                    className="bg-muted text-foreground px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-muted/80 transition-colors border border-border/60"
+                                >
+                                    Open Event Console
+                                </Link>
+                            </div>
                         </div>
 
                         {events && events.length > 0 ? (
@@ -497,25 +569,37 @@ export function OrganizerDashboard() {
                                                 {event.capacity && <span className="text-muted-foreground">{` / ${event.capacity}`}</span>}
                                             </p>
                                         </div>
-                                        <div className="mt-4 flex flex-wrap gap-2">
-                                            <Link
-                                                to={`/events/${event.id}`}
-                                                className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium"
-                                            >
-                                                View details
-                                            </Link>
-                                            <Link
-                                                to={`/events/${event.id}/edit`}
-                                                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm font-medium"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <Link
-                                                to={`/${organization.slug}/workspaces?eventId=${event.id}`}
-                                                className="text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium"
-                                            >
-                                                Event workspace
-                                            </Link>
+                                        <div className="mt-4 space-y-2">
+                                            <div className="flex flex-wrap gap-2 items-center">
+                                                <span className="text-[11px] sm:text-xs text-muted-foreground">Management:</span>
+                                                <Link
+                                                    to={eventDetailPath(event.id)}
+                                                    className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium"
+                                                >
+                                                    Open console
+                                                </Link>
+                                                <Link
+                                                    to={eventEditPath(event.id)}
+                                                    className="text-muted-foreground hover:text-foreground text-xs sm:text-sm font-medium"
+                                                >
+                                                    Edit in console
+                                                </Link>
+                                                <Link
+                                                    to={`/${organization.slug}/workspaces?eventId=${event.id}`}
+                                                    className="text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium"
+                                                >
+                                                    Event workspace
+                                                </Link>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 items-center">
+                                                <span className="text-[11px] sm:text-xs text-muted-foreground">Public:</span>
+                                                <Link
+                                                    to={`/events/${event.id}`}
+                                                    className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium"
+                                                >
+                                                    View public page
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

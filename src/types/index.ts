@@ -72,6 +72,7 @@ export interface Event {
   organization?: Organization;
   createdAt: string;
   updatedAt: string;
+
   /** Serialized tldraw snapshot for custom hero layouts */
   canvasState?: any;
   /** GrapesJS landing page output: html, css, and meta */
