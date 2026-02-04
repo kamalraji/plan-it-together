@@ -62,6 +62,48 @@ This document provides comprehensive guidance for deploying Thittam1Hub to produ
 
 ## 🔧 Environment Configuration
 
+### Node.js Version (CRITICAL)
+
+This project requires **Node.js 20.19.0 LTS**. This is pinned in `.nvmrc`.
+
+#### Vercel Configuration (Required)
+
+Vercel ignores `.nvmrc` and `NODE_VERSION` env vars in `vercel.json`. You **MUST** set the Node version in the Vercel Dashboard:
+
+1. Go to your Vercel project → **Settings** → **General**
+2. Scroll to **Node.js Version**
+3. Select **20.x** (or enter `20.19.0` if custom input is available)
+4. Save and redeploy
+
+#### Regenerate package-lock.json (Required if built on wrong Node version)
+
+If your `package-lock.json` was generated on Node 24, you'll get esbuild binary mismatches. Fix:
+
+```bash
+# Ensure you're on Node 20
+nvm install 20.19.0
+nvm use 20.19.0
+node -v  # Should show v20.19.0
+
+# Regenerate lockfile
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
+
+# Commit the new lockfile
+git add package-lock.json
+git commit -m "fix: regenerate package-lock on Node 20 LTS"
+git push
+```
+
+#### Why Node 20 LTS?
+
+- **Security**: LTS versions receive prioritized security patches until April 2026
+- **Stability**: Battle-tested by AWS, Netflix, Airbnb, and enterprise deployments
+- **Compatibility**: Most npm packages and build tools optimize for LTS versions
+- **esbuild**: Native binaries are version-matched; mixing Node versions causes the "Expected X but got Y" error
+
+---
+
 ### Required Environment Variables
 
 | Variable | Description | Required |
@@ -299,6 +341,26 @@ export const FEATURE_FLAGS = {
 ## 🆘 Troubleshooting
 
 ### Common Issues
+
+#### esbuild version mismatch
+```
+Error: Expected "0.25.12" but got "0.25.0"
+```
+
+**Cause**: `package-lock.json` was generated on a different Node version than the build environment.
+
+**Fix**: 
+1. Set Node 20.x in Vercel Dashboard → Settings → General → Node.js Version
+2. Regenerate `package-lock.json` on Node 20 (see Node.js section above)
+
+#### Vercel uses wrong Node version
+```
+Node.js v24.13.0
+```
+
+**Cause**: Vercel Dashboard overrides all other Node version settings (`.nvmrc`, env vars).
+
+**Fix**: Set Node version in Vercel Dashboard → Settings → General → Node.js Version → Select 20.x
 
 #### Build Failures
 ```bash
