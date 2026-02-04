@@ -20,7 +20,11 @@
 - [ ] **Leaked Password Protection**: Pending manual action in Supabase Dashboard
 - [x] **Function Security**: `auto_join_participant_channels` has `SET search_path = public`
 
-### Phase 3: Accessibility ⏳ PENDING
+### Phase 3: Accessibility ✅ COMPLETE (2026-02-04)
+- [x] **Focus Trap in Modals**: Verified - Radix UI Dialog/AlertDialog already includes focus trap
+- [x] **Route Change Announcements**: Created `useRouteAnnouncement` hook + `RouteAnnouncer` component
+- [x] **Tab Change Announcements**: Created `useTabAnnouncement` hook for workspace context
+
 ### Phase 4: Performance Monitoring ⏳ PENDING
 
 ---
