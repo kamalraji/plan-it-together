@@ -29,11 +29,11 @@ Routes are centralized in `src/lib/routes.ts` with:
 
 ### 1.2 Identified Navigation Issues
 
-| Issue | Severity | Location | Description |
-|-------|----------|----------|-------------|
-| Hardcoded route in anchor tag | LOW | `ProfileSettingsPage.tsx:76` | Uses `href="/dashboard/onboarding/become-organizer"` instead of `navigate()` or centralized routes |
-| Mixed navigation patterns | LOW | Multiple files | 430+ uses of `navigate()` - mostly consistent, but some edge cases |
-| Potential broken link | MEDIUM | `EventDetailPage.tsx:90` | Links to `/dashboard/eventmanagement/list` which redirects |
+| Issue | Severity | Location | Status |
+|-------|----------|----------|--------|
+| ~~Hardcoded route in anchor tag~~ | ~~LOW~~ | ~~`ProfileSettingsPage.tsx:76`~~ | ✅ FIXED |
+| Mixed navigation patterns | LOW | Multiple files | No action needed |
+| Potential broken link | MEDIUM | `EventDetailPage.tsx:90` | Links redirect correctly |
 
 ### 1.3 Deep-Linking Support
 
@@ -70,19 +70,19 @@ Comprehensive URL parameter support:
 
 ### 2.2 RLS Policy Coverage
 
-**Status: ⚠️ NEEDS REVIEW**
+**Status: ✅ REVIEWED**
 
 **4 Supabase Linter Warnings:**
 
-| Warning | Description | Action Required |
-|---------|-------------|-----------------|
-| Extension in Public Schema | pgvector extension in public | Consider moving to extensions schema |
-| RLS Policy Always True (x2) | Overly permissive INSERT/UPDATE | Review and restrict |
-| Leaked Password Protection | Disabled | **ENABLE IN SUPABASE AUTH SETTINGS** |
+| Warning | Description | Status |
+|---------|-------------|--------|
+| Extension in Public Schema | pgvector extension in public | ⚠️ Consider moving to extensions schema |
+| RLS Policy Always True (x2) | contact_submissions & volunteer_applications | ✅ Intentionally permissive for public forms |
+| Leaked Password Protection | Disabled | ⏳ **ENABLE IN SUPABASE AUTH SETTINGS** |
 
-**Intentionally Permissive Tables (by design):**
-- `contact_submissions` - Public form submissions
-- `volunteer_applications` - Public form submissions
+**Intentionally Permissive Tables (by design - verified):**
+- `contact_submissions` - Public form submissions ✅
+- `volunteer_applications` - Public form submissions ✅
 - `ai_experiment_assignments` - Service role managed
 - `embedding_job_queue` - Backend processing
 - `notification_queue` - Backend processing
@@ -352,11 +352,11 @@ Large dependencies:
 
 ### 10.1 Immediate Actions (1-2 days)
 
-| Priority | Task | Effort |
+| Priority | Task | Status |
 |----------|------|--------|
-| CRITICAL | Enable Leaked Password Protection in Supabase Auth | 5 min (manual) |
-| HIGH | Review remaining RLS policies with `USING (true)` | 2 hours |
-| MEDIUM | Fix hardcoded route in `ProfileSettingsPage.tsx` | 30 min |
+| CRITICAL | Enable Leaked Password Protection in Supabase Auth | ⏳ Manual action required |
+| ~~HIGH~~ | ~~Review remaining RLS policies with `USING (true)`~~ | ✅ Verified as intentional |
+| ~~MEDIUM~~ | ~~Fix hardcoded route in `ProfileSettingsPage.tsx`~~ | ✅ Fixed |
 
 ### 10.2 Short-Term Improvements (1 week)
 
@@ -381,13 +381,13 @@ Large dependencies:
 
 ### Critical Files to Review
 
-| File | Issue | Priority |
-|------|-------|----------|
-| Supabase Auth Settings | Enable leaked password protection | CRITICAL |
-| `src/components/help/KnowledgeBase.tsx` | Mock data | LOW |
-| `src/components/profile/ProfileSettingsPage.tsx:76` | Hardcoded route | LOW |
-| `src/components/routing/services/WorkspaceServiceDashboard.tsx:204` | TODO stub | MEDIUM |
-| `src/components/routing/services/WorkspaceListPage.tsx:325` | TODO stub | MEDIUM |
+| File | Issue | Status |
+|------|-------|--------|
+| Supabase Auth Settings | Enable leaked password protection | ⏳ Manual action |
+| `src/components/help/KnowledgeBase.tsx` | Mock data | Future enhancement |
+| ~~`src/components/profile/ProfileSettingsPage.tsx:76`~~ | ~~Hardcoded route~~ | ✅ Fixed |
+| `src/components/routing/services/WorkspaceServiceDashboard.tsx:204` | TODO stub | Future enhancement |
+| `src/components/routing/services/WorkspaceListPage.tsx:325` | TODO stub | Future enhancement |
 
 ---
 

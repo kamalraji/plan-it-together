@@ -63,6 +63,7 @@ export const AUTH_ROUTES = {
   ONBOARDING_WELCOME: '/onboarding/welcome',
   ONBOARDING_ORGANIZATION: '/onboarding/organization',
   ORGANIZER_ONBOARDING: '/dashboard/onboarding/organizer',
+  BECOME_ORGANIZER: '/dashboard/onboarding/become-organizer',
   
   // Payment callbacks
   PAYMENT_SUCCESS: '/payment-success',
