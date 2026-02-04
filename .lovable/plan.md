@@ -158,10 +158,14 @@ This analysis covers all workspace-related features against industry standards, 
 
 ### 4. REMAINING WORK
 
-#### Security Fixes (Manual)
-- Enable leaked password protection in Supabase Dashboard
-- Review and tighten RLS policies with `USING (true)`
-- Set explicit `search_path` on remaining database functions
+#### Security Fixes (Manual) ✅ MOSTLY COMPLETE
+- ✅ Fixed `auto_join_participant_channels` function with explicit search_path
+- ✅ Restricted RLS policies on audit logs, analytics, and navigation tables
+- ✅ Created `events_public_safe` view to hide contact info from anonymous users
+- ✅ Restricted `channel_templates` to authenticated users only
+- ✅ Restricted `reserved_usernames` to authenticated users only
+- ⏳ Enable leaked password protection in Supabase Dashboard (manual step)
+- ⏳ Extension in public schema (pgvector) - low priority, structural change
 
 ---
 
