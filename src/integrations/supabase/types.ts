@@ -6922,6 +6922,312 @@ export type Database = {
           },
         ]
       }
+      kb_articles: {
+        Row: {
+          author_id: string | null
+          category_id: string | null
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          helpful_count: number | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          meta_description: string | null
+          meta_title: string | null
+          not_helpful_count: number | null
+          published_at: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: string | null
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          not_helpful_count?: number | null
+          published_at?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          not_helpful_count?: number | null
+          published_at?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "kb_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kb_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      kb_contextual_help: {
+        Row: {
+          content: string
+          context_key: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          related_article_id: string | null
+          related_tutorial_id: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          context_key: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          related_article_id?: string | null
+          related_tutorial_id?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          context_key?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          related_article_id?: string | null
+          related_tutorial_id?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_contextual_help_related_article_id_fkey"
+            columns: ["related_article_id"]
+            isOneToOne: false
+            referencedRelation: "kb_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kb_contextual_help_related_tutorial_id_fkey"
+            columns: ["related_tutorial_id"]
+            isOneToOne: false
+            referencedRelation: "kb_tutorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kb_faqs: {
+        Row: {
+          answer: string
+          category_id: string | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          is_published: boolean | null
+          not_helpful_count: number | null
+          question: string
+          sort_order: number | null
+          tags: string[] | null
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          answer: string
+          category_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_published?: boolean | null
+          not_helpful_count?: number | null
+          question: string
+          sort_order?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          answer?: string
+          category_id?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          is_published?: boolean | null
+          not_helpful_count?: number | null
+          question?: string
+          sort_order?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_faqs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "kb_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kb_tutorial_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: number[] | null
+          current_step: number | null
+          id: string
+          is_completed: boolean | null
+          started_at: string | null
+          tutorial_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: number[] | null
+          current_step?: number | null
+          id?: string
+          is_completed?: boolean | null
+          started_at?: string | null
+          tutorial_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: number[] | null
+          current_step?: number | null
+          id?: string
+          is_completed?: boolean | null
+          started_at?: string | null
+          tutorial_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_tutorial_progress_tutorial_id_fkey"
+            columns: ["tutorial_id"]
+            isOneToOne: false
+            referencedRelation: "kb_tutorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kb_tutorials: {
+        Row: {
+          category: string | null
+          completion_count: number | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
+          estimated_minutes: number | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          slug: string
+          sort_order: number | null
+          steps: Json
+          target_roles: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          completion_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          slug: string
+          sort_order?: number | null
+          steps?: Json
+          target_roles?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          completion_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          slug?: string
+          sort_order?: number | null
+          steps?: Json
+          target_roles?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       landing_page_versions: {
         Row: {
           created_at: string | null

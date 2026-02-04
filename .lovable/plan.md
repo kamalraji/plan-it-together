@@ -173,12 +173,18 @@ No sensitive server-side secrets exposed in client code.
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| `KnowledgeBase.tsx` | MOCK | Lines 69-138: Full mock data for articles, categories, FAQs |
+| ~~`KnowledgeBase.tsx`~~ | ✅ FIXED | Now uses `useKBCategories`, `useKBArticles`, `useKBFAQs` hooks |
 | `HelpPage.tsx` | MOCK | Lines 97-115: Mock contextual help items |
-| `InteractiveTutorials.tsx` | MOCK | Likely mock tutorial data |
-| `SupportContact.tsx` | MOCK | Likely mock support data |
+| `InteractiveTutorials.tsx` | MOCK | Uses `useKBTutorials` hook but table is empty |
+| `SupportContact.tsx` | MOCK | Uses `support_tickets` table but needs UI wiring |
 
-**Reason:** No database tables exist for `articles`, `faqs`, `tutorials`. These tables need to be created before wiring real data.
+**Database tables created:**
+- `kb_categories` - Article categories
+- `kb_articles` - Knowledge base articles
+- `kb_faqs` - Frequently asked questions
+- `kb_tutorials` - Interactive tutorials
+- `kb_tutorial_progress` - User progress tracking
+- `kb_contextual_help` - In-app help tooltips
 
 ### 4.3 Console.log Usage
 
@@ -360,12 +366,12 @@ Large dependencies:
 
 ### 10.2 Short-Term Improvements (1 week)
 
-| Priority | Task | Effort |
+| Priority | Task | Status |
 |----------|------|--------|
-| MEDIUM | Create database tables for Help/KB system | 1 day |
-| MEDIUM | Implement workspace import functionality | 1 day |
-| LOW | Standardize error UI patterns across components | 2 days |
-| LOW | Add image lazy loading | 1 day |
+| ~~MEDIUM~~ | ~~Create database tables for Help/KB system~~ | ✅ Created 6 tables with hooks |
+| MEDIUM | Implement workspace import functionality | Future |
+| LOW | Standardize error UI patterns across components | Future |
+| LOW | Add image lazy loading | Future |
 
 ### 10.3 Long-Term Enhancements (1 month)
 
