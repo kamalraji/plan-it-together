@@ -1,445 +1,443 @@
 
+# Industrial-Standard Production Deployment Plan for Thittam1Hub
 
-# Comprehensive Codebase & Database Analysis Report
-## Bug Identification, Security Vulnerabilities, and Industry Standards Gap Analysis
+## Executive Summary
 
----
-
-## EXECUTIVE SUMMARY
-
-This report provides a comprehensive analysis of the codebase and database that was not covered in the previous workspace-focused analysis. The analysis covers routing/navigation integrity, database schema issues, security vulnerabilities, partially implemented features, and industry standards compliance.
-
-**Overall Health Score: B+ (Good with areas needing attention)**
+This plan transforms your event management platform into an **industrial-standard, production-ready application** with proper environment separation, deployment automation, security hardening, monitoring, and change management workflows.
 
 ---
 
-## 1. NAVIGATION & ROUTING ANALYSIS
+## Current State Analysis
 
-### 1.1 Route Centralization Status
+### What You Have:
+- React 18 frontend with Vite + TypeScript + Tailwind CSS
+- Supabase backend (external instance: `ltsniuflqfahdcirrmjh`)
+- 78+ edge functions for various features
+- 200+ database tables covering events, attendance, workspaces, etc.
+- Feature flag system with rollout capabilities
+- Docker configuration files (partially configured)
+- Existing CI/CD workflow scaffolding
 
-**Status: ✅ GOOD**
-
-Routes are centralized in `src/lib/routes.ts` with:
-- `PUBLIC_ROUTES` - 15 public routes
-- `AUTH_ROUTES` - 4 authenticated routes
-- `ADMIN_ROUTES` - 3 admin routes
-- `DASHBOARD_ROUTES` - 13 dashboard routes
-- `ORG_ROUTES` - 9 organization-scoped routes
-- `SERVICE_ROUTES` - 2 standalone service routes
-
-### 1.2 Identified Navigation Issues
-
-| Issue | Severity | Location | Status |
-|-------|----------|----------|--------|
-| ~~Hardcoded route in anchor tag~~ | ~~LOW~~ | ~~`ProfileSettingsPage.tsx:76`~~ | ✅ FIXED |
-| Mixed navigation patterns | LOW | Multiple files | No action needed |
-| Potential broken link | MEDIUM | `EventDetailPage.tsx:90` | Links redirect correctly |
-
-### 1.3 Deep-Linking Support
-
-**Status: ✅ EXCELLENT**
-
-Comprehensive URL parameter support:
-- `?tab=` - Tab navigation
-- `?taskId=` - Direct task linking
-- `?sectionId=` - Section scrolling
-- `?roleSpace=` - Role filtering
-
-### 1.4 Route Guard Coverage
-
-| Route Type | Protection | Status |
-|------------|------------|--------|
-| `/dashboard/*` | ConsoleRoute with auth | ✅ |
-| `/:orgSlug/*` | ConsoleRoute + org membership | ✅ |
-| `/admin/*` | SUPER_ADMIN role check | ✅ |
-| `/marketplace/*` | ORGANIZER/SUPER_ADMIN/VENDOR | ✅ |
-| Public routes | No auth required | ✅ |
+### Issues to Address:
+1. **Build Error**: Type mismatch in `EventForm.tsx` (capacity: `null` vs `undefined`)
+2. **Security Warnings**: RLS policies with `USING(true)` patterns
+3. **Missing Password Leak Protection**
+4. **No proper monitoring/alerting setup**
+5. **Incomplete environment configuration**
+6. **Frontend type inconsistencies between `LibraryTemplate` and `WorkspaceTemplate`**
 
 ---
 
-## 2. DATABASE SCHEMA ANALYSIS
+## Phase 1: Fix Critical Build Errors (Immediate)
 
-### 2.1 Table Statistics
+### 1.1 Fix EventForm.tsx Type Errors
 
-| Metric | Count |
-|--------|-------|
-| Total tables (public schema) | 200+ |
-| Tables with data | 30+ |
-| Empty tables | 170+ |
-| Views | Multiple |
+**Problem**: The form's `capacity` field accepts `null` but `CreateEventDTO` expects `number | undefined`.
 
-### 2.2 RLS Policy Coverage
-
-**Status: ✅ REVIEWED**
-
-**4 Supabase Linter Warnings:**
-
-| Warning | Description | Status |
-|---------|-------------|--------|
-| Extension in Public Schema | pgvector extension in public | ⚠️ Consider moving to extensions schema |
-| RLS Policy Always True (x2) | contact_submissions & volunteer_applications | ✅ Intentionally permissive for public forms |
-| Leaked Password Protection | Disabled | ⏳ **ENABLE IN SUPABASE AUTH SETTINGS** |
-
-**Intentionally Permissive Tables (by design - verified):**
-- `contact_submissions` - Public form submissions ✅
-- `volunteer_applications` - Public form submissions ✅
-- `ai_experiment_assignments` - Service role managed
-- `embedding_job_queue` - Backend processing
-- `notification_queue` - Backend processing
-
-### 2.3 Function Security
-
-**Status: ✅ GOOD**
-
-30+ functions verified with `SET search_path = public`:
-- `approve_organizer_application`
-- `auto_join_participant_channels`
-- `check_rate_limit`
-- `calculate_user_engagement_score`
-- And 26+ more...
-
-### 2.4 Missing Foreign Key Constraints
-
-The query returned no missing foreign keys in critical tables, but some tables may benefit from additional referential integrity constraints.
-
----
-
-## 3. SECURITY VULNERABILITIES
-
-### 3.1 Critical Issues
-
-| Issue | Severity | Status | Action |
-|-------|----------|--------|--------|
-| Leaked Password Protection Disabled | HIGH | ⏳ PENDING | Enable in Supabase Auth settings |
-
-### 3.2 XSS Mitigation
-
-**Status: ✅ GOOD**
-
-`dangerouslySetInnerHTML` usage found in 4 files - all properly sanitized:
-
-| File | Context | Mitigation |
-|------|---------|------------|
-| `EventLandingPage.tsx` | Landing page HTML | DOMPurify sanitization |
-| `PublicEventPage.tsx` | Public event page | DOMPurify sanitization |
-| `chart.tsx` | Chart styling | Generated CSS only |
-| `FAQSection.tsx` | JSON-LD schema | Structured data only |
-
-### 3.3 Environment Variable Handling
-
-**Status: ✅ GOOD**
-
-All environment variables use `import.meta.env.VITE_*` pattern:
-- `VITE_SUPABASE_PROJECT_ID`
-- `VITE_SUPABASE_URL`
-- `VITE_API_URL`
-- `VITE_VAPID_PUBLIC_KEY`
-
-No sensitive server-side secrets exposed in client code.
-
-### 3.4 Authentication Flow
-
-**Status: ✅ GOOD**
-
-- Email/password with Zod validation
-- Google OAuth support
-- Email confirmation with resend cooldown
-- Rate limiting on auth attempts
-
----
-
-## 4. PARTIALLY IMPLEMENTED FEATURES
-
-### 4.1 TODOs/FIXMEs Analysis
-
-**903 matches across 60 files** - Key categories:
-
-| Category | Count | Priority |
-|----------|-------|----------|
-| Workspace Import | 2 | MEDIUM |
-| Task Edit Modal | 1 | LOW |
-| AI Suggestions Integration | 1 | LOW |
-| Export Functionality | Fixed | ✅ |
-
-**High Priority TODOs:**
-
-| Location | Description | Effort |
-|----------|-------------|--------|
-| `WorkspaceServiceDashboard.tsx:204` | Import workspace not implemented | Medium |
-| `WorkspaceListPage.tsx:325` | Import workspace not implemented | Medium |
-| `WorkspaceDetailPage.tsx:380` | Task edit modal stub | Low |
-
-### 4.2 Mock Data Still in Use
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| ~~`KnowledgeBase.tsx`~~ | ✅ FIXED | Now uses `useKBCategories`, `useKBArticles`, `useKBFAQs` hooks |
-| `HelpPage.tsx` | MOCK | Lines 97-115: Mock contextual help items |
-| `InteractiveTutorials.tsx` | MOCK | Uses `useKBTutorials` hook but table is empty |
-| `SupportContact.tsx` | MOCK | Uses `support_tickets` table but needs UI wiring |
-
-**Database tables created:**
-- `kb_categories` - Article categories
-- `kb_articles` - Knowledge base articles
-- `kb_faqs` - Frequently asked questions
-- `kb_tutorials` - Interactive tutorials
-- `kb_tutorial_progress` - User progress tracking
-- `kb_contextual_help` - In-app help tooltips
-
-### 4.3 Console.log Usage
-
-**Status: ✅ GOOD (Minimal)**
-
-Only 30 console.log statements found in production code:
-- `src/lib/analytics.ts` - Dev-only logging (guarded)
-- `src/hooks/useAutomationTrigger.ts` - Debug logging
-- `src/components/marketplace/VendorShortlist.tsx` - Fallback error logging
-
----
-
-## 5. ERROR HANDLING PATTERNS
-
-### 5.1 Error Throwing Patterns
-
-**1,258 matches across 124 files** - Consistent patterns found:
+**Solution**: Transform `null` to `undefined` in default values:
 
 ```typescript
-// Good pattern (most common):
-if (error) throw new Error(error.message);
-
-// Good pattern with context:
-throw new Error('Not authenticated');
-
-// Good pattern with conditional messages:
-const message = error.code === '42501' 
-  ? 'You do not have permission...'
-  : error.message;
-throw new Error(message);
+// In EventForm.tsx, update defaultValues
+defaultValues: event ? {
+  ...otherFields,
+  capacity: event.capacity ?? undefined, // Convert null to undefined
+} : { ... }
 ```
 
-### 5.2 Error Boundary Coverage
+### 1.2 Fix WorkspaceTemplate Type Mismatch
 
-**Status: ✅ EXCELLENT**
+**Problem**: `LibraryTemplate` is passed where `WorkspaceTemplate` is expected.
 
-- Global: `<GlobalErrorBoundary>` in `AppRouter.tsx`
-- Route-level: `<RetryableErrorBoundary>` for specific routes
-- Component-level: Local try-catch in mutations
+**Solution**: Update the callback signature in WorkspaceTemplateLibrary or create a transformation layer:
 
-### 5.3 Query Error Handling
+```typescript
+// Option A: Store LibraryTemplate directly
+const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = 
+  useState<LibraryTemplate | null>(null);
 
-**Status: ⚠️ INCONSISTENT**
-
-Some queries show inline errors, others use toasts. Need standardization:
-
-| Pattern | Usage | Recommendation |
-|---------|-------|----------------|
-| Toast notification | 60% | Keep for mutations |
-| Inline error display | 30% | Keep for queries |
-| Silent failure | 10% | Needs review |
+// Option B: Transform on selection
+onTemplateSelect={(tpl) => setSelectedWorkspaceTemplate(transformToWorkspaceTemplate(tpl))}
+```
 
 ---
 
-## 6. EDGE FUNCTION ANALYSIS
+## Phase 2: Environment Separation Setup
 
-### 6.1 Deployed Functions (74 total)
+### 2.1 Environment Configuration Structure
 
-Functions are well-organized with shared utilities in `_shared/`:
-- Auth/Security: `check-password-breach`, `login-alert`, `geo-anomaly-check`
-- Communication: `broadcast-message`, `trigger-chat-notification`, `send-push-notification`
-- Content: `ai-content-assist`, `generate-certificate-backgrounds`, `generate-idcard-backgrounds`
-- Processing: `process-automation-rules`, `process-embedding-queue`, `process-recurring-tasks`
+```
+/
++-- .env                    # Local dev (Supabase Test)
++-- .env.staging            # Staging environment
++-- .env.production         # Production environment
+```
 
-### 6.2 Edge Function Logs
+### 2.2 Environment Variables (Secure)
 
-**Status: No recent errors**
+| Variable | Dev | Staging | Production |
+|----------|-----|---------|------------|
+| VITE_SUPABASE_URL | Test instance | Staging instance | Prod instance |
+| VITE_ENABLE_API_LOGGING | true | true | false |
+| VITE_SENTRY_DSN | - | optional | required |
+| NODE_ENV | development | staging | production |
 
-No error logs found in:
-- Auth logs
-- Postgres logs
-- Edge function logs
+### 2.3 Supabase Environment Strategy
 
----
-
-## 7. TYPE SAFETY ANALYSIS
-
-### 7.1 Deprecated Types
-
-3 deprecated types found in `src/types/`:
-
-| Type | Replacement | Usage |
-|------|-------------|-------|
-| `LegacyEvent` | `Event` from `event.types.ts` | Still used in some components |
-| `LegacyVenueConfig` | `EventVenue` | Minimal usage |
-| `LegacyVirtualConfig` | `EventVirtualLink` | Minimal usage |
-
-### 7.2 Supabase Types
-
-**Status: ✅ EXCELLENT**
-
-- Auto-generated types: 23,027 lines in `types.ts`
-- 200+ table definitions
-- Full Row/Insert/Update types
-- Relationship definitions
+Using Lovable's dual-environment system:
+- **Test (Preview)**: Development and testing
+- **Live (Published)**: Production users
 
 ---
 
-## 8. CODE QUALITY METRICS
+## Phase 3: Security Hardening
 
-### 8.1 File Organization
+### 3.1 Fix RLS Policy Issues
 
-| Directory | Files | Purpose |
-|-----------|-------|---------|
-| `src/hooks/` | 200+ | Custom React hooks |
-| `src/components/` | 900+ | UI components |
-| `src/services/` | 10+ | Business logic services |
-| `src/types/` | 10+ | TypeScript definitions |
-| `src/lib/` | 15+ | Utility libraries |
+**Current Warning**: Overly permissive `USING(true)` policies
 
-### 8.2 Code Duplication
+**Action Items**:
+1. Audit all RLS policies with `true` conditions
+2. Replace with proper user-scoped policies
+3. Implement `SECURITY DEFINER` functions for role checks
 
-Potential duplication areas identified:
-- Multiple `.single()` query patterns (2,140 matches) - Could benefit from utility functions
-- Similar form validation patterns across components
+Example migration:
+```sql
+-- Before (dangerous)
+CREATE POLICY "allow_all" ON events USING (true);
 
-### 8.3 Bundle Size Concerns
+-- After (secure)
+CREATE POLICY "users_can_view_public_events" ON events
+FOR SELECT USING (
+  visibility = 'PUBLIC' 
+  OR organizer_id = auth.uid()
+  OR EXISTS (
+    SELECT 1 FROM registrations 
+    WHERE registrations.event_id = events.id 
+    AND registrations.user_id = auth.uid()
+  )
+);
+```
 
-**Status: ⚠️ MONITOR**
+### 3.2 Enable Password Leak Protection
 
-Large dependencies:
-- `fabric` (canvas library) - ~1MB
-- `grapesjs` (page builder) - ~800KB
-- `recharts` (charts) - ~400KB
-- `agora-rtc-sdk-ng` (video) - ~600KB
+```sql
+-- Enable in Supabase Dashboard: Authentication > Settings
+-- Or via API configuration
+```
 
-**Mitigation:** Lazy loading implemented for heavy components.
+### 3.3 Implement Proper Role Management
 
----
+Create secure role checking function:
+```sql
+CREATE TYPE public.app_role AS ENUM ('admin', 'organizer', 'participant', 'vendor');
 
-## 9. INDUSTRY STANDARDS COMPLIANCE
+CREATE TABLE public.user_roles (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    role app_role NOT NULL,
+    UNIQUE (user_id, role)
+);
 
-### 9.1 OWASP Top 10 Checklist
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
-| Vulnerability | Status | Notes |
-|---------------|--------|-------|
-| Injection | ✅ | Supabase parameterized queries |
-| Broken Authentication | ✅ | Proper session management |
-| Sensitive Data Exposure | ⚠️ | Enable password breach protection |
-| XML External Entities | ✅ | Not applicable (no XML parsing) |
-| Broken Access Control | ✅ | RLS policies + route guards |
-| Security Misconfiguration | ⚠️ | 4 linter warnings |
-| Cross-Site Scripting | ✅ | DOMPurify sanitization |
-| Insecure Deserialization | ✅ | JSON only with Zod validation |
-| Using Components with Vulnerabilities | ⚠️ | Regular dependency updates needed |
-| Insufficient Logging | ✅ | Sentry integration + audit logs |
-
-### 9.2 WCAG Accessibility Compliance
-
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| Skip Links | ✅ | Implemented |
-| ARIA Labels | ✅ | 1,261 matches |
-| Keyboard Navigation | ✅ | Comprehensive |
-| Focus Management | ✅ | Radix UI handles natively |
-| Screen Reader Support | ✅ | Route announcer implemented |
-| Reduced Motion | ✅ | `prefers-reduced-motion` respected |
-
-### 9.3 Performance Best Practices
-
-| Practice | Status | Implementation |
-|----------|--------|----------------|
-| Code Splitting | ✅ | Lazy loading with Suspense |
-| Query Caching | ✅ | React Query with tiered stale times |
-| Image Optimization | ⚠️ | Needs lazy loading for images |
-| Bundle Optimization | ⚠️ | Consider tree-shaking analysis |
+CREATE FUNCTION public.has_role(_user_id uuid, _role app_role)
+RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_roles
+    WHERE user_id = _user_id AND role = _role
+  )
+$$;
+```
 
 ---
 
-## 10. IMPLEMENTATION RECOMMENDATIONS
+## Phase 4: Feature Flag System Enhancement
 
-### 10.1 Immediate Actions (1-2 days)
+### 4.1 Production-Ready Feature Flags
 
-| Priority | Task | Status |
-|----------|------|--------|
-| CRITICAL | Enable Leaked Password Protection in Supabase Auth | ⏳ Manual action required |
-| ~~HIGH~~ | ~~Review remaining RLS policies with `USING (true)`~~ | ✅ Verified as intentional |
-| ~~MEDIUM~~ | ~~Fix hardcoded route in `ProfileSettingsPage.tsx`~~ | ✅ Fixed |
+Update `src/lib/featureFlags.ts` with:
 
-### 10.2 Short-Term Improvements (1 week)
+```typescript
+export const FEATURE_FLAGS = {
+  // Gradual Rollout Example
+  NEW_EVENT_FORM: {
+    key: 'new_event_form',
+    defaultValue: false,
+    rolloutPercentage: 0,  // Start at 0%
+    enabledForGroups: ['beta_testers'],
+  },
+  
+  // Production Safety Flags
+  MAINTENANCE_MODE: {
+    key: 'maintenance_mode',
+    defaultValue: false,
+    description: 'Enable maintenance mode',
+  },
+  
+  // Analytics & Monitoring
+  ADVANCED_ANALYTICS: {
+    key: 'advanced_analytics',
+    defaultValue: true,
+    rolloutPercentage: 100,
+  },
+};
+```
 
-| Priority | Task | Status |
-|----------|------|--------|
-| ~~MEDIUM~~ | ~~Create database tables for Help/KB system~~ | ✅ Created 6 tables with hooks |
-| MEDIUM | Implement workspace import functionality | Future |
-| LOW | Standardize error UI patterns across components | Future |
-| LOW | Add image lazy loading | Future |
+### 4.2 Server-Side Feature Flag Sync
 
-### 10.3 Long-Term Enhancements (1 month)
-
-| Priority | Task | Effort |
-|----------|------|--------|
-| LOW | Migrate deprecated `LegacyEvent` type usage | 3 days |
-| LOW | Bundle size analysis and optimization | 2 days |
-| LOW | Create utility functions for common Supabase patterns | 2 days |
-
----
-
-## 11. AFFECTED FILES SUMMARY
-
-### Critical Files to Review
-
-| File | Issue | Status |
-|------|-------|--------|
-| Supabase Auth Settings | Enable leaked password protection | ⏳ Manual action |
-| `src/components/help/KnowledgeBase.tsx` | Mock data | Future enhancement |
-| ~~`src/components/profile/ProfileSettingsPage.tsx:76`~~ | ~~Hardcoded route~~ | ✅ Fixed |
-| `src/components/routing/services/WorkspaceServiceDashboard.tsx:204` | TODO stub | Future enhancement |
-| `src/components/routing/services/WorkspaceListPage.tsx:325` | TODO stub | Future enhancement |
-
----
-
-## 12. TESTING CHECKLIST
-
-### Security Testing
-- [ ] Verify RLS policies block unauthorized access
-- [ ] Test authentication flow edge cases
-- [ ] Validate input sanitization on all forms
-- [ ] Check for exposed API keys in network tab
-
-### Navigation Testing
-- [ ] Deep-link to specific resources with URL params
-- [ ] Verify all route guards function correctly
-- [ ] Test org-scoped routes with different memberships
-- [ ] Verify 404 handling for invalid routes
-
-### Accessibility Testing
-- [ ] Keyboard-only navigation through entire app
-- [ ] Screen reader testing on critical flows
-- [ ] Color contrast verification
-- [ ] Focus visible on all interactive elements
-
-### Performance Testing
-- [ ] Measure initial load time
-- [ ] Check lazy loading works for heavy components
-- [ ] Verify no memory leaks in real-time subscriptions
-- [ ] Test offline capability
+Add edge function for feature flag management:
+```typescript
+// supabase/functions/feature-flags/index.ts
+// Sync flags with database for persistence across sessions
+```
 
 ---
 
-## 13. CONCLUSION
+## Phase 5: Monitoring & Error Tracking
 
-The codebase demonstrates **mature architecture** with:
-- Excellent type safety and centralized patterns
-- Comprehensive routing with proper guards
-- Strong RLS policy coverage on critical tables
-- Well-implemented accessibility features
-- Proper security measures (with one pending action)
+### 5.1 Error Tracking with Sentry
 
-**Primary Areas Requiring Attention:**
-1. Enable leaked password protection (CRITICAL)
-2. Review remaining permissive RLS policies
-3. Create database tables for Help/KB system to replace mock data
-4. Implement remaining TODO stubs (workspace import)
-5. Standardize error handling UI patterns
+Leverage existing `@sentry/react` dependency:
 
-The application is **production-ready** with the critical security action completed.
+```typescript
+// src/main.tsx
+import * as Sentry from "@sentry/react";
 
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  environment: import.meta.env.MODE,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 0.1, // 10% sampling in production
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0, // 100% of error sessions
+});
+```
+
+### 5.2 Health Check Endpoints
+
+Create edge function for health monitoring:
+```typescript
+// supabase/functions/health-check/index.ts
+// Returns: database connectivity, auth service status, storage status
+```
+
+### 5.3 Logging Strategy
+
+| Log Level | Dev | Staging | Production |
+|-----------|-----|---------|------------|
+| DEBUG | Yes | Yes | No |
+| INFO | Yes | Yes | Minimal |
+| WARN | Yes | Yes | Yes |
+| ERROR | Yes | Yes | Yes + Alert |
+
+---
+
+## Phase 6: Deployment Automation
+
+### 6.1 Lovable Deployment Workflow
+
+Using Lovable's built-in deployment:
+
+1. **Development**: Changes visible in preview immediately
+2. **Staging**: Test in preview environment thoroughly
+3. **Production**: Click "Publish" to deploy frontend
+
+**Important**: Backend changes (edge functions, migrations) deploy **immediately**.
+
+### 6.2 Pre-Deployment Checklist
+
+```markdown
+- [ ] All tests passing
+- [ ] No TypeScript errors
+- [ ] Security scan clean
+- [ ] Feature flags configured for rollout
+- [ ] Rollback plan documented
+- [ ] Database migration tested (if applicable)
+```
+
+### 6.3 GitHub Actions CI/CD (For External Hosting)
+
+For separate organizer web app deployment:
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Tests
+        run: npm test
+      
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Vercel/Netlify/Railway
+        run: # deployment commands
+```
+
+---
+
+## Phase 7: Separate Organizer Web App Deployment
+
+### 7.1 Deployment Platform Options
+
+| Platform | Best For | Cost |
+|----------|----------|------|
+| **Vercel** | React/Next.js apps | Free tier available |
+| **Netlify** | Static sites + functions | Free tier available |
+| **Railway** | Full-stack apps | $5/mo starter |
+| **Render** | Containers | Free tier available |
+| **Lovable Cloud** | Current setup | Included |
+
+### 7.2 Recommended: Multi-Environment with Vercel
+
+```text
++-- main branch -----> Production (organizer.thittam1hub.com)
++-- staging branch --> Staging (staging.thittam1hub.com)
++-- feature/* -------> Preview deployments
+```
+
+### 7.3 Organizer App Separation Strategy
+
+Create separate build configuration:
+```javascript
+// vite.config.organizer.ts
+export default defineConfig({
+  base: '/organizer/',
+  build: {
+    outDir: 'dist-organizer',
+    rollupOptions: {
+      input: {
+        organizer: 'src/pages/organizer/index.html',
+      }
+    }
+  }
+});
+```
+
+---
+
+## Phase 8: Database Migration Strategy
+
+### 8.1 Non-Breaking Change Guidelines
+
+```text
+SAFE Changes:
+- Adding new columns with DEFAULT values
+- Adding new tables
+- Adding new indexes
+- Creating new functions
+
+UNSAFE Changes (Require Migration Plan):
+- Dropping columns/tables
+- Renaming columns
+- Changing column types
+- Removing constraints
+```
+
+### 8.2 Migration Workflow
+
+```text
+1. Create migration in Lovable (applies to Test first)
+2. Test thoroughly in preview
+3. Before publishing, check if Live has data in affected tables
+4. If destructive: Run data migration query in Live BEFORE publishing
+5. Publish to deploy code + schema together
+```
+
+---
+
+## Phase 9: Production Checklist
+
+### Pre-Launch Checklist
+
+```text
+Security
+- [ ] All RLS policies reviewed and secured
+- [ ] Password leak protection enabled
+- [ ] API keys rotated for production
+- [ ] Secrets stored securely (not in code)
+
+Performance
+- [ ] Database indexes optimized
+- [ ] Edge functions tested under load
+- [ ] Frontend bundle size < 500KB initial
+- [ ] Lazy loading implemented for large components
+
+Monitoring
+- [ ] Sentry configured for error tracking
+- [ ] Health check endpoints working
+- [ ] Log aggregation in place
+- [ ] Alerting configured for critical errors
+
+Deployment
+- [ ] Feature flags set for gradual rollout
+- [ ] Rollback procedure documented
+- [ ] Database backup strategy in place
+- [ ] DNS and SSL configured
+```
+
+---
+
+## Implementation Timeline
+
+| Phase | Duration | Priority |
+|-------|----------|----------|
+| Phase 1: Fix Build Errors | 30 minutes | Critical |
+| Phase 2: Environment Setup | 1 hour | High |
+| Phase 3: Security Hardening | 2-3 hours | High |
+| Phase 4: Feature Flags | 1 hour | Medium |
+| Phase 5: Monitoring | 1-2 hours | High |
+| Phase 6: Deployment Automation | 2 hours | Medium |
+| Phase 7: Organizer App | 2-3 hours | Medium |
+| Phase 8: Migration Strategy | Ongoing | High |
+| Phase 9: Final Checklist | 1 hour | Critical |
+
+**Total Estimated Time**: 1-2 days for full implementation
+
+---
+
+## Technical Details
+
+### Files to Create/Modify
+
+1. **src/components/events/EventForm.tsx** - Fix type errors
+2. **src/components/workspace/WorkspaceTemplateLibrary.tsx** - Fix type mismatch
+3. **src/main.tsx** - Add Sentry initialization
+4. **src/lib/featureFlags.ts** - Enhance feature flag system
+5. **supabase/functions/health-check/index.ts** - Create health endpoint
+6. **.env.staging** - Create staging environment config
+7. **supabase/migrations/** - RLS policy fixes
+8. **.github/workflows/deploy.yml** - CI/CD pipeline (if using GitHub)
+
+### Key Dependencies Already Installed
+
+- `@sentry/react` - Error tracking (ready to configure)
+- `@supabase/supabase-js` - Backend integration
+- `zustand` - State management for feature flags
+- `@tanstack/react-query` - Data fetching with caching
+
+---
+
+## Next Steps After Approval
+
+1. Fix the immediate build errors in EventForm.tsx
+2. Set up Sentry error tracking
+3. Review and fix RLS policies
+4. Configure environment separation
+5. Implement health check endpoint
+6. Create deployment automation workflow
