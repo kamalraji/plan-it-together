@@ -91,12 +91,60 @@ export function BulkOperationsPanel({
     }
   };
 
-  const handleExport = () => {
-    toast({
-      title: 'Export Started',
-      description: 'Preparing workspace data for export...',
-    });
-    // TODO: Implement actual export logic
+  const handleExport = async () => {
+    try {
+      toast({
+        title: 'Export Started',
+        description: 'Preparing workspace data for export...',
+      });
+      
+      // Fetch workspace data for selected IDs
+      const { data: workspaces, error } = await supabase
+        .from('workspaces')
+        .select('id, name, workspace_type, status, created_at, event_id, parent_workspace_id')
+        .in('id', selectedIds);
+      
+      if (error) throw error;
+      
+      // Create CSV content
+      const headers = ['ID', 'Name', 'Type', 'Status', 'Created At', 'Event ID', 'Parent ID'];
+      const rows = workspaces?.map(w => [
+        w.id,
+        w.name,
+        w.workspace_type,
+        w.status,
+        w.created_at,
+        w.event_id || '',
+        w.parent_workspace_id || ''
+      ]) || [];
+      
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+      
+      // Download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `workspaces-export-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Export Complete',
+        description: `Exported ${workspaces?.length || 0} workspace(s) to CSV`,
+      });
+    } catch (_error) {
+      toast({
+        title: 'Export Failed',
+        description: 'Failed to export workspace data. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (selectedIds.length === 0) {

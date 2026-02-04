@@ -28,15 +28,8 @@ export function BudgetTracker({
   const isOverBudget = used > allocated;
   const isNearLimit = usagePercent >= 80 && !isOverBudget;
 
-  // Use provided categories or generate mock ones
-  const categories: BudgetCategory[] = propCategories && propCategories.length > 0 
-    ? propCategories 
-    : [
-        { name: 'Vendors', allocated: allocated * 0.4, used: used * 0.35 },
-        { name: 'Equipment', allocated: allocated * 0.25, used: used * 0.3 },
-        { name: 'Marketing', allocated: allocated * 0.2, used: used * 0.25 },
-        { name: 'Miscellaneous', allocated: allocated * 0.15, used: used * 0.1 },
-      ];
+  // Use provided categories - no mock fallback (show empty if no data)
+  const categories: BudgetCategory[] = propCategories || [];
 
   const formatCurrency = (amount: number) => {
     return `${currency}${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
