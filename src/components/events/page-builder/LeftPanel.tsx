@@ -33,6 +33,7 @@ interface LeftPanelProps {
   selectedLayerId?: string;
   onSelectTemplate?: (template: TemplateData) => void;
   selectedTemplateId?: string;
+  children?: React.ReactNode;
 }
 
 export interface LayerData {
@@ -75,6 +76,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   selectedLayerId,
   onSelectTemplate,
   selectedTemplateId,
+  children,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('Layers');
 
@@ -116,6 +118,8 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             onLayerDelete={onLayerDelete}
             selectedLayerId={selectedLayerId}
           />
+          {/* Version History (rendered as children) */}
+          {children}
         </div>
 
         <div className={cn(activeTab === 'Assets' ? 'block' : 'hidden')}>

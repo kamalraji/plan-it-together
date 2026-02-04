@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import api from '../../lib/api';
+import { useMutation } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface WorkspaceTemplateRatingProps {
   templateId: string;
@@ -31,8 +33,54 @@ export function WorkspaceTemplateRating({
     eventSuccess: false,
     wouldRecommend: false
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Submit rating mutation - now using real database
+  const submitRatingMutation = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+      
+      // Build review text with additional context
+      const reviewParts = [
+        ratingData.feedback,
+        `Team Satisfaction: ${ratingData.teamSatisfaction}/5`,
+        `Task Completion: ${ratingData.completionRate}%`,
+        `Event Successful: ${ratingData.eventSuccess ? 'Yes' : 'No'}`,
+        `Would Recommend: ${ratingData.wouldRecommend ? 'Yes' : 'No'}`
+      ].filter(Boolean);
+      
+      const review = reviewParts.join(' | ');
+      
+      // Upsert rating to workspace_template_ratings table
+      const { error: upsertError } = await supabase
+        .from('workspace_template_ratings')
+        .upsert({
+          template_id: templateId,
+          user_id: user.id,
+          workspace_id: workspaceId,
+          rating: ratingData.rating,
+          review: review,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'template_id,user_id'
+        });
+      
+      if (upsertError) throw upsertError;
+      
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Rating submitted',
+        description: 'Thank you for your feedback!',
+      });
+      onRatingSubmitted();
+    },
+    onError: (error) => {
+      setError(error instanceof Error ? error.message : 'Failed to submit rating');
+    },
+  });
 
   const handleRatingChange = (field: keyof RatingData, value: any) => {
     setRatingData(prev => ({
@@ -56,21 +104,8 @@ export function WorkspaceTemplateRating({
       return;
     }
 
-    setLoading(true);
     setError(null);
-
-    try {
-      await api.post(`/api/workspace-templates/${templateId}/rate`, {
-        workspaceId,
-        ...ratingData
-      });
-      onRatingSubmitted();
-    } catch (error: any) {
-      console.error('Error submitting rating:', error);
-      setError(error.response?.data?.message || 'Failed to submit rating');
-    } finally {
-      setLoading(false);
-    }
+    submitRatingMutation.mutate();
   };
 
   const renderStars = (
@@ -239,10 +274,10 @@ export function WorkspaceTemplateRating({
             </button>
             <button
               type="submit"
-              disabled={loading || ratingData.rating === 0}
+              disabled={submitRatingMutation.isPending || ratingData.rating === 0}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
             >
-              {loading ? 'Submitting...' : 'Submit Rating'}
+              {submitRatingMutation.isPending ? 'Submitting...' : 'Submit Rating'}
             </button>
           </div>
         </form>

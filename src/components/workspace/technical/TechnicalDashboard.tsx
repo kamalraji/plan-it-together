@@ -14,6 +14,8 @@ import { Video, Radio } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLiveStreams } from '@/hooks/useLiveStreaming';
+import { useTechnicalCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface TechnicalDashboardProps {
   workspace: Workspace;
@@ -28,10 +30,13 @@ export function TechnicalDashboard({
   const { data: streams = [] } = useLiveStreams(workspace.id);
   const activeStreams = streams.filter(s => s.stream_status === 'live');
 
+  // Enable real-time updates for technical committee data
+  useTechnicalCommitteeRealtime({ workspaceId: workspace.id });
+
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <TechnicalStatsCards />
+      <TechnicalStatsCards workspaceId={workspace.id} eventId={workspace.eventId} />
 
       {/* Quick Actions */}
       <TechnicalQuickActions />
@@ -81,6 +86,12 @@ export function TechnicalDashboard({
           </CardContent>
         </Card>
       )}
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Main Grid with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

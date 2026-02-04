@@ -18,6 +18,7 @@ export { TaskKanbanBoard } from './TaskKanbanBoard';
 export { TaskManagementInterface } from './TaskManagementInterface';
 export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
+export { TaskEditModal } from './TaskEditModal';
 export { TaskDetailView } from './TaskDetailView';
 export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
@@ -26,6 +27,26 @@ export { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
 export { WorkspacePermissionGuard, PermissionBadge } from './WorkspacePermissionGuard';
 export { WorkspaceRBACInfo } from './WorkspaceRBACInfo';
 export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
+export { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
+export { ActivityFeedWidget } from './ActivityFeedWidget';
+export { PostEventRatingPrompt } from './PostEventRatingPrompt';
+export { BulkTaskActions } from './BulkTaskActions';
+export { TaskListWithBulkActions } from './TaskListWithBulkActions';
+export { BroadcastMessageDialog } from './BroadcastMessageDialog';
+export { VirtualizedTaskList } from './VirtualizedTaskList';
+export { GoalSettingDialog } from './GoalSettingDialog';
+export { DashboardExportButton } from './DashboardExportButton';
+export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+export { OfflineSyncIndicator } from './OfflineSyncIndicator';
+
+// Drag and Drop Components
+export * from './dnd';
 
 // Mobile Components
 export * from './mobile';
+
+// Voice Channel Components
+export * from './voice';
+
+// Notifications Components
+export * from './notifications';

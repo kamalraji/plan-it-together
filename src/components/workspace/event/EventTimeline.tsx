@@ -1,28 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Flag, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEventTimeline, TimelineEvent } from '@/hooks/useEventScheduleData';
 
 interface EventTimelineProps {
   workspaceId?: string;
 }
 
-interface TimelineEvent {
-  id: string;
-  time: string;
-  title: string;
-  type: 'milestone' | 'alert' | 'completed' | 'current';
-  description?: string;
-}
-
-export function EventTimeline(_props: EventTimelineProps) {
-  const timelineEvents: TimelineEvent[] = [
-    { id: '1', time: '1 week ago', title: 'Venue Contract Signed', type: 'completed' },
-    { id: '2', time: '3 days ago', title: 'Final Headcount Confirmed', type: 'completed' },
-    { id: '3', time: 'Yesterday', title: 'AV Equipment Delivered', type: 'completed' },
-    { id: '4', time: 'Today', title: 'Staff Briefing', type: 'current', description: 'In progress' },
-    { id: '5', time: 'Tomorrow', title: 'Event Day', type: 'milestone', description: 'Main event' },
-    { id: '6', time: 'In 3 days', title: 'Post-Event Debrief', type: 'milestone' },
-  ];
+export function EventTimeline({ workspaceId }: EventTimelineProps) {
+  const { timelineEvents, isLoading } = useEventTimeline(workspaceId);
 
   const getTypeIcon = (type: TimelineEvent['type']) => {
     switch (type) {
@@ -42,48 +29,114 @@ export function EventTimeline(_props: EventTimelineProps) {
     }
   };
 
+  if (isLoading) {
+    return (
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Clock className="h-4 w-4 text-blue-500" />
+            Event Timeline
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex gap-4">
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const isEmpty = timelineEvents.length === 0;
+
   return (
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <Clock className="h-4 w-4 text-blue-500" />
           Event Timeline
+          {timelineEvents.length > 0 && (
+            <Badge variant="secondary" className="ml-2 text-xs">
+              {timelineEvents.length} milestones
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border" />
+        {isEmpty ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <Flag className="h-10 w-10 text-muted-foreground/50 mb-3" />
+            <p className="text-sm text-muted-foreground">No milestones yet</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              Add milestones to track your event progress
+            </p>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Timeline line */}
+            <div 
+              className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-border" 
+              aria-hidden="true"
+            />
 
-          <div className="space-y-4">
-            {timelineEvents.map((event) => (
-              <div key={event.id} className="flex gap-4 relative">
-                {/* Icon */}
-                <div className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-background border border-border">
-                  {getTypeIcon(event.type)}
-                </div>
+            <div className="space-y-4" role="list" aria-label="Event timeline">
+              {timelineEvents.map((event) => (
+                <div 
+                  key={event.id} 
+                  className="flex gap-4 relative"
+                  role="listitem"
+                >
+                  {/* Icon */}
+                  <div 
+                    className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-background border border-border"
+                    aria-hidden="true"
+                  >
+                    {getTypeIcon(event.type)}
+                  </div>
 
-                {/* Content */}
-                <div className="flex-1 pb-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-muted-foreground font-mono">{event.time}</span>
-                    {event.type === 'current' && (
-                      <Badge variant="outline" className={`text-xs ${getTypeBadge(event.type)}`}>
-                        Now
-                      </Badge>
+                  {/* Content */}
+                  <div className="flex-1 pb-2">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {event.time}
+                      </span>
+                      {event.type === 'current' && (
+                        <Badge variant="outline" className={`text-xs ${getTypeBadge(event.type)}`}>
+                          Now
+                        </Badge>
+                      )}
+                      {event.type === 'alert' && (
+                        <Badge variant="outline" className={`text-xs ${getTypeBadge(event.type)}`}>
+                          Overdue
+                        </Badge>
+                      )}
+                    </div>
+                    <h4 
+                      className={`font-medium text-sm ${
+                        event.type === 'completed' ? 'text-muted-foreground line-through' : ''
+                      }`}
+                    >
+                      {event.title}
+                    </h4>
+                    {event.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {event.description}
+                      </p>
                     )}
                   </div>
-                  <h4 className={`font-medium text-sm ${event.type === 'completed' ? 'text-muted-foreground' : ''}`}>
-                    {event.title}
-                  </h4>
-                  {event.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

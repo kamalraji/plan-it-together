@@ -60,8 +60,8 @@ export function RealtimeMessageThread({ channel, userName = 'User' }: RealtimeMe
   const handleSendMessage = async (content: string) => {
     try {
       await sendMessage(content, userName);
-    } catch (error) {
-      console.error('Failed to send message:', error);
+    } catch {
+      // Message send failed - error handled by the hook
     }
   };
 

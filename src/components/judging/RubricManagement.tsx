@@ -35,8 +35,8 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
           setCriteria(rubric.criteria as any);
         }
       }
-    } catch (err) {
-      console.error('Error fetching rubric:', err);
+    } catch (_err) {
+      // Silently handle - rubric may not exist yet
     }
   };
 

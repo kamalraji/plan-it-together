@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { WorkspaceChannel, MessageResponse, SendMessageDTO } from '../../../types';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { WorkspaceChannel, SendMessageDTO } from '../../../types';
 import { MessageComposer } from './MessageComposer';
-import api from '../../../lib/api';
+
+interface MessageData {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string | null;
+  sentAt: string;
+  editedAt: string | null;
+  attachments: any[] | null;
+}
 
 interface MessageThreadProps {
   channel: WorkspaceChannel;
@@ -11,23 +21,62 @@ interface MessageThreadProps {
 }
 
 export function MessageThread({ channel, onSendMessage, isSending }: MessageThreadProps) {
-  const [messages, setMessages] = useState<MessageResponse[]>([]);
+  const [messages, setMessages] = useState<MessageData[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
-  // Fetch channel messages
+  // Fetch channel messages using Supabase
   const { data: messageHistory, isLoading } = useQuery({
     queryKey: ['channel-messages', channel.id],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/channels/${channel.id}/messages`);
-      return response.data;
+      const { data, error } = await supabase
+        .from('channel_messages')
+        .select('id, content, sender_id, sender_name, created_at, edited_at, attachments')
+        .eq('channel_id', channel.id)
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      return (data || []).map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        senderId: msg.sender_id,
+        senderName: msg.sender_name,
+        sentAt: msg.created_at,
+        editedAt: msg.edited_at,
+        attachments: msg.attachments as any[] | null
+      })) as MessageData[];
     },
-    refetchInterval: 5000, // Poll for new messages every 5 seconds
   });
+
+  // Set up real-time subscription for new messages
+  useEffect(() => {
+    const subscription = supabase
+      .channel(`messages:${channel.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'channel_messages',
+          filter: `channel_id=eq.${channel.id}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['channel-messages', channel.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [channel.id, queryClient]);
 
   // Update messages when data changes
   useEffect(() => {
-    if (messageHistory?.messages) {
-      setMessages(messageHistory.messages);
+    if (messageHistory) {
+      setMessages(messageHistory);
     }
   }, [messageHistory]);
 
@@ -49,10 +98,11 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
       return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
   };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -61,7 +111,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
     <div className="h-full flex flex-col bg-card border border-border rounded-lg">
       {/* Channel Header */}
       <div className="px-4 py-3 border-b border-border bg-muted/50 rounded-t-lg">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
           <div>
             <h3 className="font-medium text-foreground">#{channel.name}</h3>
             {channel.description && (
@@ -69,7 +119,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
             )}
           </div>
           {channel.isPrivate && (
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+            <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full">
               🔒 Private
             </span>
           )}
@@ -107,22 +157,22 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                 
                 <div className={`flex space-x-3 ${showSenderInfo ? 'mt-4' : 'mt-1'}`}>
                   {showSenderInfo ? (
-                    <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {message.senderId.charAt(0).toUpperCase()}
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
+                      {(message.senderName || message.senderId).charAt(0).toUpperCase()}
                     </div>
                   ) : (
                     <div className="w-8 h-8 flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100">
                         {formatMessageTime(message.sentAt)}
                       </span>
                     </div>
                   )}
                   
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 group">
                     {showSenderInfo && (
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="font-medium text-foreground">
-                          User {message.senderId.slice(-4)}
+                          {message.senderName || `User ${message.senderId.slice(-4)}`}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {formatMessageTime(message.sentAt)}
@@ -132,9 +182,9 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                     
                     <div className="text-foreground text-sm leading-relaxed">
                       {message.content.startsWith('**Task Update**:') ? (
-                        <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                        <div className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-400 p-3 rounded">
                           <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-blue-600 font-medium text-xs">TASK UPDATE</span>
+                            <span className="text-blue-600 dark:text-blue-400 font-medium text-xs">TASK UPDATE</span>
                           </div>
                           <p>{message.content.replace('**Task Update**: ', '')}</p>
                         </div>
@@ -146,14 +196,14 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                     {/* Attachments */}
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-2">
-                        {message.attachments.map((attachment, idx) => (
+                        {message.attachments.map((attachment: any, idx: number) => (
                           <div key={idx} className="flex items-center space-x-2 text-sm">
                             <span className="text-muted-foreground">📎</span>
                             <a
                               href={attachment.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-indigo-600 hover:text-indigo-700 underline"
+                              className="text-primary hover:text-primary/80 underline"
                             >
                               {attachment.filename}
                             </a>

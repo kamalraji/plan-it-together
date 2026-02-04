@@ -408,7 +408,7 @@ export function CheckInventoryTab({ workspaceId }: CheckInventoryTabProps) {
                             Mark Ordered
                           </Button>
                         )}
-                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => handleEdit(item)}>
+                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => handleEdit(item)} aria-label="Edit item">
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button

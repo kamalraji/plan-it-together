@@ -12,6 +12,7 @@ import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
 
 import { DollarSign, Users, LayoutGrid } from 'lucide-react';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,6 +28,9 @@ export function FinanceDepartmentDashboard({
   onViewTasks,
 }: FinanceDepartmentDashboardProps) {
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time updates for tasks, activities, milestones, budget_requests
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch child committees count
   const { data: committees = [] } = useQuery({

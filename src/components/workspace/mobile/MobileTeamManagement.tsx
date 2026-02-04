@@ -9,11 +9,11 @@ import {
   ClockIcon,
   XCircleIcon,
   UserMinusIcon,
-  PencilIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
-import { Workspace, TeamMember, WorkspaceRole } from '../../../types';
-import api from '../../../lib/api';
+import { MobileRoleEditor } from './MobileRoleEditor';
+import { Workspace, WorkspaceRole } from '../../../types';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
@@ -25,28 +25,54 @@ interface MobileTeamManagementProps {
   onInviteMember: () => void;
 }
 
+interface TeamMemberWithProfile {
+  id: string;
+  user_id: string;
+  role: string;
+  status: string;
+  user_profiles: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
 export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<WorkspaceRole | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'inactive'>('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMemberWithProfile | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [memberToEditRole, setMemberToEditRole] = useState<TeamMemberWithProfile | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch team members
+  // Fetch team members from Supabase
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ['workspace-team-members', workspace.id],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('id, user_id, role, status')
+        .eq('workspace_id', workspace.id);
+      
+      if (error) throw error;
+      return (data || []).map(m => ({
+        ...m,
+        user_profiles: { id: m.user_id, name: 'Team Member', email: '' }
+      })) as TeamMemberWithProfile[];
     },
   });
 
   // Remove team member mutation
   const removeTeamMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      await api.delete(`/workspaces/${workspace.id}/team-members/${memberId}`);
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
 
       // Log workspace activity for mobile member removals
       await supabase.from('workspace_activities').insert({
@@ -64,8 +90,10 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
   });
 
   const filteredMembers = teamMembers?.filter(member => {
-    const matchesSearch = member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const name = member.user_profiles?.name?.toLowerCase() || '';
+    const email = member.user_profiles?.email?.toLowerCase() || '';
+    const matchesSearch = name.includes(searchTerm.toLowerCase()) ||
+                         email.includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || member.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || 
                          (statusFilter === 'active' && member.status === 'ACTIVE') ||
@@ -103,7 +131,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
     }
   };
 
-  const getRoleBadge = (role: WorkspaceRole) => {
+  const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
       [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
       [WorkspaceRole.OPERATIONS_MANAGER]: 'bg-violet-100 text-violet-800',
@@ -126,8 +154,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       [WorkspaceRole.MARKETING_LEAD]: 'Marketing Lead',
     };
 
-    // Get label with fallback - handle lead roles and coordinator roles
-    const getLabel = (r: WorkspaceRole): string => {
+    const getLabel = (r: string): string => {
       if (roleLabels[r]) return roleLabels[r];
       if (r.endsWith('_MANAGER')) return r.replace(/_MANAGER$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ') + ' Mgr';
       if (r.endsWith('_LEAD')) return r.replace(/_LEAD$/, '').split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ') + ' Lead';
@@ -135,8 +162,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       return r.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
     };
 
-    // Get color with fallback based on role hierarchy
-    const getColor = (r: WorkspaceRole): string => {
+    const getColor = (r: string): string => {
       if (roleColors[r]) return roleColors[r];
       if (r.endsWith('_MANAGER')) return 'bg-violet-100 text-violet-800';
       if (r.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
@@ -171,11 +197,6 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
     }
   };
 
-  // Role update function available for future use
-  // const handleUpdateRole = async (memberId: string, role: WorkspaceRole) => {
-  //   await updateRoleMutation.mutateAsync({ memberId, role });
-  // };
-
   if (isLoading) {
     return <TeamListSkeleton itemCount={5} />;
   }
@@ -190,7 +211,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
         </div>
         <button
           onClick={onInviteMember}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 min-h-[48px]"
         >
           <UserPlusIcon className="w-4 h-4 mr-2" />
           Invite
@@ -207,14 +228,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
             placeholder="Search members..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
+            className="w-full pl-10 pr-4 py-3 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary min-h-[48px]"
           />
         </div>
 
         {/* Filter Toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center text-sm text-muted-foreground hover:text-foreground"
+          className="flex items-center text-sm text-muted-foreground hover:text-foreground min-h-[48px] px-2"
         >
           <FunnelIcon className="w-4 h-4 mr-2" />
           Filters
@@ -228,7 +249,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value as WorkspaceRole | 'all')}
-                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
+                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary min-h-[48px]"
               >
                 <option value="all">All Roles</option>
                 <option value={WorkspaceRole.WORKSPACE_OWNER}>Owner</option>
@@ -245,7 +266,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
+                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary min-h-[48px]"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -290,9 +311,9 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
             >
               <div className="flex items-center space-x-3">
                 {/* Avatar */}
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-indigo-600 font-medium text-sm">
-                    {getInitials(member.user.name)}
+                    {getInitials(member.user_profiles?.name || 'Unknown')}
                   </span>
                 </div>
 
@@ -300,17 +321,17 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-foreground truncate">
-                      {member.user.name}
+                      {member.user_profiles?.name || 'Unknown User'}
                     </h3>
                     <button
                       onClick={() => setSelectedMember(selectedMember?.id === member.id ? null : member)}
-                      className="p-1 rounded-md hover:bg-muted transition-colors"
+                      className="p-2 rounded-md hover:bg-muted transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
                     >
                       <EllipsisVerticalIcon className="w-4 h-4 text-muted-foreground" />
                     </button>
                   </div>
                   
-                  <p className="text-xs text-muted-foreground truncate">{member.user.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{member.user_profiles?.email || ''}</p>
                   
                   <div className="flex items-center space-x-2 mt-2">
                     {getRoleBadge(member.role)}
@@ -324,21 +345,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                 <div className="mt-4 pt-4 border-t border-border space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <button
-                      onClick={() => {
-                        // Handle edit role
-                        console.log('Edit role for', member.id);
-                      }}
-                      className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
+                      onClick={() => setMemberToEditRole(member)}
+                      className="flex items-center justify-center px-3 py-3 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 min-h-[48px]"
                     >
-                      <PencilIcon className="w-4 h-4 mr-2" />
+                      <ShieldCheckIcon className="w-4 h-4 mr-2" />
                       Edit Role
                     </button>
                     <button
-                      onClick={() => {
-                        // Handle send message
-                        console.log('Send message to', member.id);
-                      }}
-                      className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
+                      className="flex items-center justify-center px-3 py-3 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 min-h-[48px]"
                     >
                       <EnvelopeIcon className="w-4 h-4 mr-2" />
                       Message
@@ -348,7 +362,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                   {member.role !== WorkspaceRole.WORKSPACE_OWNER && (
                     <button
                       onClick={() => handleRemoveMember(member.id)}
-                      className="w-full flex items-center justify-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
+                      className="w-full flex items-center justify-center px-3 py-3 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 min-h-[48px]"
                     >
                       <UserMinusIcon className="w-4 h-4 mr-2" />
                       Remove Member
@@ -371,6 +385,17 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
         onConfirm={confirmRemoveMember}
         isLoading={removeTeamMemberMutation.isPending}
       />
+
+      {/* Mobile Role Editor */}
+      {memberToEditRole && (
+        <MobileRoleEditor
+          memberId={memberToEditRole.id}
+          currentRole={memberToEditRole.role}
+          memberName={memberToEditRole.user_profiles?.name || 'Team Member'}
+          workspaceId={workspace.id}
+          onClose={() => setMemberToEditRole(null)}
+        />
+      )}
     </div>
   );
 }

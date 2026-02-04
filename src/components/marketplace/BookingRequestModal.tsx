@@ -83,8 +83,7 @@ export const BookingRequestModal: React.FC<BookingRequestModalProps> = ({
         title: 'Redirecting',
         description: 'You can complete your quote request on the vendor page.',
       });
-    } catch (error) {
-      console.error('Failed to process request:', error);
+    } catch (_error) {
       toast({
         title: 'Error',
         description: 'Failed to process your request. Please try again.',

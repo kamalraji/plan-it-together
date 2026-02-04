@@ -4,6 +4,7 @@ import { VendorDashboardPage } from './VendorDashboardPage';
 import { VendorRegistrationPage } from './VendorRegistrationPage';
 import { VendorListingPage } from './VendorListingPage';
 import { BookingListPage } from './BookingListPage';
+import { BookingCreatePage } from './BookingCreatePage';
 import { MarketplacePage } from './MarketplacePage';
 import { VendorPage } from './VendorPage';
 import { ServiceDetailPage, ServiceDiscoveryEnhanced } from '../../marketplace';
@@ -41,6 +42,7 @@ export const MarketplaceService: React.FC = () => {
       
       {/* Booking Management */}
       <Route path="bookings" element={<BookingListPage />} />
+      <Route path="bookings/new" element={<BookingCreatePage />} />
       <Route path="bookings/:bookingId" element={<BookingListPage />} />
       
       {/* Vendor Analytics and Performance */}

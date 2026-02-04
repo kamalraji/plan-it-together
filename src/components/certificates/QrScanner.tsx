@@ -69,15 +69,13 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
               onScan(certificateId);
             }
             if (err && !(err instanceof NotFoundException)) {
-              // NotFoundException is expected when no QR is in view
-              console.warn('QR scan error:', err);
+              // NotFoundException is expected when no QR is in view - other errors ignored silently
             }
           }
         );
 
         setIsStarting(false);
       } catch (err) {
-        console.error('Camera access error:', err);
         if (err instanceof Error) {
           if (err.name === 'NotAllowedError') {
             setError('Camera access was denied. Please allow camera access to scan QR codes.');

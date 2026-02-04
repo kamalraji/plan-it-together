@@ -11,6 +11,8 @@ import { AdPerformancePanel } from './AdPerformancePanel';
 import { BrandingAssetsManager } from './BrandingAssetsManager';
 import { MarketingCalendar } from './MarketingCalendar';
 import { AudienceInsights } from './AudienceInsights';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { useMarketingCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface MarketingDashboardProps {
   workspace: Workspace;
@@ -23,6 +25,8 @@ export function MarketingDashboard({
   orgSlug,
   onViewTasks,
 }: MarketingDashboardProps) {
+  // Enable real-time updates for marketing committee data
+  useMarketingCommitteeRealtime({ workspaceId: workspace.id });
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['marketing-team-members', workspace.id],
@@ -78,21 +82,22 @@ export function MarketingDashboard({
       />
 
       {/* Marketing Stats */}
-      <MarketingStatsCards
-        activeCampaigns={5}
-        totalReach={45200}
-        conversionRate={3.8}
-        adSpend={8500}
-      />
+      <MarketingStatsCards workspaceId={workspace.id} />
 
       {/* Campaign Tracker */}
       <CampaignTracker />
 
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
+
       {/* Marketing Calendar - Full Width */}
-      <MarketingCalendar />
+      <MarketingCalendar workspaceId={workspace.id} />
 
       {/* Ad Performance */}
-      <AdPerformancePanel />
+      <AdPerformancePanel workspaceId={workspace.id} />
 
       {/* Task Summary with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -111,7 +116,7 @@ export function MarketingDashboard({
       {/* Audience Insights and Branding Assets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AudienceInsights />
-        <BrandingAssetsManager />
+        <BrandingAssetsManager workspaceId={workspace.id} />
       </div>
 
       {/* Team Members */}

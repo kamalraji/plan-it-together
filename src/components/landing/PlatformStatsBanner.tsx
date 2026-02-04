@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, forwardRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Users, Building2, Award } from "lucide-react";
@@ -11,54 +11,54 @@ interface StatItem {
   suffix: string;
 }
 
-function AnimatedCounter({
-  value,
-  suffix,
-  isInView,
-}: {
+interface AnimatedCounterProps {
   value: number;
   suffix: string;
   isInView: boolean;
-}) {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    const duration = 2000;
-    const steps = 60;
-    const increment = value / steps;
-    let current = 0;
-    let step = 0;
-
-    const timer = setInterval(() => {
-      step++;
-      current = Math.min(Math.round(increment * step), value);
-      setDisplayValue(current);
-
-      if (step >= steps) {
-        clearInterval(timer);
-        setDisplayValue(value);
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [value, isInView]);
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000) {
-      return (num / 1000).toFixed(num >= 10000 ? 0 : 1) + "K";
-    }
-    return num.toString();
-  };
-
-  return (
-    <span className="tabular-nums">
-      {formatNumber(displayValue)}
-      {suffix}
-    </span>
-  );
 }
+
+const AnimatedCounter = forwardRef<HTMLSpanElement, AnimatedCounterProps>(
+  function AnimatedCounter({ value, suffix, isInView }, ref) {
+    const [displayValue, setDisplayValue] = useState(0);
+
+    useEffect(() => {
+      if (!isInView) return;
+
+      const duration = 2000;
+      const steps = 60;
+      const increment = value / steps;
+      let current = 0;
+      let step = 0;
+
+      const timer = setInterval(() => {
+        step++;
+        current = Math.min(Math.round(increment * step), value);
+        setDisplayValue(current);
+
+        if (step >= steps) {
+          clearInterval(timer);
+          setDisplayValue(value);
+        }
+      }, duration / steps);
+
+      return () => clearInterval(timer);
+    }, [value, isInView]);
+
+    const formatNumber = (num: number) => {
+      if (num >= 1000) {
+        return (num / 1000).toFixed(num >= 10000 ? 0 : 1) + "K";
+      }
+      return num.toString();
+    };
+
+    return (
+      <span ref={ref} className="tabular-nums">
+        {formatNumber(displayValue)}
+        {suffix}
+      </span>
+    );
+  }
+);
 
 export function PlatformStatsBanner() {
   const ref = useRef<HTMLDivElement>(null);

@@ -11,8 +11,10 @@ import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useSocialMediaCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface SocialMediaDashboardProps {
   workspace: Workspace;
@@ -25,6 +27,8 @@ export function SocialMediaDashboard({
   orgSlug,
   onViewTasks,
 }: SocialMediaDashboardProps) {
+  // Enable real-time updates for social media committee data
+  useSocialMediaCommitteeRealtime({ workspaceId: workspace.id });
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['social-media-team-members', workspace.id],
@@ -100,20 +104,26 @@ export function SocialMediaDashboard({
       {/* Quick Actions */}
       <SocialMediaQuickActions />
 
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
+
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
-          <PlatformManager />
+          <PlatformManager workspaceId={workspace.id} />
           <ContentCalendar />
-          <HashtagTracker />
+          <HashtagTracker workspaceId={workspace.id} />
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
-          <EngagementTracker />
-          <InfluencerTracker />
-          <ContentLibrary />
+          <EngagementTracker workspaceId={workspace.id} />
+          <InfluencerTracker workspaceId={workspace.id} />
+          <ContentLibrary workspaceId={workspace.id} />
         </div>
       </div>
 

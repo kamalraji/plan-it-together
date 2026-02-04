@@ -132,9 +132,8 @@ export function useCreateIncident(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-incidents', workspaceId] });
       toast.success('Incident reported successfully');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to report incident');
-      console.error(error);
     },
   });
 }
@@ -157,9 +156,8 @@ export function useUpdateIncident(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-incidents', workspaceId] });
       toast.success('Incident updated');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update incident');
-      console.error(error);
     },
   });
 }
@@ -186,9 +184,8 @@ export function useResolveIncident(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-incidents', workspaceId] });
       toast.success('Incident resolved');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to resolve incident');
-      console.error(error);
     },
   });
 }
@@ -205,9 +202,8 @@ export function useDeleteIncident(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-incidents', workspaceId] });
       toast.success('Incident deleted');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to delete incident');
-      console.error(error);
     },
   });
 }
@@ -263,9 +259,8 @@ export function useCreateLogistics(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-logistics', workspaceId] });
       toast.success('Shipment added');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to add shipment');
-      console.error(error);
     },
   });
 }
@@ -288,9 +283,8 @@ export function useUpdateLogistics(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-logistics', workspaceId] });
       toast.success('Shipment updated');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update shipment');
-      console.error(error);
     },
   });
 }
@@ -307,9 +301,8 @@ export function useDeleteLogistics(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-logistics', workspaceId] });
       toast.success('Shipment removed');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to remove shipment');
-      console.error(error);
     },
   });
 }
@@ -360,9 +353,8 @@ export function useCreateFacilityCheck(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-facility-checks', workspaceId] });
       toast.success('Facility check added');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to add facility check');
-      console.error(error);
     },
   });
 }
@@ -392,9 +384,8 @@ export function useUpdateFacilityCheck(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-facility-checks', workspaceId] });
       toast.success('Facility check updated');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update facility check');
-      console.error(error);
     },
   });
 }
@@ -424,9 +415,8 @@ export function useRecheckFacility(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-facility-checks', workspaceId] });
       toast.success('Facility re-checked and passed');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to re-check facility');
-      console.error(error);
     },
   });
 }
@@ -443,9 +433,8 @@ export function useDeleteFacilityCheck(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-facility-checks', workspaceId] });
       toast.success('Facility check removed');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to remove facility check');
-      console.error(error);
     },
   });
 }
@@ -498,9 +487,8 @@ export function useCreateEventBriefing(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-event-briefings', workspaceId] });
       toast.success('Schedule item added');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to add schedule item');
-      console.error(error);
     },
   });
 }
@@ -523,9 +511,8 @@ export function useUpdateEventBriefing(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-event-briefings', workspaceId] });
       toast.success('Schedule item updated');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update schedule item');
-      console.error(error);
     },
   });
 }
@@ -542,9 +529,8 @@ export function useDeleteEventBriefing(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-event-briefings', workspaceId] });
       toast.success('Schedule item removed');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to remove schedule item');
-      console.error(error);
     },
   });
 }
@@ -698,9 +684,8 @@ export function useUpdateChecklist(workspaceId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['workspace-checklists-master', workspaceId] });
       toast.success('Checklist updated');
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update checklist');
-      console.error(error);
     },
   });
 }

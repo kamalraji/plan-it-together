@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ServiceListing {
   id: string;
@@ -50,27 +50,57 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Fetch event details for context
+  // Fetch event details from Supabase
   const { data: event } = useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
-      const response = await api.get(`/events/${eventId}`);
-      return response.data.event as Event;
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          id,
+          name,
+          mode,
+          start_date,
+          end_date,
+          capacity
+        `)
+        .eq('id', eventId)
+        .single();
+
+      if (error) throw error;
+
+      // Fetch venue separately
+      const { data: venues } = await supabase
+        .from('event_venues')
+        .select('address, city, state')
+        .eq('event_id', eventId)
+        .limit(1);
+
+      const venue = venues?.[0];
+
+      return {
+        id: data.id,
+        name: data.name,
+        mode: data.mode as 'OFFLINE' | 'ONLINE' | 'HYBRID',
+        startDate: data.start_date,
+        endDate: data.end_date,
+        capacity: data.capacity,
+        venue: venue ? {
+          address: venue.address || '',
+          city: venue.city || '',
+          state: venue.state || '',
+        } : undefined,
+      } as Event;
     },
   });
 
-  // Fetch recommended services based on event details
-  const { data: recommendations, isLoading } = useQuery({
+  // Fetch recommended services - placeholder since service_listings table may not exist
+  const { data: recommendations, isLoading } = useQuery<ServiceListing[]>({
     queryKey: ['service-recommendations', eventId, selectedCategory],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('eventId', eventId);
-      if (selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
-      }
-      
-      const response = await api.get(`/marketplace/services/recommendations?${params.toString()}`);
-      return response.data.services as ServiceListing[];
+      // Placeholder: service_listings table may not exist in current schema
+      // Return empty array for now - implement when marketplace tables are created
+      return [] as ServiceListing[];
     },
   });
 

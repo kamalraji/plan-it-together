@@ -23,6 +23,8 @@ import { supabase } from '@/integrations/supabase/looseClient';
 import { slugify } from '@/lib/workspaceNavigation';
 import { EventSettingsTab } from '@/components/events/settings';
 import { EventStatusActions } from '@/components/events/publish';
+import { RegistrationManagementTab } from '@/components/events/registration';
+import { EventAnalyticsTab } from '@/components/events/analytics';
 
 // Extended event type for internal use
 interface EventWithSlug extends Event {
@@ -85,7 +87,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Event not found or access denied</h1>
-          <Link to="/console/events/list" className="text-indigo-600 hover:text-indigo-800">
+          <Link to="/dashboard/eventmanagement/list" className="text-indigo-600 hover:text-indigo-800">
             Back to events
           </Link>
         </div>
@@ -122,13 +124,13 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Edit Landing Page',
-          action: () => navigate(`/console/events/${eventId}/page-builder`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/page-builder`),
           icon: PaintBrushIcon,
           variant: 'primary' as const,
         },
         {
           label: 'Edit Event',
-          action: () => navigate(`/console/events/${eventId}/edit`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/edit`),
           icon: PencilIcon,
           variant: 'secondary' as const,
         },
@@ -156,7 +158,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       ? [
         {
           label: 'Open Ops Console',
-          action: () => navigate(`/console/events/${eventId}/ops`),
+          action: () => navigate(`/dashboard/eventmanagement/${eventId}/ops`),
           icon: UsersIcon,
           variant: 'secondary' as const,
         },
@@ -164,7 +166,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       : []),
   ];
 
-  const tabs = [
+  const tabs: Array<{ id: string; label: string; badge?: string; component?: React.FC<{ event: Event }> }> = [
     {
       id: 'overview',
       label: 'Overview',
@@ -174,7 +176,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       id: 'registrations',
       label: 'Registrations',
       badge: '156',
-      component: RegistrationsTab,
+      // Component handled specially in render
     },
     ...(canManage
       ? [
@@ -191,7 +193,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
         {
           id: 'settings',
           label: 'Settings',
-          component: SettingsTab,
+          // Component handled specially in render
         },
       ]
       : [
@@ -204,8 +206,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   ];
 
   const breadcrumbs = [
-    { label: 'Events', href: '/console/events/list' },
-    { label: event.name, href: `/console/events/${eventId}` },
+    { label: 'Events', href: '/dashboard/eventmanagement/list' },
+    { label: event.name, href: `/dashboard/eventmanagement/${eventId}` },
   ];
 
   return (
@@ -326,9 +328,20 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               );
             }
             
+            // Special handling for registrations tab to pass canManage
+            if (tab.id === 'registrations') {
+              return (
+                <div key={tab.id}>
+                  <RegistrationsTab event={event} canManage={canManage} />
+                </div>
+              );
+            }
+            
+            if (!tab.component) return null;
+            const TabComponent = tab.component;
             return (
               <div key={tab.id}>
-                <tab.component event={event} />
+                <TabComponent event={event} />
               </div>
             );
           })}
@@ -408,21 +421,13 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
   </div>
 );
 
-const RegistrationsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Registration Management</h3>
-    <p className="text-sm text-muted-foreground">Registration management functionality will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
+const RegistrationsTab: React.FC<{ event: Event; canManage: boolean }> = ({ event, canManage }) => (
+  <RegistrationManagementTab eventId={event.id} canManage={canManage} />
 );
 
 
 const AnalyticsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Analytics</h3>
-    <p className="text-sm text-muted-foreground">Event analytics and reporting will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
+  <EventAnalyticsTab eventId={event.id} />
 );
 
 const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
@@ -482,13 +487,6 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
   );
 };
 
-const SettingsTab: React.FC<{ event: Event }> = ({ event }) => (
-  <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
-    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Event Settings</h3>
-    <p className="text-sm text-muted-foreground">Event settings and configuration will be implemented in future iterations.</p>
-    <p className="text-xs text-muted-foreground/70 mt-2">Event: {event.name}</p>
-  </div>
-);
 
 export default EventDetailPage;
 

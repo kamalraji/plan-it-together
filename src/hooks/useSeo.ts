@@ -9,7 +9,7 @@ interface UseSeoOptions {
   description: string;
   /** Path part of the canonical URL, e.g. "/" or "/login" */
   canonicalPath: string;
-  /** Path to an OG/Twitter image, e.g. "/images/attendflow-og.png" */
+  /** Path to an OG/Twitter image, e.g. "/images/thittam1hub-og.png" */
   ogImagePath?: string;
   /** Schema.org JSON-LD factory for this page. Receives the resolved canonical URL. */
   jsonLdId?: string;

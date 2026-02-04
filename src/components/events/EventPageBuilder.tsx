@@ -1,9 +1,19 @@
 import React from 'react';
 import 'grapesjs/dist/css/grapes.min.css';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePageBuilder, LeftPanel, RightPanel, CanvasArea, pageBuilderTheme } from './page-builder';
+import { 
+  usePageBuilder, 
+  LeftPanel, 
+  RightPanel, 
+  CanvasArea, 
+  pageBuilderTheme,
+  SaveIndicator,
+  PublishDialog,
+  PreviewOverlay,
+  VersionHistory,
+} from './page-builder';
 import { BuilderThemeProvider, useBuilderTheme } from './page-builder/BuilderThemeContext';
-import { ArrowLeft, Save, Eye, Maximize2, Minimize2, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Maximize2, Minimize2, Sun, Moon, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -26,9 +36,19 @@ const EventPageBuilderContent: React.FC = () => {
     traitsContainerRef,
     loading,
     saving,
+    publishing,
     device,
     layers,
     selectedLayerId,
+    slug,
+    saveStatus,
+    lastSavedAt,
+    hasPublishedVersion,
+    showPreview,
+    setShowPreview,
+    showPublishDialog,
+    setShowPublishDialog,
+    previewContent,
     handleDeviceChange,
     handleSave,
     handlePreview,
@@ -39,6 +59,8 @@ const EventPageBuilderContent: React.FC = () => {
     handleLayerLockToggle,
     handleLayerDelete,
     handleLayersReorder,
+    handlePublish,
+    handleRestoreVersion,
   } = usePageBuilder({ eventId });
 
   const handleBack = () => {
@@ -72,6 +94,9 @@ const EventPageBuilderContent: React.FC = () => {
           </Button>
           <div className="h-5 w-px bg-[var(--gjs-border)]" />
           <span className="text-sm font-medium text-[var(--gjs-text-primary)]">Page Builder</span>
+          
+          {/* Save Status Indicator */}
+          <SaveIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
         </div>
         <div className="flex items-center gap-2">
           {/* Theme Toggle */}
@@ -93,13 +118,23 @@ const EventPageBuilderContent: React.FC = () => {
             <span className="hidden sm:inline">Preview</span>
           </Button>
           <Button
+            variant="outline"
             size="sm"
             onClick={handleSave}
             disabled={saving}
-            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            className="gap-2"
           >
             <Save className="h-4 w-4" />
             {saving ? 'Saving...' : 'Save'}
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setShowPublishDialog(true)}
+            disabled={publishing}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <Globe className="h-4 w-4" />
+            {publishing ? 'Publishing...' : 'Publish'}
           </Button>
           <Button
             variant="ghost"
@@ -127,7 +162,19 @@ const EventPageBuilderContent: React.FC = () => {
             onLayerDelete={handleLayerDelete}
             onLayersReorder={handleLayersReorder}
             onSelectTemplate={handleSelectTemplate}
-          />
+          >
+            {/* Version History in Left Panel */}
+            {eventId && (
+              <VersionHistory
+                eventId={eventId}
+                onPreview={() => {
+                  // Preview handled by VersionHistory internally
+                  setShowPreview(true);
+                }}
+                onRestore={handleRestoreVersion}
+              />
+            )}
+          </LeftPanel>
         </div>
 
         {/* Center: Canvas Area */}
@@ -145,12 +192,32 @@ const EventPageBuilderContent: React.FC = () => {
             stylesContainerRef={stylesContainerRef}
             traitsContainerRef={traitsContainerRef}
             onApplyAnimation={handleApplyAnimation}
+            html={previewContent.html}
           />
         </div>
       </div>
 
       {/* GrapesJS Theme */}
       <style>{pageBuilderTheme}</style>
+
+      {/* Preview Overlay */}
+      <PreviewOverlay
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        html={previewContent.html}
+        css={previewContent.css}
+        eventId={eventId}
+      />
+
+      {/* Publish Dialog */}
+      <PublishDialog
+        open={showPublishDialog}
+        onOpenChange={setShowPublishDialog}
+        onPublish={handlePublish}
+        eventSlug={slug}
+        isPublishing={publishing}
+        hasPublishedVersion={hasPublishedVersion}
+      />
     </div>
   );
 };

@@ -74,7 +74,7 @@ export function SocialPostQueueTab({ workspaceId }: SocialPostQueueTabProps) {
                     <div className="flex items-center gap-1">
                       {post.status === 'pending' && <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => handlePublishNow(post.id)} disabled={isPublishing}><Send className="h-3 w-3 mr-1" />Post Now</Button>}
                       {post.status === 'failed' && <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => handlePublishNow(post.id)}><RefreshCw className="h-3 w-3 mr-1" />Retry</Button>}
-                      {(post.status === 'pending' || post.status === 'scheduled') && <Button size="sm" variant="ghost" className="h-8 text-red-500 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>}
+                      {(post.status === 'pending' || post.status === 'scheduled') && <Button size="sm" variant="ghost" className="h-8 text-red-500 hover:text-red-600" aria-label="Delete post"><Trash2 className="h-4 w-4" /></Button>}
                     </div>
                   </div>
                 </div>

@@ -28,11 +28,11 @@ export const createLazyRoute = <P extends object>(
     // Use requestIdleCallback if available for better performance
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(() => {
-        importFn().catch(console.error);
+        importFn().catch(() => { /* Preload failed silently */ });
       });
     } else {
       setTimeout(() => {
-        importFn().catch(console.error);
+        importFn().catch(() => { /* Preload failed silently */ });
       }, 100);
     }
   }
@@ -91,8 +91,8 @@ export const preloadRoutes = (routes: string[]) => {
   routes.forEach(route => {
     // This would be replaced with actual route imports in implementation
     import(/* webpackChunkName: "[request]" */ `@/pages/${route}.tsx`)
-      .catch(error => {
-        console.warn(`Failed to preload route ${route}:`, error);
+      .catch(() => {
+        // Route preload failed - will load on demand
       });
   });
 };
@@ -263,13 +263,7 @@ export const useRoutePerformance = (routeName: string) => {
     // Measure after a short delay to allow for hydration
     setTimeout(measureInteractionTime, 100);
 
-    // Log performance metrics in development
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.log(`Route ${routeName} performance:`, {
-        loadTime: performance.now() - startTime,
-        route: routeName
-      });
-    }
+    // Performance metrics are collected silently for internal use
   }, [routeName]);
 
   return metrics;

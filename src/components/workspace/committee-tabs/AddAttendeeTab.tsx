@@ -308,8 +308,7 @@ export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
 
       setCsvPreview(attendees);
       toast.success(`Found ${attendees.length} attendee(s) in CSV`);
-    } catch (error) {
-      console.error('CSV parse error:', error);
+    } catch {
       toast.error('Failed to parse CSV file');
       setCsvFile(null);
     } finally {

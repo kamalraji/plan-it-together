@@ -30,9 +30,10 @@ export const WORKSPACE_TEAM_MEMBER_COLUMNS = {
 // User profiles columns
 export const USER_PROFILE_COLUMNS = {
   list: 'id, full_name, avatar_url, email',
-  detail: 'id, full_name, avatar_url, email, bio, phone, organization, website, linkedin_url, twitter_url, github_url, username, username_changed_at, skills, social_links, qr_code, cover_image_url, cover_gradient_id, portfolio_accent_color, portfolio_layout, portfolio_sections, portfolio_is_public, created_at, updated_at',
+  detail: 'id, full_name, avatar_url, email, bio, phone, organization, website, linkedin_url, twitter_url, github_url, username, username_changed_at, skills, social_links, qr_code, cover_image_url, cover_gradient_id, portfolio_accent_color, portfolio_layout, portfolio_sections, portfolio_is_public, experience_level, job_title, onboarding_completed_at, onboarding_step, created_at, updated_at',
   minimal: 'id, full_name, avatar_url',
   display: 'id, full_name, avatar_url, email',
+  onboarding: 'id, full_name, avatar_url, email, username, bio, organization, skills, experience_level, job_title, onboarding_completed_at, onboarding_step',
 } as const;
 
 // Events columns

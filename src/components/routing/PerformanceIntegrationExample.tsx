@@ -185,7 +185,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
             paginated={true}
             itemsPerPage={20}
             loading={loading}
-            onRowClick={(record) => console.log('Row clicked:', record)}
+            onRowClick={(_record) => { /* Handle row click */ }}
           />
         );
 
@@ -222,7 +222,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
               description: 'Try adjusting your search criteria',
               action: {
                 label: 'Clear Search',
-                onClick: () => console.log('Clear search')
+                onClick: () => { /* Clear search */ }
               }
             }}
           />

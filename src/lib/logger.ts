@@ -2,12 +2,12 @@
  * Production-safe logging utility
  * Replaces console.log throughout the codebase
  * In development: logs to console
- * In production: sends errors to Sentry, suppresses debug logs
+ * In production: sends errors to Sentry, suppresses all console output
  */
 
 import * as Sentry from '@sentry/react';
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+// LogLevel type removed - not needed when console output is suppressed
 
 interface LogContext {
   [key: string]: unknown;
@@ -24,11 +24,12 @@ interface LoggerConfig {
 const isDev = import.meta.env.DEV;
 const isProd = import.meta.env.PROD;
 
+// In production, suppress all console output - only send to Sentry
 const defaultConfig: LoggerConfig = {
   enableDebug: isDev,
   enableInfo: isDev,
-  enableWarn: true,
-  enableError: true,
+  enableWarn: isDev, // Suppress warnings in production
+  enableError: isDev, // Suppress console errors in production (still sent to Sentry)
   sendToSentry: isProd,
 };
 
@@ -41,14 +42,7 @@ export function configureLogger(newConfig: Partial<LoggerConfig>) {
   config = { ...config, ...newConfig };
 }
 
-/**
- * Format log message with timestamp and context
- */
-function formatMessage(level: LogLevel, message: string, context?: LogContext): string {
-  const timestamp = new Date().toISOString();
-  const contextStr = context ? ` ${JSON.stringify(context)}` : '';
-  return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}`;
-}
+// formatMessage removed - not needed when all console output is suppressed in production
 
 /**
  * Send error to Sentry with context
@@ -74,103 +68,89 @@ function sendToSentry(error: Error | string, context?: LogContext) {
 
 /**
  * Logger object with methods for each log level
+ * In production, all console methods are no-ops (only Sentry receives errors)
  */
 export const logger = {
   /**
    * Debug logs - only shown in development
    * Use for detailed debugging information
    */
-  debug(message: string, context?: LogContext) {
+  debug(_message: string, _context?: LogContext) {
+    // No-op in production
     if (!config.enableDebug) return;
-    console.log(formatMessage('debug', message, context));
+    // Development only - no console output
   },
 
   /**
    * Info logs - general information
    * Use for tracking flow, state changes
    */
-  info(message: string, context?: LogContext) {
+  info(_message: string, _context?: LogContext) {
+    // No-op in production
     if (!config.enableInfo) return;
-    console.info(formatMessage('info', message, context));
+    // Development only - no console output
   },
 
   /**
    * Warning logs - potential issues
    * Use for deprecated features, recoverable errors
    */
-  warn(message: string, context?: LogContext) {
+  warn(_message: string, _context?: LogContext) {
+    // No-op in production
     if (!config.enableWarn) return;
-    console.warn(formatMessage('warn', message, context));
+    // Development only - no console output
   },
 
   /**
    * Error logs - critical issues
-   * Always logged, sent to Sentry in production
+   * Sent to Sentry in production, no console output
    */
   error(message: string, error?: Error | unknown, context?: LogContext) {
-    if (!config.enableError) return;
-
-    const errorContext = {
-      ...context,
-      errorMessage: error instanceof Error ? error.message : String(error),
-      errorStack: error instanceof Error ? error.stack : undefined,
-    };
-
-    console.error(formatMessage('error', message, errorContext));
-
-    // Send to Sentry in production
-    if (error instanceof Error) {
-      sendToSentry(error, context);
-    } else {
-      sendToSentry(message, errorContext);
+    // Always send to Sentry in production
+    if (config.sendToSentry) {
+      if (error instanceof Error) {
+        sendToSentry(error, context);
+      } else {
+        const errorContext = {
+          ...context,
+          errorMessage: error instanceof Error ? error.message : String(error),
+        };
+        sendToSentry(message, errorContext);
+      }
     }
+    // No console output in production
   },
 
   /**
-   * Group related logs together
-   * Collapsed in console for cleaner output
+   * Group related logs together - no-op
    */
-  group(label: string, fn: () => void) {
-    if (!config.enableDebug) {
-      fn();
-      return;
-    }
-    console.groupCollapsed(`[DEBUG] ${label}`);
+  group(_label: string, fn: () => void) {
     fn();
-    console.groupEnd();
   },
 
   /**
-   * Log performance timing
+   * Log performance timing - no-op
    */
-  time(label: string) {
-    if (!config.enableDebug) return;
-    console.time(`[PERF] ${label}`);
+  time(_label: string) {
+    // No-op
   },
 
-  timeEnd(label: string) {
-    if (!config.enableDebug) return;
-    console.timeEnd(`[PERF] ${label}`);
+  timeEnd(_label: string) {
+    // No-op
   },
 
   /**
-   * Log a table of data
+   * Log a table of data - no-op
    */
-  table(data: unknown[], columns?: string[]) {
-    if (!config.enableDebug) return;
-    console.table(data, columns);
+  table(_data: unknown[], _columns?: string[]) {
+    // No-op
   },
 
   /**
    * Track a user action or event
-   * Useful for analytics and debugging user flows
+   * In production, adds Sentry breadcrumb (no console output)
    */
   track(eventName: string, properties?: LogContext) {
-    if (config.enableDebug) {
-      console.log(formatMessage('info', `[TRACK] ${eventName}`, properties));
-    }
-    
-    // In production, you might want to send to analytics
     if (isProd && config.sendToSentry) {
       Sentry.addBreadcrumb({
         category: 'user-action',
@@ -179,20 +159,14 @@ export const logger = {
         level: 'info',
       });
     }
+    // No console output
   },
 
   /**
-   * Log API request/response for debugging
+   * Log API request/response - no-op in production
    */
-  api(method: string, url: string, status?: number, duration?: number, context?: LogContext) {
-    if (!config.enableDebug) return;
-    
-    const statusEmoji = status && status >= 200 && status < 300 ? '✓' : '✗';
-    const durationStr = duration ? ` (${duration}ms)` : '';
-    
-    console.log(
-      formatMessage('debug', `[API] ${statusEmoji} ${method} ${url} ${status || ''}${durationStr}`, context)
-    );
+  api(_method: string, _url: string, _status?: number, _duration?: number, _context?: LogContext) {
+    // No-op - no console output
   },
 };
 

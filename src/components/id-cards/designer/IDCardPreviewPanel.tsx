@@ -91,8 +91,8 @@ export function IDCardPreviewPanel({
       });
       
       previewFabricRef.current.renderAll();
-    } catch (error) {
-      console.error('Failed to render preview:', error);
+    } catch {
+      // Preview render failed - will show empty preview
     } finally {
       setIsRendering(false);
     }

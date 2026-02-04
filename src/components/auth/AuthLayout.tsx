@@ -8,7 +8,7 @@ interface AuthLayoutProps {
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-background af-grid-bg py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Attendflow-style soft card on top of gradient grid */}
+      {/* Thittam1Hub-style soft card on top of gradient grid */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
       </div>

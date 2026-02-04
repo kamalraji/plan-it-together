@@ -8,8 +8,17 @@ import {
   Camera, 
   Mic2, 
   ChevronRight,
-  Users
+  Users,
+  Loader2,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+interface ContentCommitteeHubProps {
+  workspaceId?: string;
+  committees?: Workspace[];
+  onCommitteeClick?: (committee: Workspace) => void;
+}
 
 interface CommitteeStatus {
   id: string;
@@ -20,11 +29,6 @@ interface CommitteeStatus {
   tasksTotal: number;
   members: number;
   status: 'on-track' | 'at-risk' | 'behind';
-}
-
-interface ContentCommitteeHubProps {
-  committees?: Workspace[];
-  onCommitteeClick?: (committee: Workspace) => void;
 }
 
 const COMMITTEE_CONFIG = {
@@ -54,51 +58,88 @@ const COMMITTEE_CONFIG = {
   },
 };
 
-// Mock data for demo purposes
-const mockCommitteeStatus: CommitteeStatus[] = [
-  {
-    id: '1',
-    name: 'Content Committee',
-    type: 'content',
-    progress: 75,
-    tasksDone: 18,
-    tasksTotal: 24,
-    members: 6,
-    status: 'on-track',
-  },
-  {
-    id: '2',
-    name: 'Judge Committee',
-    type: 'judge',
-    progress: 60,
-    tasksDone: 12,
-    tasksTotal: 20,
-    members: 8,
-    status: 'on-track',
-  },
-  {
-    id: '3',
-    name: 'Media Committee',
-    type: 'media',
-    progress: 45,
-    tasksDone: 9,
-    tasksTotal: 20,
-    members: 5,
-    status: 'at-risk',
-  },
-  {
-    id: '4',
-    name: 'Speaker Liaison',
-    type: 'speaker',
-    progress: 85,
-    tasksDone: 17,
-    tasksTotal: 20,
-    members: 4,
-    status: 'on-track',
-  },
-];
+// Helper to detect committee type from name
+function detectCommitteeType(name: string): 'content' | 'judge' | 'media' | 'speaker' {
+  const lowerName = name.toLowerCase();
+  if (lowerName.includes('judge') || lowerName.includes('judging')) return 'judge';
+  if (lowerName.includes('media') || lowerName.includes('photo') || lowerName.includes('video')) return 'media';
+  if (lowerName.includes('speaker') || lowerName.includes('liaison')) return 'speaker';
+  return 'content';
+}
 
-export function ContentCommitteeHub({ committees: _committees = [], onCommitteeClick }: ContentCommitteeHubProps) {
+export function ContentCommitteeHub({ workspaceId, committees: propCommittees = [], onCommitteeClick }: ContentCommitteeHubProps) {
+  // Fetch child workspaces (committees) if workspaceId provided
+  const { data: fetchedCommittees, isLoading } = useQuery({
+    queryKey: ['content-committee-hub', workspaceId],
+    queryFn: async (): Promise<CommitteeStatus[]> => {
+      if (!workspaceId) return [];
+
+      // Fetch child workspaces
+      const { data: childWorkspaces } = await supabase
+        .from('workspaces')
+        .select('id, name')
+        .eq('parent_id', workspaceId);
+
+      if (!childWorkspaces || childWorkspaces.length === 0) return [];
+
+      // For each child workspace, get task and member counts
+      const committeeStats = await Promise.all(
+        childWorkspaces.map(async (ws) => {
+          const [tasksResult, membersResult] = await Promise.all([
+            supabase
+              .from('workspace_tasks')
+              .select('id, status')
+              .eq('workspace_id', ws.id),
+            supabase
+              .from('workspace_team_members')
+              .select('id')
+              .eq('workspace_id', ws.id),
+          ]);
+
+          const tasks = tasksResult.data || [];
+          const completedTasks = tasks.filter(t => 
+            ['completed', 'done', 'COMPLETED'].includes(t.status || '')
+          ).length;
+          const totalTasks = tasks.length;
+          const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+          // Determine status based on progress
+          let status: 'on-track' | 'at-risk' | 'behind' = 'on-track';
+          if (progress < 50) status = 'behind';
+          else if (progress < 75) status = 'at-risk';
+
+          return {
+            id: ws.id,
+            name: ws.name,
+            type: detectCommitteeType(ws.name),
+            progress,
+            tasksDone: completedTasks,
+            tasksTotal: totalTasks,
+            members: membersResult.data?.length || 0,
+            status,
+          };
+        })
+      );
+
+      return committeeStats;
+    },
+    enabled: !!workspaceId,
+  });
+
+  // Use prop committees if no workspaceId, otherwise use fetched data
+  const committees: CommitteeStatus[] = workspaceId 
+    ? (fetchedCommittees || [])
+    : propCommittees.map(c => ({
+        id: c.id,
+        name: c.name,
+        type: detectCommitteeType(c.name),
+        progress: 0,
+        tasksDone: 0,
+        tasksTotal: 0,
+        members: c.teamMembers?.length || 0,
+        status: 'on-track' as const,
+      }));
+
   const getStatusBadge = (status: CommitteeStatus['status']) => {
     const config = {
       'on-track': { label: 'On Track', className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
@@ -107,6 +148,16 @@ export function ContentCommitteeHub({ committees: _committees = [], onCommitteeC
     };
     return config[status];
   };
+
+  if (isLoading) {
+    return (
+      <Card className="bg-card border-border">
+        <CardContent className="flex items-center justify-center h-[300px]">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-card border-border">
@@ -119,50 +170,56 @@ export function ContentCommitteeHub({ committees: _committees = [], onCommitteeC
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {mockCommitteeStatus.map((committee) => {
-          const config = COMMITTEE_CONFIG[committee.type];
-          const statusBadge = getStatusBadge(committee.status);
-          const Icon = config.icon;
+        {committees.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-muted-foreground">No sub-committees found</p>
+          </div>
+        ) : (
+          committees.map((committee) => {
+            const config = COMMITTEE_CONFIG[committee.type];
+            const statusBadge = getStatusBadge(committee.status);
+            const Icon = config.icon;
 
-          return (
-            <div
-              key={committee.id}
-              className={`p-4 rounded-lg border ${config.borderColor} bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer group`}
-              onClick={() => onCommitteeClick?.({ id: committee.id, name: committee.name } as Workspace)}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${config.bgColor}`}>
-                    <Icon className={`h-4 w-4 ${config.color}`} />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm text-foreground">{committee.name}</h4>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Users className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{committee.members} members</span>
+            return (
+              <div
+                key={committee.id}
+                className={`p-4 rounded-lg border ${config.borderColor} bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer group`}
+                onClick={() => onCommitteeClick?.({ id: committee.id, name: committee.name } as Workspace)}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${config.bgColor}`}>
+                      <Icon className={`h-4 w-4 ${config.color}`} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm text-foreground">{committee.name}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Users className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{committee.members} members</span>
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={statusBadge.className}>
+                      {statusBadge.label}
+                    </Badge>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={statusBadge.className}>
-                    {statusBadge.label}
-                  </Badge>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Task Progress</span>
-                  <span className="font-medium text-foreground">
-                    {committee.tasksDone}/{committee.tasksTotal} ({committee.progress}%)
-                  </span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Task Progress</span>
+                    <span className="font-medium text-foreground">
+                      {committee.tasksDone}/{committee.tasksTotal} ({committee.progress}%)
+                    </span>
+                  </div>
+                  <Progress value={committee.progress} className="h-1.5" />
                 </div>
-                <Progress value={committee.progress} className="h-1.5" />
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </CardContent>
     </Card>
   );

@@ -177,8 +177,8 @@ export const SupportContact: React.FC<SupportContactProps> = ({
         category: 'general',
         attachments: []
       });
-    } catch (error) {
-      console.error('Failed to submit ticket:', error);
+    } catch (_error) {
+      // Form is mocked - silently handle
     } finally {
       setSubmitting(false);
     }

@@ -145,7 +145,6 @@ export const RequestQuoteForm: React.FC<RequestQuoteFormProps> = ({
       setSelectedServices([]);
       setOpen(false);
     } catch (error: any) {
-      console.error('Failed to send quote request:', error);
       toast.error('Failed to send quote request', {
         description: error.message || 'Please try again later.',
       });

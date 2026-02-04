@@ -101,8 +101,7 @@ export function useVolunteerShifts(workspaceId: string) {
       toast.success('Shift created successfully');
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error creating shift:', error);
+    onError: (_error) => {
       toast.error('Failed to create shift');
     },
   });
@@ -129,8 +128,7 @@ export function useVolunteerShifts(workspaceId: string) {
       toast.success('Shift updated successfully');
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error updating shift:', error);
+    onError: (_error) => {
       toast.error('Failed to update shift');
     },
   });
@@ -155,8 +153,7 @@ export function useVolunteerShifts(workspaceId: string) {
       toast.success('Shift deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error deleting shift:', error);
+    onError: (_error) => {
       toast.error('Failed to delete shift');
     },
   });
@@ -181,8 +178,7 @@ export function useVolunteerShifts(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
       queryClient.invalidateQueries({ queryKey: ['volunteer-roster', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error assigning volunteers:', error);
+    onError: (_error) => {
       toast.error('Failed to assign volunteers');
     },
   });
@@ -203,8 +199,7 @@ export function useVolunteerShifts(workspaceId: string) {
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
       queryClient.invalidateQueries({ queryKey: ['volunteer-roster', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error unassigning volunteer:', error);
+    onError: (_error) => {
       toast.error('Failed to unassign volunteer');
     },
   });
@@ -227,8 +222,7 @@ export function useVolunteerShifts(workspaceId: string) {
       toast.success('Checked in successfully');
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error checking in:', error);
+    onError: (_error) => {
       toast.error('Failed to check in');
     },
   });
@@ -251,8 +245,7 @@ export function useVolunteerShifts(workspaceId: string) {
       toast.success('Checked out successfully');
       queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
     },
-    onError: (error) => {
-      console.error('Error checking out:', error);
+    onError: (_error) => {
       toast.error('Failed to check out');
     },
   });

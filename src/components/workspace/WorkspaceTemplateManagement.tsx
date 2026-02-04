@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { WorkspaceTemplateLibrary } from './WorkspaceTemplateLibrary';
+import { WorkspaceTemplateLibrary, LibraryTemplate } from './WorkspaceTemplateLibrary';
 import { WorkspaceTemplateCreation } from './WorkspaceTemplateCreation';
 import { WorkspaceTemplatePreview } from './WorkspaceTemplatePreview';
 import { WorkspaceTemplateRating } from './WorkspaceTemplateRating';
 import { IndustryTemplateBrowser } from './templates/IndustryTemplateBrowser';
-import { WorkspaceTemplate } from '../../types/workspace-template';
 import { supabase } from '@/integrations/supabase/client';
-import api from '../../lib/api';
+import { toast } from 'sonner';
 
 interface WorkspaceTemplateManagementProps {
   workspaceId?: string;
   mode: 'library' | 'create' | 'apply';
-  onTemplateApplied?: (template: WorkspaceTemplate) => void;
-  onTemplateCreated?: (template: WorkspaceTemplate) => void;
+  onTemplateApplied?: (template: LibraryTemplate) => void;
+  onTemplateCreated?: (template: LibraryTemplate) => void;
 }
 
 export function WorkspaceTemplateManagement({
@@ -23,21 +22,52 @@ export function WorkspaceTemplateManagement({
 }: WorkspaceTemplateManagementProps) {
   const [currentMode, setCurrentMode] = useState(mode);
   const [libraryTab, setLibraryTab] = useState<'workspace' | 'tasks'>('workspace');
-  const [selectedTemplate, setSelectedTemplate] = useState<WorkspaceTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<LibraryTemplate | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showRating, setShowRating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTemplateSelect = async (template: WorkspaceTemplate) => {
+  const applyTemplate = async (template: LibraryTemplate, targetWorkspaceId: string) => {
+    // Invoke edge function to apply template
+    const { data, error } = await supabase.functions.invoke('apply-workspace-template', {
+      body: {
+        templateId: template.id,
+        workspaceId: targetWorkspaceId,
+      },
+    });
+
+    if (error) throw error;
+
+    // Log workspace activity
+    await supabase.from('workspace_activities').insert({
+      workspace_id: targetWorkspaceId,
+      type: 'template',
+      title: `Template "${template.name}" applied`,
+      description: 'Standard tasks, channels, and milestones were created from the template.',
+      metadata: { templateId: template.id, templateName: template.name },
+    });
+
+    // Update template usage count
+    await supabase
+      .from('workspace_templates')
+      .update({ usage_count: (template.usage_count || 0) + 1 })
+      .eq('id', template.id);
+
+    return data;
+  };
+
+  const handleTemplateSelect = async (template: LibraryTemplate) => {
     if (currentMode === 'apply' && workspaceId) {
       try {
         setLoading(true);
-        await api.post(`/api/workspace-templates/${template.id}/apply/${workspaceId}`);
+        setError(null);
+        await applyTemplate(template, workspaceId);
+        toast.success('Template applied successfully');
         onTemplateApplied?.(template);
-      } catch (error) {
-        console.error('Error applying template:', error);
+      } catch (err: any) {
         setError('Failed to apply template');
+        toast.error('Failed to apply template');
       } finally {
         setLoading(false);
       }
@@ -46,36 +76,28 @@ export function WorkspaceTemplateManagement({
     }
   };
 
-  const handleTemplatePreview = (template: WorkspaceTemplate) => {
+  const handleTemplatePreview = (template: LibraryTemplate) => {
     setSelectedTemplate(template);
     setShowPreview(true);
   };
 
-  const handleTemplateCreated = (template: WorkspaceTemplate) => {
+  const handleTemplateCreated = (template: LibraryTemplate) => {
     onTemplateCreated?.(template);
     setCurrentMode('library');
   };
 
-  const handleUseTemplate = async (template: WorkspaceTemplate) => {
+  const handleUseTemplate = async (template: LibraryTemplate) => {
     if (workspaceId) {
       try {
         setLoading(true);
-        await api.post(`/api/workspace-templates/${template.id}/apply/${workspaceId}`);
-
-        // Log workspace activity (non-blocking)
-        await supabase.from('workspace_activities').insert({
-          workspace_id: workspaceId,
-          type: 'template',
-          title: `Template "${template.name}" applied`,
-          description: 'Standard tasks, channels, and milestones were created from the template.',
-          metadata: { templateId: template.id, templateName: template.name },
-        });
-
+        setError(null);
+        await applyTemplate(template, workspaceId);
         setShowPreview(false);
+        toast.success('Template applied successfully');
         onTemplateApplied?.(template);
-      } catch (error) {
-        console.error('Error applying template:', error);
+      } catch (err: any) {
         setError('Failed to apply template');
+        toast.error('Failed to apply template');
       } finally {
         setLoading(false);
       }
@@ -98,6 +120,12 @@ export function WorkspaceTemplateManagement({
           </div>
           <div className="ml-3">
             <p className="text-sm text-red-800">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="text-sm text-red-600 underline mt-1"
+            >
+              Dismiss
+            </button>
           </div>
         </div>
       </div>

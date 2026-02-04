@@ -14,22 +14,15 @@ export const OrganizationAnalyticsPage: React.FC<OrganizationAnalyticsPageProps>
   organizationId
 }) => {
   const handleExportStart = () => {
-    console.log('Export started');
+    // Export process started
   };
 
-  const handleExportComplete = (success: boolean, filename?: string) => {
-    if (success) {
-      console.log(`Export completed successfully: ${filename}`);
-      // Could show a success toast notification here
-    } else {
-      console.log('Export failed');
-      // Could show an error toast notification here
-    }
+  const handleExportComplete = (_success: boolean, _filename?: string) => {
+    // Export complete - could show a success/error toast notification here
   };
 
-  const handleExportError = (error: string) => {
-    console.error('Export error:', error);
-    // Could show an error toast notification here
+  const handleExportError = (_error: string) => {
+    // Export error - could show an error toast notification here
   };
 
   return (

@@ -133,8 +133,7 @@ export function useUsernameValidation(username: string, debounceMs = 500) {
           error: result.available ? undefined : (result.message || 'Username unavailable'),
           suggestions: result.available ? [] : generateSuggestions(trimmedUsername),
         });
-      } catch (err) {
-        console.error('Username availability check failed:', err);
+      } catch (_err) {
         setState({
           isChecking: false,
           isAvailable: null,

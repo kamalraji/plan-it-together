@@ -12,6 +12,7 @@ interface SectionHeaderProps {
   isOpen: boolean;
   stepNumber: number;
   isConditional?: boolean;
+  sectionId?: string;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -21,11 +22,18 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   isOpen,
   stepNumber,
   isConditional,
+  sectionId,
 }) => (
-  <div className="flex items-center gap-4 w-full py-4 px-2">
+  <div 
+    className="flex items-center gap-4 w-full py-4 px-2"
+    role="button"
+    aria-expanded={isOpen}
+    aria-controls={sectionId ? `section-content-${sectionId}` : undefined}
+    aria-label={`${title} section, ${isOpen ? 'expanded' : 'collapsed'}, step ${stepNumber}${isConditional ? ', conditional' : ''}`}
+  >
     <div
       className={cn(
-        'flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300',
+        'flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl transition-all duration-300',
         isOpen
           ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
           : 'bg-muted text-muted-foreground'
@@ -54,7 +62,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     </div>
     <div
       className={cn(
-        'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300',
+        'flex items-center justify-center w-8 h-8 min-w-[32px] min-h-[32px] rounded-lg transition-all duration-300',
         isOpen ? 'bg-primary/10 rotate-0' : 'bg-transparent -rotate-90'
       )}
     >
@@ -63,6 +71,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           'h-5 w-5 transition-transform duration-300',
           isOpen ? 'text-primary' : 'text-muted-foreground'
         )}
+        aria-hidden="true"
       />
     </div>
   </div>

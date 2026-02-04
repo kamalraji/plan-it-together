@@ -12,6 +12,8 @@ import { MediaAssetsLibrary } from './MediaAssetsLibrary';
 import { BlogArticleTracker } from './BlogArticleTracker';
 import { PageBuilderStatusCard } from './PageBuilderStatusCard';
 import { PublicationPipeline } from './PublicationPipeline';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { useContentCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface ContentDashboardProps {
   workspace: Workspace;
@@ -24,6 +26,8 @@ export function ContentDashboard({
   orgSlug,
   onViewTasks,
 }: ContentDashboardProps) {
+  // Enable real-time updates for content committee data
+  useContentCommitteeRealtime({ workspaceId: workspace.id });
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['content-team-members', workspace.id],
@@ -87,6 +91,12 @@ export function ContentDashboard({
 
       {/* Social Media */}
       <SocialMediaTracker />
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Content Calendar - Full Width */}
       <ContentCalendar />

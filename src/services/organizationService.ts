@@ -207,7 +207,6 @@ class OrganizationService {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error searching organizations', error);
       throw new Error(error.message);
     }
 
@@ -321,11 +320,6 @@ class OrganizationService {
       .maybeSingle();
 
     if (existingError && existingError.code !== 'PGRST116') {
-      console.error('Error checking existing membership', {
-        organizationId,
-        userId: user.id,
-        error: existingError,
-      });
       throw new Error(existingError.message || 'Failed to check existing membership');
     }
 
@@ -350,11 +344,6 @@ class OrganizationService {
       .single();
 
     if (error) {
-      console.error('Error creating membership request', {
-        organizationId,
-        userId: user.id,
-        error,
-      });
       const message =
         error.message?.includes('violates row-level security policy')
           ? 'You do not have permission to request to join this organization.'

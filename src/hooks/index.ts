@@ -43,6 +43,76 @@ export * from './it';
 // Committee hooks (shared dashboard hooks only - specific committees have their own imports)
 export * from './committee';
 
+// Mobile & Responsiveness
+export { useIsMobile } from './use-mobile';
+export { 
+  useSwipeGesture, 
+  useLongPress, 
+  useSwipeAction, 
+  usePinchZoom 
+} from './useTouchGestures';
+
+// URL & Navigation
+export { useUrlState } from './useUrlState';
+export { useDeepLink } from './useDeepLink';
+
+// Event Registration Management
+export { 
+  useEventRegistrations, 
+  useEventRegistrationStats,
+  useUpdateRegistrationStatus,
+  useBulkUpdateRegistrations,
+  exportRegistrationsToCSV,
+} from './useEventRegistrations';
+
+// Content Assets
+export { useContentAssets } from './useContentAssets';
+
+// Sponsorship
+export { useSponsorshipBenefits } from './useSponsorshipBenefits';
+
+// Workspace & Approvals
+export { useApprovalMutations } from './useApprovalMutations';
+
+// Activity Feed & Real-time Updates
+export { 
+  useActivityFeed, 
+  useApprovalRealtimeUpdates, 
+  useTaskRealtimeUpdates 
+} from './useActivityFeed';
+
+// Escalation Workflow
+export { 
+  useEscalationWorkflow,
+  useEscalationRules,
+  useOverdueItems,
+  useEscalateItem,
+  getSLAStatus,
+  type EscalationRule,
+  type OverdueItem,
+  type EscalationLevel,
+  type EscalationStatus,
+} from './useEscalationWorkflow';
+
+// Global Keyboard Shortcuts
+export {
+  useGlobalKeyboardShortcuts,
+  formatShortcutKey,
+  GLOBAL_SHORTCUTS,
+  type KeyboardShortcut,
+} from './useGlobalKeyboardShortcuts';
+
+// Bulk Operations
+export { useBulkTaskOperations } from './useBulkTaskOperations';
+
+// Undo/Redo System
+export {
+  useUndoRedo,
+  createTaskStatusUndoAction,
+  createTaskDeleteUndoAction,
+  createBulkOperationUndoAction,
+} from './useUndoRedo';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';

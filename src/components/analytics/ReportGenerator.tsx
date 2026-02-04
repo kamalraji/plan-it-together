@@ -165,8 +165,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
         setIsGenerating(false);
         setGenerationProgress(0);
       }, 1000);
-    } catch (error) {
-      console.error('Report generation failed:', error);
+    } catch (_error) {
       setIsGenerating(false);
       setGenerationProgress(0);
     }

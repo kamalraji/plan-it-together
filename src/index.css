@@ -81,16 +81,36 @@ code {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Performance-aware reduced motion */
+/* Performance-aware reduced motion - WCAG 2.1 AA compliant */
 @media (prefers-reduced-motion: reduce) {
-  .animate-shimmer,
-  .animate-pulse-dot,
-  .skeleton-pulse {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 
-  .virtualized-container {
-    scroll-behavior: auto;
+  .animate-shimmer,
+  .animate-pulse-dot,
+  .skeleton-pulse,
+  .animate-pulse,
+  .animate-spin,
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  .virtualized-container,
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable parallax and transform animations */
+  .motion-reduce,
+  [data-motion-reduce] {
+    transform: none !important;
+    opacity: 1 !important;
   }
 }
 
@@ -128,7 +148,7 @@ code {
   perspective: 1000px;
 }
 
-/* Attendflow-style light/dark design tokens applied app-wide */
+/* Thittam1Hub-style light/dark design tokens applied app-wide */
 @layer base {
   /* ===== NATIVE FORM ELEMENT DARK MODE FIXES ===== */
   
@@ -370,6 +390,22 @@ code {
 @media (prefers-reduced-motion: reduce) {
   .af-floating {
     animation: none;
+  }
+  
+  /* Comprehensive reduced motion support */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .hover-glow,
+  .hover-scale {
+    transform: none !important;
+    transition: none !important;
   }
 }
 

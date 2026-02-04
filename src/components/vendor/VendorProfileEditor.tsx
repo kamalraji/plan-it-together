@@ -104,9 +104,8 @@ const VendorProfileEditor: React.FC<VendorProfileEditorProps> = ({ vendor, onUpd
       toast.success('Profile updated successfully');
       onUpdate?.();
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast.error('Failed to update profile');
-      console.error(error);
     },
   });
 
@@ -141,9 +140,8 @@ const VendorProfileEditor: React.FC<VendorProfileEditorProps> = ({ vendor, onUpd
 
       setLogoUrl(publicUrl);
       toast.success('Logo uploaded successfully');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to upload logo');
-      console.error(error);
     } finally {
       setIsUploading(false);
     }

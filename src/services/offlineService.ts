@@ -24,7 +24,7 @@ class OfflineService {
   async initialize(): Promise<boolean> {
     try {
       if (!('indexedDB' in window)) {
-        console.warn('IndexedDB not supported');
+        // IndexedDB not supported - gracefully degrade
         return false;
       }
 
@@ -32,13 +32,13 @@ class OfflineService {
 
       // Register background sync if supported
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-        const registration = await navigator.serviceWorker.ready;
-        console.log('Background sync supported', registration);
+        await navigator.serviceWorker.ready;
+        // Background sync is available
       }
 
       return true;
-    } catch (error) {
-      console.error('Failed to initialize offline service:', error);
+    } catch (_error) {
+      // Offline service initialization failed - gracefully degrade
       return false;
     }
   }
@@ -237,15 +237,15 @@ class OfflineService {
   }
 
   // Background Sync
-  private async registerBackgroundSync(tag: string): Promise<void> {
+  private async registerBackgroundSync(_tag: string): Promise<void> {
     try {
       if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-        const registration = await navigator.serviceWorker.ready;
-        // await registration.sync.register(tag); // Background sync not supported in all browsers
-        console.log(`Background sync registered: ${tag}`, registration);
+        await navigator.serviceWorker.ready;
+        // Background sync registration would happen here
+        // await registration.sync.register(tag); // Not supported in all browsers
       }
-    } catch (error) {
-      console.error('Failed to register background sync:', error);
+    } catch (_error) {
+      // Background sync registration failed - will retry on next attempt
     }
   }
 
@@ -266,8 +266,8 @@ class OfflineService {
         if (response.ok) {
           await this.clearTaskUpdate(update.id);
         }
-      } catch (error) {
-        console.error('Failed to sync task update:', error);
+      } catch (_error) {
+        // Task sync failed - will retry on next attempt
       }
     }
   }
@@ -288,8 +288,8 @@ class OfflineService {
         if (response.ok) {
           await this.clearMessage(message.id);
         }
-      } catch (error) {
-        console.error('Failed to sync message:', error);
+      } catch (_error) {
+        // Message sync failed - will retry on next attempt
       }
     }
   }

@@ -11,6 +11,8 @@ import { EmailCampaignTracker } from './EmailCampaignTracker';
 import { MessagingChannels } from './MessagingChannels';
 import { PressReleaseTracker } from './PressReleaseTracker';
 import { StakeholderDirectory } from './StakeholderDirectory';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { useCommunicationCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface CommunicationDashboardProps {
   workspace: Workspace;
@@ -23,6 +25,8 @@ export function CommunicationDashboard({
   orgSlug,
   onViewTasks,
 }: CommunicationDashboardProps) {
+  // Enable real-time updates for communication committee data
+  useCommunicationCommitteeRealtime({ workspaceId: workspace.id });
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['communication-team-members', workspace.id],
@@ -88,6 +92,12 @@ export function CommunicationDashboard({
 
       {/* Announcement Manager */}
       <AnnouncementManager />
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
+      </div>
 
       {/* Email Campaigns - Full Width */}
       <EmailCampaignTracker />

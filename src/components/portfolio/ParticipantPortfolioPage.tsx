@@ -23,15 +23,13 @@ export const ParticipantPortfolioPage: React.FC = () => {
           .maybeSingle();
 
         if (queryError) {
-          console.error('Unable to load participant portfolio.', queryError);
           setError('Unable to load participant portfolio.');
         } else if (!data) {
           setError('Participant not found or portfolio is private.');
         } else {
           setProfile(data as PublicPortfolioProfile);
         }
-      } catch (err) {
-        console.error('Error loading participant portfolio', err);
+      } catch (_err) {
         setError('Unexpected error while loading portfolio.');
       } finally {
         setIsLoading(false);

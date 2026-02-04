@@ -51,6 +51,7 @@ export interface SectionState {
   media: boolean;
   faqs: boolean;
   cta: boolean;
+  template: boolean;
 }
 
 export interface BaseSectionProps {

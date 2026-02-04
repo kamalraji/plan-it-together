@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../lib/api';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCreateTemplate } from '@/hooks/useWorkspaceTemplates';
+import { Loader2 } from 'lucide-react';
 
 interface WorkspaceTemplateCreationProps {
   workspaceId: string;
@@ -10,44 +13,59 @@ interface WorkspaceTemplateCreationProps {
 interface TemplateFormData {
   name: string;
   description: string;
-  category: 'CONFERENCE' | 'WORKSHOP' | 'HACKATHON' | 'NETWORKING' | 'COMPETITION' | 'GENERAL';
+  event_type: 'CONFERENCE' | 'WORKSHOP' | 'HACKATHON' | 'NETWORKING' | 'COMPETITION' | 'GENERAL';
   isPublic: boolean;
-  tags: string[];
 }
 
 export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCancel }: WorkspaceTemplateCreationProps) {
   const [formData, setFormData] = useState<TemplateFormData>({
     name: '',
     description: '',
-    category: 'GENERAL',
+    event_type: 'GENERAL',
     isPublic: false,
-    tags: []
   });
-  const [workspaceData, setWorkspaceData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tagInput, setTagInput] = useState('');
 
-  useEffect(() => {
-    fetchWorkspaceData();
-  }, [workspaceId]);
+  const createTemplate = useCreateTemplate();
 
-  const fetchWorkspaceData = async () => {
-    try {
-      const response = await api.get(`/api/workspace/${workspaceId}`);
-      setWorkspaceData(response.data);
+  // Fetch workspace data from Supabase
+  const { data: workspaceData, isLoading: workspaceLoading } = useQuery({
+    queryKey: ['workspace-for-template', workspaceId],
+    queryFn: async () => {
+      const { data: workspace, error: workspaceError } = await supabase
+        .from('workspaces')
+        .select('id, name')
+        .eq('id', workspaceId)
+        .single();
       
-      // Pre-populate form with workspace data
+      if (workspaceError) throw workspaceError;
+
+      // Fetch related data
+      const [teamResult, tasksResult, channelsResult] = await Promise.all([
+        supabase.from('workspace_team_members').select('id').eq('workspace_id', workspaceId),
+        supabase.from('workspace_tasks').select('id').eq('workspace_id', workspaceId),
+        supabase.from('workspace_channels').select('id').eq('workspace_id', workspaceId),
+      ]);
+
+      return {
+        ...workspace,
+        teamMembersCount: teamResult.data?.length || 0,
+        tasksCount: tasksResult.data?.length || 0,
+        channelsCount: channelsResult.data?.length || 0,
+      };
+    },
+  });
+
+  // Pre-populate form when workspace data loads
+  React.useEffect(() => {
+    if (workspaceData) {
       setFormData(prev => ({
         ...prev,
-        name: `${response.data.name} Template`,
-        description: `Template based on successful workspace: ${response.data.name}`
+        name: `${workspaceData.name} Template`,
+        description: `Template based on successful workspace: ${workspaceData.name}`
       }));
-    } catch (error) {
-      console.error('Error fetching workspace data:', error);
-      setError('Failed to load workspace data');
     }
-  };
+  }, [workspaceData]);
 
   const handleInputChange = (field: keyof TemplateFormData, value: any) => {
     setFormData(prev => ({
@@ -56,43 +74,30 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
     }));
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()]
-      }));
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
-
-    try {
-      const response = await api.post(`/api/workspace-templates/from-workspace/${workspaceId}`, formData);
-      onTemplateCreated(response.data);
-    } catch (error: any) {
-      console.error('Error creating template:', error);
-      setError(error.response?.data?.message || 'Failed to create template');
-    } finally {
-      setLoading(false);
-    }
+    
+    createTemplate.mutate({
+      name: formData.name,
+      description: formData.description,
+      event_type: formData.event_type,
+      is_public: formData.isPublic,
+      source_workspace_id: workspaceId,
+    }, {
+      onSuccess: (data) => {
+        onTemplateCreated(data);
+      },
+      onError: (err) => {
+        setError(err instanceof Error ? err.message : 'Failed to create template');
+      },
+    });
   };
 
-  if (!workspaceData) {
+  if (workspaceLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -108,30 +113,23 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
-              </div>
-            </div>
+          <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
 
         {/* Workspace Preview */}
-        <div className="bg-muted/50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-foreground mb-2">Source Workspace</h3>
-          <div className="text-sm text-muted-foreground">
-            <p><strong>Name:</strong> {workspaceData.name}</p>
-            <p><strong>Team Members:</strong> {workspaceData.teamMembers?.length || 0}</p>
-            <p><strong>Tasks:</strong> {workspaceData.tasks?.length || 0}</p>
-            <p><strong>Channels:</strong> {workspaceData.channels?.length || 0}</p>
+        {workspaceData && (
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-foreground mb-2">Source Workspace</h3>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p><strong>Name:</strong> {workspaceData.name}</p>
+              <p><strong>Team Members:</strong> {workspaceData.teamMembersCount}</p>
+              <p><strong>Tasks:</strong> {workspaceData.tasksCount}</p>
+              <p><strong>Channels:</strong> {workspaceData.channelsCount}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Template Name */}
         <div>
@@ -144,7 +142,7 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             required
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary sm:text-sm"
             placeholder="Enter template name"
           />
         </div>
@@ -160,21 +158,21 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             rows={3}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary sm:text-sm"
             placeholder="Describe what this template is best used for"
           />
         </div>
 
-        {/* Category */}
+        {/* Event Type */}
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-foreground">
-            Event Category *
+          <label htmlFor="event_type" className="block text-sm font-medium text-foreground">
+            Event Type *
           </label>
           <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => handleInputChange('category', e.target.value)}
-            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
+            id="event_type"
+            value={formData.event_type}
+            onChange={(e) => handleInputChange('event_type', e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary sm:text-sm"
           >
             <option value="GENERAL">General</option>
             <option value="CONFERENCE">Conference</option>
@@ -185,45 +183,6 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
           </select>
         </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium text-foreground">Tags</label>
-          <div className="mt-1 flex flex-wrap gap-2 mb-2">
-            {formData.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="ml-1 text-indigo-600 hover:text-indigo-800"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-              className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
-              placeholder="Add tags (e.g., tech, startup, corporate)"
-            />
-            <button
-              type="button"
-              onClick={handleAddTag}
-              className="px-3 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-
         {/* Public/Private */}
         <div className="flex items-center">
           <input
@@ -231,7 +190,7 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             type="checkbox"
             checked={formData.isPublic}
             onChange={(e) => handleInputChange('isPublic', e.target.checked)}
-            className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+            className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
           />
           <label htmlFor="isPublic" className="ml-2 block text-sm text-foreground">
             Make this template publicly available to all users
@@ -243,16 +202,23 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
+            className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-background hover:bg-muted transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            disabled={loading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
+            disabled={createTemplate.isPending}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Creating...' : 'Create Template'}
+            {createTemplate.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Creating...
+              </span>
+            ) : (
+              'Create Template'
+            )}
           </button>
         </div>
       </form>

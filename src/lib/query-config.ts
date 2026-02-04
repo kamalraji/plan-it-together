@@ -72,6 +72,28 @@ export const queryKeys = {
     milestones: (id: string) => [...queryKeys.workspaces.detail(id), 'milestones'] as const,
     checklists: (id: string) => [...queryKeys.workspaces.detail(id), 'checklists'] as const,
     userWorkspaces: (workspaceId: string) => [...queryKeys.workspaces.all, 'user', workspaceId] as const,
+    // New: Committee and department specific
+    committeeStats: (id: string) => [...queryKeys.workspaces.detail(id), 'committee-stats'] as const,
+    departmentStats: (id: string) => [...queryKeys.workspaces.detail(id), 'department-stats'] as const,
+    contentAssets: (id: string) => [...queryKeys.workspaces.detail(id), 'content-assets'] as const,
+    sponsors: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsors'] as const,
+    sponsorDeliverables: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsor-deliverables'] as const,
+    sponsorProposals: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsor-proposals'] as const,
+    sponsorBenefits: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsor-benefits'] as const,
+    sponsorCommunications: (id: string) => [...queryKeys.workspaces.detail(id), 'sponsor-communications'] as const,
+    campaigns: (id: string) => [...queryKeys.workspaces.detail(id), 'campaigns'] as const,
+    emailCampaigns: (id: string) => [...queryKeys.workspaces.detail(id), 'email-campaigns'] as const,
+    announcements: (id: string) => [...queryKeys.workspaces.detail(id), 'announcements'] as const,
+    pressReleases: (id: string) => [...queryKeys.workspaces.detail(id), 'press-releases'] as const,
+    timesheets: (id: string) => [...queryKeys.workspaces.detail(id), 'timesheets'] as const,
+    volunteerTimeLogs: (id: string) => [...queryKeys.workspaces.detail(id), 'volunteer-time-logs'] as const,
+    volunteerTraining: (id: string) => [...queryKeys.workspaces.detail(id), 'volunteer-training'] as const,
+    volunteerRecognitions: (id: string) => [...queryKeys.workspaces.detail(id), 'volunteer-recognitions'] as const,
+    volunteerApplications: (id: string) => [...queryKeys.workspaces.detail(id), 'volunteer-applications'] as const,
+    escalations: (id: string) => [...queryKeys.workspaces.detail(id), 'escalations'] as const,
+    escalationRules: (id: string) => [...queryKeys.workspaces.detail(id), 'escalation-rules'] as const,
+    templates: () => [...queryKeys.workspaces.all, 'templates'] as const,
+    templateRatings: (templateId: string) => [...queryKeys.workspaces.all, 'template-ratings', templateId] as const,
   },
 
   // Organization-related queries
@@ -94,6 +116,9 @@ export const queryKeys = {
     details: () => [...queryKeys.events.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.events.details(), id] as const,
     registrations: (id: string) => [...queryKeys.events.detail(id), 'registrations'] as const,
+    registrationStats: (id: string) => [...queryKeys.events.detail(id), 'registration-stats'] as const,
+    attendees: (id: string) => [...queryKeys.events.detail(id), 'attendees'] as const,
+    waitlist: (id: string) => [...queryKeys.events.detail(id), 'waitlist'] as const,
     sessions: (id: string) => [...queryKeys.events.detail(id), 'sessions'] as const,
     tickets: (id: string) => [...queryKeys.events.detail(id), 'tickets'] as const,
     branding: (id: string) => [...queryKeys.events.detail(id), 'branding'] as const,
@@ -138,6 +163,15 @@ export const queryKeys = {
     assets: (workspaceId: string) => ['media-assets', workspaceId] as const,
     content: (workspaceId: string) => ['content-items', workspaceId] as const,
     speakers: (workspaceId: string) => ['speakers', workspaceId] as const,
+    crew: (workspaceId: string) => ['media-crew', workspaceId] as const,
+    coverageSchedule: (workspaceId: string) => ['coverage-schedule', workspaceId] as const,
+    pressCredentials: (workspaceId: string) => ['press-credentials', workspaceId] as const,
+  },
+
+  // Marketing-related queries
+  marketing: {
+    adChannels: (workspaceId: string) => ['ad-channels', workspaceId] as const,
+    brandingAssets: (workspaceId: string) => ['branding-assets', workspaceId] as const,
   },
 
   // Tasks queries

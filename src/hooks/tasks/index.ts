@@ -29,3 +29,9 @@ export { useTimeReports } from '../useTimeReports';
 
 // Automation
 export { useAutomationRules } from '../useAutomationRules';
+
+// Committee stats
+export { useCommitteeStats, useDepartmentStats } from '../useCommitteeStats';
+
+// Volunteer timesheets
+export { useVolunteerTimesheets } from '../useVolunteerTimesheets';

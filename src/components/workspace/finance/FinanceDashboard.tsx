@@ -3,15 +3,17 @@ import { FinancialSummaryCards } from './FinancialSummaryCards';
 import { ExpenseTracker } from './ExpenseTracker';
 import { InvoiceManager } from './InvoiceManager';
 import { BudgetApprovalQueue } from './BudgetApprovalQueue';
-
 import { SpendingByCategory } from './SpendingByCategory';
 import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { MilestoneTimeline } from '../committee/MilestoneTimeline';
+import { useFinanceCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { DashboardExportButton } from '../DashboardExportButton';
 
 interface FinanceDashboardProps {
   workspace: Workspace;
@@ -34,6 +36,9 @@ export function FinanceDashboard({
   onRequestBudget: _onRequestBudget,
   onRequestResource: _onRequestResource,
 }: FinanceDashboardProps) {
+  // Enable real-time updates for finance committee data
+  useFinanceCommitteeRealtime({ workspaceId: workspace.id });
+
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['finance-team-members', workspace.id],
@@ -80,13 +85,16 @@ export function FinanceDashboard({
   return (
     <div className="space-y-6">
       {/* Finance Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+        <DashboardExportButton workspaceId={workspace.id} dashboardType="finance" />
+      </div>
 
       {/* Financial Summary Cards */}
       <FinancialSummaryCards workspaceId={workspace.id} />
@@ -121,6 +129,12 @@ export function FinanceDashboard({
           <SpendingByCategory workspaceId={workspace.id} />
           <InvoiceManager workspaceId={workspace.id} />
         </div>
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Timeline */}

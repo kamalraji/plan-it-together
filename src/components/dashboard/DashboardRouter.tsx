@@ -5,6 +5,7 @@ import { ParticipantDashboard } from './ParticipantDashboard';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { UserRole } from '@/types';
 import { ParticipantDashboardSkeleton } from './DashboardSkeleton';
+import { PUBLIC_ROUTES, AUTH_ROUTES, ORG_ROUTES } from '@/lib/routes';
 
 /**
  * DashboardRouter
@@ -26,7 +27,7 @@ export const DashboardRouter: React.FC = () => {
 
   // Not authenticated - redirect to login
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={PUBLIC_ROUTES.LOGIN} replace />;
   }
 
   // Organizers and admins with a primary org go to org-scoped dashboard
@@ -34,12 +35,12 @@ export const DashboardRouter: React.FC = () => {
     (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN) &&
     primaryOrg?.slug
   ) {
-    return <Navigate to={`/${primaryOrg.slug}/dashboard`} replace />;
+    return <Navigate to={ORG_ROUTES.DASHBOARD(primaryOrg.slug)} replace />;
   }
 
   // Organizers without an org - might need onboarding
   if (user.role === UserRole.ORGANIZER && !primaryOrg) {
-    return <Navigate to="/onboarding/organization" replace />;
+    return <Navigate to={AUTH_ROUTES.ONBOARDING_ORGANIZATION} replace />;
   }
 
   // Participants and fallback: render participant dashboard directly

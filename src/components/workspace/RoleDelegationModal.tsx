@@ -99,7 +99,7 @@ export function RoleDelegationModal({
           .eq('id', currentHolder.id);
 
         if (demoteError) {
-          console.error('Failed to demote previous holder:', demoteError);
+          // Previous holder demotion failed - continue with delegation
         }
       }
 
@@ -107,8 +107,7 @@ export function RoleDelegationModal({
       onDelegated?.();
       onOpenChange(false);
       setSelectedMember(null);
-    } catch (error) {
-      console.error('Failed to delegate role:', error);
+    } catch {
       toast.error('Failed to delegate role');
     } finally {
       setIsDelegating(false);

@@ -78,7 +78,7 @@ export const DangerZoneCard: React.FC<DangerZoneCardProps> = ({
         title: 'Event deleted',
         description: 'The event has been permanently deleted.',
       });
-      navigate('/console/events/list');
+      navigate('/dashboard/eventmanagement/list');
     } catch (error) {
       toast({
         title: 'Error deleting event',

@@ -4,8 +4,12 @@ import { WorkspaceSidebar } from './WorkspaceSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { Workspace } from '@/types';
-import { WorkspaceTab } from './WorkspaceSidebar';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 import { GlobalTimerWidget } from './GlobalTimerWidget';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { useGlobalKeyboardShortcuts } from '@/hooks/useGlobalKeyboardShortcuts';
+import { CommandPalette } from '@/components/ui/command-palette';
+import { SkipLinks } from '@/components/accessibility/SkipLinks';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -14,12 +18,12 @@ import { GlobalTimerWidget } from './GlobalTimerWidget';
 const WorkspaceConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> = ({ user, onLogout }) => {
   const { toggleSidebar } = useSidebar();
 
-  const handleServiceChange = useCallback((service: string) => {
-    console.log('Workspace console service change:', service);
+  const handleServiceChange = useCallback((_service: string) => {
+    // Service change handler - can be extended for analytics
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    console.log('Workspace console global search:', query);
+  const handleSearch = useCallback((_query: string) => {
+    // Global search handler - can be extended for workspace-scoped search
   }, []);
 
   return (
@@ -60,13 +64,31 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const [activeTaskTitle, _setActiveTaskTitle] = useState<string | undefined>();
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
 
+  // Global keyboard shortcuts
+  useGlobalKeyboardShortcuts({
+    onShowShortcuts: () => setShowShortcuts(true),
+    onNewTask: () => onTabChange('tasks'),
+    onSearch: () => setShowCommandPalette(true),
+  });
+  // Workspace-specific skip links
+  const workspaceSkipLinks = [
+    { id: 'main-content', label: 'Skip to main content' },
+    { id: 'workspace-navigation', label: 'Skip to workspace navigation' },
+    { id: 'workspace-actions', label: 'Skip to workspace actions' },
+  ];
+
   return (
     <SidebarProvider defaultOpen={true} className="flex-col">
+      {/* Accessibility: Skip Links for keyboard navigation */}
+      <SkipLinks links={workspaceSkipLinks} />
+      
       {/* Global console header fixed at the top */}
       <WorkspaceConsoleHeader user={user} onLogout={handleLogout} />
 
@@ -74,22 +96,29 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
       <div className="relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background/95 to-background/90 overflow-hidden mt-16">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(circle_at_bottom,_hsl(var(--primary)/0.10),_transparent_55%)]" />
         <div className="relative flex w-full h-full">
-          <WorkspaceSidebar
-            workspace={workspace}
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            orgSlug={orgSlug}
-            canCreateSubWorkspace={canCreateSubWorkspace}
-            canInviteMembers={canInviteMembers}
-            onCreateSubWorkspace={onCreateSubWorkspace}
-            onInviteMember={onInviteMember}
-            onManageSettings={onManageSettings}
-          />
+          <nav id="workspace-navigation" aria-label="Workspace navigation" tabIndex={-1}>
+            <WorkspaceSidebar
+              workspace={workspace}
+              activeTab={activeTab}
+              onTabChange={onTabChange}
+              orgSlug={orgSlug}
+              canCreateSubWorkspace={canCreateSubWorkspace}
+              canInviteMembers={canInviteMembers}
+              onCreateSubWorkspace={onCreateSubWorkspace}
+              onInviteMember={onInviteMember}
+              onManageSettings={onManageSettings}
+            />
+          </nav>
 
           <SidebarInset className="flex-1 min-w-0 overflow-y-auto">
-            <div className="w-full my-4 sm:my-6 mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in">
+            <main 
+              id="main-content" 
+              tabIndex={-1}
+              aria-label="Workspace content"
+              className="w-full my-4 sm:my-6 mx-1 sm:mx-2 px-2 sm:px-3 md:px-4 rounded-2xl sm:rounded-3xl border border-border/60 bg-card/75 py-4 sm:py-6 shadow-lg shadow-primary/20 backdrop-blur-xl animate-fade-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               {children}
-            </div>
+            </main>
           </SidebarInset>
         </div>
         
@@ -101,6 +130,20 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
             taskTitle={activeTaskTitle}
           />
         )}
+        
+        {/* Keyboard Shortcuts Dialog */}
+        <KeyboardShortcutsDialog 
+          open={showShortcuts} 
+          onOpenChange={setShowShortcuts} 
+        />
+        
+        {/* Command Palette (Ctrl+K) */}
+        <CommandPalette
+          open={showCommandPalette}
+          onOpenChange={setShowCommandPalette}
+          workspaceId={workspace.id}
+          orgSlug={orgSlug}
+        />
       </div>
     </SidebarProvider>
   );

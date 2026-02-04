@@ -51,7 +51,7 @@ export const OrganizationProductsLandingPage: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (productsError) {
-        console.error('Error loading organization products', productsError);
+        // Silent fail - UI will show empty state
       } else {
         setProducts(productsData ?? []);
       }
@@ -90,11 +90,8 @@ export const OrganizationProductsLandingPage: React.FC = () => {
         'href',
         `${window.location.origin}/${organization.slug}/products`,
       );
-    } catch (seoError) {
-      console.warn(
-        'Unable to set SEO metadata for organization products page',
-        seoError,
-      );
+    } catch {
+      // SEO metadata failed - non-critical
     }
   }, [organization]);
 
@@ -127,8 +124,8 @@ export const OrganizationProductsLandingPage: React.FC = () => {
         _event_type: eventType,
         _product_ids: productIds,
       });
-    } catch (rpcError) {
-      console.error('Error recording product metrics', rpcError);
+    } catch {
+      // Metrics recording failed - non-critical
     }
   };
 

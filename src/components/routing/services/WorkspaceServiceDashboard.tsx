@@ -201,7 +201,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         },
         {
           label: 'Import Workspace',
-          action: () => console.log('Import workspace'),
+          action: () => { /* TODO: Implement import */ },
           variant: 'secondary' as const,
         },
       ]

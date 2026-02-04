@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import api from '../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VendorProfile {
   id: string;
@@ -9,19 +9,30 @@ interface VendorProfile {
 }
 
 export function useVendorStatus(userId: string) {
-  const { data: vendorProfile, isLoading, error } = useQuery({
+  const { data: vendorProfile, isLoading, error } = useQuery<VendorProfile | null>({
     queryKey: ['vendor-profile', userId],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/vendors/profile/${userId}`);
-        return response.data.data as VendorProfile;
-      } catch (err: any) {
-        if (err.response?.status === 404) {
-          // User doesn't have a vendor profile
+      // Query user_profiles to get user info
+      // Note: There's no vendor_profiles or role column in user_profiles yet
+      // This is a placeholder until vendor tables are created
+      const { error } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, organization')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No profile found
           return null;
         }
-        throw err;
+        throw error;
       }
+
+      // For now, return null since we don't have vendor-specific tables
+      // In the future, this would check a vendor_profiles table
+      // or a role column on user_profiles
+      return null;
     },
     enabled: !!userId,
     retry: false, // Don't retry on 404
@@ -31,6 +42,6 @@ export function useVendorStatus(userId: string) {
     vendorProfile,
     isVendor: !!vendorProfile,
     isLoading,
-    error: error && (error as any).response?.status !== 404 ? error : null,
+    error: error ? error : null,
   };
 }

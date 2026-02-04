@@ -226,7 +226,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
     // Perform search
     onSearch(query);
-    navigate(`/console/search?q=${encodeURIComponent(query)}`);
+    navigate(`/dashboard/search?q=${encodeURIComponent(query)}`);
     setIsOpen(false);
     inputRef.current?.blur();
   };
@@ -247,7 +247,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
   const handleRecentSearchClick = (recentQuery: string) => {
     setQuery(recentQuery);
     onSearch(recentQuery);
-    navigate(`/console/search?q=${encodeURIComponent(recentQuery)}`);
+    navigate(`/dashboard/search?q=${encodeURIComponent(recentQuery)}`);
     setIsOpen(false);
   };
 

@@ -1,5 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Users, Target, Megaphone, Handshake } from 'lucide-react';
+import { useGrowthStats } from '@/hooks/useStatsData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface StatCardProps {
   title: string;
@@ -40,37 +42,70 @@ function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
   );
 }
 
-export function GrowthStatsCards() {
+interface GrowthStatsCardsProps {
+  workspaceId?: string;
+}
+
+export function GrowthStatsCards({ workspaceId }: GrowthStatsCardsProps) {
+  const { data, isLoading } = useGrowthStats(workspaceId || '');
+
+  const formatValue = (value: number, prefix = '', suffix = '') => {
+    if (value >= 1000000) return `${prefix}${(value / 1000000).toFixed(1)}M${suffix}`;
+    if (value >= 1000) return `${prefix}${(value / 1000).toFixed(1)}K${suffix}`;
+    return `${prefix}${value}${suffix}`;
+  };
+
   const stats = [
     {
       title: 'Total Reach',
-      value: '2.4M',
+      value: formatValue(data?.totalReach ?? 0),
       change: 18,
       icon: Megaphone,
       color: 'bg-blue-500',
     },
     {
       title: 'Audience Growth',
-      value: '48.2K',
+      value: formatValue(data?.audienceGrowth ?? 0),
       change: 24,
       icon: Users,
       color: 'bg-emerald-500',
     },
     {
       title: 'Sponsorship Revenue',
-      value: '$125K',
+      value: formatValue(data?.sponsorshipRevenue ?? 0, '$'),
       change: 15,
       icon: Handshake,
       color: 'bg-amber-500',
     },
     {
       title: 'Engagement Rate',
-      value: '6.8%',
+      value: `${data?.engagementRate ?? 0}%`,
       change: 12,
       icon: Target,
       color: 'bg-violet-500',
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-11 w-11 rounded-xl" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

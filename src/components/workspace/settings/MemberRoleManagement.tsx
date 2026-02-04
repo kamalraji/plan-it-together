@@ -81,8 +81,7 @@ export function MemberRoleManagement({
       if (error) throw error;
       toast.success('Member role updated');
       onMemberUpdated?.();
-    } catch (error) {
-      console.error('Failed to update role:', error);
+    } catch {
       toast.error('Failed to update member role');
     } finally {
       setUpdatingMemberId(null);
@@ -102,8 +101,7 @@ export function MemberRoleManagement({
       if (error) throw error;
       toast.success(`${removingMember.user.name} removed from workspace`);
       onMemberUpdated?.();
-    } catch (error) {
-      console.error('Failed to remove member:', error);
+    } catch {
       toast.error('Failed to remove member');
     } finally {
       setIsRemoving(false);

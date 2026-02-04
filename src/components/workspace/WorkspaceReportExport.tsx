@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Workspace, UserRole, WorkspaceRole, TeamMember } from '../../types';
-import api from '../../lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface ReportTemplate {
   id: string;
@@ -77,7 +79,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [scheduledReports, setScheduledReports] = useState<any[]>([]);
+  const [scheduledReports] = useState<any[]>([]);
 
   const isGlobalManager =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
@@ -126,30 +128,235 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
       // Simulate progress updates
       const progressInterval = setInterval(() => {
         setGenerationProgress(prev => Math.min(prev + 15, 90));
-      }, 500);
+      }, 300);
 
-      const response = await api.post(`/workspaces/${workspace.id}/reports/generate`, reportOptions, {
-        responseType: 'blob'
-      });
+      // Fetch data from Supabase directly
+      const { data: tasks } = await supabase
+        .from('workspace_tasks')
+        .select('*')
+        .eq('workspace_id', workspace.id);
+
+      const { data: members } = await supabase
+        .from('workspace_team_members')
+        .select('*, profiles:user_id(full_name, email)')
+        .eq('workspace_id', workspace.id);
 
       clearInterval(progressInterval);
       setGenerationProgress(100);
 
-      // Create download link
-      const blob = new Blob([response.data], { 
-        type: reportOptions.format === 'PDF' ? 'application/pdf' : 'text/csv' 
-      });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      const timestamp = new Date().toISOString().split('T')[0];
-      link.download = `${workspace.name}-${selectedTemplate.name.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.${reportOptions.format.toLowerCase()}`;
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      const allTasks = tasks || [];
+      const allMembers = members || [];
+
+      if (reportOptions.format === 'CSV') {
+        // Generate CSV content
+        const csvRows = [
+          ['Report Type', selectedTemplate.name],
+          ['Workspace', workspace.name],
+          ['Generated', new Date().toISOString()],
+          ['Date Range', `${reportOptions.dateRange.startDate} to ${reportOptions.dateRange.endDate}`],
+          [],
+          ['Task Metrics'],
+          ['Total Tasks', allTasks.length.toString()],
+          ['Completed', allTasks.filter(t => t.status === 'COMPLETED').length.toString()],
+          ['In Progress', allTasks.filter(t => t.status === 'IN_PROGRESS').length.toString()],
+          ['Overdue', allTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED').length.toString()],
+          [],
+          ['Team Metrics'],
+          ['Total Members', allMembers.length.toString()],
+        ];
+
+        const csvContent = csvRows.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        link.download = `${workspace.name}-${selectedTemplate.name.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast({ title: 'Report generated', description: 'CSV file downloaded successfully' });
+      } else {
+        // Generate PDF using jsPDF
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        // Title
+        doc.setFontSize(20);
+        doc.setTextColor(30, 58, 138); // primary blue
+        doc.text(selectedTemplate.name, pageWidth / 2, 20, { align: 'center' });
+        
+        // Subtitle
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Workspace: ${workspace.name}`, pageWidth / 2, 30, { align: 'center' });
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 37, { align: 'center' });
+        doc.text(`Date Range: ${reportOptions.dateRange.startDate} to ${reportOptions.dateRange.endDate}`, pageWidth / 2, 44, { align: 'center' });
+        
+        let yPos = 60;
+        
+        // Task Metrics Section
+        if (reportOptions.includeSections.includes('task_metrics') || reportOptions.includeSections.includes('key_metrics')) {
+          doc.setFontSize(14);
+          doc.setTextColor(30, 58, 138);
+          doc.text('Task Metrics', 14, yPos);
+          yPos += 10;
+          
+          const completedTasks = allTasks.filter(t => t.status === 'COMPLETED').length;
+          const inProgressTasks = allTasks.filter(t => t.status === 'IN_PROGRESS').length;
+          const overdueTasks = allTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED').length;
+          const completionRate = allTasks.length > 0 ? Math.round((completedTasks / allTasks.length) * 100) : 0;
+          
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Metric', 'Value']],
+            body: [
+              ['Total Tasks', allTasks.length.toString()],
+              ['Completed', completedTasks.toString()],
+              ['In Progress', inProgressTasks.toString()],
+              ['Overdue', overdueTasks.toString()],
+              ['Completion Rate', `${completionRate}%`],
+            ],
+            theme: 'striped',
+            headStyles: { fillColor: [30, 58, 138] },
+            margin: { left: 14, right: 14 },
+          });
+          
+          yPos = (doc as any).lastAutoTable.finalY + 15;
+        }
+        
+        // Team Performance Section
+        if (reportOptions.includeSections.includes('team_performance')) {
+          doc.setFontSize(14);
+          doc.setTextColor(30, 58, 138);
+          doc.text('Team Performance', 14, yPos);
+          yPos += 10;
+          
+          const teamData = allMembers.map((member: any) => {
+            const memberTasks = allTasks.filter(t => t.assigned_to === member.user_id);
+            const completedMemberTasks = memberTasks.filter(t => t.status === 'COMPLETED').length;
+            return [
+              member.profiles?.full_name || member.profiles?.email || 'Unknown',
+              member.role || 'Member',
+              memberTasks.length.toString(),
+              completedMemberTasks.toString(),
+              memberTasks.length > 0 ? `${Math.round((completedMemberTasks / memberTasks.length) * 100)}%` : 'N/A'
+            ];
+          });
+          
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Member', 'Role', 'Tasks', 'Completed', 'Rate']],
+            body: teamData.length > 0 ? teamData : [['No team members found', '', '', '', '']],
+            theme: 'striped',
+            headStyles: { fillColor: [30, 58, 138] },
+            margin: { left: 14, right: 14 },
+          });
+          
+          yPos = (doc as any).lastAutoTable.finalY + 15;
+        }
+        
+        // Health Indicators Section
+        if (reportOptions.includeSections.includes('health_indicators')) {
+          // Check if we need a new page
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          
+          doc.setFontSize(14);
+          doc.setTextColor(30, 58, 138);
+          doc.text('Health Indicators', 14, yPos);
+          yPos += 10;
+          
+          const completedTasks = allTasks.filter(t => t.status === 'COMPLETED').length;
+          const overdueTasks = allTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED').length;
+          const completionRate = allTasks.length > 0 ? Math.round((completedTasks / allTasks.length) * 100) : 0;
+          const overdueRate = allTasks.length > 0 ? Math.round((overdueTasks / allTasks.length) * 100) : 0;
+          
+          let healthStatus = 'Healthy';
+          if (overdueRate > 30) healthStatus = 'At Risk';
+          else if (overdueRate > 15) healthStatus = 'Needs Attention';
+          
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Indicator', 'Status', 'Details']],
+            body: [
+              ['Overall Health', healthStatus, `${completionRate}% completion rate`],
+              ['Schedule Adherence', overdueRate < 15 ? 'On Track' : 'Behind', `${overdueRate}% tasks overdue`],
+              ['Team Capacity', allMembers.length > 0 ? 'Adequate' : 'Understaffed', `${allMembers.length} team members`],
+            ],
+            theme: 'striped',
+            headStyles: { fillColor: [30, 58, 138] },
+            margin: { left: 14, right: 14 },
+          });
+          
+          yPos = (doc as any).lastAutoTable.finalY + 15;
+        }
+        
+        // Recommendations Section
+        if (reportOptions.includeSections.includes('recommendations')) {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          
+          doc.setFontSize(14);
+          doc.setTextColor(30, 58, 138);
+          doc.text('Recommendations', 14, yPos);
+          yPos += 10;
+          
+          const recommendations: string[] = [];
+          const overdueTasks = allTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED');
+          
+          if (overdueTasks.length > 0) {
+            recommendations.push(`Address ${overdueTasks.length} overdue task(s) to improve schedule adherence`);
+          }
+          if (allMembers.length < 3) {
+            recommendations.push('Consider expanding the team for better workload distribution');
+          }
+          const highPriorityPending = allTasks.filter(t => t.priority === 'HIGH' && t.status !== 'COMPLETED').length;
+          if (highPriorityPending > 0) {
+            recommendations.push(`Prioritize ${highPriorityPending} high-priority pending task(s)`);
+          }
+          if (recommendations.length === 0) {
+            recommendations.push('Workspace is performing well - maintain current momentum');
+          }
+          
+          autoTable(doc, {
+            startY: yPos,
+            head: [['#', 'Recommendation']],
+            body: recommendations.map((rec, idx) => [(idx + 1).toString(), rec]),
+            theme: 'striped',
+            headStyles: { fillColor: [30, 58, 138] },
+            margin: { left: 14, right: 14 },
+          });
+        }
+        
+        // Footer
+        const pageCount = doc.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text(
+            `Page ${i} of ${pageCount} | Generated by Thittam1Hub`,
+            pageWidth / 2,
+            doc.internal.pageSize.getHeight() - 10,
+            { align: 'center' }
+          );
+        }
+        
+        // Download PDF
+        const timestamp = new Date().toISOString().split('T')[0];
+        doc.save(`${workspace.name}-${selectedTemplate.name.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.pdf`);
+        
+        toast({ title: 'Report generated', description: 'PDF file downloaded successfully' });
+      }
 
       // Log audit event for report export
       await supabase.from('workspace_activities').insert({
@@ -182,27 +389,28 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
 
   const scheduleReport = async () => {
     try {
-      await api.post(`/workspaces/${workspace.id}/reports/schedule`, {
-        ...reportOptions,
-        frequency: 'weekly', // Could be made configurable
-        nextRun: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-      });
+      // Store scheduled report in Supabase using correct schema
+      const { error: insertError } = await supabase.from('scheduled_reports').insert([{
+        workspace_id: workspace.id,
+        report_type: reportOptions.templateId,
+        format: reportOptions.format,
+        frequency: 'weekly',
+        next_run_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        include_children: false,
+        is_active: true,
+        created_by: user?.id || '',
+      }]);
 
-      // Refresh scheduled reports list
-      fetchScheduledReports();
+      if (insertError) throw insertError;
+
+      toast({ title: 'Report scheduled', description: 'Weekly report has been scheduled' });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to schedule report');
     }
   };
 
-  const fetchScheduledReports = async () => {
-    try {
-      const response = await api.get(`/workspaces/${workspace.id}/reports/scheduled`);
-      setScheduledReports(response.data.reports);
-    } catch (err) {
-      // Handle error silently for now
-    }
-  };
+  // Keep scheduleReport available for UI
+  void scheduleReport; // Prevent unused warning
 
   const getSectionDisplayName = (section: string) => {
     const names: Record<string, string> = {
@@ -218,10 +426,6 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
     };
     return names[section] || section;
   };
-
-  useEffect(() => {
-    fetchScheduledReports();
-  }, [workspace.id]);
 
   return (
     <div className="space-y-6">

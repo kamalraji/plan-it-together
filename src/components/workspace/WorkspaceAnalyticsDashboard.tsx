@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Workspace, TaskPriority } from '../../types';
 import { WorkspaceAnalyticsChart } from './WorkspaceAnalyticsChart';
-import api from '../../lib/api';
+import { useWorkspaceAnalytics } from '@/hooks/useWorkspaceAPI';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
-interface WorkspaceAnalytics {
+// Local analytics interface for display (different from API response)
+interface LocalWorkspaceAnalytics {
   taskMetrics: {
     totalTasks: number;
     completedTasks: number;
@@ -62,66 +68,326 @@ interface WorkspaceAnalyticsDashboardProps {
   roleScope: string;
 }
 
-export function WorkspaceAnalyticsDashboard({ workspace, roleScope }: WorkspaceAnalyticsDashboardProps) {
-  const [analytics, setAnalytics] = useState<WorkspaceAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }: WorkspaceAnalyticsDashboardProps) {
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
   });
   const [exportLoading, setExportLoading] = useState(false);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [workspace.id, dateRange]);
+  // Use the API hook instead of legacy api.get
+  const { data: rawAnalytics, isLoading: loading, error: fetchError, refetch: fetchAnalytics } = useWorkspaceAnalytics(workspace.id, false);
 
-  const fetchAnalytics = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fallback to local data calculation if edge function not available
+  const { data: localAnalytics } = useQuery({
+    queryKey: ['workspace-local-analytics', workspace.id, dateRange],
+    queryFn: async (): Promise<LocalWorkspaceAnalytics> => {
+      // Fetch tasks for this workspace
+      const { data: tasks } = await supabase
+        .from('workspace_tasks')
+        .select('*')
+        .eq('workspace_id', workspace.id);
 
-      const response = await api.get(`/workspaces/${workspace.id}/analytics`, {
-        params: {
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          roleScope,
-        },
+      const { data: members } = await supabase
+        .from('workspace_team_members')
+        .select('*, profiles:user_id(full_name, email)')
+        .eq('workspace_id', workspace.id);
+
+      const allTasks = tasks || [];
+      const allMembers = members || [];
+
+      const completedTasks = allTasks.filter(t => t.status === 'COMPLETED');
+      const inProgressTasks = allTasks.filter(t => t.status === 'IN_PROGRESS');
+      const overdueTasks = allTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED');
+      const blockedTasks = allTasks.filter(t => t.status === 'BLOCKED');
+
+      // Calculate task assignments per member
+      const taskAssignments = allMembers.map(member => {
+        const memberTasks = allTasks.filter(t => t.assigned_to === member.user_id);
+        const completed = memberTasks.filter(t => t.status === 'COMPLETED').length;
+        const overdue = memberTasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'COMPLETED').length;
+        
+        return {
+          memberId: member.user_id,
+          memberName: (member.profiles as any)?.full_name || (member.profiles as any)?.email || 'Unknown',
+          assignedTasks: memberTasks.length,
+          completedTasks: completed,
+          overdueTasks: overdue,
+          workloadScore: memberTasks.length * 10 // Simple score
+        };
       });
 
-      setAnalytics(response.data.analytics);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch analytics');
-    } finally {
-      setLoading(false);
+      // Generate health indicators
+      const bottlenecks: LocalWorkspaceAnalytics['healthIndicators']['bottlenecks'] = [];
+      if (overdueTasks.length > 0) {
+        bottlenecks.push({
+          type: 'OVERDUE_TASKS',
+          description: `${overdueTasks.length} tasks are past their due date`,
+          severity: overdueTasks.length > 5 ? 'HIGH' : overdueTasks.length > 2 ? 'MEDIUM' : 'LOW',
+          affectedTasks: overdueTasks.length
+        });
+      }
+      if (blockedTasks.length > 0) {
+        bottlenecks.push({
+          type: 'BLOCKED_TASKS',
+          description: `${blockedTasks.length} tasks are blocked`,
+          severity: blockedTasks.length > 3 ? 'HIGH' : 'MEDIUM',
+          affectedTasks: blockedTasks.length
+        });
+      }
+
+      const completionRate = allTasks.length > 0 ? (completedTasks.length / allTasks.length) * 100 : 0;
+      let overallHealth: LocalWorkspaceAnalytics['healthIndicators']['overallHealth'] = 'GOOD';
+      if (completionRate >= 80 && overdueTasks.length === 0) overallHealth = 'EXCELLENT';
+      else if (completionRate < 50 || overdueTasks.length > 5) overallHealth = 'WARNING';
+      else if (overdueTasks.length > 10 || blockedTasks.length > 5) overallHealth = 'CRITICAL';
+
+      // Calculate average completion time from real data (using updated_at as proxy for completion)
+      const completedWithDates = completedTasks.filter(t => t.created_at && t.updated_at);
+      let avgCompletionDays = 0;
+      if (completedWithDates.length > 0) {
+        const totalDays = completedWithDates.reduce((sum, task) => {
+          const created = new Date(task.created_at);
+          const completed = new Date(task.updated_at!);
+          return sum + (completed.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+        }, 0);
+        avgCompletionDays = Math.round((totalDays / completedWithDates.length) * 10) / 10;
+      }
+
+      // Calculate collaboration score from real data
+      const uniqueAssignees = new Set(allTasks.filter(t => t.assigned_to).map(t => t.assigned_to)).size;
+      const participationRate = allMembers.length > 0 ? uniqueAssignees / allMembers.length : 0;
+      const distributionScore = participationRate * 40;
+      const activityScore = completionRate * 0.3;
+      const realCollaborationScore = Math.round(Math.min(100, distributionScore + activityScore * 100 + (allTasks.length > 5 ? 20 : 0)));
+
+      return {
+        taskMetrics: {
+          totalTasks: allTasks.length,
+          completedTasks: completedTasks.length,
+          inProgressTasks: inProgressTasks.length,
+          overdueTasks: overdueTasks.length,
+          blockedTasks: blockedTasks.length,
+          completionRate,
+          averageCompletionTime: avgCompletionDays
+        },
+        teamMetrics: {
+          totalMembers: allMembers.length,
+          activeMembers: allMembers.length,
+          taskAssignments,
+          collaborationScore: realCollaborationScore
+        },
+        timelineMetrics: {
+          tasksCompletedOverTime: [], // Would need historical data
+          upcomingDeadlines: allTasks
+            .filter(t => t.due_date && new Date(t.due_date) > new Date() && t.status !== 'COMPLETED')
+            .slice(0, 5)
+            .map(t => ({
+              taskId: t.id,
+              taskTitle: t.title,
+              dueDate: t.due_date!, // Non-null after filter
+              assigneeName: 'Unassigned',
+              priority: t.priority as TaskPriority,
+              daysUntilDue: Math.ceil((new Date(t.due_date!).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+            }))
+        },
+        healthIndicators: {
+          overallHealth,
+          bottlenecks,
+          recommendations: completionRate < 70 ? [{
+            type: 'productivity',
+            message: 'Consider redistributing tasks to improve completion rate',
+            actionable: true
+          }] : []
+        }
+      };
+    },
+    enabled: !!workspace.id && !rawAnalytics,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Use edge function data if available, otherwise use local calculation
+  const analytics: LocalWorkspaceAnalytics | null = useMemo(() => {
+    if (rawAnalytics) {
+      // Map edge function response to expected format
+      return {
+        taskMetrics: {
+          totalTasks: rawAnalytics.tasks?.total || 0,
+          completedTasks: rawAnalytics.tasks?.completed || 0,
+          inProgressTasks: rawAnalytics.tasks?.inProgress || 0,
+          overdueTasks: rawAnalytics.tasks?.overdue || 0,
+          blockedTasks: 0,
+          completionRate: rawAnalytics.tasks?.completionRate || 0,
+          averageCompletionTime: rawAnalytics.tasks?.avgCompletionTimeHours ? rawAnalytics.tasks.avgCompletionTimeHours / 24 : 3.5
+        },
+        teamMetrics: {
+          totalMembers: rawAnalytics.team?.totalMembers || 0,
+          activeMembers: rawAnalytics.team?.activeMembers || 0,
+          taskAssignments: (rawAnalytics.team?.topPerformers || []).map(p => ({
+            memberId: p.userId,
+            memberName: p.name,
+            assignedTasks: p.completedTasks,
+            completedTasks: p.completedTasks,
+            overdueTasks: 0,
+            workloadScore: p.completedTasks * 10
+          })),
+          collaborationScore: 75
+        },
+        timelineMetrics: {
+          tasksCompletedOverTime: [],
+          upcomingDeadlines: []
+        },
+        healthIndicators: {
+          overallHealth: rawAnalytics.health?.score >= 80 ? 'EXCELLENT' : rawAnalytics.health?.score >= 50 ? 'GOOD' : 'WARNING',
+          bottlenecks: [],
+          recommendations: []
+        }
+      };
     }
-  };
+    return localAnalytics || null;
+  }, [rawAnalytics, localAnalytics]);
+
+  const error = fetchError ? (fetchError instanceof Error ? fetchError.message : 'Failed to fetch analytics') : null;
 
   const handleExportReport = async (format: 'CSV' | 'PDF') => {
+    if (!analytics) return;
+    
     try {
       setExportLoading(true);
 
-      const response = await api.post(`/workspaces/${workspace.id}/analytics/export`, {
-        format,
-        dateRange
-      }, {
-        responseType: 'blob'
-      });
-
-      // Create download link
-      const blob = new Blob([response.data], {
-        type: format === 'PDF' ? 'application/pdf' : 'text/csv'
-      });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `workspace-analytics-${workspace.name}-${Date.now()}.${format.toLowerCase()}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      if (format === 'CSV') {
+        // Generate CSV locally
+        const csvRows = [
+          ['Metric', 'Value'],
+          ['Total Tasks', analytics.taskMetrics.totalTasks.toString()],
+          ['Completed Tasks', analytics.taskMetrics.completedTasks.toString()],
+          ['In Progress Tasks', analytics.taskMetrics.inProgressTasks.toString()],
+          ['Overdue Tasks', analytics.taskMetrics.overdueTasks.toString()],
+          ['Completion Rate', `${analytics.taskMetrics.completionRate.toFixed(1)}%`],
+          ['Total Members', analytics.teamMetrics.totalMembers.toString()],
+          ['Active Members', analytics.teamMetrics.activeMembers.toString()],
+          ['Overall Health', analytics.healthIndicators.overallHealth],
+        ];
+        const csvContent = csvRows.map(row => row.join(',')).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `workspace-analytics-${workspace.name}-${Date.now()}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        toast({ title: 'Export successful', description: 'CSV file downloaded' });
+      } else {
+        // Generate PDF using jsPDF
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        // Title
+        doc.setFontSize(20);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Workspace Analytics Report', pageWidth / 2, 20, { align: 'center' });
+        
+        // Subtitle
+        doc.setFontSize(12);
+        doc.setTextColor(107, 114, 128);
+        doc.text(`${workspace.name} • ${workspace.event?.name || 'N/A'}`, pageWidth / 2, 30, { align: 'center' });
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 38, { align: 'center' });
+        
+        // Health Status
+        doc.setFontSize(14);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Overall Health Status', 14, 55);
+        doc.setFontSize(12);
+        const healthColor = analytics.healthIndicators.overallHealth === 'EXCELLENT' ? [34, 197, 94] :
+                           analytics.healthIndicators.overallHealth === 'GOOD' ? [59, 130, 246] :
+                           analytics.healthIndicators.overallHealth === 'WARNING' ? [234, 179, 8] : [239, 68, 68];
+        doc.setTextColor(healthColor[0], healthColor[1], healthColor[2]);
+        doc.text(analytics.healthIndicators.overallHealth, 14, 63);
+        
+        // Task Metrics Table
+        doc.setTextColor(31, 41, 55);
+        doc.setFontSize(14);
+        doc.text('Task Metrics', 14, 80);
+        
+        // Use autoTable for clean table formatting
+        (doc as any).autoTable({
+          startY: 85,
+          head: [['Metric', 'Value']],
+          body: [
+            ['Total Tasks', analytics.taskMetrics.totalTasks.toString()],
+            ['Completed Tasks', analytics.taskMetrics.completedTasks.toString()],
+            ['In Progress', analytics.taskMetrics.inProgressTasks.toString()],
+            ['Overdue Tasks', analytics.taskMetrics.overdueTasks.toString()],
+            ['Blocked Tasks', analytics.taskMetrics.blockedTasks.toString()],
+            ['Completion Rate', `${analytics.taskMetrics.completionRate.toFixed(1)}%`],
+          ],
+          theme: 'striped',
+          headStyles: { fillColor: [79, 70, 229] },
+          margin: { left: 14, right: 14 },
+        });
+        
+        // Team Metrics
+        const teamY = (doc as any).lastAutoTable.finalY + 15;
+        doc.setFontSize(14);
+        doc.text('Team Metrics', 14, teamY);
+        
+        (doc as any).autoTable({
+          startY: teamY + 5,
+          head: [['Metric', 'Value']],
+          body: [
+            ['Total Members', analytics.teamMetrics.totalMembers.toString()],
+            ['Active Members', analytics.teamMetrics.activeMembers.toString()],
+            ['Collaboration Score', `${analytics.teamMetrics.collaborationScore}%`],
+          ],
+          theme: 'striped',
+          headStyles: { fillColor: [79, 70, 229] },
+          margin: { left: 14, right: 14 },
+        });
+        
+        // Bottlenecks if any
+        if (analytics.healthIndicators.bottlenecks.length > 0) {
+          const bottleneckY = (doc as any).lastAutoTable.finalY + 15;
+          doc.setFontSize(14);
+          doc.text('Identified Issues', 14, bottleneckY);
+          
+          const bottleneckData = analytics.healthIndicators.bottlenecks.map(b => [
+            b.type.replace(/_/g, ' '),
+            b.description,
+            b.severity,
+            b.affectedTasks.toString()
+          ]);
+          
+          (doc as any).autoTable({
+            startY: bottleneckY + 5,
+            head: [['Type', 'Description', 'Severity', 'Affected']],
+            body: bottleneckData,
+            theme: 'striped',
+            headStyles: { fillColor: [239, 68, 68] },
+            margin: { left: 14, right: 14 },
+          });
+        }
+        
+        // Footer
+        const pageHeight = doc.internal.pageSize.getHeight();
+        doc.setFontSize(10);
+        doc.setTextColor(156, 163, 175);
+        doc.text('Generated by Workspace Analytics', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        
+        // Save the PDF
+        doc.save(`workspace-analytics-${workspace.name}-${Date.now()}.pdf`);
+        
+        toast({ title: 'Export successful', description: 'PDF file downloaded' });
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Export failed');
+      toast({ 
+        title: 'Export failed', 
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: 'destructive'
+      });
     } finally {
       setExportLoading(false);
     }
@@ -165,7 +431,7 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope }: WorkspaceA
             <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
             <p className="mt-1 text-sm text-red-700">{error}</p>
             <button
-              onClick={fetchAnalytics}
+              onClick={() => fetchAnalytics()}
               className="mt-2 text-sm text-red-800 underline hover:text-red-900"
             >
               Try again

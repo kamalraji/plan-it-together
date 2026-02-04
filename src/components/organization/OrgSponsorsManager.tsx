@@ -45,7 +45,6 @@ export const OrgSponsorsManager: React.FC = () => {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Failed to load sponsors', error);
       toast({
         title: 'Error loading sponsors',
         description: 'Please try again in a moment.',
@@ -102,7 +101,6 @@ export const OrgSponsorsManager: React.FC = () => {
         .eq('id', editingId);
 
       if (error) {
-        console.error('Failed to update sponsor', error);
         toast({
           title: 'Error updating sponsor',
           description: 'Please try again.',
@@ -121,7 +119,6 @@ export const OrgSponsorsManager: React.FC = () => {
         .insert({ ...payload, position: maxPosition + 1 });
 
       if (error) {
-        console.error('Failed to create sponsor', error);
         toast({
           title: 'Error creating sponsor',
           description: 'Please try again.',
@@ -162,7 +159,6 @@ export const OrgSponsorsManager: React.FC = () => {
       .eq('id', id);
 
     if (error) {
-      console.error('Failed to delete sponsor', error);
       toast({
         title: 'Error deleting sponsor',
         description: 'Please try again.',
@@ -211,7 +207,6 @@ export const OrgSponsorsManager: React.FC = () => {
     const results = await Promise.all(updates);
     const hasError = results.some((r) => r.error);
     if (hasError) {
-      console.error('Failed to save sponsor order', results);
       toast({
         title: 'Error saving order',
         description: 'Some items may not be in the correct order.',

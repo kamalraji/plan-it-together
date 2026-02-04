@@ -1,5 +1,7 @@
 import { Workspace, WorkspaceRole } from '../../types';
 import { WorkspaceRoleBadge } from './WorkspaceBadges';
+import { SkeletonTeamRoster } from '@/components/ui/skeleton-patterns';
+import { Plus, MoreVertical, UserPlus, Users } from 'lucide-react';
 
 interface TeamMemberRosterProps {
   workspace: Workspace;
@@ -7,6 +9,7 @@ interface TeamMemberRosterProps {
   maxMembers?: number;
   onViewAllMembers?: () => void;
   onInviteMember?: () => void;
+  isLoading?: boolean;
 }
 
 export function TeamMemberRoster({ 
@@ -14,7 +17,8 @@ export function TeamMemberRoster({
   showActions = true, 
   maxMembers,
   onViewAllMembers,
-  onInviteMember 
+  onInviteMember,
+  isLoading = false
 }: TeamMemberRosterProps) {
   const teamMembers = workspace.teamMembers || [];
   const displayMembers = maxMembers ? teamMembers.slice(0, maxMembers) : teamMembers;
@@ -55,31 +59,46 @@ export function TeamMemberRoster({
   };
 
   const getStatusIndicator = () => {
-    // For now, assume all members are active
-    // This could be enhanced with actual status tracking
     return (
-      <div className="w-3 h-3 bg-green-400 rounded-full border-2 border-background"></div>
+      <div 
+        className="w-3 h-3 bg-green-400 rounded-full border-2 border-background"
+        aria-label="Online"
+      />
     );
   };
 
-  return (
-    <div className="bg-card overflow-hidden shadow rounded-lg">
-      <div className="p-6">
+  if (isLoading) {
+    return (
+      <div className="bg-card overflow-hidden shadow rounded-lg p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-medium text-foreground">Team Members</h3>
-          <div className="flex items-center space-x-2">
+          <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+          <div className="h-6 w-20 bg-muted rounded animate-pulse" />
+        </div>
+        <SkeletonTeamRoster count={maxMembers || 4} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-card overflow-hidden shadow rounded-lg" role="region" aria-label="Team members">
+      <div className="p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
+          <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
+            <Users className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+            Team Members
+          </h3>
+          <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
               {teamMembers.length} member{teamMembers.length !== 1 ? 's' : ''}
             </span>
             {showActions && onInviteMember && (
               <button
                 onClick={onInviteMember}
-                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
+                className="inline-flex items-center px-3 py-2 min-h-[44px] border border-transparent text-sm font-medium rounded-md text-primary bg-primary/10 hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                aria-label="Invite new team member"
               >
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Invite
+                <Plus className="w-4 h-4 mr-1" aria-hidden="true" />
+                <span className="hidden sm:inline">Invite</span>
               </button>
             )}
           </div>
@@ -87,30 +106,36 @@ export function TeamMemberRoster({
 
         {/* Team Members List */}
         {displayMembers.length > 0 ? (
-          <div className="space-y-4">
+          <ul className="space-y-3 sm:space-y-4" role="list">
             {displayMembers.map((member) => (
-              <div key={member.id} className="flex items-center space-x-4">
+              <li 
+                key={member.id} 
+                className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors -mx-2 sm:-mx-3"
+              >
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-foreground">
+                  <div 
+                    className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-full flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <span className="text-sm sm:text-base font-medium text-foreground">
                       {getInitials(member.user.name)}
                     </span>
                   </div>
-                  <div className="absolute -bottom-1 -right-1">
+                  <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1">
                     {getStatusIndicator()}
                   </div>
                 </div>
 
                 {/* Member Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium text-foreground truncate">
+                  <div className="flex items-center flex-wrap gap-1 sm:gap-2">
+                    <p className="text-sm font-medium text-foreground truncate max-w-[150px] sm:max-w-none">
                       {member.user.name}
                     </p>
                     <WorkspaceRoleBadge role={member.role} />
                   </div>
-                  <p className="text-sm text-muted-foreground truncate">
+                  <p className="text-sm text-muted-foreground truncate hidden sm:block">
                     {member.user.email}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -121,47 +146,48 @@ export function TeamMemberRoster({
                 {/* Actions */}
                 {showActions && (
                   <div className="flex-shrink-0">
-                    <button className="text-muted-foreground hover:text-muted-foreground">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
+                    <button 
+                      className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                      aria-label={`More options for ${member.user.name}`}
+                    >
+                      <MoreVertical className="w-5 h-5" />
                     </button>
                   </div>
                 )}
-              </div>
+              </li>
             ))}
 
             {/* Show More Button */}
             {hasMoreMembers && onViewAllMembers && (
-              <div className="pt-4 border-t border-border">
+              <li className="pt-3 sm:pt-4 border-t border-border">
                 <button
                   onClick={onViewAllMembers}
-                  className="w-full text-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                  className="w-full text-center text-sm text-primary hover:text-primary/80 font-medium py-2 min-h-[44px] rounded-md hover:bg-primary/5 transition-colors"
+                  aria-label={`View all ${teamMembers.length} team members`}
                 >
                   View all {teamMembers.length} members →
                 </button>
-              </div>
+              </li>
             )}
-          </div>
+          </ul>
         ) : (
           /* Empty State */
-          <div className="text-center py-8">
-            <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.196M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-foreground">No team members yet</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <div className="text-center py-8 sm:py-12">
+            <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <UserPlus className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" aria-hidden="true" />
+            </div>
+            <h3 className="text-sm font-medium text-foreground">No team members yet</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-xs mx-auto">
               Get started by inviting team members to collaborate.
             </p>
             {showActions && onInviteMember && (
               <div className="mt-6">
                 <button
                   onClick={onInviteMember}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
+                  className="inline-flex items-center px-4 py-2 min-h-[44px] border border-transparent shadow-sm text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                  aria-label="Invite first team member"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+                  <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
                   Invite Team Members
                 </button>
               </div>
@@ -171,7 +197,7 @@ export function TeamMemberRoster({
 
         {/* Role Distribution Summary */}
         {teamMembers.length > 0 && (
-          <div className="mt-6 pt-6 border-t border-border">
+          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
             <h4 className="text-sm font-medium text-foreground mb-3">Role Distribution</h4>
             <div className="flex flex-wrap gap-2">
               {Object.values(WorkspaceRole).map((role) => {
@@ -181,7 +207,8 @@ export function TeamMemberRoster({
                 return (
                   <span
                     key={role}
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(role)}`}
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getRoleColor(role)}`}
+                    aria-label={`${getRoleDisplayName(role)}: ${count} members`}
                   >
                     {getRoleDisplayName(role)}: {count}
                   </span>

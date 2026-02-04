@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,6 +10,7 @@ import { AuthLayout } from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { useSeo } from '@/hooks/useSeo';
 import { fetchPrimaryOrganizationForUser } from '@/hooks/usePrimaryOrganization';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -18,9 +19,15 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const RESEND_COOLDOWN_SECONDS = 60;
+
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -30,7 +37,7 @@ export function LoginForm() {
     description:
       'Sign in to Thittam1Hub to access your event workspaces, registrations, attendance, and certificates.',
     canonicalPath: '/login',
-    ogImagePath: '/images/attendflow-og.png',
+    ogImagePath: '/images/thittam1hub-og.png',
     ogType: 'website',
   });
 
@@ -42,17 +49,72 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  // Countdown timer for rate limiting
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleResendConfirmation = useCallback(async () => {
+    if (!pendingEmail || resendCooldown > 0) return;
+    
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingEmail,
+      });
+      
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Failed to resend',
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: 'Email sent',
+          description: 'A new confirmation email has been sent to your inbox.',
+        });
+        // Start cooldown after successful send
+        setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      }
+    } catch {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to resend confirmation email.',
+      });
+    } finally {
+      setIsResending(false);
+    }
+  }, [pendingEmail, resendCooldown, toast]);
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError(null);
+    setEmailNotConfirmed(false);
+    setPendingEmail(null);
 
     const { error } = await login(data.email, data.password);
     if (error) {
-      setError(error.message);
+      const isUnconfirmed = error.message?.toLowerCase().includes('email not confirmed');
+      setError(isUnconfirmed ? 'Email not confirmed' : error.message);
+      setEmailNotConfirmed(isUnconfirmed);
+      if (isUnconfirmed) {
+        setPendingEmail(data.email);
+      }
       toast({
         variant: 'destructive',
         title: 'Sign-in failed',
-        description: error.message || 'Please check your details and try again.',
+        description: isUnconfirmed 
+          ? 'Please verify your email before signing in.' 
+          : (error.message || 'Please check your details and try again.'),
       });
       setIsLoading(false);
       return;
@@ -104,8 +166,7 @@ export function LoginForm() {
         // Participant or user without org membership
         navigate('/dashboard', { replace: true });
       }
-    } catch (checkError) {
-      console.warn('Failed to determine navigation target', checkError);
+    } catch {
       navigate('/dashboard', { replace: true });
     } finally {
       setIsLoading(false);
@@ -151,6 +212,30 @@ export function LoginForm() {
                   <span className="text-destructive">⚠️</span>
                   <div className="text-sm text-destructive font-medium">{error}</div>
                 </div>
+                {emailNotConfirmed && pendingEmail && (
+                  <div className="mt-3 pt-3 border-t border-destructive/20">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Didn't receive the confirmation email?
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={isResending || resendCooldown > 0}
+                      className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isResending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2" />
+                          Sending...
+                        </>
+                      ) : resendCooldown > 0 ? (
+                        `Resend in ${resendCooldown}s`
+                      ) : (
+                        'Resend confirmation email'
+                      )}
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -231,6 +316,19 @@ export function LoginForm() {
                 <span>Sign in</span>
               )}
             </motion.button>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            {/* Google Sign In */}
+            <GoogleSignInButton label="Sign in with Google" />
           </form>
         </motion.div>
       </div>

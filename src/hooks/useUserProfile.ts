@@ -38,14 +38,12 @@ export function useUserProfile() {
         .maybeSingle();
 
       if (error) {
-        console.error('Failed to load user profile:', error.message);
         setState((prev) => ({ ...prev, isLoading: false, error: 'Unable to load profile.' }));
         return;
       }
 
       setState({ profile: data ?? null, isLoading: false, error: null });
-    } catch (err) {
-      console.error('Unexpected error loading user profile:', err);
+    } catch {
       setState((prev) => ({ ...prev, isLoading: false, error: 'Unable to load profile.' }));
     }
   }, [user]);
@@ -67,7 +65,6 @@ export function useUserProfile() {
           .maybeSingle();
 
         if (error) {
-          console.error('Failed to update user profile:', error.message);
           return { error: 'Unable to update profile' } as const;
         }
 
@@ -76,8 +73,7 @@ export function useUserProfile() {
         }
 
         return { error: null } as const;
-      } catch (err) {
-        console.error('Unexpected error updating user profile:', err);
+      } catch {
         return { error: 'Unable to update profile' } as const;
       }
     },

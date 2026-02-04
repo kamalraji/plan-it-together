@@ -9,6 +9,7 @@ import { LeaderboardPreview } from './LeaderboardPreview';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
+import { useJudgingProgress } from '@/hooks/useJudgeCommitteeData';
 
 interface JudgeDashboardProps {
   workspace: Workspace;
@@ -21,14 +22,16 @@ export function JudgeDashboard({
   orgSlug,
   onViewTasks,
 }: JudgeDashboardProps) {
-  // Mock stats - in production, fetch from database
+  // Use real data from the judging progress hook
+  const { data: progress } = useJudgingProgress(workspace.id);
+
   const stats = {
-    totalJudges: 8,
-    totalSubmissions: 48,
-    evaluatedCount: 32,
-    pendingCount: 16,
-    averageScore: 7.8,
-    criteriaCount: 9,
+    totalJudges: progress?.totalJudges ?? 0,
+    totalSubmissions: progress?.totalSubmissions ?? 0,
+    evaluatedCount: progress?.judgedSubmissions ?? 0,
+    pendingCount: progress?.totalAssignments ? progress.totalAssignments - (progress?.completedAssignments ?? 0) : 0,
+    averageScore: progress?.averageScore ?? 0,
+    criteriaCount: 0, // Will be populated from rubrics if needed
   };
 
   return (

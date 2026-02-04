@@ -100,7 +100,7 @@ export function WorkspaceHierarchyTree({
         .from('workspace_team_members')
         .select('id, user_id, role, status, joined_at, workspace_id')
         .in('workspace_id', workspaceIds)
-        .eq('status', 'active');
+        .eq('status', 'ACTIVE');
 
       if (error) throw error;
 
@@ -232,7 +232,7 @@ export function WorkspaceHierarchyTree({
       
       navigate(url);
     } else {
-      console.warn('[HierarchyTree] Missing data for hierarchical URL, redirecting to org dashboard');
+      // Missing data for hierarchical URL, redirecting to org dashboard
       if (orgSlug) {
         navigate(`/${orgSlug}/dashboard`);
       } else {

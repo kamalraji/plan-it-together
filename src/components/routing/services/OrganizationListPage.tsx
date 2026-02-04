@@ -180,7 +180,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
               </div>
             </div>
             <Button
-              onClick={() => navigate('/console/organizations/create')}
+              onClick={() => navigate('/dashboard/organizations/create')}
               className="gap-2 shadow-lg shadow-primary/20"
             >
               <Plus className="h-4 w-4" />
@@ -260,7 +260,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
             </p>
             {!searchQuery && (
               <Button
-                onClick={() => navigate('/console/organizations/create')}
+                onClick={() => navigate('/dashboard/organizations/create')}
                 className="mt-4 gap-2"
               >
                 <Plus className="h-4 w-4" />

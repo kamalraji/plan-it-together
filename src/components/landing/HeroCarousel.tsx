@@ -36,7 +36,7 @@ const slides: HeroSlide[] = [
     title: "One rail from event idea",
     highlight: "to verified outcomes",
     description:
-      "Attendflow turns every event into a trackable workspace—unifying registrations, QR-based attendance, judging, and certificate-backed proof.",
+      "Thittam1Hub turns every event into a trackable workspace—unifying registrations, QR-based attendance, judging, and certificate-backed proof.",
     cta: { label: "Get started free", href: "/register" },
     secondaryCta: { label: "Book a demo", href: "/help?intent=demo" },
     icon: <Calendar className="h-12 w-12" />,
@@ -119,11 +119,33 @@ export function HeroCarousel() {
     }
   };
 
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!api) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        api.scrollPrev();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        api.scrollNext();
+      }
+    },
+    [api]
+  );
+
   return (
     <section
       className="relative py-16 md:py-24 lg:py-32 overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="region"
+      aria-label="Hero carousel"
+      aria-roledescription="carousel"
     >
       {/* Background gradient based on active slide */}
       <div
@@ -131,6 +153,11 @@ export function HeroCarousel() {
       />
 
       <div className="container relative">
+        {/* Live region for screen readers */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          Slide {activeIndex + 1} of {slides.length}: {slides[activeIndex].badge}
+        </div>
+        
         <Carousel
           setApi={setApi}
           opts={{ loop: true, align: "start" }}

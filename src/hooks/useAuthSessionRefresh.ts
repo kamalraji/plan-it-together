@@ -1,45 +1,54 @@
 import { useEffect } from 'react';
-import api from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * useAuthSessionRefresh
  *
- * Frontend-only hook that keeps the cookie-based session fresh and
- * redirects to /login when the backend signals that the session is no longer valid.
+ * Hook that keeps the Supabase session fresh by periodically refreshing the token.
+ * Listens for auth state changes and triggers logout callback when session expires.
  *
- * - Periodically calls /api/auth/refresh-token using axios `withCredentials`.
- * - Listens for the global `auth:logout` event dispatched by api.ts on 401s
- *   and navigates to /login.
- *
- * NOTE: This hook does not touch tokens directly; it relies purely on
- * httpOnly cookies managed by the backend.
+ * Uses native Supabase auth methods instead of legacy REST API calls.
  */
 export function useAuthSessionRefresh(onLogout: () => void, refreshIntervalMs = 10 * 60 * 1000) {
   useEffect(() => {
     let isMounted = true;
     let intervalId: number | undefined;
 
-    const refresh = async () => {
+    const refreshSession = async () => {
       try {
-        await api.post('/auth/refresh-token');
-      } catch (error) {
-        // If refresh fails, api.ts will surface 401s and emit auth:logout if applicable.
-        if (import.meta.env.DEV) {
-          console.warn('[useAuthSessionRefresh] Refresh failed', error);
+        const { error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.warn('Session refresh failed:', error.message);
+          // If refresh fails due to invalid session, trigger logout
+          if (error.message.includes('Invalid') || error.message.includes('expired')) {
+            onLogout();
+          }
         }
+      } catch (_error) {
+        // Silent failure - Supabase handles session state internally
       }
     };
 
     // Initial refresh once the hook mounts to extend any existing session
-    void refresh();
+    void refreshSession();
 
     if (refreshIntervalMs > 0) {
       intervalId = window.setInterval(() => {
         if (!isMounted) return;
-        void refresh();
+        void refreshSession();
       }, refreshIntervalMs);
     }
 
+    // Listen for auth state changes from Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_OUT') {
+          onLogout();
+        }
+      }
+    });
+
+    // Also listen for global auth:logout events (from api.ts 401 responses)
     const handleLogout = () => {
       onLogout();
     };
@@ -51,6 +60,7 @@ export function useAuthSessionRefresh(onLogout: () => void, refreshIntervalMs = 
       if (intervalId !== undefined) {
         window.clearInterval(intervalId);
       }
+      subscription.unsubscribe();
       window.removeEventListener('auth:logout' as any, handleLogout);
     };
   }, [onLogout, refreshIntervalMs]);

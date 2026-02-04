@@ -51,13 +51,13 @@ export const AdminLayout: React.FC = () => {
         });
 
         if (error) {
-          console.error('AdminLayout: Server-side role verification failed', error);
+          // Server-side verification failed - deny access silently
           setServerVerified(false);
         } else {
           setServerVerified(!!isAdmin);
         }
-      } catch (err) {
-        console.error('AdminLayout: Unexpected error during role verification', err);
+      } catch (_err) {
+        // Unexpected error during verification - deny access
         setServerVerified(false);
       } finally {
         setVerifying(false);
@@ -91,28 +91,20 @@ export const AdminLayout: React.FC = () => {
 
   // Client-side role check - must be SUPER_ADMIN
   if (user.role !== UserRole.SUPER_ADMIN) {
-    console.warn('AdminLayout: Access denied - user role is not SUPER_ADMIN', {
-      userId: user.id,
-      role: user.role,
-    });
+    // Access denied - insufficient role
     return <Navigate to={dashboardPath} replace />;
   }
 
   // Server-side role verification failed
   if (serverVerified === false) {
-    console.warn('AdminLayout: Access denied - server-side role verification failed', {
-      userId: user.id,
-    });
+    // Access denied - server verification failed
     return <Navigate to={dashboardPath} replace />;
   }
 
   // Check if user is admin of the thittam1hub organization
   const isThittamAdmin = myOrganizations?.some((org: any) => org.slug === 'thittam1hub');
   if (!isThittamAdmin) {
-    console.warn('AdminLayout: Access denied - user is not admin of thittam1hub org', {
-      userId: user.id,
-      orgs: myOrganizations?.map((o: any) => o.slug),
-    });
+    // Access denied - not a member of thittam1hub org
     return <Navigate to={dashboardPath} replace />;
   }
 

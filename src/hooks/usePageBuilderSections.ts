@@ -110,7 +110,6 @@ export function useLockSection() {
       queryClient.invalidateQueries({ queryKey: ['page-builder-sections', variables.eventId] });
     },
     onError: (error) => {
-      console.error('Failed to lock section:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to lock section');
     },
   });
@@ -131,8 +130,7 @@ export function useLockSection() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['page-builder-sections', variables.eventId] });
     },
-    onError: (error) => {
-      console.error('Failed to unlock section:', error);
+    onError: (_error) => {
       toast.error('Failed to unlock section');
     },
   });
@@ -201,8 +199,7 @@ export function useSaveSectionContent() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['page-builder-sections', variables.eventId] });
     },
-    onError: (error) => {
-      console.error('Failed to save section:', error);
+    onError: (_error) => {
       toast.error('Failed to save section');
     },
   });

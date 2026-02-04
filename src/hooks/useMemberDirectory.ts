@@ -44,7 +44,6 @@ export function useMemberDirectory({ eventId }: UseMemberDirectoryOptions) {
         .eq('event_id', eventId);
 
       if (wsError) {
-        console.error('Error fetching workspaces:', wsError);
         throw wsError;
       }
 
@@ -59,10 +58,9 @@ export function useMemberDirectory({ eventId }: UseMemberDirectoryOptions) {
         .from('workspace_team_members')
         .select('user_id, role, workspace_id, status')
         .in('workspace_id', workspaceIds)
-        .or('status.ilike.active,status.eq.ACTIVE');
+        .eq('status', 'ACTIVE');
 
       if (tmError) {
-        console.error('Error fetching team members:', tmError);
         throw tmError;
       }
 
@@ -78,7 +76,6 @@ export function useMemberDirectory({ eventId }: UseMemberDirectoryOptions) {
         .in('id', userIds);
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 

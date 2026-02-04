@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Organization, Event, User } from '../../types';
-import api from '../../lib/api';
+import { toast } from 'sonner';
 
 interface OrganizationPageProps {
   organizationId: string;
@@ -17,66 +19,122 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
   organizationId,
   currentUser
 }) => {
-  const [data, setData] = useState<OrganizationPageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
-  useEffect(() => {
-    fetchOrganizationData();
-  }, [organizationId]);
+  // Fetch organization data from Supabase
+  const { data, isLoading, error } = useQuery<OrganizationPageData>({
+    queryKey: ['organization-page', organizationId, currentUser?.id],
+    queryFn: async () => {
+      // Fetch organization
+      const { data: org, error: orgError } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', organizationId)
+        .single();
 
-  const fetchOrganizationData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+      if (orgError) throw orgError;
 
-      const [orgResponse, eventsResponse, followResponse] = await Promise.all([
-        api.get(`/organizations/${organizationId}`),
-        api.get(`/discovery/organizations/${organizationId}/events`),
-        currentUser ? api.get(`/discovery/organizations/${organizationId}/following-status`) : Promise.resolve({ data: { isFollowing: false } })
-      ]);
+      // Fetch events
+      const { data: events, error: eventsError } = await supabase
+        .from('events')
+        .select(`
+          id,
+          name,
+          description,
+          start_date,
+          end_date,
+          mode,
+          capacity,
+          status
+        `)
+        .eq('organization_id', organizationId)
+        .eq('visibility', 'PUBLIC')
+        .order('start_date', { ascending: false });
 
-      setData({
-        organization: orgResponse.data.data,
-        events: eventsResponse.data.data,
-        isFollowing: followResponse.data.data.isFollowing
-      });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load organization data');
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (eventsError) throw eventsError;
 
-  const handleFollowToggle = async () => {
-    if (!currentUser || !data) return;
+      // Check follow status
+      let isFollowing = false;
+      if (currentUser) {
+        const { data: follow } = await supabase
+          .from('followers')
+          .select('id')
+          .eq('follower_id', currentUser.id)
+          .eq('organization_id', organizationId)
+          .maybeSingle();
 
-    try {
-      setFollowLoading(true);
-      
-      if (data.isFollowing) {
-        await api.delete(`/discovery/${organizationId}/follow`);
-      } else {
-        await api.post(`/discovery/${organizationId}/follow`);
+        isFollowing = !!follow;
       }
 
-      setData({
-        ...data,
-        isFollowing: !data.isFollowing,
+      return {
         organization: {
-          ...data.organization,
-          followerCount: data.isFollowing 
-            ? data.organization.followerCount - 1 
-            : data.organization.followerCount + 1
-        }
-      });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update follow status');
-    } finally {
-      setFollowLoading(false);
-    }
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          description: org.description || '',
+          category: org.category || 'OTHER',
+          verificationStatus: org.verification_status || 'PENDING',
+          branding: {
+            logoUrl: org.logo_url || undefined,
+            bannerUrl: org.banner_url || undefined,
+          },
+          socialLinks: {},
+          pageUrl: `/${org.slug}`,
+          followerCount: 0,
+          eventCount: (events || []).length,
+          createdAt: org.created_at,
+          updatedAt: org.created_at, // Use created_at as fallback since updated_at may not exist
+        } as Organization,
+        events: (events || []).map(e => ({
+          id: e.id,
+          name: e.name,
+          description: e.description || '',
+          startDate: e.start_date,
+          endDate: e.end_date,
+          mode: e.mode,
+          capacity: e.capacity,
+          status: e.status,
+        })) as Event[],
+        isFollowing,
+      };
+    },
+  });
+
+  // Follow/unfollow mutation
+  const followMutation = useMutation({
+    mutationFn: async (follow: boolean) => {
+      if (!currentUser) throw new Error('Not authenticated');
+
+      if (follow) {
+        const { error } = await supabase
+          .from('followers')
+          .insert({
+            follower_id: currentUser.id,
+            following_id: organizationId,
+          });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('followers')
+          .delete()
+          .eq('follower_id', currentUser.id)
+          .eq('following_id', organizationId);
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_, follow) => {
+      queryClient.invalidateQueries({ queryKey: ['organization-page', organizationId] });
+      toast.success(follow ? 'Now following organization' : 'Unfollowed organization');
+    },
+    onError: () => {
+      toast.error('Failed to update follow status');
+    },
+  });
+
+  const handleFollowToggle = () => {
+    if (!currentUser || !data) return;
+    followMutation.mutate(!data.isFollowing);
   };
 
   const getUpcomingEvents = () => {
@@ -140,7 +198,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-muted/50">
         <div className="animate-pulse">
@@ -166,7 +224,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
       <div className="min-h-screen bg-muted/50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
-          <p className="text-muted-foreground">{error || 'The organization you are looking for does not exist.'}</p>
+          <p className="text-muted-foreground">{error?.message || 'The organization you are looking for does not exist.'}</p>
         </div>
       </div>
     );
@@ -182,7 +240,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
       <div 
         className="h-64 bg-gradient-to-r from-blue-600 to-purple-600 relative"
         style={{
-          backgroundImage: organization.branding.bannerUrl ? `url(${organization.branding.bannerUrl})` : undefined,
+          backgroundImage: organization.branding?.bannerUrl ? `url(${organization.branding.bannerUrl})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -197,7 +255,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
               {/* Logo */}
               <div className="flex-shrink-0">
-                {organization.branding.logoUrl ? (
+                {organization.branding?.logoUrl ? (
                   <img
                     src={organization.branding.logoUrl}
                     alt={organization.name}
@@ -241,21 +299,21 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                     <div className="mt-4 sm:mt-0">
                       <button
                         onClick={handleFollowToggle}
-                        disabled={followLoading}
+                        disabled={followMutation.isPending}
                         className={`px-6 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
                           isFollowing
                             ? 'bg-muted text-foreground hover:bg-muted focus:ring-ring'
                             : 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-ring'
                         }`}
                       >
-                        {followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+                        {followMutation.isPending ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
                       </button>
                     </div>
                   )}
                 </div>
 
                 {/* Social Links */}
-                {Object.keys(organization.socialLinks).length > 0 && (
+                {Object.keys(organization.socialLinks || {}).length > 0 && (
                   <div className="flex items-center space-x-4 mt-4">
                     {Object.entries(organization.socialLinks).map(([platform, url]) => (
                       <a
@@ -263,7 +321,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-muted-foreground"
+                        className="text-muted-foreground hover:text-foreground"
                       >
                         <span className="sr-only">{platform}</span>
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -402,19 +460,15 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                                 </svg>
                                 {event.mode}
                               </div>
-
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
-                                Completed
-                              </span>
                             </div>
                           </div>
 
                           <div className="ml-6">
                             <a
                               href={`/events/${event.id}`}
-                              className="bg-muted-foreground/40 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
+                              className="bg-muted text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted/80"
                             >
-                              View Event
+                              View Details
                             </a>
                           </div>
                         </div>

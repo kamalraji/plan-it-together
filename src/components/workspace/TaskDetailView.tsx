@@ -165,7 +165,7 @@ export function TaskDetailView({
       .eq('id', task.id);
 
     if (error) {
-      console.error('Failed to update task role scope', error);
+      // Role scope update failed silently
     }
 
     setIsSavingRoleScope(false);

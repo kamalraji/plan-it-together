@@ -16,21 +16,18 @@ interface ErrorBoundaryInnerState {
 class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundaryInnerState> {
   override state: ErrorBoundaryInnerState = { hasError: false };
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryInnerState {
+  static getDerivedStateFromError(_error: Error): ErrorBoundaryInnerState {
     // Ensure a consistent fallback UI is shown after an error is thrown
-    console.error('GlobalErrorBoundary getDerivedStateFromError:', error);
     return { hasError: true };
   }
 
   override componentDidCatch(error: Error, info: React.ErrorInfo) {
-    // Log the error for debugging and send it to any external handler
-    console.error('GlobalErrorBoundary caught an error:', error, info);
-
+    // Send to external handler (Sentry via logging service)
     if (this.props.onError) {
       try {
         this.props.onError(error, info);
-      } catch (handlerError) {
-        console.error('Error in GlobalErrorBoundary onError handler:', handlerError);
+      } catch {
+        // Silently fail if handler throws
       }
     }
   }

@@ -26,33 +26,29 @@ class NotificationService {
     try {
       // Check if service workers are supported
       if (!('serviceWorker' in navigator)) {
-        console.warn('Service workers not supported');
         return false;
       }
 
       // Check if push notifications are supported
       if (!('PushManager' in window)) {
-        console.warn('Push notifications not supported');
         return false;
       }
 
       // Register service worker
       this.registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered:', this.registration);
 
       // Wait for service worker to be ready
       await navigator.serviceWorker.ready;
 
       return true;
-    } catch (error) {
-      console.error('Failed to initialize notification service:', error);
+    } catch (_error) {
+      // Notification service initialization failed - gracefully degrade
       return false;
     }
   }
 
   async requestPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
-      console.warn('Notifications not supported');
       return 'denied';
     }
 
@@ -91,8 +87,8 @@ class NotificationService {
       await this.sendSubscriptionToServer(subscription);
 
       return subscription;
-    } catch (error) {
-      console.error('Failed to subscribe to push notifications:', error);
+    } catch (_error) {
+      // Push subscription failed - gracefully degrade
       return null;
     }
   }
@@ -110,8 +106,8 @@ class NotificationService {
       }
 
       return true;
-    } catch (error) {
-      console.error('Failed to unsubscribe from push notifications:', error);
+    } catch (_error) {
+      // Unsubscribe failed - subscription may already be invalid
       return false;
     }
   }
@@ -129,8 +125,8 @@ class NotificationService {
           const audio = new Audio('/notification-sound.mp3');
           // Fire and forget; some browsers may block without user interaction
           void audio.play();
-        } catch (error) {
-          console.warn('Notification sound failed:', error);
+        } catch (_error) {
+          // Sound playback failed - likely blocked by browser
         }
 
         if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -138,8 +134,8 @@ class NotificationService {
             // Short vibration pattern for critical alerts
             // @ts-ignore
             navigator.vibrate([80, 40, 80]);
-          } catch (error) {
-            console.warn('Notification vibration failed:', error);
+          } catch (_error) {
+            // Vibration failed - not supported or blocked
           }
         }
       }
@@ -163,8 +159,8 @@ class NotificationService {
           data: payload.data,
         });
       }
-    } catch (error) {
-      console.error('Failed to show notification:', error);
+    } catch (_error) {
+      // Notification display failed - browser may have blocked it
     }
   }
 
@@ -265,7 +261,7 @@ class NotificationService {
         throw new Error('Failed to send subscription to server');
       }
     } catch (error) {
-      console.error('Error sending subscription to server:', error);
+      // Re-throw to let caller handle
       throw error;
     }
   }
@@ -286,7 +282,7 @@ class NotificationService {
         throw new Error('Failed to remove subscription from server');
       }
     } catch (error) {
-      console.error('Error removing subscription from server:', error);
+      // Re-throw to let caller handle
       throw error;
     }
   }

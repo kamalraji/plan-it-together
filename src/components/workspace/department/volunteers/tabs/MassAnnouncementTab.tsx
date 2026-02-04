@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Workspace } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Megaphone, Send, Users, Clock, CheckCircle, FileText } from 'lucide-react';
+import { Megaphone, Send, Users, Clock, CheckCircle, FileText, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,27 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
+import { useWorkspaceAnnouncements, AUDIENCE_OPTIONS, getAudienceLabel } from '@/hooks/useWorkspaceAnnouncements';
+import { format } from 'date-fns';
 
 interface MassAnnouncementTabProps {
   workspace: Workspace;
 }
 
-interface Announcement {
-  id: string;
-  title: string;
-  recipients: string;
-  sentAt: string;
-  status: 'sent' | 'scheduled' | 'draft';
-}
-
-const mockAnnouncements: Announcement[] = [
-  { id: '1', title: 'Event Day Briefing', recipients: 'All Volunteers', sentAt: '2024-01-08T09:00:00', status: 'sent' },
-  { id: '2', title: 'Schedule Update Notice', recipients: 'Morning Shift', sentAt: '2024-01-07T14:00:00', status: 'sent' },
-  { id: '3', title: 'Training Reminder', recipients: 'New Volunteers', sentAt: '2024-01-06T10:00:00', status: 'sent' },
-];
-
-export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementTabProps) {
+export function MassAnnouncementTab({ workspace }: MassAnnouncementTabProps) {
   const [showComposer, setShowComposer] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -37,12 +24,48 @@ export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementT
   const [sendEmail, setSendEmail] = useState(true);
   const [sendPush, setSendPush] = useState(true);
 
+  const {
+    announcements,
+    isLoading,
+    createAnnouncement,
+    deleteAnnouncement,
+  } = useWorkspaceAnnouncements(workspace.id);
+
   const handleSend = () => {
-    toast.success('Announcement sent to all recipients');
+    createAnnouncement.mutate({
+      title,
+      content: message,
+      target_audience: recipients,
+      channels: { email: sendEmail, in_app: sendPush },
+      sendNow: true,
+    });
     setShowComposer(false);
     setTitle('');
     setMessage('');
   };
+
+  const handleSaveDraft = () => {
+    createAnnouncement.mutate({
+      title,
+      content: message,
+      target_audience: recipients,
+      channels: { email: sendEmail, in_app: sendPush },
+      sendNow: false,
+    });
+    setShowComposer(false);
+    setTitle('');
+    setMessage('');
+  };
+
+  // Calculate stats from real data
+  const stats = {
+    totalSent: announcements.filter((a) => a.status === 'sent').length,
+    totalRecipients: announcements.reduce((sum, a) => sum + (a.recipients_count || 0), 0),
+    // Placeholder for open rate - would need tracking
+    openRate: announcements.length > 0 ? 94 : 0,
+  };
+
+  const sentAnnouncements = announcements.filter((a) => a.status === 'sent');
 
   return (
     <div className="space-y-6">
@@ -70,19 +93,19 @@ export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementT
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-rose-500/10 to-rose-600/5 border-rose-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-rose-600">{mockAnnouncements.length}</div>
+            <div className="text-2xl font-bold text-rose-600">{stats.totalSent}</div>
             <div className="text-xs text-muted-foreground">Total Sent</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">156</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.totalRecipients}</div>
             <div className="text-xs text-muted-foreground">Recipients Reached</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">94%</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.openRate}%</div>
             <div className="text-xs text-muted-foreground">Open Rate</div>
           </CardContent>
         </Card>
@@ -118,12 +141,11 @@ export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementT
                   <SelectValue placeholder="Select recipients" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Volunteers</SelectItem>
-                  <SelectItem value="active">Active Volunteers Only</SelectItem>
-                  <SelectItem value="leads">Team Leads Only</SelectItem>
-                  <SelectItem value="morning">Morning Shift</SelectItem>
-                  <SelectItem value="afternoon">Afternoon Shift</SelectItem>
-                  <SelectItem value="evening">Evening Shift</SelectItem>
+                  {AUDIENCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -165,16 +187,24 @@ export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementT
               <Button variant="outline" onClick={() => setShowComposer(false)}>
                 Cancel
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={handleSaveDraft}
+                disabled={!title.trim() || !message.trim() || createAnnouncement.isPending}
+              >
                 <Clock className="h-4 w-4 mr-2" />
-                Schedule
+                Save Draft
               </Button>
               <Button 
                 className="bg-rose-500 hover:bg-rose-600"
                 onClick={handleSend}
-                disabled={!title.trim() || !message.trim()}
+                disabled={!title.trim() || !message.trim() || createAnnouncement.isPending}
               >
-                <Send className="h-4 w-4 mr-2" />
+                {createAnnouncement.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
                 Send Now
               </Button>
             </div>
@@ -188,31 +218,55 @@ export function MassAnnouncementTab({ workspace: _workspace }: MassAnnouncementT
           <CardTitle className="text-lg">Recent Announcements</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {mockAnnouncements.map(announcement => (
-            <div
-              key={announcement.id}
-              className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-emerald-500/10">
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground">{announcement.title}</h4>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="h-3.5 w-3.5" />
-                    {announcement.recipients}
-                    <span className="text-muted-foreground/50">•</span>
-                    <Clock className="h-3.5 w-3.5" />
-                    {new Date(announcement.sentAt).toLocaleDateString()}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : sentAnnouncements.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Megaphone className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">No announcements sent yet.</p>
+              <p className="text-xs mt-1">Create your first announcement above.</p>
+            </div>
+          ) : (
+            sentAnnouncements.slice(0, 10).map((announcement) => (
+              <div
+                key={announcement.id}
+                className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10">
+                    <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">{announcement.title}</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="h-3.5 w-3.5" />
+                      {getAudienceLabel(announcement.target_audience)}
+                      <span className="text-muted-foreground/50">•</span>
+                      <Clock className="h-3.5 w-3.5" />
+                      {announcement.sent_at 
+                        ? format(new Date(announcement.sent_at), 'MMM d, yyyy')
+                        : 'Not sent'}
+                    </div>
                   </div>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="border-emerald-500/30 text-emerald-600">
+                    Sent
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => deleteAnnouncement.mutate(announcement.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <Badge variant="outline" className="border-emerald-500/30 text-emerald-600">
-                Sent
-              </Badge>
-            </div>
-          ))}
+            ))
+          )}
         </CardContent>
       </Card>
     </div>

@@ -38,12 +38,12 @@ const OrganizerConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void
 }) => {
   const { toggleSidebar } = useSidebar();
 
-  const handleServiceChange = useCallback((service: string) => {
-    console.log('Organizer console service change:', service);
+  const handleServiceChange = useCallback((_service: string) => {
+    // TODO: Implement service navigation
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    console.log('Organizer console global search:', query);
+  const handleSearch = useCallback((_query: string) => {
+    // TODO: Implement global search
   }, []);
 
   return (

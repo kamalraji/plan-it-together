@@ -126,9 +126,8 @@ export const VendorApprovalPanel: React.FC = () => {
           rejectionReason,
         },
       });
-      console.log(`Status email sent to ${vendor.contact_email}`);
     } catch (error) {
-      console.error('Failed to send status email:', error);
+      // Email failure should not block status update
       // Don't throw - email failure shouldn't block the status update
     }
   };

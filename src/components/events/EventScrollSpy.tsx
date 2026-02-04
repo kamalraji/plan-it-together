@@ -76,17 +76,27 @@ export function EventScrollSpy({ sections = DEFAULT_SECTIONS, className }: Event
         'fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm',
         className
       )}
+      role="navigation"
+      aria-label="Page sections navigation"
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center gap-1 py-3 overflow-x-auto no-scrollbar">
+        <div 
+          className="flex items-center justify-center gap-1 py-3 overflow-x-auto no-scrollbar"
+          role="tablist"
+          aria-label="Navigate to page sections"
+        >
           {availableSections.map((section) => {
             const isActive = activeSection === section.id;
             return (
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={section.id}
+                aria-label={`Navigate to ${section.label} section`}
                 className={cn(
-                  'relative px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap',
+                  'relative px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap min-h-[44px] min-w-[44px]',
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'

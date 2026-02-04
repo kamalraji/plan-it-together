@@ -86,8 +86,8 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
     setRecentCheckIns((prev) => [result, ...prev.slice(0, 4)]);
   };
 
-  const handleScanError = (error: string) => {
-    console.error('Scan error:', error);
+  const handleScanError = (_error: string) => {
+    // Scan error is handled by the QRCodeScanner component UI
   };
 
   // Realtime updates for recent check-ins and attendance list

@@ -102,8 +102,7 @@ export function usePromoCodeValidation(eventId: string | null) {
       setPromoError(null);
       return { isValid: true, promoCode, errorMessage: null, discountAmount };
 
-    } catch (error) {
-      console.error('Error validating promo code:', error);
+    } catch (_error) {
       const errorMsg = 'Failed to validate promo code';
       setPromoError(errorMsg);
       setAppliedPromoCode(null);

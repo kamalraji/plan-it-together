@@ -113,7 +113,6 @@ export function useITDashboardData(workspaceId: string) {
         .limit(10);
 
       if (error) {
-        console.error('Error fetching IT tickets:', error);
         return [];
       }
 
@@ -143,7 +142,6 @@ export function useITDashboardData(workspaceId: string) {
         .limit(10);
 
       if (error) {
-        console.error('Error fetching access requests:', error);
         return [];
       }
 
@@ -170,7 +168,6 @@ export function useITDashboardData(workspaceId: string) {
         .limit(6);
 
       if (error) {
-        console.error('Error fetching system health:', error);
         return getDefaultSystems();
       }
 
@@ -202,7 +199,6 @@ export function useITDashboardData(workspaceId: string) {
         .limit(5);
 
       if (error) {
-        console.error('Error fetching security alerts:', error);
         return [];
       }
 

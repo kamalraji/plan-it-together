@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -12,6 +12,7 @@ import {
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
 import { TeamMember, WorkspaceRole } from '../../types';
+import { useTeamMemberActivity, MemberActivityData } from '@/hooks/useMemberActivity';
 
 interface TeamRosterManagementProps {
   teamMembers: TeamMember[];
@@ -25,13 +26,7 @@ interface TeamRosterManagementProps {
   onUpdateRole: (memberId: string, role: WorkspaceRole) => void;
   getRoleBadge: (role: WorkspaceRole) => React.ReactNode;
   getStatusBadge: (status: string) => React.ReactNode;
-}
-
-interface MemberActivityData {
-  tasksAssigned: number;
-  tasksCompleted: number;
-  lastActivity: string;
-  contributionScore: number;
+  workspaceId?: string;
 }
 
 export function TeamRosterManagement({
@@ -45,7 +40,8 @@ export function TeamRosterManagement({
   onRemoveMember,
   onUpdateRole,
   getRoleBadge,
-  getStatusBadge
+  getStatusBadge,
+  workspaceId
 }: TeamRosterManagementProps) {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [showMemberProfile, setShowMemberProfile] = useState(false);
@@ -54,15 +50,28 @@ export function TeamRosterManagement({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Mock activity data - in real implementation, this would come from API
-  const getMemberActivity = (_memberId: string): MemberActivityData => {
-    return {
-      tasksAssigned: Math.floor(Math.random() * 10) + 1,
-      tasksCompleted: Math.floor(Math.random() * 8),
-      lastActivity: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-      contributionScore: Math.floor(Math.random() * 100)
+  // Fetch real activity data from database
+  const { data: activityMap } = useTeamMemberActivity(workspaceId);
+
+  // Memoized activity getter
+  const getMemberActivity = useMemo(() => {
+    return (memberId: string): MemberActivityData => {
+      // Get userId from team member
+      const member = teamMembers.find(m => m.id === memberId);
+      const userId = member?.userId || member?.user?.id;
+      
+      if (userId && activityMap?.has(userId)) {
+        return activityMap.get(userId)!;
+      }
+      // Return default values if no data found
+      return {
+        tasksAssigned: 0,
+        tasksCompleted: 0,
+        lastActivity: null,
+        contributionScore: 0
+      };
     };
-  };
+  }, [activityMap, teamMembers]);
 
   // Count owners in the workspace
   const ownerCount = teamMembers.filter(m => m.role === WorkspaceRole.WORKSPACE_OWNER).length;
@@ -565,7 +574,9 @@ export function TeamRosterManagement({
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Last Activity:</span>
                             <span className="text-foreground">
-                              {new Date(activity.lastActivity).toLocaleDateString()}
+                              {activity.lastActivity 
+                                ? new Date(activity.lastActivity).toLocaleDateString() 
+                                : 'No activity yet'}
                             </span>
                           </div>
                           <div className="flex justify-between text-sm">

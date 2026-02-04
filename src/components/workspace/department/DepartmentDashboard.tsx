@@ -13,6 +13,7 @@ import { Building2, Users, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { WORKSPACE_DEPARTMENTS } from '@/lib/workspaceHierarchy';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { TechDepartmentDashboard } from './tech';
 import { FinanceDepartmentDashboard } from './finance';
 import { ContentDepartmentDashboard } from './content';
@@ -34,6 +35,9 @@ export function DepartmentDashboard({
 }: DepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time updates for tasks, activities, milestones, budget_requests
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Extract department type from workspace name
   const departmentType = workspace.name.toLowerCase();

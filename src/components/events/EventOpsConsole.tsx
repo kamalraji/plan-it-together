@@ -7,12 +7,18 @@ import { QRCodeScanner } from '@/components/attendance/QRCodeScanner';
 import { supabase } from '@/integrations/supabase/client';
 import type { AttendanceReport } from '@/types';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { LiveRegion, useLiveAnnouncement } from '@/components/accessibility/LiveRegion';
+import { eventQueryKeys } from '@/lib/query-keys/events';
+
 export const EventOpsConsole: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  
+  // Accessibility announcements for screen readers
+  const { message: announcement, announce } = useLiveAnnouncement();
 
   const { data: attendanceReport } = useQuery<AttendanceReport>({
-    queryKey: ['attendance-report', eventId, undefined],
+    queryKey: eventQueryKeys.attendance(eventId || ''),
     queryFn: async () => {
       if (!eventId) throw new Error('Missing event id');
       const { data, error } = await supabase.functions.invoke('attendance-report', {
@@ -21,7 +27,12 @@ export const EventOpsConsole: React.FC = () => {
       if (error || !data?.success) {
         throw error || new Error('Failed to load attendance');
       }
-      return data.data as AttendanceReport;
+      
+      // Announce check-in count for accessibility
+      const report = data.data as AttendanceReport;
+      announce(`${report.attendedCount} of ${report.totalRegistrations} checked in`);
+      
+      return report;
     },
     enabled: !!eventId,
     refetchInterval: 5000,
@@ -42,12 +53,12 @@ export const EventOpsConsole: React.FC = () => {
 
   const handleOpenVolunteerConsole = () => {
     if (!eventId) return;
-    navigate(`/console/events/${eventId}/check-in`);
+    navigate(`/dashboard/eventmanagement/${eventId}/check-in`);
   };
 
   const handleViewEventDetails = () => {
     if (!eventId) return;
-    navigate(`/console/events/${eventId}`);
+    navigate(`/dashboard/eventmanagement/${eventId}`);
   };
 
   if (!eventId) {
@@ -67,12 +78,15 @@ export const EventOpsConsole: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/50">
+      {/* Accessibility: Live region for check-in announcements */}
+      <LiveRegion message={announcement} priority="polite" />
+
       <PageHeader
         title="Event-Day Ops Console"
         subtitle="Monitor live check-ins, print badges, and coordinate volunteers for this event."
         breadcrumbs={[
-          { label: 'Events', href: '/console/events' },
-          { label: `Event ${eventId}`, href: `/console/events/${eventId}` },
+          { label: 'Events', href: '/dashboard/eventmanagement' },
+          { label: `Event ${eventId}`, href: `/dashboard/eventmanagement/${eventId}` },
           { label: 'Ops Console', current: true },
         ]}
         actions={[

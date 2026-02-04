@@ -84,8 +84,8 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
         setExistingScore(score);
         setScores(score.scores as any);
       }
-    } catch (err) {
-      console.error('Error fetching existing score:', err);
+    } catch {
+      // Score fetch failed - will show empty form
     }
   };
 

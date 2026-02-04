@@ -109,8 +109,8 @@ export function ExportResultsTab({ workspaceId }: ExportResultsTabProps) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export failed:', error);
+    } catch (_error) {
+      // Export failed silently
     } finally {
       setIsExporting(false);
     }

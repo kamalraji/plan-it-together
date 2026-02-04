@@ -192,8 +192,7 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       } else {
         setTemplates(dbTemplates);
       }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
+    } catch (_error) {
       // Fall back to defaults on error
       setTemplates(DEFAULT_TEMPLATES.map(t => ({
         ...t,
@@ -223,8 +222,8 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
 
       if (error) throw error;
       setCampaigns((data || []) as EmailCampaign[]);
-    } catch (error) {
-      console.error('Error fetching campaigns:', error);
+    } catch (_error) {
+      // Fetching campaigns failed silently
     } finally {
       setIsLoadingCampaigns(false);
     }
@@ -275,8 +274,8 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
         notCheckedIn: notCheckedInData || 0,
         vip: vipCount || 0,
       });
-    } catch (error) {
-      console.error('Error fetching audience counts:', error);
+    } catch (_error) {
+      // Fetching audience counts failed silently
     } finally {
       setIsLoadingAudience(false);
     }
@@ -348,8 +347,7 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       }
 
       return recipients;
-    } catch (error) {
-      console.error('Error fetching recipients:', error);
+    } catch (_error) {
       return [];
     }
   };
@@ -373,8 +371,8 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
           location: branding?.venue || '',
         };
       }
-    } catch (error) {
-      console.error('Error fetching event details:', error);
+    } catch (_error) {
+      // Fetching event details failed silently
     }
     return { name: '', date: '', location: '' };
   };
@@ -464,7 +462,6 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       // Refresh campaigns list
       await fetchCampaigns();
     } catch (error: any) {
-      console.error('Error sending reminder:', error);
       toast.error('Failed to send reminders', {
         description: error.message || 'An unexpected error occurred',
       });
@@ -518,8 +515,7 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       }
 
       await fetchTemplates();
-    } catch (error: any) {
-      console.error('Error saving template:', error);
+    } catch {
       toast.error('Failed to save template');
     }
   };
@@ -535,8 +531,7 @@ export function useReminders(workspaceId: string | undefined, eventId: string | 
       if (error) throw error;
       toast.success('Template deleted');
       await fetchTemplates();
-    } catch (error: any) {
-      console.error('Error deleting template:', error);
+    } catch {
       toast.error('Failed to delete template');
     }
   };

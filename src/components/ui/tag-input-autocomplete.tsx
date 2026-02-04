@@ -84,8 +84,7 @@ export const TagInputWithAutocomplete: React.FC<TagInputWithAutocompleteProps> =
           .slice(0, 5);
 
         setSuggestions(filteredTags);
-      } catch (error) {
-        console.error('Error fetching tags:', error);
+      } catch {
         setSuggestions([]);
       } finally {
         setIsLoading(false);

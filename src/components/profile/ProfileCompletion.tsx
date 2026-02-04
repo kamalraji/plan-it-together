@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 import { profileSchema, type ProfileFormData } from './profileSchema';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
@@ -29,15 +29,28 @@ export function ProfileCompletion() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      const response = await api.put('/auth/profile', {
-        ...data,
-        profileCompleted: true
-      });
-      return response.data;
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          full_name: data.name,
+          bio: data.bio || null,
+          organization: data.organization || null,
+          phone: data.phone || null,
+          website: data.website || null,
+          social_links: data.socialLinks || null,
+          onboarding_completed_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      return { success: true };
     },
     onSuccess: () => {
       // Update the auth context with the new user data
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] });
       // Navigate to primary org dashboard to avoid redirect chain
       if (primaryOrg?.slug) {
         navigate(`/${primaryOrg.slug}/dashboard`);
@@ -54,7 +67,7 @@ export function ProfileCompletion() {
     try {
       await updateProfileMutation.mutateAsync(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
+      setError(err.message || 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +108,7 @@ export function ProfileCompletion() {
               <input
                 {...register('name')}
                 type="text"
+                autoComplete="name"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Enter your full name"
               />
@@ -122,6 +136,7 @@ export function ProfileCompletion() {
               <input
                 {...register('organization')}
                 type="text"
+                autoComplete="organization"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your company, school, or organization"
               />
@@ -134,6 +149,7 @@ export function ProfileCompletion() {
               <input
                 {...register('phone')}
                 type="tel"
+                autoComplete="tel"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your phone number"
               />
@@ -146,6 +162,7 @@ export function ProfileCompletion() {
               <input
                 {...register('website')}
                 type="url"
+                autoComplete="url"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="https://your-website.com"
               />
@@ -163,6 +180,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.linkedin')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="LinkedIn profile URL"
                 />
@@ -175,6 +193,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.twitter')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="Twitter profile URL"
                 />
@@ -187,6 +206,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.github')}
                   type="url"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="GitHub profile URL"
                 />

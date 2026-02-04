@@ -141,8 +141,6 @@ export const AdminUserRolesPage: React.FC = () => {
     mutationFn: async ({
       userId,
       role,
-      note,
-      actorId,
     }: {
       userId: string;
       role: AppRole;
@@ -155,14 +153,7 @@ export const AdminUserRolesPage: React.FC = () => {
         throw error;
       }
 
-      console.log('Role change audit', {
-        action: 'add',
-        targetUserId: userId,
-        role,
-        note: note ?? null,
-        performedBy: actorId ?? null,
-        at: new Date().toISOString(),
-      });
+      // Role change audit: add role
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] });
@@ -182,8 +173,6 @@ export const AdminUserRolesPage: React.FC = () => {
       userId,
       primaryRole,
       currentRoles,
-      note,
-      actorId,
     }: {
       userId: string;
       primaryRole: AppRole;
@@ -210,14 +199,7 @@ export const AdminUserRolesPage: React.FC = () => {
         throw insertError;
       }
 
-      console.log('Role change audit', {
-        action: 'update_primary',
-        targetUserId: userId,
-        roles: allRoles,
-        note: note ?? null,
-        performedBy: actorId ?? null,
-        at: new Date().toISOString(),
-      });
+      // Role change audit: update primary role
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] });
@@ -234,8 +216,6 @@ export const AdminUserRolesPage: React.FC = () => {
     mutationFn: async ({
       userId,
       role,
-      note,
-      actorId,
     }: {
       userId: string;
       role: AppRole;
@@ -252,14 +232,7 @@ export const AdminUserRolesPage: React.FC = () => {
         throw error;
       }
 
-      console.log('Role change audit', {
-        action: 'remove',
-        targetUserId: userId,
-        role,
-        note: note ?? null,
-        performedBy: actorId ?? null,
-        at: new Date().toISOString(),
-      });
+      // Role change audit: remove role
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-user-roles'] });
@@ -358,7 +331,7 @@ export const AdminUserRolesPage: React.FC = () => {
           </span>
           <div className="flex gap-2 flex-wrap">
             <Button asChild size="sm" variant="outline">
-              <Link to="/console/admin/roles-diagram">View role model & access matrix</Link>
+              <Link to="/thittam1hub/admin/roles-diagram">View role model & access matrix</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
               <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>

@@ -29,7 +29,6 @@ export function usePrimaryOrganization() {
         .maybeSingle();
 
       if (error) {
-        console.warn('[usePrimaryOrganization] Failed to fetch:', error);
         return null;
       }
 

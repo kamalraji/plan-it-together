@@ -225,7 +225,7 @@ export function TaskForm({
       };
       const { data, error } = await supabase.from('workspace_tasks').upsert(payload, { onConflict: 'id' }).select('id').single();
       if (error) {
-        console.error('Failed to upsert workspace task', error);
+        // Task upsert failed - handled by form state
       } else {
         createdTaskId = data?.id;
 

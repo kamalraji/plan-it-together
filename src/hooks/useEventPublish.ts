@@ -353,17 +353,39 @@ export function useEventPublish(eventId: string) {
   // Direct publish mutation (no approval required)
   const publishMutation = useMutation({
     mutationFn: async () => {
+      // 1. Update event status
       const { error } = await supabase
         .from('events')
         .update({ status: 'PUBLISHED' })
         .eq('id', eventId);
 
       if (error) throw error;
+
+      // 2. Auto-provision workspaces via edge function
+      const { data: { user } } = await supabase.auth.getUser();
+      const event = eventQuery.data;
+      
+      if (user && event) {
+        try {
+          await supabase.functions.invoke('workspace-provision', {
+            body: {
+              eventId,
+              organizationId: event.organization_id || '',
+              requestedBy: user.id,
+              skipExisting: true,
+            },
+          });
+        } catch (provisionError) {
+          // Log but don't fail the publish if workspace provisioning fails
+          console.warn('Workspace auto-provisioning failed:', provisionError);
+        }
+      }
     },
     onSuccess: () => {
       toast.success('Event published successfully!');
       queryClient.invalidateQueries({ queryKey: ['event-status', eventId] });
       queryClient.invalidateQueries({ queryKey: ['organizer-event', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['event-root-workspace', eventId] });
     },
     onError: (error) => {
       toast.error(`Failed to publish event: ${error.message}`);

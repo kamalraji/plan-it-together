@@ -4,15 +4,20 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useSeo } from '@/hooks/useSeo';
 import { usePageViewTracking } from '@/hooks/usePageViewTracking';
-import { Calendar, MapPin, Users, Clock, Globe, ExternalLink, Ticket } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Globe, ExternalLink, Ticket, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { EventScrollSpy } from './EventScrollSpy';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
 import { getTierSaleStatus, TicketTier } from '@/types/ticketTier';
+import { SkipLink } from '@/components/accessibility';
+import { AccessibilityBadges, EventCountdown, EventSocialLinks } from './shared';
+import { GlobalFooter } from '@/components/layout/GlobalFooter';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   INR: '₹',
@@ -132,6 +137,23 @@ export function PublicEventPage() {
     return () => clearTimeout(timer);
   }, [sectionId, event]);
 
+  // Set HTML lang attribute based on event language setting
+  useEffect(() => {
+    if (!event) return;
+    
+    const branding = event.branding as Record<string, unknown> | null;
+    const accessibility = branding?.accessibility as Record<string, unknown> | null;
+    const language = (accessibility?.language as string) || 'en';
+    
+    // Save original lang to restore on unmount
+    const originalLang = document.documentElement.lang;
+    document.documentElement.lang = language;
+    
+    return () => {
+      document.documentElement.lang = originalLang || 'en';
+    };
+  }, [event]);
+
   // JSON-LD for events
   useEffect(() => {
     if (!event) return;
@@ -211,13 +233,48 @@ export function PublicEventPage() {
     );
   }
 
+  // Prefer GrapesJS-built landing page when available (full page replacement)
+  if (event.landing_page_data && (event.landing_page_data as any).html) {
+    const lp = event.landing_page_data as any as { 
+      html: string; 
+      css?: string | null; 
+      meta?: { title?: string; description?: string } 
+    };
+
+    // Sanitize HTML and CSS to prevent XSS attacks
+    const sanitizedHTML = sanitizeLandingPageHTML(lp.html);
+    const sanitizedCSS = lp.css ? sanitizeLandingPageCSS(lp.css) : null;
+
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <SkipLink href="#main-content" />
+        <main id="main-content" className="flex-1">
+          <section className="border-b border-border bg-background">
+            {/* Inject sanitized GrapesJS CSS into the page scope */}
+            {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
+            <div
+              className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+              dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+            />
+          </section>
+        </main>
+        <GlobalFooter />
+        <CookieConsentBanner />
+      </div>
+    );
+  }
+
   const org = event.organizations as any;
   const branding = (event.branding as any) || {};
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip link for keyboard navigation - WCAG 2.1 AA */}
+      <SkipLink href="#main-content" />
+      
       {/* Scroll-spy navigation */}
       <EventScrollSpy />
+      
       {/* Hero Section */}
       <section
         id="hero"
@@ -312,33 +369,68 @@ export function PublicEventPage() {
               )}
             </div>
 
-            {/* CTA */}
-            <div className="flex flex-wrap gap-3">
+            {/* Countdown timer */}
+            {new Date(event.start_date) > new Date() && (
+              <div className="mb-6">
+                <EventCountdown targetDate={event.start_date} variant="hero" />
+              </div>
+            )}
+
+            {/* Accessibility badges */}
+            {branding.accessibility?.features && Array.isArray(branding.accessibility.features) && branding.accessibility.features.length > 0 && (
+              <div className="mb-6">
+                <AccessibilityBadges enabledFeatures={branding.accessibility.features} showLabels />
+              </div>
+            )}
+
+            {/* Age restriction warning */}
+            {branding.accessibility?.ageRestriction?.enabled && (
+              <Alert className="mb-6 bg-background/20 border-background/30 text-primary-foreground">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  This event requires attendees to be 
+                  {branding.accessibility.ageRestriction.minAge && ` at least ${branding.accessibility.ageRestriction.minAge}`}
+                  {branding.accessibility.ageRestriction.minAge && branding.accessibility.ageRestriction.maxAge && ' and'}
+                  {branding.accessibility.ageRestriction.maxAge && ` no more than ${branding.accessibility.ageRestriction.maxAge}`} years old.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* CTA - 44px min touch targets for accessibility */}
+            <div className="flex flex-wrap gap-3 mb-6" role="group" aria-label="Event actions">
               <Button
                 size="lg"
                 variant="secondary"
                 onClick={() => navigate(`/events/${event.id}`)}
-                className="font-semibold"
+                className="font-semibold min-h-[44px] min-w-[44px]"
+                aria-label={`Register for ${event.name}`}
               >
                 {branding.primaryCtaLabel || 'Register Now'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 min-h-[44px] min-w-[44px]"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
                 }}
+                aria-label="Copy event link to clipboard"
               >
                 Share Event
               </Button>
             </div>
+
+            {/* Social links from event branding */}
+            {branding.socialLinks && (
+              <EventSocialLinks links={branding.socialLinks} variant="hero" showLabels />
+            )}
           </div>
         </div>
       </section>
 
-      {/* Event Details */}
-      <section id="details" className="container mx-auto px-4 py-10">
+      {/* Event Details - Main content region */}
+      <main id="main-content" tabIndex={-1}>
+        <section id="details" className="container mx-auto px-4 py-10" aria-label="Event details">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <Card id="about">
@@ -352,25 +444,6 @@ export function PublicEventPage() {
               </CardContent>
             </Card>
 
-            {/* Render custom landing page if available (sanitized to prevent XSS) */}
-            {event.landing_page_data && (event.landing_page_data as any).html && (
-              <Card id="custom-content">
-                <CardContent className="pt-6">
-                  {(event.landing_page_data as any).css && (
-                    <style
-                      dangerouslySetInnerHTML={{ 
-                        __html: sanitizeLandingPageCSS((event.landing_page_data as any).css) 
-                      }}
-                    />
-                  )}
-                  <div
-                    dangerouslySetInnerHTML={{ 
-                      __html: sanitizeLandingPageHTML((event.landing_page_data as any).html) 
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -467,7 +540,11 @@ export function PublicEventPage() {
             )}
           </aside>
         </div>
-      </section>
+        </section>
+      </main>
+      
+      <GlobalFooter />
+      <CookieConsentBanner />
     </div>
   );
 }

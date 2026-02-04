@@ -90,6 +90,7 @@ export const getInitialSectionState = () => ({
   media: false,
   faqs: false,
   cta: false,
+  template: false,
 });
 
 /**

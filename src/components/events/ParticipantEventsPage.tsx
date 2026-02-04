@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OrganizationsListView } from './OrganizationsListView';
+import { PublicPageLayout } from '@/components/layout/PublicPageLayout';
+import { useSeo } from '@/hooks/useSeo';
 
 interface SupabaseEventRow {
   id: string;
@@ -157,27 +159,11 @@ export function ParticipantEventsPage() {
     },
   });
 
-  useEffect(() => {
-    document.title = 'Discover Events | Thittam1Hub';
-
-    const description = 'Discover amazing events happening near you and online. Filter by date, type, and status.';
-
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'description');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', description);
-
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', window.location.origin + '/events');
-  }, []);
+  useSeo({
+    title: 'Discover Events | Thittam1Hub',
+    description: 'Discover amazing events happening near you and online. Filter by date, type, and status.',
+    canonicalPath: '/events',
+  });
 
   const now = new Date().getTime();
 
@@ -309,7 +295,8 @@ export function ParticipantEventsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicPageLayout>
+      <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Effects */}
@@ -719,7 +706,8 @@ export function ParticipantEventsPage() {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </PublicPageLayout>
   );
 }
 

@@ -113,8 +113,7 @@ export function useGanttChart({ tasks, workspaceId }: UseGanttChartOptions) {
 
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
       toast.success('Task dates updated');
-    } catch (error) {
-      console.error('Failed to update task dates:', error);
+    } catch (_error) {
       toast.error('Failed to update task dates');
     }
   }, [workspaceId, queryClient]);
@@ -142,8 +141,7 @@ export function useGanttChart({ tasks, workspaceId }: UseGanttChartOptions) {
 
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
       toast.success('Milestone created');
-    } catch (error) {
-      console.error('Failed to create milestone:', error);
+    } catch (_error) {
       toast.error('Failed to create milestone');
     }
   }, [workspaceId, queryClient]);
@@ -181,8 +179,7 @@ export function useGanttChart({ tasks, workspaceId }: UseGanttChartOptions) {
 
       queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
       toast.success('Dependency created');
-    } catch (error) {
-      console.error('Failed to create dependency:', error);
+    } catch (_error) {
       toast.error('Failed to create dependency');
     }
   }, [workspaceId, queryClient]);

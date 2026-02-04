@@ -21,22 +21,17 @@ interface WebhookNotificationPayload {
 export function useWebhookNotifications() {
   const sendWebhookNotification = useCallback(async (payload: WebhookNotificationPayload) => {
     try {
-      console.log('Sending webhook notification:', payload);
-      
       const { data, error } = await supabase.functions.invoke('send-webhook-notification', {
         body: payload,
       });
 
       if (error) {
-        console.error('Webhook notification error:', error);
         return { success: false, error };
       }
 
-      console.log('Webhook notification result:', data);
       return { success: true, data };
-    } catch (error) {
-      console.error('Failed to send webhook notification:', error);
-      return { success: false, error };
+    } catch (err) {
+      return { success: false, error: err };
     }
   }, []);
 

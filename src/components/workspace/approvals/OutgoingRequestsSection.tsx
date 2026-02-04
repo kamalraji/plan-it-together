@@ -1,4 +1,5 @@
 import { useOutgoingRequests } from '@/hooks/useOutgoingRequests';
+import { useApprovalRealtimeUpdates } from '@/hooks/useActivityFeed';
 import { OutgoingSummaryCards } from './OutgoingSummaryCards';
 import { OutgoingRequestsList } from './OutgoingRequestsList';
 import { BudgetRequestDialog } from './BudgetRequestDialog';
@@ -22,6 +23,9 @@ export function OutgoingRequestsSection({
     rejectedCount,
     isLoading,
   } = useOutgoingRequests(workspaceId);
+
+  // Enable real-time updates for approval status changes
+  useApprovalRealtimeUpdates(workspaceId);
 
   return (
     <div className="space-y-6">

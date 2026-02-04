@@ -156,8 +156,8 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
         email: user?.email || '',
         allowContact: true
       });
-    } catch (error) {
-      console.error('Failed to submit feedback:', error);
+    } catch (_error) {
+      // Feedback submission failed silently
     } finally {
       setSubmitting(false);
     }

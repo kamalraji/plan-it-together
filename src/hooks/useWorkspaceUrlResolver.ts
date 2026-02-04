@@ -11,7 +11,7 @@ import {
   ParsedWorkspaceUrl,
   slugify,
 } from '@/lib/workspaceNavigation';
-import { WorkspaceTab } from './useWorkspaceShell';
+import type { WorkspaceTab } from '@/types/workspace-tabs';
 
 interface ResolvedWorkspaceContext {
   // URL parsing

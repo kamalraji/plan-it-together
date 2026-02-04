@@ -8,6 +8,7 @@ import { UserRole } from '../../types';
 import { motion } from 'framer-motion';
 import { AuthLayout } from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -142,6 +143,7 @@ export function RegisterForm() {
                 <input
                   {...register('name')}
                   type="text"
+                  autoComplete="name"
                   className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your full name"
                 />
@@ -202,6 +204,7 @@ export function RegisterForm() {
                   <input
                     {...register('eventCode')}
                     type="text"
+                    autoComplete="off"
                     className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                     placeholder="Enter event code if you have one"
                   />
@@ -286,6 +289,19 @@ export function RegisterForm() {
                 </div>
               </motion.div>
             )}
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            {/* Google Sign Up */}
+            <GoogleSignInButton label="Sign up with Google" />
           </form>
         </motion.div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider, useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
@@ -20,6 +21,8 @@ import { EventLandingPage } from '../events/EventLandingPage';
 import { PublicEventPage } from '../events/PublicEventPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
+import { SettingsPage } from './SettingsPage';
+import { AnalyticsPage } from './AnalyticsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
@@ -27,11 +30,17 @@ import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import { CertificateVerification } from '../certificates';
+import { ForgotPasswordForm } from '../auth/ForgotPasswordForm';
+import { ResetPasswordForm } from '../auth/ResetPasswordForm';
 
-import AttendflowLanding from '@/pages/AttendflowLanding';
+import Thittam1HubLanding from '@/pages/Thittam1HubLanding';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import PricingPage from '@/pages/PricingPage';
 import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
+import { PrivacyPolicyPage, TermsOfServicePage, CookiePolicyPage, SecurityPage } from '@/components/legal';
+import { PublicHelpPage } from '@/components/help';
+import { RouteAnnouncer } from '@/components/accessibility';
 
 // Lazy-loaded components for better bundle splitting
 // Heavy/role-specific components only downloaded when needed
@@ -48,7 +57,8 @@ const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPort
 const HelpPage = lazy(() => import('../help/HelpPage'));
 const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
 const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
-
+const OnboardingPage = lazy(() => import('../../pages/OnboardingPage'));
+const EventChannelsPage = lazy(() => import('../../pages/participant/EventChannelsPage'));
 // Loading fallback for lazy-loaded routes
 const RouteLoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/95">
@@ -78,70 +88,20 @@ const queryClient = new QueryClient({
 const ForgotPasswordPage = () => {
   return (
     <AuthLayout>
-      <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
-            Forgot your password?
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Password reset functionality will be implemented in upcoming updates.
-          </p>
-        </div>
-
-        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
-          <div className="space-y-4 text-center">
-            <div>
-              <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
-              <p className="text-sm text-muted-foreground">
-                You&apos;ll be able to request a secure reset link to your email from here.
-              </p>
-            </div>
-
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              Back to login
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ForgotPasswordForm />
     </AuthLayout>
   );
 };
 
-// Password Reset page placeholder using shared AuthLayout
+// Password Reset page using shared AuthLayout
 const ResetPasswordPage = () => {
   return (
     <AuthLayout>
-      <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
-            Reset your password
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            The secure password reset experience will be available soon.
-          </p>
-        </div>
-
-        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
-          <div className="space-y-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Once implemented, this page will let you choose a new password after opening a
-              verified reset link from your email.
-            </p>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              Back to login
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ResetPasswordForm />
     </AuthLayout>
   );
 };
+
 
 // Redirect component for backward compatibility from /e/:slug to /event/:slug
 const SlugRedirect = () => {
@@ -221,6 +181,11 @@ export const ConsoleDashboard = () => {
           .eq('status', 'COMPLETED'),
       ]);
 
+      // Fetch team member count from organization_members
+      const teamMembersRes = await supabase
+        .from('organization_members')
+        .select('*', { count: 'exact', head: true });
+
       if (activeEventsRes.error) throw activeEventsRes.error;
       if (draftEventsRes.error) throw draftEventsRes.error;
       if (completedEventsRes.error) throw completedEventsRes.error;
@@ -241,7 +206,7 @@ export const ConsoleDashboard = () => {
         completedEvents: completedEventsRes.count ?? 0,
         totalRegistrations: registrationsRes.count ?? 0,
         activeWorkspaces: activeWorkspacesRes.count ?? 0,
-        teamMembers: 0, // Team metrics will be wired to dedicated tables later
+        teamMembers: teamMembersRes.count ?? 0,
         availableServices: servicesRes.count ?? 0,
         activeBookings: activeBookingsRes.count ?? 0,
         totalRevenue,
@@ -401,10 +366,16 @@ export const ConsoleDashboard = () => {
         <div className="mt-16 mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Quick Actions</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button 
+              onClick={() => navigate('/dashboard/eventmanagement/create')}
+              className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
               Create Event
             </button>
-            <button className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button 
+              onClick={() => navigate('/dashboard/workspaces')}
+              className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+            >
               Join Workspace
             </button>
             <button
@@ -435,20 +406,27 @@ const ProfileService = () => {
 const RootLandingRoute: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
+  const { isCompleted: onboardingCompleted, isLoading: onboardingLoading } = useOnboardingStatus();
 
   if (authLoading) {
     return <RouteLoadingFallback />;
   }
 
   if (isAuthenticated) {
-    // Wait for org data before redirecting
-    if (orgLoading) {
+    // Wait for onboarding and org data before redirecting
+    if (onboardingLoading || orgLoading) {
       return <RouteLoadingFallback />;
     }
+    
+    // Redirect to onboarding if not completed
+    if (!onboardingCompleted) {
+      return <Navigate to="/onboarding/welcome" replace />;
+    }
+    
     return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
   }
 
-  return <AttendflowLanding />;
+  return <Thittam1HubLanding />;
 };
 
 const SupportService = () => {
@@ -515,10 +493,20 @@ export const AppRouter: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
+          <RouteAnnouncer />
           <Routes>
-             {/* Attendflow-style marketing landing at root */}
+             {/* Thittam1Hub-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
              <Route path="/pricing" element={<PricingPage />} />
+             
+             {/* Legal pages */}
+             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+             <Route path="/terms" element={<TermsOfServicePage />} />
+             <Route path="/cookies" element={<CookiePolicyPage />} />
+             <Route path="/security" element={<SecurityPage />} />
+             
+             {/* Public help - accessible without auth */}
+             <Route path="/help" element={<PublicHelpPage />} />
              
              {/* Dev tools */}
              <Route path="/dev/illustrations" element={<IllustrationGalleryPage />} />
@@ -528,6 +516,16 @@ export const AppRouter: React.FC = () => {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Onboarding wizard for new users */}
+            <Route
+              path="/onboarding/welcome"
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <OnboardingPage />
+                </Suspense>
+              }
+            />
 
             {/* Organizer onboarding - appears for new organizers */}
             <Route
@@ -582,6 +580,11 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
             <Route path="/event/:slug" element={<PublicEventPage />} />
+            <Route path="/event/:eventId/channels" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <EventChannelsPage />
+              </Suspense>
+            } />
             {/* Backward compatibility redirect from old /e/:slug to /event/:slug */}
             <Route path="/e/:slug" element={<SlugRedirect />} />
 
@@ -737,6 +740,22 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
+              <Route
+                path="settings/*"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <SettingsPage />
+                  </ConsoleRoute>
+                }
+              />
+              <Route
+                path="analytics"
+                element={
+                  <ConsoleRoute>
+                    <AnalyticsPage />
+                  </ConsoleRoute>
+                }
+              />
             </Route>
 
             {/* Standalone Marketplace - public marketplace for browsing services */}
@@ -769,6 +788,7 @@ export const AppRouter: React.FC = () => {
           </Routes >
         </BrowserRouter >
       </AuthProvider >
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider >
   );
 };

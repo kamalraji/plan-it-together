@@ -38,7 +38,6 @@ export const PublicProfilePage: React.FC = () => {
           .rpc('get_public_portfolio', { _user_id: userId });
 
         if (queryError) {
-          console.error('Error loading public profile:', queryError.message);
           setError('Unable to load profile.');
         } else if (!data || (Array.isArray(data) && data.length === 0)) {
           setError('Profile not found or is private.');
@@ -47,8 +46,7 @@ export const PublicProfilePage: React.FC = () => {
           const profileData = Array.isArray(data) ? data[0] : data;
           setProfile(profileData as PublicProfile);
         }
-      } catch (err) {
-        console.error('Error loading public profile', err);
+      } catch {
         setError('Unexpected error while loading profile.');
       } finally {
         setIsLoading(false);

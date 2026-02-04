@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
@@ -11,6 +11,11 @@ import { Badge } from '@/components/ui/badge';
 import { Ticket } from 'lucide-react';
 import type { TicketTier } from '@/types/ticketTier';
 import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/types/ticketTier';
+import { SkipLink } from '@/components/accessibility';
+import { GlobalFooter } from '@/components/layout/GlobalFooter';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
+
+type TabType = 'overview' | 'schedule' | 'prizes' | 'sponsors';
 
 interface EventLandingPageProps {
   eventId?: string;
@@ -20,10 +25,27 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const { eventId: paramEventId } = useParams<{ eventId: string }>();
   const eventId = propEventId || paramEventId;
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
   const { data: primaryOrg } = usePrimaryOrganization();
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
+  
+  // Parse tab from URL query param for deep linking
+  const tabParam = searchParams.get('tab') as TabType | null;
+  const validTabs: TabType[] = ['overview', 'schedule', 'prizes', 'sponsors'];
+  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : 'overview';
+  
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  
+  // Sync URL with active tab
+  useEffect(() => {
+    if (activeTab !== 'overview') {
+      searchParams.set('tab', activeTab);
+    } else {
+      searchParams.delete('tab');
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [activeTab]);
 
   // Fetch event details directly from Supabase
   const { data: event, isLoading, error } = useQuery({
@@ -227,23 +249,31 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     const sanitizedCSS = lp.css ? sanitizeLandingPageCSS(lp.css) : null;
 
     return (
-      <div className="min-h-screen bg-background">
-        <section className="border-b border-border bg-background">
-          {/* Inject sanitized GrapesJS CSS into the page scope */}
-          {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
-          <div
-            className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
-          />
-        </section>
+      <div className="min-h-screen bg-background flex flex-col">
+        <SkipLink href="#main-content" />
+        <main id="main-content" className="flex-1">
+          <section className="border-b border-border bg-background">
+            {/* Inject sanitized GrapesJS CSS into the page scope */}
+            {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
+            <div
+              className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+              dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+            />
+          </section>
+        </main>
+        <GlobalFooter />
+        <CookieConsentBanner />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip link for keyboard navigation - WCAG 2.1 AA */}
+      <SkipLink href="#main-content" />
+      
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
-      <div
+      <header
         className="relative text-primary-foreground bg-gradient-to-r from-primary to-accent overflow-hidden"
         style={{
           backgroundColor: event.branding.primaryColor || undefined,
@@ -384,7 +414,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Navigation Tabs */}
       <div className="bg-card/80 border-b border-border/60 backdrop-blur sticky top-0 z-10">
@@ -845,6 +875,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
           </div>
         </div>
       )}
+      
+      <GlobalFooter />
+      <CookieConsentBanner />
     </div>
   );
 }

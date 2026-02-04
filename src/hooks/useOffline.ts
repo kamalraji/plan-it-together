@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { offlineService } from '../services/offlineService';
 import { notificationService } from '../services/notificationService';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface OfflineState {
   isOnline: boolean;
@@ -37,8 +38,7 @@ export function useOffline() {
             pendingMessages: pendingMessages.length
           }));
         }
-      } catch (error) {
-        console.error('Failed to initialize offline services:', error);
+      } catch (_error) {
         setState(prev => ({ ...prev, isInitialized: true }));
       }
     };
@@ -79,8 +79,8 @@ export function useOffline() {
         pendingUpdates: pendingUpdates.length,
         pendingMessages: pendingMessages.length
       }));
-    } catch (error) {
-      console.error('Failed to sync pending data:', error);
+    } catch (_error) {
+      // Sync failures are expected when offline
     }
   }, []);
 
@@ -88,17 +88,15 @@ export function useOffline() {
   const saveTaskUpdate = useCallback(async (workspaceId: string, taskId: string, updateData: any) => {
     try {
       if (state.isOnline) {
-        // Try to update immediately if online
-        const response = await fetch(`/api/workspaces/${workspaceId}/tasks/${taskId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData)
-        });
+        // Try to update immediately via Supabase if online
+        const { error } = await supabase
+          .from('workspace_tasks')
+          .update(updateData)
+          .eq('id', taskId)
+          .eq('workspace_id', workspaceId);
 
-        if (!response.ok) {
-          throw new Error('Network request failed');
+        if (error) {
+          throw new Error(error.message);
         }
       } else {
         // Save for offline sync
@@ -116,9 +114,7 @@ export function useOffline() {
           tag: 'offline-task-update'
         });
       }
-    } catch (error) {
-      console.error('Failed to save task update:', error);
-      
+    } catch (_error) {
       // Save for offline sync as fallback
       await offlineService.saveTaskUpdate(workspaceId, taskId, updateData);
       
@@ -133,21 +129,26 @@ export function useOffline() {
   const saveMessage = useCallback(async (channelId: string, content: string): Promise<string> => {
     try {
       if (state.isOnline) {
-        // Try to send immediately if online
-        const response = await fetch(`/api/channels/${channelId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ content })
-        });
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
 
-        if (!response.ok) {
-          throw new Error('Network request failed');
+        // Try to send immediately via Supabase if online
+        const { data, error } = await supabase
+          .from('channel_messages')
+          .insert({
+            channel_id: channelId,
+            content,
+            sender_id: user.id,
+          })
+          .select('id')
+          .single();
+
+        if (error) {
+          throw new Error(error.message);
         }
 
-        const result = await response.json();
-        return result.message.id;
+        return data.id;
       } else {
         // Save for offline sync
         const tempId = await offlineService.saveOfflineMessage(channelId, content);
@@ -159,9 +160,7 @@ export function useOffline() {
 
         return tempId;
       }
-    } catch (error) {
-      console.error('Failed to save message:', error);
-      
+    } catch (_error) {
       // Save for offline sync as fallback
       const tempId = await offlineService.saveOfflineMessage(channelId, content);
       
@@ -178,8 +177,8 @@ export function useOffline() {
   const cacheData = useCallback(async (key: string, data: any, ttl?: number) => {
     try {
       await offlineService.cacheData(key, data, ttl);
-    } catch (error) {
-      console.error('Failed to cache data:', error);
+    } catch (_error) {
+      // Caching failures are non-critical
     }
   }, []);
 
@@ -187,8 +186,7 @@ export function useOffline() {
   const getCachedData = useCallback(async (key: string) => {
     try {
       return await offlineService.getCachedData(key);
-    } catch (error) {
-      console.error('Failed to get cached data:', error);
+    } catch (_error) {
       return null;
     }
   }, []);
@@ -202,8 +200,8 @@ export function useOffline() {
         pendingUpdates: 0,
         pendingMessages: 0
       }));
-    } catch (error) {
-      console.error('Failed to clear offline data:', error);
+    } catch (_error) {
+      // Clear failures are non-critical
     }
   }, []);
 
@@ -211,8 +209,7 @@ export function useOffline() {
   const getStorageUsage = useCallback(async () => {
     try {
       return await offlineService.getStorageUsage();
-    } catch (error) {
-      console.error('Failed to get storage usage:', error);
+    } catch (_error) {
       return null;
     }
   }, []);

@@ -234,7 +234,7 @@ export const VendorRegistrationPage: React.FC = () => {
       .upload(path, file, { upsert: true });
     
     if (error) {
-      console.error('Upload error:', error);
+      // Upload failed - return null to indicate failure
       return null;
     }
     

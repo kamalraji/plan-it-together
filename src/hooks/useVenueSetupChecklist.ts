@@ -191,9 +191,8 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
       toast.success('Task added');
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('Failed to add task');
-      console.error(error);
     },
   });
 
@@ -216,9 +215,8 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('Failed to update task');
-      console.error(error);
     },
   });
 
@@ -236,9 +234,8 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
       toast.success('Task deleted');
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('Failed to delete task');
-      console.error(error);
     },
   });
 
@@ -260,7 +257,6 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to update task');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
     }
@@ -275,7 +271,6 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to assign task');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
       toast.success(assigneeId ? 'Task assigned' : 'Assignment removed');
@@ -291,7 +286,6 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to add note');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
       toast.success('Note saved');
@@ -313,7 +307,6 @@ export function useVenueSetupChecklist(workspaceId: string, eventId?: string) {
 
     if (error) {
       toast.error('Failed to reset tasks');
-      console.error(error);
     } else {
       queryClient.invalidateQueries({ queryKey: ['venue-setup-checklist', workspaceId] });
       toast.success('All tasks reset');

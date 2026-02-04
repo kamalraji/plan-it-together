@@ -277,7 +277,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               <div className="p-4 border-t border-border bg-muted">
                 <div className="flex items-center justify-between">
                   <Link
-                    to="/console/notifications"
+                    to="/dashboard/notifications"
                     className="text-sm text-primary hover:text-primary/80 font-medium"
                     onClick={() => setIsOpen(false)}
                   >
@@ -371,7 +371,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div className="p-4 border-t border-border bg-muted">
               <div className="flex items-center justify-between">
                 <Link
-                  to="/console/notifications"
+                  to="/dashboard/notifications"
                   className="text-sm text-primary hover:text-primary/80 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
@@ -502,7 +502,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     if (taskId) params.set('taskId', taskId);
 
     const query = params.toString();
-    const basePath = `/console/events/${eventId}/workspace`;
+    const basePath = `/dashboard/eventmanagement/${eventId}/workspace`;
     return query ? `${basePath}?${query}` : basePath;
   };
 

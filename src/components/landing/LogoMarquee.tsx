@@ -52,7 +52,7 @@ export function LogoMarquee() {
     <section className="relative py-12 md:py-16 bg-background overflow-hidden">
       <div className="container mb-8">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-          Teams running events on Attendflow
+          Teams running events on Thittam1Hub
         </p>
       </div>
 

@@ -98,8 +98,7 @@ export function AddVolunteerModal({
       queryClient.invalidateQueries({ queryKey: ['full-volunteer-roster', workspaceId] });
       form.reset({ email: '', role: defaultRole, message: '' });
       onOpenChange(false);
-    } catch (error) {
-      console.error('Error sending invitation:', error);
+    } catch {
       toast.error('Failed to send invitation');
     } finally {
       setIsSubmitting(false);
@@ -132,7 +131,8 @@ export function AddVolunteerModal({
                   </FormLabel>
                   <FormControl>
                     <Input 
-                      type="email" 
+                      type="email"
+                      autoComplete="email"
                       placeholder="team-member@example.com" 
                       {...field} 
                     />

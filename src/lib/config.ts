@@ -26,5 +26,4 @@ export const FEATURE_FLAGS = {
 export const validateEnvironment = (): void => {
   // VITE_API_URL is optional since we have a default value
   // No required environment variables for now
-  console.log('Environment validated successfully');
 };

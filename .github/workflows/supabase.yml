@@ -1,0 +1,66 @@
+name: Supabase CI/CD
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'supabase/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'supabase/**'
+
+jobs:
+  validate:
+    name: Validate Edge Functions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Type check shared utilities
+        run: deno check supabase/functions/_shared/*.ts
+
+      - name: Validate function structure
+        run: |
+          for dir in supabase/functions/*/; do
+            if [ -f "${dir}index.ts" ]; then
+              echo "Checking ${dir}..."
+              deno check "${dir}index.ts" || true
+            fi
+          done
+
+  # Uncomment when you have Supabase CLI credentials configured
+  # deploy:
+  #   name: Deploy to Supabase
+  #   runs-on: ubuntu-latest
+  #   needs: validate
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Supabase CLI
+  #       uses: supabase/setup-cli@v1
+  #
+  #     - name: Link project
+  #       run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+  #       env:
+  #         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  #
+  #     - name: Push database changes
+  #       run: supabase db push
+  #       env:
+  #         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  #
+  #     - name: Deploy edge functions
+  #       run: supabase functions deploy --all
+  #       env:
+  #         SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

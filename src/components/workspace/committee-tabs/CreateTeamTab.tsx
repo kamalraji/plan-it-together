@@ -93,8 +93,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
       setShowCreateForm(false);
       setTeamName('');
       setTeamDescription('');
-    } catch (err) {
-      console.error('Failed to create team:', err);
+    } catch (_err) {
       toast.error('Failed to create team');
     } finally {
       setIsCreating(false);

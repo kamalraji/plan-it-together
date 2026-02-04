@@ -152,7 +152,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
     ]);
 
     if (error) {
-      console.error('Failed to seed notifications:', error.message);
+      // Seed notifications failed silently
     }
   };
 
@@ -216,8 +216,8 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
         subtitle={`${stats.total} total notifications, ${stats.unread} unread`}
         actions={pageActions}
         breadcrumbs={[
-          { label: 'Console', href: '/console' },
-          { label: 'Notifications', href: '/console/notifications' },
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Notifications', href: '/dashboard/notifications' },
         ]}
       />
 

@@ -84,7 +84,6 @@ export default function JudgePortalPage() {
           setSelectedWorkspaceId(mapped[0].workspace_id);
         }
       } catch (err: any) {
-        console.error('Error fetching judge workspaces:', err);
         setError(err.message || 'Failed to load judge data');
       } finally {
         setIsLoading(false);

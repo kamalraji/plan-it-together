@@ -7,70 +7,19 @@ import {
   CheckCircle, 
   Edit3,
   Eye,
-  Send
+  Send,
+  Loader2,
 } from 'lucide-react';
+import { useContentItems } from '@/hooks/useContentDepartmentData';
 
-interface ContentItem {
-  id: string;
-  title: string;
-  type: 'article' | 'presentation' | 'video' | 'document';
-  status: 'draft' | 'review' | 'approved' | 'published';
-  author: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high';
+interface ContentPipelineOverviewProps {
+  workspaceId?: string;
 }
-
-const mockContentPipeline: ContentItem[] = [
-  {
-    id: '1',
-    title: 'Opening Ceremony Script',
-    type: 'document',
-    status: 'approved',
-    author: 'Sarah Chen',
-    dueDate: '2024-01-15',
-    priority: 'high',
-  },
-  {
-    id: '2',
-    title: 'Keynote Speaker Introduction',
-    type: 'presentation',
-    status: 'review',
-    author: 'Mike Johnson',
-    dueDate: '2024-01-16',
-    priority: 'high',
-  },
-  {
-    id: '3',
-    title: 'Event Recap Blog Post',
-    type: 'article',
-    status: 'draft',
-    author: 'Emily Davis',
-    dueDate: '2024-01-20',
-    priority: 'medium',
-  },
-  {
-    id: '4',
-    title: 'Promo Video Storyboard',
-    type: 'video',
-    status: 'review',
-    author: 'Alex Wong',
-    dueDate: '2024-01-18',
-    priority: 'high',
-  },
-  {
-    id: '5',
-    title: 'Sponsor Acknowledgments',
-    type: 'document',
-    status: 'approved',
-    author: 'James Lee',
-    dueDate: '2024-01-14',
-    priority: 'medium',
-  },
-];
 
 const statusConfig = {
   draft: { icon: Edit3, label: 'Draft', color: 'text-muted-foreground', bgColor: 'bg-muted' },
   review: { icon: Eye, label: 'In Review', color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
+  in_review: { icon: Eye, label: 'In Review', color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
   approved: { icon: CheckCircle, label: 'Approved', color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
   published: { icon: Send, label: 'Published', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
 };
@@ -81,7 +30,19 @@ const priorityConfig = {
   high: 'bg-red-500/10 text-red-500',
 };
 
-export function ContentPipelineOverview() {
+export function ContentPipelineOverview({ workspaceId }: ContentPipelineOverviewProps) {
+  const { data: contentItems = [], isLoading } = useContentItems(workspaceId || '');
+
+  if (isLoading) {
+    return (
+      <Card className="bg-card border-border">
+        <CardContent className="flex items-center justify-center h-[350px]">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-card border-border">
       <CardHeader className="pb-3">
@@ -93,52 +54,62 @@ export function ContentPipelineOverview() {
             Content Pipeline
           </CardTitle>
           <Badge variant="secondary" className="text-xs">
-            {mockContentPipeline.length} items
+            {contentItems.length} items
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[300px] pr-3">
-          <div className="space-y-3">
-            {mockContentPipeline.map((item) => {
-              const status = statusConfig[item.status];
-              const StatusIcon = status.icon;
+          {contentItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <FileText className="h-10 w-10 text-muted-foreground/50 mb-3" />
+              <p className="text-sm text-muted-foreground">No content items yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {contentItems.map((item) => {
+                const status = statusConfig[item.status as keyof typeof statusConfig] || statusConfig.draft;
+                const StatusIcon = status.icon;
+                const priority = item.priority as keyof typeof priorityConfig || 'medium';
 
-              return (
-                <div
-                  key={item.id}
-                  className="p-3 rounded-lg border border-border bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start justify-between gap-3">
+                return (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-lg border border-border bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm text-foreground truncate">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        by {item.author}
-                      </p>
+                        <h4 className="font-medium text-sm text-foreground truncate">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          by {item.author_name || 'Unknown'}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className={priorityConfig[priority] || priorityConfig.medium}>
+                        {priority}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className={priorityConfig[item.priority]}>
-                      {item.priority}
-                    </Badge>
-                  </div>
 
-                  <div className="flex items-center justify-between mt-3">
-                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${status.bgColor}`}>
-                      <StatusIcon className={`h-3 w-3 ${status.color}`} />
-                      <span className={`text-xs font-medium ${status.color}`}>
-                        {status.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span>{new Date(item.dueDate).toLocaleDateString()}</span>
+                    <div className="flex items-center justify-between mt-3">
+                      <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${status.bgColor}`}>
+                        <StatusIcon className={`h-3 w-3 ${status.color}`} />
+                        <span className={`text-xs font-medium ${status.color}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                      {item.due_date && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <span>{new Date(item.due_date).toLocaleDateString()}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </ScrollArea>
       </CardContent>
     </Card>

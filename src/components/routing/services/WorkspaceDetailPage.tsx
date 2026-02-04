@@ -234,7 +234,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 <dd className="mt-1 text-sm text-foreground">
                   {workspace?.event ? (
                     <Link
-                      to={`/console/events/${workspace.event.id}`}
+                      to={`/dashboard/eventmanagement/${workspace.event.id}`}
                       className="text-primary hover:text-primary/80"
                     >
                       {workspace.event.name}
@@ -377,7 +377,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         <TaskManagementInterface
           tasks={tasks || []}
           teamMembers={teamMembers || []}
-          onTaskEdit={(task) => console.log('Edit task:', task)}
+          onTaskEdit={() => { /* TODO: Implement task edit modal */ }}
           onTaskDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
           onTaskStatusChange={(taskId, status) => updateTaskStatusMutation.mutate({ taskId, status })}
           onCreateTask={() => createTaskMutation.mutate()}
@@ -430,8 +430,8 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
         <WorkspaceTemplateManagement
           workspaceId={workspaceId}
           mode="library"
-          onTemplateApplied={(template) => console.log('Template applied:', template)}
-          onTemplateCreated={(template) => console.log('Template created:', template)}
+          onTemplateApplied={() => {}}
+          onTemplateCreated={() => {}}
         />
       ) : null,
     },
@@ -503,7 +503,7 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
               The workspace you're looking for doesn't exist or you don't have access to it.
             </p>
             <Link
-              to="/console/workspaces"
+              to="/dashboard/workspaces"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
             >
               <ArrowLeftIcon className="w-4 h-4 mr-2" />

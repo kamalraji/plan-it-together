@@ -2,28 +2,47 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
+import { Calendar, ChevronLeft, ChevronRight, Plus, Loader2 } from 'lucide-react';
+import { format, addDays, startOfWeek, isSameDay, parseISO } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-interface ScheduledContent {
-  id: string;
-  title: string;
-  platform: 'twitter' | 'instagram' | 'linkedin' | 'facebook' | 'blog';
-  date: Date;
-  status: 'draft' | 'scheduled' | 'published';
+interface ContentCalendarProps {
+  workspaceId?: string;
 }
 
-export function ContentCalendar() {
+export function ContentCalendar({ workspaceId }: ContentCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   
-  // Mock scheduled content
-  const scheduledContent: ScheduledContent[] = [
-    { id: '1', title: 'Event Announcement', platform: 'twitter', date: new Date(), status: 'scheduled' },
-    { id: '2', title: 'Speaker Spotlight', platform: 'instagram', date: addDays(new Date(), 1), status: 'draft' },
-    { id: '3', title: 'Registration Reminder', platform: 'linkedin', date: addDays(new Date(), 2), status: 'scheduled' },
-    { id: '4', title: 'Behind the Scenes', platform: 'facebook', date: addDays(new Date(), 3), status: 'draft' },
-    { id: '5', title: 'Event Guide Blog', platform: 'blog', date: addDays(new Date(), 4), status: 'scheduled' },
-  ];
+  // Fetch scheduled content from database
+  const { data: scheduledContent = [], isLoading } = useQuery({
+    queryKey: ['workspace-scheduled-content', workspaceId, currentDate.toISOString()],
+    queryFn: async () => {
+      if (!workspaceId) return [];
+      
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+      const weekEnd = addDays(weekStart, 7);
+      
+      const { data, error } = await supabase
+        .from('workspace_scheduled_content')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .gte('scheduled_date', format(weekStart, 'yyyy-MM-dd'))
+        .lt('scheduled_date', format(weekEnd, 'yyyy-MM-dd'))
+        .order('scheduled_date', { ascending: true });
+      
+      if (error) throw error;
+      
+      return (data || []).map(item => ({
+        id: item.id,
+        title: item.title,
+        platform: item.platform || 'general',
+        date: parseISO(item.scheduled_date),
+        status: (item.status as 'draft' | 'scheduled' | 'published') || 'draft',
+      }));
+    },
+    enabled: !!workspaceId,
+  });
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -35,8 +54,9 @@ export function ContentCalendar() {
       linkedin: 'bg-blue-600',
       facebook: 'bg-indigo-500',
       blog: 'bg-emerald-500',
+      general: 'bg-muted-foreground',
     };
-    return colors[platform] || 'bg-muted';
+    return colors[platform.toLowerCase()] || 'bg-muted';
   };
 
   const getStatusBadge = (status: string) => {
@@ -51,6 +71,22 @@ export function ContentCalendar() {
   const getContentForDay = (day: Date) => {
     return scheduledContent.filter(content => isSameDay(content.date, day));
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Calendar className="h-5 w-5 text-primary" />
+            Content Calendar
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -126,6 +162,13 @@ export function ContentCalendar() {
             );
           })}
         </div>
+        
+        {scheduledContent.length === 0 && (
+          <div className="text-center py-4 text-muted-foreground">
+            <p className="text-sm">No content scheduled for this week.</p>
+            <p className="text-xs mt-1">Click &quot;Add&quot; on any day to schedule content.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

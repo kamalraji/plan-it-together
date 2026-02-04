@@ -139,8 +139,8 @@ export function TestEquipmentTab({ workspaceId }: TestEquipmentTabProps) {
     try {
       const history = await getTestHistory(item.id);
       setTestHistory(history);
-    } catch (error) {
-      console.error('Failed to load test history:', error);
+    } catch {
+      // History load failed - will show empty state
     } finally {
       setIsLoadingHistory(false);
     }

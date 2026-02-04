@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,57 +7,58 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Truck, Package, MapPin, Clock } from 'lucide-react';
+import { Truck, Package, MapPin, Clock, Loader2 } from 'lucide-react';
+import { useLogisticsShipments } from '@/hooks/useLogisticsCommitteeData';
 
 interface LogisticsStatusModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  workspaceId?: string;
 }
 
-interface Shipment {
-  id: string;
-  item: string;
-  carrier: string;
-  origin: string;
-  destination: string;
-  status: 'delivered' | 'in-transit' | 'pending' | 'delayed';
-  progress: number;
-  eta: string;
-}
+export function LogisticsStatusModal({ open, onOpenChange, workspaceId }: LogisticsStatusModalProps) {
+  const { data: shipments = [], isLoading } = useLogisticsShipments(workspaceId);
 
-export function LogisticsStatusModal({ open, onOpenChange }: LogisticsStatusModalProps) {
-  const [shipments] = useState<Shipment[]>([
-    { id: 'SHP001', item: 'AV Equipment', carrier: 'FedEx', origin: 'Los Angeles', destination: 'Venue', status: 'delivered', progress: 100, eta: 'Delivered' },
-    { id: 'SHP002', item: 'Stage Decorations', carrier: 'UPS', origin: 'San Francisco', destination: 'Venue', status: 'in-transit', progress: 75, eta: '2 hours' },
-    { id: 'SHP003', item: 'Promotional Materials', carrier: 'DHL', origin: 'Chicago', destination: 'Venue', status: 'in-transit', progress: 45, eta: '4 hours' },
-    { id: 'SHP004', item: 'Gift Bags', carrier: 'FedEx', origin: 'New York', destination: 'Venue', status: 'pending', progress: 10, eta: 'Tomorrow' },
-    { id: 'SHP005', item: 'Backup Equipment', carrier: 'Local', origin: 'Warehouse', destination: 'Venue', status: 'delayed', progress: 30, eta: 'Delayed 1hr' },
-  ]);
-
-  const getStatusBadge = (status: Shipment['status']) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'delivered':
         return <Badge className="bg-green-500/10 text-green-600 border-green-500/30">Delivered</Badge>;
+      case 'in_transit':
       case 'in-transit':
         return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">In Transit</Badge>;
       case 'pending':
         return <Badge className="bg-muted-foreground/30/10 text-muted-foreground border-gray-500/30">Pending</Badge>;
       case 'delayed':
         return <Badge className="bg-red-500/10 text-red-600 border-red-500/30">Delayed</Badge>;
+      default:
+        return <Badge className="bg-muted text-muted-foreground">Unknown</Badge>;
     }
   };
 
-  const getProgressColor = (status: Shipment['status']) => {
+  const getProgressValue = (status: string) => {
+    switch (status) {
+      case 'delivered': return 100;
+      case 'in_transit':
+      case 'in-transit': return 60;
+      case 'delayed': return 30;
+      case 'pending': return 10;
+      default: return 0;
+    }
+  };
+
+  const getProgressColor = (status: string) => {
     switch (status) {
       case 'delivered': return 'bg-green-500';
+      case 'in_transit':
       case 'in-transit': return 'bg-blue-500';
       case 'pending': return 'bg-muted-foreground/20';
       case 'delayed': return 'bg-red-500';
+      default: return 'bg-muted';
     }
   };
 
   const deliveredCount = shipments.filter(s => s.status === 'delivered').length;
-  const inTransitCount = shipments.filter(s => s.status === 'in-transit').length;
+  const inTransitCount = shipments.filter(s => s.status === 'in_transit' || s.status === 'in-transit').length;
   const delayedCount = shipments.filter(s => s.status === 'delayed').length;
 
   return (
@@ -87,43 +87,57 @@ export function LogisticsStatusModal({ open, onOpenChange }: LogisticsStatusModa
         </div>
 
         <ScrollArea className="h-[320px] pr-4">
-          <div className="space-y-3">
-            {shipments.map((shipment) => (
-              <div key={shipment.id} className="p-4 rounded-lg border border-border">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">{shipment.item}</p>
-                      <p className="text-xs text-muted-foreground">{shipment.id} • {shipment.carrier}</p>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : shipments.length === 0 ? (
+            <div className="text-center py-12">
+              <Truck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
+              <p className="text-sm text-muted-foreground">No shipments found</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {shipments.map((shipment) => {
+                const progress = getProgressValue(shipment.status || 'pending');
+                return (
+                  <div key={shipment.id} className="p-4 rounded-lg border border-border">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <Package className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{shipment.item_name}</p>
+                          <p className="text-xs text-muted-foreground">{shipment.tracking_number} • {shipment.carrier}</p>
+                        </div>
+                      </div>
+                      {getStatusBadge(shipment.status || 'pending')}
+                    </div>
+
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {shipment.origin || 'Origin'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" /> ETA: {shipment.eta ? new Date(shipment.eta).toLocaleDateString() : 'TBD'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> {shipment.destination || 'Destination'}
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <Progress value={progress} className="h-2" />
+                        <div 
+                          className={`absolute top-0 left-0 h-2 rounded-full transition-all ${getProgressColor(shipment.status || 'pending')}`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
-                  {getStatusBadge(shipment.status)}
-                </div>
-
-                <div className="mb-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" /> {shipment.origin}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> ETA: {shipment.eta}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" /> {shipment.destination}
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <Progress value={shipment.progress} className="h-2" />
-                    <div 
-                      className={`absolute top-0 left-0 h-2 rounded-full transition-all ${getProgressColor(shipment.status)}`}
-                      style={{ width: `${shipment.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </ScrollArea>
       </DialogContent>
     </Dialog>

@@ -29,101 +29,54 @@ import {
   MapPin,
   AlertTriangle,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useLogisticsShipments, useCreateShipment } from '@/hooks/useLogisticsCommitteeData';
 
 interface LogisticsShipmentsTabProps {
   workspaceId?: string;
 }
 
-interface Shipment {
-  id: string;
-  trackingNumber: string;
-  carrier: string;
-  origin: string;
-  destination: string;
-  items: string;
-  status: 'pending' | 'in-transit' | 'out-for-delivery' | 'delivered' | 'delayed';
-  estimatedArrival: string;
-  actualArrival?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-}
-
-// Mock data for demonstration
-const mockShipments: Shipment[] = [
-  {
-    id: '1',
-    trackingNumber: 'SHP-2024-001',
-    carrier: 'FedEx',
-    origin: 'Mumbai Warehouse',
-    destination: 'Venue - Main Hall',
-    items: 'AV Equipment (Projectors x2, Screens x4)',
-    status: 'in-transit',
-    estimatedArrival: '2024-02-15T10:00:00',
-    priority: 'high',
-  },
-  {
-    id: '2',
-    trackingNumber: 'SHP-2024-002',
-    carrier: 'Blue Dart',
-    origin: 'Bangalore Office',
-    destination: 'Venue - Conference Room A',
-    items: 'Marketing Materials (Banners x10, Standees x5)',
-    status: 'delivered',
-    estimatedArrival: '2024-02-14T14:00:00',
-    actualArrival: '2024-02-14T13:45:00',
-    priority: 'normal',
-  },
-  {
-    id: '3',
-    trackingNumber: 'SHP-2024-003',
-    carrier: 'DTDC',
-    origin: 'Delhi Supplier',
-    destination: 'Venue - Back Stage',
-    items: 'Stage Props, Lighting Equipment',
-    status: 'delayed',
-    estimatedArrival: '2024-02-14T09:00:00',
-    priority: 'urgent',
-  },
-  {
-    id: '4',
-    trackingNumber: 'SHP-2024-004',
-    carrier: 'Delhivery',
-    origin: 'Chennai Vendor',
-    destination: 'Venue - Kitchen Area',
-    items: 'Catering Equipment (Chafing Dishes x20)',
-    status: 'pending',
-    estimatedArrival: '2024-02-16T08:00:00',
-    priority: 'normal',
-  },
-];
-
-export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsShipmentsTabProps) {
+export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [shipments] = useState<Shipment[]>(mockShipments);
+  
+  // Form state for new shipment
+  const [formData, setFormData] = useState({
+    tracking_number: '',
+    carrier: '',
+    priority: 'normal' as const,
+    origin: '',
+    destination: '',
+    item_name: '',
+    eta: '',
+  });
+
+  const { data: shipments = [], isLoading } = useLogisticsShipments(workspaceId);
+  const createShipment = useCreateShipment(workspaceId || '');
 
   const filteredShipments = shipments.filter(s => {
     const matchesSearch = 
-      s.trackingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.items.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.carrier.toLowerCase().includes(searchQuery.toLowerCase());
+      (s.tracking_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.item_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.carrier || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || s.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const pendingCount = shipments.filter(s => s.status === 'pending').length;
-  const inTransitCount = shipments.filter(s => s.status === 'in-transit' || s.status === 'out-for-delivery').length;
+  const inTransitCount = shipments.filter(s => s.status === 'in_transit' || s.status === 'out_for_delivery').length;
   const deliveredCount = shipments.filter(s => s.status === 'delivered').length;
   const delayedCount = shipments.filter(s => s.status === 'delayed').length;
 
   const getStatusBadge = (status: string) => {
     const config = {
       'pending': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Pending', icon: Clock },
-      'in-transit': { class: 'bg-blue-500/10 text-blue-600 border-blue-500/20', label: 'In Transit', icon: Truck },
-      'out-for-delivery': { class: 'bg-purple-500/10 text-purple-600 border-purple-500/20', label: 'Out for Delivery', icon: Package },
+      'in_transit': { class: 'bg-blue-500/10 text-blue-600 border-blue-500/20', label: 'In Transit', icon: Truck },
+      'out_for_delivery': { class: 'bg-purple-500/10 text-purple-600 border-purple-500/20', label: 'Out for Delivery', icon: Package },
       'delivered': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Delivered', icon: CheckCircle2 },
       'delayed': { class: 'bg-red-500/10 text-red-600 border-red-500/20', label: 'Delayed', icon: AlertTriangle },
     };
@@ -147,6 +100,43 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
     return <Badge className={className}>{label}</Badge>;
   };
 
+  const handleAddShipment = () => {
+    if (!workspaceId) return;
+    
+    createShipment.mutate({
+      workspace_id: workspaceId,
+      tracking_number: formData.tracking_number || `SHP-${Date.now()}`,
+      carrier: formData.carrier,
+      origin: formData.origin,
+      destination: formData.destination,
+      item_name: formData.item_name,
+      status: 'pending',
+      priority: formData.priority,
+      eta: formData.eta || null,
+    }, {
+      onSuccess: () => {
+        setIsAddOpen(false);
+        setFormData({
+          tracking_number: '',
+          carrier: '',
+          priority: 'normal',
+          origin: '',
+          destination: '',
+          item_name: '',
+          eta: '',
+        });
+      },
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -169,27 +159,31 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
             <div className="space-y-4 pt-4">
               <div>
                 <Label>Tracking Number</Label>
-                <Input placeholder="e.g., SHP-2024-005" />
+                <Input 
+                  placeholder="e.g., SHP-2024-005"
+                  value={formData.tracking_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tracking_number: e.target.value }))}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Carrier</Label>
-                  <Select>
+                  <Select value={formData.carrier} onValueChange={(v) => setFormData(prev => ({ ...prev, carrier: v }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select carrier" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fedex">FedEx</SelectItem>
-                      <SelectItem value="bluedart">Blue Dart</SelectItem>
-                      <SelectItem value="delhivery">Delhivery</SelectItem>
-                      <SelectItem value="dtdc">DTDC</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="FedEx">FedEx</SelectItem>
+                      <SelectItem value="Blue Dart">Blue Dart</SelectItem>
+                      <SelectItem value="Delhivery">Delhivery</SelectItem>
+                      <SelectItem value="DTDC">DTDC</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label>Priority</Label>
-                  <Select>
+                  <Select value={formData.priority} onValueChange={(v: any) => setFormData(prev => ({ ...prev, priority: v }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
@@ -204,21 +198,46 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
               </div>
               <div>
                 <Label>Origin</Label>
-                <Input placeholder="e.g., Mumbai Warehouse" />
+                <Input 
+                  placeholder="e.g., Mumbai Warehouse"
+                  value={formData.origin}
+                  onChange={(e) => setFormData(prev => ({ ...prev, origin: e.target.value }))}
+                />
               </div>
               <div>
                 <Label>Destination</Label>
-                <Input placeholder="e.g., Venue - Main Hall" />
+                <Input 
+                  placeholder="e.g., Venue - Main Hall"
+                  value={formData.destination}
+                  onChange={(e) => setFormData(prev => ({ ...prev, destination: e.target.value }))}
+                />
               </div>
               <div>
                 <Label>Items</Label>
-                <Textarea placeholder="Description of items being shipped" />
+                <Textarea 
+                  placeholder="Description of items being shipped"
+                  value={formData.item_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, item_name: e.target.value }))}
+                />
               </div>
               <div>
                 <Label>Estimated Arrival</Label>
-                <Input type="datetime-local" />
+                <Input 
+                  type="datetime-local"
+                  value={formData.eta}
+                  onChange={(e) => setFormData(prev => ({ ...prev, eta: e.target.value }))}
+                />
               </div>
-              <Button className="w-full">Add Shipment</Button>
+              <Button 
+                className="w-full" 
+                onClick={handleAddShipment}
+                disabled={createShipment.isPending}
+              >
+                {createShipment.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                Add Shipment
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -322,8 +341,8 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in-transit">In Transit</SelectItem>
-                  <SelectItem value="out-for-delivery">Out for Delivery</SelectItem>
+                  <SelectItem value="in_transit">In Transit</SelectItem>
+                  <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
                   <SelectItem value="delivered">Delivered</SelectItem>
                   <SelectItem value="delayed">Delayed</SelectItem>
                 </SelectContent>
@@ -354,11 +373,11 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
                   <div className="flex items-start justify-between">
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-3">
-                        <span className="font-mono font-medium">{shipment.trackingNumber}</span>
-                        {getStatusBadge(shipment.status)}
-                        {getPriorityBadge(shipment.priority)}
+                        <span className="font-mono font-medium">{shipment.tracking_number}</span>
+                        {getStatusBadge(shipment.status || 'pending')}
+                        {getPriorityBadge(shipment.priority || 'normal')}
                       </div>
-                      <p className="text-sm text-muted-foreground">{shipment.items}</p>
+                      <p className="text-sm text-muted-foreground">{shipment.item_name}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <MapPin className="h-3 w-3" />
                         <span>{shipment.origin}</span>
@@ -371,7 +390,9 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
                         {shipment.status === 'delivered' ? 'Delivered' : 'ETA'}
                       </p>
                       <p className="text-sm font-medium">
-                        {format(new Date(shipment.actualArrival || shipment.estimatedArrival), 'MMM d, h:mm a')}
+                        {shipment.actual_arrival || shipment.eta
+                          ? format(new Date(shipment.actual_arrival || shipment.eta!), 'MMM d, h:mm a')
+                          : 'TBD'}
                       </p>
                       <p className="text-xs text-muted-foreground">{shipment.carrier}</p>
                     </div>

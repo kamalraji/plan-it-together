@@ -1,74 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Plus, Camera, Video, MapPin, Clock } from 'lucide-react';
+import { Calendar, Plus, Camera, Video, MapPin, Clock, Loader2 } from 'lucide-react';
+import { useCoverageSchedule, CoverageSchedule as CoverageScheduleType } from '@/hooks/useMediaData';
+import { format } from 'date-fns';
 
-interface CoverageSlot {
-  id: string;
-  event: string;
-  location: string;
-  startTime: string;
-  endTime: string;
-  type: 'photo' | 'video' | 'both';
-  assignedCrew: string[];
-  priority: 'high' | 'medium' | 'low';
+interface CoverageScheduleProps {
+  workspaceId: string;
 }
 
-export function CoverageSchedule() {
-  const schedule: CoverageSlot[] = [
-    {
-      id: '1',
-      event: 'Opening Ceremony',
-      location: 'Main Auditorium',
-      startTime: '09:00',
-      endTime: '10:30',
-      type: 'both',
-      assignedCrew: ['Arjun M.', 'Priya N.'],
-      priority: 'high',
-    },
-    {
-      id: '2',
-      event: 'Keynote Speech',
-      location: 'Hall A',
-      startTime: '11:00',
-      endTime: '12:00',
-      type: 'both',
-      assignedCrew: ['Arjun M.', 'Priya N.', 'Rahul S.'],
-      priority: 'high',
-    },
-    {
-      id: '3',
-      event: 'Panel Discussion',
-      location: 'Conference Room 1',
-      startTime: '14:00',
-      endTime: '15:30',
-      type: 'photo',
-      assignedCrew: ['Sneha P.'],
-      priority: 'medium',
-    },
-    {
-      id: '4',
-      event: 'Networking Session',
-      location: 'Lobby Area',
-      startTime: '16:00',
-      endTime: '17:00',
-      type: 'photo',
-      assignedCrew: ['Arjun M.'],
-      priority: 'low',
-    },
-    {
-      id: '5',
-      event: 'Award Ceremony',
-      location: 'Main Auditorium',
-      startTime: '18:00',
-      endTime: '19:30',
-      type: 'both',
-      assignedCrew: ['Arjun M.', 'Priya N.', 'Sneha P.'],
-      priority: 'high',
-    },
-  ];
+export function CoverageSchedule({ workspaceId }: CoverageScheduleProps) {
+  const { schedule, isLoading } = useCoverageSchedule(workspaceId);
 
-  const getTypeIcon = (type: CoverageSlot['type']) => {
+  const getTypeIcon = (type: CoverageScheduleType['coverage_type']) => {
     switch (type) {
       case 'photo':
         return <Camera className="h-4 w-4" />;
@@ -84,7 +28,7 @@ export function CoverageSchedule() {
     }
   };
 
-  const getPriorityColor = (priority: CoverageSlot['priority']) => {
+  const getPriorityColor = (priority: CoverageScheduleType['priority']) => {
     switch (priority) {
       case 'high':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -94,6 +38,16 @@ export function CoverageSchedule() {
         return 'bg-muted text-foreground border-border';
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card className="border-border/50">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border/50">
@@ -108,44 +62,52 @@ export function CoverageSchedule() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
-        {schedule.map((slot) => (
-          <div 
-            key={slot.id}
-            className={`p-3 rounded-lg border-l-4 bg-muted/30 ${getPriorityColor(slot.priority)}`}
-          >
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <p className="font-medium text-foreground">{slot.event}</p>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {slot.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {slot.startTime} - {slot.endTime}
-                  </span>
+        {schedule.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No coverage scheduled yet
+          </p>
+        ) : (
+          schedule.map((slot) => (
+            <div 
+              key={slot.id}
+              className={`p-3 rounded-lg border-l-4 bg-muted/30 ${getPriorityColor(slot.priority)}`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="font-medium text-foreground">{slot.event_name}</p>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                    {slot.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {slot.location}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {format(new Date(slot.start_time), 'HH:mm')} - {format(new Date(slot.end_time), 'HH:mm')}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {getTypeIcon(slot.coverage_type)}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {getTypeIcon(slot.type)}
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex flex-wrap gap-1">
-                {slot.assignedCrew.map((crew) => (
-                  <Badge key={crew} variant="outline" className="text-xs">
-                    {crew}
-                  </Badge>
-                ))}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {slot.assigned_crew?.map((crew) => (
+                    <Badge key={crew.id} variant="outline" className="text-xs">
+                      {crew.name.split(' ').map(n => n[0]).join('')}. {crew.name.split(' ').slice(-1)[0]}
+                    </Badge>
+                  ))}
+                </div>
+                <Badge variant="secondary" className={getPriorityColor(slot.priority)}>
+                  {slot.priority}
+                </Badge>
               </div>
-              <Badge variant="secondary" className={getPriorityColor(slot.priority)}>
-                {slot.priority}
-              </Badge>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   );

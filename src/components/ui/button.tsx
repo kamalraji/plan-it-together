@@ -5,7 +5,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  // Base styles with 44px minimum touch target for accessibility (WCAG 2.1 AA)
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 min-h-[44px]",
   {
     variants: {
       variant: {
@@ -14,7 +15,7 @@ const buttonVariants = cva(
         outline: "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground hover:scale-105",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-105",
         ghost: "hover:bg-muted hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-primary underline-offset-4 hover:underline min-h-0",
         // Custom doodle variants
         doodle: "bg-primary text-primary-foreground hover:scale-110 hover:rotate-1 hover:shadow-doodle active:scale-95 active:rotate-0 transition-all duration-200",
         "doodle-outline": "border-2 border-dashed border-primary bg-transparent text-primary hover:bg-primary/10 hover:scale-105 hover:border-solid",
@@ -27,7 +28,7 @@ const buttonVariants = cva(
         sm: "h-9 rounded-lg px-3",
         lg: "h-11 rounded-xl px-8",
         xl: "h-14 rounded-2xl px-10 text-base",
-        icon: "h-10 w-10",
+        icon: "h-10 w-10 min-h-[44px] min-w-[44px]",
       },
     },
     defaultVariants: {

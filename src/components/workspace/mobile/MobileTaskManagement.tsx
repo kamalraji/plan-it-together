@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   XMarkIcon,
   MapPinIcon,
   PhotoIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { WorkspaceTask, TaskStatus, TeamMember } from '../../../types';
 import { MobileTaskList } from './MobileTaskList';
@@ -13,6 +14,7 @@ import { TaskFormData } from '../TaskForm';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
 interface MobileTaskManagementProps {
   workspaceId: string;
@@ -31,7 +33,7 @@ export function MobileTaskManagement({
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
 
   // Fetch tasks from Supabase
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: tasks = [], isLoading, refetch } = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -61,6 +63,16 @@ export function MobileTaskManagement({
         category: 'GENERAL',
       })) as unknown as WorkspaceTask[];
     },
+  });
+
+  // Pull to refresh
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const { pullDistance, isPulling, isRefreshing, handlers } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    threshold: 80,
   });
 
   // Fetch team members
@@ -225,8 +237,7 @@ export function MobileTaskManagement({
         });
 
         toast.success('Location check-in successful!');
-      } catch (error) {
-        console.error('Location check-in failed:', error);
+      } catch (_error) {
         toast.error('Failed to get location. Please ensure location services are enabled.');
       }
     } else {
@@ -259,8 +270,7 @@ export function MobileTaskManagement({
           });
 
           toast.success('Photo uploaded successfully!');
-        } catch (error) {
-          console.error('Photo upload failed:', error);
+        } catch (_error) {
           toast.error('Failed to upload photo. Please try again.');
         }
       }
@@ -269,7 +279,29 @@ export function MobileTaskManagement({
   };
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div 
+      className="h-full flex flex-col bg-background touch-pan-y"
+      {...handlers}
+    >
+      {/* Pull to refresh indicator */}
+      <div 
+        className={cn(
+          "flex items-center justify-center overflow-hidden transition-all",
+          isPulling || isRefreshing ? "opacity-100" : "opacity-0"
+        )}
+        style={{ height: Math.min(pullDistance, 80) }}
+      >
+        <ArrowPathIcon 
+          className={cn(
+            "w-6 h-6 text-primary transition-transform",
+            isRefreshing && "animate-spin"
+          )}
+          style={{ 
+            transform: `rotate(${Math.min(pullDistance * 2, 180)}deg)` 
+          }}
+        />
+      </div>
+
       <MobileTaskList
         tasks={tasks}
         onTaskStatusChange={handleTaskStatusChange}

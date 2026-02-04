@@ -13,6 +13,7 @@ import { RoomManager } from './RoomManager';
 import { SafetyChecklist } from './SafetyChecklist';
 import { VenueSetupTracker } from './VenueSetupTracker';
 import { MaintenanceRequests } from './MaintenanceRequests';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 
 interface FacilityDashboardProps {
   workspace: Workspace;
@@ -105,6 +106,12 @@ export function FacilityDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <VenueSetupTracker workspaceId={workspace.id} />
         <MaintenanceRequests workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Milestones and Goals */}

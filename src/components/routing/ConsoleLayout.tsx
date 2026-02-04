@@ -33,12 +33,12 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   
-  const handleServiceChange = (service: string) => {
-    console.log('Service changed to:', service);
+  const handleServiceChange = (_service: string) => {
+    // Service change handling - implement navigation or state update as needed
   };
 
-  const handleSearch = (query: string) => {
-    console.log('Global search:', query);
+  const handleSearch = (_query: string) => {
+    // Global search handling - implement search functionality as needed
   };
 
   const handleLogout = async () => {

@@ -59,8 +59,8 @@ export function useTaskNotifications() {
           workspaceId
         );
       }
-    } catch (error) {
-      console.error('Failed to send task assignment notifications:', error);
+    } catch (_error) {
+      // Notification failures are non-critical
     }
   };
 
@@ -85,8 +85,8 @@ export function useTaskNotifications() {
         actor_id: user.id,
         metadata: { taskId },
       });
-    } catch (error) {
-      console.error('Failed to log task creation:', error);
+    } catch (_error) {
+      // Activity logging failures are non-critical
     }
   };
 
@@ -129,8 +129,8 @@ export function useTaskNotifications() {
           workspaceId
         );
       }
-    } catch (error) {
-      console.error('Failed to send task due soon notifications:', error);
+    } catch (_error) {
+      // Notification failures are non-critical
     }
   };
 
@@ -163,8 +163,8 @@ export function useTaskNotifications() {
 
     try {
       await supabase.from('notifications').insert(notifications);
-    } catch (error) {
-      console.error('Failed to send subtask completion notifications:', error);
+    } catch (_error) {
+      // Notification failures are non-critical
     }
   };
 

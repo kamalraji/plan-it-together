@@ -161,8 +161,7 @@ export function EnterScoreModal({ open, onOpenChange, eventId }: EnterScoreModal
       setSelectedSubmissionId('');
       setCriteriaScores([]);
       setComments('');
-    } catch (error) {
-      console.error('Error submitting score:', error);
+    } catch {
       toast.error('Failed to submit score');
     } finally {
       setIsSubmitting(false);

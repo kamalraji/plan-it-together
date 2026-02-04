@@ -54,6 +54,8 @@ export interface ServiceListingData {
   inclusions: string[] | null;
   media_urls: string[] | null;
   tags: string[] | null;
+  avg_rating?: number;
+  review_count?: number;
   vendor: {
     id: string;
     business_name: string;
@@ -178,8 +180,41 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({
       });
     }
 
+    // Fetch aggregated ratings from vendor_reviews
+    const vendorIds = filteredData
+      .map((s: any) => s.vendor?.id)
+      .filter((id: string | undefined): id is string => Boolean(id));
+
+    let ratingMap: Record<string, { total: number; count: number }> = {};
+    
+    if (vendorIds.length > 0) {
+      const { data: reviews } = await supabase
+        .from('vendor_reviews')
+        .select('vendor_id, rating')
+        .in('vendor_id', vendorIds);
+
+      if (reviews) {
+        ratingMap = reviews.reduce((acc, r) => {
+          if (!acc[r.vendor_id]) acc[r.vendor_id] = { total: 0, count: 0 };
+          acc[r.vendor_id].total += r.rating;
+          acc[r.vendor_id].count += 1;
+          return acc;
+        }, {} as Record<string, { total: number; count: number }>);
+      }
+    }
+
+    // Add ratings to services
+    const servicesWithRatings = filteredData.map((service: any) => {
+      const vendorRating = ratingMap[service.vendor?.id];
+      return {
+        ...service,
+        avg_rating: vendorRating ? vendorRating.total / vendorRating.count : 0,
+        review_count: vendorRating?.count || 0,
+      };
+    });
+
     return {
-      services: filteredData as ServiceListingData[],
+      services: servicesWithRatings as ServiceListingData[],
       totalCount: count || 0,
     };
   };

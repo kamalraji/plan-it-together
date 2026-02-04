@@ -1,4 +1,5 @@
 import { Workspace } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { CommitteeHeaderCard } from '../committee/CommitteeHeaderCard';
 import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
@@ -16,6 +17,8 @@ import { InventoryTracker } from './InventoryTracker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
+import { DashboardExportButton } from '../DashboardExportButton';
 
 interface CateringDashboardProps {
   workspace: Workspace;
@@ -29,6 +32,9 @@ export function CateringDashboard({
   onViewTasks,
 }: CateringDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
+  
+  // Enable real-time updates
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch team members count
   const { data: teamMembers = [] } = useQuery({
@@ -76,13 +82,16 @@ export function CateringDashboard({
   return (
     <div className="space-y-6">
       {/* Catering Committee Header */}
-      <CommitteeHeaderCard
-        workspaceName={workspace.name}
-        memberCount={teamMembers.length}
-        tasksCompleted={tasksCompleted}
-        tasksTotal={tasks.length}
-        teamsCount={teams.length}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <CommitteeHeaderCard
+          workspaceName={workspace.name}
+          memberCount={teamMembers.length}
+          tasksCompleted={tasksCompleted}
+          tasksTotal={tasks.length}
+          teamsCount={teams.length}
+        />
+        <DashboardExportButton workspaceId={workspace.id} dashboardType="catering" />
+      </div>
 
 
       {/* Catering Stats Overview */}
@@ -120,6 +129,12 @@ export function CateringDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <VendorManagement workspaceId={workspace.id} />
         <InventoryTracker workspaceId={workspace.id} />
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Goals & Milestones */}

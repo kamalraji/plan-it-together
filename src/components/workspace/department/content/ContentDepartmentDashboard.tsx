@@ -10,8 +10,10 @@ import { BudgetTrackerConnected } from '../BudgetTrackerConnected';
 import { TaskSummaryCards } from '../../TaskSummaryCards';
 import { TeamMemberRoster } from '../../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
+import { ActivityFeedWidget } from '../../ActivityFeedWidget';
 
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 
 import { ContentStatsConnected } from './ContentStatsConnected';
 import { ContentCommitteeHub } from './ContentCommitteeHub';
@@ -38,6 +40,9 @@ export function ContentDepartmentDashboard({
 }: ContentDepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time updates for tasks, activities, milestones, budget_requests
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Modal states
   const [createContentOpen, setCreateContentOpen] = useState(false);
@@ -157,6 +162,13 @@ export function ContentDepartmentDashboard({
         <SpeakerScheduleConnected workspaceId={workspace.id} />
         <MediaAssetsConnected workspaceId={workspace.id} />
       </div>
+
+      {/* Activity Feed */}
+      <ActivityFeedWidget 
+        eventId={workspace.eventId} 
+        maxItems={10}
+        showHeader={true}
+      />
 
       {/* Budget Section */}
       <BudgetTrackerConnected 

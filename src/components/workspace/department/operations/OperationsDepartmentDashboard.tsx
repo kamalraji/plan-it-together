@@ -1,4 +1,5 @@
 import { Workspace } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { OperationsStatsCards } from './OperationsStatsCards';
 import { OperationsCommitteePanel } from './OperationsCommitteePanel';
 import { OperationsOverview } from './OperationsOverview';
@@ -27,6 +28,9 @@ export function OperationsDepartmentDashboard({
   onViewTasks,
 }: OperationsDepartmentDashboardProps) {
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time updates for tasks, activities, milestones, budget_requests
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Fetch child committees count
   const { data: committees = [] } = useQuery({

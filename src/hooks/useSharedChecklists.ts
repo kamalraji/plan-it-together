@@ -87,8 +87,7 @@ export function useSharedChecklists({ eventId, workspaceId }: UseSharedChecklist
           workspace_name: checklist.workspaces?.name,
           items: Array.isArray(checklist.items) ? checklist.items : [],
         })) as SharedChecklist[];
-      } catch (error) {
-        console.error('Failed to fetch shared checklists:', error);
+      } catch (_error) {
         return [];
       }
     },

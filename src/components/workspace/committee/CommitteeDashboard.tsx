@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceRole } from '@/types';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { MilestoneTimeline } from './MilestoneTimeline';
 import { GoalTracker } from './GoalTracker';
 
@@ -53,6 +54,9 @@ export function CommitteeDashboard({
   onRequestResource,
 }: CommitteeDashboardProps) {
   const { isLoading: isBudgetLoading } = useWorkspaceBudget(workspace.id);
+  
+  // Enable real-time updates for all dashboard data
+  useRealtimeDashboard({ eventId: workspace.eventId, workspaceId: workspace.id });
 
   // Extract committee type from workspace name
   const committeeType = workspace.name

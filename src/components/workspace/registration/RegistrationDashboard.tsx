@@ -10,8 +10,10 @@ import { TaskSummaryCards } from '../TaskSummaryCards';
 import { WorkspaceHierarchyMiniMap } from '../WorkspaceHierarchyMiniMap';
 import { TeamMemberRoster } from '../TeamMemberRoster';
 import { MilestoneTimeline } from '../committee/MilestoneTimeline';
+import { OverdueItemsWidget, EscalationRulesManager } from '../escalation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useRegistrationCommitteeRealtime } from '@/hooks/useCommitteeRealtime';
 
 interface RegistrationDashboardProps {
   workspace: Workspace;
@@ -77,6 +79,9 @@ export function RegistrationDashboard({
 
   const tasksCompleted = tasks.filter(t => t.status === 'DONE').length;
 
+  // Enable real-time updates for registration committee data
+  useRegistrationCommitteeRealtime({ workspaceId: workspace.id });
+
   return (
     <div className="space-y-6">
       {/* Registration Header */}
@@ -119,6 +124,12 @@ export function RegistrationDashboard({
           <CheckInMonitor workspaceId={workspace.id} />
           <TicketTypeBreakdown workspaceId={workspace.id} />
         </div>
+      </div>
+
+      {/* Escalation & Overdue Items */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <OverdueItemsWidget workspaceId={workspace.id} />
+        <EscalationRulesManager workspaceId={workspace.id} />
       </div>
 
       {/* Timeline */}

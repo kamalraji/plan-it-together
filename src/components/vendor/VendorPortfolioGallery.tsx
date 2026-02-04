@@ -49,7 +49,6 @@ const VendorPortfolioGallery: React.FC<VendorPortfolioGalleryProps> = ({ vendorI
 
         // If the folder doesn't exist or is empty, return empty array
         if (error) {
-          console.error('Storage list error:', error);
           // Return empty array instead of throwing for common errors
           if (error.message?.includes('not found') || error.message?.includes('empty')) {
             return [];
@@ -67,8 +66,7 @@ const VendorPortfolioGallery: React.FC<VendorPortfolioGalleryProps> = ({ vendorI
             .getPublicUrl(`${vendorId}/gallery/${file.name}`).data.publicUrl,
           name: file.name
         })) as PortfolioImage[];
-      } catch (err) {
-        console.error('Portfolio fetch error:', err);
+      } catch {
         // Return empty array for any error - don't block the UI
         return [];
       }
@@ -137,9 +135,8 @@ const VendorPortfolioGallery: React.FC<VendorPortfolioGalleryProps> = ({ vendorI
 
       queryClient.invalidateQueries({ queryKey: ['vendor-portfolio', vendorId] });
       toast.success(`${validFiles.length} image(s) uploaded successfully`);
-    } catch (error) {
+    } catch {
       toast.error('Failed to upload images');
-      console.error(error);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);

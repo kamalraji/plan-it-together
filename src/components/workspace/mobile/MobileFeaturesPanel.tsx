@@ -82,8 +82,7 @@ export function MobileFeaturesPanel({
         onLocationUpdate(locationData);
       }
 
-    } catch (error) {
-      console.error('Location error:', error);
+    } catch {
       setLocationStatus('error');
     }
   };
@@ -135,8 +134,7 @@ export function MobileFeaturesPanel({
       }, 1000);
       setRecordingInterval(interval);
 
-    } catch (error) {
-      console.error('Failed to start voice recording:', error);
+    } catch {
       alert('Failed to access microphone. Please check permissions.');
     }
   };

@@ -26,10 +26,10 @@ export async function logTaskActivity({
     }]);
 
     if (error) {
-      console.error('Failed to log task activity:', error);
+      // Activity logging failed - non-critical
     }
-  } catch (err) {
-    console.error('Error logging task activity:', err);
+  } catch {
+    // Activity logging failed - non-critical
   }
 }
 

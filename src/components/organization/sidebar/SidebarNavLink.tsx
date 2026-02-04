@@ -21,21 +21,23 @@ export const SidebarNavLink: React.FC<SidebarNavLinkProps> = ({
   isActive = false,
   external = false,
 }) => {
+  // Ensure minimum 44px touch target for mobile accessibility
   const className = cn(
-    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition-all duration-300',
+    'group flex items-center gap-3 rounded-2xl px-3 py-3 min-h-[44px] text-sm transition-all duration-300',
     'hover:bg-gradient-to-r hover:from-muted/60 hover:to-muted/30',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+    'active:scale-[0.98]', // Touch feedback
     isActive && 'bg-muted/50'
   );
 
   const content = (
     <>
       <div className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300",
+        "flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300 flex-shrink-0",
         "bg-muted/40 text-muted-foreground",
         "group-hover:bg-primary/15 group-hover:text-primary group-hover:shadow-sm"
       )}>
-        <Icon className="h-4 w-4" />
+        <Icon className="h-5 w-5" />
       </div>
       {!isCollapsed && (
         <div className="flex flex-col items-start animate-fade-in">

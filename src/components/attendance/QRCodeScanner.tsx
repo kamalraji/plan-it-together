@@ -293,8 +293,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       );
 
       controlsRef.current = controls;
-    } catch (error) {
-      console.error('Error accessing camera or decoding QR:', error);
+    } catch (_error) {
       setIsScanning(false);
       setScanMode('manual');
     }
@@ -371,8 +370,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
           formResponses.TrackName ||
           undefined;
       }
-    } catch (error) {
-      console.error('Error loading badge metadata:', error);
+    } catch (_error) {
+      // Loading badge metadata failed silently
     }
 
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(

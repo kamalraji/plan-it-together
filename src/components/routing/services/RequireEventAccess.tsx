@@ -24,7 +24,7 @@ export const RequireEventAccess: React.FC<RequireEventAccessProps> = ({
   }
 
   if (error || !canView || (requireManage && !canManage)) {
-    return <Navigate to="/console/events/list" replace />;
+    return <Navigate to="/dashboard/eventmanagement/list" replace />;
   }
 
   return <>{children}</>;

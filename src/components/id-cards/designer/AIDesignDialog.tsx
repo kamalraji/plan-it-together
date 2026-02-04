@@ -171,9 +171,7 @@ export function AIDesignDialog({
       
       // Reset state for next use
       setStep('style');
-    } catch (error) {
-      console.error('Design generation error:', error);
-      
+    } catch {
       // Fallback to AI generation if pre-built fails
       try {
         toast.info('Using AI fallback...');
@@ -194,8 +192,7 @@ export function AIDesignDialog({
           onOpenChange(false);
           toast.success('Design generated with AI fallback');
         }
-      } catch (fallbackError) {
-        console.error('AI fallback error:', fallbackError);
+      } catch {
         toast.error('Failed to generate design. Please try again.');
       }
     } finally {

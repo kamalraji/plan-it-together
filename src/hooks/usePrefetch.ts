@@ -134,7 +134,36 @@ export function usePrefetchEvent() {
     [queryClient]
   );
 
-  return { prefetch };
+  const prefetchBySlug = useCallback(
+    (slug: string) => {
+      queryClient.prefetchQuery({
+        queryKey: ['public-event-by-slug', slug],
+        queryFn: async () => {
+          const { data, error } = await supabase
+            .from('events')
+            .select(`
+              *,
+              organizations:organization_id (
+                id,
+                name,
+                slug,
+                logo_url,
+                verification_status
+              )
+            `)
+            .eq('landing_page_slug', slug)
+            .eq('visibility', 'PUBLIC')
+            .maybeSingle();
+          if (error) throw error;
+          return data;
+        },
+        ...queryPresets.standard,
+      });
+    },
+    [queryClient]
+  );
+
+  return { prefetch, prefetchBySlug };
 }
 
 /**
