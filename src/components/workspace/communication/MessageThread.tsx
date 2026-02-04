@@ -6,7 +6,7 @@ import api from '../../../lib/api';
 
 interface MessageThreadProps {
   channel: WorkspaceChannel;
-  onSendMessage?: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
+  onSendMessage: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
   isSending: boolean;
 }
 

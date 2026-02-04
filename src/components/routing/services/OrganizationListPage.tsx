@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { ResourceListPage } from '../ResourceListPage';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
-import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
-import MembershipBadge from '@/components/organization/MembershipBadge';
 
 interface OrganizationListPageProps {
   filterBy?: 'all' | 'managed' | 'member';
@@ -15,8 +13,7 @@ interface OrganizationListRow {
   name: string;
   slug: string;
   category: string;
-  role: 'OWNER' | 'ADMIN' | 'ORGANIZER' | 'VIEWER' | 'UNKNOWN';
-  status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED' | 'UNKNOWN';
+  role: 'OWNER' | 'MEMBER';
   memberCount: number;
   eventCount: number;
   followerCount: number;
@@ -41,8 +38,6 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
     isLoadingEvents,
   } = useOrganizerOrganizations();
 
-  const { data: myMemberships } = useMyOrganizationMemberships();
-
   const organizationsWithMetrics: OrganizationListRow[] = useMemo(() => {
     if (!organizations) return [];
 
@@ -52,22 +47,12 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
         totalEvents: 0,
       };
 
-      const membership = (myMemberships || []).find(
-        (m: any) => m.organization_id === org.id,
-      );
-
-      const role = (membership?.role as OrganizationListRow['role'])
-        || (isManaged ? 'OWNER' : 'VIEWER');
-      const status = (membership?.status as OrganizationListRow['status'])
-        || (isManaged ? 'ACTIVE' : 'UNKNOWN');
-
       return {
         id: org.id,
         name: org.name,
         slug: org.slug,
         category: org.category,
-        role,
-        status,
+        role: isManaged ? 'OWNER' : 'MEMBER',
         // These aggregates can be wired to real metrics once available
         memberCount: 0,
         eventCount: analytics.totalEvents,
@@ -78,16 +63,14 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
         description: null,
       };
     });
-  }, [organizations, managedOrganizations, perOrgAnalytics, myMemberships]);
+  }, [organizations, managedOrganizations, perOrgAnalytics]);
 
   const filteredOrganizations = useMemo(() => {
     if (filterBy === 'managed') {
-      return organizationsWithMetrics.filter((org) =>
-        ['OWNER', 'ADMIN', 'ORGANIZER'].includes(org.role),
-      );
+      return organizationsWithMetrics.filter((org) => org.role === 'OWNER');
     }
     if (filterBy === 'member') {
-      return organizationsWithMetrics.filter((org) => org.status === 'ACTIVE');
+      return organizationsWithMetrics.filter((org) => org.role === 'MEMBER');
     }
     return organizationsWithMetrics;
   }, [filterBy, organizationsWithMetrics]);
@@ -101,16 +84,16 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       render: (_value: string, record: OrganizationListRow) => (
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <span className="text-sm font-medium text-primary">
+            <div className="h-10 w-10 rounded-lg bg-gray-300 flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-700">
                 {record.name.charAt(0).toUpperCase()}
               </span>
             </div>
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-foreground">{record.name}</div>
+            <div className="text-sm font-medium text-gray-900">{record.name}</div>
             {record.description && (
-              <div className="text-sm text-muted-foreground truncate max-w-xs">
+              <div className="text-sm text-gray-500 truncate max-w-xs">
                 {record.description}
               </div>
             )}
@@ -125,16 +108,17 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       filterable: true,
       render: (value: string) => (
         <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${value === 'COMPANY'
-              ? 'bg-primary/10 text-primary'
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'COMPANY'
+              ? 'bg-purple-100 text-purple-800'
               : value === 'COLLEGE'
-                ? 'bg-secondary/10 text-secondary-foreground'
-                : value === 'INDUSTRY'
-                  ? 'bg-accent/10 text-accent-foreground'
-                  : value === 'NON_PROFIT'
-                    ? 'bg-muted text-foreground'
-                    : 'bg-muted text-foreground'
-            }`}
+              ? 'bg-blue-100 text-blue-800'
+              : value === 'INDUSTRY'
+              ? 'bg-green-100 text-green-800'
+              : value === 'NON_PROFIT'
+              ? 'bg-orange-100 text-orange-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
         >
           {value.replace('_', ' ')}
         </span>
@@ -145,8 +129,18 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       label: 'Your Role',
       sortable: true,
       filterable: true,
-      render: (_value: string, record: OrganizationListRow) => (
-        <MembershipBadge role={record.role} status={record.status} />
+      render: (value: string) => (
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'OWNER'
+              ? 'bg-purple-100 text-purple-800'
+              : value === 'ADMIN'
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
+        >
+          {value}
+        </span>
       ),
     },
     {
@@ -155,7 +149,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-foreground">{value}</span>
+        <span className="text-sm text-gray-900">{value}</span>
       ),
     },
     {
@@ -164,7 +158,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-foreground">{value}</span>
+        <span className="text-sm text-gray-900">{value}</span>
       ),
     },
     {
@@ -173,7 +167,7 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       sortable: true,
       filterable: false,
       render: (value: number) => (
-        <span className="text-sm text-foreground">{value.toLocaleString()}</span>
+        <span className="text-sm text-gray-900">{value.toLocaleString()}</span>
       ),
     },
     {
@@ -183,12 +177,13 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       filterable: true,
       render: (value: string) => (
         <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${value === 'VERIFIED'
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+            value === 'VERIFIED'
               ? 'bg-green-100 text-green-800'
               : value === 'PENDING'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}
         >
           {value}
         </span>
@@ -202,10 +197,10 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
       render: (_value: any, record: OrganizationListRow) => (
         <div className="flex space-x-2">
           <Link
-            to={`/${record.slug}`}
+            to={`/${record.slug}/organizations`}
             className="text-blue-600 hover:text-blue-500 text-sm font-medium"
           >
-            View Public Page
+            View
           </Link>
           {record.role === 'OWNER' && (
             <>
@@ -272,13 +267,8 @@ export const OrganizationListPage: React.FC<OrganizationListPageProps> = ({
     {
       label: 'View Analytics',
       action: (selectedItems: OrganizationListRow[]) => {
-        const manageable = selectedItems.filter((i) =>
-          ['OWNER', 'ADMIN', 'ORGANIZER'].includes(i.role),
-        );
-        console.log(
-          'Viewing analytics for manageable organizations:',
-          manageable.map((i) => i.id),
-        );
+        const manageable = selectedItems.filter((i) => i.role === 'OWNER');
+        console.log('Viewing analytics for manageable organizations:', manageable.map((i) => i.id));
       },
     },
   ];

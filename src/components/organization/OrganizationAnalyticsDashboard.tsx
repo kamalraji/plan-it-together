@@ -28,22 +28,22 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
     { title: 'Completed', value: events?.filter((e: any) => e.status === 'COMPLETED').length || 0, icon: CheckCircleIcon, color: 'text-orange-600' },
   ];
 
-    return (
-       <div className="space-y-5 sm:space-y-6">
-       <div>
-         <h2 className="text-xl sm:text-2xl font-bold">Organization Analytics</h2>
-         <p className="text-sm text-muted-foreground">Performance metrics for {organization?.name}</p>
-       </div>
-       <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Organization Analytics</h2>
+        <p className="text-muted-foreground">Performance metrics for {organization?.name}</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-           <Card key={stat.title}>
-             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2">
-               <CardTitle className="text-xs sm:text-sm font-medium">{stat.title}</CardTitle>
-               <stat.icon className={`h-5 w-5 ${stat.color}`} />
-             </CardHeader>
-             <CardContent>
-               <div className="text-2xl sm:text-3xl font-bold">{stat.value}</div>
-             </CardContent>
+          <Card key={stat.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <stat.icon className={`h-5 w-5 ${stat.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stat.value}</div>
+            </CardContent>
           </Card>
         ))}
       </div>

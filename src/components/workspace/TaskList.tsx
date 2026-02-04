@@ -251,29 +251,31 @@ export function TaskList({
             <div className="flex rounded-md shadow-sm">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-2 text-sm font-medium rounded-l-md border ${viewMode === 'list'
+                className={`px-3 py-2 text-sm font-medium rounded-l-md border ${
+                  viewMode === 'list'
                     ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
+                }`}
               >
                 List
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${viewMode === 'grid'
+                className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${
+                  viewMode === 'grid'
                     ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
+                }`}
               >
                 Grid
               </button>
             </div>
 
-            {/* Create Task Button (hidden on mobile, shown on larger screens) */}
+            {/* Create Task Button */}
             {onCreateTask && (
               <button
                 onClick={onCreateTask}
-                className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -385,7 +387,7 @@ export function TaskList({
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {tasks.length === 0
+              {tasks.length === 0 
                 ? "Get started by creating your first task."
                 : "Try adjusting your filters to see more tasks."
               }
@@ -478,13 +480,14 @@ export function TaskList({
                             {task.description}
                           </p>
                           <div className="flex items-center space-x-2 mt-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
-                                task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
-                                  task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
-                                    task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
-                                      task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-gray-100 text-gray-800'
-                              }`}>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                              task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
+                              task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
+                              task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
+                              task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
+                              task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
                               {task.category.replace('_', ' ')}
                             </span>
                             {task.tags.map(tag => (
@@ -623,13 +626,14 @@ export function TaskList({
                   </div>
 
                   <div className="flex items-center justify-between mb-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
-                        task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
-                          task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
-                            task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
-                              task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
-                      }`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                      task.category === TaskCategory.SETUP ? 'bg-purple-100 text-purple-800' :
+                      task.category === TaskCategory.MARKETING ? 'bg-pink-100 text-pink-800' :
+                      task.category === TaskCategory.LOGISTICS ? 'bg-blue-100 text-blue-800' :
+                      task.category === TaskCategory.TECHNICAL ? 'bg-green-100 text-green-800' :
+                      task.category === TaskCategory.REGISTRATION ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
                       {task.category.replace('_', ' ')}
                     </span>
                     {task.dueDate && (

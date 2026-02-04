@@ -65,97 +65,8 @@ export type Database = {
           },
         ]
       }
-      certificate_criteria: {
-        Row: {
-          conditions: Json
-          created_at: string
-          event_id: string
-          id: string
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          conditions?: Json
-          created_at?: string
-          event_id: string
-          id?: string
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          conditions?: Json
-          created_at?: string
-          event_id?: string
-          id?: string
-          type?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "certificate_criteria_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      certificates: {
-        Row: {
-          certificate_id: string
-          created_at: string
-          distributed_at: string | null
-          event_id: string
-          id: string
-          issued_at: string
-          metadata: Json
-          pdf_url: string | null
-          qr_payload: string
-          recipient_id: string
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          certificate_id: string
-          created_at?: string
-          distributed_at?: string | null
-          event_id: string
-          id?: string
-          issued_at?: string
-          metadata?: Json
-          pdf_url?: string | null
-          qr_payload: string
-          recipient_id: string
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          certificate_id?: string
-          created_at?: string
-          distributed_at?: string | null
-          event_id?: string
-          id?: string
-          issued_at?: string
-          metadata?: Json
-          pdf_url?: string | null
-          qr_payload?: string
-          recipient_id?: string
-          type?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "certificates_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
-          branding: Json | null
           capacity: number | null
           created_at: string
           description: string | null
@@ -164,14 +75,12 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
-          owner_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
           updated_at: string
           visibility: Database["public"]["Enums"]["event_visibility"]
         }
         Insert: {
-          branding?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
@@ -180,14 +89,12 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
-          owner_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
           visibility?: Database["public"]["Enums"]["event_visibility"]
         }
         Update: {
-          branding?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
@@ -196,7 +103,6 @@ export type Database = {
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
-          owner_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -346,185 +252,41 @@ export type Database = {
         }
         Relationships: []
       }
-      organization_memberships: {
-        Row: {
-          approved_by: string | null
-          created_at: string
-          id: string
-          invited_by: string | null
-          organization_id: string
-          role: Database["public"]["Enums"]["organization_membership_role"]
-          status: Database["public"]["Enums"]["organization_membership_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          approved_by?: string | null
-          created_at?: string
-          id?: string
-          invited_by?: string | null
-          organization_id: string
-          role?: Database["public"]["Enums"]["organization_membership_role"]
-          status?: Database["public"]["Enums"]["organization_membership_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          approved_by?: string | null
-          created_at?: string
-          id?: string
-          invited_by?: string | null
-          organization_id?: string
-          role?: Database["public"]["Enums"]["organization_membership_role"]
-          status?: Database["public"]["Enums"]["organization_membership_status"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_memberships_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      organization_sponsors: {
-        Row: {
-          created_at: string
-          id: string
-          logo_url: string | null
-          name: string
-          organization_id: string
-          position: number | null
-          tier: string | null
-          website_url: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          logo_url?: string | null
-          name: string
-          organization_id: string
-          position?: number | null
-          tier?: string | null
-          website_url?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          logo_url?: string | null
-          name?: string
-          organization_id?: string
-          position?: number | null
-          tier?: string | null
-          website_url?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_sponsors_organization_fk"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      organization_testimonials: {
-        Row: {
-          author_name: string
-          author_role: string | null
-          created_at: string
-          highlight: boolean
-          id: string
-          organization_id: string
-          position: number | null
-          quote: string
-        }
-        Insert: {
-          author_name: string
-          author_role?: string | null
-          created_at?: string
-          highlight?: boolean
-          id?: string
-          organization_id: string
-          position?: number | null
-          quote: string
-        }
-        Update: {
-          author_name?: string
-          author_role?: string | null
-          created_at?: string
-          highlight?: boolean
-          id?: string
-          organization_id?: string
-          position?: number | null
-          quote?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_testimonials_organization_fk"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       organizations: {
         Row: {
           category: string
-          city: string | null
-          country: string | null
           created_at: string
           description: string | null
           email: string | null
-          gov_registration_id: string | null
           id: string
           name: string
           owner_id: string
           phone: string | null
           slug: string
-          state: string | null
-          verification_source: string | null
-          verification_status: string | null
           website: string | null
         }
         Insert: {
           category: string
-          city?: string | null
-          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
-          gov_registration_id?: string | null
           id?: string
           name: string
           owner_id: string
           phone?: string | null
           slug: string
-          state?: string | null
-          verification_source?: string | null
-          verification_status?: string | null
           website?: string | null
         }
         Update: {
           category?: string
-          city?: string | null
-          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
-          gov_registration_id?: string | null
           id?: string
           name?: string
           owner_id?: string
           phone?: string | null
           slug?: string
-          state?: string | null
-          verification_source?: string | null
-          verification_status?: string | null
           website?: string | null
         }
         Relationships: []
@@ -739,10 +501,6 @@ export type Database = {
           linkedin_url: string | null
           organization: string | null
           phone: string | null
-          portfolio_accent_color: string | null
-          portfolio_is_public: boolean
-          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
-          portfolio_sections: string[]
           qr_code: string
           twitter_url: string | null
           website: string | null
@@ -757,10 +515,6 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
-          portfolio_accent_color?: string | null
-          portfolio_is_public?: boolean
-          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
-          portfolio_sections?: string[]
           qr_code: string
           twitter_url?: string | null
           website?: string | null
@@ -775,10 +529,6 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
-          portfolio_accent_color?: string | null
-          portfolio_is_public?: boolean
-          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
-          portfolio_sections?: string[]
           qr_code?: string
           twitter_url?: string | null
           website?: string | null
@@ -839,164 +589,16 @@ export type Database = {
         }
         Relationships: []
       }
-      workspace_tasks: {
-        Row: {
-          assigned_to: string | null
-          created_at: string
-          description: string | null
-          due_date: string | null
-          id: string
-          priority: string
-          role_scope: string | null
-          status: string
-          title: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          assigned_to?: string | null
-          created_at?: string
-          description?: string | null
-          due_date?: string | null
-          id?: string
-          priority?: string
-          role_scope?: string | null
-          status?: string
-          title: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          assigned_to?: string | null
-          created_at?: string
-          description?: string | null
-          due_date?: string | null
-          id?: string
-          priority?: string
-          role_scope?: string | null
-          status?: string
-          title?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workspace_tasks_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      workspace_team_members: {
-        Row: {
-          id: string
-          joined_at: string
-          left_at: string | null
-          role: string
-          status: string
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          id?: string
-          joined_at?: string
-          left_at?: string | null
-          role?: string
-          status?: string
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          id?: string
-          joined_at?: string
-          left_at?: string | null
-          role?: string
-          status?: string
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workspace_team_members_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      workspaces: {
-        Row: {
-          created_at: string
-          event_id: string
-          id: string
-          name: string
-          organizer_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          name: string
-          organizer_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          name?: string
-          organizer_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workspaces_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_public_portfolio: {
-        Args: { _user_id: string }
-        Returns: {
-          avatar_url: string
-          bio: string
-          created_at: string
-          full_name: string
-          github_url: string
-          id: string
-          linkedin_url: string
-          organization: string
-          portfolio_accent_color: string
-          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
-          portfolio_sections: string[]
-          twitter_url: string
-          website: string
-        }[]
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
-        Returns: boolean
-      }
-      is_org_admin_for_org: {
-        Args: { _organization_id: string; _user_id: string }
         Returns: boolean
       }
     }
@@ -1019,13 +621,6 @@ export type Database = {
         | "CANCELLED"
       event_visibility: "PUBLIC" | "PRIVATE" | "UNLISTED"
       organization_category: "COLLEGE" | "COMPANY" | "INDUSTRY" | "NON_PROFIT"
-      organization_membership_role: "OWNER" | "ADMIN" | "ORGANIZER" | "VIEWER"
-      organization_membership_status:
-        | "PENDING"
-        | "ACTIVE"
-        | "REJECTED"
-        | "REMOVED"
-      portfolio_layout: "stacked" | "grid"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
       user_role:
         | "SUPER_ADMIN"
@@ -1178,14 +773,6 @@ export const Constants = {
       event_status: ["DRAFT", "PUBLISHED", "ONGOING", "COMPLETED", "CANCELLED"],
       event_visibility: ["PUBLIC", "PRIVATE", "UNLISTED"],
       organization_category: ["COLLEGE", "COMPANY", "INDUSTRY", "NON_PROFIT"],
-      organization_membership_role: ["OWNER", "ADMIN", "ORGANIZER", "VIEWER"],
-      organization_membership_status: [
-        "PENDING",
-        "ACTIVE",
-        "REJECTED",
-        "REMOVED",
-      ],
-      portfolio_layout: ["stacked", "grid"],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
       user_role: [
         "SUPER_ADMIN",

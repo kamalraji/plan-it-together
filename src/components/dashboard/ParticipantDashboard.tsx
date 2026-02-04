@@ -6,7 +6,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
-import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 
 
@@ -67,12 +66,6 @@ export function ParticipantDashboard() {
     return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
   });
   const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
-  const [showOrganizerSummaryBanner, setShowOrganizerSummaryBanner] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('th1_organizer_summary_banner_dismissed') !== '1';
-  });
-
-  const { isHealthy } = useApiHealth();
 
   useEffect(() => {
     const checkOrganizerSignup = async () => {
@@ -163,50 +156,15 @@ export function ParticipantDashboard() {
         return registration;
       });
     },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
   });
- 
+
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
       const response = await api.get('/certificates/my-certificates');
       return response.data.certificates as Certificate[];
     },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
   });
-
-  const { data: organizerOnboardingStatus } = useQuery<{ completed_at: string | null } | null>({
-    queryKey: ['organizer-onboarding-status', user?.id],
-    queryFn: async () => {
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      const { data, error } = await supabase
-        .from('onboarding_checklist')
-        .select('completed_at')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!user && user.role === 'ORGANIZER' && isHealthy !== false,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-
-  const hasCompletedOrganizerOnboarding = !!organizerOnboardingStatus?.completed_at;
-
 
   const isProfileIncomplete = !user?.profileCompleted;
 
@@ -334,57 +292,18 @@ export function ParticipantDashboard() {
         <div className="bg-accent/80 text-accent-foreground border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
             <span>
-              You signed up as an organizer. To unlock organizer tools, first join or create an organization.
+              You signed up as an organizer. To unlock organizer tools, first create your organization.
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate('/dashboard/organizations/join')}
+                onClick={() => navigate('/onboarding/organization')}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
               >
-                Join or create organization
+                Set up organization
               </button>
               <button
                 onClick={() => setShowOrganizerBanner(false)}
                 className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Organizer summary banner after onboarding completion */}
-      {user?.role === 'ORGANIZER' && hasCompletedOrganizerOnboarding && showOrganizerSummaryBanner && (
-        <div className="bg-accent text-accent-foreground border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs sm:text-sm">
-            <div className="space-y-1">
-              <p className="font-medium text-foreground">You're all set as an organizer.</p>
-              <p className="text-muted-foreground">
-                Create and manage events, invite your team, and keep everything organized from your organizer console.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => navigate('/dashboard/eventmanagement/events')}
-                className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:bg-primary/90"
-              >
-                View events
-              </button>
-              <button
-                onClick={() => navigate('/dashboard/team')}
-                className="inline-flex items-center rounded-md bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-secondary/90"
-              >
-                Manage team
-              </button>
-              <button
-                onClick={() => {
-                  setShowOrganizerSummaryBanner(false);
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('th1_organizer_summary_banner_dismissed', '1');
-                  }
-                }}
-                className="text-xs text-muted-foreground hover:text-foreground ml-1"
               >
                 Dismiss
               </button>
@@ -423,11 +342,10 @@ export function ParticipantDashboard() {
         </div>
       )}
 
-
       {/* QR Pass Modal */}
       {canShowQrPass && qrCoreRegistration && qrRegistration && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center p-4 sm:p-6 z-50">
-          <div className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+          <div className="max-w-md w-full mx-4">
             <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
                 <h2 className="text-base sm:text-lg font-semibold text-foreground">Event Pass</h2>

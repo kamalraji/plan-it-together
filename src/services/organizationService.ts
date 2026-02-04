@@ -123,81 +123,37 @@ class OrganizationService {
   }
 
   /**
-   * Get organization membership rows for the current user
-   */
-  async getMyOrganizationMemberships(): Promise<any[]> {
-    const { data: session } = await supabase.auth.getSession();
-    const user = session?.session?.user;
-
-    if (!user) {
-      throw new Error('Not authenticated');
-    }
-
-    const { data, error } = await supabase
-      .from('organization_memberships')
-      .select('*')
-      .eq('user_id', user.id);
-
-    if (error) throw new Error(error.message);
-    return data || [];
-  }
-
-  /**
-   * Get organizations where the current user is an ACTIVE member
-   */
-  async getMyMemberOrganizations(): Promise<Organization[]> {
-    const { data: session } = await supabase.auth.getSession();
-    const user = session?.session?.user;
-
-    if (!user) {
-      throw new Error('Not authenticated');
-    }
-
-    const { data, error } = await supabase
-      .from('organization_memberships')
-      .select('organizations(*)')
-      .eq('user_id', user.id)
-      .eq('status', 'ACTIVE')
-      .in('role', ['OWNER', 'ADMIN', 'ORGANIZER']);
-
-    if (error) throw new Error(error.message);
-
-    return (data || [])
-      .map((row: any) => row.organizations)
-      .filter(Boolean);
-  }
-
-  /**
    * Search organizations with filters
    */
   async searchOrganizations(params: SearchOrganizationsParams): Promise<Organization[]> {
     let query = supabase.from('organizations').select('*');
 
-    // Filter by category when provided
+    // Filter by verified status
+    if (params.verifiedOnly) {
+      query = query.eq('verification_status', 'VERIFIED');
+    }
+
+    // Filter by category
     if (params.category) {
       query = query.eq('category', params.category);
     }
 
-    // Simple search by name (case-insensitive)
+    // Search by name (case-insensitive)
     if (params.query) {
       query = query.ilike('name', `%${params.query}%`);
     }
 
     // Pagination
-    const limit = params.limit ?? 20;
-    const offset = params.offset ?? 0;
+    const limit = params.limit || 20;
+    const offset = params.offset || 0;
     query = query.range(offset, offset + limit - 1);
 
-    // Stable ordering by name
-    query = query.order('name', { ascending: true });
+    // Order by follower count and name
+    query = query.order('follower_count', { ascending: false }).order('name');
 
     const { data, error } = await query;
 
-    if (error) {
-      console.error('Error searching organizations', error);
-      throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     return data || [];
   }
 
@@ -227,7 +183,6 @@ class OrganizationService {
 
   /**
    * Add an admin to an organization
-   * (legacy admin model, kept for backwards compatibility)
    */
   async addAdmin(
     organizationId: string,
@@ -235,7 +190,7 @@ class OrganizationService {
     role: string = 'ADMIN'
   ): Promise<OrganizationAdmin> {
     const { data: session } = await supabase.auth.getSession();
-
+    
     const { data: admin, error } = await supabase
       .from('organization_admins')
       .insert({
@@ -293,116 +248,6 @@ class OrganizationService {
     return !error && !!data;
   }
 
-  async requestJoinOrganization(organizationId: string): Promise<any> {
-    const { data: session } = await supabase.auth.getSession();
-    const user = session?.session?.user;
-
-    if (!user) throw new Error('You must be logged in to request to join an organization.');
-
-    // Check if a membership already exists for this org + user
-    const { data: existing, error: existingError } = await supabase
-      .from('organization_memberships')
-      .select('id, status')
-      .eq('organization_id', organizationId)
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (existingError && existingError.code !== 'PGRST116') {
-      console.error('Error checking existing membership', {
-        organizationId,
-        userId: user.id,
-        error: existingError,
-      });
-      throw new Error(existingError.message || 'Failed to check existing membership');
-    }
-
-    if (existing) {
-      if (existing.status === 'PENDING') {
-        throw new Error('You already have a pending request for this organization.');
-      }
-      if (existing.status === 'ACTIVE') {
-        throw new Error('You are already a member of this organization.');
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('organization_memberships')
-      .insert({
-        organization_id: organizationId,
-        user_id: user.id,
-        role: 'ORGANIZER',
-        status: 'PENDING',
-      })
-      .select('*')
-      .single();
-
-    if (error) {
-      console.error('Error creating membership request', {
-        organizationId,
-        userId: user.id,
-        error,
-      });
-      const message =
-        error.message?.includes('violates row-level security policy')
-          ? 'You do not have permission to request to join this organization.'
-          : error.message;
-      throw new Error(message || 'Failed to send join request');
-    }
-    return data;
-  }
-
-  /**
-   * Get memberships for an organization (all statuses)
-   */
-  async getOrganizationMemberships(
-    organizationId: string,
-    status?: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED',
-  ): Promise<any[]> {
-    let query = supabase
-      .from('organization_memberships')
-      .select('*')
-      .eq('organization_id', organizationId);
-
-    if (status) {
-      query = query.eq('status', status);
-    }
-
-    const { data, error } = await query;
-    if (error) throw new Error(error.message);
-    return data || [];
-  }
-
-  /**
-   * Update membership status / role (for org admins)
-   */
-  async updateMembershipStatus(
-    membershipId: string,
-    updates: { status?: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED'; role?: string },
-  ): Promise<any> {
-    const { data: session } = await supabase.auth.getSession();
-    const user = session?.session?.user;
-
-    if (!user) throw new Error('Not authenticated');
-
-    const payload: any = {
-      ...updates,
-    };
-
-    if (updates.status === 'ACTIVE' || updates.status === 'REJECTED') {
-      payload.approved_by = user.id;
-    }
-
-    const { data, error } = await supabase
-      .from('organization_memberships')
-      .update(payload)
-      .eq('id', membershipId)
-      .select('*')
-      .single();
-
-    if (error) throw new Error(error.message);
-    return data;
-  }
-
   /**
    * Follow an organization
    */
@@ -450,7 +295,7 @@ class OrganizationService {
       .eq('user_id', userId);
 
     if (error) throw new Error(error.message);
-
+    
     return (data || [])
       .map((item: any) => item.organizations)
       .filter(Boolean);
@@ -494,7 +339,7 @@ class OrganizationService {
       .eq('organization_id', organizationId);
 
     const eventIds = (events || []).map((e: any) => e.id);
-
+    
     let totalRegistrations = 0;
     if (eventIds.length > 0) {
       const { count } = await supabase
@@ -504,17 +349,18 @@ class OrganizationService {
       totalRegistrations = count || 0;
     }
 
-    // Get followers from follows table (organization followers)
-    const { count: followerCount } = await supabase
-      .from('follows')
-      .select('*', { count: 'exact', head: true })
-      .eq('organization_id', organizationId);
+    // Get followers
+    const { data: organization } = await supabase
+      .from('organizations')
+      .select('follower_count')
+      .eq('id', organizationId)
+      .single();
 
     return {
       totalEvents: totalEvents || 0,
       activeEvents: activeEvents || 0,
       totalRegistrations,
-      followerCount: followerCount || 0,
+      followerCount: organization?.follower_count || 0,
     };
   }
 }

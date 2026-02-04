@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
-import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import {
   Event,
   EventMode,
@@ -26,7 +25,6 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const organizationContext = useCurrentOrganization();
   const [selectedTemplate, setSelectedTemplate] = useState<EventTemplate | null>(null);
   const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = useState<WorkspaceWorkspaceTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'branding' | 'timeline' | 'details'>('basic');
@@ -59,12 +57,6 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     }
   });
 
-  useEffect(() => {
-    if (!isEditing && organizationContext && !event) {
-      setValue('organizationId', (organizationContext as any).id);
-    }
-  }, [isEditing, organizationContext, event, setValue]);
-
   const { fields: timelineFields, append: appendTimeline, remove: removeTimeline } = useFieldArray({
     control,
     name: 'timeline'
@@ -93,44 +85,34 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     },
   });
 
-  // Fetch user's organizations via memberships, so they only see orgs they belong to
+  // Fetch user's organizations from Lovable Cloud (Requirements 19.1)
   const { data: organizations } = useQuery({
     queryKey: ['user-organizations'],
     queryFn: async () => {
-      const { data: session } = await supabase.auth.getSession();
-      const userSession = session?.session;
-
-      if (!userSession?.user) {
-        return [] as Organization[];
-      }
-
       const { data, error } = await supabase
-        .from('organization_memberships')
-        .select('organizations ( id, name, category, verification_status )')
-        .eq('user_id', userSession.user.id)
-        .eq('status', 'ACTIVE');
+        .from('organizations')
+        .select('id, name, category, verification_status')
+        .order('name');
 
       if (error) {
         throw error;
       }
 
-      return (data || [])
-        .map((row: any) => row.organizations)
-        .filter(Boolean)
-        .map((org: any) => ({
-          id: org.id,
-          name: org.name,
-          description: '',
-          category: org.category,
-          verificationStatus: org.verification_status,
-          branding: {},
-          socialLinks: {},
-          pageUrl: '',
-          followerCount: 0,
-          eventCount: 0,
-          createdAt: '',
-          updatedAt: '',
-        })) as Organization[];
+      // Map Supabase rows into the minimal shape EventForm needs
+      return (data || []).map((org: any) => ({
+        id: org.id,
+        name: org.name,
+        description: '',
+        category: org.category,
+        verificationStatus: org.verification_status,
+        branding: {},
+        socialLinks: {},
+        pageUrl: '',
+        followerCount: 0,
+        eventCount: 0,
+        createdAt: '',
+        updatedAt: '',
+      })) as Organization[];
     },
   });
 

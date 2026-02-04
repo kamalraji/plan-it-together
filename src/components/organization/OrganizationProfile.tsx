@@ -33,7 +33,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
   const { data: organization, isLoading, error } = useOrganization(organizationId!);
   const { data: events, isLoading: eventsLoading } = useOrganizationEvents(organizationId!, 'PUBLIC');
   const { data: isFollowing, isLoading: followLoading } = useIsFollowing(organizationId!, user?.id || '');
-
+  
   const followMutation = useFollowOrganization(organizationId!);
   const unfollowMutation = useUnfollowOrganization(organizationId!);
 
@@ -81,29 +81,29 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
           <img
             src={organization.banner_url}
             alt={`${organization.name} banner`}
-            className="w-full h-40 sm:h-56 md:h-64 object-cover rounded-2xl"
+            className="w-full h-64 object-cover rounded-lg"
           />
         ) : (
-          <div className="w-full h-40 sm:h-56 md:h-64 bg-gradient-to-r from-primary to-primary/70 rounded-2xl" />
+          <div className="w-full h-64 bg-gradient-to-r from-primary to-primary/70 rounded-lg" />
         )}
-
-        <div className="absolute left-4 sm:left-8 -bottom-12 sm:-bottom-16">
+        
+        <div className="absolute -bottom-16 left-8">
           {organization.logo_url ? (
             <img
               src={organization.logo_url}
               alt={`${organization.name} logo`}
-              className="w-20 h-20 sm:w-32 sm:h-32 rounded-lg border-4 border-background object-cover shadow-lg"
+              className="w-32 h-32 rounded-lg border-4 border-background object-cover shadow-lg"
             />
           ) : (
-            <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-lg border-4 border-background bg-muted flex items-center justify-center shadow-lg">
-              <Building className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground" />
+            <div className="w-32 h-32 rounded-lg border-4 border-background bg-muted flex items-center justify-center shadow-lg">
+              <Building className="h-16 w-16 text-muted-foreground" />
             </div>
           )}
         </div>
       </div>
 
       {/* Organization Info */}
-      <div className="mt-16 sm:mt-20 mb-8">
+      <div className="mt-20 mb-8">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -115,7 +115,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                 </Badge>
               )}
             </div>
-
+            
             <div className="flex items-center gap-4 text-muted-foreground mb-4">
               <Badge variant="outline">{categoryLabels[organization.category as keyof typeof categoryLabels]}</Badge>
               <div className="flex items-center gap-1">
@@ -248,7 +248,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                   {categoryLabels[organization.category as keyof typeof categoryLabels]}
                 </p>
               </div>
-
+              
               {organization.description && (
                 <div>
                   <h4 className="font-semibold mb-2">Description</h4>

@@ -189,7 +189,7 @@ export function LoginForm() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3.5 px-6 rounded-xl text-base sm:text-[15px] font-medium tracking-tight bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center py-3.5 px-6 rounded-xl text-base sm:text-[15px] font-medium tracking-tight text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
               whileHover={!isLoading ? { scale: 1.02 } : undefined}
               whileTap={!isLoading ? { scale: 0.99 } : undefined}
               initial={{ opacity: 0, y: 16 }}
@@ -198,7 +198,7 @@ export function LoginForm() {
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   <span>Signing in...</span>
                 </div>
               ) : (

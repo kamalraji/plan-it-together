@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { SendMessageDTO } from '../../../types';
 
 interface MessageComposerProps {
-  onSendMessage?: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
+  onSendMessage: (messageData: SendMessageDTO & { isPriority?: boolean }) => void;
   isSending: boolean;
   placeholder?: string;
   allowPriority?: boolean;
@@ -22,7 +22,6 @@ export function MessageComposer({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!onSendMessage) return;
     if (!message.trim() && attachments.length === 0) return;
 
     // For now, we'll handle file uploads as a simple array

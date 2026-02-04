@@ -55,12 +55,35 @@ serve(async (req) => {
 
     const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Record approval for auditing, using the user as both subject and approver.
-    // Participants can self-approve to become organizers without already owning an organization.
+    // Ensure the user actually owns at least one organization before promoting
+    const { data: orgs, error: orgError } = await serviceClient
+      .from("organizations")
+      .select("id")
+      .eq("owner_id", user.id)
+      .limit(1);
+
+    if (orgError) {
+      console.error("self-approve-organizer: organizations query error", orgError);
+      return new Response(JSON.stringify({ error: "Unable to verify organizations" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!orgs || orgs.length === 0) {
+      return new Response(JSON.stringify({ error: "You must own an organization to become an organizer" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const organizationId = orgs[0].id as string | null;
+
+    // Record approval for auditing, using the user as both subject and approver
     const { error: insertApprovalError } = await serviceClient.from("organizer_approvals").insert({
       user_id: user.id,
       approved_by: user.id,
-      organization_id: null,
+      organization_id: organizationId,
     });
 
     if (insertApprovalError) {

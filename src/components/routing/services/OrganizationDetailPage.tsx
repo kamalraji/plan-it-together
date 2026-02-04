@@ -5,8 +5,6 @@ import { ResourceDetailPage } from '../ResourceDetailPage';
 import OrganizationPage from '../../organization/OrganizationPage';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
-import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
-import MembershipBadge from '@/components/organization/MembershipBadge';
 
 /**
  * OrganizationDetailPage provides AWS-style resource detail interface for organizations.
@@ -16,7 +14,6 @@ export const OrganizationDetailPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
   const { user } = useAuth();
   const { organizations, perOrgAnalytics, isLoadingOrganizations } = useOrganizerOrganizations();
-  const { data: myMemberships } = useMyOrganizationMemberships();
 
   const organization = useMemo(
     () => organizations?.find((org) => org.id === organizationId) ?? null,
@@ -25,18 +22,9 @@ export const OrganizationDetailPage: React.FC = () => {
 
   const analytics = organization ? perOrgAnalytics[organization.id] : undefined;
 
-  const membership = useMemo(
-    () =>
-      (myMemberships || []).find((m: any) => m.organization_id === organization?.id) ?? null,
-    [myMemberships, organization?.id],
-  );
-
-  const isOwner = !!(organization && user && organization.owner_id === user.id);
-
-  const membershipRole = (membership?.role as any) || (isOwner ? 'OWNER' : 'VIEWER');
-  const membershipStatus = (membership?.status as any) || (isOwner ? 'ACTIVE' : 'UNKNOWN');
-
-  const userRole: 'OWNER' | 'MEMBER' = membershipRole === 'OWNER' || isOwner ? 'OWNER' : 'MEMBER';
+  const userRole: 'OWNER' | 'MEMBER' = organization && user && organization.owner_id === user.id
+    ? 'OWNER'
+    : 'MEMBER';
 
   if (isLoadingOrganizations && !organizations) {
     return (
@@ -205,10 +193,6 @@ export const OrganizationDetailPage: React.FC = () => {
           breadcrumbs={breadcrumbs}
           actions={filteredActions}
         />
-
-        <div className="mb-4">
-          <MembershipBadge role={membershipRole} status={membershipStatus} />
-        </div>
 
         <ResourceDetailPage
           title={organization.name}

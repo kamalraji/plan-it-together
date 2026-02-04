@@ -8,7 +8,7 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
@@ -22,16 +22,11 @@ import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
-import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
-import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
-import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
-import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
-import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -289,13 +284,13 @@ export const ConsoleDashboard = () => {
               </div>
             </div>
             <button onClick={() => {
-              const orgSlugCandidate = location.pathname.split('/')[1];
-              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
-                navigate(`/${orgSlugCandidate}/eventmanagement`);
-              } else {
-                navigate('/dashboard/eventmanagement');
-              }
-            }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+      const orgSlugCandidate = location.pathname.split('/')[1];
+      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+        navigate(`/${orgSlugCandidate}/eventmanagement`);
+      } else {
+        navigate('/dashboard/eventmanagement');
+      }
+    }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Events
             </button>
           </div>
@@ -319,13 +314,13 @@ export const ConsoleDashboard = () => {
               </div>
             </div>
             <button onClick={() => {
-              const orgSlugCandidate = location.pathname.split('/')[1];
-              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
-                navigate(`/${orgSlugCandidate}/workspaces`);
-              } else {
-                navigate('/dashboard/workspaces');
-              }
-            }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+      const orgSlugCandidate = location.pathname.split('/')[1];
+      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+        navigate(`/${orgSlugCandidate}/workspaces`);
+      } else {
+        navigate('/dashboard/workspaces');
+      }
+    }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Workspaces
             </button>
           </div>
@@ -354,7 +349,7 @@ export const ConsoleDashboard = () => {
                 </span>
               </div>
             </div>
-            <button
+            <button 
               onClick={() => window.location.href = '/marketplace'}
               className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
             >
@@ -372,7 +367,7 @@ export const ConsoleDashboard = () => {
             <button className="bg-white/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Join Workspace
             </button>
-            <button
+            <button 
               onClick={() => window.location.href = '/marketplace'}
               className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
@@ -477,9 +472,9 @@ const ProfileService = () => {
 const SupportService = () => {
   // Get current context from URL or other means
   const currentContext = window.location.pathname.includes('/events') ? 'events' :
-    window.location.pathname.includes('/workspaces') ? 'workspaces' :
-      window.location.pathname.includes('/marketplace') ? 'marketplace' :
-        undefined;
+                         window.location.pathname.includes('/workspaces') ? 'workspaces' :
+                         window.location.pathname.includes('/marketplace') ? 'marketplace' :
+                         undefined;
 
   return <HelpPage currentContext={currentContext} />;
 };
@@ -500,36 +495,16 @@ export const AppRouter: React.FC = () => {
           <Routes>
             {/* Root redirect to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
+            
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Organizer onboarding - appears for new organizers */}
-            <Route
-              path="/dashboard/onboarding/organizer"
-              element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <OrganizerOnboardingPage />
-                </ConsoleRoute>
-              }
-            />
-
-            {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
+            {/* Organizer onboarding */}
             <Route
               path="/onboarding/organization"
-              element={
-                <ConsoleRoute requireEmailVerification={false}>
-                  <Navigate to="/dashboard/organizations/join" replace />
-                </ConsoleRoute>
-              }
-            />
-
-            {/* Create organization page */}
-            <Route
-              path="/organizations/create"
               element={
                 <ConsoleRoute requireEmailVerification={false}>
                   <OrganizationRegistrationPage />
@@ -541,43 +516,22 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
 
-            {/* Public organization landing by slug */}
-            <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
-
             {/* Organization-scoped organizer console */}
             <Route
               path="/:orgSlug/*"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <GlobalErrorBoundary>
-                    <OrgScopedLayout />
-                  </GlobalErrorBoundary>
+                  <OrgScopedLayout />
                 </ConsoleRoute>
               }
             />
-
-            {/* Organizer root dashboard (org-agnostic) */}
-            <Route
-              path="/organizer/dashboard"
-              element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <GlobalErrorBoundary>
-                    <ConsoleLayout />
-                  </GlobalErrorBoundary>
-                </ConsoleRoute>
-              }
-            >
-              <Route index element={<OrganizerSpecificDashboard />} />
-            </Route>
 
             {/* Dashboard routes - all protected with enhanced authentication */}
             <Route
               path="/dashboard"
               element={
                 <ConsoleRoute>
-                  <GlobalErrorBoundary>
-                    <ConsoleLayout />
-                  </GlobalErrorBoundary>
+                  <ConsoleLayout />
                 </ConsoleRoute>
               }
             >
@@ -599,56 +553,50 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-              <Route
-                path="organizations/join"
-                element={
-                  <ConsoleRoute requireEmailVerification={false}>
-                    <JoinOrganizationPage />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="eventmanagement/*"
+
+              {/* Service routes with role-based access control */}
+              <Route 
+                path="eventmanagement/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <EventService />
+                    <Navigate to="/dashboard" replace />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="workspaces/*"
+              <Route 
+                path="workspaces/*" 
                 element={
                   <ConsoleRoute>
                     <WorkspaceService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="marketplace/*"
+              <Route 
+                path="marketplace/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <MarketplaceService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="organizations/*"
+              <Route 
+                path="organizations/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <OrganizationServiceComponent />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="analytics/*"
+              <Route 
+                path="analytics/*" 
                 element={
                   <ConsoleRoute>
                     <AnalyticsService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="admin/users"
+              <Route 
+                path="admin/users" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
                     <AdminUserRolesPage />
@@ -663,48 +611,48 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-              <Route
-                path="profile/*"
+              <Route 
+                path="profile/*" 
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <ProfileService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="support/*"
+              <Route 
+                path="support/*" 
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <SupportService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="notifications/*"
+              <Route 
+                path="notifications/*" 
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <NotificationService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="communications/*"
+              <Route 
+                path="communications/*" 
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <CommunicationService />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="search"
+              <Route 
+                path="search" 
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <SearchPage />
                   </ConsoleRoute>
-                }
+                } 
               />
-              <Route
-                path="data-lab"
+              <Route 
+                path="data-lab" 
                 element={
                   <ConsoleRoute>
                     <DashboardDataLab />
@@ -714,24 +662,24 @@ export const AppRouter: React.FC = () => {
             </Route>
 
             {/* Standalone Marketplace - public marketplace for browsing services */}
-            <Route
-              path="/marketplace/*"
+            <Route 
+              path="/marketplace/*" 
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <MarketplaceService />
                 </ConsoleRoute>
-              }
+              } 
             />
 
             {/* Legacy console redirect */}
             <Route path="/console/*" element={<Navigate to="/dashboard" replace />} />
-
+            
             {/* 404 Not Found - must be last */}
             <Route path="*" element={<NotFoundPage />} />
-          </Routes >
-        </BrowserRouter >
-      </AuthProvider >
-    </QueryClientProvider >
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -15,7 +15,6 @@ import { KnowledgeBase } from './KnowledgeBase';
 import { InteractiveTutorials } from './InteractiveTutorials';
 import { SupportContact } from './SupportContact';
 import { FeedbackCollection } from './FeedbackCollection';
-import { useEventCreatePath } from '@/hooks/useEventCreatePath';
 
 interface HelpPageProps {
   currentContext?: string; // Current page/feature context for contextual help
@@ -41,7 +40,6 @@ interface ContextualHelpItem {
 
 export const HelpPage: React.FC<HelpPageProps> = ({ currentContext }) => {
   const { user } = useAuth();
-  const eventCreatePath = useEventCreatePath();
   const [activeSection, setActiveSection] = useState('knowledge-base');
   const [searchQuery, setSearchQuery] = useState('');
   const [contextualHelp, setContextualHelp] = useState<ContextualHelpItem[]>([]);
@@ -227,7 +225,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ currentContext }) => {
               <h3 className="font-medium text-gray-900 mb-3">Quick Links</h3>
               <div className="space-y-2">
                 <a
-                  href={eventCreatePath}
+                  href="/dashboard/eventmanagement/create"
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />

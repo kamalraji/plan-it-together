@@ -101,9 +101,6 @@ export interface BrandingConfig {
   secondaryColor?: string;
   customCss?: string;
   workspaceTemplateId?: string;
-  heroSubtitle?: string;
-  primaryCtaLabel?: string;
-  secondaryCtaLabel?: string;
 }
 
 export interface VenueConfig {
@@ -620,11 +617,8 @@ export enum WorkspaceRole {
   VOLUNTEER_MANAGER = 'VOLUNTEER_MANAGER',
   TECHNICAL_SPECIALIST = 'TECHNICAL_SPECIALIST',
   MARKETING_LEAD = 'MARKETING_LEAD',
-  GENERAL_VOLUNTEER = 'GENERAL_VOLUNTEER',
+  GENERAL_VOLUNTEER = 'GENERAL_VOLUNTEER'
 }
-
-export type WorkspaceRoleScope = WorkspaceRole | 'ALL';
-
 
 export enum TaskStatus {
   NOT_STARTED = 'NOT_STARTED',
@@ -709,7 +703,6 @@ export interface WorkspaceTask {
   dependencies: string[];
   tags: string[];
   metadata?: Record<string, any>;
-  roleScope?: WorkspaceRoleScope;
   assignee?: {
     id: string;
     userId: string;
@@ -746,7 +739,6 @@ export interface WorkspaceChannel {
   description?: string;
   members: string[];
   isPrivate: boolean;
-  roleScope?: WorkspaceRoleScope;
   createdAt: string;
   updatedAt: string;
 }
@@ -757,7 +749,6 @@ export interface CreateChannelDTO {
   description?: string;
   members?: string[];
   isPrivate?: boolean;
-  roleScope?: WorkspaceRoleScope;
 }
 
 export interface SendMessageDTO {

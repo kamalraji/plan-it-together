@@ -53,7 +53,7 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
         onToggleMobileMenu={toggleMobileMenu}
       />
 
-      <div className="flex mt-14 sm:mt-16">
+      <div className="flex">
         {/* Service Navigation Sidebar */}
         {showServiceNavigation && (
           <>

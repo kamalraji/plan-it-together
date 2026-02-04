@@ -1,12 +1,9 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import OrganizationAdminManagement from '../../organization/OrganizationAdminManagement';
 import { useAuth } from '../../../hooks/useAuth';
 import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Check, X } from 'lucide-react';
 
 /**
  * OrganizationMembersPage provides AWS-style interface for organization member management.
@@ -16,10 +13,6 @@ export const OrganizationMembersPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
   const { user } = useAuth();
   const { organizations, managedOrganizations, isLoadingOrganizations } = useOrganizerOrganizations();
-  const { toast } = useToast();
-  const [pendingOrganizers, setPendingOrganizers] = useState<any[]>([]);
-  const [isLoadingPending, setIsLoadingPending] = useState(false);
-  const [pendingError, setPendingError] = useState<string | null>(null);
 
   const organization = useMemo(
     () => organizations?.find((org) => org.id === organizationId) ?? null,
@@ -61,30 +54,6 @@ export const OrganizationMembersPage: React.FC = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    const loadPendingOrganizers = async () => {
-      if (!managedOrg) return;
-      setIsLoadingPending(true);
-      setPendingError(null);
-      try {
-        const { data, error } = await supabase.functions.invoke('pending-organizers');
-        if (error) throw error;
-        const all = (data as any)?.organizers ?? [];
-        const filtered = all.filter(
-          (o: any) => !organizationId || o.firstOrganizationId === organizationId,
-        );
-        setPendingOrganizers(filtered);
-      } catch (err: any) {
-        console.error('Failed to load pending organizers', err);
-        setPendingError(err?.message || 'Failed to load pending organizer requests.');
-      } finally {
-        setIsLoadingPending(false);
-      }
-    };
-
-    loadPendingOrganizers();
-  }, [managedOrg, organizationId]);
 
   // Only owners can manage members from this console
   if (!managedOrg || !user) {
@@ -156,81 +125,7 @@ export const OrganizationMembersPage: React.FC = () => {
             onUpdate={handleUpdate}
           />
         </div>
-        {/* Pending organizer approvals */}
-        {(pendingError || isLoadingPending || pendingOrganizers.length > 0) && (
-          <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-medium text-gray-900">Organizer access requests</h3>
-              {isLoadingPending && (
-                <span className="text-xs text-gray-500">Loading requests...</span>
-              )}
-            </div>
-            {pendingError && (
-              <p className="text-sm text-red-600 mb-2">{pendingError}</p>
-            )}
-            {pendingOrganizers.length === 0 && !isLoadingPending ? (
-              <p className="text-sm text-gray-500">No pending organizer requests for this organization.</p>
-            ) : (
-              <div className="space-y-3">
-                {pendingOrganizers.map((req) => (
-                  <div
-                    key={req.userId}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-200"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {req.name || req.email || req.userId}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {req.email}
-                        {req.requestedAt && ` • Requested at ${new Date(req.requestedAt).toLocaleString()}`}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            const { error } = await supabase.functions.invoke('approve-organizer', {
-                              body: { userId: req.userId, organizationId },
-                            });
-                            if (error) throw error;
-                            setPendingOrganizers((prev) =>
-                              prev.filter((p) => p.userId !== req.userId),
-                            );
-                            toast({
-                              title: 'Organizer approved',
-                              description: 'The user now has organizer access.',
-                            });
-                          } catch (err: any) {
-                            console.error('Failed to approve organizer', err);
-                            toast({
-                              title: 'Failed to approve organizer',
-                              description: err?.message || 'Please try again.',
-                              variant: 'destructive',
-                            });
-                          }
-                        }}
-                        className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700"
-                      >
-                        <Check className="w-3 h-3 mr-1" /> Approve
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPendingOrganizers((prev) => prev.filter((p) => p.userId !== req.userId))
-                        }
-                        className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200"
-                      >
-                        <X className="w-3 h-3 mr-1" /> Deny
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+
 
         {/* Existing member management helper content remains unchanged */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">

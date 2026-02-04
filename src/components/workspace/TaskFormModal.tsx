@@ -23,9 +23,8 @@ export function TaskFormModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="relative w-full max-w-4xl text-left">
-
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div 
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
@@ -33,8 +32,7 @@ export function TaskFormModal({
         />
 
         {/* Modal panel */}
-        <div className="bg-white rounded-lg text-left shadow-xl transform transition-all w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
           <TaskForm
             task={task}
             teamMembers={teamMembers}

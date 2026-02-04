@@ -117,10 +117,10 @@ interface FollowedOrganizationCardProps {
   isUnfollowing: boolean;
 }
 
-function FollowedOrganizationCard({
-  organization,
-  onUnfollow,
-  isUnfollowing
+function FollowedOrganizationCard({ 
+  organization, 
+  onUnfollow, 
+  isUnfollowing 
 }: FollowedOrganizationCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -128,7 +128,7 @@ function FollowedOrganizationCard({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            <Link to={`/${organization.slug}`} className="flex items-center">
+            <Link to={`/organizations/${organization.id}`} className="flex items-center">
               <div className="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
                 {organization.name.charAt(0).toUpperCase()}
               </div>
@@ -162,33 +162,31 @@ function FollowedOrganizationCard({
               </>
             )}
           </button>
-        </div >
+        </div>
 
         {/* Organization Description */}
-        {
-          organization.description && (
-            <p className="mt-4 text-gray-600 text-sm line-clamp-2">
-              {organization.description}
-            </p>
-          )
-        }
-      </div >
+        {organization.description && (
+          <p className="mt-4 text-gray-600 text-sm line-clamp-2">
+            {organization.description}
+          </p>
+        )}
+      </div>
 
       {/* Events Section */}
-      < div className="p-6" >
+      <div className="p-6">
         <div className="text-center py-4 text-gray-500 flex flex-col items-center gap-2">
           <CalendarIcon className="h-6 w-6 text-gray-400" />
           <p className="text-sm">
             Event updates from this organization are available on their public page.
           </p>
           <Link
-            to={`/${organization.slug}`}
+            to={`/organizations/${organization.id}`}
             className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
           >
             View upcoming events
           </Link>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }

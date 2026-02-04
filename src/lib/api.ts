@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const REQUEST_TIMEOUT = 8000; // 8 seconds to fail fast on slow/unreachable backend
-const MAX_RETRY_ATTEMPTS = 1;
+const REQUEST_TIMEOUT = 30000; // 30 seconds
+const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAY = 1000; // 1 second
 
 // Create axios instance with enhanced configuration

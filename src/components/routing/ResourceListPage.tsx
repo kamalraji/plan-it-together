@@ -265,10 +265,11 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                   <button
                     key={index}
                     onClick={() => handleBulkAction(action)}
-                    className={`inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${action.variant === 'danger'
+                    className={`inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                      action.variant === 'danger'
                         ? 'border-red-300 text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500'
                         : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500'
-                      }`}
+                    }`}
                   >
                     {action.icon && <action.icon className="h-4 w-4 mr-2" />}
                     {action.label}
@@ -304,8 +305,9 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                     {columns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
-                          }`}
+                        className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                          column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
+                        }`}
                         style={{ width: column.width }}
                       >
                         {column.sortable ? (
@@ -347,8 +349,9 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                       {columns.map((column) => (
                         <td
                           key={column.key}
-                          className={`px-6 py-4 whitespace-nowrap text-sm ${column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
-                            }`}
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
+                          }`}
                         >
                           {column.render ? column.render(item[column.key], item) : item[column.key]}
                         </td>
@@ -425,10 +428,11 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === currentPage
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            page === currentPage
                               ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
                               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
+                          }`}
                         >
                           {page}
                         </button>

@@ -12,7 +12,6 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
-  refreshUserRoles: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -56,9 +55,24 @@ async function mapSupabaseUserToAppUserWithRoles(sbUser: SupabaseUser): Promise<
       .eq('user_id', sbUser.id);
 
     if (error || !data || data.length === 0) {
-      // No roles found yet; fall back to base user without mutating user_roles
-      // from the client. Role assignment is handled exclusively in the database
-      // via triggers and admin tools.
+      // If no roles are found yet, bootstrap a default coarse role in user_roles.
+      // This ensures every authenticated user gets an app_role row the first time
+      // they sign in, which RLS policies and admin tooling can rely on.
+      try {
+        const { error: insertError } = await supabase.from('user_roles').insert({
+          user_id: sbUser.id,
+          role: 'participant',
+        });
+
+        if (insertError) {
+          // Swallow insert errors and just fall back to base user; RLS or
+          // connectivity issues should not block the app from working.
+          console.warn('Failed to bootstrap user_roles row for user', sbUser.id, insertError);
+        }
+      } catch (e) {
+        console.warn('Unexpected error bootstrapping user_roles row for user', sbUser.id, e);
+      }
+
       return baseUser;
     }
 
@@ -208,13 +222,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshUserRoles = async (): Promise<void> => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) return;
-    const userWithRoles = await mapSupabaseUserToAppUserWithRoles(data.user);
-    setUser(userWithRoles);
-  };
-
   const value: AuthContextType = {
     user,
     session,
@@ -224,7 +231,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     verifyEmail,
-    refreshUserRoles,
   };
 
   return React.createElement(AuthContext.Provider, { value }, children);

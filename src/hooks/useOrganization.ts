@@ -16,10 +16,7 @@ const orgKeys = {
   followed: (userId: string) => [...orgKeys.all, 'followed', userId] as const,
   isFollowing: (orgId: string, userId: string) => [...orgKeys.detail(orgId), 'following', userId] as const,
   myOrganizations: ['organizations', 'mine'] as const,
-  myMemberOrganizations: ['organizations', 'member-orgs'] as const,
-  myMemberships: ['organizations', 'memberships', 'me'] as const,
-  memberships: (orgId: string) => [...orgKeys.detail(orgId), 'memberships'] as const,
-} as const;
+};
 
 /**
  * Hook to create an organization
@@ -191,26 +188,12 @@ export function useRemoveOrganizationAdmin(organizationId: string) {
 }
 
 /**
- * Hook to fetch organization admins (legacy)
+ * Hook to fetch organization admins
  */
 export function useOrganizationAdmins(organizationId: string) {
   return useQuery({
     queryKey: orgKeys.admins(organizationId),
     queryFn: () => organizationService.getOrganizationAdmins(organizationId),
-    enabled: !!organizationId,
-  });
-}
-
-/**
- * Hook to fetch memberships for an organization
- */
-export function useOrganizationMemberships(
-  organizationId: string,
-  status?: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED',
-) {
-  return useQuery({
-    queryKey: [orgKeys.memberships(organizationId), status],
-    queryFn: () => organizationService.getOrganizationMemberships(organizationId, status),
     enabled: !!organizationId,
   });
 }
@@ -269,79 +252,6 @@ export function useUnfollowOrganization(organizationId: string) {
   });
 }
 
-export function useRequestJoinOrganization() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: (organizationId: string) =>
-      organizationService.requestJoinOrganization(organizationId),
-    onSuccess: (data, organizationId) => {
-      toast({
-        title: 'Request sent',
-        description: 'Your request to join this organization is pending approval.',
-      });
-
-      // Optimistically merge the new membership into the cached list so
-      // components like JoinOrganizationPage immediately show "Pending"/
-      // "Joined" instead of reverting back to the "Request to join" button.
-      queryClient.setQueryData<any[]>(orgKeys.myMemberships, (old) => {
-        const previous = old || [];
-        if (!data || !organizationId) return previous;
-
-        const exists = previous.some(
-          (m) => m.organization_id === organizationId && m.user_id === data.user_id,
-        );
-        if (exists) return previous;
-
-        return [...previous, data];
-      });
-
-      queryClient.invalidateQueries({ queryKey: orgKeys.myMemberships });
-      if (organizationId) {
-        queryClient.invalidateQueries({ queryKey: orgKeys.memberships(organizationId) });
-      }
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to send join request',
-        variant: 'destructive',
-      });
-    },
-  });
-}
-
-/**
- * Hook to update membership status (approve / reject / remove)
- */
-export function useUpdateMembershipStatus(organizationId: string) {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: (args: { membershipId: string; status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED'; role?: string }) =>
-      organizationService.updateMembershipStatus(args.membershipId, {
-        status: args.status,
-        role: args.role,
-      }),
-    onSuccess: () => {
-      toast({
-        title: 'Updated',
-        description: 'Membership updated successfully.',
-      });
-      queryClient.invalidateQueries({ queryKey: orgKeys.memberships(organizationId) });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to update membership',
-        variant: 'destructive',
-      });
-    },
-  });
-}
-
 /**
  * Hook to fetch followed organizations
  */
@@ -376,31 +286,11 @@ export function useOrganizationAnalytics(organizationId: string) {
 }
 
 /**
- * Hook to fetch organizations where the current user is the owner (legacy)
+ * Hook to fetch organizations where the current user is an admin
  */
 export function useMyOrganizations() {
   return useQuery({
     queryKey: orgKeys.myOrganizations,
     queryFn: () => organizationService.getMyOrganizations(),
-  });
-}
-
-/**
- * Hook to fetch organizations where the current user is an ACTIVE member
- */
-export function useMyMemberOrganizations() {
-  return useQuery({
-    queryKey: orgKeys.myMemberOrganizations,
-    queryFn: () => organizationService.getMyMemberOrganizations(),
-  });
-}
-
-/**
- * Hook to fetch membership rows for the current user
- */
-export function useMyOrganizationMemberships() {
-  return useQuery({
-    queryKey: orgKeys.myMemberships,
-    queryFn: () => organizationService.getMyOrganizationMemberships(),
   });
 }
