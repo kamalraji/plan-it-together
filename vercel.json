@@ -9,8 +9,7 @@
   "regions": ["iad1"],
   
   "env": {
-    "NODE_ENV": "production",
-    "NODE_VERSION": "20"
+    "NODE_ENV": "production"
   },
   
   "headers": [
