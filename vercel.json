@@ -4,12 +4,13 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "source ~/.nvm/nvm.sh && nvm install 20.19.0 && nvm use 20.19.0 && rm -rf node_modules && npm install --legacy-peer-deps",
+  "installCommand": "rm -rf node_modules && npm install --legacy-peer-deps",
   "devCommand": "npm run dev",
   "regions": ["iad1"],
   
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "NODE_VERSION": "20.19.0"
   },
   
   "headers": [
