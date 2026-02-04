@@ -1,0 +1,187 @@
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { WorkspaceStatus, UserRole } from '@/types';
+import { useCurrentOrganization } from './OrganizationContext';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  BuildingOfficeIcon,
+  EnvelopeIcon,
+} from '@heroicons/react/24/outline';
+import { cn } from '@/lib/utils';
+
+// Refactored components
+import { WorkspaceItem } from './workspace-list/WorkspaceCard';
+import { WorkspaceGroup } from './workspace-list/WorkspaceGroup';
+import { WorkspaceListHeader } from './workspace-list/WorkspaceListHeader';
+import { WorkspaceListSkeleton } from './workspace-list/WorkspaceListSkeleton';
+import { MyWorkspacesHierarchy } from './workspace-list/MyWorkspacesHierarchy';
+
+/**
+ * OrgWorkspaceListPage
+ *
+ * Displays all workspaces for an organization, grouped by:
+ * - My Workspaces (owned by or involving the user)
+ * - Organization Workspaces (other org workspaces)
+ * - Invited Workspaces (where user is invited as a member)
+ */
+export const OrgWorkspaceListPage: React.FC = () => {
+  const organization = useCurrentOrganization();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
+  const { user } = useAuth();
+
+  // Fetch all workspaces for this organization
+  const { data: workspacesData, isLoading } = useQuery({
+    queryKey: ['org-all-workspaces', organization?.id, user?.id],
+    queryFn: async () => {
+      if (!organization?.id || !user?.id) return { myWorkspaces: [], orgWorkspaces: [], invitedWorkspaces: [], totalCount: 0 };
+
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select(`
+          id, name, slug, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id, workspace_type,
+          events!inner(id, name, slug, organization_id),
+          workspace_team_members(user_id, role)
+        `)
+        .eq('events.organization_id', organization.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+
+      const allWorkspaces: WorkspaceItem[] = (data || []).map((row: any) => {
+        const memberRecord = row.workspace_team_members?.find((m: any) => m.user_id === user?.id);
+        return {
+          id: row.id,
+          eventId: row.event_id,
+          name: row.name,
+          slug: row.slug,
+          workspaceType: row.workspace_type,
+          status: row.status as WorkspaceStatus,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+          organizerId: row.organizer_id,
+          parentWorkspaceId: row.parent_workspace_id,
+          isOwner: row.organizer_id === user?.id,
+          isMember: !!memberRecord,
+          event: row.events
+            ? {
+              id: row.events.id,
+              name: row.events.name,
+              slug: row.events.slug,
+            }
+            : undefined,
+        };
+      });
+
+      // Build deep hierarchy using ALL workspaces, then extract trees by ownership
+      const buildFullHierarchy = (allWs: WorkspaceItem[]): Map<string, WorkspaceItem> => {
+        const workspaceMap = new Map<string, WorkspaceItem>();
+        
+        // Create a map of all workspaces with empty subWorkspaces arrays
+        allWs.forEach(ws => {
+          workspaceMap.set(ws.id, { ...ws, subWorkspaces: [] });
+        });
+        
+        // Build parent-child relationships
+        allWs.forEach(ws => {
+          if (ws.parentWorkspaceId) {
+            const parent = workspaceMap.get(ws.parentWorkspaceId);
+            const child = workspaceMap.get(ws.id);
+            if (parent && child) {
+              parent.subWorkspaces = parent.subWorkspaces || [];
+              parent.subWorkspaces.push(child);
+            }
+          }
+        });
+        
+        return workspaceMap;
+      };
+
+      // Build full hierarchy map once
+      const hierarchyMap = buildFullHierarchy(allWorkspaces);
+
+      // Extract trees rooted at workspaces matching a filter
+      // For "My Workspaces": show roots the user owns, with ALL their children
+      const getTreesForRoots = (rootFilter: (ws: WorkspaceItem) => boolean): WorkspaceItem[] => {
+        return Array.from(hierarchyMap.values())
+          .filter(ws => !ws.parentWorkspaceId && rootFilter(ws));
+      };
+
+      // My Workspaces: root workspaces created by user (includes all descendants)
+      const myRoots = getTreesForRoots(w => w.isOwner);
+      
+      // Invited Workspaces: roots where user is member but not owner
+      const invitedRoots = getTreesForRoots(w => w.isMember && !w.isOwner);
+      
+      // Organization Workspaces: roots neither owned nor member
+      const orgRoots = getTreesForRoots(w => !w.isOwner && !w.isMember);
+
+      return {
+        myWorkspaces: myRoots,
+        allWorkspaces, // Pass flat list for navigation
+        invitedWorkspaces: invitedRoots,
+        orgWorkspaces: orgRoots,
+        totalCount: allWorkspaces.length,
+      };
+    },
+    enabled: !!organization?.id && !!user?.id,
+  });
+
+  const canManageWorkspaces =
+    !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
+
+  return (
+    <div className={cn(
+      "min-h-[calc(100vh-4rem)]",
+      "bg-gradient-to-br from-background via-background to-muted/20"
+    )}>
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+        {/* Header */}
+        <WorkspaceListHeader
+          organizationName={organization?.name}
+          orgSlug={orgSlug}
+          totalCount={workspacesData?.totalCount ?? 0}
+          canManageWorkspaces={canManageWorkspaces}
+        />
+
+        {/* Loading state */}
+        {isLoading && <WorkspaceListSkeleton />}
+
+        {/* Workspace groups */}
+        {!isLoading && (
+          <div className="space-y-6 sm:space-y-8 pb-8">
+            {/* My Workspaces - Hierarchy View */}
+            <MyWorkspacesHierarchy
+              workspaces={workspacesData?.myWorkspaces || []}
+              allWorkspaces={workspacesData?.allWorkspaces || []}
+              orgSlug={orgSlug}
+            />
+
+            {/* Invited Workspaces */}
+            <WorkspaceGroup
+              title="Invited Workspaces"
+              icon={<EnvelopeIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
+              workspaces={workspacesData?.invitedWorkspaces || []}
+              emptyMessage="No workspace invitations"
+              defaultExpanded={true}
+              orgSlug={orgSlug}
+            />
+
+            {/* Organization Workspaces */}
+            <WorkspaceGroup
+              title="Organization Workspaces"
+              icon={<BuildingOfficeIcon className="h-5 w-5 text-muted-foreground" />}
+              workspaces={workspacesData?.orgWorkspaces || []}
+              emptyMessage="No other workspaces in this organization"
+              defaultExpanded={true}
+              orgSlug={orgSlug}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default OrgWorkspaceListPage;
