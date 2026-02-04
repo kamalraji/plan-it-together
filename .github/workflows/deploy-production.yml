@@ -1,0 +1,306 @@
+# =============================================================================
+# THITTAM1HUB PRODUCTION DEPLOYMENT WORKFLOW
+# =============================================================================
+# This workflow handles automated testing, security scanning, and deployment
+# for the Thittam1Hub event management platform.
+#
+# Triggers:
+# - Push to main branch (production deployment)
+# - Push to develop branch (staging deployment)
+# - Pull requests to main (testing only)
+# =============================================================================
+
+name: Production Deployment
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+# Prevent concurrent deployments to the same environment
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # QUALITY CHECKS
+  # ===========================================================================
+  
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: false
+      
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+        continue-on-error: false
+
+  # ===========================================================================
+  # TESTING
+  # ===========================================================================
+  
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test -- --coverage --passWithNoTests
+        env:
+          CI: true
+      
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  # ===========================================================================
+  # SECURITY SCANNING
+  # ===========================================================================
+  
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # ===========================================================================
+  # BUILD
+  # ===========================================================================
+  
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, unit-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_APP_VERSION: ${{ github.sha }}
+          NODE_ENV: production
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  # ===========================================================================
+  # STAGING DEPLOYMENT
+  # ===========================================================================
+  
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment:
+      name: staging
+      url: https://staging.thittam1hub.com
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+      
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Build SHA: ${{ github.sha }}"
+          # Add your staging deployment commands here
+          # Examples:
+          # - Vercel: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+          # - Netlify: npx netlify deploy --prod --auth=${{ secrets.NETLIFY_TOKEN }}
+          # - Railway: railway up
+      
+      - name: Run smoke tests
+        run: |
+          echo "🔍 Running smoke tests against staging..."
+          # Add health check or smoke test commands
+          # curl -f https://staging.thittam1hub.com/api/health || exit 1
+      
+      - name: Notify on success
+        if: success()
+        run: echo "✅ Staging deployment successful!"
+      
+      - name: Notify on failure
+        if: failure()
+        run: echo "❌ Staging deployment failed!"
+
+  # ===========================================================================
+  # PRODUCTION DEPLOYMENT
+  # ===========================================================================
+  
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment:
+      name: production
+      url: https://thittam1hub.com
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+      
+      - name: Pre-deployment checks
+        run: |
+          echo "🔒 Running pre-deployment checks..."
+          echo "Commit: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+      
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          # Add your production deployment commands here
+          # This is where you'd integrate with your hosting platform
+      
+      - name: Run production health check
+        run: |
+          echo "🏥 Running production health checks..."
+          # Add production health check commands
+          # curl -f https://thittam1hub.com/api/health || exit 1
+      
+      - name: Create deployment record
+        run: |
+          echo "📝 Recording deployment..."
+          echo "Version: ${{ github.sha }}"
+          echo "Deployed at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "Deployed by: ${{ github.actor }}"
+      
+      - name: Notify on success
+        if: success()
+        run: echo "✅ Production deployment successful!"
+      
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "❌ Production deployment failed!"
+          echo "🔄 Consider rollback procedures..."
+          # Add rollback commands if needed
+
+  # ===========================================================================
+  # POST-DEPLOYMENT
+  # ===========================================================================
+  
+  post-deployment:
+    name: Post-Deployment Tasks
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: success()
+    
+    steps:
+      - name: Notify Sentry of release
+        run: |
+          echo "📊 Notifying Sentry of new release..."
+          # If using Sentry CLI:
+          # npx @sentry/cli releases new ${{ github.sha }}
+          # npx @sentry/cli releases set-commits ${{ github.sha }} --auto
+          # npx @sentry/cli releases finalize ${{ github.sha }}
+      
+      - name: Update monitoring dashboards
+        run: |
+          echo "📈 Updating monitoring dashboards..."
+          # Add commands to update dashboards, send notifications, etc.
+      
+      - name: Summary
+        run: |
+          echo "🎉 Deployment pipeline completed successfully!"
+          echo ""
+          echo "Summary:"
+          echo "- Commit: ${{ github.sha }}"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo "- Actor: ${{ github.actor }}"
+          echo "- Workflow: ${{ github.workflow }}"
