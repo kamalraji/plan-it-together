@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
+import { EventCanvasHero } from './EventCanvasHero';
 
 interface EventLandingPageProps {
   eventId?: string;
@@ -17,7 +18,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
-  // Fetch event details directly from Lovable Cloud
+  // Fetch event details directly from Supabase
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
@@ -29,6 +30,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
       if (error) throw error;
 
+      const landingPageData = (data as any).landing_page_data ?? null;
+
       // Map Supabase row to the existing Event type shape used in the UI
       const mappedEvent: Event = {
         id: data.id,
@@ -38,16 +41,16 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         startDate: data.start_date || '',
         endDate: data.end_date || '',
         capacity: data.capacity ?? undefined,
-        registrationDeadline: data.registration_deadline || undefined,
-        organizerId: data.organizer_id,
+        registrationDeadline: (data as any).registration_deadline || undefined,
+        organizerId: (data as any).organizer_id,
         organizationId: data.organization_id || undefined,
         visibility: data.visibility as EventVisibility,
-        inviteLink: data.invite_link || undefined,
+        inviteLink: (data as any).invite_link || undefined,
         branding: (data.branding as any) || {},
-        venue: (data.venue as any) || undefined,
-        virtualLinks: (data.virtual_links as any) || undefined,
+        venue: (data as any).venue || undefined,
+        virtualLinks: (data as any).virtual_links || undefined,
         status: data.status as any,
-        landingPageUrl: data.landing_page_url || '',
+        landingPageUrl: (data as any).landing_page_url || '',
         timeline: [],
         agenda: [],
         prizes: [],
@@ -55,6 +58,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
         organization: undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
+        canvasState: (data as any).canvas_state ?? undefined,
+        landingPageData: landingPageData,
       };
 
       return mappedEvent;
@@ -127,23 +132,25 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error || !event) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
-          <p className="text-gray-600 mb-4">The event you're looking for doesn't exist or has been removed.</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-semibold text-foreground">Event not found</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            The event you're looking for doesn't exist, is private, or has been removed.
+          </p>
           <button
             onClick={() => navigate('/')}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground px-5 py-2.5 text-sm font-medium shadow-sm hover:shadow-md hover:from-primary hover:to-primary/80 transition-colors"
           >
-            Go Home
+            Go home
           </button>
         </div>
       </div>
@@ -168,11 +175,38 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
     });
   };
 
+  // Prefer GrapesJS-built landing page when available
+  if (event.landingPageData && (event.landingPageData as any).html) {
+    const lp = event.landingPageData as any as { html: string; css?: string | null; meta?: { title?: string; description?: string } };
+
+    return (
+      <div className="min-h-screen bg-background">
+        <section className="border-b border-border bg-background">
+          {/* Inject GrapesJS CSS into the page scope */}
+          {lp.css && <style dangerouslySetInnerHTML={{ __html: lp.css }} />}
+          <div
+            className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+            dangerouslySetInnerHTML={{ __html: lp.html }}
+          />
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
+      {/* Optional custom designed hero canvas */}
+      {event.canvasState && (
+        <section className="border-b border-border bg-background/40">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+            <EventCanvasHero snapshot={event.canvasState} />
+          </div>
+        </section>
+      )}
+
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
       <div
-        className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+        className="relative text-primary-foreground bg-gradient-to-r from-primary to-accent overflow-hidden"
         style={{
           backgroundColor: event.branding.primaryColor || undefined,
           backgroundImage: event.branding.bannerUrl ? `url(${event.branding.bannerUrl})` : undefined,
@@ -180,8 +214,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="absolute inset-0 bg-background/40"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="text-center">
             {/* Organization or Event Branding (Requirements 19.2) */}
             {event.organization?.branding?.logoUrl ? (
@@ -191,10 +225,10 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   alt={event.organization.name}
                   className="h-16 w-auto mx-auto mb-2"
                 />
-                <p className="text-sm text-white text-opacity-90">
+                <p className="text-sm text-primary-foreground/80">
                   Hosted by {event.organization.name}
                   {event.organization.verificationStatus === 'VERIFIED' && (
-                    <span className="ml-1 text-blue-300">✓</span>
+                    <span className="ml-1 text-primary-foreground">✓</span>
                   )}
                 </p>
               </div>
@@ -205,18 +239,18 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 className="h-16 w-auto mx-auto mb-6"
               />
             )}
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">{event.name}</h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">{event.description}</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4">{event.name}</h1>
+            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-primary-foreground/90">{event.description}</p>
 
-            <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 mb-8">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-8 text-sm sm:text-base">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/15 backdrop-blur-sm">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span>{formatDate(event.startDate)}</span>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/15 backdrop-blur-sm">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -228,7 +262,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </span>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/15 backdrop-blur-sm">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -303,9 +337,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-card/80 border-b border-border/60 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex gap-4 overflow-x-auto py-2">
             {[
               { key: 'overview', label: 'Overview' },
               { key: 'schedule', label: 'Schedule' },
@@ -315,10 +349,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.key
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                }`}
               >
                 {tab.label}
               </button>

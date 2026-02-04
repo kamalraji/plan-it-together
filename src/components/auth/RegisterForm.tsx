@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
 import { motion } from 'framer-motion';
 import { AuthLayout } from './AuthLayout';
+import { useToast } from '@/hooks/use-toast';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -28,6 +29,7 @@ export function RegisterForm() {
   const { register: registerUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   
   // Get event code from URL if present
   const eventCodeFromUrl = searchParams.get('eventCode');
@@ -60,12 +62,22 @@ export function RegisterForm() {
     try {
       const { confirmPassword, ...registerData } = data;
       const { error: registerError } = await registerUser(registerData);
-      
+
       if (registerError) {
         setError(registerError.message || 'Registration failed. Please try again.');
+        toast({
+          variant: 'destructive',
+          title: 'Registration failed',
+          description: registerError.message || 'Please check your details and try again.',
+        });
         return;
       }
-      
+
+      toast({
+        title: 'Account created',
+        description: 'Check your email to verify your account, then sign in.',
+      });
+
       // After registration, redirect to login. Organizer signups will be guided
       // into the organization onboarding flow after login.
       if (data.role === UserRole.ORGANIZER) {
@@ -75,6 +87,11 @@ export function RegisterForm() {
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
+      toast({
+        variant: 'destructive',
+        title: 'Registration failed',
+        description: err.message || 'Something went wrong. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -83,18 +100,18 @@ export function RegisterForm() {
   return (
     <AuthLayout>
       <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
-            Join the Adventure!
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground mb-1">
+            Create your account
           </h2>
-          <p className="text-gray-600 mb-2">
-            Create your account and start exploring amazing events
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Join your event workspace in a few clicks.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-medium text-teal hover:text-teal-light transition-colors"
+              className="font-medium text-primary hover:text-primary/80 transition-colors"
             >
               Sign in here
             </Link>
@@ -102,15 +119,13 @@ export function RegisterForm() {
         </div>
 
         {/* Registration Form */}
-        <motion.div
-          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
-        >
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <motion.div className="relative rounded-2xl border border-border/70 bg-card/90 shadow-md">
+          <form className="space-y-6 p-6 sm:p-8" onSubmit={handleSubmit(onSubmit)}>
             {error && (
-              <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
+              <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-4">
                 <div className="flex items-center space-x-2">
-                  <span className="text-coral">⚠️</span>
-                  <div className="text-sm text-coral font-medium">{error}</div>
+                  <span className="text-destructive">⚠️</span>
+                  <div className="text-sm text-destructive font-medium">{error}</div>
                 </div>
               </div>
             )}
@@ -127,11 +142,11 @@ export function RegisterForm() {
                 <input
                   {...register('name')}
                   type="text"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your full name"
                 />
                 {errors.name && (
-                  <p className="mt-2 text-sm text-coral">{errors.name.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.name.message}</p>
                 )}
               </motion.div>
 
@@ -147,11 +162,11 @@ export function RegisterForm() {
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Enter your email address"
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.email.message}</p>
                 )}
               </motion.div>
 
@@ -165,13 +180,13 @@ export function RegisterForm() {
                 </label>
                 <select
                   {...register('role')}
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                 >
                   <option value={UserRole.PARTICIPANT}>Participant</option>
                   <option value={UserRole.ORGANIZER}>Organizer</option>
                 </select>
                 {errors.role && (
-                  <p className="mt-2 text-sm text-coral">{errors.role.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.role.message}</p>
                 )}
               </motion.div>
 
@@ -187,11 +202,11 @@ export function RegisterForm() {
                   <input
                     {...register('eventCode')}
                     type="text"
-                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                     placeholder="Enter event code if you have one"
                   />
                   {errors.eventCode && (
-                    <p className="mt-2 text-sm text-coral">{errors.eventCode.message}</p>
+                    <p className="mt-2 text-sm text-destructive">{errors.eventCode.message}</p>
                   )}
                 </motion.div>
               )}
@@ -208,11 +223,11 @@ export function RegisterForm() {
                   {...register('password')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Create a secure password"
                 />
                 {errors.password && (
-                  <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.password.message}</p>
                 )}
               </motion.div>
 
@@ -228,11 +243,11 @@ export function RegisterForm() {
                   {...register('confirmPassword')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 bg-background/80"
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
-                  <p className="mt-2 text-sm text-coral">{errors.confirmPassword.message}</p>
+                  <p className="mt-2 text-sm text-destructive">{errors.confirmPassword.message}</p>
                 )}
               </motion.div>
             </div>
@@ -240,7 +255,7 @@ export function RegisterForm() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center py-3.5 px-6 rounded-full text-base font-medium bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md hover:shadow-lg hover:from-primary hover:to-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
               whileHover={!isLoading ? { scale: 1.02 } : undefined}
               whileTap={!isLoading ? { scale: 0.99 } : undefined}
               initial={{ opacity: 0, y: 16 }}
@@ -264,7 +279,7 @@ export function RegisterForm() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.44 }}
               >
-                <div className="text-sm text-teal">
+                <div className="text-sm text-primary">
                   <strong>Organizer Account:</strong> After you verify your email and sign in,
                   you'll be guided to set up your organization. Once your first organization is
                   created, you'll automatically get organizer access.

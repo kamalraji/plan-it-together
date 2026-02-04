@@ -5,13 +5,13 @@ import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrga
 import { OrganizerDashboard } from '@/components/dashboard/OrganizerDashboard';
 import { EventService, WorkspaceService, OrganizationService } from '@/components/routing/services';
 import { OrganizationProvider } from './OrganizationContext';
+import { OrganizationAnalyticsDashboard } from './OrganizationAnalyticsDashboard';
 import { OrganizationTeamManagement } from './OrganizationTeamManagement';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { OrgSettingsDashboard } from './OrgSettingsDashboard';
 import { OrgStorySettingsPage } from './OrgStorySettingsPage';
-import { OrgScopedAnalyticsPage } from './OrgScopedAnalyticsPage';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -95,7 +95,7 @@ export const OrgScopedLayout: React.FC = () => {
                   <Route path="eventmanagement/*" element={<EventService />} />
                   <Route path="workspaces/*" element={<WorkspaceService />} />
                   <Route path="organizations/*" element={<OrganizationService />} />
-                  <Route path="analytics" element={<OrgScopedAnalyticsPage />} />
+                  <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
                   <Route path="team" element={<OrganizationTeamManagement />} />
                   <Route path="*" element={<Navigate to="dashboard" replace />} />
                 </Routes>

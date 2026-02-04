@@ -156,11 +156,14 @@ export type Database = {
       events: {
         Row: {
           branding: Json | null
+          canvas_state: Json | null
           capacity: number | null
           created_at: string
           description: string | null
           end_date: string
           id: string
+          landing_page_data: Json | null
+          landing_page_slug: string | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
@@ -172,11 +175,14 @@ export type Database = {
         }
         Insert: {
           branding?: Json | null
+          canvas_state?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
           end_date: string
           id?: string
+          landing_page_data?: Json | null
+          landing_page_slug?: string | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
@@ -188,11 +194,14 @@ export type Database = {
         }
         Update: {
           branding?: Json | null
+          canvas_state?: Json | null
           capacity?: number | null
           created_at?: string
           description?: string | null
           end_date?: string
           id?: string
+          landing_page_data?: Json | null
+          landing_page_slug?: string | null
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null

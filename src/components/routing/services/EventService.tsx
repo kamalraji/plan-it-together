@@ -5,10 +5,14 @@ import { EventListPage } from './EventListPage';
 import { EventDetailPage } from './EventDetailPage';
 import { EventFormPage } from './EventFormPage';
 import { EventOpsConsole } from '@/components/events/EventOpsConsole';
+import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 import { VolunteerCheckInInterface } from '@/components/attendance';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '../../../types';
 import { RequireEventAccess } from './RequireEventAccess';
+import { EventAnalyticsOverviewPage } from './EventAnalyticsOverviewPage';
+import { EventAnalyticsPage } from './EventAnalyticsPage';
+import { EventRegistrationsOverviewPage } from './EventRegistrationsOverviewPage';
 
 /**
  * EventService component provides the main routing structure for the Event Management Service.
@@ -23,6 +27,12 @@ export const EventService: React.FC = () => {
     <Routes>
       {/* Service Dashboard - default route */}
       <Route index element={<EventServiceDashboard />} />
+
+      {/* Event Analytics Overview */}
+      <Route path="analytics" element={<EventAnalyticsOverviewPage />} />
+
+      {/* Registrations Overview */}
+      <Route path="registrations" element={<EventRegistrationsOverviewPage />} />
 
       {/* Event List Page */}
       <Route path="list" element={<EventListPage />} />
@@ -67,7 +77,7 @@ export const EventService: React.FC = () => {
         path=":eventId/analytics"
         element={
           <EventAccessRoute requireManage>
-            <EventDetailPage defaultTab="analytics" />
+            <EventAnalyticsPage />
           </EventAccessRoute>
         }
       />
@@ -78,6 +88,16 @@ export const EventService: React.FC = () => {
         element={
           <EventAccessRoute requireManage>
             <EventOpsConsole />
+          </EventAccessRoute>
+        }
+      />
+
+      {/* Event landing page builder (require manage access) */}
+      <Route
+        path=":eventId/page-builder"
+        element={
+          <EventAccessRoute requireManage>
+            <EventPageBuilder />
           </EventAccessRoute>
         }
       />
