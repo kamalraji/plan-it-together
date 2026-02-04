@@ -39,6 +39,7 @@ import PricingPage from '@/pages/PricingPage';
 import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
 import { PrivacyPolicyPage, TermsOfServicePage, CookiePolicyPage, SecurityPage } from '@/components/legal';
 import { PublicHelpPage } from '@/components/help';
+import { RouteAnnouncer } from '@/components/accessibility';
 
 // Lazy-loaded components for better bundle splitting
 // Heavy/role-specific components only downloaded when needed
@@ -491,6 +492,7 @@ export const AppRouter: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
+          <RouteAnnouncer />
           <Routes>
              {/* Thittam1Hub-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
