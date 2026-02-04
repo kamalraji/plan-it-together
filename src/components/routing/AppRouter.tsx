@@ -23,12 +23,14 @@ import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
 import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
+import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
+import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -504,6 +506,16 @@ export const AppRouter: React.FC = () => {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
+            {/* Organizer onboarding - appears for new organizers */}
+            <Route
+              path="/dashboard/onboarding/organizer"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <OrganizerOnboardingPage />
+                </ConsoleRoute>
+              }
+            />
+
             {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
             <Route
               path="/onboarding/organization"
@@ -539,6 +551,20 @@ export const AppRouter: React.FC = () => {
                 </ConsoleRoute>
               }
             />
+
+            {/* Organizer root dashboard (org-agnostic) */}
+            <Route
+              path="/organizer/dashboard"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <GlobalErrorBoundary>
+                    <ConsoleLayout />
+                  </GlobalErrorBoundary>
+                </ConsoleRoute>
+              }
+            >
+              <Route index element={<OrganizerSpecificDashboard />} />
+            </Route>
 
             {/* Dashboard routes - all protected with enhanced authentication */}
             <Route

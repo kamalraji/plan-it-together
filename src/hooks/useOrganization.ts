@@ -269,22 +269,38 @@ export function useUnfollowOrganization(organizationId: string) {
   });
 }
 
-/**
- * Hook to request joining an organization
- */
-export function useRequestJoinOrganization(organizationId: string) {
+export function useRequestJoinOrganization() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: () => organizationService.requestJoinOrganization(organizationId),
-    onSuccess: () => {
+    mutationFn: (organizationId: string) =>
+      organizationService.requestJoinOrganization(organizationId),
+    onSuccess: (data, organizationId) => {
       toast({
         title: 'Request sent',
         description: 'Your request to join this organization is pending approval.',
       });
+
+      // Optimistically merge the new membership into the cached list so
+      // components like JoinOrganizationPage immediately show "Pending"/
+      // "Joined" instead of reverting back to the "Request to join" button.
+      queryClient.setQueryData<any[]>(orgKeys.myMemberships, (old) => {
+        const previous = old || [];
+        if (!data || !organizationId) return previous;
+
+        const exists = previous.some(
+          (m) => m.organization_id === organizationId && m.user_id === data.user_id,
+        );
+        if (exists) return previous;
+
+        return [...previous, data];
+      });
+
       queryClient.invalidateQueries({ queryKey: orgKeys.myMemberships });
-      queryClient.invalidateQueries({ queryKey: orgKeys.memberships(organizationId) });
+      if (organizationId) {
+        queryClient.invalidateQueries({ queryKey: orgKeys.memberships(organizationId) });
+      }
     },
     onError: (error: Error) => {
       toast({

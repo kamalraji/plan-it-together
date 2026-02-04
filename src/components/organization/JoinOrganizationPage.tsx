@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearchOrganizations } from '@/hooks/useOrganization';
-import { organizationService } from '@/services/organizationService';
-import { useToast } from '@/hooks/use-toast';
+import { useSearchOrganizations, useMyOrganizationMemberships, useRequestJoinOrganization } from '@/hooks/useOrganization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,10 +19,10 @@ export interface JoinOrganizationMembership {
 
 export const JoinOrganizationPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
@@ -37,60 +35,37 @@ export const JoinOrganizationPage: React.FC = () => {
     offset: 0,
   });
 
-  const [memberships, setMemberships] = useState<JoinOrganizationMembership[] | null>(null);
-  const [loadingMemberships, setLoadingMemberships] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadMemberships = async () => {
-      setLoadingMemberships(true);
-      try {
-        const result = await organizationService.getMyOrganizationMemberships();
-        if (isMounted) setMemberships(result as any);
-      } catch (e: any) {
-        console.error('Failed to load memberships', e);
-      } finally {
-        if (isMounted) setLoadingMemberships(false);
-      }
-    };
-
-    loadMemberships();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: memberships, isLoading: loadingMemberships } = useMyOrganizationMemberships();
 
   const [requestingOrgId, setRequestingOrgId] = useState<string | null>(null);
-
-  const handleRequestJoin = async (organizationId: string) => {
-    setRequestingOrgId(organizationId);
-    try {
-      await organizationService.requestJoinOrganization(organizationId);
-      toast({
-        title: 'Request sent',
-        description: 'Your request to join this organization is pending approval.',
-      });
-
-      // Refresh memberships so we can immediately show "Pending approval"
-      const result = await organizationService.getMyOrganizationMemberships();
-      setMemberships(result as any);
-    } catch (e: any) {
-      toast({
-        title: 'Error',
-        description: e?.message || 'Failed to send join request',
-        variant: 'destructive',
-      });
-    } finally {
-      setRequestingOrgId(null);
-    }
+  const requestJoin = useRequestJoinOrganization();
+ 
+  const handleRequestJoin = (organization: any) => {
+    setJoinError(null);
+    setRequestingOrgId(organization.id);
+    requestJoin.mutate(organization.id, {
+      onSuccess: () => {
+        navigate('/dashboard/organizations/join/success', {
+          state: { organizationName: organization.name },
+        });
+      },
+      onError: (error: any) => {
+        const message =
+          (error as any)?.message ||
+          (error as any)?.data?.message ||
+          'Failed to send join request. Please try again.';
+        setJoinError(message);
+        // eslint-disable-next-line no-console
+        console.error('Join organization error', error);
+      },
+      onSettled: () => setRequestingOrgId(null),
+    });
   };
 
   const getMembershipForOrg = useMemo(
     () =>
       (orgId: string) =>
-        memberships?.find((m) => m.organization_id === orgId) ?? null,
+        memberships?.find((m: any) => m.organization_id === orgId) ?? null,
     [memberships],
   );
 
@@ -161,7 +136,7 @@ export const JoinOrganizationPage: React.FC = () => {
                             </p>
                           </div>
 
-                          <div className="ml-3 flex items-center gap-2">
+                          <div className="ml-3 flex flex-col items-end gap-1">
                             {isActive ? (
                               <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-500">
                                 Joined
@@ -171,14 +146,23 @@ export const JoinOrganizationPage: React.FC = () => {
                                 Pending approval
                               </span>
                             ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleRequestJoin(org.id)}
-                                disabled={requestingOrgId === org.id}
-                              >
-                                {requestingOrgId === org.id ? 'Requesting...' : 'Request to join'}
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleRequestJoin(org)}
+                                  disabled={requestingOrgId === org.id || requestJoin.isPending}
+                                >
+                                  {requestingOrgId === org.id
+                                    ? 'Requesting...'
+                                    : 'Request to join'}
+                                </Button>
+                                {joinError && (
+                                  <p className="max-w-xs text-right text-[11px] text-destructive">
+                                    {joinError}
+                                  </p>
+                                )}
+                              </>
                             )}
                           </div>
 

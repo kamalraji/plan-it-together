@@ -49,8 +49,8 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
     // Build breadcrumbs from path segments
     let currentPath = '';
     pathSegments.forEach((segment, index) => {
-      // Skip 'console' segment as it's already added
-      if (segment === 'console') return;
+      // Skip base routing segments already represented in the first item
+      if (segment === 'console' || segment === 'dashboard') return;
 
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;

@@ -23,64 +23,82 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
   }, [eventId]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Event Marketplace</h1>
-        <p className="mt-2 text-gray-600">
-          {eventId 
-            ? `Discover and book services for ${eventName || 'your event'} from verified vendors`
-            : 'Discover and book services for your events from verified vendors'
-          }
-        </p>
-      </div>
+    <div className="w-full overflow-x-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Event Marketplace</h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">
+            {eventId 
+              ? `Discover and book services for ${eventName || 'your event'} from verified vendors`
+              : 'Discover and book services for your events from verified vendors'
+            }
+          </p>
+        </div>
 
-      {/* Navigation Tabs */}
-      <div className="border-b border-gray-200 mb-8">
-        <nav className="-mb-px flex space-x-8">
-          {eventId && (
-            <button
-              onClick={() => setCurrentTab('integrated')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                currentTab === 'integrated'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <span className="mr-2">🎯</span>
-              Event Planning
-            </button>
+        {/* Navigation Tabs */}
+        <div className="border-b border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
+          <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
+            {eventId && (
+              <button
+                onClick={() => setCurrentTab('integrated')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  currentTab === 'integrated'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <span className="mr-2">🎯</span>
+                Event Planning
+              </button>
+            )}
+            {[
+              { id: 'discover', name: 'Discover Services', icon: '🔍' },
+              { id: 'bookings', name: 'My Bookings', icon: '📋' },
+              { id: 'reviews', name: 'Reviews', icon: '⭐' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setCurrentTab(tab.id as any)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  currentTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <span className="mr-2">{tab.icon}</span>
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        <div className="space-y-6">
+          {currentTab === 'integrated' && eventId && (
+            <div className="animate-fade-in">
+              <EventMarketplaceIntegration 
+                eventId={eventId} 
+                eventName={eventName || 'Your Event'} 
+              />
+            </div>
           )}
-          {[
-            { id: 'discover', name: 'Discover Services', icon: '🔍' },
-            { id: 'bookings', name: 'My Bookings', icon: '📋' },
-            { id: 'reviews', name: 'Reviews', icon: '⭐' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setCurrentTab(tab.id as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                currentTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <span className="mr-2">{tab.icon}</span>
-              {tab.name}
-            </button>
-          ))}
-        </nav>
+          {currentTab === 'discover' && (
+            <div className="animate-fade-in">
+              <ServiceDiscoveryUI eventId={eventId} />
+            </div>
+          )}
+          {currentTab === 'bookings' && (
+            <div className="animate-fade-in">
+              <BookingManagementUI eventId={eventId} />
+            </div>
+          )}
+          {currentTab === 'reviews' && (
+            <div className="animate-fade-in">
+              <ReviewRatingUI eventId={eventId} />
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Tab Content */}
-      {currentTab === 'integrated' && eventId && (
-        <EventMarketplaceIntegration 
-          eventId={eventId} 
-          eventName={eventName || 'Your Event'} 
-        />
-      )}
-      {currentTab === 'discover' && <ServiceDiscoveryUI eventId={eventId} />}
-      {currentTab === 'bookings' && <BookingManagementUI eventId={eventId} />}
-      {currentTab === 'reviews' && <ReviewRatingUI eventId={eventId} />}
     </div>
   );
 };
