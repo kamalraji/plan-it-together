@@ -109,6 +109,13 @@ export type Database = {
             foreignKeyName: "activity_feed_events_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_feed_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -756,6 +763,13 @@ export type Database = {
             foreignKeyName: "attendance_records_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -1109,6 +1123,13 @@ export type Database = {
             foreignKeyName: "catering_dietary_requirements_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catering_dietary_requirements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -1192,6 +1213,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catering_headcount_confirmations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -1479,6 +1507,13 @@ export type Database = {
             foreignKeyName: "certificate_criteria_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_criteria_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -1613,6 +1648,13 @@ export type Database = {
             foreignKeyName: "certificate_templates_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_templates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -1687,6 +1729,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -2917,6 +2966,13 @@ export type Database = {
             foreignKeyName: "competition_presence_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_presence_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -3069,6 +3125,13 @@ export type Database = {
             foreignKeyName: "competition_rounds_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_rounds_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -3124,6 +3187,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_scores_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -3192,6 +3262,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_team_scores_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -3326,6 +3403,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_exchanges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4058,6 +4142,13 @@ export type Database = {
             foreignKeyName: "event_announcements_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_announcements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4113,6 +4204,13 @@ export type Database = {
             foreignKeyName: "event_checkins_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_checkins_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4159,6 +4257,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_drafts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4227,6 +4332,13 @@ export type Database = {
             foreignKeyName: "event_faqs_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_faqs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4270,6 +4382,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_icebreakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4328,6 +4447,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_images_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4434,6 +4560,13 @@ export type Database = {
             foreignKeyName: "event_live_streams_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_live_streams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4517,6 +4650,13 @@ export type Database = {
             foreignKeyName: "event_materials_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_materials_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4575,6 +4715,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_page_views_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4704,6 +4851,13 @@ export type Database = {
             foreignKeyName: "event_polls_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_polls_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -4765,6 +4919,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_publish_requests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4833,6 +4994,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_session_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4963,6 +5131,13 @@ export type Database = {
             foreignKeyName: "event_sessions_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -5022,6 +5197,13 @@ export type Database = {
             foreignKeyName: "event_status_history_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_status_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -5074,6 +5256,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_tracks_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -5159,6 +5348,13 @@ export type Database = {
             foreignKeyName: "event_venues_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: true
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_venues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -5214,6 +5410,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_virtual_links_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -5296,6 +5499,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_waitlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -5484,6 +5694,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "export_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -5834,6 +6051,13 @@ export type Database = {
             foreignKeyName: "hackathon_deadlines_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hackathon_deadlines_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -5916,6 +6140,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hackathon_submissions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -6035,6 +6266,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hackathon_teams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -6172,6 +6410,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "icebreaker_prompts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -6321,6 +6566,13 @@ export type Database = {
             foreignKeyName: "id_card_print_jobs_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "id_card_print_jobs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -6393,6 +6645,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "id_card_templates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -6704,6 +6963,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "landing_page_versions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -7140,6 +7406,13 @@ export type Database = {
             foreignKeyName: "mentor_slots_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_slots_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -7441,6 +7714,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "networking_meetings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -8161,6 +8441,13 @@ export type Database = {
             foreignKeyName: "page_builder_history_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_builder_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -8223,6 +8510,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_builder_sections_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -8301,6 +8595,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_channels_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -8408,6 +8709,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -9056,6 +9364,13 @@ export type Database = {
             foreignKeyName: "promo_codes_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_codes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -9201,6 +9516,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -9420,6 +9742,13 @@ export type Database = {
             foreignKeyName: "rubrics_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rubrics_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -9466,6 +9795,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -9781,6 +10117,13 @@ export type Database = {
             foreignKeyName: "session_bookmarks_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_bookmarks_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -9935,6 +10278,13 @@ export type Database = {
             foreignKeyName: "session_materials_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_materials_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -10032,6 +10382,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -10882,6 +11239,13 @@ export type Database = {
             foreignKeyName: "sponsor_booths_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_booths_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -10937,6 +11301,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsorship_benefits_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -11198,6 +11569,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -11801,6 +12179,13 @@ export type Database = {
             foreignKeyName: "ticket_tiers_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_tiers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -12040,6 +12425,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_competition_badges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -12633,6 +13025,13 @@ export type Database = {
             foreignKeyName: "vendor_bookings_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bookings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -12711,6 +13110,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_reviews_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -12835,6 +13241,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_shortlist_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -13117,6 +13530,13 @@ export type Database = {
             foreignKeyName: "volunteer_applications_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -13341,6 +13761,13 @@ export type Database = {
             foreignKeyName: "volunteer_time_logs_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_time_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -13502,6 +13929,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workshop_progress_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -14065,6 +14499,13 @@ export type Database = {
             foreignKeyName: "workspace_broadcasts_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_broadcasts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -14591,6 +15032,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_checklists_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -15276,6 +15724,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_equipment_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -16262,6 +16717,13 @@ export type Database = {
             foreignKeyName: "workspace_issues_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_issues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -16424,6 +16886,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_it_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -16923,6 +17392,13 @@ export type Database = {
             foreignKeyName: "workspace_network_zones_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_network_zones_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -16985,6 +17461,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_page_responsibilities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -17772,6 +18255,13 @@ export type Database = {
             foreignKeyName: "workspace_runsheet_cues_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_runsheet_cues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -18411,6 +18901,13 @@ export type Database = {
             foreignKeyName: "workspace_software_licenses_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_software_licenses_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -19027,6 +19524,13 @@ export type Database = {
             foreignKeyName: "workspace_submissions_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_submissions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -19199,6 +19703,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_support_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -19667,6 +20178,13 @@ export type Database = {
             foreignKeyName: "workspace_tech_check_sections_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_tech_check_sections_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20097,6 +20615,13 @@ export type Database = {
             foreignKeyName: "workspace_vip_guests_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_vip_guests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20354,6 +20879,13 @@ export type Database = {
             foreignKeyName: "workspaces_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspaces_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20419,6 +20951,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_activity_feed_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -20520,6 +21059,13 @@ export type Database = {
             foreignKeyName: "zone_challenge_completions_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_challenge_completions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20606,6 +21152,13 @@ export type Database = {
             foreignKeyName: "zone_challenges_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_challenges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20658,6 +21211,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_leaderboard_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -20731,6 +21291,13 @@ export type Database = {
             foreignKeyName: "zone_notification_preferences_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notification_preferences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20792,6 +21359,13 @@ export type Database = {
             foreignKeyName: "zone_notifications_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20838,6 +21412,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_point_activities_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public_safe"
             referencedColumns: ["id"]
           },
           {
@@ -20897,6 +21478,13 @@ export type Database = {
             foreignKeyName: "zone_user_badges_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
+            referencedRelation: "events_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zone_user_badges_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
           },
@@ -20946,6 +21534,98 @@ export type Database = {
           status: Database["public"]["Enums"]["event_status"] | null
           updated_at: string | null
           visibility: Database["public"]["Enums"]["event_visibility"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events_public_safe: {
+        Row: {
+          allow_waitlist: boolean | null
+          capacity: number | null
+          category: Database["public"]["Enums"]["event_category"] | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          event_website: string | null
+          id: string | null
+          is_free: boolean | null
+          language: string | null
+          max_age: number | null
+          min_age: number | null
+          mode: Database["public"]["Enums"]["event_mode"] | null
+          name: string | null
+          organization_id: string | null
+          registration_deadline: string | null
+          registration_type: string | null
+          slug: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["event_status"] | null
+          timezone: string | null
+          updated_at: string | null
+          visibility: Database["public"]["Enums"]["event_visibility"] | null
+        }
+        Insert: {
+          allow_waitlist?: boolean | null
+          capacity?: number | null
+          category?: Database["public"]["Enums"]["event_category"] | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_website?: string | null
+          id?: string | null
+          is_free?: boolean | null
+          language?: string | null
+          max_age?: number | null
+          min_age?: number | null
+          mode?: Database["public"]["Enums"]["event_mode"] | null
+          name?: string | null
+          organization_id?: string | null
+          registration_deadline?: string | null
+          registration_type?: string | null
+          slug?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
+          timezone?: string | null
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["event_visibility"] | null
+        }
+        Update: {
+          allow_waitlist?: boolean | null
+          capacity?: number | null
+          category?: Database["public"]["Enums"]["event_category"] | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_website?: string | null
+          id?: string | null
+          is_free?: boolean | null
+          language?: string | null
+          max_age?: number | null
+          min_age?: number | null
+          mode?: Database["public"]["Enums"]["event_mode"] | null
+          name?: string | null
+          organization_id?: string | null
+          registration_deadline?: string | null
+          registration_type?: string | null
+          slug?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
+          timezone?: string | null
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["event_visibility"] | null
         }
         Relationships: [
           {
