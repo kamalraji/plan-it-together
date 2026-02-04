@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ThinkingPerson } from '@/components/illustrations';
+import { useWorkspaceTemplates } from '@/hooks/useWorkspaceTemplates';
 
 // Local template type for library display (simpler than full WorkspaceTemplate)
 export interface LibraryTemplate {
@@ -40,10 +41,25 @@ export function WorkspaceTemplateLibrary({
   const [selectedComplexity, setSelectedComplexity] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'usage' | 'created'>('rating');
 
-  // Use mock templates for now (table not in schema)
-  const templates: LibraryTemplate[] = [];
-  const isLoading = false;
-  const error = null;
+  // Fetch real templates from database
+  const { data: rawTemplates = [], isLoading, error } = useWorkspaceTemplates({ publicOnly: true });
+  
+  // Transform database templates to LibraryTemplate format
+  const templates: LibraryTemplate[] = useMemo(() => 
+    rawTemplates.map(t => ({
+      id: t.id,
+      name: t.name,
+      description: t.description || '',
+      category: t.event_type || 'GENERAL',
+      complexity: t.complexity || 'MODERATE',
+      event_size_min: t.event_size_min || 0,
+      event_size_max: t.event_size_max || 1000,
+      usage_count: t.usage_count || 0,
+      average_rating: t.effectiveness || 4.0,
+      structure: t.structure as LibraryTemplate['structure'],
+      created_at: t.created_at || new Date().toISOString(),
+    })), 
+  [rawTemplates]);
 
   const filteredTemplates = useMemo(() => {
     let filtered = [...templates];
