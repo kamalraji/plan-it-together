@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { AUTH_ROUTES } from '@/lib/routes';
 export const ProfileSettingsPage: React.FC = () => {
   const {
     user
@@ -72,12 +74,12 @@ export const ProfileSettingsPage: React.FC = () => {
                   still participating in events.
                 </p>
               </div>
-              <a
-                href="/dashboard/onboarding/become-organizer"
+              <Link
+                to={AUTH_ROUTES.BECOME_ORGANIZER}
                 className="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Become an organizer
-              </a>
+              </Link>
             </section>
           )}
 
