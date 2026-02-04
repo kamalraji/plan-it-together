@@ -23,9 +23,7 @@ export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   ORGANIZER = 'ORGANIZER',
   PARTICIPANT = 'PARTICIPANT',
-  JUDGE = 'JUDGE',
-  VOLUNTEER = 'VOLUNTEER',
-  SPEAKER = 'SPEAKER',
+  VENDOR = 'VENDOR',
 }
 
 export enum UserStatus {
@@ -47,11 +45,16 @@ export interface ApiError {
 }
 
 // Event Management Types
-export interface Event {
+// NOTE: Comprehensive event types are now in src/types/event.types.ts
+// The types below are kept for backward compatibility with existing code
+
+/** @deprecated Use Event from event.types.ts */
+export interface LegacyEvent {
   id: string;
   name: string;
   description: string;
   mode: EventMode;
+  category?: EventCategory;
   startDate: string;
   endDate: string;
   capacity?: number;
@@ -72,10 +75,7 @@ export interface Event {
   organization?: Organization;
   createdAt: string;
   updatedAt: string;
-
-  /** Serialized tldraw snapshot for custom hero layouts */
   canvasState?: any;
-  /** GrapesJS landing page output: html, css, and meta */
   landingPageData?: {
     html: string;
     css: string;
@@ -86,6 +86,8 @@ export interface Event {
   } | null;
 }
 
+// Re-export comprehensive event types
+export * from './event.types';
 
 
 export enum EventMode {
@@ -106,6 +108,56 @@ export enum EventVisibility {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
   UNLISTED = 'UNLISTED'
+}
+
+export enum EventCategory {
+  // Original categories
+  HACKATHON = 'HACKATHON',
+  BOOTCAMP = 'BOOTCAMP',
+  WORKSHOP = 'WORKSHOP',
+  CONFERENCE = 'CONFERENCE',
+  MEETUP = 'MEETUP',
+  STARTUP_PITCH = 'STARTUP_PITCH',
+  HIRING_CHALLENGE = 'HIRING_CHALLENGE',
+  WEBINAR = 'WEBINAR',
+  COMPETITION = 'COMPETITION',
+  OTHER = 'OTHER',
+  // College/University
+  SEMINAR = 'SEMINAR',
+  SYMPOSIUM = 'SYMPOSIUM',
+  CULTURAL_FEST = 'CULTURAL_FEST',
+  SPORTS_EVENT = 'SPORTS_EVENT',
+  ORIENTATION = 'ORIENTATION',
+  ALUMNI_MEET = 'ALUMNI_MEET',
+  CAREER_FAIR = 'CAREER_FAIR',
+  LECTURE = 'LECTURE',
+  QUIZ = 'QUIZ',
+  DEBATE = 'DEBATE',
+  // Company
+  PRODUCT_LAUNCH = 'PRODUCT_LAUNCH',
+  TOWN_HALL = 'TOWN_HALL',
+  TEAM_BUILDING = 'TEAM_BUILDING',
+  TRAINING = 'TRAINING',
+  AWARDS_CEREMONY = 'AWARDS_CEREMONY',
+  OFFSITE = 'OFFSITE',
+  NETWORKING = 'NETWORKING',
+  // Industry
+  TRADE_SHOW = 'TRADE_SHOW',
+  EXPO = 'EXPO',
+  SUMMIT = 'SUMMIT',
+  PANEL_DISCUSSION = 'PANEL_DISCUSSION',
+  DEMO_DAY = 'DEMO_DAY',
+  // Non-Profit
+  FUNDRAISER = 'FUNDRAISER',
+  GALA = 'GALA',
+  CHARITY_EVENT = 'CHARITY_EVENT',
+  VOLUNTEER_DRIVE = 'VOLUNTEER_DRIVE',
+  AWARENESS_CAMPAIGN = 'AWARENESS_CAMPAIGN',
+  // General
+  CONCERT = 'CONCERT',
+  EXHIBITION = 'EXHIBITION',
+  FESTIVAL = 'FESTIVAL',
+  SOCIAL_GATHERING = 'SOCIAL_GATHERING',
 }
 
 export interface BrandingConfig {
@@ -205,6 +257,7 @@ export interface CreateEventDTO {
   registrationDeadline?: string;
   organizationId?: string;
   visibility: EventVisibility;
+  category?: EventCategory;
   templateId?: string;
   branding: BrandingConfig;
   venue?: VenueConfig;
@@ -620,21 +673,80 @@ export interface WorkspaceSettings {
   allowExternalMembers: boolean;
 }
 
+/**
+ * Workspace hierarchy types for the 4-level structure
+ */
+export enum WorkspaceType {
+  ROOT = 'ROOT',           // Level 1 - Main workspace
+  DEPARTMENT = 'DEPARTMENT', // Level 2 - Department sub-workspace
+  COMMITTEE = 'COMMITTEE',  // Level 3 - Committee under department
+  TEAM = 'TEAM',           // Level 4 - Team under committee
+}
+
 export enum WorkspaceStatus {
   PROVISIONING = 'PROVISIONING',
   ACTIVE = 'ACTIVE',
   WINDING_DOWN = 'WINDING_DOWN',
-  DISSOLVED = 'DISSOLVED'
+  DISSOLVED = 'DISSOLVED',
+  ARCHIVED = 'ARCHIVED'
 }
 
+/**
+ * 4-Level Workspace Hierarchy Roles
+ * 
+ * Level 1: WORKSPACE_OWNER - Full control & oversight
+ * Level 2: *_MANAGER roles - Department-specific managers (Operations, Growth, Content, Tech/Finance, Volunteers)
+ * Level 3: TEAM_LEAD, *_LEAD roles - Committee execution, manages coordinators
+ * Level 4: *_COORDINATOR roles - Task execution
+ */
 export enum WorkspaceRole {
+  // Level 1 - Workspace Owner
   WORKSPACE_OWNER = 'WORKSPACE_OWNER',
-  TEAM_LEAD = 'TEAM_LEAD',
-  EVENT_COORDINATOR = 'EVENT_COORDINATOR',
-  VOLUNTEER_MANAGER = 'VOLUNTEER_MANAGER',
-  TECHNICAL_SPECIALIST = 'TECHNICAL_SPECIALIST',
+  
+  // Level 2 - Department Managers (one per department)
+  OPERATIONS_MANAGER = 'OPERATIONS_MANAGER',
+  GROWTH_MANAGER = 'GROWTH_MANAGER',
+  CONTENT_MANAGER = 'CONTENT_MANAGER',
+  TECH_FINANCE_MANAGER = 'TECH_FINANCE_MANAGER',
+  VOLUNTEERS_MANAGER = 'VOLUNTEERS_MANAGER',
+  
+  // Level 3 - Team Leads (Committee Leads)
+  EVENT_LEAD = 'EVENT_LEAD',
+  CATERING_LEAD = 'CATERING_LEAD',
+  LOGISTICS_LEAD = 'LOGISTICS_LEAD',
+  FACILITY_LEAD = 'FACILITY_LEAD',
   MARKETING_LEAD = 'MARKETING_LEAD',
-  GENERAL_VOLUNTEER = 'GENERAL_VOLUNTEER',
+  COMMUNICATION_LEAD = 'COMMUNICATION_LEAD',
+  SPONSORSHIP_LEAD = 'SPONSORSHIP_LEAD',
+  SOCIAL_MEDIA_LEAD = 'SOCIAL_MEDIA_LEAD',
+  CONTENT_LEAD = 'CONTENT_LEAD',
+  SPEAKER_LIAISON_LEAD = 'SPEAKER_LIAISON_LEAD',
+  JUDGE_LEAD = 'JUDGE_LEAD',
+  MEDIA_LEAD = 'MEDIA_LEAD',
+  FINANCE_LEAD = 'FINANCE_LEAD',
+  REGISTRATION_LEAD = 'REGISTRATION_LEAD',
+  TECHNICAL_LEAD = 'TECHNICAL_LEAD',
+  IT_LEAD = 'IT_LEAD',
+  VOLUNTEERS_LEAD = 'VOLUNTEERS_LEAD',
+  
+  // Level 4 - Coordinators
+  EVENT_COORDINATOR = 'EVENT_COORDINATOR',
+  CATERING_COORDINATOR = 'CATERING_COORDINATOR',
+  LOGISTICS_COORDINATOR = 'LOGISTICS_COORDINATOR',
+  FACILITY_COORDINATOR = 'FACILITY_COORDINATOR',
+  MARKETING_COORDINATOR = 'MARKETING_COORDINATOR',
+  COMMUNICATION_COORDINATOR = 'COMMUNICATION_COORDINATOR',
+  SPONSORSHIP_COORDINATOR = 'SPONSORSHIP_COORDINATOR',
+  SOCIAL_MEDIA_COORDINATOR = 'SOCIAL_MEDIA_COORDINATOR',
+  CONTENT_COORDINATOR = 'CONTENT_COORDINATOR',
+  SPEAKER_LIAISON_COORDINATOR = 'SPEAKER_LIAISON_COORDINATOR',
+  JUDGE_COORDINATOR = 'JUDGE_COORDINATOR',
+  MEDIA_COORDINATOR = 'MEDIA_COORDINATOR',
+  FINANCE_COORDINATOR = 'FINANCE_COORDINATOR',
+  REGISTRATION_COORDINATOR = 'REGISTRATION_COORDINATOR',
+  TECHNICAL_COORDINATOR = 'TECHNICAL_COORDINATOR',
+  IT_COORDINATOR = 'IT_COORDINATOR',
+  VOLUNTEER_COORDINATOR = 'VOLUNTEER_COORDINATOR',
 }
 
 export type WorkspaceRoleScope = WorkspaceRole | 'ALL';
@@ -656,12 +768,25 @@ export enum TaskPriority {
 }
 
 export enum TaskCategory {
+  // Core categories
+  GENERAL = 'GENERAL',
   SETUP = 'SETUP',
   MARKETING = 'MARKETING',
   LOGISTICS = 'LOGISTICS',
   TECHNICAL = 'TECHNICAL',
   REGISTRATION = 'REGISTRATION',
-  POST_EVENT = 'POST_EVENT'
+  POST_EVENT = 'POST_EVENT',
+  // Extended categories
+  COMMUNICATION = 'COMMUNICATION',
+  FINANCE = 'FINANCE',
+  VOLUNTEER = 'VOLUNTEER',
+  SPONSOR = 'SPONSOR',
+  CONTENT = 'CONTENT',
+  DESIGN = 'DESIGN',
+  OPERATIONS = 'OPERATIONS',
+  SAFETY = 'SAFETY',
+  CATERING = 'CATERING',
+  VENUE = 'VENUE',
 }
 
 export interface Workspace {
@@ -672,6 +797,10 @@ export interface Workspace {
   status: WorkspaceStatus;
   settings?: WorkspaceSettings;
   templateId?: string;
+  /** Workspace hierarchy type: ROOT, DEPARTMENT, COMMITTEE, or TEAM */
+  workspaceType?: WorkspaceType;
+  /** Department identifier for committees and teams (e.g., 'operations', 'growth') */
+  departmentId?: string;
   event?: {
     id: string;
     name: string;
@@ -711,6 +840,18 @@ export interface TeamMember {
   };
 }
 
+// Subtask interface for child tasks
+export interface Subtask {
+  id: string;
+  parentTaskId: string;
+  title: string;
+  status: 'TODO' | 'COMPLETED';
+  assignedTo?: string;
+  sortOrder?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WorkspaceTask {
   id: string;
   workspaceId: string;
@@ -725,6 +866,7 @@ export interface WorkspaceTask {
   tags: string[];
   metadata?: Record<string, any>;
   roleScope?: WorkspaceRoleScope;
+  // Single assignee (backward compatible)
   assignee?: {
     id: string;
     userId: string;
@@ -735,6 +877,19 @@ export interface WorkspaceTask {
       email: string;
     };
   } | null;
+  // Multi-assignee support
+  assignees?: Array<{
+    id: string;
+    userId: string;
+    role: WorkspaceRole;
+    user: { id: string; name: string; email?: string };
+  }>;
+  // Subtasks for progress tracking
+  subtasks?: Subtask[];
+  // Extended fields
+  estimatedHours?: number;
+  location?: string;
+  attachments?: string[];
   creator: {
     id: string;
     userId: string;
@@ -834,3 +989,85 @@ export interface QuickAction {
   action: () => void;
   variant?: 'primary' | 'secondary';
 }
+
+// =============================================================================
+// SUPABASE TYPE HELPERS
+// =============================================================================
+
+// Re-export type-safe Supabase helpers with prefixes to avoid conflicts
+export {
+  // Workspace types (prefixed to avoid conflicts with existing Workspace interface)
+  type Workspace as DbWorkspace,
+  type WorkspaceWithParent as DbWorkspaceWithParent,
+  type WorkspaceWithEvent as DbWorkspaceWithEvent,
+  type WorkspaceWithHierarchy as DbWorkspaceWithHierarchy,
+  type WorkspaceListItem as DbWorkspaceListItem,
+  // Team member types
+  type WorkspaceTeamMember as DbTeamMember,
+  type TeamMemberWithProfile as DbTeamMemberWithProfile,
+  type TeamMemberWithWorkspace as DbTeamMemberWithWorkspace,
+  // Task types (prefixed to avoid conflicts with existing WorkspaceTask interface)
+  type WorkspaceTask as DbWorkspaceTask,
+  type TaskWithAssignee as DbTaskWithAssignee,
+  type TaskWithRelations as DbTaskWithRelations,
+  type TaskListItem as DbTaskListItem,
+  // Organization types
+  type Organization as DbOrganization,
+  type OrganizationMembership as DbOrganizationMembership,
+  type MembershipWithOrganization as DbMembershipWithOrganization,
+  // Registration types
+  type RegistrationWithDetails as DbRegistrationWithDetails,
+  // Budget types
+  type WorkspaceBudget as DbWorkspaceBudget,
+  type WorkspaceExpense as DbWorkspaceExpense,
+  type BudgetRequest as DbBudgetRequest,
+  type BudgetRequestWithWorkspace as DbBudgetRequestWithWorkspace,
+  // Resource types
+  type WorkspaceResource as DbWorkspaceResource,
+  type ResourceRequest as DbResourceRequest,
+  type ResourceRequestWithDetails as DbResourceRequestWithDetails,
+  // Checklist types (prefixed to avoid conflicts)
+  type Checklist as DbChecklist,
+  type ChecklistItem as DbChecklistItem,
+  type ChecklistWithItems as DbChecklistWithItems,
+  // User types
+  type UserDisplay as DbUserDisplay,
+  // Utility types
+  type TableRow,
+  type TableInsert,
+  type TableUpdate,
+  type PartialBy,
+  type RequiredBy,
+  type Nullable,
+  type DeepPartial,
+  // Type guards
+  isObject,
+  hasProperty,
+  assertDefined,
+  isNonEmptyArray,
+  castQueryResult,
+  castQueryArray,
+} from './supabase-helpers';
+
+// Re-export query utilities
+export { 
+  safeQuery, 
+  safeQueryNullable, 
+  safeMutation,
+  requireAuth,
+  getCurrentUserId,
+  parseJsonColumn,
+  parseEventBranding,
+  extractRelation,
+  extractArrayRelation,
+} from '@/lib/query-utils';
+
+// Re-export error handling
+export { 
+  AppError, 
+  ErrorCode, 
+  isAppError, 
+  handleError, 
+  getUserMessage,
+  fromSupabaseError,
+} from '@/lib/errors';

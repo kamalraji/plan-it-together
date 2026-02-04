@@ -1,7 +1,8 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole, UserStatus } from '../../types';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 interface ConsoleRouteProps {
   children: React.ReactNode;
@@ -26,17 +27,21 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
   requireEmailVerification = true, // Console requires email verification by default
   requireActiveStatus = true, // Console requires active user status by default
 }) => {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isRolesLoading, isAuthenticated } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
-  // Show console-style loading indicator while checking authentication
-  if (isLoading) {
+  // Show console-style loading indicator while checking authentication or loading roles
+  if (isLoading || (isAuthenticated && isRolesLoading && requiredRoles.length > 0)) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted/50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-lg font-medium text-gray-900 mb-2">Loading Console</h2>
-          <p className="text-sm text-gray-600">Verifying your access...</p>
+          <h2 className="text-lg font-medium text-foreground mb-2">Loading Console</h2>
+          <p className="text-sm text-muted-foreground">Verifying your access...</p>
         </div>
       </div>
     );
@@ -65,7 +70,7 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
     const statusConfig = statusMessages[user.status as keyof typeof statusMessages];
 
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-muted/50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 text-yellow-600 mb-4">
@@ -73,22 +78,22 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               {statusConfig?.title || 'Account Status Issue'}
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               {statusConfig?.message || 'There is an issue with your account status.'}
             </p>
             <div className="space-y-3">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 {statusConfig?.action || 'Refresh Page'}
               </button>
               <button
-                onClick={() => window.location.href = '/profile'}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => navigate('/profile')}
+                className="w-full flex justify-center py-2 px-4 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 Go to Profile Settings
               </button>
@@ -102,7 +107,7 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
   // Check email verification requirement for console access
   if (requireEmailVerification && !user?.emailVerified) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-muted/50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 text-red-600 mb-4">
@@ -110,22 +115,22 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Email Verification Required
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               Console access requires email verification. Please check your email and click the verification link to continue.
             </p>
             <div className="space-y-3">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 I've verified my email
               </button>
               <button
-                onClick={() => window.location.href = '/profile'}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => navigate('/profile')}
+                className="w-full flex justify-center py-2 px-4 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 Go to Profile Settings
               </button>
@@ -139,7 +144,7 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
   // Check role-based access for specific console services
   if (requiredRoles.length > 0 && user && !requiredRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-muted/50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 text-red-600 mb-4">
@@ -147,28 +152,28 @@ export const ConsoleRoute: React.FC<ConsoleRouteProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Access Denied
             </h2>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-muted-foreground mb-2">
               You don't have permission to access this service.
             </p>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-muted-foreground mb-2">
               Required roles: {requiredRoles.join(', ')}
             </p>
-            <p className="text-xs text-gray-500 mb-6">
+            <p className="text-xs text-muted-foreground mb-6">
               Your current role: {user.role}
             </p>
             <div className="space-y-3">
               <button
-                onClick={() => window.history.back()}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => navigate(-1)}
+                className="w-full flex justify-center py-2 px-4 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 Go Back
               </button>
               <button
-                onClick={() => window.location.href = '/dashboard'}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => navigate(dashboardPath)}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 Return to Dashboard
               </button>

@@ -14,18 +14,16 @@ export default defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, './src'),
       '@/components': path.resolve(__dirname, './src/components'),
       '@/components/ui': path.resolve(__dirname, './src/components/ui'),
-      '@/components/doodles': path.resolve(__dirname, './src/components/doodles'),
-      '@/components/doodles/original': path.resolve(__dirname, './src/components/doodles/original'),
-      '@/components/doodles/ligne-claire': path.resolve(__dirname, './src/components/doodles/ligne-claire'),
-      '@/components/doodles/hand-drawn': path.resolve(__dirname, './src/components/doodles/hand-drawn'),
+      '@/components/illustrations': path.resolve(__dirname, './src/components/illustrations'),
       '@/components/enhanced': path.resolve(__dirname, './src/components/enhanced'),
       '@/lib': path.resolve(__dirname, './src/lib'),
-      '@/lib/design-system': path.resolve(__dirname, './src/lib/design-system'),
       '@/styles': path.resolve(__dirname, './src/styles'),
       '@/types': path.resolve(__dirname, './src/types'),
       '@/hooks': path.resolve(__dirname, './src/hooks'),
       '@/utils': path.resolve(__dirname, './src/utils'),
     },
+    // Dedupe React to prevent multiple instances
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     host: '::',
@@ -48,15 +46,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Separate chunks for better caching and performance
-          'doodle-original': ['./src/components/doodles/original'],
-          'doodle-ligne-claire': ['./src/components/doodles/ligne-claire'],
-          'doodle-hand-drawn': ['./src/components/doodles/hand-drawn'],
-          'design-system': ['./src/lib/design-system'],
-          'ui-components': ['./src/components/ui'],
-          'enhanced-components': ['./src/components/enhanced'],
-          // Vendor chunks for better caching
-          'react-vendor': ['react', 'react-dom'],
+          // Vendor chunks for better caching (npm packages only)
           'ui-vendor': ['@radix-ui/react-slot', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
         },
       },
@@ -84,6 +74,8 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-slot',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
+      '@zxing/library',
+      '@zxing/browser',
     ],
     // Exclude large dependencies that should be loaded on demand
     exclude: ['@supabase/supabase-js'],
@@ -91,11 +83,6 @@ export default defineConfig(({ mode }) => ({
   // CSS preprocessing
   css: {
     devSourcemap: mode === 'development',
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@import "@/styles/tokens.css";`,
-      },
-    },
   },
   // Enhanced error handling for design system development
   define: {

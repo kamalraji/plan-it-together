@@ -1,4 +1,5 @@
 export { WorkspaceDashboard } from './WorkspaceDashboard';
+export { WorkspaceDashboardSkeleton } from './WorkspaceDashboardSkeleton';
 export { ResponsiveWorkspaceDashboard } from './ResponsiveWorkspaceDashboard';
 export { WorkspaceHeader } from './WorkspaceHeader';
 export { WorkspaceNavigation } from './WorkspaceNavigation';
@@ -18,6 +19,13 @@ export { TaskManagementInterface } from './TaskManagementInterface';
 export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
 export { TaskDetailView } from './TaskDetailView';
+export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
+export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';
+export { WorkspaceBreadcrumbs } from './WorkspaceBreadcrumbs';
+export { WorkspaceHierarchyStats } from './WorkspaceHierarchyStats';
+export { WorkspacePermissionGuard, PermissionBadge } from './WorkspacePermissionGuard';
+export { WorkspaceRBACInfo } from './WorkspaceRBACInfo';
+export { WorkspaceRolePermissionsTable } from './WorkspaceRolePermissionsTable';
 
 // Mobile Components
 export * from './mobile';

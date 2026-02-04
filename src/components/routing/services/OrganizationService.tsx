@@ -28,6 +28,9 @@ export const OrganizationService: React.FC = () => {
       {/* Organization List Page */}
       <Route path="list" element={<OrganizationListPage />} />
       
+      {/* Current org members (uses org context from OrgScopedLayout) */}
+      <Route path="members" element={<OrganizationMembersPage />} />
+      
       {/* Organization Detail and Management */}
       <Route path=":organizationId" element={<OrganizationDetailPage />} />
       <Route path=":organizationId/members" element={<OrganizationMembersPage />} />

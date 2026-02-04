@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { GlobalSearch } from './GlobalSearch';
 import { NotificationCenter } from './NotificationCenter';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 interface ConsoleHeaderProps {
   user: any;
@@ -96,66 +97,49 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
 
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
-  const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+  const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard' && orgSlugCandidate !== 'organizer';
   const PRIMARY_ADMIN_ORG_SLUG = 'thittam1hub';
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isOrganizerOrAdmin = user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN';
+  const isOrganizerRootDashboard = currentPath.startsWith('/organizer/dashboard');
+
+  // Get the org slug to use - either from current context or fallback to primary admin org for organizers
+  const effectiveOrgSlug = isOrgContext ? orgSlugCandidate : (isOrganizerOrAdmin ? PRIMARY_ADMIN_ORG_SLUG : null);
 
   const getServicePath = (serviceId: string): string => {
-    // If we are already in an org context, keep using that org
-    if (isOrgContext && orgSlugCandidate) {
+    // For organizers/admins, always use org-scoped routes
+    if (effectiveOrgSlug && isOrganizerOrAdmin) {
       switch (serviceId) {
         case 'dashboard':
-          return `/${orgSlugCandidate}/dashboard`;
+          return `/${effectiveOrgSlug}/dashboard`;
         case 'events':
-          return `/${orgSlugCandidate}/eventmanagement`;
+          return `/${effectiveOrgSlug}/eventmanagement`;
         case 'workspaces':
-          return `/${orgSlugCandidate}/workspaces`;
+          return `/${effectiveOrgSlug}/workspaces`;
         case 'marketplace':
-          return `/${orgSlugCandidate}/marketplace`;
+          return `/${effectiveOrgSlug}/marketplace`;
         case 'organizations':
-          return `/${orgSlugCandidate}/organizations`;
+          return `/${effectiveOrgSlug}/organizations`;
         case 'analytics':
-          return `/${orgSlugCandidate}/analytics`;
+          return `/${effectiveOrgSlug}/analytics`;
         default:
-          return `/${orgSlugCandidate}/dashboard`;
+          return `/${effectiveOrgSlug}/dashboard`;
       }
     }
 
-    // For SUPER_ADMINs outside an org context, default to the primary admin org
-    if (isSuperAdmin) {
-      const base = `/${PRIMARY_ADMIN_ORG_SLUG}`;
-      switch (serviceId) {
-        case 'dashboard':
-          return `${base}/dashboard`;
-        case 'events':
-          return `${base}/eventmanagement`;
-        case 'workspaces':
-          return `${base}/workspaces`;
-        case 'marketplace':
-          return `${base}/marketplace`;
-        case 'organizations':
-          return `${base}/organizations`;
-        case 'analytics':
-          return `${base}/analytics`;
-        default:
-          return `${base}/dashboard`;
-      }
-    }
-
-    // Generic dashboard console for non-admin contexts
+    // For participants (non-organizer/admin), use dashboard routes
     switch (serviceId) {
       case 'dashboard':
         return '/dashboard';
       case 'events':
-        return '/dashboard/eventmanagement';
+        return '/events';
       case 'workspaces':
-        return '/dashboard/workspaces';
+        return '/dashboard'; // Participants don't have workspaces access
       case 'marketplace':
         return '/marketplace';
       case 'organizations':
-        return '/dashboard/organizations';
+        return '/dashboard/organizations/join';
       case 'analytics':
-        return '/dashboard/analytics';
+        return '/dashboard'; // Participants don't have analytics access
       default:
         return '/dashboard';
     }
@@ -202,13 +186,13 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
        <div className="flex items-center justify-between h-full px-3 sm:px-4 lg:px-6">
          {/* Left Section */}
          <div className="flex items-center gap-3 sm:gap-4">
-           {/* Mobile Menu Button */}
-           <button
-             onClick={onToggleMobileMenu}
-             className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
-           >
-             <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
-           </button>
+            {/* Sidebar Toggle Button */}
+            <button
+              onClick={onToggleMobileMenu}
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+            >
+              <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
  
            {/* Logo */}
            <Link to={getServicePath('dashboard')} className="flex items-center gap-2">
@@ -220,8 +204,8 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
               </span>
             </Link>
 
-          {/* Service Switcher - visible only for organizer/admin roles */}
-           {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (
+          {/* Service Switcher - visible only for organizer/admin roles, but hidden on organizer root dashboard */}
+           {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && !isOrganizerRootDashboard && (
              <div className="relative" ref={serviceSwitcherRef}>
                <button
                  onClick={() => setIsServiceSwitcherOpen(!isServiceSwitcherOpen)}
@@ -276,9 +260,12 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
          </div>
 
          {/* Right Section */}
-         <div className="flex items-center gap-3 sm:gap-4">
-           {/* Notification Center */}
-           <NotificationCenter />
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Notification Center */}
+            <NotificationCenter />
  
            {/* User Menu */}
            <div className="relative" ref={userMenuRef}>

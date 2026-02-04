@@ -210,7 +210,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title="Notifications"
         subtitle={`${stats.total} total notifications, ${stats.unread} unread`}
@@ -225,21 +225,21 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Filters */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 space-y-6">
+            <div className="bg-card rounded-lg shadow p-6 space-y-6">
               {/* Search */}
               <div>
-                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="search" className="block text-sm font-medium text-foreground mb-2">
                   Search Notifications
                 </label>
                 <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     type="text"
                     id="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search notifications..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full pl-10 pr-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                   />
                 </div>
               </div>
@@ -251,15 +251,15 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                     type="checkbox"
                     checked={showUnreadOnly}
                     onChange={(e) => setShowUnreadOnly(e.target.checked)}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Show unread only</span>
+                  <span className="ml-2 text-sm text-foreground">Show unread only</span>
                 </label>
               </div>
 
               {/* Category Filter */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Categories</h3>
+                <h3 className="text-sm font-medium text-foreground mb-3">Categories</h3>
                 <div className="space-y-2">
                   {categories.map((category) => {
                     const IconComponent = category.icon;
@@ -270,14 +270,14 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                         className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                           selectedCategory === category.id
                             ? 'bg-indigo-100 text-indigo-700'
-                            : 'text-gray-600 hover:bg-gray-100'
+                            : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
                         <div className="flex items-center space-x-2">
                           <IconComponent className="h-4 w-4" />
                           <span>{category.label}</span>
                         </div>
-                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
                           {category.count}
                         </span>
                       </button>
@@ -288,7 +288,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
 
               {/* Type Filter */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Types</h3>
+                <h3 className="text-sm font-medium text-foreground mb-3">Types</h3>
                 <div className="space-y-2">
                   {types.map((type) => (
                     <button
@@ -297,11 +297,11 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                       className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                         selectedType === type.id
                           ? 'bg-indigo-100 text-indigo-700'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-muted-foreground hover:bg-muted'
                       }`}
                     >
                       <span>{type.label}</span>
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
                         {type.count}
                       </span>
                     </button>
@@ -313,18 +313,18 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
 
           {/* Main Content - Notifications List */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-card rounded-lg shadow">
               {/* Results Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
+              <div className="px-6 py-4 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <FunnelIcon className="h-5 w-5 text-gray-400" />
-                    <span className="text-sm text-gray-600">
+                    <FunnelIcon className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
                       {filteredNotifications.length} of {stats.total} notifications
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       {stats.unread} unread
                     </span>
                   </div>
@@ -332,12 +332,12 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
               </div>
 
               {/* Notifications List */}
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-border">
                 {filteredNotifications.length === 0 ? (
                   <div className="p-12 text-center">
-                    <BellIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications found</h3>
-                    <p className="text-gray-500">
+                    <BellIcon className="h-12 w-12 text-muted-foreground/70 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">No notifications found</h3>
+                    <p className="text-muted-foreground">
                       {searchQuery || selectedCategory !== 'all' || selectedType !== 'all' || showUnreadOnly
                         ? 'Try adjusting your filters or search terms.'
                         : 'You\'re all caught up! New notifications will appear here.'}
@@ -400,7 +400,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
       case 'marketplace':
         return <ShoppingBagIcon className="h-5 w-5 text-orange-500" />;
       case 'system':
-        return <Cog6ToothIcon className="h-5 w-5 text-gray-500" />;
+        return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:
         return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
     }
@@ -421,7 +421,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
   };
 
   const NotificationContent = () => (
-    <div className={`p-6 hover:bg-gray-50 transition-colors ${!notification.read ? 'bg-blue-50' : ''}`}>
+    <div className={`p-6 hover:bg-muted/50 transition-colors ${!notification.read ? 'bg-blue-50' : ''}`}>
       <div className="flex items-start space-x-4">
         {/* Type Icon */}
         <div className="flex-shrink-0 mt-1">
@@ -432,19 +432,19 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className={`text-base font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+              <h3 className={`text-base font-medium ${!notification.read ? 'text-foreground' : 'text-foreground'}`}>
                 {notification.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {notification.message}
               </p>
               
               {/* Metadata */}
               <div className="flex items-center space-x-4 mt-3">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground capitalize">
                   {notification.category}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {formatTimestamp(notification.timestamp)}
                 </span>
               </div>
@@ -467,7 +467,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
               {!notification.read && (
                 <button
                   onClick={handleMarkAsRead}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-muted-foreground rounded-md hover:bg-muted transition-colors"
                   title="Mark as read"
                 >
                   <CheckIcon className="h-4 w-4" />
@@ -475,7 +475,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
               )}
               <button
                 onClick={handleDelete}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+                className="p-2 text-muted-foreground hover:text-muted-foreground rounded-md hover:bg-muted transition-colors"
                 title="Delete notification"
               >
                 <XMarkIcon className="h-4 w-4" />

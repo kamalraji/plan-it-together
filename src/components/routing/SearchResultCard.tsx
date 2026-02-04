@@ -44,21 +44,21 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       workspace: 'text-green-600 bg-green-50 border-green-200',
       organization: 'text-purple-600 bg-purple-50 border-purple-200',
       marketplace: 'text-orange-600 bg-orange-50 border-orange-200',
-      user: 'text-gray-600 bg-gray-50 border-gray-200',
+      user: 'text-muted-foreground bg-muted/50 border-border',
       service: 'text-orange-600 bg-orange-50 border-orange-200',
     };
-    return colors[type as keyof typeof colors] || 'text-gray-600 bg-gray-50 border-gray-200';
+    return colors[type as keyof typeof colors] || 'text-muted-foreground bg-muted/50 border-border';
   };
 
   const getStatusColor = (status: string) => {
     const colors = {
       active: 'text-green-700 bg-green-100',
       upcoming: 'text-blue-700 bg-blue-100',
-      completed: 'text-gray-700 bg-gray-100',
+      completed: 'text-foreground bg-muted',
       draft: 'text-yellow-700 bg-yellow-100',
       cancelled: 'text-red-700 bg-red-100',
     };
-    return colors[status as keyof typeof colors] || 'text-gray-700 bg-gray-100';
+    return colors[status as keyof typeof colors] || 'text-foreground bg-muted';
   };
 
   const formatMetadata = () => {
@@ -71,7 +71,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       case 'event':
         if (metadata.attendees) {
           items.push(
-            <div key="attendees" className="flex items-center space-x-1 text-gray-500">
+            <div key="attendees" className="flex items-center space-x-1 text-muted-foreground">
               <UserGroupIcon className="h-3 w-3" />
               <span>{metadata.attendees} attendees</span>
             </div>
@@ -79,7 +79,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.location) {
           items.push(
-            <div key="location" className="flex items-center space-x-1 text-gray-500">
+            <div key="location" className="flex items-center space-x-1 text-muted-foreground">
               <MapPinIcon className="h-3 w-3" />
               <span>{metadata.location}</span>
             </div>
@@ -87,7 +87,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.date) {
           items.push(
-            <div key="date" className="flex items-center space-x-1 text-gray-500">
+            <div key="date" className="flex items-center space-x-1 text-muted-foreground">
               <CalendarIcon className="h-3 w-3" />
               <span>{new Date(metadata.date).toLocaleDateString()}</span>
             </div>
@@ -98,7 +98,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       case 'workspace':
         if (metadata.members) {
           items.push(
-            <div key="members" className="flex items-center space-x-1 text-gray-500">
+            <div key="members" className="flex items-center space-x-1 text-muted-foreground">
               <UserGroupIcon className="h-3 w-3" />
               <span>{metadata.members} members</span>
             </div>
@@ -106,7 +106,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.tasks) {
           items.push(
-            <div key="tasks" className="flex items-center space-x-1 text-gray-500">
+            <div key="tasks" className="flex items-center space-x-1 text-muted-foreground">
               <span>{metadata.tasks} tasks</span>
             </div>
           );
@@ -116,7 +116,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       case 'organization':
         if (metadata.events) {
           items.push(
-            <div key="events" className="flex items-center space-x-1 text-gray-500">
+            <div key="events" className="flex items-center space-x-1 text-muted-foreground">
               <CalendarIcon className="h-3 w-3" />
               <span>{metadata.events} events</span>
             </div>
@@ -124,7 +124,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.members) {
           items.push(
-            <div key="members" className="flex items-center space-x-1 text-gray-500">
+            <div key="members" className="flex items-center space-x-1 text-muted-foreground">
               <UserGroupIcon className="h-3 w-3" />
               <span>{metadata.members} members</span>
             </div>
@@ -151,14 +151,14 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.bookings) {
           items.push(
-            <div key="bookings" className="flex items-center space-x-1 text-gray-500">
+            <div key="bookings" className="flex items-center space-x-1 text-muted-foreground">
               <span>{metadata.bookings} bookings</span>
             </div>
           );
         }
         if (metadata.price) {
           items.push(
-            <div key="price" className="text-gray-500">
+            <div key="price" className="text-muted-foreground">
               <span>{metadata.price}</span>
             </div>
           );
@@ -168,14 +168,14 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       case 'user':
         if (metadata.role) {
           items.push(
-            <div key="role" className="text-gray-500 capitalize">
+            <div key="role" className="text-muted-foreground capitalize">
               <span>{metadata.role}</span>
             </div>
           );
         }
         if (metadata.events) {
           items.push(
-            <div key="events" className="flex items-center space-x-1 text-gray-500">
+            <div key="events" className="flex items-center space-x-1 text-muted-foreground">
               <CalendarIcon className="h-3 w-3" />
               <span>{metadata.events} events</span>
             </div>

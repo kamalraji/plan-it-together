@@ -102,7 +102,7 @@ export const ServiceSwitcher: React.FC<ServiceSwitcherProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-foreground bg-muted/50 rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus-visible:ring-ring transition-colors"
         aria-label="Service switcher"
         aria-expanded={isOpen}
       >
@@ -114,17 +114,17 @@ export const ServiceSwitcher: React.FC<ServiceSwitcherProps> = ({
 
       {/* Service Switcher Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-96 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[600px] overflow-y-auto">
+        <div className="absolute top-full left-0 mt-1 w-96 bg-card rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[600px] overflow-y-auto">
           <div className="p-4">
             {/* Search Input */}
             <div className="relative mb-4">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search services..."
-                className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full pl-9 pr-4 py-2 border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                 autoFocus
               />
             </div>
@@ -132,7 +132,7 @@ export const ServiceSwitcher: React.FC<ServiceSwitcherProps> = ({
             {/* Favorites Section */}
             {!searchQuery && favoriteServicesList.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Favorites
                 </h3>
                 <div className="space-y-1">
@@ -153,7 +153,7 @@ export const ServiceSwitcher: React.FC<ServiceSwitcherProps> = ({
             {/* Recent Services Section */}
             {!searchQuery && recentServicesList.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Recent
                 </h3>
                 <div className="space-y-1">
@@ -173,18 +173,18 @@ export const ServiceSwitcher: React.FC<ServiceSwitcherProps> = ({
 
             {/* All Services by Category */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                 {searchQuery ? 'Search Results' : 'All Services'}
               </h3>
               {Object.keys(servicesByCategory).length === 0 ? (
-                <div className="text-sm text-gray-500 py-4 text-center">
+                <div className="text-sm text-muted-foreground py-4 text-center">
                   No services found matching "{searchQuery}"
                 </div>
               ) : (
                 Object.entries(servicesByCategory).map(([category, categoryServices]) => (
                   <div key={category} className="mb-3">
                     {!searchQuery && (
-                      <h4 className="text-xs font-medium text-gray-700 mb-1 px-2">{category}</h4>
+                      <h4 className="text-xs font-medium text-foreground mb-1 px-2">{category}</h4>
                     )}
                     <div className="space-y-1">
                       {categoryServices.map((service) => (
@@ -227,13 +227,13 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
   return (
     <button
       onClick={() => onSelect(service.id)}
-      className={`w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-md text-left hover:bg-gray-50 transition-colors group ${
-        isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'
+      className={`w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-md text-left hover:bg-muted/50 transition-colors group ${
+        isActive ? 'bg-indigo-50 text-indigo-700' : 'text-foreground'
       }`}
     >
       <div className="flex-1 min-w-0">
         <div className="font-medium truncate">{service.displayName}</div>
-        <div className="text-xs text-gray-500 truncate">{service.description}</div>
+        <div className="text-xs text-muted-foreground truncate">{service.description}</div>
       </div>
       <button
         onClick={(e) => onToggleFavorite(e, service.id)}
@@ -243,7 +243,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         {isFavorite ? (
           <StarIconSolid className="h-4 w-4 text-yellow-500" />
         ) : (
-          <StarIcon className="h-4 w-4 text-gray-400 hover:text-yellow-500" />
+          <StarIcon className="h-4 w-4 text-muted-foreground hover:text-yellow-500" />
         )}
       </button>
     </button>

@@ -128,8 +128,8 @@ export const ServiceDetailPage: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Service Not Found</h2>
-          <p className="text-gray-600 mb-8">The service you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Service Not Found</h2>
+          <p className="text-muted-foreground mb-8">The service you're looking for doesn't exist or has been removed.</p>
           <Button onClick={() => navigate('/marketplace/services')}>
             Browse All Services
           </Button>

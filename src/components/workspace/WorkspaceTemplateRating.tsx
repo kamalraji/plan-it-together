@@ -80,7 +80,7 @@ export function WorkspaceTemplateRating({
   ) => {
     return (
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-foreground mb-2">{label}</label>
         <div className="flex items-center space-x-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -88,7 +88,7 @@ export function WorkspaceTemplateRating({
               type="button"
               onClick={() => handleStarClick(field, star)}
               className={`h-8 w-8 ${
-                star <= currentValue ? 'text-yellow-400' : 'text-gray-300'
+                star <= currentValue ? 'text-yellow-400' : 'text-muted-foreground/70'
               } hover:text-yellow-400 transition-colors`}
             >
               <svg fill="currentColor" viewBox="0 0 20 20">
@@ -96,7 +96,7 @@ export function WorkspaceTemplateRating({
               </svg>
             </button>
           ))}
-          <span className="ml-2 text-sm text-gray-600">
+          <span className="ml-2 text-sm text-muted-foreground">
             {currentValue > 0 ? `${currentValue}/5` : 'Not rated'}
           </span>
         </div>
@@ -105,19 +105,19 @@ export function WorkspaceTemplateRating({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-muted-foreground/40 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-card">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Rate Template Experience</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-xl font-semibold text-foreground">Rate Template Experience</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               Help others by sharing your experience with this workspace template
             </p>
           </div>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-muted-foreground hover:text-muted-foreground"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -153,7 +153,7 @@ export function WorkspaceTemplateRating({
 
           {/* Completion Rate */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Task Completion Rate (%)
             </label>
             <input
@@ -162,17 +162,17 @@ export function WorkspaceTemplateRating({
               max="100"
               value={ratingData.completionRate}
               onChange={(e) => handleRatingChange('completionRate', parseInt(e.target.value) || 0)}
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               placeholder="e.g., 85"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               What percentage of planned tasks were completed?
             </p>
           </div>
 
           {/* Event Success */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Event Outcome
             </label>
             <div className="space-y-2">
@@ -182,9 +182,9 @@ export function WorkspaceTemplateRating({
                   name="eventSuccess"
                   checked={ratingData.eventSuccess === true}
                   onChange={() => handleRatingChange('eventSuccess', true)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
                 />
-                <span className="ml-2 text-sm text-gray-900">Event was successful</span>
+                <span className="ml-2 text-sm text-foreground">Event was successful</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -192,9 +192,9 @@ export function WorkspaceTemplateRating({
                   name="eventSuccess"
                   checked={ratingData.eventSuccess === false}
                   onChange={() => handleRatingChange('eventSuccess', false)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
                 />
-                <span className="ml-2 text-sm text-gray-900">Event had challenges</span>
+                <span className="ml-2 text-sm text-foreground">Event had challenges</span>
               </label>
             </div>
           </div>
@@ -206,16 +206,16 @@ export function WorkspaceTemplateRating({
               type="checkbox"
               checked={ratingData.wouldRecommend}
               onChange={(e) => handleRatingChange('wouldRecommend', e.target.checked)}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
             />
-            <label htmlFor="wouldRecommend" className="ml-2 block text-sm text-gray-900">
+            <label htmlFor="wouldRecommend" className="ml-2 block text-sm text-foreground">
               I would recommend this template to others
             </label>
           </div>
 
           {/* Feedback */}
           <div>
-            <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="feedback" className="block text-sm font-medium text-foreground mb-2">
               Additional Feedback
             </label>
             <textarea
@@ -223,24 +223,24 @@ export function WorkspaceTemplateRating({
               rows={4}
               value={ratingData.feedback}
               onChange={(e) => handleRatingChange('feedback', e.target.value)}
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               placeholder="Share what worked well, what could be improved, or any suggestions for future users..."
             />
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || ratingData.rating === 0}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
             >
               {loading ? 'Submitting...' : 'Submit Rating'}
             </button>

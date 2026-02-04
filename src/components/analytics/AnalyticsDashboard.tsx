@@ -177,7 +177,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
   if (!analyticsData) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">No analytics data available</p>
+        <p className="text-muted-foreground">No analytics data available</p>
       </div>
     );
   }
@@ -188,8 +188,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
         {/* Header with Export Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-foreground">Analytics Dashboard</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               Event: {analyticsData.eventName}
             </p>
           </div>
@@ -199,11 +199,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
             <button
               onClick={() => handleExport('CSV')}
               disabled={exportState.isExporting}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {exportState.isExporting && exportState.format === 'CSV' ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -222,7 +222,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
             <button
               onClick={() => handleExport('PDF')}
               disabled={exportState.isExporting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {exportState.isExporting && exportState.format === 'PDF' ? (
                 <>
@@ -270,11 +270,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
         )}
 
         {/* Date Range Filter */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Date Range Filter</h3>
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Date Range Filter</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="startDate" className="block text-sm font-medium text-foreground">
                 Start Date
               </label>
               <input
@@ -282,11 +282,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
                 id="startDate"
                 value={dateRange.startDate}
                 onChange={(e) => handleDateRangeChange('startDate', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="endDate" className="block text-sm font-medium text-foreground">
                 End Date
               </label>
               <input
@@ -294,7 +294,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
                 id="endDate"
                 value={dateRange.endDate}
                 onChange={(e) => handleDateRangeChange('endDate', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               />
             </div>
           </div>
@@ -302,72 +302,72 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-card overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Registrations</dt>
-                    <dd className="text-lg font-medium text-gray-900">{analyticsData.summary.totalRegistrations}</dd>
+                    <dt className="text-sm font-medium text-muted-foreground truncate">Total Registrations</dt>
+                    <dd className="text-lg font-medium text-foreground">{analyticsData.summary.totalRegistrations}</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-card overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Attendance Rate</dt>
-                    <dd className="text-lg font-medium text-gray-900">{analyticsData.summary.overallCheckInRate.toFixed(1)}%</dd>
+                    <dt className="text-sm font-medium text-muted-foreground truncate">Attendance Rate</dt>
+                    <dd className="text-lg font-medium text-foreground">{analyticsData.summary.overallCheckInRate.toFixed(1)}%</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-card overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Average Score</dt>
-                    <dd className="text-lg font-medium text-gray-900">{analyticsData.summary.averageScore.toFixed(1)}</dd>
+                    <dt className="text-sm font-medium text-muted-foreground truncate">Average Score</dt>
+                    <dd className="text-lg font-medium text-foreground">{analyticsData.summary.averageScore.toFixed(1)}</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-card overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                   </svg>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Judges</dt>
-                    <dd className="text-lg font-medium text-gray-900">{analyticsData.summary.totalJudges}</dd>
+                    <dt className="text-sm font-medium text-muted-foreground truncate">Total Judges</dt>
+                    <dd className="text-lg font-medium text-foreground">{analyticsData.summary.totalJudges}</dd>
                   </dl>
                 </div>
               </div>
@@ -376,9 +376,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
         </div>
 
         {/* Registration Over Time Chart */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Registration Over Time</h3>
-          <div className="h-64 flex items-center justify-center text-gray-500">
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Registration Over Time</h3>
+          <div className="h-64 flex items-center justify-center text-muted-foreground">
             {/* Placeholder for chart - would integrate with a charting library like Recharts */}
             <div className="text-center">
               <p>Registration chart would be displayed here</p>
@@ -390,25 +390,25 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
         </div>
 
         {/* Session Check-in Rates */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Session Check-in Rates</h3>
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Session Check-in Rates</h3>
           <div className="space-y-4">
             {analyticsData.sessionCheckInRates.map((session, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{session.sessionName}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium text-foreground">{session.sessionName}</p>
+                  <p className="text-sm text-muted-foreground">
                     {session.checkedIn} of {session.totalRegistrations} participants
                   </p>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${session.checkInRate}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     {session.checkInRate.toFixed(1)}%
                   </span>
                 </div>
@@ -419,23 +419,23 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
         {/* Score Distribution */}
         {analyticsData.scoreDistributions.length > 0 && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Score Distribution</h3>
+          <div className="bg-card shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Score Distribution</h3>
             <div className="space-y-4">
               {analyticsData.scoreDistributions.map((dist, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{dist.range}%</p>
-                    <p className="text-sm text-gray-500">{dist.count} submissions</p>
+                    <p className="text-sm font-medium text-foreground">{dist.range}%</p>
+                    <p className="text-sm text-muted-foreground">{dist.count} submissions</p>
                   </div>
                   <div className="flex items-center">
-                    <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div className="w-32 bg-muted rounded-full h-2 mr-3">
                       <div
                         className="bg-green-600 h-2 rounded-full"
                         style={{ width: `${dist.percentage}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-foreground">
                       {dist.percentage.toFixed(1)}%
                     </span>
                   </div>
@@ -447,25 +447,25 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
         {/* Judge Participation */}
         {analyticsData.judgeParticipation.length > 0 && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Judge Participation</h3>
+          <div className="bg-card shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Judge Participation</h3>
             <div className="space-y-4">
               {analyticsData.judgeParticipation.map((judge, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{judge.judgeName}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm font-medium text-foreground">{judge.judgeName}</p>
+                    <p className="text-sm text-muted-foreground">
                       {judge.scoredSubmissions} of {judge.assignedSubmissions} submissions scored
                     </p>
                   </div>
                   <div className="flex items-center">
-                    <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div className="w-32 bg-muted rounded-full h-2 mr-3">
                       <div
                         className="bg-purple-600 h-2 rounded-full"
                         style={{ width: `${judge.completionRate}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-foreground">
                       {judge.completionRate.toFixed(1)}%
                     </span>
                   </div>

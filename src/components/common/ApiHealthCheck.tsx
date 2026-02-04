@@ -50,7 +50,7 @@ export const ApiHealthCheck: React.FC<ApiHealthCheckProps> = ({
       <div
         className={`w-2 h-2 rounded-full ${
           isHealthy === null
-            ? 'bg-gray-400'
+            ? 'bg-muted-foreground/20'
             : isHealthy
             ? 'bg-green-500'
             : 'bg-red-500'
@@ -63,7 +63,7 @@ export const ApiHealthCheck: React.FC<ApiHealthCheckProps> = ({
             : 'API is unavailable'
         }
       />
-      <span className="text-gray-600">
+      <span className="text-muted-foreground">
         {isHealthy === null
           ? 'Checking...'
           : isHealthy
@@ -71,7 +71,7 @@ export const ApiHealthCheck: React.FC<ApiHealthCheckProps> = ({
           : 'API Offline'}
       </span>
       {lastCheck && (
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-muted-foreground">
           Last check: {lastCheck.toLocaleTimeString()}
         </span>
       )}

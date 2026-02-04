@@ -44,7 +44,7 @@ export function EmailVerification() {
           </h2>
         </div>
 
-        <div className="mt-4 relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+        <div className="mt-4 relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           {status === 'loading' && (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>

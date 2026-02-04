@@ -137,12 +137,12 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
     }
   };
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-card rounded-lg shadow-md p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           {existingRubric ? 'Edit Judging Rubric' : 'Create Judging Rubric'}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Define the criteria and weights for judging submissions. Total weight must equal 100%.
         </p>
       </div>
@@ -162,9 +162,9 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
           {criteria.map((criterion, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-border rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-foreground">
                   Criterion {index + 1}
                 </h3>
                 {criteria.length > 1 && (
@@ -180,14 +180,14 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Criterion Name *
                   </label>
                   <input
                     type="text"
                     value={criterion.name}
                     onChange={(e) => updateCriterion(index, 'name', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                     placeholder="e.g., Innovation"
                     required
                   />
@@ -195,7 +195,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       Weight (%) *
                     </label>
                     <input
@@ -204,13 +204,13 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
                       max="100"
                       value={criterion.weight || ''}
                       onChange={(e) => updateCriterion(index, 'weight', parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       Max Score *
                     </label>
                     <input
@@ -218,7 +218,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
                       min="1"
                       value={criterion.maxScore || ''}
                       onChange={(e) => updateCriterion(index, 'maxScore', parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                       required
                     />
                   </div>
@@ -226,14 +226,14 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Description *
                 </label>
                 <textarea
                   value={criterion.description}
                   onChange={(e) => updateCriterion(index, 'description', e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                   placeholder="Describe what judges should evaluate for this criterion..."
                   required
                 />
@@ -246,7 +246,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
           <button
             type="button"
             onClick={addCriterion}
-            className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus-visible:ring-ring"
           >
             Add Criterion
           </button>
@@ -258,7 +258,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
             <button
               type="submit"
               disabled={loading || getTotalWeight() !== 100}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : existingRubric ? 'Update Rubric' : 'Create Rubric'}
             </button>
@@ -267,8 +267,8 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
       </form>
 
       {existingRubric && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
+        <div className="mt-6 pt-6 border-t border-border">
+          <div className="text-sm text-muted-foreground">
             Last updated: {new Date(existingRubric.updatedAt).toLocaleString()}
           </div>
         </div>

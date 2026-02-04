@@ -420,9 +420,9 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
   };
 
   const renderServiceForm = () => (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-card shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-foreground">
           {editingService ? 'Edit Service' : 'Create New Service'}
         </h2>
         <button
@@ -431,7 +431,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             setEditingService(null);
             resetForm();
           }}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-muted-foreground"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -443,7 +443,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-foreground">
               Service Title *
             </label>
             <input
@@ -451,20 +451,20 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="category" className="block text-sm font-medium text-foreground">
               Category *
             </label>
             <select
               id="category"
               value={formData.category}
               onChange={(e) => handleInputChange('category', e.target.value as ServiceCategory)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               required
             >
               {serviceCategories.map((category) => (
@@ -477,7 +477,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="description" className="block text-sm font-medium text-foreground">
             Description *
           </label>
           <textarea
@@ -485,7 +485,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
             placeholder="Describe your service in detail"
             required
           />
@@ -493,18 +493,18 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
         {/* Pricing */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Pricing</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Pricing</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="pricingType" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="pricingType" className="block text-sm font-medium text-foreground">
                 Pricing Type *
               </label>
               <select
                 id="pricingType"
                 value={formData.pricing.type}
                 onChange={(e) => handleNestedInputChange('pricing', 'type', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               >
                 {pricingTypes.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -516,19 +516,19 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
             {formData.pricing.type !== 'CUSTOM_QUOTE' && (
               <div>
-                <label htmlFor="basePrice" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="basePrice" className="block text-sm font-medium text-foreground">
                   Base Price *
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
+                    <span className="text-muted-foreground sm:text-sm">$</span>
                   </div>
                   <input
                     type="number"
                     id="basePrice"
                     value={formData.pricing.basePrice || ''}
                     onChange={(e) => handleNestedInputChange('pricing', 'basePrice', parseFloat(e.target.value))}
-                    className="pl-7 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-7 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                     placeholder="0.00"
                     min="0"
                     step="0.01"
@@ -540,7 +540,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
           {formData.pricing.type !== 'CUSTOM_QUOTE' && (
             <div className="mt-4">
-              <label htmlFor="minimumOrder" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="minimumOrder" className="block text-sm font-medium text-foreground">
                 Minimum Order
               </label>
               <input
@@ -548,7 +548,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 id="minimumOrder"
                 value={formData.pricing.minimumOrder || ''}
                 onChange={(e) => handleNestedInputChange('pricing', 'minimumOrder', parseInt(e.target.value))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                 min="1"
               />
             </div>
@@ -557,7 +557,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
         {/* Service Areas */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Service Areas</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Service Areas</h3>
           
           <div className="space-y-2">
             {formData.serviceArea.map((area, index) => (
@@ -566,7 +566,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                   type="text"
                   value={area}
                   onChange={(e) => handleArrayInputChange('serviceArea', index, e.target.value)}
-                  className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                   placeholder="Enter city or region"
                 />
                 <button
@@ -592,7 +592,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
         {/* Inclusions */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">What's Included</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">What's Included</h3>
           
           <div className="space-y-2">
             {formData.inclusions.map((inclusion, index) => (
@@ -601,7 +601,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                   type="text"
                   value={inclusion}
                   onChange={(e) => handleArrayInputChange('inclusions', index, e.target.value)}
-                  className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                   placeholder="What's included in this service"
                 />
                 <button
@@ -627,7 +627,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
         {/* Exclusions */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Exclusions (Optional)</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Exclusions (Optional)</h3>
           
           <div className="space-y-2">
             {formData.exclusions?.map((exclusion, index) => (
@@ -636,7 +636,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                   type="text"
                   value={exclusion}
                   onChange={(e) => handleArrayInputChange('exclusions', index, e.target.value)}
-                  className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                   placeholder="What's not included"
                 />
                 <button
@@ -662,7 +662,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
         {/* Requirements */}
         <div className="border-t pt-6">
-          <label htmlFor="requirements" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="requirements" className="block text-sm font-medium text-foreground">
             Special Requirements (Optional)
           </label>
           <textarea
@@ -670,19 +670,19 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             rows={3}
             value={formData.requirements}
             onChange={(e) => handleInputChange('requirements', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
             placeholder="Any special requirements or conditions"
           />
         </div>
 
         {/* Media Upload */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Media</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Media</h3>
           
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input border-dashed rounded-md">
             <div className="space-y-1 text-center">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-muted-foreground"
                 stroke="currentColor"
                 fill="none"
                 viewBox="0 0 48 48"
@@ -694,10 +694,10 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                   strokeLinejoin="round"
                 />
               </svg>
-              <div className="flex text-sm text-gray-600">
+              <div className="flex text-sm text-muted-foreground">
                 <label
                   htmlFor="media"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                  className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                 >
                   <span>Upload media files</span>
                   <input
@@ -712,17 +712,17 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 </label>
                 <p className="pl-1">or drag and drop</p>
               </div>
-              <p className="text-xs text-gray-500">Images and videos up to 10MB each</p>
+              <p className="text-xs text-muted-foreground">Images and videos up to 10MB each</p>
             </div>
           </div>
 
           {formData.media.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Uploaded Media</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">Uploaded Media</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {formData.media.map((item) => (
                   <div key={item.id} className="relative group">
-                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-muted">
                       {item.type === 'IMAGE' ? (
                         <img
                           src={item.url}
@@ -733,7 +733,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                         <div className="flex items-center justify-center h-full">
                           <div className="text-center">
                             <svg
-                              className="mx-auto h-12 w-12 text-gray-400"
+                              className="mx-auto h-12 w-12 text-muted-foreground"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -745,7 +745,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                                 d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                               />
                             </svg>
-                            <p className="text-xs text-gray-500 mt-1">VIDEO</p>
+                            <p className="text-xs text-muted-foreground mt-1">VIDEO</p>
                           </div>
                         </div>
                       )}
@@ -793,14 +793,14 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
               setEditingService(null);
               resetForm();
             }}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted/50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
           >
             {loading ? 'Saving...' : editingService ? 'Update Service' : 'Create Service'}
           </button>
@@ -849,14 +849,14 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Service Listings</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-2xl font-bold text-foreground">Service Listings</h1>
+          <p className="mt-1 text-muted-foreground">
             Manage your marketplace service offerings
           </p>
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
         >
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -869,7 +869,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
       {services.length === 0 ? (
         <div className="text-center py-12">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -881,8 +881,8 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
             />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No services</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <h3 className="mt-2 text-sm font-medium text-foreground">No services</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Get started by creating your first service listing.
           </p>
           <div className="mt-6">
@@ -900,15 +900,15 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {services.map((service) => (
-            <div key={service.id} className="bg-white shadow rounded-lg overflow-hidden">
+            <div key={service.id} className="bg-card shadow rounded-lg overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center">
-                      <h3 className="text-lg font-medium text-gray-900">{service.title}</h3>
+                      <h3 className="text-lg font-medium text-foreground">{service.title}</h3>
                       <span className={`ml-3 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         service.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                        service.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
+                        service.status === 'INACTIVE' ? 'bg-muted text-foreground' :
                         'bg-red-100 text-red-800'
                       }`}>
                         {service.status}
@@ -919,8 +919,8 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-gray-600">{service.description}</p>
-                    <div className="mt-2 flex items-center text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
+                    <div className="mt-2 flex items-center text-sm text-muted-foreground">
                       <span className="capitalize">{service.category.toLowerCase().replace('_', ' ')}</span>
                       <span className="mx-2">•</span>
                       <span>
@@ -937,7 +937,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                       onClick={() => toggleServiceStatus(service.id, service.status)}
                       className={`px-3 py-1 text-xs font-medium rounded-md ${
                         service.status === 'ACTIVE'
-                          ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                          ? 'bg-muted text-foreground hover:bg-muted'
                           : 'bg-green-100 text-green-800 hover:bg-green-200'
                       }`}
                     >
@@ -961,31 +961,31 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 {/* Service Stats */}
                 <div className="mt-4 grid grid-cols-3 gap-4">
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">{service.viewCount}</div>
-                    <div className="text-xs text-gray-500">Views</div>
+                    <div className="text-lg font-semibold text-foreground">{service.viewCount}</div>
+                    <div className="text-xs text-muted-foreground">Views</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">{service.inquiryCount}</div>
-                    <div className="text-xs text-gray-500">Inquiries</div>
+                    <div className="text-lg font-semibold text-foreground">{service.inquiryCount}</div>
+                    <div className="text-xs text-muted-foreground">Inquiries</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">{service.bookingCount}</div>
-                    <div className="text-xs text-gray-500">Bookings</div>
+                    <div className="text-lg font-semibold text-foreground">{service.bookingCount}</div>
+                    <div className="text-xs text-muted-foreground">Bookings</div>
                   </div>
                 </div>
 
                 {/* Service Areas */}
                 {service.serviceArea.length > 0 && (
                   <div className="mt-4">
-                    <div className="text-sm text-gray-500">Service Areas:</div>
+                    <div className="text-sm text-muted-foreground">Service Areas:</div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {service.serviceArea.slice(0, 3).map((area, index) => (
-                        <span key={index} className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                        <span key={index} className="inline-flex px-2 py-1 text-xs bg-muted text-foreground rounded">
                           {area}
                         </span>
                       ))}
                       {service.serviceArea.length > 3 && (
-                        <span className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                        <span className="inline-flex px-2 py-1 text-xs bg-muted text-foreground rounded">
                           +{service.serviceArea.length - 3} more
                         </span>
                       )}

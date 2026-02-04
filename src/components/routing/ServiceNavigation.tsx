@@ -59,7 +59,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/dashboard',
         icon: '📊',
         description: 'Overview and quick access',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
       },
     ],
   },
@@ -97,7 +97,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: orgSlug ? `/${orgSlug}/workspaces` : '/dashboard/workspaces',
         icon: '💼',
         description: 'Team collaboration',
-        roles: [UserRole.ORGANIZER, UserRole.VOLUNTEER, UserRole.SUPER_ADMIN],
+        roles: [UserRole.ORGANIZER, UserRole.SUPER_ADMIN],
       },
     ],
   },
@@ -142,7 +142,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/dashboard/notifications',
         icon: '🔔',
         description: 'Manage your notifications',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
       },
       {
         id: 'communications',
@@ -150,7 +150,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/dashboard/communications',
         icon: '💬',
         description: 'Messages and communication preferences',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
       },
     ],
   },
@@ -165,7 +165,15 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/dashboard/profile',
         icon: '👤',
         description: 'Manage your profile',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
+      },
+      {
+        id: 'settings',
+        label: 'Settings',
+        path: '/dashboard/settings',
+        icon: '⚙️',
+        description: 'Account and app settings',
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
       },
     ],
   },
@@ -180,7 +188,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/dashboard/support',
         icon: '🆘',
         description: 'Get help and support',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.JUDGE, UserRole.VOLUNTEER, UserRole.SPEAKER],
+        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN, UserRole.VENDOR],
       },
     ],
   },
@@ -342,14 +350,14 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${collapsed && !isMobile ? 'w-16' : 'w-64'}`}>
+    <div className={`bg-card border-r border-border h-full flex flex-col ${collapsed && !isMobile ? 'w-16' : 'w-64'}`}>
       {/* Mobile Header */}
       {isMobile && (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Services</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2 className="text-lg font-semibold text-foreground">Services</h2>
           <button
             onClick={onCloseMobile}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
@@ -358,11 +366,11 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
 
       {/* Desktop Header with Search Toggle */}
       {!isMobile && (
-        <div className="flex items-center justify-between p-2 border-b border-gray-200">
+        <div className="flex items-center justify-between p-2 border-b border-border">
           {(!collapsed || showSearch) && (
             <button
               onClick={toggleSearch}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
               title="Search services"
             >
               <MagnifyingGlassIcon className="h-4 w-4" />
@@ -371,7 +379,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
               title={collapsed ? 'Expand navigation' : 'Collapse navigation'}
             >
               {collapsed ? (
@@ -386,15 +394,15 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
 
       {/* Search Bar */}
       {(showSearch || isMobile) && (!collapsed || isMobile) && (
-        <div className="p-3 border-b border-gray-200">
+        <div className="p-3 border-b border-border">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-2 border border-input bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -405,7 +413,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Search Results */}
         {searchQuery.trim() && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
               Search Results ({filteredServices.length})
             </h3>
             <div className="space-y-1">
@@ -416,13 +424,13 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isItemActive(service)
                       ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
+                      : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                   }`}
                 >
                     <div className="flex-1 text-left">
                       <div className="truncate">{service.label}</div>
                       {service.description && (
-                        <div className="text-xs text-gray-500 truncate">
+                        <div className="text-xs text-muted-foreground truncate">
                           {service.description}
                         </div>
                       )}
@@ -432,18 +440,18 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                       e.stopPropagation();
                       toggleFavorite(service.id);
                     }}
-                    className="ml-2 p-1 rounded hover:bg-gray-200"
+                    className="ml-2 p-1 rounded hover:bg-muted"
                   >
                     {preferences.favoriteServices.includes(service.id) ? (
                       <StarIconSolid className="h-4 w-4 text-yellow-400" />
                     ) : (
-                      <StarIcon className="h-4 w-4 text-gray-400" />
+                      <StarIcon className="h-4 w-4 text-muted-foreground" />
                     )}
                   </button>
                 </button>
               ))}
               {filteredServices.length === 0 && (
-                <div className="text-sm text-gray-500 text-center py-4">
+                <div className="text-sm text-muted-foreground text-center py-4">
                   No services found matching "{searchQuery}"
                 </div>
               )}
@@ -465,8 +473,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                   onClick={() => handleServiceClick(service)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isItemActive(service)
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                   }`}
                 >
                     <span className="truncate">{service.label}</span>
@@ -490,8 +498,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                   onClick={() => handleServiceClick(service)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isItemActive(service)
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                   }`}
                 >
                     <span className="truncate">{service.label}</span>
@@ -518,8 +526,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                     onClick={() => toggleCategory(category.id)}
                     className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 text-indigo-700'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-primary/5 text-primary'
+                        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                     } ${collapsed && !isMobile ? 'justify-center' : 'justify-between'}`}
                     disabled={collapsed && !isMobile}
                   >
@@ -547,33 +555,33 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                             onClick={isMobile ? onCloseMobile : undefined}
                             className={`group flex items-center px-3 py-2 ml-6 text-sm font-medium rounded-md transition-colors flex-1 ${
                               isItemActive(item)
-                                ? 'bg-indigo-100 text-indigo-700'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                             }`}
                           >
                             <div className="flex-1">
                               <div className="truncate">{item.label}</div>
                               {item.description && (
-                                <div className="text-xs text-gray-500 truncate">
+                                <div className="text-xs text-muted-foreground truncate">
                                   {item.description}
                                 </div>
                               )}
                             </div>
                             {item.badge && (
-                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
                                 {item.badge}
                               </span>
                             )}
                           </Link>
                           <button
                             onClick={() => toggleFavorite(item.id)}
-                            className="ml-1 p-1 rounded hover:bg-gray-200"
+                            className="ml-1 p-1 rounded hover:bg-muted"
                             title={preferences.favoriteServices.includes(item.id) ? 'Remove from favorites' : 'Add to favorites'}
                           >
                             {preferences.favoriteServices.includes(item.id) ? (
                               <StarIconSolid className="h-4 w-4 text-yellow-400" />
                             ) : (
-                              <StarIcon className="h-4 w-4 text-gray-400" />
+                              <StarIcon className="h-4 w-4 text-muted-foreground" />
                             )}
                           </button>
                         </div>
@@ -590,8 +598,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                           to={item.path}
                           className={`group flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                             isItemActive(item)
-                              ? 'bg-indigo-100 text-indigo-700'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                           }`}
                           title={item.label}
                         >
@@ -609,18 +617,18 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
 
       {/* User Info (when not collapsed) */}
       {(!collapsed || isMobile) && user && (
-        <div className="border-t border-gray-200 p-4">
+        <div className="border-t border-border p-4">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 bg-indigo-100 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-indigo-700">
+            <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-primary">
                 {user.name?.charAt(0) || 'U'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900 truncate">
+              <div className="text-sm font-medium text-foreground truncate">
                 {user.name || 'User'}
               </div>
-              <div className="text-xs text-gray-500 truncate">
+              <div className="text-xs text-muted-foreground truncate">
                 {user.role || 'User'}
               </div>
             </div>

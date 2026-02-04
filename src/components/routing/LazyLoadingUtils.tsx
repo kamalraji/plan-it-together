@@ -88,15 +88,15 @@ const DefaultErrorFallback: React.FC<{
     <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4 p-8">
       <div className="text-center">
         <div className="text-5xl mb-4 font-bold text-red-500">!</div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           Something went wrong
         </h2>
-        <p className="text-gray-600 mb-4 max-w-md">
+        <p className="text-muted-foreground mb-4 max-w-md">
           {error?.message || 'An unexpected error occurred while loading this page.'}
         </p>
         
         {retryCount > 0 && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Retry attempt: {retryCount} of {maxRetries}
           </p>
         )}
@@ -106,7 +106,7 @@ const DefaultErrorFallback: React.FC<{
         {canRetry && (
           <button
             onClick={retry}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus-visible:ring-ring focus:ring-offset-2"
           >
             Try Again
           </button>
@@ -114,7 +114,7 @@ const DefaultErrorFallback: React.FC<{
         
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          className="px-4 py-2 bg-muted-foreground/40 text-white rounded-md hover:bg-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Reload Page
         </button>
@@ -122,7 +122,7 @@ const DefaultErrorFallback: React.FC<{
 
       {!canRetry && (
         <div className="text-center mt-4">
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-muted-foreground mb-2">
             Maximum retry attempts reached.
           </p>
           <button
@@ -329,7 +329,7 @@ export const ProgressiveLoader: React.FC<{
           ) : (
             <button
               onClick={loadMore}
-              className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
+              className="w-full py-2 px-4 bg-muted hover:bg-muted rounded-md text-foreground transition-colors"
             >
               Load More ({items.length - loadedCount} remaining)
             </button>
@@ -373,8 +373,8 @@ export const SlowNetworkFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
     <div className="text-center">
-      <p className="text-gray-600 mb-2">Taking longer than usual...</p>
-      <p className="text-sm text-gray-500">
+      <p className="text-muted-foreground mb-2">Taking longer than usual...</p>
+      <p className="text-sm text-muted-foreground">
         This might be due to a slow network connection.
       </p>
     </div>

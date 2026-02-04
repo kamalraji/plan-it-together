@@ -14,6 +14,7 @@ import {
 import { PageHeader } from './PageHeader';
 import { CommunicationHistory } from '../communication/CommunicationHistory';
 import { EmailComposer } from '../communication/EmailComposer';
+import { EmptyInbox } from '@/components/illustrations';
 
 interface CommunicationMessage {
   id: string;
@@ -242,7 +243,7 @@ export const CommunicationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title="Communications"
         subtitle={`${stats.total} messages, ${stats.unread} unread`}
@@ -264,21 +265,21 @@ export const CommunicationPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar - Filters */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow p-6 space-y-6">
+              <div className="bg-card rounded-lg shadow p-6 space-y-6">
                 {/* Search */}
                 <div>
-                  <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="search" className="block text-sm font-medium text-foreground mb-2">
                     Search Messages
                   </label>
                   <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                       type="text"
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search messages..."
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full pl-10 pr-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                     />
                   </div>
                 </div>
@@ -290,15 +291,15 @@ export const CommunicationPage: React.FC = () => {
                       type="checkbox"
                       checked={showUnreadOnly}
                       onChange={(e) => setShowUnreadOnly(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Show unread only</span>
+                    <span className="ml-2 text-sm text-foreground">Show unread only</span>
                   </label>
                 </div>
 
                 {/* Category Filter */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Categories</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-3">Categories</h3>
                   <div className="space-y-2">
                     {categories.map((category) => {
                       const IconComponent = category.icon;
@@ -309,14 +310,14 @@ export const CommunicationPage: React.FC = () => {
                           className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                             selectedCategory === category.id
                               ? 'bg-indigo-100 text-indigo-700'
-                              : 'text-gray-600 hover:bg-gray-100'
+                              : 'text-muted-foreground hover:bg-muted'
                           }`}
                         >
                           <div className="flex items-center space-x-2">
                             <IconComponent className="h-4 w-4" />
                             <span>{category.label}</span>
                           </div>
-                          <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                          <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
                             {category.count}
                           </span>
                         </button>
@@ -329,18 +330,18 @@ export const CommunicationPage: React.FC = () => {
 
             {/* Main Content - Messages List */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow">
+              <div className="bg-card rounded-lg shadow">
                 {/* Results Header */}
-                <div className="px-6 py-4 border-b border-gray-200">
+                <div className="px-6 py-4 border-b border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <FunnelIcon className="h-5 w-5 text-gray-400" />
-                      <span className="text-sm text-gray-600">
+                      <FunnelIcon className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
                         {filteredMessages.length} of {stats.total} messages
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         {stats.unread} unread
                       </span>
                     </div>
@@ -348,12 +349,12 @@ export const CommunicationPage: React.FC = () => {
                 </div>
 
                 {/* Messages List */}
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-border">
                   {filteredMessages.length === 0 ? (
-                    <div className="p-12 text-center">
-                      <InboxIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No messages found</h3>
-                      <p className="text-gray-500">
+                    <div className="p-12 text-center flex flex-col items-center">
+                      <EmptyInbox size="sm" showBackground={false} />
+                      <h3 className="text-lg font-medium text-foreground mb-2 mt-4">No messages found</h3>
+                      <p className="text-muted-foreground">
                         {searchQuery || selectedCategory !== 'all' || showUnreadOnly
                           ? 'Try adjusting your filters or search terms.'
                           : 'Your inbox is empty. New messages will appear here.'}
@@ -372,8 +373,8 @@ export const CommunicationPage: React.FC = () => {
 
         {activeTab === 'compose' && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Compose Message</h2>
+            <div className="bg-card rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-6">Compose Message</h2>
               <EmailComposer eventId="default" />
             </div>
           </div>
@@ -381,8 +382,8 @@ export const CommunicationPage: React.FC = () => {
 
         {activeTab === 'history' && (
           <div className="max-w-6xl mx-auto">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Communication History</h2>
+            <div className="bg-card rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-6">Communication History</h2>
               <CommunicationHistory eventId="default" />
             </div>
           </div>
@@ -390,21 +391,21 @@ export const CommunicationPage: React.FC = () => {
 
         {activeTab === 'preferences' && (
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Communication Preferences</h2>
+            <div className="bg-card rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-6">Communication Preferences</h2>
               
               <div className="space-y-8">
                 {/* Email Notifications */}
                 <div>
-                  <h3 className="text-base font-medium text-gray-900 mb-4">Email Notifications</h3>
+                  <h3 className="text-base font-medium text-foreground mb-4">Email Notifications</h3>
                   <div className="space-y-4">
                     {Object.entries(preferences.emailNotifications).map(([key, value]) => (
                       <label key={key} className="flex items-center justify-between">
                         <div>
-                          <span className="text-sm font-medium text-gray-700 capitalize">
+                          <span className="text-sm font-medium text-foreground capitalize">
                             {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
                           </span>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             Receive notifications for {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
                           </p>
                         </div>
@@ -412,7 +413,7 @@ export const CommunicationPage: React.FC = () => {
                           type="checkbox"
                           checked={value}
                           onChange={(e) => handlePreferenceChange('emailNotifications', key, e.target.checked)}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                         />
                       </label>
                     ))}
@@ -421,7 +422,7 @@ export const CommunicationPage: React.FC = () => {
 
                 {/* Frequency */}
                 <div>
-                  <h3 className="text-base font-medium text-gray-900 mb-4">Notification Frequency</h3>
+                  <h3 className="text-base font-medium text-foreground mb-4">Notification Frequency</h3>
                   <div className="space-y-2">
                     {[
                       { value: 'immediate', label: 'Immediate', description: 'Receive notifications as they happen' },
@@ -435,11 +436,11 @@ export const CommunicationPage: React.FC = () => {
                           value={option.value}
                           checked={preferences.frequency === option.value}
                           onChange={(e) => setPreferences(prev => ({ ...prev, frequency: e.target.value as any }))}
-                          className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
                         />
                         <div className="ml-3">
-                          <span className="text-sm font-medium text-gray-700">{option.label}</span>
-                          <p className="text-xs text-gray-500">{option.description}</p>
+                          <span className="text-sm font-medium text-foreground">{option.label}</span>
+                          <p className="text-xs text-muted-foreground">{option.description}</p>
                         </div>
                       </label>
                     ))}
@@ -448,36 +449,36 @@ export const CommunicationPage: React.FC = () => {
 
                 {/* Quiet Hours */}
                 <div>
-                  <h3 className="text-base font-medium text-gray-900 mb-4">Quiet Hours</h3>
+                  <h3 className="text-base font-medium text-foreground mb-4">Quiet Hours</h3>
                   <div className="space-y-4">
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         checked={preferences.quietHours.enabled}
                         onChange={(e) => handlePreferenceChange('quietHours', 'enabled', e.target.checked)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                       />
-                      <span className="ml-2 text-sm text-gray-700">Enable quiet hours</span>
+                      <span className="ml-2 text-sm text-foreground">Enable quiet hours</span>
                     </label>
                     
                     {preferences.quietHours.enabled && (
                       <div className="grid grid-cols-2 gap-4 ml-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                          <label className="block text-sm font-medium text-foreground mb-1">Start Time</label>
                           <input
                             type="time"
                             value={preferences.quietHours.start}
                             onChange={(e) => handlePreferenceChange('quietHours', 'start', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                          <label className="block text-sm font-medium text-foreground mb-1">End Time</label>
                           <input
                             type="time"
                             value={preferences.quietHours.end}
                             onChange={(e) => handlePreferenceChange('quietHours', 'end', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                           />
                         </div>
                       </div>
@@ -486,10 +487,10 @@ export const CommunicationPage: React.FC = () => {
                 </div>
 
                 {/* Save Button */}
-                <div className="pt-6 border-t border-gray-200">
+                <div className="pt-6 border-t border-border">
                   <button
                     type="button"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
                   >
                     Save Preferences
                   </button>
@@ -526,12 +527,12 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
       case 'notification': return 'bg-yellow-100 text-yellow-800';
       case 'announcement': return 'bg-green-100 text-green-800';
       case 'reminder': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-muted text-foreground';
     }
   };
 
   return (
-    <div className={`p-6 hover:bg-gray-50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}>
+    <div className={`p-6 hover:bg-muted/50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}>
       <div className="flex items-start space-x-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
@@ -542,8 +543,8 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
               className="h-10 w-10 rounded-full"
             />
           ) : (
-            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">
+            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-sm font-medium text-foreground">
                 {message.sender.name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -555,7 +556,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
-                <h3 className={`text-sm font-medium ${!message.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                <h3 className={`text-sm font-medium ${!message.read ? 'text-foreground' : 'text-foreground'}`}>
                   {message.sender.name}
                 </h3>
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getTypeColor(message.type)}`}>
@@ -563,24 +564,24 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
                 </span>
               </div>
               
-              <h4 className={`text-base font-medium mb-2 ${!message.read ? 'text-gray-900' : 'text-gray-700'}`}>
+              <h4 className={`text-base font-medium mb-2 ${!message.read ? 'text-foreground' : 'text-foreground'}`}>
                 {message.subject}
               </h4>
               
-              <p className="text-sm text-gray-600 line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {message.content}
               </p>
               
               {/* Metadata */}
               <div className="flex items-center space-x-4 mt-3">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground capitalize">
                   {message.category}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-muted-foreground">
                   {formatTimestamp(message.timestamp)}
                 </span>
                 {message.attachments && message.attachments.length > 0 && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     Attachments: {message.attachments.length} file{message.attachments.length > 1 ? 's' : ''}
                   </span>
                 )}

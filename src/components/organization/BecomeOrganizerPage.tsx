@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { usePrimaryOrganization, fetchPrimaryOrganizationForUser } from '@/hooks/usePrimaryOrganization';
 
 export const BecomeOrganizerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { refreshUserRoles } = useAuth();
+  const { user, refreshUserRoles } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +26,13 @@ export const BecomeOrganizerPage: React.FC = () => {
       }
 
       await refreshUserRoles();
-      navigate('/dashboard', { replace: true });
+      // Fetch primary org after upgrade (may have been created during organizer flow)
+      const org = user?.id ? await fetchPrimaryOrganizationForUser(user.id) : null;
+      if (org?.slug) {
+        navigate(`/${org.slug}/dashboard`, { replace: true });
+      } else {
+        navigate('/onboarding/organization', { replace: true });
+      }
     } catch (err: any) {
       setError(err?.message || 'Failed to upgrade to organizer. Please try again.');
     } finally {
@@ -60,7 +68,7 @@ export const BecomeOrganizerPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
             <button
               type="button"
-              onClick={() => navigate('/dashboard', { replace: true })}
+              onClick={() => navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard', { replace: true })}
               className="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm rounded-lg border border-border bg-background/60 text-muted-foreground hover:bg-background/90 transition-colors"
             >
               Cancel

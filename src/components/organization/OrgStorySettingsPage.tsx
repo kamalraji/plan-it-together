@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OrgTestimonialsManager } from './OrgTestimonialsManager';
 import { OrgSponsorsManager } from './OrgSponsorsManager';
 import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 
 export const OrgStorySettingsPage: React.FC = () => {
   const organization = useCurrentOrganization();
 
   return (
-    <main className="min-h-screen bg-transparent">
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+    <OrgPageWrapper>
+      <section>
         <OrganizationBreadcrumbs
           items={[
             {
@@ -79,6 +80,6 @@ export const OrgStorySettingsPage: React.FC = () => {
           </CardContent>
         </Card>
       </section>
-    </main>
+    </OrgPageWrapper>
   );
 };

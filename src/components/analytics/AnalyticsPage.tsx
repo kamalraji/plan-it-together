@@ -313,7 +313,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title={getScopeTitle()}
         subtitle="Comprehensive insights and performance metrics"

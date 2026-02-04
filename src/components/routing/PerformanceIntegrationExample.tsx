@@ -22,13 +22,13 @@ const LazyDashboard = () => (
   <div className="p-6">
     <h3 className="text-lg font-medium mb-4">Lazy Loaded Dashboard</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="bg-muted/50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Widget 1</h4>
-        <p className="text-sm text-gray-600">This widget was lazy loaded</p>
+        <p className="text-sm text-muted-foreground">This widget was lazy loaded</p>
       </div>
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="bg-muted/50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Widget 2</h4>
-        <p className="text-sm text-gray-600">Performance optimized content</p>
+        <p className="text-sm text-muted-foreground">Performance optimized content</p>
       </div>
     </div>
   </div>
@@ -39,9 +39,9 @@ const LazyResourceList = () => (
     <h3 className="text-lg font-medium mb-4">Lazy Loaded Resource List</h3>
     <div className="space-y-2">
       {Array.from({ length: 5 }, (_, i) => (
-        <div key={i} className="bg-gray-50 p-3 rounded border">
+        <div key={i} className="bg-muted/50 p-3 rounded border">
           <div className="font-medium">Resource {i + 1}</div>
-          <div className="text-sm text-gray-600">Lazy loaded resource item</div>
+          <div className="text-sm text-muted-foreground">Lazy loaded resource item</div>
         </div>
       ))}
     </div>
@@ -120,11 +120,11 @@ export const PerformanceIntegrationExample: React.FC = () => {
       component: () => (
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Load Time:</span>
+            <span className="text-sm text-muted-foreground">Load Time:</span>
             <span className="text-sm font-medium">{metrics.loadTime.toFixed(2)}ms</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Memory Usage:</span>
+            <span className="text-sm text-muted-foreground">Memory Usage:</span>
             <span className="text-sm font-medium">{(metrics.memoryUsage * 100).toFixed(1)}%</span>
           </div>
         </div>
@@ -137,11 +137,11 @@ export const PerformanceIntegrationExample: React.FC = () => {
       component: () => (
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Total Items:</span>
+            <span className="text-sm text-muted-foreground">Total Items:</span>
             <span className="text-sm font-medium">{data.length}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Active:</span>
+            <span className="text-sm text-muted-foreground">Active:</span>
             <span className="text-sm font-medium">
               {data.filter(item => item.status === 'active').length}
             </span>
@@ -156,9 +156,9 @@ export const PerformanceIntegrationExample: React.FC = () => {
       component: () => (
         <div className="space-y-2">
           <LoadingButton
-            loading={loading}
+            isLoading={loading}
             onClick={handleRefresh}
-            className="w-full px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            className="w-full"
           >
             Refresh Data
           </LoadingButton>
@@ -198,11 +198,11 @@ export const PerformanceIntegrationExample: React.FC = () => {
             batchSize={25}
             searchable={true}
             renderItem={(item) => (
-              <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-4">
+              <div key={item.id} className="bg-card rounded-lg border border-border p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-500">{item.category}</p>
+                    <h3 className="text-sm font-medium text-foreground">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">{item.category}</p>
                   </div>
                   <div className="text-right">
                     <div className={`px-2 py-1 text-xs rounded-full ${
@@ -212,7 +212,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
                     }`}>
                       {item.status}
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">{item.value}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{item.value}</p>
                   </div>
                 </div>
               </div>
@@ -240,15 +240,15 @@ export const PerformanceIntegrationExample: React.FC = () => {
       case 'lazy':
         return (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Lazy Loaded Dashboard</h3>
+            <div className="bg-card rounded-lg border border-border p-6">
+              <h3 className="text-lg font-medium text-foreground mb-4">Lazy Loaded Dashboard</h3>
               <SuspenseWrapper fallback={PageLoading} errorBoundary={true}>
                 <LazyDashboard />
               </SuspenseWrapper>
             </div>
             
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Lazy Loaded Resource List</h3>
+            <div className="bg-card rounded-lg border border-border p-6">
+              <h3 className="text-lg font-medium text-foreground mb-4">Lazy Loaded Resource List</h3>
               <SuspenseWrapper fallback={SkeletonTable} errorBoundary={true}>
                 <LazyResourceList />
               </SuspenseWrapper>
@@ -270,19 +270,19 @@ export const PerformanceIntegrationExample: React.FC = () => {
     >
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-card shadow rounded-lg p-6">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
             Performance Optimization Demo
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             This page demonstrates various performance optimization techniques including
             lazy loading, virtualization, pagination, and error handling.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="border-b border-gray-200">
+        <div className="bg-card shadow rounded-lg">
+          <div className="border-b border-border">
             <nav className="-mb-px flex space-x-8 px-6">
               {[
                 { key: 'table', label: 'Optimized Table' },
@@ -296,7 +296,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.key
                       ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >
                   {tab.label}
@@ -311,42 +311,42 @@ export const PerformanceIntegrationExample: React.FC = () => {
         </div>
 
         {/* Performance Info */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Features</h3>
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Performance Features</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Loading States</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Loading States</h4>
+              <p className="text-sm text-muted-foreground">
                 Skeleton screens, spinners, and progress indicators for better UX
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Lazy Loading</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Lazy Loading</h4>
+              <p className="text-sm text-muted-foreground">
                 Code splitting and component lazy loading for faster initial loads
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Virtualization</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Virtualization</h4>
+              <p className="text-sm text-muted-foreground">
                 Virtual scrolling for large datasets to maintain performance
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Error Handling</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Error Handling</h4>
+              <p className="text-sm text-muted-foreground">
                 Retry mechanisms and graceful error recovery
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Search Optimization</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Search Optimization</h4>
+              <p className="text-sm text-muted-foreground">
                 Debounced search to reduce unnecessary API calls
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Pagination</h4>
-              <p className="text-sm text-gray-600">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Pagination</h4>
+              <p className="text-sm text-muted-foreground">
                 Smart pagination with prefetching for smooth navigation
               </p>
             </div>

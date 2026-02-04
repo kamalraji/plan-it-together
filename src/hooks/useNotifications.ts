@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { notificationService } from '../services/notificationService';
 import { supabase } from '@/integrations/supabase/client';
+import { NOTIFICATION_PREFERENCES_COLUMNS } from '@/lib/supabase-columns';
 
 export interface NotificationState {
   isSupported: boolean;
@@ -75,7 +76,7 @@ export function useNotifications(userId?: string) {
       try {
         const { data, error } = await supabase
           .from('notification_preferences')
-          .select('*')
+          .select(NOTIFICATION_PREFERENCES_COLUMNS.detail)
           .eq('user_id', userId)
           .maybeSingle();
 
@@ -90,7 +91,7 @@ export function useNotifications(userId?: string) {
           const { data: inserted, error: insertError } = await supabase
             .from('notification_preferences')
             .insert({ user_id: userId })
-            .select('*')
+            .select(NOTIFICATION_PREFERENCES_COLUMNS.detail)
             .single();
 
           if (insertError) {
@@ -204,7 +205,7 @@ export function useNotifications(userId?: string) {
           .from('notification_preferences')
           .update(updates)
           .eq('user_id', userId)
-          .select('*')
+          .select(NOTIFICATION_PREFERENCES_COLUMNS.detail)
           .maybeSingle();
 
         if (error) {

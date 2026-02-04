@@ -1,95 +1,66 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Bars3Icon,
-  PlusIcon,
-  UserPlusIcon,
-  ChatBubbleLeftRightIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/outline';
-import { Workspace } from '../../../types';
+  Home,
+  CalendarDays,
+  Mail,
+  BarChart3,
+  Search,
+  Plus,
+  Users,
+  SlidersHorizontal,
+  Image,
+  MessageSquare
+} from 'lucide-react';
+
 import { MobileTaskSummary } from './MobileTaskSummary';
-import { MobileTeamOverview } from './MobileTeamOverview';
 import { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
 import { MobileNavigation } from './MobileNavigation';
-import { MobileFeaturesPanel } from './MobileFeaturesPanel';
-import api from '../../../lib/api';
+import { MobileWorkspaceDashboardSkeleton } from './MobileWorkspaceDashboardSkeleton';
+import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface MobileWorkspaceDashboardProps {
   workspaceId?: string;
+  orgSlug?: string;
 }
 
-export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: MobileWorkspaceDashboardProps) {
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
-  const workspaceId = propWorkspaceId || paramWorkspaceId;
+export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspaceDashboardProps) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics'>('overview');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'home' | 'events' | 'email' | 'analytics' | 'search'>('home');
 
-  // Fetch workspace data
-  const { data: workspace, isLoading, error } = useQuery({
-    queryKey: ['workspace', workspaceId],
-    queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}`);
-      return response.data.workspace as Workspace;
-    },
-    enabled: !!workspaceId,
-  });
-
-  // Fetch user's workspaces for switching
-  const { data: userWorkspaces } = useQuery({
-    queryKey: ['user-workspaces'],
-    queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces');
-      return response.data.workspaces as Workspace[];
-    },
-  });
+  // Use shared shell hook
+  const { state, actions } = useWorkspaceShell({ workspaceId, orgSlug });
+  const { workspace, userWorkspaces, isLoading, error } = state;
 
   const handleQuickAction = (action: string) => {
     setIsMenuOpen(false);
     switch (action) {
       case 'create-task':
-        navigate(`/workspaces/${workspaceId}/tasks/create`);
+        actions.handleCreateTask();
         break;
       case 'invite-member':
-        navigate(`/workspaces/${workspaceId}/team/invite`);
-        break;
-      case 'view-tasks':
-        setActiveTab('tasks');
-        break;
-      case 'view-team':
-        setActiveTab('team');
-        break;
-      case 'view-communication':
-        setActiveTab('communication');
-        break;
-      case 'view-analytics':
-        setActiveTab('analytics');
+        actions.handleInviteTeamMember();
         break;
       case 'settings':
-        navigate(`/workspaces/${workspaceId}/settings`);
+        actions.handleManageSettings();
         break;
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+    return <MobileWorkspaceDashboardSkeleton />;
   }
 
   if (error || !workspace) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Workspace Not Found</h2>
-          <p className="text-gray-600 mb-4 text-sm">The workspace you're looking for doesn't exist or you don't have access to it.</p>
+          <h2 className="text-xl font-bold text-foreground mb-4">Workspace Not Found</h2>
+          <p className="text-muted-foreground mb-4 text-sm">The workspace you're looking for doesn't exist or you don't have access to it.</p>
           <button
-            onClick={() => navigate('/dashboard')}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm"
+            onClick={() => navigate(orgSlug ? `/${orgSlug}/dashboard` : '/dashboard')}
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 text-sm transition-colors"
           >
             Back to Dashboard
           </button>
@@ -98,8 +69,16 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
     );
   }
 
+  // Quick action grid items (2x2 layout like Attendflow)
+  const quickActionCards = [
+    { icon: Users, label: 'Contacts', color: 'text-primary' },
+    { icon: SlidersHorizontal, label: 'Segments', color: 'text-primary' },
+    { icon: Image, label: 'Assets', color: 'text-primary' },
+    { icon: MessageSquare, label: 'Team', color: 'text-primary' },
+  ];
+
   return (
-    <div className="min-h-screen w-full bg-gray-50 flex flex-col overflow-y-auto">
+    <div className="min-h-screen w-full bg-background flex flex-col">
       {/* Mobile Header */}
       <MobileWorkspaceHeader
         workspace={workspace}
@@ -111,14 +90,16 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
       {isMenuOpen && (
         <MobileNavigation
           workspace={workspace}
-          userWorkspaces={userWorkspaces || []}
-          activeTab={activeTab}
+          userWorkspaces={userWorkspaces}
+          activeTab={mobileActiveTab === 'home' ? 'overview' : mobileActiveTab === 'events' ? 'tasks' : mobileActiveTab === 'analytics' ? 'analytics' : 'overview'}
           onTabChange={(tab) => {
-            setActiveTab(tab);
+            if (tab === 'overview') setMobileActiveTab('home');
+            else if (tab === 'tasks') setMobileActiveTab('events');
+            else if (tab === 'analytics') setMobileActiveTab('analytics');
             setIsMenuOpen(false);
           }}
           onWorkspaceSwitch={(newWorkspaceId) => {
-            navigate(`/workspaces/${newWorkspaceId}`);
+            actions.handleWorkspaceSwitch(newWorkspaceId);
             setIsMenuOpen(false);
           }}
           onQuickAction={handleQuickAction}
@@ -126,189 +107,163 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
         />
       )}
 
-      {/* Main Content */}
-      <div className="w-full pt-16 pb-24 px-4 space-y-6">
-        {activeTab === 'overview' && (
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto pt-20 pb-24 px-4">
+        {mobileActiveTab === 'home' && (
           <div className="space-y-6">
-            {/* Overview Cards */}
-            <section aria-label="Workspace overview" className="space-y-4">
-              <h2 className="text-base font-semibold text-gray-900">Workspace overview</h2>
-              <div className="grid grid-cols-1 gap-4">
-                {/* Tasks Card */}
+            {/* 2x2 Quick Action Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {quickActionCards.map((card, index) => (
                 <button
-                  type="button"
-                  onClick={() => handleQuickAction('view-tasks')}
-                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
+                  key={index}
+                  className="bg-card border border-border rounded-xl p-5 flex flex-col items-center justify-center gap-2 hover:bg-muted/50 active:scale-[0.98] transition-all"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50">
-                      <PlusIcon className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Tasks</p>
-                      <p className="text-xs text-gray-500">View and update all workspace tasks</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">
-                      {workspace.taskSummary?.total ?? 0}
-                    </p>
-                    <p className="text-xs text-gray-400">total</p>
-                  </div>
+                  <card.icon className={`w-6 h-6 ${card.color}`} />
+                  <span className="text-sm font-medium text-foreground">{card.label}</span>
                 </button>
+              ))}
+            </div>
 
-                {/* Team Card */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickAction('view-team')}
-                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
-                      <UserPlusIcon className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Team</p>
-                      <p className="text-xs text-gray-500">See who is in your workspace</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">
-                      {workspace.teamMembers?.length ?? 0}
-                    </p>
-                    <p className="text-xs text-gray-400">members</p>
-                  </div>
+            {/* Tasks Section */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Tasks</h2>
+                <button className="text-sm font-medium text-primary hover:underline">
+                  View all
                 </button>
+              </div>
+              {workspace.taskSummary?.total === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-muted-foreground">No tasks yet</p>
+                </div>
+              ) : (
+                <MobileTaskSummary
+                  workspace={workspace}
+                  onViewTasks={() => {}}
+                />
+              )}
+            </section>
 
-                {/* Communication Card */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickAction('view-communication')}
-                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-                      <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Communication</p>
-                      <p className="text-xs text-gray-500">Jump into workspace conversations</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-medium text-indigo-600">Open communication</p>
-                  </div>
+            {/* Upcoming Meetings Section */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Upcoming Meetings</h2>
+                <button className="text-sm font-medium text-primary hover:underline">
+                  View all
                 </button>
+              </div>
+              <div className="py-8 text-center">
+                <p className="text-muted-foreground">No upcoming meetings</p>
               </div>
             </section>
 
-            {/* Existing rich panels below the overview cards */}
-            <MobileFeaturesPanel
-              workspaceId={workspace.id}
-              onLocationUpdate={(location) => {
-                console.log('Location updated:', location);
-              }}
-              onPhotoCapture={(file) => {
-                console.log('Photo captured:', file.name);
-              }}
-              onVoiceRecording={(audioBlob) => {
-                console.log('Voice recording captured:', audioBlob.size, 'bytes');
-              }}
-            />
-
-            <MobileTaskSummary
-              workspace={workspace}
-              onViewTasks={() => handleQuickAction('view-tasks')}
-            />
-
-            <MobileTeamOverview
-              workspace={workspace}
-              onViewTeam={() => handleQuickAction('view-team')}
-            />
+            {/* Upcoming Events Section */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Upcoming Events</h2>
+                <button className="text-sm font-medium text-primary hover:underline">
+                  View all
+                </button>
+              </div>
+              <div className="py-8 text-center">
+                <p className="text-muted-foreground">No upcoming events</p>
+              </div>
+            </section>
           </div>
         )}
 
-        {activeTab === 'tasks' && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tasks</h2>
-            <p className="text-gray-600 text-sm">Mobile task management interface will be implemented in the next component.</p>
+        {mobileActiveTab === 'events' && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Events</h2>
+            <div className="py-8 text-center text-muted-foreground">
+              No events to display
+            </div>
           </div>
         )}
 
-        {activeTab === 'team' && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Team</h2>
-            <p className="text-gray-600 text-sm">Mobile team management interface will be implemented in the next component.</p>
+        {mobileActiveTab === 'email' && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Email</h2>
+            <div className="py-8 text-center text-muted-foreground">
+              No emails to display
+            </div>
           </div>
         )}
 
-        {activeTab === 'communication' && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Communication</h2>
-            <p className="text-gray-600 text-sm">Mobile communication interface will be implemented in the next component.</p>
+        {mobileActiveTab === 'analytics' && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Analytics</h2>
+            <div className="py-8 text-center text-muted-foreground">
+              Analytics coming soon
+            </div>
           </div>
         )}
 
-        {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Analytics</h2>
-            <p className="text-gray-600 text-sm">Mobile analytics interface will be implemented in the next component.</p>
+        {mobileActiveTab === 'search' && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Search</h2>
+            <div className="py-8 text-center text-muted-foreground">
+              Search functionality coming soon
+            </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-around">
+      {/* Floating Action Button */}
+      <button
+        onClick={() => handleQuickAction('create-task')}
+        className="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-gradient-to-br from-primary via-primary to-cyan-400 text-primary-foreground shadow-lg flex items-center justify-center hover:shadow-xl active:scale-95 transition-all z-40"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
+
+      {/* Bottom Navigation - Attendflow style */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+        <div className="flex justify-around items-center h-16 px-2 pb-safe">
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'overview'
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={() => setMobileActiveTab('home')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
+              mobileActiveTab === 'home' ? 'text-primary' : 'text-muted-foreground'
+            }`}
           >
-            <Bars3Icon className="w-5 h-5" />
-            <span className="text-xs mt-1">Overview</span>
+            <Home className="w-5 h-5" />
+            <span className="text-xs mt-1 font-medium">Home</span>
           </button>
           <button
-            onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'tasks'
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={() => setMobileActiveTab('events')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
+              mobileActiveTab === 'events' ? 'text-primary' : 'text-muted-foreground'
+            }`}
           >
-            <PlusIcon className="w-5 h-5" />
-            <span className="text-xs mt-1">Tasks</span>
+            <CalendarDays className="w-5 h-5" />
+            <span className="text-xs mt-1 font-medium">Events</span>
           </button>
           <button
-            onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'team'
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={() => setMobileActiveTab('email')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
+              mobileActiveTab === 'email' ? 'text-primary' : 'text-muted-foreground'
+            }`}
           >
-            <UserPlusIcon className="w-5 h-5" />
-            <span className="text-xs mt-1">Team</span>
+            <Mail className="w-5 h-5" />
+            <span className="text-xs mt-1 font-medium">Email</span>
           </button>
           <button
-            onClick={() => setActiveTab('communication')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'communication'
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={() => setMobileActiveTab('analytics')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
+              mobileActiveTab === 'analytics' ? 'text-primary' : 'text-muted-foreground'
+            }`}
           >
-            <ChatBubbleLeftRightIcon className="w-5 h-5" />
-            <span className="text-xs mt-1">Chat</span>
+            <BarChart3 className="w-5 h-5" />
+            <span className="text-xs mt-1 font-medium">Analytics</span>
           </button>
           <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'analytics'
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={() => setMobileActiveTab('search')}
+            className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
+              mobileActiveTab === 'search' ? 'text-primary' : 'text-muted-foreground'
+            }`}
           >
-            <ChartBarIcon className="w-5 h-5" />
-            <span className="text-xs mt-1">Stats</span>
+            <Search className="w-5 h-5" />
+            <span className="text-xs mt-1 font-medium">Search</span>
           </button>
         </div>
       </div>

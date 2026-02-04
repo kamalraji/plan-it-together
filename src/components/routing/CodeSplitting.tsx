@@ -157,7 +157,7 @@ export const BundleAnalyzer: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 bg-gray-800 text-white p-3 rounded-md text-xs max-w-xs">
+    <div className="fixed bottom-4 left-4 bg-foreground/80 text-white p-3 rounded-md text-xs max-w-xs">
       <div className="font-semibold mb-2">Bundle Info</div>
       <div className="space-y-1">
         <div>Chunks: {bundleInfo.chunks}</div>

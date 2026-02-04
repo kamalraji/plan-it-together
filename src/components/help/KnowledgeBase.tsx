@@ -195,17 +195,17 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
   if (selectedArticle) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-card rounded-lg border border-border">
         {/* Article Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-border">
           <button
             onClick={() => setSelectedArticle(null)}
             className="text-blue-600 hover:text-blue-800 mb-4 flex items-center"
           >
             ← Back to Knowledge Base
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{selectedArticle.title}</h1>
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground mb-2">{selectedArticle.title}</h1>
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
             <span className="flex items-center">
               <User className="w-4 h-4 mr-1" />
               {selectedArticle.author}
@@ -221,12 +221,12 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
         {/* Article Content */}
         <div className="p-6">
           <div className="prose max-w-none">
-            <p className="text-lg text-gray-700 mb-6">{selectedArticle.excerpt}</p>
+            <p className="text-lg text-foreground mb-6">{selectedArticle.excerpt}</p>
             <div className="whitespace-pre-wrap">{selectedArticle.content}</div>
           </div>
 
           {/* Tags */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-8 pt-6 border-t border-border">
             <div className="flex flex-wrap gap-2">
               {selectedArticle.tags.map((tag) => (
                 <span
@@ -240,8 +240,8 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
           </div>
 
           {/* Feedback */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3">Was this article helpful?</p>
+          <div className="mt-6 pt-6 border-t border-border">
+            <p className="text-sm text-muted-foreground mb-3">Was this article helpful?</p>
             <div className="flex space-x-4">
               <button
                 onClick={() => handleHelpfulClick(selectedArticle.id, true)}
@@ -266,11 +266,11 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
+      <div className="bg-card rounded-lg border border-border p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-4 bg-muted rounded w-1/4"></div>
+          <div className="h-4 bg-muted rounded w-1/2"></div>
+          <div className="h-4 bg-muted rounded w-1/3"></div>
         </div>
       </div>
     );
@@ -280,17 +280,17 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
     <div className="space-y-6">
       {/* Search Input */}
       {!searchQuery && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-card rounded-lg border border-border p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
               placeholder={`Search knowledge base${currentContext ? ` for ${currentContext}` : ''}...`}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
             />
           </div>
           {user && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-muted-foreground">
               Showing content relevant to {user.role.toLowerCase()} role
             </p>
           )}
@@ -298,8 +298,8 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
       )}
       {/* Featured Articles */}
       {!searchQuery && featuredArticles.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <div className="bg-card rounded-lg border border-border p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center">
             <BookOpen className="w-5 h-5 mr-2" />
             Featured Articles
           </h2>
@@ -308,11 +308,11 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
               <div
                 key={article.id}
                 onClick={() => handleArticleClick(article)}
-                className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors"
+                className="p-4 border border-border rounded-lg hover:border-blue-300 cursor-pointer transition-colors"
               >
-                <h3 className="font-medium text-gray-900 mb-2">{article.title}</h3>
-                <p className="text-sm text-gray-600 mb-3">{article.excerpt}</p>
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <h3 className="font-medium text-foreground mb-2">{article.title}</h3>
+                <p className="text-sm text-muted-foreground mb-3">{article.excerpt}</p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{article.readTime} min read</span>
                   <span>{article.views} views</span>
                 </div>
@@ -324,8 +324,8 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
       {/* Categories */}
       {!searchQuery && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse by Category</h2>
+        <div className="bg-card rounded-lg border border-border p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Browse by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category) => (
               <button
@@ -334,16 +334,16 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
                 className={`p-4 text-left border rounded-lg transition-colors ${
                   selectedCategory === category.id
                     ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-border hover:border-input'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl">{category.icon}</span>
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">{category.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">{category.description}</p>
-                <span className="text-xs text-gray-500">{category.articleCount} articles</span>
+                <h3 className="font-medium text-foreground mb-1">{category.name}</h3>
+                <p className="text-sm text-muted-foreground mb-2">{category.description}</p>
+                <span className="text-xs text-muted-foreground">{category.articleCount} articles</span>
               </button>
             ))}
           </div>
@@ -351,10 +351,10 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
       )}
 
       {/* Articles List */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-card rounded-lg border border-border">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-foreground">
               {searchQuery ? `Search Results (${filteredArticles.length})` : 
                selectedCategory === 'all' ? 'All Articles' : 
                categories.find(c => c.id === selectedCategory)?.name}
@@ -370,18 +370,18 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-border">
           {filteredArticles.map((article) => (
             <div
               key={article.id}
               onClick={() => handleArticleClick(article)}
-              className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
+              className="p-6 hover:bg-muted/50 cursor-pointer transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-900 mb-2">{article.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{article.excerpt}</p>
-                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                  <h3 className="font-medium text-foreground mb-2">{article.title}</h3>
+                  <p className="text-muted-foreground text-sm mb-3">{article.excerpt}</p>
+                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                     <span className="flex items-center">
                       <Clock className="w-3 h-3 mr-1" />
                       {article.readTime} min
@@ -393,15 +393,15 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 ml-4" />
+                <ChevronRight className="w-5 h-5 text-muted-foreground ml-4" />
               </div>
             </div>
           ))}
         </div>
 
         {filteredArticles.length === 0 && (
-          <div className="p-8 text-center text-gray-500">
-            <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="p-8 text-center text-muted-foreground">
+            <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground/70" />
             <p>No articles found matching your criteria.</p>
           </div>
         )}
@@ -409,14 +409,14 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
 
       {/* FAQ Section */}
       {!searchQuery && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Frequently Asked Questions</h2>
+        <div className="bg-card rounded-lg border border-border p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.slice(0, 3).map((faq) => (
-              <div key={faq.id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                <h3 className="font-medium text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600 text-sm mb-2">{faq.answer}</p>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
+              <div key={faq.id} className="border-b border-border pb-4 last:border-b-0">
+                <h3 className="font-medium text-foreground mb-2">{faq.question}</h3>
+                <p className="text-muted-foreground text-sm mb-2">{faq.answer}</p>
+                <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                   <span className="flex items-center">
                     <ThumbsUp className="w-3 h-3 mr-1" />
                     {faq.helpful}

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StarIcon, MapPinIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
+import { SearchEmptyState } from '@/components/ui/empty-state';
 
 interface SearchFilters {
   query?: string;
@@ -325,12 +326,10 @@ export const ServiceDiscoveryEnhanced: React.FC = () => {
             </div>
 
             {services && services.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No services found matching your criteria.</p>
-                <Button variant="link" onClick={() => setFilters({ sortBy: 'rating' })}>
-                  Clear Filters
-                </Button>
-              </div>
+              <SearchEmptyState
+                searchTerm={filters.query}
+                onClear={() => setFilters({ sortBy: 'rating' })}
+              />
             )}
           </>
         )}

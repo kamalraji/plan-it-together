@@ -4,9 +4,10 @@ import { MobileWorkspaceDashboard } from './mobile/MobileWorkspaceDashboard';
 
 interface ResponsiveWorkspaceDashboardProps {
   workspaceId?: string;
+  orgSlug?: string;
 }
 
-export function ResponsiveWorkspaceDashboard({ workspaceId }: ResponsiveWorkspaceDashboardProps) {
+export function ResponsiveWorkspaceDashboard({ workspaceId, orgSlug }: ResponsiveWorkspaceDashboardProps) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -34,8 +35,8 @@ export function ResponsiveWorkspaceDashboard({ workspaceId }: ResponsiveWorkspac
   }, []);
 
   return isMobile ? (
-    <MobileWorkspaceDashboard workspaceId={workspaceId} />
+    <MobileWorkspaceDashboard workspaceId={workspaceId} orgSlug={orgSlug} />
   ) : (
-    <WorkspaceDashboard workspaceId={workspaceId} />
+    <WorkspaceDashboard workspaceId={workspaceId} orgSlug={orgSlug} />
   );
 }

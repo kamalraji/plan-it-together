@@ -280,7 +280,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <label htmlFor="businessName" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="businessName" className="block text-sm font-medium text-foreground">
           Business Name *
         </label>
         <input
@@ -288,13 +288,13 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
           id="businessName"
           value={formData.businessName}
           onChange={(e) => handleInputChange('businessName', e.target.value)}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
           placeholder="Enter your business name"
         />
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="description" className="block text-sm font-medium text-foreground">
           Business Description *
         </label>
         <textarea
@@ -302,7 +302,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
           rows={4}
           value={formData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
           placeholder="Describe your business and the services you offer"
         />
       </div>
@@ -313,7 +313,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-foreground">
             Email Address *
           </label>
           <input
@@ -321,12 +321,12 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             id="email"
             value={formData.contactInfo.email}
             onChange={(e) => handleNestedInputChange('contactInfo', 'email', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="phone" className="block text-sm font-medium text-foreground">
             Phone Number *
           </label>
           <input
@@ -334,13 +334,13 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             id="phone"
             value={formData.contactInfo.phone}
             onChange={(e) => handleNestedInputChange('contactInfo', 'phone', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="website" className="block text-sm font-medium text-foreground">
           Website
         </label>
         <input
@@ -348,17 +348,17 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
           id="website"
           value={formData.contactInfo.website}
           onChange={(e) => handleNestedInputChange('contactInfo', 'website', e.target.value)}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
           placeholder="https://your-website.com"
         />
       </div>
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Business Address</h3>
+        <h3 className="text-lg font-medium text-foreground mb-4">Business Address</h3>
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="street" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="street" className="block text-sm font-medium text-foreground">
               Street Address *
             </label>
             <input
@@ -366,13 +366,13 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               id="street"
               value={formData.businessAddress.street}
               onChange={(e) => handleNestedInputChange('businessAddress', 'street', e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="city" className="block text-sm font-medium text-foreground">
                 City *
               </label>
               <input
@@ -380,12 +380,12 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 id="city"
                 value={formData.businessAddress.city}
                 onChange={(e) => handleNestedInputChange('businessAddress', 'city', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
 
             <div>
-              <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="state" className="block text-sm font-medium text-foreground">
                 State *
               </label>
               <input
@@ -393,12 +393,12 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 id="state"
                 value={formData.businessAddress.state}
                 onChange={(e) => handleNestedInputChange('businessAddress', 'state', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
 
             <div>
-              <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="postalCode" className="block text-sm font-medium text-foreground">
                 Postal Code *
               </label>
               <input
@@ -406,13 +406,13 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 id="postalCode"
                 value={formData.businessAddress.postalCode}
                 onChange={(e) => handleNestedInputChange('businessAddress', 'postalCode', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="country" className="block text-sm font-medium text-foreground">
               Country *
             </label>
             <input
@@ -420,7 +420,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               id="country"
               value={formData.businessAddress.country}
               onChange={(e) => handleNestedInputChange('businessAddress', 'country', e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
             />
           </div>
         </div>
@@ -431,10 +431,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
   const renderStep3 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <h3 className="text-lg font-medium text-foreground mb-4">
           Service Categories *
         </h3>
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-muted-foreground mb-6">
           Select all categories that apply to your business. You can add more later.
         </p>
         
@@ -442,10 +442,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
           {serviceCategories.map((category) => (
             <div
               key={category.value}
-              className={`relative rounded-lg border p-4 cursor-pointer hover:bg-gray-50 ${
+              className={`relative rounded-lg border p-4 cursor-pointer hover:bg-muted/50 ${
                 formData.serviceCategories.includes(category.value)
                   ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-300'
+                  : 'border-input'
               }`}
               onClick={() => handleServiceCategoryToggle(category.value)}
             >
@@ -455,14 +455,14 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                     type="checkbox"
                     checked={formData.serviceCategories.includes(category.value)}
                     onChange={() => handleServiceCategoryToggle(category.value)}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                    className="focus-visible:ring-ring h-4 w-4 text-blue-600 border-input rounded"
                   />
                 </div>
                 <div className="ml-3">
-                  <label className="font-medium text-gray-900">
+                  <label className="font-medium text-foreground">
                     {category.label}
                   </label>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {category.description}
                   </p>
                 </div>
@@ -477,22 +477,22 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
   const renderStep4 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <h3 className="text-lg font-medium text-foreground mb-4">
           Verification Documents
         </h3>
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-muted-foreground mb-6">
           Upload the required documents to verify your business. This helps build trust with event organizers.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Business License *
         </label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input border-dashed rounded-md">
           <div className="space-y-1 text-center">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-muted-foreground"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -504,10 +504,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <div className="flex text-sm text-gray-600">
+            <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="businessLicense"
-                className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
               >
                 <span>Upload business license</span>
                 <input
@@ -521,7 +521,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               </label>
               <p className="pl-1">or drag and drop</p>
             </div>
-            <p className="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
+            <p className="text-xs text-muted-foreground">PDF, PNG, JPG up to 10MB</p>
             {formData.businessLicense && (
               <p className="text-sm text-green-600">✓ Document uploaded</p>
             )}
@@ -530,14 +530,14 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Insurance Certificate
-          <span className="text-sm text-gray-500 ml-1">(Required for certain categories)</span>
+          <span className="text-sm text-muted-foreground ml-1">(Required for certain categories)</span>
         </label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input border-dashed rounded-md">
           <div className="space-y-1 text-center">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-muted-foreground"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -549,10 +549,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <div className="flex text-sm text-gray-600">
+            <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="insuranceCertificate"
-                className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
               >
                 <span>Upload insurance certificate</span>
                 <input
@@ -566,7 +566,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               </label>
               <p className="pl-1">or drag and drop</p>
             </div>
-            <p className="text-xs text-gray-500">PDF, PNG, JPG up to 10MB</p>
+            <p className="text-xs text-muted-foreground">PDF, PNG, JPG up to 10MB</p>
             {formData.insuranceCertificate && (
               <p className="text-sm text-green-600">✓ Document uploaded</p>
             )}
@@ -579,19 +579,19 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
   const renderStep5 = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <h3 className="text-lg font-medium text-foreground mb-4">
           Portfolio
         </h3>
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-muted-foreground mb-6">
           Showcase your best work to attract more clients. You can add photos, videos, or documents.
         </p>
       </div>
 
       <div>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input border-dashed rounded-md">
           <div className="space-y-1 text-center">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-muted-foreground"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -603,10 +603,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <div className="flex text-sm text-gray-600">
+            <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="portfolio"
-                className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
               >
                 <span>Upload portfolio files</span>
                 <input
@@ -621,18 +621,18 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               </label>
               <p className="pl-1">or drag and drop</p>
             </div>
-            <p className="text-xs text-gray-500">Images, videos, or PDFs up to 10MB each</p>
+            <p className="text-xs text-muted-foreground">Images, videos, or PDFs up to 10MB each</p>
           </div>
         </div>
       </div>
 
       {formData.portfolio.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Uploaded Files</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Uploaded Files</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {formData.portfolio.map((item) => (
               <div key={item.id} className="relative group">
-                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-muted">
                   {item.type === 'IMAGE' ? (
                     <img
                       src={item.url}
@@ -643,7 +643,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
                         <svg
-                          className="mx-auto h-12 w-12 text-gray-400"
+                          className="mx-auto h-12 w-12 text-muted-foreground"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -655,7 +655,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                           />
                         </svg>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {item.type}
                         </p>
                       </div>
@@ -682,8 +682,8 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Become a Vendor</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-3xl font-bold text-foreground">Become a Vendor</h1>
+        <p className="mt-2 text-muted-foreground">
           Join our marketplace and connect with event organizers looking for your services.
         </p>
       </div>
@@ -700,8 +700,8 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                       step.id < currentStep
                         ? 'bg-blue-600'
                         : step.id === currentStep
-                        ? 'border-2 border-blue-600 bg-white'
-                        : 'border-2 border-gray-300 bg-white'
+                        ? 'border-2 border-blue-600 bg-card'
+                        : 'border-2 border-input bg-card'
                     }`}
                   >
                     {step.id < currentStep ? (
@@ -715,19 +715,19 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                     ) : (
                       <span
                         className={`text-sm font-medium ${
-                          step.id === currentStep ? 'text-blue-600' : 'text-gray-500'
+                          step.id === currentStep ? 'text-blue-600' : 'text-muted-foreground'
                         }`}
                       >
                         {step.id}
                       </span>
                     )}
                   </div>
-                  <span className="ml-4 text-sm font-medium text-gray-900">{step.name}</span>
+                  <span className="ml-4 text-sm font-medium text-foreground">{step.name}</span>
                 </div>
                 {stepIdx !== steps.length - 1 && (
                   <div
                     className={`absolute top-4 left-4 -ml-px mt-0.5 h-full w-0.5 ${
-                      step.id < currentStep ? 'bg-blue-600' : 'bg-gray-300'
+                      step.id < currentStep ? 'bg-blue-600' : 'bg-muted'
                     }`}
                   />
                 )}
@@ -738,12 +738,12 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
       </div>
 
       {/* Form Content */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-foreground">
             {steps[currentStep - 1].name}
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {steps[currentStep - 1].description}
           </p>
         </div>
@@ -781,8 +781,8 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             disabled={currentStep === 1}
             className={`px-4 py-2 text-sm font-medium rounded-md ${
               currentStep === 1
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'text-foreground bg-card border border-input hover:bg-muted/50'
             }`}
           >
             Previous
@@ -792,7 +792,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             <button
               type="button"
               onClick={nextStep}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
             >
               Next
             </button>
@@ -801,7 +801,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Profile...' : 'Complete Registration'}
             </button>

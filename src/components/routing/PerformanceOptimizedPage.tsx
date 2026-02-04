@@ -135,11 +135,11 @@ export const OptimizedDataTable: React.FC<{
   const renderRow = (item: any, index: number) => (
     <tr
       key={index}
-      className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+      className={`hover:bg-muted/50 ${onRowClick ? 'cursor-pointer' : ''}`}
       onClick={() => onRowClick?.(item)}
     >
       {columns.map((column) => (
-        <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
           {column.render ? column.render(item[column.key], item) : item[column.key]}
         </td>
       ))}
@@ -159,26 +159,26 @@ export const OptimizedDataTable: React.FC<{
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
       )}
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-card shadow rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted/50">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >
                   {column.label}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {virtualized ? (
               <tr>
                 <td colSpan={columns.length} className="p-0">
@@ -198,7 +198,7 @@ export const OptimizedDataTable: React.FC<{
 
         {filteredData.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No data found</p>
+            <p className="text-muted-foreground">No data found</p>
           </div>
         )}
       </div>
@@ -265,7 +265,7 @@ export const OptimizedList: React.FC<{
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
       )}
@@ -279,7 +279,7 @@ export const OptimizedList: React.FC<{
           />
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500">No items found</p>
+            <p className="text-muted-foreground">No items found</p>
           </div>
         )
       ) : progressive ? (
@@ -317,8 +317,8 @@ export const OptimizedDashboard: React.FC<{
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${columns} gap-6`}>
       {widgets.map((widget) => (
-        <div key={widget.id} className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{widget.title}</h3>
+        <div key={widget.id} className="bg-card rounded-lg border border-border p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">{widget.title}</h3>
           
           <LoadingOverlay isLoading={widget.loading || false}>
             {widget.error ? (

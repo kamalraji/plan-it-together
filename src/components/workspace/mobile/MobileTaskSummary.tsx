@@ -26,10 +26,10 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="bg-card rounded-lg shadow-sm p-4">
         <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-muted rounded w-1/3"></div>
+          <div className="h-20 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -78,12 +78,12 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-card rounded-lg shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center space-x-2">
-          <ClipboardDocumentListIcon className="w-5 h-5 text-gray-600" />
-          <h3 className="text-base font-semibold text-gray-900">Tasks</h3>
+          <ClipboardDocumentListIcon className="w-5 h-5 text-muted-foreground" />
+          <h3 className="text-base font-semibold text-foreground">Tasks</h3>
         </div>
         <button
           onClick={onViewTasks}
@@ -95,19 +95,19 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
       </div>
 
       {/* Progress Bar */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-          <span className="text-sm font-semibold text-gray-900">{completionRate}%</span>
+          <span className="text-sm font-medium text-foreground">Overall Progress</span>
+          <span className="text-sm font-semibold text-foreground">{completionRate}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-muted rounded-full h-2">
           <div
             className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${completionRate}%` }}
           ></div>
         </div>
         <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-gray-500">{completedTasks} of {totalTasks} tasks completed</span>
+          <span className="text-xs text-muted-foreground">{completedTasks} of {totalTasks} tasks completed</span>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
             >
               <div className="flex items-center space-x-2 mb-1">
                 <Icon className={`w-4 h-4 ${stat.color}`} />
-                <span className="text-xs font-medium text-gray-600">{stat.label}</span>
+                <span className="text-xs font-medium text-muted-foreground">{stat.label}</span>
               </div>
               <div className={`text-2xl font-bold ${stat.color}`}>
                 {stat.value}
@@ -134,8 +134,8 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
 
       {/* Upcoming Tasks Preview */}
       {tasks && tasks.length > 0 && (
-        <div className="p-4 border-t border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Upcoming Tasks</h4>
+        <div className="p-4 border-t border-border">
+          <h4 className="text-sm font-medium text-foreground mb-3">Upcoming Tasks</h4>
           <div className="space-y-2">
             {tasks
               .filter(t => t.status !== 'COMPLETED' && t.dueDate)
@@ -149,12 +149,12 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
                 return (
                   <div
                     key={task.id}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+                    className="flex items-center justify-between p-2 bg-muted/50 rounded-md"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{task.title}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
                       {task.dueDate && (
-                        <p className={`text-xs ${isOverdue ? 'text-red-600' : 'text-gray-500'}`}>
+                        <p className={`text-xs ${isOverdue ? 'text-red-600' : 'text-muted-foreground'}`}>
                           Due: {new Date(task.dueDate).toLocaleDateString()}
                         </p>
                       )}
@@ -164,7 +164,7 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
                         ? 'bg-red-100 text-red-800'
                         : task.priority === 'MEDIUM'
                         ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-muted text-foreground'
                     }`}>
                       {task.priority}
                     </span>

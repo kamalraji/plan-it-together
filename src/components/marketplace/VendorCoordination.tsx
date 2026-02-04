@@ -120,7 +120,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
         return 'bg-red-100 text-red-800';
       case 'PENDING':
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -161,16 +161,16 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-foreground">
           Vendor Coordination
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Manage vendor timelines, deliverables, and communications
         </p>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'timeline', name: 'Timeline' },
@@ -183,7 +183,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
               {tab.name}
@@ -198,7 +198,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
           {timeline && timeline.length > 0 ? (
             <div className="space-y-4">
               {timeline.map((event) => (
-                <div key={event.id} className="flex items-start space-x-4 p-4 bg-white border border-gray-200 rounded-lg">
+                <div key={event.id} className="flex items-start space-x-4 p-4 bg-card border border-border rounded-lg">
                   <div className="flex-shrink-0">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${getStatusColor(event.status)}`}>
                       {getTimelineIcon(event.type)}
@@ -206,17 +206,17 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-medium text-gray-900">
+                      <h4 className="text-sm font-medium text-foreground">
                         {event.title}
                       </h4>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
                         {event.status.replace('_', ' ').toLowerCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {event.description}
                     </p>
-                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                    <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
                       <span>Due: {new Date(event.date).toLocaleDateString()}</span>
                       {event.vendorId && (
                         <span>
@@ -230,7 +230,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">No timeline events yet. Timeline will populate as vendors are confirmed.</p>
+              <p className="text-muted-foreground">No timeline events yet. Timeline will populate as vendors are confirmed.</p>
             </div>
           )}
         </div>
@@ -241,13 +241,13 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
         <div className="space-y-6">
           {/* Vendor Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Select Vendor to Communicate With
             </label>
             <select
               value={selectedBooking || ''}
               onChange={(e) => setSelectedBooking(e.target.value || null)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
             >
               <option value="">Choose a vendor...</option>
               {confirmedBookings.map((booking) => (
@@ -268,8 +268,8 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                 return (
                   <>
                     {/* Message History */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto">
-                      <h4 className="font-medium text-gray-900 mb-4">
+                    <div className="bg-card border border-border rounded-lg p-4 max-h-96 overflow-y-auto">
+                      <h4 className="font-medium text-foreground mb-4">
                         Messages with {booking.vendor.businessName}
                       </h4>
                       
@@ -284,12 +284,12 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                                   message.senderType === 'ORGANIZER'
                                     ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 text-gray-900'
+                                    : 'bg-muted text-foreground'
                                 }`}
                               >
                                 <p className="text-sm">{message.message}</p>
                                 <p className={`text-xs mt-1 ${
-                                  message.senderType === 'ORGANIZER' ? 'text-blue-100' : 'text-gray-500'
+                                  message.senderType === 'ORGANIZER' ? 'text-blue-100' : 'text-muted-foreground'
                                 }`}>
                                   {new Date(message.sentAt).toLocaleString()}
                                 </p>
@@ -298,7 +298,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-600 text-sm">No messages yet. Start the conversation!</p>
+                        <p className="text-muted-foreground text-sm">No messages yet. Start the conversation!</p>
                       )}
                     </div>
 
@@ -309,7 +309,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your message..."
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
                             handleSendMessage(selectedBooking);
@@ -337,12 +337,12 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
         <div className="space-y-4">
           {confirmedBookings.length > 0 ? (
             confirmedBookings.map((booking) => (
-              <div key={booking.id} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div key={booking.id} className="bg-card border border-border rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-medium text-gray-900">
+                  <h4 className="text-lg font-medium text-foreground">
                     {booking.vendor.businessName}
                   </h4>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     {booking.serviceListing.title}
                   </span>
                 </div>
@@ -350,15 +350,15 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                 {booking.deliverables.length > 0 ? (
                   <div className="space-y-3">
                     {booking.deliverables.map((deliverable) => (
-                      <div key={deliverable.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                      <div key={deliverable.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                         <div className="flex-1">
-                          <h5 className="font-medium text-gray-900 text-sm">
+                          <h5 className="font-medium text-foreground text-sm">
                             {deliverable.title}
                           </h5>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             {deliverable.description}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             Due: {new Date(deliverable.dueDate).toLocaleDateString()}
                             {deliverable.completedAt && (
                               <span className="ml-2">
@@ -398,13 +398,13 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-sm">No deliverables defined yet.</p>
+                  <p className="text-muted-foreground text-sm">No deliverables defined yet.</p>
                 )}
               </div>
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600">No confirmed vendor bookings yet.</p>
+              <p className="text-muted-foreground">No confirmed vendor bookings yet.</p>
             </div>
           )}
         </div>

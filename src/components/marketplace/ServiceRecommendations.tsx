@@ -126,21 +126,21 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-foreground">
             Recommended Services
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Services suggested for your event: {event?.name}
           </p>
         </div>
         
         {/* Category Filter */}
         <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">Category:</label>
+          <label className="text-sm font-medium text-foreground">Category:</label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-1 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus-visible:ring-ring"
           >
             <option value="all">All Categories</option>
             {getEventTypeCategories().map((category) => (
@@ -179,10 +179,10 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
       {recommendations && recommendations.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {recommendations.map((service) => (
-            <div key={service.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div key={service.id} className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 text-sm">
+                  <h4 className="font-medium text-foreground text-sm">
                     {service.title}
                     {service.featured && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -190,7 +190,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
                       </span>
                     )}
                   </h4>
-                  <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                     {service.description}
                   </p>
                 </div>
@@ -198,7 +198,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
 
               {/* Vendor Info */}
               <div className="flex items-center space-x-2 mb-3">
-                <span className="text-xs font-medium text-gray-900">
+                <span className="text-xs font-medium text-foreground">
                   {service.vendor.businessName}
                 </span>
                 {service.vendor.verificationStatus === 'VERIFIED' && (
@@ -214,7 +214,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
                         className={`w-3 h-3 ${
                           i < Math.floor(service.vendor.rating)
                             ? 'text-yellow-400'
-                            : 'text-gray-300'
+                            : 'text-muted-foreground/70'
                         }`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
@@ -223,7 +223,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
                       </svg>
                     ))}
                   </div>
-                  <span className="ml-1 text-xs text-gray-600">
+                  <span className="ml-1 text-xs text-muted-foreground">
                     {service.vendor.rating.toFixed(1)} ({service.vendor.reviewCount})
                   </span>
                 </div>
@@ -231,7 +231,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
 
               {/* Pricing */}
               <div className="mb-3">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-foreground">
                   {formatPrice(service.pricing)}
                 </span>
               </div>
@@ -240,7 +240,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
               <div className="flex space-x-2">
                 <button
                   onClick={() => onAddToShortlist(service.id)}
-                  className="flex-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+                  className="flex-1 text-xs bg-muted text-foreground px-2 py-1 rounded hover:bg-muted transition-colors"
                 >
                   Add to Shortlist
                 </button>
@@ -256,13 +256,13 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
         </div>
       ) : (
         <div className="text-center py-8">
-          <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+          <div className="mx-auto h-12 w-12 text-muted-foreground mb-4">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No recommendations found</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-medium text-foreground mb-2">No recommendations found</h3>
+          <p className="text-muted-foreground">
             We couldn't find any services matching your event requirements. Try browsing all services.
           </p>
         </div>

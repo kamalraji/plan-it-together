@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Registration, RegistrationStatus, Event } from '../../types';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 interface RegistrationConfirmationProps {
   registration: Registration;
@@ -12,6 +13,7 @@ export const RegistrationConfirmation: React.FC<RegistrationConfirmationProps> =
   event,
 }) => {
   const navigate = useNavigate();
+  const { data: primaryOrg } = usePrimaryOrganization();
 
   const getStatusInfo = () => {
     switch (registration.status) {
@@ -206,7 +208,7 @@ export const RegistrationConfirmation: React.FC<RegistrationConfirmationProps> =
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard')}
               className="flex-1 bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-medium hover:from-primary hover:to-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
             >
               Go to Dashboard

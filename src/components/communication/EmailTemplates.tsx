@@ -15,9 +15,9 @@ export function EmailTemplates({
 }: EmailTemplatesProps) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Email Templates</h3>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+      <div className="bg-card border border-border rounded-lg p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">Email Templates</h3>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
           <span>Loading templates...</span>
         </div>
@@ -27,12 +27,12 @@ export function EmailTemplates({
 
   if (!templates || templates.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Email Templates</h3>
+      <div className="bg-card border border-border rounded-lg p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">Email Templates</h3>
         <div className="text-center py-6">
-          <div className="text-gray-400 text-4xl mb-2">📧</div>
-          <p className="text-gray-600">No email templates available</p>
-          <p className="text-sm text-gray-500 mt-1">
+          <div className="text-muted-foreground text-4xl mb-2">📧</div>
+          <p className="text-muted-foreground">No email templates available</p>
+          <p className="text-sm text-muted-foreground mt-1">
             You can still compose emails manually below
           </p>
         </div>
@@ -41,9 +41,9 @@ export function EmailTemplates({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Email Templates</h3>
-      <p className="text-sm text-gray-600 mb-4">
+    <div className="bg-card border border-border rounded-lg p-6">
+      <h3 className="text-lg font-medium text-foreground mb-4">Email Templates</h3>
+      <p className="text-sm text-muted-foreground mb-4">
         Choose a pre-built template to get started quickly, or compose your own email from scratch.
       </p>
 
@@ -54,12 +54,12 @@ export function EmailTemplates({
             className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
               selectedTemplate?.id === template.id
                 ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                : 'border-border hover:border-input hover:shadow-sm'
             }`}
             onClick={() => onTemplateSelect(template)}
           >
             <div className="flex items-start justify-between mb-2">
-              <h4 className="font-medium text-gray-900">{template.name}</h4>
+              <h4 className="font-medium text-foreground">{template.name}</h4>
               {selectedTemplate?.id === template.id && (
                 <div className="flex-shrink-0">
                   <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
@@ -73,13 +73,13 @@ export function EmailTemplates({
 
             <div className="space-y-2">
               <div>
-                <p className="text-xs font-medium text-gray-700 mb-1">Subject:</p>
-                <p className="text-sm text-gray-600 truncate">{template.subject}</p>
+                <p className="text-xs font-medium text-foreground mb-1">Subject:</p>
+                <p className="text-sm text-muted-foreground truncate">{template.subject}</p>
               </div>
 
               <div>
-                <p className="text-xs font-medium text-gray-700 mb-1">Preview:</p>
-                <p className="text-sm text-gray-600 line-clamp-3">
+                <p className="text-xs font-medium text-foreground mb-1">Preview:</p>
+                <p className="text-sm text-muted-foreground line-clamp-3">
                   {template.body.substring(0, 100)}
                   {template.body.length > 100 ? '...' : ''}
                 </p>
@@ -87,18 +87,18 @@ export function EmailTemplates({
 
               {template.variables.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-gray-700 mb-1">Variables:</p>
+                  <p className="text-xs font-medium text-foreground mb-1">Variables:</p>
                   <div className="flex flex-wrap gap-1">
                     {template.variables.slice(0, 3).map((variable) => (
                       <span
                         key={variable}
-                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-foreground"
                       >
                         {`{{${variable}}}`}
                       </span>
                     ))}
                     {template.variables.length > 3 && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         +{template.variables.length - 3} more
                       </span>
                     )}
@@ -107,13 +107,13 @@ export function EmailTemplates({
               )}
             </div>
 
-            <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="mt-3 pt-3 border-t border-border">
               <button
                 type="button"
                 className={`w-full text-sm font-medium py-1 px-2 rounded transition-colors ${
                   selectedTemplate?.id === template.id
                     ? 'text-indigo-700 bg-indigo-100'
-                    : 'text-gray-700 hover:text-indigo-600'
+                    : 'text-foreground hover:text-indigo-600'
                 }`}
               >
                 {selectedTemplate?.id === template.id ? 'Selected' : 'Use Template'}

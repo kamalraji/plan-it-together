@@ -26,8 +26,8 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
     <div className="w-full overflow-x-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
         <div className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Event Marketplace</h1>
-          <p className="mt-2 text-sm sm:text-base text-gray-600">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Event Marketplace</h1>
+          <p className="mt-2 text-sm sm:text-base text-muted-foreground">
             {eventId 
               ? `Discover and book services for ${eventName || 'your event'} from verified vendors`
               : 'Discover and book services for your events from verified vendors'
@@ -36,7 +36,7 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
         </div>
 
         {/* Navigation Tabs */}
-        <div className="border-b border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
+        <div className="border-b border-border mb-6 sm:mb-8 overflow-x-auto">
           <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
             {eventId && (
               <button
@@ -44,7 +44,7 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   currentTab === 'integrated'
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >
                 <span className="mr-2">🎯</span>
@@ -62,7 +62,7 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   currentTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>

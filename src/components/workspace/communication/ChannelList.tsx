@@ -80,7 +80,7 @@ export function ChannelList({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Channels</h3>
+        <h3 className="text-lg font-medium text-foreground">Channels</h3>
         <button
           onClick={onCreateChannel}
           className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
@@ -91,10 +91,10 @@ export function ChannelList({
 
       {/* Create Channel Form */}
       {showCreateChannel && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-4 bg-muted/50 rounded-lg">
           <form onSubmit={handleSubmitCreate} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Channel Name
               </label>
               <input
@@ -102,19 +102,19 @@ export function ChannelList({
                 value={newChannelData.name}
                 onChange={(e) => setNewChannelData({ ...newChannelData, name: e.target.value })}
                 placeholder="e.g., marketing-updates"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus-visible:ring-ring"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Channel Type
               </label>
               <select
                 value={newChannelData.type}
                 onChange={(e) => setNewChannelData({ ...newChannelData, type: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus-visible:ring-ring"
               >
                 <option value="GENERAL">General Discussion</option>
                 <option value="ROLE_BASED">Role-based Team</option>
@@ -123,7 +123,7 @@ export function ChannelList({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Description (Optional)
               </label>
               <input
@@ -131,7 +131,7 @@ export function ChannelList({
                 value={newChannelData.description}
                 onChange={(e) => setNewChannelData({ ...newChannelData, description: e.target.value })}
                 placeholder="Brief description of the channel purpose"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus-visible:ring-ring"
               />
             </div>
 
@@ -141,9 +141,9 @@ export function ChannelList({
                 id="isPrivate"
                 checked={newChannelData.isPrivate}
                 onChange={(e) => setNewChannelData({ ...newChannelData, isPrivate: e.target.checked })}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
               />
-              <label htmlFor="isPrivate" className="ml-2 text-sm text-gray-700">
+              <label htmlFor="isPrivate" className="ml-2 text-sm text-foreground">
                 Private channel (invite-only)
               </label>
             </div>
@@ -159,7 +159,7 @@ export function ChannelList({
               <button
                 type="button"
                 onClick={onCancelCreate}
-                className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-400"
+                className="flex-1 bg-muted text-foreground px-3 py-2 rounded-md text-sm font-medium hover:bg-muted-foreground/20"
               >
                 Cancel
               </button>
@@ -176,7 +176,7 @@ export function ChannelList({
 
           return (
             <div key={type}>
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                 {getChannelTypeLabel(type)}
               </h4>
               <div className="space-y-1">
@@ -187,7 +187,7 @@ export function ChannelList({
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                       selectedChannel?.id === channel.id
                         ? 'bg-indigo-100 text-indigo-700 border-l-4 border-indigo-500'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        : 'text-foreground hover:bg-muted'
                     }`}
                   >
                     <div className="flex items-center space-x-2">
@@ -196,11 +196,11 @@ export function ChannelList({
                         <div className="flex items-center space-x-1">
                           <span className="font-medium truncate">#{channel.name}</span>
                           {channel.isPrivate && (
-                            <span className="text-xs text-gray-500">🔒</span>
+                            <span className="text-xs text-muted-foreground">🔒</span>
                           )}
                         </div>
                         {channel.description && (
-                          <p className="text-xs text-gray-500 truncate mt-1">
+                          <p className="text-xs text-muted-foreground truncate mt-1">
                             {channel.description}
                           </p>
                         )}
@@ -215,9 +215,9 @@ export function ChannelList({
 
         {channels.length === 0 && (
           <div className="text-center py-8">
-            <div className="text-gray-400 text-3xl mb-2">💬</div>
-            <p className="text-gray-600 text-sm">No channels yet</p>
-            <p className="text-gray-500 text-xs mt-1">
+            <div className="text-muted-foreground text-3xl mb-2">💬</div>
+            <p className="text-muted-foreground text-sm">No channels yet</p>
+            <p className="text-muted-foreground text-xs mt-1">
               Create your first channel to start communicating
             </p>
           </div>

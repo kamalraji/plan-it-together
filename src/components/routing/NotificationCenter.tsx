@@ -173,11 +173,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+        className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
         aria-label="Notifications"
       >
         {unreadCount > 0 ? (
-          <BellIconSolid className="h-6 w-6 text-indigo-600" />
+          <BellIconSolid className="h-6 w-6 text-primary" />
         ) : (
           <BellIcon className="h-6 w-6" />
         )}
@@ -194,33 +194,33 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       {isOpen && isMobile && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/30 sm:hidden"
+            className="fixed inset-0 z-40 bg-black/50 sm:hidden"
             onClick={() => setIsOpen(false)}
           />
           <div
-            className="fixed inset-x-0 bottom-0 z-50 sm:hidden bg-white rounded-t-2xl shadow-2xl ring-1 ring-black/10 max-h-[80vh] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 sm:hidden bg-card rounded-t-2xl shadow-2xl ring-1 ring-border max-h-[80vh] flex flex-col"
             style={{ transform: `translateY(${touchTranslateY}px)` }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
             {/* Header */}
-            <div className="px-4 pt-3 pb-2 border-b border-gray-200">
-              <div className="mx-auto mb-2 h-1 w-12 rounded-full bg-gray-300" />
+            <div className="px-4 pt-3 pb-2 border-b border-border">
+              <div className="mx-auto mb-2 h-1 w-12 rounded-full bg-muted-foreground/30" />
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-gray-900">Notifications</h3>
+                <h3 className="text-base font-semibold text-foreground">Notifications</h3>
                 <div className="flex items-center space-x-2">
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllAsRead}
-                      className="text-sm text-indigo-600 hover:text-indigo-700 font-medium px-2 py-1"
+                      className="text-sm text-primary hover:text-primary/80 font-medium px-2 py-1"
                     >
                       Mark all read
                     </button>
                   )}
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-2 text-gray-400 hover:text-gray-500 rounded-full"
+                    className="p-2 text-muted-foreground hover:text-foreground rounded-full"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -236,8 +236,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       onClick={() => setSelectedCategory(category.id)}
                       className={`flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
                         selectedCategory === category.id
-                          ? 'bg-indigo-100 text-indigo-700'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-muted'
                       }`}
                     >
                       {category.label}
@@ -254,12 +254,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div className="flex-1 overflow-y-auto">
               {sortedNotifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <BellIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No notifications</p>
-                  <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
+                  <BellIcon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No notifications</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">You're all caught up!</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-border">
                   {sortedNotifications.map((notification) => (
                     <NotificationItem
                       key={notification.id}
@@ -274,18 +274,18 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
             {/* Footer */}
             {effectiveNotifications.length > 0 && (
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 border-t border-border bg-muted">
                 <div className="flex items-center justify-between">
                   <Link
                     to="/console/notifications"
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-primary hover:text-primary/80 font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     View all notifications
                   </Link>
                   <button
                     onClick={handleClearAll}
-                    className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1"
+                    className="text-sm text-muted-foreground hover:text-foreground px-2 py-1"
                   >
                     Clear all
                   </button>
@@ -298,23 +298,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
       {/* Desktop dropdown */}
       {isOpen && !isMobile && (
-        <div className="absolute top-full right-0 mt-1 w-96 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[600px] overflow-hidden">
+        <div className="absolute top-full right-0 mt-1 w-96 bg-card rounded-md shadow-lg ring-1 ring-border z-50 max-h-[600px] overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-lg font-semibold text-foreground">Notifications</h3>
               <div className="flex items-center space-x-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-primary hover:text-primary/80 font-medium"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-500 rounded-md"
+                  className="p-1 text-muted-foreground hover:text-foreground rounded-md"
                 >
                   <XMarkIcon className="h-5 w-5" />
                 </button>
@@ -330,8 +330,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                     onClick={() => setSelectedCategory(category.id)}
                     className={`flex-shrink-0 px-3 py-1 text-sm font-medium rounded-full transition-colors ${
                       selectedCategory === category.id
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:bg-muted'
                     }`}
                   >
                     {category.label}
@@ -348,12 +348,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           <div className="max-h-[60vh] overflow-y-auto">
             {sortedNotifications.length === 0 ? (
               <div className="p-8 text-center">
-                <BellIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No notifications</p>
-                <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
+                <BellIcon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">No notifications</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">You're all caught up!</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-border">
                 {sortedNotifications.map((notification) => (
                   <NotificationItem
                     key={notification.id}
@@ -368,18 +368,18 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
           {/* Footer */}
           {effectiveNotifications.length > 0 && (
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="p-4 border-t border-border bg-muted">
               <div className="flex items-center justify-between">
                 <Link
                   to="/console/notifications"
-                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="text-sm text-primary hover:text-primary/80 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   View all notifications
                 </Link>
                 <button
                   onClick={handleClearAll}
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Clear all
                 </button>
@@ -430,9 +430,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'marketplace':
         return <ShoppingBagIcon className="h-5 w-5 text-purple-500" />;
       case 'system':
-        return <Cog6ToothIcon className="h-5 w-5 text-gray-500" />;
+        return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-gray-400" />;
+        return <InformationCircleIcon className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -440,32 +440,32 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     switch (notification.category) {
       case 'workspace':
         return (
-          <span className="inline-flex items-center text-xs text-gray-500">
+          <span className="inline-flex items-center text-xs text-muted-foreground">
             <UserGroupIcon className="h-3.5 w-3.5 mr-1" /> Workspace
           </span>
         );
       case 'event':
         return (
-          <span className="inline-flex items-center text-xs text-gray-500">
+          <span className="inline-flex items-center text-xs text-muted-foreground">
             <CalendarIcon className="h-3.5 w-3.5 mr-1" /> Event
           </span>
         );
       case 'marketplace':
         return (
-          <span className="inline-flex items-center text-xs text-gray-500">
+          <span className="inline-flex items-center text-xs text-muted-foreground">
             <ShoppingBagIcon className="h-3.5 w-3.5 mr-1" /> Marketplace
           </span>
         );
       case 'organization':
         return (
-          <span className="inline-flex items-center text-xs text-gray-500">
+          <span className="inline-flex items-center text-xs text-muted-foreground">
             <UserGroupIcon className="h-3.5 w-3.5 mr-1" /> Organization
           </span>
         );
       case 'system':
       default:
         return (
-          <span className="inline-flex items-center text-xs text-gray-500">
+          <span className="inline-flex items-center text-xs text-muted-foreground">
             <Cog6ToothIcon className="h-3.5 w-3.5 mr-1" /> System
           </span>
         );
@@ -484,8 +484,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   const containerClasses = notification.read
-    ? 'bg-white'
-    : 'bg-indigo-50';
+    ? 'bg-card'
+    : 'bg-primary/5';
 
   const getWorkspaceDeepLink = () => {
     const metadata: any = (notification as any).metadata;
@@ -515,13 +515,13 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-              <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
+              <p className="text-sm font-medium text-foreground">{notification.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{notification.message}</p>
             </div>
             <div className="ml-2 flex flex-col items-end space-y-1">
-              <span className="text-xs text-gray-400 whitespace-nowrap">{timeAgo()}</span>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{timeAgo()}</span>
               {!notification.read && (
-                <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" aria-hidden="true" />
+                <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
               )}
             </div>
           </div>
@@ -532,7 +532,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               {notification.actionLabel && deepLinkUrl && (
                 <Link
                   to={deepLinkUrl}
-                  className="inline-flex items-center px-2.5 py-1 border border-gray-200 rounded-full text-xs font-medium text-indigo-600 hover:bg-indigo-50"
+                  className="inline-flex items-center px-2.5 py-1 border border-border rounded-full text-xs font-medium text-primary hover:bg-primary/5"
                 >
                   {notification.actionLabel}
                 </Link>
@@ -543,14 +543,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               {!notification.read && (
                 <button
                   onClick={handleMarkAsRead}
-                  className="text-xs text-indigo-600 hover:text-indigo-700 px-2 py-1"
+                  className="text-xs text-primary hover:text-primary/80 px-2 py-1"
                 >
                   Mark read
                 </button>
               )}
               <button
                 onClick={handleDelete}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded-md"
+                className="p-1 text-muted-foreground hover:text-foreground rounded-md"
               >
                 <XMarkIcon className="h-4 w-4" />
               </button>

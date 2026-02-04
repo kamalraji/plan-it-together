@@ -79,11 +79,11 @@ export function MessageComposer({
       {attachments.length > 0 && (
         <div className="space-y-2">
           {attachments.map((file, index) => (
-            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+            <div key={index} className="flex items-center justify-between bg-muted/50 p-2 rounded">
               <div className="flex items-center space-x-2">
-                <span className="text-gray-400">📎</span>
-                <span className="text-sm text-gray-700">{file.name}</span>
-                <span className="text-xs text-gray-500">({formatFileSize(file.size)})</span>
+                <span className="text-muted-foreground">📎</span>
+                <span className="text-sm text-foreground">{file.name}</span>
+                <span className="text-xs text-muted-foreground">({formatFileSize(file.size)})</span>
               </div>
               <button
                 type="button"
@@ -106,7 +106,7 @@ export function MessageComposer({
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-input rounded-md resize-none focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
           />
         </div>
       </div>
@@ -118,7 +118,7 @@ export function MessageComposer({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="text-gray-500 hover:text-gray-700 text-sm flex items-center space-x-1"
+            className="text-muted-foreground hover:text-foreground text-sm flex items-center space-x-1"
           >
             <span>📎</span>
             <span>Attach</span>
@@ -139,9 +139,9 @@ export function MessageComposer({
                 type="checkbox"
                 checked={isPriority}
                 onChange={(e) => setIsPriority(e.target.checked)}
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                className="h-4 w-4 text-red-600 focus:ring-red-500 border-input rounded"
               />
-              <span className={isPriority ? 'text-red-600 font-medium' : 'text-gray-600'}>
+              <span className={isPriority ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
                 🚨 Priority
               </span>
             </label>
@@ -160,7 +160,7 @@ export function MessageComposer({
         >
           {isSending ? (
             <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background"></div>
               <span>Sending...</span>
             </div>
           ) : (
@@ -173,7 +173,7 @@ export function MessageComposer({
       </div>
 
       {/* Keyboard Shortcut Hint */}
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         Press Enter to send, Shift+Enter for new line
         {isPriority && (
           <span className="text-red-500 font-medium ml-2">

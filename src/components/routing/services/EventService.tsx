@@ -10,9 +10,10 @@ import { VolunteerCheckInInterface } from '@/components/attendance';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '../../../types';
 import { RequireEventAccess } from './RequireEventAccess';
-import { EventAnalyticsOverviewPage } from './EventAnalyticsOverviewPage';
 import { EventAnalyticsPage } from './EventAnalyticsPage';
 import { EventRegistrationsOverviewPage } from './EventRegistrationsOverviewPage';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
+import { useEventWorkspaceAccess } from '@/hooks/useEventWorkspaceAccess';
 
 /**
  * EventService component provides the main routing structure for the Event Management Service.
@@ -27,9 +28,6 @@ export const EventService: React.FC = () => {
     <Routes>
       {/* Service Dashboard - default route */}
       <Route index element={<EventServiceDashboard />} />
-
-      {/* Event Analytics Overview */}
-      <Route path="analytics" element={<EventAnalyticsOverviewPage />} />
 
       {/* Registrations Overview */}
       <Route path="registrations" element={<EventRegistrationsOverviewPage />} />
@@ -57,7 +55,7 @@ export const EventService: React.FC = () => {
         }
       />
 
-      {/* Volunteer Check-in Console (uses existing role-based guard) */}
+      {/* Volunteer Check-in Console (uses workspace-based access) */}
       <Route path=":eventId/check-in" element={<EventCheckInRoute />} />
 
       {/* Event Templates */}
@@ -124,23 +122,28 @@ const EventAccessRoute: React.FC<{ requireManage?: boolean; children: React.Reac
 const EventCheckInRoute: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { user, isLoading } = useAuth();
+  const { data: primaryOrg } = usePrimaryOrganization();
+  const { hasWorkspaceAccess, isLoading: workspaceLoading } = useEventWorkspaceAccess(eventId);
+  
+  const dashboardPath = primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard';
 
   if (!eventId) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
-  if (isLoading) {
+  if (isLoading || workspaceLoading) {
     return null;
   }
 
+  // Access: Super Admin, Organizer, or any workspace team member for this event
   const hasAccess =
     user &&
     (user.role === UserRole.SUPER_ADMIN ||
       user.role === UserRole.ORGANIZER ||
-      user.role === UserRole.VOLUNTEER);
+      hasWorkspaceAccess);
 
   if (!hasAccess) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={dashboardPath} replace />;
   }
 
   return <VolunteerCheckInInterface eventId={eventId} />;

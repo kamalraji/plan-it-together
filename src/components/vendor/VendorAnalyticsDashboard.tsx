@@ -184,7 +184,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
     <div className="space-y-6">
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
@@ -196,14 +196,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Total Views</dt>
-                <dd className="text-lg font-medium text-gray-900">{performanceMetrics?.listingViews.toLocaleString()}</dd>
+                <dt className="text-sm font-medium text-muted-foreground truncate">Total Views</dt>
+                <dd className="text-lg font-medium text-foreground">{performanceMetrics?.listingViews.toLocaleString()}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
@@ -214,14 +214,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Inquiries</dt>
-                <dd className="text-lg font-medium text-gray-900">{performanceMetrics?.inquiryCount}</dd>
+                <dt className="text-sm font-medium text-muted-foreground truncate">Inquiries</dt>
+                <dd className="text-lg font-medium text-foreground">{performanceMetrics?.inquiryCount}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
@@ -232,14 +232,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Bookings</dt>
-                <dd className="text-lg font-medium text-gray-900">{performanceMetrics?.bookingCount}</dd>
+                <dt className="text-sm font-medium text-muted-foreground truncate">Bookings</dt>
+                <dd className="text-lg font-medium text-foreground">{performanceMetrics?.bookingCount}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
@@ -251,8 +251,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Revenue</dt>
-                <dd className="text-lg font-medium text-gray-900">${performanceMetrics?.revenue.toLocaleString()}</dd>
+                <dt className="text-sm font-medium text-muted-foreground truncate">Revenue</dt>
+                <dd className="text-lg font-medium text-foreground">${performanceMetrics?.revenue.toLocaleString()}</dd>
               </dl>
             </div>
           </div>
@@ -261,24 +261,24 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
 
       {/* Conversion Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Conversion Rate</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Conversion Rate</h3>
           <div className="text-3xl font-bold text-blue-600">
             {performanceMetrics?.conversionRate.toFixed(1)}%
           </div>
-          <p className="text-sm text-gray-500 mt-2">Views to Inquiries</p>
+          <p className="text-sm text-muted-foreground mt-2">Views to Inquiries</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Booking Rate</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Booking Rate</h3>
           <div className="text-3xl font-bold text-green-600">
             {performanceMetrics?.inquiryToBookingRate.toFixed(1)}%
           </div>
-          <p className="text-sm text-gray-500 mt-2">Inquiries to Bookings</p>
+          <p className="text-sm text-muted-foreground mt-2">Inquiries to Bookings</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Average Rating</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Average Rating</h3>
           <div className="flex items-center">
             <div className="text-3xl font-bold text-yellow-600">
               {performanceMetrics?.averageRating.toFixed(1)}
@@ -290,7 +290,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   className={`w-5 h-5 ${
                     star <= (performanceMetrics?.averageRating || 0)
                       ? 'text-yellow-400'
-                      : 'text-gray-300'
+                      : 'text-muted-foreground/70'
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
@@ -300,14 +300,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               ))}
             </div>
           </div>
-          <p className="text-sm text-gray-500 mt-2">{performanceMetrics?.totalReviews} reviews</p>
+          <p className="text-sm text-muted-foreground mt-2">{performanceMetrics?.totalReviews} reviews</p>
         </div>
       </div>
 
       {/* Trend Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Bookings Over Time</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Bookings Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trendData?.bookingsOverTime}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -319,8 +319,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Revenue Over Time</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Revenue Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={trendData?.revenueOverTime}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -334,8 +334,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       </div>
 
       {/* Service Distribution Chart */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Service Distribution</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Service Distribution</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -373,8 +373,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
     <div className="space-y-6">
       {/* Performance Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Response Time</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Response Time</h3>
           <div className="text-3xl font-bold text-blue-600">
             {performanceMetrics?.averageResponseTime}h
           </div>
@@ -392,8 +392,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Completion Rate</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Completion Rate</h3>
           <div className="text-3xl font-bold text-green-600">
             {performanceMetrics?.completionRate.toFixed(1)}%
           </div>
@@ -411,8 +411,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Repeat Customer Rate</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Repeat Customer Rate</h3>
           <div className="text-3xl font-bold text-purple-600">
             {performanceMetrics?.repeatCustomerRate.toFixed(1)}%
           </div>
@@ -432,8 +432,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       </div>
 
       {/* Seasonal Demand Pattern */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Seasonal Demand Patterns</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Seasonal Demand Patterns</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={insights?.seasonalDemandPatterns}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -446,15 +446,15 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       </div>
 
       {/* Competitive Positioning */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Competitive Positioning</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Competitive Positioning</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
               #{insights?.competitivePositioning.marketRank}
             </div>
-            <div className="text-sm text-gray-500">Market Rank</div>
-            <div className="text-xs text-gray-400">
+            <div className="text-sm text-muted-foreground">Market Rank</div>
+            <div className="text-xs text-muted-foreground">
               out of {insights?.competitivePositioning.totalCompetitors} competitors
             </div>
           </div>
@@ -467,7 +467,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             }`}>
               {insights?.competitivePositioning.pricePosition.replace('_', ' ')}
             </div>
-            <div className="text-sm text-gray-500">Price Position</div>
+            <div className="text-sm text-muted-foreground">Price Position</div>
           </div>
           
           <div className="text-center">
@@ -478,14 +478,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
             }`}>
               {insights?.competitivePositioning.ratingPosition.replace('_', ' ')}
             </div>
-            <div className="text-sm text-gray-500">Rating Position</div>
+            <div className="text-sm text-muted-foreground">Rating Position</div>
           </div>
           
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600">
               ${performanceMetrics?.averageOrderValue.toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500">Avg Order Value</div>
+            <div className="text-sm text-muted-foreground">Avg Order Value</div>
           </div>
         </div>
       </div>
@@ -496,21 +496,21 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
     <div className="space-y-6">
       {/* Pricing Recommendations */}
       {insights?.pricingRecommendations && insights.pricingRecommendations.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Pricing Recommendations</h3>
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-foreground mb-4">Pricing Recommendations</h3>
           <div className="space-y-4">
             {insights.pricingRecommendations.map((rec, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={index} className="border border-border rounded-lg p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-medium text-gray-900">{rec.serviceName}</h4>
+                  <h4 className="font-medium text-foreground">{rec.serviceName}</h4>
                   <div className="text-right">
-                    <div className="text-sm text-gray-500">Current: ${rec.currentPrice}</div>
+                    <div className="text-sm text-muted-foreground">Current: ${rec.currentPrice}</div>
                     <div className="text-sm font-medium text-green-600">
                       Recommended: ${rec.recommendedPrice}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{rec.reasoning}</p>
+                <p className="text-sm text-muted-foreground">{rec.reasoning}</p>
               </div>
             ))}
           </div>
@@ -518,11 +518,11 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       )}
 
       {/* Improvement Suggestions */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Improvement Suggestions</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Improvement Suggestions</h3>
         <div className="space-y-4">
           {insights?.improvementSuggestions.map((suggestion, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-border rounded-lg p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mr-3 ${
@@ -532,13 +532,13 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   }`}>
                     {suggestion.priority}
                   </span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     {suggestion.category.replace('_', ' ')}
                   </span>
                 </div>
               </div>
-              <p className="text-sm text-gray-700 mb-2">{suggestion.suggestion}</p>
-              <p className="text-xs text-gray-500">{suggestion.expectedImpact}</p>
+              <p className="text-sm text-foreground mb-2">{suggestion.suggestion}</p>
+              <p className="text-xs text-muted-foreground">{suggestion.expectedImpact}</p>
             </div>
           ))}
         </div>
@@ -549,43 +549,43 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
   const renderMarketTab = () => (
     <div className="space-y-6">
       {/* Category Demand Forecast */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Category Demand Forecast</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Category Demand Forecast</h3>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Current Demand
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Projected Demand
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Growth Rate
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {marketIntelligence?.categoryDemandForecast.map((forecast, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                     {forecast.category}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {forecast.currentDemand}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {forecast.projectedDemand}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       forecast.growthRate > 0 ? 'bg-green-100 text-green-800' : 
                       forecast.growthRate < 0 ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-muted text-foreground'
                     }`}>
                       {forecast.growthRate > 0 ? '+' : ''}{forecast.growthRate.toFixed(1)}%
                     </span>
@@ -598,23 +598,23 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       </div>
 
       {/* Pricing Benchmarks */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Pricing Benchmarks</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Pricing Benchmarks</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {marketIntelligence?.pricingBenchmarks.map((benchmark, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">{benchmark.category}</h4>
+            <div key={index} className="border border-border rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">{benchmark.category}</h4>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Average:</span>
+                  <span className="text-muted-foreground">Average:</span>
                   <span className="font-medium">${benchmark.averagePrice}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Median:</span>
+                  <span className="text-muted-foreground">Median:</span>
                   <span className="font-medium">${benchmark.medianPrice}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Range:</span>
+                  <span className="text-muted-foreground">Range:</span>
                   <span className="font-medium">
                     ${benchmark.priceRange.min} - ${benchmark.priceRange.max}
                   </span>
@@ -626,25 +626,25 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       </div>
 
       {/* Emerging Trends */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Emerging Trends</h3>
+      <div className="bg-card p-6 rounded-lg shadow">
+        <h3 className="text-lg font-medium text-foreground mb-4">Emerging Trends</h3>
         <div className="space-y-4">
           {marketIntelligence?.emergingTrends.map((trend, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border border-border rounded-lg p-4">
               <div className="flex items-start justify-between mb-2">
-                <h4 className="font-medium text-gray-900">{trend.trend}</h4>
+                <h4 className="font-medium text-foreground">{trend.trend}</h4>
                 <div className="flex items-center">
-                  <span className="text-sm text-gray-500 mr-2">Relevance:</span>
+                  <span className="text-sm text-muted-foreground mr-2">Relevance:</span>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     trend.relevanceScore >= 80 ? 'bg-green-100 text-green-800' :
                     trend.relevanceScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
+                    'bg-muted text-foreground'
                   }`}>
                     {trend.relevanceScore}%
                   </span>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mb-2">{trend.description}</p>
+              <p className="text-sm text-muted-foreground mb-2">{trend.description}</p>
               {trend.actionable && (
                 <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                   Actionable
@@ -660,14 +660,14 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Vendor Analytics Dashboard</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-3xl font-bold text-foreground">Vendor Analytics Dashboard</h1>
+        <p className="mt-2 text-muted-foreground">
           Track your performance, get insights, and optimize your marketplace presence
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-8">
+      <div className="border-b border-border mb-8">
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'overview', name: 'Overview', icon: '📊' },
@@ -681,7 +681,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
               <span className="mr-2">{tab.icon}</span>

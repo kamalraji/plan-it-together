@@ -167,11 +167,11 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
       case 'COMPLETED':
         return 'bg-green-100 text-green-800';
       case 'CANCELLED':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       case 'DISPUTED':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -224,15 +224,15 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Booking Management</h2>
-          <p className="mt-1 text-gray-600">
+          <h2 className="text-2xl font-bold text-foreground">Booking Management</h2>
+          <p className="mt-1 text-muted-foreground">
             Manage your service bookings and communicate with organizers
           </p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'all', name: 'All Bookings', count: bookings.length },
@@ -246,13 +246,13 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
               {tab.name}
               {tab.count > 0 && (
                 <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                  activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                  activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-muted text-muted-foreground'
                 }`}>
                   {tab.count}
                 </span>
@@ -265,16 +265,16 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Bookings List */}
         <div className="lg:col-span-1">
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-card shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-foreground mb-4">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Bookings
               </h3>
               
               {getFilteredBookings().length === 0 ? (
                 <div className="text-center py-8">
                   <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
+                    className="mx-auto h-12 w-12 text-muted-foreground"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -286,8 +286,8 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <h3 className="mt-2 text-sm font-medium text-foreground">No bookings</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     No bookings found for this category.
                   </p>
                 </div>
@@ -297,19 +297,19 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                     <div
                       key={booking.id}
                       onClick={() => setSelectedBooking(booking)}
-                      className={`p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                        selectedBooking?.id === booking.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                      className={`p-4 border rounded-lg cursor-pointer hover:bg-muted/50 ${
+                        selectedBooking?.id === booking.id ? 'border-blue-500 bg-blue-50' : 'border-border'
                       }`}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-gray-900">{booking.serviceTitle}</h4>
+                        <h4 className="font-medium text-foreground">{booking.serviceTitle}</h4>
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
                           {booking.status.replace('_', ' ')}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">{booking.eventName}</p>
-                      <p className="text-sm text-gray-500">{booking.organizerName}</p>
-                      <div className="mt-2 flex justify-between items-center text-xs text-gray-500">
+                      <p className="text-sm text-muted-foreground mb-1">{booking.eventName}</p>
+                      <p className="text-sm text-muted-foreground">{booking.organizerName}</p>
+                      <div className="mt-2 flex justify-between items-center text-xs text-muted-foreground">
                         <span>{new Date(booking.serviceDate).toLocaleDateString()}</span>
                         {booking.budgetRange && (
                           <span>${booking.budgetRange.min} - ${booking.budgetRange.max}</span>
@@ -326,12 +326,12 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
         {/* Booking Details */}
         <div className="lg:col-span-2">
           {selectedBooking ? (
-            <div className="bg-white shadow rounded-lg">
+            <div className="bg-card shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">{selectedBooking.serviceTitle}</h3>
-                    <p className="text-sm text-gray-600">{selectedBooking.eventName}</p>
+                    <h3 className="text-lg font-medium text-foreground">{selectedBooking.serviceTitle}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedBooking.eventName}</p>
                   </div>
                   <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(selectedBooking.status)}`}>
                     {selectedBooking.status.replace('_', ' ')}
@@ -341,8 +341,8 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                 {/* Booking Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Event Details</h4>
-                    <div className="space-y-1 text-sm text-gray-600">
+                    <h4 className="text-sm font-medium text-foreground mb-2">Event Details</h4>
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <p><span className="font-medium">Event:</span> {selectedBooking.eventName}</p>
                       <p><span className="font-medium">Date:</span> {new Date(selectedBooking.serviceDate).toLocaleDateString()}</p>
                       <p><span className="font-medium">Organizer:</span> {selectedBooking.organizerName}</p>
@@ -351,8 +351,8 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Pricing</h4>
-                    <div className="space-y-1 text-sm text-gray-600">
+                    <h4 className="text-sm font-medium text-foreground mb-2">Pricing</h4>
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       {selectedBooking.budgetRange && (
                         <p><span className="font-medium">Budget Range:</span> ${selectedBooking.budgetRange.min} - ${selectedBooking.budgetRange.max}</p>
                       )}
@@ -368,12 +368,12 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
 
                 {/* Requirements */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Requirements</h4>
-                  <p className="text-sm text-gray-600">{selectedBooking.requirements}</p>
+                  <h4 className="text-sm font-medium text-foreground mb-2">Requirements</h4>
+                  <p className="text-sm text-muted-foreground">{selectedBooking.requirements}</p>
                   {selectedBooking.additionalNotes && (
                     <>
-                      <h4 className="text-sm font-medium text-gray-900 mt-4 mb-2">Additional Notes</h4>
-                      <p className="text-sm text-gray-600">{selectedBooking.additionalNotes}</p>
+                      <h4 className="text-sm font-medium text-foreground mt-4 mb-2">Additional Notes</h4>
+                      <p className="text-sm text-muted-foreground">{selectedBooking.additionalNotes}</p>
                     </>
                   )}
                 </div>
@@ -389,7 +389,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                     </button>
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'CANCELLED')}
-                      className="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700"
+                      className="px-4 py-2 bg-muted-foreground/40 text-white text-sm font-medium rounded-md hover:bg-muted-foreground/50"
                     >
                       Decline
                     </button>
@@ -400,7 +400,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   <div className="mb-6">
                     <div className="flex items-end space-x-3">
                       <div className="flex-1">
-                        <label htmlFor="quotedPrice" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="quotedPrice" className="block text-sm font-medium text-foreground">
                           Quote Price ($)
                         </label>
                         <input
@@ -408,7 +408,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                           id="quotedPrice"
                           value={quotedPrice}
                           onChange={(e) => setQuotedPrice(e.target.value ? parseFloat(e.target.value) : '')}
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                           placeholder="Enter your quote"
                           min="0"
                           step="0.01"
@@ -460,7 +460,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
 
                 {/* Messages */}
                 <div className="border-t pt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-4">Messages</h4>
+                  <h4 className="text-sm font-medium text-foreground mb-4">Messages</h4>
                   
                   <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
                     {messages.map((message) => (
@@ -472,12 +472,12 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                           className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                             message.senderType === 'VENDOR'
                               ? 'bg-blue-600 text-white'
-                              : 'bg-gray-100 text-gray-900'
+                              : 'bg-muted text-foreground'
                           }`}
                         >
                           <p className="text-sm">{message.message}</p>
                           <p className={`text-xs mt-1 ${
-                            message.senderType === 'VENDOR' ? 'text-blue-100' : 'text-gray-500'
+                            message.senderType === 'VENDOR' ? 'text-blue-100' : 'text-muted-foreground'
                           }`}>
                             {message.senderName} • {new Date(message.sentAt).toLocaleString()}
                           </p>
@@ -492,7 +492,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       placeholder="Type your message..."
                     />
                     <button
@@ -507,11 +507,11 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
               </div>
             </div>
           ) : (
-            <div className="bg-white shadow rounded-lg">
+            <div className="bg-card shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="text-center py-12">
                   <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
+                    className="mx-auto h-12 w-12 text-muted-foreground"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -523,8 +523,8 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">Select a booking</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <h3 className="mt-2 text-sm font-medium text-foreground">Select a booking</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Choose a booking from the list to view details and manage it.
                   </p>
                 </div>

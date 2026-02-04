@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { OrganizationAnalyticsDashboard } from '../../organization/OrganizationAnalyticsDashboard';
 import { useAuth } from '../../../hooks/useAuth';
@@ -14,6 +14,7 @@ import { useAuth } from '../../../hooks/useAuth';
  */
 export const OrganizationAnalyticsPage: React.FC = () => {
   const { organizationId } = useParams<{ organizationId: string }>();
+  const navigate = useNavigate();
   useAuth();
   const [organization, setOrganization] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -39,9 +40,9 @@ export const OrganizationAnalyticsPage: React.FC = () => {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-muted rounded w-2/3 mb-8"></div>
+            <div className="h-64 bg-muted rounded"></div>
           </div>
         </div>
       </div>
@@ -52,8 +53,8 @@ export const OrganizationAnalyticsPage: React.FC = () => {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Organization Not Found</h2>
-          <p className="text-gray-600 mb-4">The organization you are looking for does not exist.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
+          <p className="text-muted-foreground mb-4">The organization you are looking for does not exist.</p>
           <Link
             to="/console/organizations"
             className="text-blue-600 hover:text-blue-500 font-medium"
@@ -72,8 +73,8 @@ export const OrganizationAnalyticsPage: React.FC = () => {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600 mb-4">You don't have permission to view analytics for this organization.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
+          <p className="text-muted-foreground mb-4">You don't have permission to view analytics for this organization.</p>
           <Link
             to={`/console/organizations/${organizationId}`}
             className="text-blue-600 hover:text-blue-500 font-medium"
@@ -88,17 +89,17 @@ export const OrganizationAnalyticsPage: React.FC = () => {
   const pageActions = [
     {
       label: 'View Organization',
-      action: () => { window.location.href = `/console/organizations/${organizationId}`; },
+      action: () => navigate(`/console/organizations/${organizationId}`),
       variant: 'secondary' as const,
     },
     {
       label: 'Manage Members',
-      action: () => { window.location.href = `/console/organizations/${organizationId}/members`; },
+      action: () => navigate(`/console/organizations/${organizationId}/members`),
       variant: 'secondary' as const,
     },
     {
       label: 'Organization Settings',
-      action: () => { window.location.href = `/console/organizations/${organizationId}/settings`; },
+      action: () => navigate(`/console/organizations/${organizationId}/settings`),
       variant: 'secondary' as const,
     },
   ];
@@ -126,58 +127,58 @@ export const OrganizationAnalyticsPage: React.FC = () => {
         {/* Additional Analytics Features */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Quick Insights */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Insights</h3>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Quick Insights</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Growth Rate</span>
+                <span className="text-sm text-muted-foreground">Growth Rate</span>
                 <span className="text-sm font-medium text-green-600">+12.5%</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Engagement Score</span>
+                <span className="text-sm text-muted-foreground">Engagement Score</span>
                 <span className="text-sm font-medium text-blue-600">8.4/10</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Event Success Rate</span>
+                <span className="text-sm text-muted-foreground">Event Success Rate</span>
                 <span className="text-sm font-medium text-purple-600">94%</span>
               </div>
             </div>
           </div>
 
           {/* Top Events */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Top Performing Events</h3>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Top Performing Events</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-900 truncate">Tech Innovation Summit</span>
-                <span className="text-sm text-gray-600">156 attendees</span>
+                <span className="text-sm text-foreground truncate">Tech Innovation Summit</span>
+                <span className="text-sm text-muted-foreground">156 attendees</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-900 truncate">AI Workshop Series</span>
-                <span className="text-sm text-gray-600">89 attendees</span>
+                <span className="text-sm text-foreground truncate">AI Workshop Series</span>
+                <span className="text-sm text-muted-foreground">89 attendees</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-900 truncate">Startup Pitch Night</span>
-                <span className="text-sm text-gray-600">67 attendees</span>
+                <span className="text-sm text-foreground truncate">Startup Pitch Night</span>
+                <span className="text-sm text-muted-foreground">67 attendees</span>
               </div>
             </div>
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Recent Activity</h3>
             <div className="space-y-3">
               <div className="text-sm">
-                <span className="text-gray-600">New follower:</span>
-                <span className="text-gray-900 ml-1">John Doe</span>
+                <span className="text-muted-foreground">New follower:</span>
+                <span className="text-foreground ml-1">John Doe</span>
               </div>
               <div className="text-sm">
-                <span className="text-gray-600">Event published:</span>
-                <span className="text-gray-900 ml-1">AI Workshop</span>
+                <span className="text-muted-foreground">Event published:</span>
+                <span className="text-foreground ml-1">AI Workshop</span>
               </div>
               <div className="text-sm">
-                <span className="text-gray-600">Member joined:</span>
-                <span className="text-gray-900 ml-1">Jane Smith</span>
+                <span className="text-muted-foreground">Member joined:</span>
+                <span className="text-foreground ml-1">Jane Smith</span>
               </div>
             </div>
           </div>

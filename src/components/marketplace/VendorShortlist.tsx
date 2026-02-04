@@ -117,14 +117,14 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-foreground">
             Vendor Shortlist
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Services you've saved for this event
           </p>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           {shortlistItems?.length || 0} services saved
         </div>
       </div>
@@ -133,23 +133,23 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
       {shortlistItems && shortlistItems.length > 0 ? (
         <div className="space-y-4">
           {shortlistItems.map((item) => (
-            <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6">
+            <div key={item.id} className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {/* Service Info */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">
+                      <h4 className="text-lg font-medium text-foreground mb-2">
                         {item.serviceListing.title}
                       </h4>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
                         {item.serviceListing.description}
                       </p>
                       
                       {/* Vendor Info */}
                       <div className="flex items-center space-x-4 mb-3">
                         <div className="flex items-center">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-foreground">
                             {item.serviceListing.vendor.businessName}
                           </span>
                           {item.serviceListing.vendor.verificationStatus === 'VERIFIED' && (
@@ -167,7 +167,7 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
                                 className={`w-4 h-4 ${
                                   i < Math.floor(item.serviceListing.vendor.rating)
                                     ? 'text-yellow-400'
-                                    : 'text-gray-300'
+                                    : 'text-muted-foreground/70'
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -176,22 +176,22 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
                               </svg>
                             ))}
                           </div>
-                          <span className="ml-1 text-sm text-gray-600">
+                          <span className="ml-1 text-sm text-muted-foreground">
                             {item.serviceListing.vendor.rating.toFixed(1)} ({item.serviceListing.vendor.reviewCount} reviews)
                           </span>
                         </div>
                         
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           Responds in ~{item.serviceListing.vendor.responseTime}h
                         </span>
                       </div>
 
                       {/* Category and Pricing */}
                       <div className="flex items-center justify-between mb-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
                           {item.serviceListing.category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
                         </span>
-                        <div className="text-lg font-semibold text-gray-900">
+                        <div className="text-lg font-semibold text-foreground">
                           {formatPrice(item.serviceListing.pricing)}
                         </div>
                       </div>
@@ -201,7 +201,7 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
                   {/* Notes Section */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium text-gray-700">Notes</label>
+                      <label className="text-sm font-medium text-foreground">Notes</label>
                       {editingNotes !== item.id && (
                         <button
                           onClick={() => handleEditNotes(item)}
@@ -219,7 +219,7 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
                           onChange={(e) => setNoteText(e.target.value)}
                           placeholder="Add notes about this vendor..."
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring text-sm"
                         />
                         <div className="flex space-x-2">
                           <button
@@ -231,21 +231,21 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="px-3 py-1 border border-gray-300 text-gray-700 text-sm rounded hover:bg-gray-50"
+                            className="px-3 py-1 border border-input text-foreground text-sm rounded hover:bg-muted/50"
                           >
                             Cancel
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-600 bg-gray-50 rounded-md p-3 min-h-[60px]">
+                      <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3 min-h-[60px]">
                         {item.notes || 'No notes added yet'}
                       </div>
                     )}
                   </div>
 
                   {/* Added Date */}
-                  <div className="text-xs text-gray-500 mb-4">
+                  <div className="text-xs text-muted-foreground mb-4">
                     Added on {new Date(item.addedAt).toLocaleDateString()}
                   </div>
 
@@ -272,13 +272,13 @@ const VendorShortlist: React.FC<VendorShortlistProps> = ({ eventId, onRequestQuo
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+          <div className="mx-auto h-12 w-12 text-muted-foreground mb-4">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No vendors in shortlist</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-medium text-foreground mb-2">No vendors in shortlist</h3>
+          <p className="text-muted-foreground">
             Start adding services to your shortlist to compare and manage vendors for this event.
           </p>
         </div>

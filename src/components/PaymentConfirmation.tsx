@@ -71,20 +71,20 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
 
             <h3 className="text-lg font-semibold mb-4">{modalTitle}</h3>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Payment Method *
                 </label>
                 <select
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-input rounded-lg px-3 py-2"
                 >
                   <option value="">Select payment method</option>
                   <option value="Bank Transfer">Bank Transfer</option>
@@ -98,7 +98,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Payment Date *
                 </label>
                 <input
@@ -106,13 +106,13 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                   value={formData.paymentDate}
                   onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
                   required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-input rounded-lg px-3 py-2"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Amount *
                   </label>
                   <input
@@ -121,18 +121,18 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                     required
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-input rounded-lg px-3 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Currency *
                   </label>
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     required
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-full border border-input rounded-lg px-3 py-2"
                   >
                     <option value="USD">USD</option>
                     <option value="EUR">EUR</option>
@@ -143,7 +143,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Transaction Reference
                 </label>
                 <input
@@ -151,12 +151,12 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                   value={formData.transactionReference}
                   onChange={(e) => setFormData({ ...formData, transactionReference: e.target.value })}
                   placeholder="Transaction ID, check number, etc."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-input rounded-lg px-3 py-2"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Notes
                 </label>
                 <textarea
@@ -164,7 +164,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Additional notes about the payment..."
                   rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-input rounded-lg px-3 py-2"
                 />
               </div>
 
@@ -172,7 +172,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                  className="flex-1 bg-muted text-foreground px-4 py-2 rounded-lg hover:bg-muted-foreground/20 transition-colors"
                 >
                   Cancel
                 </button>

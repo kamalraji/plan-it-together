@@ -1,17 +1,9 @@
-@import './styles/globals.css';
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
+/* Google Fonts - must be first */
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=EB+Garamond:wght@400;500;600;700&family=Fira+Code:wght@400;700&family=Nunito:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import merged design system styles */
-@import './styles/globals.css';
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
 
 html,
 body {
@@ -23,6 +15,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 code {
@@ -136,6 +130,72 @@ code {
 
 /* Attendflow-style light/dark design tokens applied app-wide */
 @layer base {
+  /* ===== NATIVE FORM ELEMENT DARK MODE FIXES ===== */
+  
+  /* Force native select/option elements to respect dark mode */
+  select,
+  select option {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .dark select,
+  .dark select option {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  
+  /* Ensure placeholder text is visible in both modes */
+  ::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
+  }
+  
+  /* Input autofill styles for dark mode */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--background)) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark textarea:-webkit-autofill,
+  .dark select:-webkit-autofill {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--card)) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* Native input/textarea styling for dark mode */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--input));
+  }
+  
+  .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  .dark textarea {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-color: hsl(var(--input));
+  }
+  
+  /* Focus states for native elements */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline-color: hsl(var(--ring));
+  }
+  
+  /* ===== END NATIVE FORM ELEMENT FIXES ===== */
+
   :root {
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;

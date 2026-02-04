@@ -136,24 +136,24 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
       case 'NON_PROFIT':
         return 'bg-orange-100 text-orange-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-muted/50">
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200"></div>
+          <div className="h-64 bg-muted"></div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8"></div>
+            <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-muted rounded w-2/3 mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
-                <div className="h-32 bg-gray-200 rounded"></div>
-                <div className="h-32 bg-gray-200 rounded"></div>
+                <div className="h-32 bg-muted rounded"></div>
+                <div className="h-32 bg-muted rounded"></div>
               </div>
-              <div className="h-64 bg-gray-200 rounded"></div>
+              <div className="h-64 bg-muted rounded"></div>
             </div>
           </div>
         </div>
@@ -163,10 +163,10 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted/50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Organization Not Found</h2>
-          <p className="text-gray-600">{error || 'The organization you are looking for does not exist.'}</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
+          <p className="text-muted-foreground">{error || 'The organization you are looking for does not exist.'}</p>
         </div>
       </div>
     );
@@ -177,7 +177,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
   const pastEvents = getPastEvents();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       {/* Banner Section */}
       <div 
         className="h-64 bg-gradient-to-r from-blue-600 to-purple-600 relative"
@@ -193,7 +193,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
       {/* Organization Info */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative -mt-32 pb-8">
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-card rounded-lg shadow-lg p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
               {/* Logo */}
               <div className="flex-shrink-0">
@@ -201,11 +201,11 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                   <img
                     src={organization.branding.logoUrl}
                     alt={organization.name}
-                    className="w-24 h-24 rounded-lg object-cover border-4 border-white shadow-lg"
+                    className="w-24 h-24 rounded-lg object-cover border-4 border-background shadow-lg"
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-gray-300 rounded-lg flex items-center justify-center border-4 border-white shadow-lg">
-                    <span className="text-2xl font-bold text-gray-600">
+                  <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center border-4 border-background shadow-lg">
+                    <span className="text-2xl font-bold text-muted-foreground">
                       {organization.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -217,7 +217,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <div className="flex items-center space-x-3 mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
+                      <h1 className="text-3xl font-bold text-foreground">{organization.name}</h1>
                       {getVerificationBadge(organization.verificationStatus)}
                     </div>
                     
@@ -225,15 +225,15 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(organization.category)}`}>
                         {organization.category.replace('_', ' ')}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         {organization.followerCount} followers
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         {organization.eventCount} events
                       </span>
                     </div>
 
-                    <p className="text-gray-600 max-w-2xl">{organization.description}</p>
+                    <p className="text-muted-foreground max-w-2xl">{organization.description}</p>
                   </div>
 
                   {/* Follow Button */}
@@ -244,8 +244,8 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                         disabled={followLoading}
                         className={`px-6 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
                           isFollowing
-                            ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+                            ? 'bg-muted text-foreground hover:bg-muted focus:ring-ring'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-ring'
                         }`}
                       >
                         {followLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
@@ -263,7 +263,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-muted-foreground hover:text-muted-foreground"
                       >
                         <span className="sr-only">{platform}</span>
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -280,16 +280,16 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
 
         {/* Events Section */}
         <div className="pb-12">
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-card rounded-lg shadow">
             {/* Tab Navigation */}
-            <div className="border-b border-gray-200">
+            <div className="border-b border-border">
               <nav className="flex space-x-8 px-6" aria-label="Tabs">
                 <button
                   onClick={() => setActiveTab('upcoming')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'upcoming'
                       ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >
                   Upcoming Events ({upcomingEvents.length})
@@ -299,7 +299,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'past'
                       ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >
                   Past Events ({pastEvents.length})
@@ -313,21 +313,21 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                 <div className="space-y-6">
                   {upcomingEvents.length === 0 ? (
                     <div className="text-center py-12">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">No upcoming events</h3>
-                      <p className="mt-1 text-sm text-gray-500">This organization hasn't scheduled any upcoming events yet.</p>
+                      <h3 className="mt-2 text-sm font-medium text-foreground">No upcoming events</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">This organization hasn't scheduled any upcoming events yet.</p>
                     </div>
                   ) : (
                     upcomingEvents.map((event) => (
-                      <div key={event.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                      <div key={event.id} className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{event.name}</h3>
-                            <p className="text-gray-600 mb-3 line-clamp-2">{event.description}</p>
+                            <h3 className="text-lg font-semibold text-foreground mb-2">{event.name}</h3>
+                            <p className="text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
                             
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                               <div className="flex items-center">
                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -357,7 +357,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                           <div className="ml-6">
                             <a
                               href={`/events/${event.id}`}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring"
                             >
                               View Event
                             </a>
@@ -373,21 +373,21 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                 <div className="space-y-6">
                   {pastEvents.length === 0 ? (
                     <div className="text-center py-12">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">No past events</h3>
-                      <p className="mt-1 text-sm text-gray-500">This organization hasn't hosted any events yet.</p>
+                      <h3 className="mt-2 text-sm font-medium text-foreground">No past events</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">This organization hasn't hosted any events yet.</p>
                     </div>
                   ) : (
                     pastEvents.map((event) => (
-                      <div key={event.id} className="border border-gray-200 rounded-lg p-6 opacity-75">
+                      <div key={event.id} className="border border-border rounded-lg p-6 opacity-75">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{event.name}</h3>
-                            <p className="text-gray-600 mb-3 line-clamp-2">{event.description}</p>
+                            <h3 className="text-lg font-semibold text-foreground mb-2">{event.name}</h3>
+                            <p className="text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
                             
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                               <div className="flex items-center">
                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -403,7 +403,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                                 {event.mode}
                               </div>
 
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
                                 Completed
                               </span>
                             </div>
@@ -412,7 +412,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                           <div className="ml-6">
                             <a
                               href={`/events/${event.id}`}
-                              className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                              className="bg-muted-foreground/40 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                               View Event
                             </a>

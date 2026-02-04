@@ -21,9 +21,9 @@ export function WorkspaceAnalyticsChart({
 }: WorkspaceAnalyticsChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
-        <div className="flex items-center justify-center h-48 text-gray-500">
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">{title}</h3>
+        <div className="flex items-center justify-center h-48 text-muted-foreground">
           <p>No data available</p>
         </div>
       </div>
@@ -51,8 +51,8 @@ export function WorkspaceAnalyticsChart({
   }).join(' ');
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+    <div className="bg-card rounded-lg border border-border p-6">
+      <h3 className="text-lg font-medium text-foreground mb-4">{title}</h3>
       
       <div className="relative">
         <svg width={chartWidth} height={chartHeight} className="w-full h-auto">
@@ -198,7 +198,7 @@ export function WorkspaceAnalyticsChart({
             className="w-3 h-3 rounded-full" 
             style={{ backgroundColor: color }}
           ></div>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-foreground">
             {data.length} data points
           </span>
         </div>

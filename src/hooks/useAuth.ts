@@ -7,15 +7,8 @@ import { logging } from '@/lib/logging';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  /**
-   * True while the initial auth bootstrap is running (session lookup)
-   */
   isLoading: boolean;
-  /**
-   * True while we're specifically resolving role information from the user_roles table.
-   * During this phase we should avoid showing hard "Access denied" states.
-   */
-  isResolvingRoles: boolean;
+  isRolesLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
   register: (data: RegisterData) => Promise<{ error: Error | null }>;
@@ -97,8 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // Tracks when we're specifically resolving role information from user_roles
-  const [isResolvingRoles, setIsResolvingRoles] = useState(false);
+  const [isRolesLoading, setIsRolesLoading] = useState(true);
 
   // Initialize auth state and listen for changes
   useEffect(() => {
@@ -111,27 +103,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const sbUser = newSession?.user ?? null;
       if (!sbUser) {
         setUser(null);
-        setIsResolvingRoles(false);
+        setIsRolesLoading(false);
         return;
       }
 
       // Set a fast base user immediately for snappy UI
       const baseUser = mapSupabaseUserToAppUserBase(sbUser);
       setUser(baseUser);
+      setIsRolesLoading(true);
 
       // Defer any Supabase queries (roles lookup) to avoid deadlocks inside the callback
-      setIsResolvingRoles(true);
       setTimeout(() => {
         mapSupabaseUserToAppUserWithRoles(sbUser)
-          .then((resolvedUser) => {
-            setUser(resolvedUser);
+          .then((u) => {
+            setUser(u);
+            setIsRolesLoading(false);
           })
           .catch(() => {
             // On failure, keep the base user; do not throw from callback
             setUser(baseUser);
-          })
-          .finally(() => {
-            setIsResolvingRoles(false);
+            setIsRolesLoading(false);
           });
       }, 0);
     });
@@ -158,10 +149,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             },
           );
 
-          setIsResolvingRoles(true);
           mapSupabaseUserToAppUserWithRoles(currentSession.user)
             .then((u) => {
               setUser(u);
+              setIsRolesLoading(false);
               logging.setUserContext(
                 {
                   id: u.id,
@@ -176,10 +167,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 },
               );
             })
-            .catch(() => setUser(mapSupabaseUserToAppUserBase(currentSession.user)))
-            .finally(() => {
-              setIsResolvingRoles(false);
+            .catch(() => {
+              setUser(mapSupabaseUserToAppUserBase(currentSession.user));
+              setIsRolesLoading(false);
             });
+        } else {
+          setIsRolesLoading(false);
         }
       })
       .finally(() => {
@@ -273,12 +266,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshUserRoles = async (): Promise<void> => {
-    setIsResolvingRoles(true);
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
-      setIsResolvingRoles(false);
-      return;
-    }
+    if (error || !data.user) return;
     const userWithRoles = await mapSupabaseUserToAppUserWithRoles(data.user);
     setUser(userWithRoles);
     logging.setUserContext(
@@ -292,14 +281,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         provider: data.user.app_metadata?.provider as string | undefined,
       },
     );
-    setIsResolvingRoles(false);
   };
 
   const value: AuthContextType = {
     user,
     session,
     isLoading,
-    isResolvingRoles,
+    isRolesLoading,
     isAuthenticated: !!user,
     login,
     register,

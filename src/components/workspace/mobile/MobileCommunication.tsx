@@ -288,19 +288,19 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Channels</h2>
-          <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
-            <PlusIcon className="w-5 h-5 text-gray-600" />
+          <h2 className="text-lg font-semibold text-foreground">Channels</h2>
+          <button className="p-2 rounded-md hover:bg-muted transition-colors">
+            <PlusIcon className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search channels..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
 
@@ -313,16 +313,16 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                 setSelectedChannel(channel);
                 setShowChannelList(false);
               }}
-              className="w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow text-left"
+              className="w-full flex items-center space-x-3 p-3 bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow text-left"
             >
-              <div className="flex-shrink-0 p-2 bg-gray-100 rounded-lg">
+              <div className="flex-shrink-0 p-2 bg-muted rounded-lg">
                 {getChannelIcon(channel.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 truncate">
+                <h3 className="text-sm font-medium text-foreground truncate">
                   {channel.name}
                 </h3>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {channel.description || 'No description'}
                 </p>
               </div>
@@ -342,27 +342,27 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 bg-card border-b border-border">
         <button
           onClick={() => setShowChannelList(true)}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+          className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
         >
-          <div className="p-1 bg-gray-100 rounded">
+          <div className="p-1 bg-muted rounded">
             {getChannelIcon(selectedChannel.type)}
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-medium text-gray-900">{selectedChannel.name}</h3>
-            <p className="text-xs text-gray-500">{selectedChannel.members?.length || 0} members</p>
+            <h3 className="text-sm font-medium text-foreground">{selectedChannel.name}</h3>
+            <p className="text-xs text-muted-foreground">{selectedChannel.members?.length || 0} members</p>
           </div>
         </button>
         
-        <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
-          <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
+        <button className="p-2 rounded-md hover:bg-muted transition-colors">
+          <EllipsisVerticalIcon className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/50">
         {messagesLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
@@ -386,17 +386,17 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                 <div className={`flex-1 ${isConsecutive ? 'ml-11' : ''}`}>
                   {!isConsecutive && (
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-foreground">
                         {getMemberName(message.senderId)}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {formatMessageTime(message.sentAt)}
                       </span>
                     </div>
                   )}
                   
-                  <div className="bg-white rounded-lg p-3 shadow-sm">
-                    <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                  <div className="bg-card rounded-lg p-3 shadow-sm">
+                    <p className="text-sm text-foreground whitespace-pre-wrap">
                       {message.content}
                     </p>
                   </div>
@@ -406,27 +406,27 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
           })
         ) : (
           <div className="text-center py-8">
-            <HashtagIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No messages yet</h3>
-            <p className="text-xs text-gray-500">Start the conversation!</p>
+            <HashtagIcon className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-sm font-medium text-foreground mb-1">No messages yet</h3>
+            <p className="text-xs text-muted-foreground">Start the conversation!</p>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
-      <div className="p-4 bg-white border-t border-gray-200">
+      <div className="p-4 bg-card border-t border-border">
         <div className="flex items-end space-x-2">
           {/* Attachment buttons */}
           <div className="flex space-x-1">
             <button 
               onClick={triggerPhotoUpload}
-              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-md hover:bg-muted transition-colors"
             >
-              <PhotoIcon className="w-5 h-5 text-gray-600" />
+              <PhotoIcon className="w-5 h-5 text-muted-foreground" />
             </button>
-            <button className="p-2 rounded-md hover:bg-gray-100 transition-colors">
-              <PaperClipIcon className="w-5 h-5 text-gray-600" />
+            <button className="p-2 rounded-md hover:bg-muted transition-colors">
+              <PaperClipIcon className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
 
@@ -438,11 +438,11 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
               onKeyPress={handleKeyPress}
               placeholder="Type a message..."
               rows={1}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+              className="w-full px-3 py-2 border border-input rounded-lg focus-visible:ring-ring focus-visible:border-primary resize-none"
               style={{ minHeight: '40px', maxHeight: '120px' }}
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-gray-100 transition-colors">
-              <FaceSmileIcon className="w-4 h-4 text-gray-600" />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-muted transition-colors">
+              <FaceSmileIcon className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
 
@@ -454,7 +454,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
             onMouseUp={stopVoiceRecording}
             onMouseLeave={stopVoiceRecording}
             className={`p-2 rounded-md transition-colors ${
-              isRecording ? 'bg-red-100 text-red-600' : 'hover:bg-gray-100 text-gray-600'
+              isRecording ? 'bg-red-100 text-red-600' : 'hover:bg-muted text-muted-foreground'
             }`}
           >
             <MicrophoneIcon className="w-5 h-5" />
@@ -478,7 +478,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
                 Recording: {formatRecordingTime(recordingTime)}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Release to send, hold to record</p>
+            <p className="text-xs text-muted-foreground mt-1">Release to send, hold to record</p>
           </div>
         )}
       </div>

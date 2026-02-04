@@ -76,19 +76,19 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
   const breadcrumbs = generateBreadcrumbs();
 
   return (
-    <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3">
+    <div className="bg-card border-b border-border px-4 sm:px-6 lg:px-8 py-3">
       <nav className="flex" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
           {breadcrumbs.map((breadcrumb, index) => (
             <li key={index} className="flex items-center">
               {index > 0 && (
-                <ChevronRightIcon className="h-4 w-4 text-gray-400 mx-2" />
+                <ChevronRightIcon className="h-4 w-4 text-muted-foreground mx-2" />
               )}
               
               {breadcrumb.path ? (
                 <Link
                   to={breadcrumb.path}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {index === 0 ? (
                     <div className="flex items-center space-x-1">
@@ -103,8 +103,8 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
                 <span
                   className={`text-sm font-medium ${
                     breadcrumb.isActive
-                      ? 'text-gray-900'
-                      : 'text-gray-500'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground'
                   }`}
                   aria-current={breadcrumb.isActive ? 'page' : undefined}
                 >

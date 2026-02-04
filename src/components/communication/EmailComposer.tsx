@@ -127,8 +127,8 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Compose Email</h2>
-        <p className="text-gray-600">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Compose Email</h2>
+        <p className="text-muted-foreground">
           Create and send targeted communications to event participants.
         </p>
       </div>
@@ -151,18 +151,18 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
         />
 
         {/* Email Composition */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Email Content</h3>
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Email Content</h3>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Subject *
               </label>
               <input
                 type="text"
                 {...register('subject', { required: 'Subject is required' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                 placeholder="Enter email subject"
               />
               {errors.subject && (
@@ -171,13 +171,13 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Message Body *
               </label>
               <textarea
                 {...register('body', { required: 'Message body is required' })}
                 rows={12}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                 placeholder="Enter your message here..."
               />
               {errors.body && (
@@ -205,9 +205,9 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
 
         {/* Email Preview */}
         {(watchedSubject || watchedBody) && (
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="bg-card border border-border rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Email Preview</h3>
+              <h3 className="text-lg font-medium text-foreground">Email Preview</h3>
               <button
                 type="button"
                 onClick={handlePreviewToggle}
@@ -218,13 +218,13 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
             </div>
             
             {showPreview && (
-              <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
+              <div className="border border-border rounded-md p-4 bg-muted/50">
                 <div className="mb-3">
-                  <span className="text-sm font-medium text-gray-700">Subject: </span>
-                  <span className="text-sm text-gray-900">{watchedSubject || '(No subject)'}</span>
+                  <span className="text-sm font-medium text-foreground">Subject: </span>
+                  <span className="text-sm text-foreground">{watchedSubject || '(No subject)'}</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3">
-                  <div className="text-sm text-gray-900 whitespace-pre-wrap">
+                <div className="border-t border-border pt-3">
+                  <div className="text-sm text-foreground whitespace-pre-wrap">
                     {watchedBody || '(No message body)'}
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
 
         {/* Send Actions */}
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-muted-foreground">
             {recipientPreview && (
               <span>
                 Ready to send to <strong>{recipientPreview.count}</strong> recipient{recipientPreview.count !== 1 ? 's' : ''}
@@ -253,7 +253,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
                 setRecipientPreview(null);
                 setShowPreview(false);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-input rounded-md text-foreground hover:bg-muted/50 transition-colors"
             >
               Clear
             </button>

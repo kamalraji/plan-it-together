@@ -11,10 +11,12 @@ import {
 import { useNotifications } from '../../../hooks/useNotifications';
 import { useOffline } from '../../../hooks/useOffline';
 import { useAuth } from '../../../hooks/useAuth';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 export function MobileSettings() {
   const [showStorageInfo, setShowStorageInfo] = useState(false);
   const [storageUsage, setStorageUsage] = useState<{ used: number; quota: number } | null>(null);
+  const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   
   const { user } = useAuth();
 
@@ -61,10 +63,13 @@ export function MobileSettings() {
     }
   };
 
-  const handleClearOfflineData = async () => {
-    if (window.confirm('Are you sure you want to clear all offline data? This cannot be undone.')) {
-      await clearOfflineData();
-    }
+  const handleClearOfflineData = () => {
+    setShowClearDataConfirm(true);
+  };
+
+  const confirmClearOfflineData = async () => {
+    await clearOfflineData();
+    setShowClearDataConfirm(false);
   };
 
   const handleShowStorageInfo = async () => {
@@ -85,7 +90,7 @@ export function MobileSettings() {
 
   const getNotificationStatus = () => {
     if (!notificationSupported) {
-      return { icon: XCircleIcon, text: 'Not Supported', color: 'text-gray-500' };
+      return { icon: XCircleIcon, text: 'Not Supported', color: 'text-muted-foreground' };
     }
     
     if (permission === 'denied') {
@@ -113,18 +118,18 @@ export function MobileSettings() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Mobile Settings</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-lg font-semibold text-foreground">Mobile Settings</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage notifications and offline features
         </p>
       </div>
 
       {/* Notifications Section */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 border-b border-gray-200">
+      <div className="bg-card rounded-lg shadow-sm">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-2">
-            <BellIcon className="w-5 h-5 text-gray-600" />
-            <h3 className="text-base font-medium text-gray-900">Push Notifications</h3>
+            <BellIcon className="w-5 h-5 text-muted-foreground" />
+            <h3 className="text-base font-medium text-foreground">Push Notifications</h3>
           </div>
         </div>
 
@@ -134,7 +139,7 @@ export function MobileSettings() {
             <div className="flex items-center space-x-3">
               <notificationStatus.icon className={`w-5 h-5 ${notificationStatus.color}`} />
               <div>
-                <p className="text-sm font-medium text-gray-900">Status</p>
+                <p className="text-sm font-medium text-foreground">Status</p>
                 <p className={`text-xs ${notificationStatus.color}`}>
                   {notificationStatus.text}
                 </p>
@@ -157,8 +162,8 @@ export function MobileSettings() {
 
           {/* Notification Types */}
           {isEnabled() && preferences && (
-            <div className="space-y-3 pt-3 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-700">Notification Categories</p>
+            <div className="space-y-3 pt-3 border-t border-border">
+              <p className="text-sm font-medium text-foreground">Notification Categories</p>
 
               <div className="space-y-2">
                 <label className="flex items-center">
@@ -168,9 +173,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ workspace_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Workspace activity</span>
+                  <span className="ml-2 text-sm text-foreground">Workspace activity</span>
                 </label>
 
                 <label className="flex items-center">
@@ -180,9 +185,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ event_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Events</span>
+                  <span className="ml-2 text-sm text-foreground">Events</span>
                 </label>
 
                 <label className="flex items-center">
@@ -192,9 +197,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ marketplace_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Marketplace</span>
+                  <span className="ml-2 text-sm text-foreground">Marketplace</span>
                 </label>
 
                 <label className="flex items-center">
@@ -204,9 +209,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ organization_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Organization updates</span>
+                  <span className="ml-2 text-sm text-foreground">Organization updates</span>
                 </label>
 
                 <label className="flex items-center">
@@ -216,9 +221,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ system_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">System alerts</span>
+                  <span className="ml-2 text-sm text-foreground">System alerts</span>
                 </label>
 
                 <label className="flex items-center">
@@ -228,9 +233,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ sound_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Play sound for important alerts</span>
+                  <span className="ml-2 text-sm text-foreground">Play sound for important alerts</span>
                 </label>
 
                 <label className="flex items-center">
@@ -240,9 +245,9 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ vibration_enabled: e.target.checked })
                     }
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Vibrate on critical alerts</span>
+                  <span className="ml-2 text-sm text-foreground">Vibrate on critical alerts</span>
                 </label>
               </div>
             </div>
@@ -264,11 +269,11 @@ export function MobileSettings() {
       </div>
 
       {/* Offline Section */}
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-4 border-b border-gray-200">
+      <div className="bg-card rounded-lg shadow-sm">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-2">
-            <CloudArrowDownIcon className="w-5 h-5 text-gray-600" />
-            <h3 className="text-base font-medium text-gray-900">Offline Features</h3>
+            <CloudArrowDownIcon className="w-5 h-5 text-muted-foreground" />
+            <h3 className="text-base font-medium text-foreground">Offline Features</h3>
           </div>
         </div>
 
@@ -278,7 +283,7 @@ export function MobileSettings() {
             <div className="flex items-center space-x-3">
               <offlineStatus.icon className={`w-5 h-5 ${offlineStatus.color}`} />
               <div>
-                <p className="text-sm font-medium text-gray-900">Connection</p>
+                <p className="text-sm font-medium text-foreground">Connection</p>
                 <p className={`text-xs ${offlineStatus.color}`}>
                   {offlineStatus.text}
                 </p>
@@ -288,17 +293,17 @@ export function MobileSettings() {
 
           {/* Pending Data */}
           {(pendingUpdates > 0 || pendingMessages > 0) && (
-            <div className="space-y-2 pt-3 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-700">Pending Sync</p>
+            <div className="space-y-2 pt-3 border-t border-border">
+              <p className="text-sm font-medium text-foreground">Pending Sync</p>
               
               <div className="space-y-1">
                 {pendingUpdates > 0 && (
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     {pendingUpdates} task update{pendingUpdates !== 1 ? 's' : ''}
                   </p>
                 )}
                 {pendingMessages > 0 && (
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     {pendingMessages} message{pendingMessages !== 1 ? 's' : ''}
                   </p>
                 )}
@@ -316,25 +321,25 @@ export function MobileSettings() {
           )}
 
           {/* Storage Info */}
-          <div className="pt-3 border-t border-gray-200">
+          <div className="pt-3 border-t border-border">
             <button
               onClick={handleShowStorageInfo}
               className="flex items-center justify-between w-full text-left"
             >
-              <p className="text-sm font-medium text-gray-700">Storage Usage</p>
-              <InformationCircleIcon className="w-4 h-4 text-gray-400" />
+              <p className="text-sm font-medium text-foreground">Storage Usage</p>
+              <InformationCircleIcon className="w-4 h-4 text-muted-foreground" />
             </button>
 
             {showStorageInfo && storageUsage && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+              <div className="mt-2 p-3 bg-muted/50 rounded-md">
                 <div className="space-y-1">
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     Used: {formatBytes(storageUsage.used)}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     Available: {formatBytes(storageUsage.quota - storageUsage.used)}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="w-full bg-muted rounded-full h-2 mt-2">
                     <div
                       className="bg-indigo-600 h-2 rounded-full"
                       style={{
@@ -348,7 +353,7 @@ export function MobileSettings() {
           </div>
 
           {/* Clear Data */}
-          <div className="pt-3 border-t border-gray-200">
+          <div className="pt-3 border-t border-border">
             <button
               onClick={handleClearOfflineData}
               className="flex items-center space-x-2 w-full p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
@@ -356,7 +361,7 @@ export function MobileSettings() {
               <TrashIcon className="w-4 h-4" />
               <span className="text-sm font-medium">Clear Offline Data</span>
             </button>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               This will remove all cached data and pending updates
             </p>
           </div>
@@ -381,6 +386,16 @@ export function MobileSettings() {
           </div>
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={showClearDataConfirm}
+        onOpenChange={setShowClearDataConfirm}
+        title="Clear offline data"
+        description="Are you sure you want to clear all offline data? This will remove all cached data and pending updates. This action cannot be undone."
+        confirmLabel="Clear data"
+        variant="warning"
+        onConfirm={confirmClearOfflineData}
+      />
     </div>
   );
 }

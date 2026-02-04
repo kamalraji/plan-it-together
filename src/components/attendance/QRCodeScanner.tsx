@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AttendanceRecord } from '../../types';
+import { BrowserQRCodeReader, IScannerControls } from '@zxing/browser';
+import type { Result } from '@zxing/library';
 
 interface QRCodeScannerProps {
   eventId: string;
@@ -24,6 +26,62 @@ interface ScanResult {
   };
 }
 
+// Parse QR code to extract check-in identifier
+// Supports multiple formats:
+// 1. Direct user profile ID (UUID)
+// 2. "attendee:{attendee_id}" format from ID cards
+// 3. "registration:{registration_id}" format
+// 4. URL format: https://example.com/checkin/{id}
+function parseQRCode(qrText: string): { type: 'user' | 'attendee' | 'registration'; id: string } | null {
+  const trimmed = qrText.trim();
+  
+  // Check for attendee: prefix (from ID cards)
+  if (trimmed.startsWith('attendee:')) {
+    const id = trimmed.replace('attendee:', '').trim();
+    if (id) return { type: 'attendee', id };
+  }
+  
+  // Check for registration: prefix
+  if (trimmed.startsWith('registration:')) {
+    const id = trimmed.replace('registration:', '').trim();
+    if (id) return { type: 'registration', id };
+  }
+  
+  // Check for user: prefix
+  if (trimmed.startsWith('user:')) {
+    const id = trimmed.replace('user:', '').trim();
+    if (id) return { type: 'user', id };
+  }
+  
+  // Check for URL format
+  try {
+    const url = new URL(trimmed);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    if (pathParts.length >= 2) {
+      const lastPart = pathParts[pathParts.length - 1];
+      const secondLastPart = pathParts[pathParts.length - 2];
+      
+      if (secondLastPart === 'checkin' || secondLastPart === 'check-in') {
+        return { type: 'user', id: lastPart };
+      }
+      if (secondLastPart === 'attendee') {
+        return { type: 'attendee', id: lastPart };
+      }
+    }
+  } catch {
+    // Not a URL, continue
+  }
+  
+  // Check if it's a UUID format (assume it's a user ID)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(trimmed)) {
+    return { type: 'user', id: trimmed };
+  }
+  
+  // Fallback: treat as generic code (will be handled by edge function)
+  return { type: 'user', id: trimmed };
+}
+
 export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   eventId,
   sessionId,
@@ -35,45 +93,157 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const [lastScanResult, setLastScanResult] = useState<ScanResult | null>(null);
   const [scanMode, setScanMode] = useState<'camera' | 'manual'>('camera');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const codeReaderRef = useRef<BrowserQRCodeReader | null>(null);
+  const controlsRef = useRef<IScannerControls | null>(null);
   const queryClient = useQueryClient();
 
+  // Check-in mutation that handles different QR code formats
   const checkInMutation = useMutation<any, Error, string>({
     mutationFn: async (qrCode: string) => {
+      const parsed = parseQRCode(qrCode);
+      
+      if (!parsed) {
+        throw new Error('Invalid QR code format');
+      }
+
+      // If it's an attendee ID from an ID card, look up the registration first
+      if (parsed.type === 'attendee') {
+        // Look up the attendee to get their registration
+        const { data: attendee, error: attendeeError } = await supabase
+          .from('registration_attendees')
+          .select('registration_id, full_name, email')
+          .eq('id', parsed.id)
+          .maybeSingle();
+
+        if (attendeeError || !attendee) {
+          throw new Error('Attendee not found');
+        }
+
+        // Get the registration to find the user
+        const { data: registration, error: regError } = await supabase
+          .from('registrations')
+          .select('id, user_id, event_id')
+          .eq('id', attendee.registration_id)
+          .maybeSingle();
+
+        if (regError || !registration) {
+          throw new Error('Registration not found');
+        }
+
+        // Verify the registration is for this event
+        if (registration.event_id !== eventId) {
+          throw new Error('This attendee is not registered for this event');
+        }
+
+        // Check if already checked in
+        let query = supabase
+          .from('attendance_records')
+          .select('id')
+          .eq('registration_id', registration.id)
+          .eq('event_id', eventId);
+        
+        if (sessionId) {
+          query = query.eq('session_id', sessionId);
+        } else {
+          query = query.is('session_id', null);
+        }
+        
+        const { data: existingRecord } = await query
+          .maybeSingle();
+
+        if (existingRecord) {
+          throw new Error('Already checked in');
+        }
+
+        // Get current user (volunteer) info
+        const { data: userData } = await supabase.auth.getUser();
+
+        // Create attendance record directly
+        const { data: attendanceRecord, error: insertError } = await supabase
+          .from('attendance_records')
+          .insert({
+            event_id: eventId,
+            registration_id: registration.id,
+            user_id: registration.user_id,
+            session_id: sessionId || null,
+            check_in_method: 'id_card_qr',
+            volunteer_id: userData.user?.id,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        return {
+          success: true,
+          data: {
+            attendanceRecord,
+            participantInfo: {
+              userId: registration.user_id,
+              name: attendee.full_name || 'Unknown',
+              email: attendee.email,
+              registrationId: registration.id,
+              qrCode: qrCode,
+            }
+          }
+        };
+      }
+
+      // For user/registration types, use the existing edge function
       const { data, error } = await supabase.functions.invoke('attendance-checkin', {
-        body: { qrCode, eventId, sessionId },
+        body: { qrCode: parsed.id, eventId, sessionId },
       });
+
       if (error || !data?.success) {
         throw error || new Error(data?.error || 'Check-in failed');
       }
-      return data.data as any;
+
+      return data.data;
     },
     onSuccess: (result: any, qrCodeUsed: string) => {
+      // Handle both direct DB result and edge function result
+      const attendanceRecord = result.attendanceRecord || result;
+      const participantInfo = result.participantInfo || result.participantInfo;
+
       const attendance: AttendanceRecord = {
-        id: result.attendanceRecord.id,
-        registrationId: result.attendanceRecord.registration_id,
-        sessionId: result.attendanceRecord.session_id,
-        checkInTime: result.attendanceRecord.check_in_time,
-        checkInMethod: result.attendanceRecord.check_in_method,
-        volunteerId: result.attendanceRecord.volunteer_id,
+        id: attendanceRecord.id,
+        registrationId: attendanceRecord.registration_id,
+        sessionId: attendanceRecord.session_id,
+        checkInTime: attendanceRecord.check_in_time,
+        checkInMethod: attendanceRecord.check_in_method,
+        volunteerId: attendanceRecord.volunteer_id,
       };
 
       setLastScanResult(() => ({
         success: true,
         data: attendance,
-        participantInfo: {
+        participantInfo: participantInfo ? {
           qrCode: qrCodeUsed,
-          ...(result.participantInfo || {}),
+          userId: participantInfo.userId || '',
+          name: participantInfo.name || 'Unknown',
+          email: participantInfo.email,
+          organization: participantInfo.organization,
+          registrationId: participantInfo.registrationId || '',
+        } : {
+          qrCode: qrCodeUsed,
+          userId: '',
+          name: 'Check-in successful',
+          registrationId: '',
         },
       }));
+      
       // Keep attendance lists fresh for organizers
       queryClient.invalidateQueries({ queryKey: ['attendance-report', eventId, sessionId] });
+      queryClient.invalidateQueries({ queryKey: ['id-card-attendees', eventId] });
+      
       if (onScanSuccess) {
         onScanSuccess(attendance);
       }
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error?.message || 'Check-in failed';
+      const errorMessage = error.message || error.response?.data?.error?.message || 'Check-in failed';
       setLastScanResult({
         success: false,
         error: errorMessage,
@@ -84,29 +254,57 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     },
   });
 
-  // Start camera for QR scanning
+  // Start camera and begin QR scanning
   const startCamera = async () => {
+    if (!videoRef.current) return;
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }, // Use back camera if available
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsScanning(true);
+      if (!codeReaderRef.current) {
+        codeReaderRef.current = new BrowserQRCodeReader();
       }
+
+      setIsScanning(true);
+
+      const controls = await codeReaderRef.current.decodeFromVideoDevice(
+        undefined,
+        videoRef.current,
+        async (result: Result | undefined, _err: Error | undefined) => {
+          if (result) {
+            const qrText = result.getText();
+
+            try {
+              await checkInMutation.mutateAsync(qrText.trim());
+            } catch (error: any) {
+              const errorMessage = error.message || error.response?.data?.error?.message || 'Invalid QR code';
+              setLastScanResult({
+                success: false,
+                error: errorMessage,
+              });
+            } finally {
+              // Stop scanning after a successful decode to avoid duplicates
+              if (controlsRef.current) {
+                controlsRef.current.stop();
+                controlsRef.current = null;
+              }
+              setIsScanning(false);
+            }
+          }
+        },
+      );
+
+      controlsRef.current = controls;
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      console.error('Error accessing camera or decoding QR:', error);
+      setIsScanning(false);
       setScanMode('manual');
     }
   };
 
-  // Stop camera
+  // Stop camera and QR scanning
   const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+    if (controlsRef.current) {
+      controlsRef.current.stop();
+      controlsRef.current = null;
     }
     setIsScanning(false);
   };
@@ -119,7 +317,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       await checkInMutation.mutateAsync(manualCode.trim());
       setManualCode('');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
+      const errorMessage = error.message || error.response?.data?.error?.message || 'Invalid QR code';
       setLastScanResult({
         success: false,
         error: errorMessage,
@@ -127,21 +325,6 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     }
   };
 
-  // Simulate QR code detection (in a real app, you'd use a QR code library like qr-scanner)
-  const handleCameraCapture = async () => {
-    const mockQRCode = prompt('Enter QR code (for demo purposes):');
-    if (!mockQRCode) return;
-
-    try {
-      await checkInMutation.mutateAsync(mockQRCode.trim());
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error?.message || 'Invalid QR code';
-      setLastScanResult({
-        success: false,
-        error: errorMessage,
-      });
-    }
-  };
 
   useEffect(() => {
     if (scanMode === 'camera') {
@@ -247,23 +430,23 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-card rounded-lg shadow-md p-6 border border-border">
       <div className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">QR Code Check-in</h3>
-        <p className="text-gray-600">
-          Scan participant QR codes or enter codes manually for event check-in
+        <h3 className="text-xl font-semibold text-foreground mb-2">QR Code Check-in</h3>
+        <p className="text-muted-foreground">
+          Scan attendee QR codes from ID cards or registration confirmations
         </p>
       </div>
 
       {/* Scan Mode Toggle */}
       <div className="flex mb-6">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-muted rounded-lg p-1">
           <button
             onClick={() => setScanMode('camera')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               scanMode === 'camera'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Camera Scan
@@ -272,8 +455,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             onClick={() => setScanMode('manual')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               scanMode === 'manual'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Manual Entry
@@ -284,7 +467,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {/* Camera Scanner */}
       {scanMode === 'camera' && (
         <div className="mb-6">
-          <div className="relative bg-gray-900 rounded-lg overflow-hidden">
+          <div className="relative bg-foreground/90 rounded-lg overflow-hidden">
             <video
               ref={videoRef}
               autoPlay
@@ -294,7 +477,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             
             {/* Scanning overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
+              <div className="w-48 h-48 border-2 border-background border-dashed rounded-lg flex items-center justify-center">
                 <span className="text-white text-sm font-medium">
                   Position QR code here
                 </span>
@@ -304,21 +487,21 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             {/* Capture button */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
               <button
-                onClick={handleCameraCapture}
-                disabled={!isScanning}
-                className="bg-white text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50"
+                onClick={startCamera}
+                disabled={isScanning}
+                className="bg-card text-foreground px-6 py-2 rounded-full font-medium hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50"
               >
-                Scan QR Code
+                {isScanning ? 'Scanning…' : 'Start Scanner'}
               </button>
             </div>
           </div>
 
           {!isScanning && (
             <div className="mt-4 text-center">
-              <p className="text-gray-600 mb-2">Camera not available</p>
+              <p className="text-muted-foreground mb-2">Camera not available</p>
               <button
                 onClick={startCamera}
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 Try Again
               </button>
@@ -330,8 +513,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {/* Manual Entry */}
       {scanMode === 'manual' && (
         <div className="mb-6">
-          <label htmlFor="manualCode" className="block text-sm font-medium text-gray-700 mb-2">
-            Enter QR Code
+          <label htmlFor="manualCode" className="block text-sm font-medium text-foreground mb-2">
+            Enter QR Code or Attendee ID
           </label>
           <div className="flex gap-2">
             <input
@@ -339,8 +522,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               id="manualCode"
               value={manualCode}
               onChange={(e) => setManualCode(e.target.value)}
-              placeholder="Paste or type QR code here..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Paste QR code, attendee ID, or registration ID..."
+              className="flex-1 px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   handleManualScan();
@@ -350,11 +533,14 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             <button
               onClick={handleManualScan}
               disabled={!manualCode.trim() || checkInMutation.isPending}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {checkInMutation.isPending ? 'Checking...' : 'Check In'}
             </button>
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Supports: ID card QR codes (attendee:...), registration IDs, or user profile IDs
+          </p>
         </div>
       )}
 
@@ -362,27 +548,27 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {lastScanResult && (
         <div className={`mb-6 p-4 rounded-lg ${
           lastScanResult.success 
-            ? 'bg-green-50 border border-green-200' 
-            : 'bg-red-50 border border-red-200'
+            ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800' 
+            : 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800'
         }`}>
           <div className="flex items-start">
             {lastScanResult.success ? (
-              <svg className="h-6 w-6 text-green-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6 text-green-600 dark:text-green-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             ) : (
-              <svg className="h-6 w-6 text-red-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6 text-red-600 dark:text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
             <div className="flex-1">
               <h4 className={`font-medium ${
-                lastScanResult.success ? 'text-green-800' : 'text-red-800'
+                lastScanResult.success ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'
               }`}>
                 {lastScanResult.success ? 'Check-in Successful!' : 'Check-in Failed'}
               </h4>
               <p className={`text-sm mt-1 ${
-                lastScanResult.success ? 'text-green-700' : 'text-red-700'
+                lastScanResult.success ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
               }`}>
                 {lastScanResult.success 
                   ? `Participant checked in at ${new Date(lastScanResult.data!.checkInTime).toLocaleTimeString()}`
@@ -390,7 +576,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 }
               </p>
               {lastScanResult.participantInfo && (
-                <div className="mt-2 text-sm text-green-700 space-y-1">
+                <div className="mt-2 text-sm text-green-700 dark:text-green-400 space-y-1">
                   <p><strong>Name:</strong> {lastScanResult.participantInfo.name}</p>
                   {lastScanResult.participantInfo.email && (
                     <p><strong>Email:</strong> {lastScanResult.participantInfo.email}</p>
@@ -401,7 +587,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                   <button
                     type="button"
                     onClick={handlePrintBadge}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+                    className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-foreground/90 text-white hover:bg-foreground/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                   >
                     Print Badge
                   </button>
@@ -414,26 +600,26 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
 
       {/* Loading States */}
       {checkInMutation.isPending && (
-        <div className="mb-6 flex items-center justify-center p-4 bg-blue-50 rounded-lg">
-          <svg className="animate-spin h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24">
+        <div className="mb-6 flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <svg className="animate-spin h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <span className="text-blue-800">
+          <span className="text-blue-800 dark:text-blue-300">
             Processing check-in...
           </span>
         </div>
       )}
 
       {/* Instructions */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 mb-2">Instructions</h4>
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>• <strong>Camera Mode:</strong> Point camera at participant's QR code and tap "Scan QR Code"</p>
-          <p>• <strong>Manual Mode:</strong> Ask participant to read their QR code aloud or copy/paste it</p>
+      <div className="bg-muted rounded-lg p-4">
+        <h4 className="font-medium text-foreground mb-2">Supported QR Code Formats</h4>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>• <strong>ID Card QR:</strong> Scans QR codes from printed ID cards</p>
+          <p>• <strong>Registration QR:</strong> Scans codes from registration confirmations</p>
+          <p>• <strong>Manual Entry:</strong> Enter attendee ID, registration ID, or user profile ID</p>
           <p>• Green confirmation means successful check-in</p>
           <p>• Red error means invalid code or participant already checked in</p>
-          <p>• If scanning fails, you can manually check in participants using their registration ID</p>
         </div>
       </div>
     </div>

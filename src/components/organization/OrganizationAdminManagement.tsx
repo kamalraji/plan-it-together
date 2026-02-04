@@ -88,12 +88,12 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-6 bg-muted rounded w-1/4 mb-4"></div>
           <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-muted rounded"></div>
+            <div className="h-4 bg-muted rounded w-3/4"></div>
           </div>
         </div>
       </div>
@@ -101,14 +101,14 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
+    <div className="bg-card rounded-lg shadow">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium text-gray-900">Team Members</h3>
+          <h3 className="text-lg font-medium text-foreground">Team Members</h3>
           {canManageAdmins() && (
             <button
               onClick={() => setShowInviteForm(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring"
             >
               Invite Admin
             </button>
@@ -125,11 +125,11 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
 
         {/* Invite Form */}
         {showInviteForm && (
-          <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-            <h4 className="text-md font-medium text-gray-900 mb-3">Invite New Admin</h4>
+          <div className="mb-6 bg-muted/50 p-4 rounded-lg">
+            <h4 className="text-md font-medium text-foreground mb-3">Invite New Admin</h4>
             <form onSubmit={handleInviteAdmin} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-foreground">
                   Email Address
                 </label>
                 <input
@@ -137,21 +137,21 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   id="email"
                   value={inviteForm.email}
                   onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                   placeholder="admin@example.com"
                   required
                 />
               </div>
               
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="role" className="block text-sm font-medium text-foreground">
                   Role
                 </label>
                 <select
                   id="role"
                   value={inviteForm.role}
                   onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value as 'ADMIN' | 'OWNER' })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                 >
                   <option value="ADMIN">Admin</option>
                   <option value="OWNER">Owner</option>
@@ -162,14 +162,14 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                 <button
                   type="submit"
                   disabled={inviting}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
                   {inviting ? 'Inviting...' : 'Send Invitation'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowInviteForm(false)}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="bg-muted text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted-foreground/20 focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   Cancel
                 </button>
@@ -181,19 +181,19 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
         {/* Admin List */}
         <div className="space-y-4">
           {admins.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No team members found.</p>
+            <p className="text-muted-foreground text-center py-8">No team members found.</p>
           ) : (
             admins.map((admin) => (
-              <div key={admin.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div key={admin.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-700">
+                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-foreground">
                       {admin.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">{admin.user.name}</h4>
-                    <p className="text-sm text-gray-500">{admin.user.email}</p>
+                    <h4 className="text-sm font-medium text-foreground">{admin.user.name}</h4>
+                    <p className="text-sm text-muted-foreground">{admin.user.email}</p>
                   </div>
                 </div>
 
@@ -206,7 +206,7 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                     }`}>
                       {admin.role}
                     </span>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Added {new Date(admin.addedAt).toLocaleDateString()}
                     </p>
                   </div>

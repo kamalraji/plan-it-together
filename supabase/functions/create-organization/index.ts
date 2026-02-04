@@ -1,6 +1,16 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  z,
+  emailSchema,
+  phoneSchema,
+  optionalUrlSchema,
+  optionalLongStringSchema,
+  slugSchema,
+  organizationCategorySchema,
+  parseAndValidate,
+} from "../_shared/validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,8 +18,18 @@ const corsHeaders = {
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-// Use the built-in anon key env var provided by the platform
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+// Zod schema for organization creation (strict mode)
+const createOrganizationSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(200, "Name must be less than 200 characters"),
+  slug: slugSchema,
+  category: organizationCategorySchema,
+  description: optionalLongStringSchema,
+  website: optionalUrlSchema,
+  email: emailSchema.optional().nullable(),
+  phone: phoneSchema,
+}).strict();
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -45,30 +65,13 @@ serve(async (req) => {
       });
     }
 
-    const body = await req.json();
-
-    // Basic input validation and normalization
-    const name = String(body.name ?? "").trim();
-    const slug = String(body.slug ?? "").trim().toLowerCase();
-    const category = String(body.category ?? "").trim();
-    const description = body.description ? String(body.description).trim() : null;
-    const website = body.website ? String(body.website).trim() : null;
-    const email = body.email ? String(body.email).trim() : null;
-    const phone = body.phone ? String(body.phone).trim() : null;
-
-    if (!name || !slug || !category) {
-      return new Response(JSON.stringify({ error: "Name, slug and category are required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Parse and validate input with Zod
+    const parseResult = await parseAndValidate(req, createOrganizationSchema, corsHeaders);
+    if (!parseResult.success) {
+      return parseResult.response;
     }
 
-    if (name.length > 200 || slug.length > 100) {
-      return new Response(JSON.stringify({ error: "Name or slug too long" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const { name, slug, category, description, website, email, phone } = parseResult.data;
 
     // Ensure slug is unique
     const { data: existing, error: existingError } = await supabase
@@ -99,10 +102,10 @@ serve(async (req) => {
         name,
         slug,
         category,
-        description,
-        website,
-        email,
-        phone,
+        description: description ?? null,
+        website: website ?? null,
+        email: email ?? null,
+        phone: phone ?? null,
       })
       .select("id, slug, name, category, description, website, email, phone")
       .single();

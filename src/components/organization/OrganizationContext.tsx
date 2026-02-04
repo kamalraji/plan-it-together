@@ -6,6 +6,7 @@ export interface OrganizationContextValue {
 
 const OrganizationContext = createContext<OrganizationContextValue | undefined>(undefined);
 
+export { OrganizationContext };
 export const OrganizationProvider = OrganizationContext.Provider;
 
 export const useCurrentOrganization = () => {
@@ -14,4 +15,13 @@ export const useCurrentOrganization = () => {
     throw new Error('useCurrentOrganization must be used within an OrganizationProvider');
   }
   return ctx.organization;
+};
+
+/**
+ * Safe version of useCurrentOrganization that returns null if not in org context.
+ * Use this in components that may or may not be rendered within an organization scope.
+ */
+export const useOptionalOrganization = () => {
+  const ctx = useContext(OrganizationContext);
+  return ctx?.organization ?? null;
 };

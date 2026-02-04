@@ -51,11 +51,10 @@ export function RecipientSegmentation({
     onCriteriaChange({});
   };
 
+  // Note: Judges, Volunteers, and Speakers are now managed via workspace roles
+  // and should be targeted through workspace-based segmentation in a future enhancement
   const roleOptions = [
     { value: UserRole.PARTICIPANT, label: 'Participants', description: 'Event attendees' },
-    { value: UserRole.JUDGE, label: 'Judges', description: 'Competition judges' },
-    { value: UserRole.VOLUNTEER, label: 'Volunteers', description: 'Event volunteers' },
-    { value: UserRole.SPEAKER, label: 'Speakers', description: 'Event speakers' },
     { value: UserRole.ORGANIZER, label: 'Organizers', description: 'Event organizers' },
   ];
 
@@ -73,13 +72,13 @@ export function RecipientSegmentation({
   ];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Recipient Segmentation</h3>
+        <h3 className="text-lg font-medium text-foreground">Recipient Segmentation</h3>
         <button
           type="button"
           onClick={clearAllFilters}
-          className="text-sm text-gray-600 hover:text-gray-800"
+          className="text-sm text-muted-foreground hover:text-foreground"
         >
           Clear All Filters
         </button>
@@ -88,7 +87,7 @@ export function RecipientSegmentation({
       <div className="space-y-6">
         {/* Role Filter (Requirements 8.2, 8.5) */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Filter by Role</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Filter by Role</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {roleOptions.map((option) => (
               <label key={option.value} className="flex items-start space-x-3 cursor-pointer">
@@ -96,11 +95,11 @@ export function RecipientSegmentation({
                   type="checkbox"
                   checked={segmentCriteria.roles?.includes(option.value) || false}
                   onChange={(e) => handleRoleChange(option.value, e.target.checked)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">{option.label}</div>
-                  <div className="text-xs text-gray-500">{option.description}</div>
+                  <div className="text-sm font-medium text-foreground">{option.label}</div>
+                  <div className="text-xs text-muted-foreground">{option.description}</div>
                 </div>
               </label>
             ))}
@@ -109,7 +108,7 @@ export function RecipientSegmentation({
 
         {/* Registration Status Filter (Requirements 8.2, 8.5) */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Filter by Registration Status</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Filter by Registration Status</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {registrationStatusOptions.map((option) => (
               <label key={option.value} className="flex items-start space-x-3 cursor-pointer">
@@ -117,11 +116,11 @@ export function RecipientSegmentation({
                   type="checkbox"
                   checked={segmentCriteria.registrationStatus?.includes(option.value) || false}
                   onChange={(e) => handleRegistrationStatusChange(option.value, e.target.checked)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">{option.label}</div>
-                  <div className="text-xs text-gray-500">{option.description}</div>
+                  <div className="text-sm font-medium text-foreground">{option.label}</div>
+                  <div className="text-xs text-muted-foreground">{option.description}</div>
                 </div>
               </label>
             ))}
@@ -130,7 +129,7 @@ export function RecipientSegmentation({
 
         {/* Attendance Status Filter (Requirements 8.2, 8.5) */}
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Filter by Attendance Status</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Filter by Attendance Status</h4>
           <div className="space-y-2">
             {attendanceOptions.map((option) => (
               <label key={option.value || 'all'} className="flex items-start space-x-3 cursor-pointer">
@@ -139,11 +138,11 @@ export function RecipientSegmentation({
                   name="attendanceStatus"
                   checked={segmentCriteria.attendanceStatus === option.value}
                   onChange={() => handleAttendanceStatusChange(option.value)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">{option.label}</div>
-                  <div className="text-xs text-gray-500">{option.description}</div>
+                  <div className="text-sm font-medium text-foreground">{option.label}</div>
+                  <div className="text-xs text-muted-foreground">{option.description}</div>
                 </div>
               </label>
             ))}
@@ -151,9 +150,9 @@ export function RecipientSegmentation({
         </div>
 
         {/* Recipient Preview */}
-        <div className="border-t border-gray-200 pt-6">
+        <div className="border-t border-border pt-6">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium text-gray-900">Recipient Preview</h4>
+            <h4 className="text-sm font-medium text-foreground">Recipient Preview</h4>
             {recipientPreview && recipientPreview.count > 0 && (
               <button
                 type="button"
@@ -166,7 +165,7 @@ export function RecipientSegmentation({
           </div>
 
           {isLoading ? (
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
               <span>Loading recipients...</span>
             </div>
@@ -175,19 +174,19 @@ export function RecipientSegmentation({
               <div className="flex items-center space-x-2 mb-3">
                 <div className="flex items-center space-x-1">
                   <span className="text-2xl font-bold text-indigo-600">{recipientPreview.count}</span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     recipient{recipientPreview.count !== 1 ? 's' : ''} selected
                   </span>
                 </div>
               </div>
 
               {showRecipientList && recipientPreview.recipients.length > 0 && (
-                <div className="bg-gray-50 border border-gray-200 rounded-md p-3 max-h-48 overflow-y-auto">
+                <div className="bg-muted/50 border border-border rounded-md p-3 max-h-48 overflow-y-auto">
                   <div className="space-y-1">
                     {recipientPreview.recipients.map((recipient) => (
                       <div key={recipient.id} className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-gray-900">{recipient.name}</span>
-                        <span className="text-gray-600">{recipient.email}</span>
+                        <span className="font-medium text-foreground">{recipient.name}</span>
+                        <span className="text-muted-foreground">{recipient.email}</span>
                       </div>
                     ))}
                   </div>
@@ -195,7 +194,7 @@ export function RecipientSegmentation({
               )}
             </div>
           ) : (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               Select filters above to preview recipients
             </div>
           )}

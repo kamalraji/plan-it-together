@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
-  PlusIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
@@ -16,6 +15,9 @@ import { Workspace, WorkspaceStatus } from '../../../types';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
+import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
+import { TeamCollaboration } from '@/components/illustrations';
 
 /**
  * WorkspaceListPage provides AWS-style resource list interface for workspaces.
@@ -28,7 +30,9 @@ import { UserRole } from '@/types';
 export const WorkspaceListPage: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { confirm, dialogProps } = useConfirmation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkspaceStatus | 'all'>('all');
@@ -104,9 +108,9 @@ export const WorkspaceListPage: React.FC = () => {
       case WorkspaceStatus.WINDING_DOWN:
         return 'bg-blue-100 text-blue-800';
       case WorkspaceStatus.DISSOLVED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -118,9 +122,9 @@ export const WorkspaceListPage: React.FC = () => {
       filterable: true,
       render: (_value: string, workspace: Workspace) => (
         <div>
-          <div className="text-sm font-medium text-gray-900">{workspace.name}</div>
+          <div className="text-sm font-medium text-foreground">{workspace.name}</div>
           {workspace.description && (
-            <div className="text-sm text-gray-500 truncate max-w-xs">
+            <div className="text-sm text-muted-foreground truncate max-w-xs">
               {workspace.description}
             </div>
           )}
@@ -144,7 +148,7 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
         render: (_value: any, workspace: Workspace) => (
-          <div className="text-sm text-gray-900">
+          <div className="text-sm text-foreground">
             {workspace.event ? (
               <Link 
                 to={`/dashboard/eventmanagement/${workspace.event.id}`}
@@ -153,7 +157,7 @@ export const WorkspaceListPage: React.FC = () => {
                 {workspace.event.name}
               </Link>
           ) : (
-            <span className="text-gray-400">No event</span>
+            <span className="text-muted-foreground">No event</span>
           )}
         </div>
       ),
@@ -164,8 +168,8 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (_value: any, workspace: Workspace) => (
-        <div className="flex items-center text-sm text-gray-900">
-          <UsersIcon className="w-4 h-4 mr-1 text-gray-400" />
+        <div className="flex items-center text-sm text-foreground">
+          <UsersIcon className="w-4 h-4 mr-1 text-muted-foreground" />
           {workspace.teamMembers?.length || 0} members
         </div>
       ),
@@ -176,7 +180,7 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (_value: any, workspace: Workspace) => (
-        <div className="text-sm text-gray-900">
+        <div className="text-sm text-foreground">
           {workspace.taskSummary?.total || 0} tasks
         </div>
       ),
@@ -187,8 +191,8 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (value: string) => (
-        <div className="flex items-center text-sm text-gray-900">
-          <ClockIcon className="w-4 h-4 mr-1 text-gray-400" />
+        <div className="flex items-center text-sm text-foreground">
+          <ClockIcon className="w-4 h-4 mr-1 text-muted-foreground" />
           {new Date(value).toLocaleDateString()}
         </div>
       ),
@@ -211,7 +215,7 @@ export const WorkspaceListPage: React.FC = () => {
             <>
               <Link
                 to={`${baseWorkspacePath}/${workspace.id}/edit`}
-                className="text-gray-600 hover:text-gray-500 p-1"
+                className="text-muted-foreground hover:text-muted-foreground p-1"
                 title="Edit workspace"
               >
                 <PencilIcon className="w-4 h-4" />
@@ -257,9 +261,7 @@ export const WorkspaceListPage: React.FC = () => {
     ? [
         {
           label: 'Create Workspace',
-          action: () => {
-            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-          },
+          action: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
           variant: 'primary' as const,
         },
         {
@@ -271,10 +273,14 @@ export const WorkspaceListPage: React.FC = () => {
     : [];
 
 
-  const handleDeleteWorkspace = (workspaceId: string) => {
-    if (!window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
-      return;
-    }
+  const handleDeleteWorkspace = async (workspaceId: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Workspace',
+      description: 'Are you sure you want to delete this workspace? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
     console.log('Delete workspace:', workspaceId);
     // TODO: Wire to backend delete endpoint and refresh list via React Query
   };
@@ -312,23 +318,23 @@ export const WorkspaceListPage: React.FC = () => {
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search workspaces..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
-            <FunnelIcon className="w-5 h-5 text-gray-400" />
+            <FunnelIcon className="w-5 h-5 text-muted-foreground" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as WorkspaceStatus | 'all')}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              className="border border-input rounded-md px-3 py-2 focus-visible:ring-ring focus-visible:border-primary"
             >
               <option value="all">All Statuses</option>
               <option value={WorkspaceStatus.ACTIVE}>Active</option>
@@ -340,52 +346,39 @@ export const WorkspaceListPage: React.FC = () => {
         </div>
 
         {/* Workspace Table or Empty States */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
           {isLoading ? (
             <div className="py-12 flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
           ) : !hasAnyWorkspaces ? (
-            <div className="text-center py-12 px-4">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🏗️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces yet</h3>
-              <p className="text-gray-600 mb-6">
-                Get started by creating your first workspace for event collaboration.
-              </p>
-              {canManageWorkspaces && (
-                <Link
-                  to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <PlusIcon className="w-4 h-4 mr-2" />
-                  Create Workspace
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              illustration={<TeamCollaboration size="sm" />}
+              title="No workspaces yet"
+              description="Get started by creating your first workspace for event collaboration."
+              action={
+                canManageWorkspaces
+                  ? {
+                      label: 'Create Workspace',
+                      onClick: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
+                    }
+                  : undefined
+              }
+            />
           ) : filteredWorkspaces.length === 0 ? (
-            <div className="text-center py-12 px-4">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🔍</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces match your search or filters</h3>
-              <p className="text-gray-600 mb-6">
-                Try adjusting your search term or status filter to see more workspaces.
-              </p>
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Clear filters
-              </button>
-            </div>
+            <SearchEmptyState
+              searchTerm={searchTerm}
+              onClear={handleClearFilters}
+            />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       <input
                         type="checkbox"
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-input text-blue-600 focus-visible:ring-ring"
                         onChange={(e) => {
                           if (e.target.checked) {
                             setSelectedWorkspaces(filteredWorkspaces.map((w) => w.id));
@@ -402,23 +395,23 @@ export const WorkspaceListPage: React.FC = () => {
                     {columns.slice(0, -1).map((column) => (
                       <th
                         key={column.key}
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                       >
                         {column.label}
                       </th>
                     ))}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-card divide-y divide-border">
                   {filteredWorkspaces.map((workspace) => (
-                    <tr key={workspace.id} className="hover:bg-gray-50">
+                    <tr key={workspace.id} className="hover:bg-muted/50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-input text-blue-600 focus-visible:ring-ring"
                           checked={selectedWorkspaces.includes(workspace.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -464,10 +457,16 @@ export const WorkspaceListPage: React.FC = () => {
                 {bulkActions.map((action, index) => (
                   <button
                     key={index}
-                    onClick={() => {
+                    onClick={async () => {
                       const selectedItems = filteredWorkspaces.filter(w => selectedWorkspaces.includes(w.id));
                       if (action.confirmationRequired) {
-                        if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()}?`)) {
+                        const confirmed = await confirm({
+                          title: action.label,
+                          description: `Are you sure you want to ${action.label.toLowerCase()}?`,
+                          confirmLabel: action.label,
+                          variant: 'warning',
+                        });
+                        if (confirmed) {
                           action.action(selectedItems);
                           setSelectedWorkspaces([]);
                         }
@@ -476,7 +475,7 @@ export const WorkspaceListPage: React.FC = () => {
                         setSelectedWorkspaces([]);
                       }
                     }}
-                    className="px-3 py-1 text-sm font-medium text-blue-700 bg-white border border-blue-300 rounded-md hover:bg-blue-50"
+                    className="px-3 py-1 text-sm font-medium text-blue-700 bg-card border border-blue-300 rounded-md hover:bg-blue-50"
                   >
                     {action.label}
                   </button>
@@ -486,33 +485,9 @@ export const WorkspaceListPage: React.FC = () => {
           </div>
         )}
 
-        {/* Empty State */}
-        {!isLoading && filteredWorkspaces.length === 0 && (
-          <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-              🏗️
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm || statusFilter !== 'all' ? 'No workspaces found' : 'No workspaces yet'}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {searchTerm || statusFilter !== 'all' 
-                ? 'Try adjusting your search or filter criteria.'
-                : 'Get started by creating your first workspace for event collaboration.'
-              }
-            </p>
-            {canManageWorkspaces && !searchTerm && statusFilter === 'all' && (
-              <Link
-                to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Create Your First Workspace
-              </Link>
-            )}
-          </div>
-        )}
+        {/* Empty State - handled in table view above */}
       </div>
+      <ConfirmationDialog {...dialogProps} />
     </div>
   );
 };

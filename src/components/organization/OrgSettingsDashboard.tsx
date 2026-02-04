@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCurrentOrganization } from './OrganizationContext';
 import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
 
 /**
  * OrgSettingsDashboard
@@ -18,11 +19,10 @@ export const OrgSettingsDashboard: React.FC = () => {
   const storySettingsPath = `/${organization.slug}/settings/story`;
 
   return (
-    <main className="min-h-screen bg-transparent">
+    <OrgPageWrapper>
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2">
-        <OrganizationBreadcrumbs
-          items={[
+      <OrganizationBreadcrumbs
+        items={[
             {
               label: organization.name,
               href: `/${organization.slug}`,
@@ -40,9 +40,8 @@ export const OrgSettingsDashboard: React.FC = () => {
               isCurrent: true,
             },
           ]}
-          className="text-xs sm:text-sm"
+          className="text-xs sm:text-sm mb-4"
         />
-      </div>
 
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -138,6 +137,6 @@ export const OrgSettingsDashboard: React.FC = () => {
           </Link>
         </div>
       </section>
-    </main>
+    </OrgPageWrapper>
   );
 };

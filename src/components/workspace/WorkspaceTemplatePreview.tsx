@@ -19,7 +19,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
       case 'COMPLEX':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -47,7 +47,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
           <svg
             key={star}
             className={`h-4 w-4 ${
-              star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              star <= rating ? 'text-yellow-400' : 'text-muted-foreground/70'
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -55,7 +55,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
         ))}
-        <span className="ml-1 text-sm text-gray-600">({rating.toFixed(1)})</span>
+        <span className="ml-1 text-sm text-muted-foreground">({rating.toFixed(1)})</span>
       </div>
     );
   };
@@ -70,7 +70,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
       case 'low':
         return 'bg-green-100 text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -83,21 +83,21 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
   ];
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto">
+    <div className="fixed inset-0 bg-muted-foreground/40 bg-opacity-50 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-card w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto">
 
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center">
             <span className="text-3xl mr-3">{getCategoryIcon(template.category)}</span>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{template.name}</h2>
+              <h2 className="text-2xl font-bold text-foreground">{template.name}</h2>
               <div className="flex items-center space-x-4 mt-1">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(template.complexity)}`}>
                   {template.complexity}
                 </span>
-                <span className="text-sm text-gray-500">{template.category}</span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">{template.category}</span>
+                <span className="text-sm text-muted-foreground">
                   {template.eventSizeMin}-{template.eventSizeMax} people
                 </span>
                 {renderStars(template.averageRating)}
@@ -106,7 +106,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-muted-foreground hover:text-muted-foreground"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -115,10 +115,10 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 mb-6">{template.description}</p>
+        <p className="text-muted-foreground mb-6">{template.description}</p>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-border mb-6">
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => (
               <button
@@ -127,7 +127,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>
@@ -142,23 +142,23 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Team Structure</h4>
-                  <div className="text-sm text-gray-600">
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <h4 className="font-medium text-foreground mb-2">Team Structure</h4>
+                  <div className="text-sm text-muted-foreground">
                     <p>{template.structure.roles?.length || 0} role types</p>
                     <p>{template.structure.roles?.reduce((sum, role) => sum + role.count, 0) || 0} total positions</p>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Task Organization</h4>
-                  <div className="text-sm text-gray-600">
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <h4 className="font-medium text-foreground mb-2">Task Organization</h4>
+                  <div className="text-sm text-muted-foreground">
                     <p>{template.structure.taskCategories?.length || 0} categories</p>
                     <p>{template.structure.taskCategories?.reduce((sum, cat) => sum + cat.tasks.length, 0) || 0} total tasks</p>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Communication</h4>
-                  <div className="text-sm text-gray-600">
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <h4 className="font-medium text-foreground mb-2">Communication</h4>
+                  <div className="text-sm text-muted-foreground">
                     <p>{template.structure.channels?.length || 0} channels</p>
                     <p>{template.structure.milestones?.length || 0} milestones</p>
                   </div>
@@ -167,22 +167,22 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
 
               {template.effectiveness && (
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Effectiveness Metrics</h4>
+                  <h4 className="font-medium text-foreground mb-2">Effectiveness Metrics</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600">Avg. Completion Rate:</span>
+                      <span className="text-muted-foreground">Avg. Completion Rate:</span>
                       <p className="font-medium">{template.effectiveness.avgCompletionRate || 'N/A'}%</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Team Satisfaction:</span>
+                      <span className="text-muted-foreground">Team Satisfaction:</span>
                       <p className="font-medium">{template.effectiveness.avgTeamSatisfaction || 'N/A'}/5</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Success Rate:</span>
+                      <span className="text-muted-foreground">Success Rate:</span>
                       <p className="font-medium">{template.effectiveness.successRate || 'N/A'}%</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Times Used:</span>
+                      <span className="text-muted-foreground">Times Used:</span>
                       <p className="font-medium">{template.usageCount}</p>
                     </div>
                   </div>
@@ -194,21 +194,21 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
           {activeTab === 'roles' && (
             <div className="space-y-4">
               {template.structure.roles?.map((role, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div key={index} className="border border-border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-900">{role.role.replace(/_/g, ' ')}</h4>
+                    <h4 className="font-medium text-foreground">{role.role.replace(/_/g, ' ')}</h4>
                     <span className="bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-1 rounded">
                       {role.count} {role.count === 1 ? 'person' : 'people'}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">{role.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{role.description}</p>
                   <div>
-                    <h5 className="text-sm font-medium text-gray-700 mb-1">Permissions:</h5>
+                    <h5 className="text-sm font-medium text-foreground mb-1">Permissions:</h5>
                     <div className="flex flex-wrap gap-1">
                       {role.permissions.map((permission, permIndex) => (
                         <span
                           key={permIndex}
-                          className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                          className="bg-muted text-foreground text-xs px-2 py-1 rounded"
                         >
                           {permission.replace(/_/g, ' ')}
                         </span>
@@ -216,7 +216,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                     </div>
                   </div>
                 </div>
-              )) || <p className="text-gray-500">No role information available.</p>}
+              )) || <p className="text-muted-foreground">No role information available.</p>}
             </div>
           )}
 
@@ -224,44 +224,44 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
             <div className="space-y-6">
               {template.structure.taskCategories?.map((category, index) => (
                 <div key={index}>
-                  <h4 className="font-medium text-gray-900 mb-3">{category.category}</h4>
+                  <h4 className="font-medium text-foreground mb-3">{category.category}</h4>
                   <div className="space-y-2">
                     {category.tasks.map((task, taskIndex) => (
-                      <div key={taskIndex} className="border border-gray-200 rounded-lg p-3">
+                      <div key={taskIndex} className="border border-border rounded-lg p-3">
                         <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-medium text-gray-800">{task.title}</h5>
+                          <h5 className="font-medium text-foreground">{task.title}</h5>
                           <div className="flex items-center space-x-2">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                               {task.priority}
                             </span>
-                            <span className="text-xs text-gray-500">{task.estimatedHours}h</span>
+                            <span className="text-xs text-muted-foreground">{task.estimatedHours}h</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600">{task.description}</p>
+                        <p className="text-sm text-muted-foreground">{task.description}</p>
                       </div>
                     ))}
                   </div>
                 </div>
-              )) || <p className="text-gray-500">No task information available.</p>}
+              )) || <p className="text-muted-foreground">No task information available.</p>}
             </div>
           )}
 
           {activeTab === 'channels' && (
             <div className="space-y-4">
               {template.structure.channels?.map((channel, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div key={index} className="border border-border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-900">#{channel.name}</h4>
+                    <h4 className="font-medium text-foreground">#{channel.name}</h4>
                     <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
                       {channel.type.replace(/_/g, ' ')}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{channel.description}</p>
-                  <div className="text-xs text-gray-500">
+                  <p className="text-sm text-muted-foreground mb-2">{channel.description}</p>
+                  <div className="text-xs text-muted-foreground">
                     Members: {channel.members.join(', ') || 'All team members'}
                   </div>
                 </div>
-              )) || <p className="text-gray-500">No channel information available.</p>}
+              )) || <p className="text-muted-foreground">No channel information available.</p>}
             </div>
           )}
 
@@ -273,21 +273,21 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                     <span className="text-indigo-600 text-sm font-medium">{milestone.daysFromStart}</span>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{milestone.name}</h4>
-                    <p className="text-sm text-gray-600">{milestone.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">Day {milestone.daysFromStart} from event start</p>
+                    <h4 className="font-medium text-foreground">{milestone.name}</h4>
+                    <p className="text-sm text-muted-foreground">{milestone.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Day {milestone.daysFromStart} from event start</p>
                   </div>
                 </div>
-              )) || <p className="text-gray-500">No timeline information available.</p>}
+              )) || <p className="text-muted-foreground">No timeline information available.</p>}
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+        <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-border">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
           >
             Close
           </button>

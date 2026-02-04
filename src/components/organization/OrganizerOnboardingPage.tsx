@@ -66,7 +66,12 @@ export const OrganizerOnboardingPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizer-onboarding-checklist', user?.id] });
-      navigate('/dashboard', { replace: true });
+      // Navigate to primary org dashboard to avoid redirect chain
+      if (primaryOrganization?.slug) {
+        navigate(`/${primaryOrganization.slug}/dashboard`, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     },
   });
 
@@ -231,7 +236,7 @@ export const OrganizerOnboardingPage: React.FC = () => {
                     registrations and run the event.
                   </p>
                   <div className="mt-2 flex items-center gap-3 flex-wrap">
-                    <Button size="sm" variant="outline" onClick={() => navigate('/dashboard/team')}>
+                    <Button size="sm" variant="outline" onClick={() => navigate(primaryOrganization ? `/${primaryOrganization.slug}/team` : '/dashboard/organizations/join')}>
                       Manage team members
                     </Button>
                     <a

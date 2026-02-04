@@ -58,14 +58,14 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
   }
 
   return (
-    <div className="h-full flex flex-col bg-white border border-gray-200 rounded-lg">
+    <div className="h-full flex flex-col bg-card border border-border rounded-lg">
       {/* Channel Header */}
-      <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+      <div className="px-4 py-3 border-b border-border bg-muted/50 rounded-t-lg">
           <div className="flex items-center space-x-2">
           <div>
-            <h3 className="font-medium text-gray-900">#{channel.name}</h3>
+            <h3 className="font-medium text-foreground">#{channel.name}</h3>
             {channel.description && (
-              <p className="text-sm text-gray-600">{channel.description}</p>
+              <p className="text-sm text-muted-foreground">{channel.description}</p>
             )}
           </div>
           {channel.isPrivate && (
@@ -80,9 +80,9 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-gray-400 text-3xl mb-2">💭</div>
-            <p className="text-gray-600">No messages yet</p>
-            <p className="text-gray-500 text-sm mt-1">
+            <div className="text-muted-foreground text-3xl mb-2">💭</div>
+            <p className="text-muted-foreground">No messages yet</p>
+            <p className="text-muted-foreground text-sm mt-1">
               Be the first to start the conversation in #{channel.name}
             </p>
           </div>
@@ -99,7 +99,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
               <div key={message.id}>
                 {showTimeGap && (
                   <div className="text-center my-4">
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                       {formatMessageTime(message.sentAt)}
                     </span>
                   </div>
@@ -112,7 +112,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                     </div>
                   ) : (
                     <div className="w-8 h-8 flex items-center justify-center">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         {formatMessageTime(message.sentAt)}
                       </span>
                     </div>
@@ -121,16 +121,16 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                   <div className="flex-1 min-w-0">
                     {showSenderInfo && (
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           User {message.senderId.slice(-4)}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           {formatMessageTime(message.sentAt)}
                         </span>
                       </div>
                     )}
                     
-                    <div className="text-gray-700 text-sm leading-relaxed">
+                    <div className="text-foreground text-sm leading-relaxed">
                       {message.content.startsWith('**Task Update**:') ? (
                         <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
                           <div className="flex items-center space-x-2 mb-1">
@@ -148,7 +148,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                       <div className="mt-2 space-y-2">
                         {message.attachments.map((attachment, idx) => (
                           <div key={idx} className="flex items-center space-x-2 text-sm">
-                            <span className="text-gray-400">📎</span>
+                            <span className="text-muted-foreground">📎</span>
                             <a
                               href={attachment.url}
                               target="_blank"
@@ -157,7 +157,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                             >
                               {attachment.filename}
                             </a>
-                            <span className="text-gray-500 text-xs">
+                            <span className="text-muted-foreground text-xs">
                               ({Math.round(attachment.size / 1024)}KB)
                             </span>
                           </div>
@@ -166,7 +166,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
                     )}
 
                     {message.editedAt && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         (edited {formatMessageTime(message.editedAt)})
                       </p>
                     )}
@@ -180,7 +180,7 @@ export function MessageThread({ channel, onSendMessage, isSending }: MessageThre
       </div>
 
       {/* Message Composer */}
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-border p-4">
         <MessageComposer
           onSendMessage={onSendMessage}
           isSending={isSending}

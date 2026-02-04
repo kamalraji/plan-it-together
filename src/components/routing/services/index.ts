@@ -12,7 +12,6 @@ export { WorkspaceDetailPage } from './WorkspaceDetailPage';
 
 // Marketplace Service
 export { MarketplaceService } from './MarketplaceService';
-export { MarketplaceServiceDashboard } from './MarketplaceServiceDashboard';
 export { MarketplaceListPage } from './MarketplaceListPage';
 export { VendorDashboardPage } from './VendorDashboardPage';
 export { BookingListPage } from './BookingListPage';

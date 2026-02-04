@@ -245,10 +245,10 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-medium text-gray-900">Real-time Metrics</h2>
+            <h2 className="text-lg font-medium text-foreground">Real-time Metrics</h2>
             <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-600' : 'text-red-600'
               }`}>
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'
@@ -262,7 +262,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           <div className="flex items-center space-x-4">
             {/* Refresh Interval Selector */}
             <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground">
                 Refresh:
               </label>
               <select
@@ -270,7 +270,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
                 onChange={(e) => handleRefreshIntervalChange(
                   e.target.value ? parseInt(e.target.value) : null
                 )}
-                className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="border-input rounded-md text-sm focus-visible:ring-ring focus-visible:border-primary"
               >
                 {refreshIntervalOptions.map((option) => (
                   <option key={option.label} value={option.value || ''}>
@@ -283,10 +283,10 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
             {/* Pause/Resume Button */}
             <button
               onClick={handlePauseToggle}
-              className={`inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium ${isPaused
+              className={`inline-flex items-center px-3 py-2 border border-input rounded-md text-sm font-medium ${isPaused
                   ? 'text-green-700 bg-green-50 hover:bg-green-100'
-                  : 'text-gray-700 bg-white hover:bg-gray-50'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                  : 'text-foreground bg-card hover:bg-muted/50'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring`}
             >
               {isPaused ? (
                 <>
@@ -313,17 +313,17 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
       {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {getMetricCards().map((metric) => (
-          <div key={metric.id} className="bg-white rounded-lg shadow p-6">
+          <div key={metric.id} className="bg-card rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">{metric.title}</p>
+                <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
                 <p className={`text-2xl font-bold ${metric.color}`}>
                   {metric.value}
                 </p>
                 {metric.change && (
                   <p className={`text-sm ${metric.changeType === 'increase' ? 'text-green-600' :
                       metric.changeType === 'decrease' ? 'text-red-600' :
-                        'text-gray-600'
+                        'text-muted-foreground'
                     }`}>
                     {metric.change}
                   </p>
@@ -345,7 +345,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
       {/* Last Updated */}
       {realTimeData && (
         <div className="text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Last updated: {new Date(realTimeData.timestamp).toLocaleTimeString()}
           </p>
         </div>
@@ -354,9 +354,9 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
       {/* No Data State */}
       {!realTimeData && !error && (
         <div className="text-center py-12">
-          <ClockIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Waiting for data</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <ClockIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-sm font-medium text-foreground">Waiting for data</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Real-time metrics will appear here once data starts flowing.
           </p>
         </div>

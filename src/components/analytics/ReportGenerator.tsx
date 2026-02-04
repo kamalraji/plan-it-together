@@ -184,8 +184,8 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Report Templates */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Report Templates</h2>
+      <div className="bg-card shadow rounded-lg p-6">
+        <h2 className="text-lg font-medium text-foreground mb-4">Report Templates</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {getReportTemplates().map((template) => (
             <button
@@ -194,16 +194,16 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
               className={`p-4 border-2 rounded-lg text-left transition-all ${
                 selectedTemplate === template.id
                   ? 'border-indigo-500 bg-indigo-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border hover:border-input'
               }`}
             >
               <div className="flex items-center space-x-3 mb-2">
                 <template.icon className={`h-6 w-6 ${
-                  selectedTemplate === template.id ? 'text-indigo-600' : 'text-gray-400'
+                  selectedTemplate === template.id ? 'text-indigo-600' : 'text-muted-foreground'
                 }`} />
-                <h3 className="font-medium text-gray-900">{template.name}</h3>
+                <h3 className="font-medium text-foreground">{template.name}</h3>
               </div>
-              <p className="text-sm text-gray-500">{template.description}</p>
+              <p className="text-sm text-muted-foreground">{template.description}</p>
               <div className="mt-2 flex items-center space-x-2">
                 <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
                   template.defaultFormat === 'PDF' 
@@ -212,7 +212,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                 }`}>
                   {template.defaultFormat}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted-foreground">
                   {template.sections.length} sections
                 </span>
               </div>
@@ -222,18 +222,18 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
       </div>
 
       {/* Report Configuration */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-6">Report Configuration</h2>
+      <div className="bg-card shadow rounded-lg p-6">
+        <h2 className="text-lg font-medium text-foreground mb-6">Report Configuration</h2>
         
         <div className="space-y-6">
           {/* Date Range */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Date Range
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="startDate" className="block text-xs text-gray-500 mb-1">
+                <label htmlFor="startDate" className="block text-xs text-muted-foreground mb-1">
                   Start Date
                 </label>
                 <input
@@ -244,11 +244,11 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     dateRange: { ...prev.dateRange, startDate: e.target.value }
                   }))}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="endDate" className="block text-xs text-gray-500 mb-1">
+                <label htmlFor="endDate" className="block text-xs text-muted-foreground mb-1">
                   End Date
                 </label>
                 <input
@@ -259,7 +259,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     dateRange: { ...prev.dateRange, endDate: e.target.value }
                   }))}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 />
               </div>
             </div>
@@ -267,7 +267,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
 
           {/* Format Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Export Format
             </label>
             <div className="flex space-x-4">
@@ -282,9 +282,9 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                       ...prev,
                       format: e.target.value as ExportFormat
                     }))}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
                   />
-                  <span className="ml-2 text-sm text-gray-700">{format}</span>
+                  <span className="ml-2 text-sm text-foreground">{format}</span>
                 </label>
               ))}
             </div>
@@ -292,7 +292,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
 
           {/* Report Options */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Report Options
             </label>
             <div className="space-y-2">
@@ -304,9 +304,9 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     includeCharts: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">Include charts and visualizations</span>
+                <span className="ml-2 text-sm text-foreground">Include charts and visualizations</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -316,9 +316,9 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     includeRawData: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">Include raw data tables</span>
+                <span className="ml-2 text-sm text-foreground">Include raw data tables</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -328,16 +328,16 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     compareWithPrevious: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">Compare with previous period</span>
+                <span className="ml-2 text-sm text-foreground">Compare with previous period</span>
               </label>
             </div>
           </div>
 
           {/* Section Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Report Sections
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -347,11 +347,11 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     type="checkbox"
                     checked={reportOptions.sections.includes(section.id)}
                     onChange={() => handleSectionToggle(section.id)}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
+                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded mt-1"
                   />
                   <div>
-                    <div className="text-sm font-medium text-gray-700">{section.label}</div>
-                    <div className="text-xs text-gray-500">{section.description}</div>
+                    <div className="text-sm font-medium text-foreground">{section.label}</div>
+                    <div className="text-xs text-muted-foreground">{section.description}</div>
                   </div>
                 </label>
               ))}
@@ -360,7 +360,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
 
           {/* Custom Title */}
           <div>
-            <label htmlFor="customTitle" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="customTitle" className="block text-sm font-medium text-foreground mb-2">
               Custom Report Title (Optional)
             </label>
             <input
@@ -372,7 +372,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                 customTitle: e.target.value
               }))}
               placeholder="Enter custom report title..."
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             />
           </div>
         </div>
@@ -405,11 +405,11 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
         <button
           onClick={handleGenerateReport}
           disabled={isGenerating || reportOptions.sections.length === 0}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-background mr-2" />
               Generating...
             </>
           ) : (

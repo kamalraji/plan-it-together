@@ -59,7 +59,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 
   if (loading && !leaderboard) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-card rounded-lg shadow-md p-6">
         <div className="flex justify-center items-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
@@ -69,7 +69,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-card rounded-lg shadow-md p-6">
         <div className="text-center">
           <div className="text-red-600 mb-4">{error}</div>
           <button
@@ -85,8 +85,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 
   if (!leaderboard || leaderboard.entries.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-center text-gray-500">
+      <div className="bg-card rounded-lg shadow-md p-6">
+        <div className="text-center text-muted-foreground">
           <div className="text-4xl mb-4">📊</div>
           <h3 className="text-lg font-medium mb-2">No Scores Yet</h3>
           <p>The leaderboard will appear once judges start scoring submissions.</p>
@@ -98,8 +98,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   // If leaderboard is disabled and user is not organizer, don't show it
   if (!leaderboard.enabled && !isOrganizer) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-center text-gray-500">
+      <div className="bg-card rounded-lg shadow-md p-6">
+        <div className="text-center text-muted-foreground">
           <div className="text-4xl mb-4">🔒</div>
           <h3 className="text-lg font-medium mb-2">Leaderboard Hidden</h3>
           <p>The leaderboard is currently hidden by the organizers.</p>
@@ -109,13 +109,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md">
+    <div className="bg-card rounded-lg shadow-md">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Leaderboard</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-foreground">Leaderboard</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               Last updated: {new Date(leaderboard.lastUpdated).toLocaleString()}
             </p>
           </div>
@@ -135,11 +135,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
       </div>
 
       {/* Leaderboard Entries */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-border">
         {leaderboard.entries.map((entry) => (
           <div
             key={entry.id}
-            className={`px-6 py-4 hover:bg-gray-50 transition-colors ${
+            className={`px-6 py-4 hover:bg-muted/50 transition-colors ${
               entry.rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-transparent' : ''
             }`}
           >
@@ -150,10 +150,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {entry.teamName}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     Submission ID: {entry.submissionId.slice(0, 8)}...
                   </p>
                 </div>
@@ -163,7 +163,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 <div className={`text-2xl font-bold ${getScoreColor(entry.percentage)}`}>
                   {entry.percentage.toFixed(1)}%
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {entry.totalScore.toFixed(1)} / {entry.maxPossibleScore.toFixed(1)}
                 </div>
               </div>
@@ -171,7 +171,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
 
             {/* Progress Bar */}
             <div className="mt-3">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all duration-300 ${
                     entry.percentage >= 90 ? 'bg-green-500' :
@@ -189,8 +189,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-        <div className="flex justify-between items-center text-sm text-gray-600">
+      <div className="px-6 py-4 bg-muted/50 border-t border-border">
+        <div className="flex justify-between items-center text-sm text-muted-foreground">
           <div>
             Total Submissions: {leaderboard.entries.length}
           </div>

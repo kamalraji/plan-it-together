@@ -15,12 +15,15 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
   const [attachments, setAttachments] = useState<File[]>([]);
 
   const roleOptions = [
-    { value: WorkspaceRole.TEAM_LEAD, label: 'Team Leads' },
+    { value: WorkspaceRole.OPERATIONS_MANAGER, label: 'Operations Managers' },
+    { value: WorkspaceRole.GROWTH_MANAGER, label: 'Growth Managers' },
+    { value: WorkspaceRole.CONTENT_MANAGER, label: 'Content Managers' },
+    { value: WorkspaceRole.TECH_FINANCE_MANAGER, label: 'Tech & Finance Managers' },
+    { value: WorkspaceRole.VOLUNTEERS_MANAGER, label: 'Volunteers Managers' },
+    { value: WorkspaceRole.EVENT_LEAD, label: 'Event Leads' },
     { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinators' },
-    { value: WorkspaceRole.VOLUNTEER_MANAGER, label: 'Volunteer Managers' },
-    { value: WorkspaceRole.TECHNICAL_SPECIALIST, label: 'Technical Specialists' },
     { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Leads' },
-    { value: WorkspaceRole.GENERAL_VOLUNTEER, label: 'General Volunteers' },
+    { value: WorkspaceRole.VOLUNTEER_COORDINATOR, label: 'Volunteer Coordinators' },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -86,8 +89,8 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Broadcast Message</h3>
-        <p className="text-gray-600">
+        <h3 className="text-lg font-medium text-foreground mb-2">Broadcast Message</h3>
+        <p className="text-muted-foreground">
           Send important announcements to all team members or specific role groups.
         </p>
       </div>
@@ -95,7 +98,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Target Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-foreground mb-3">
             Send to
           </label>
           <div className="space-y-3">
@@ -105,9 +108,9 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 value="ALL_MEMBERS"
                 checked={targetType === 'ALL_MEMBERS'}
                 onChange={(e) => setTargetType(e.target.value as any)}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
               />
-              <span className="ml-2 text-sm text-gray-700">
+              <span className="ml-2 text-sm text-foreground">
                 All team members ({workspace?.teamMembers?.length || 0} members)
               </span>
             </label>
@@ -118,9 +121,9 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 value="ROLE_SPECIFIC"
                 checked={targetType === 'ROLE_SPECIFIC'}
                 onChange={(e) => setTargetType(e.target.value as any)}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
               />
-              <span className="ml-2 text-sm text-gray-700">
+              <span className="ml-2 text-sm text-foreground">
                 Specific roles
               </span>
             </label>
@@ -130,7 +133,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
         {/* Role Selection */}
         {targetType === 'ROLE_SPECIFIC' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Select roles ({getRecipientCount()} members)
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -145,20 +148,20 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                     className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
                       selectedRoles.includes(role.value)
                         ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        : 'border-input hover:border-input'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedRoles.includes(role.value)}
                       onChange={() => handleRoleToggle(role.value)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                     />
                     <div className="ml-3 flex-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-foreground">
                         {role.label}
                       </span>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {memberCount} member{memberCount !== 1 ? 's' : ''}
                       </p>
                     </div>
@@ -171,7 +174,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
 
         {/* Message Content */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Message
           </label>
           <textarea
@@ -179,7 +182,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your broadcast message here..."
             rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
             required
           />
         </div>
@@ -187,15 +190,15 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
         {/* Attachments */}
         {attachments.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Attachments
             </label>
             <div className="space-y-2">
               {attachments.map((file, index) => (
-                <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                <div key={index} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">{file.name}</span>
-                    <span className="text-xs text-gray-500">({formatFileSize(file.size)})</span>
+                    <span className="text-sm text-foreground">{file.name}</span>
+                    <span className="text-xs text-muted-foreground">({formatFileSize(file.size)})</span>
                   </div>
                   <button
                     type="button"
@@ -235,9 +238,9 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 type="checkbox"
                 checked={isPriority}
                 onChange={(e) => setIsPriority(e.target.checked)}
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                className="h-4 w-4 text-red-600 focus:ring-red-500 border-input rounded"
               />
-              <span className={`text-sm ${isPriority ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+              <span className={`text-sm ${isPriority ? 'text-red-600 font-medium' : 'text-muted-foreground'}`}>
                 Priority broadcast (immediate notifications)
               </span>
             </label>
@@ -245,13 +248,13 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
         </div>
 
         {/* Recipient Summary */}
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-muted/50 p-4 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-foreground">
                 Ready to send to {getRecipientCount()} recipient{getRecipientCount() !== 1 ? 's' : ''}
               </p>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {targetType === 'ALL_MEMBERS' 
                   ? 'All team members will receive this message'
                   : `Members with roles: ${selectedRoles.join(', ')}`
@@ -279,7 +282,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
           >
             {isSending ? (
               <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background"></div>
                 <span>Sending broadcast...</span>
               </div>
             ) : (

@@ -173,15 +173,15 @@ export function MobileFeaturesPanel({
       case 'error':
         return <ExclamationTriangleIcon className="w-4 h-4 text-red-600" />;
       default:
-        return <MapPinIcon className="w-4 h-4 text-gray-600" />;
+        return <MapPinIcon className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+    <div className="bg-card rounded-lg shadow-sm p-4 space-y-4">
       <div className="flex items-center space-x-2">
         <InformationCircleIcon className="w-5 h-5 text-blue-600" />
-        <h3 className="text-sm font-medium text-gray-900">Mobile Features</h3>
+        <h3 className="text-sm font-medium text-foreground">Mobile Features</h3>
       </div>
 
       {/* Location Services */}
@@ -189,7 +189,7 @@ export function MobileFeaturesPanel({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {getLocationStatusIcon()}
-            <span className="text-sm text-gray-700">Location Services</span>
+            <span className="text-sm text-foreground">Location Services</span>
           </div>
           <button
             onClick={getCurrentLocation}
@@ -224,8 +224,8 @@ export function MobileFeaturesPanel({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <PhotoIcon className="w-4 h-4 text-gray-600" />
-            <span className="text-sm text-gray-700">Photo Capture</span>
+            <PhotoIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-foreground">Photo Capture</span>
           </div>
           <button
             onClick={capturePhoto}
@@ -234,7 +234,7 @@ export function MobileFeaturesPanel({
             Take Photo
           </button>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Capture photos for task documentation or workspace updates
         </p>
       </div>
@@ -243,8 +243,8 @@ export function MobileFeaturesPanel({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <MicrophoneIcon className={`w-4 h-4 ${isRecording ? 'text-red-600' : 'text-gray-600'}`} />
-            <span className="text-sm text-gray-700">Voice Recording</span>
+            <MicrophoneIcon className={`w-4 h-4 ${isRecording ? 'text-red-600' : 'text-muted-foreground'}`} />
+            <span className="text-sm text-foreground">Voice Recording</span>
           </div>
           <button
             onTouchStart={startVoiceRecording}
@@ -273,19 +273,19 @@ export function MobileFeaturesPanel({
           </div>
         )}
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Record voice messages or audio notes for quick communication
         </p>
       </div>
 
       {/* Feature Availability Info */}
-      <div className="pt-3 border-t border-gray-200">
+      <div className="pt-3 border-t border-border">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${
               'geolocation' in navigator ? 'bg-green-500' : 'bg-red-500'
             }`}></div>
-            <span className="text-xs text-gray-600">
+            <span className="text-xs text-muted-foreground">
               Location Services: {'geolocation' in navigator ? 'Available' : 'Not Available'}
             </span>
           </div>
@@ -294,7 +294,7 @@ export function MobileFeaturesPanel({
             <div className={`w-2 h-2 rounded-full ${
               'mediaDevices' in navigator ? 'bg-green-500' : 'bg-red-500'
             }`}></div>
-            <span className="text-xs text-gray-600">
+            <span className="text-xs text-muted-foreground">
               Camera/Microphone: {'mediaDevices' in navigator ? 'Available' : 'Not Available'}
             </span>
           </div>

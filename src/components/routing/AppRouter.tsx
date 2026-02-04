@@ -1,5 +1,5 @@
-import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider, useAuth } from '../../hooks/useAuth';
@@ -8,34 +8,56 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
-import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
 import { AuthLayout } from '../auth/AuthLayout';
-import { DashboardDataLab } from '../enhanced/DashboardDataLab';
 import { DashboardRouter } from '../dashboard/DashboardRouter';
 import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
 import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
-import { OrgScopedLayout } from '../organization/OrgScopedLayout';
-import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
-import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
-import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
-import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
-import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
+import { PublicEventPage } from '../events/PublicEventPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
+import { CertificateVerification } from '../certificates';
+
 import AttendflowLanding from '@/pages/AttendflowLanding';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import PricingPage from '@/pages/PricingPage';
-import AssetsGalleryPage from '@/pages/AssetsGalleryPage';
+import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
+
+// Lazy-loaded components for better bundle splitting
+// Heavy/role-specific components only downloaded when needed
+const OrgScopedLayout = lazy(() => import('../organization/OrgScopedLayout'));
+const OrganizerDashboardLayout = lazy(() => import('../dashboard/OrganizerDashboardLayout'));
+const MarketplaceService = lazy(() => import('./services/MarketplaceService'));
+const OrganizationServiceComponent = lazy(() => import('./services').then(m => ({ default: m.OrganizationService })));
+const DashboardDataLab = lazy(() => import('../enhanced/DashboardDataLab'));
+const OrganizationRegistrationPage = lazy(() => import('../organization/OrganizationRegistrationPage'));
+const OrganizerOnboardingPage = lazy(() => import('../organization/OrganizerOnboardingPage'));
+const JoinOrganizationPage = lazy(() => import('../organization/JoinOrganizationPage'));
+const VendorPublicProfilePage = lazy(() => import('./services/VendorPublicProfilePage'));
+const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPortfolioPage'));
+const HelpPage = lazy(() => import('../help/HelpPage'));
+const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
+const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
+
+// Loading fallback for lazy-loaded routes
+const RouteLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/95">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <p className="text-muted-foreground text-sm">Loading...</p>
+    </div>
+  </div>
+);
 
 
 // Create a query client instance with optimized settings for the console application
@@ -66,7 +88,7 @@ const ForgotPasswordPage = () => {
           </p>
         </div>
 
-        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           <div className="space-y-4 text-center">
             <div>
               <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
@@ -102,7 +124,7 @@ const ResetPasswordPage = () => {
           </p>
         </div>
 
-        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">
               Once implemented, this page will let you choose a new password after opening a
@@ -121,10 +143,15 @@ const ResetPasswordPage = () => {
   );
 };
 
-const EventServiceLazy = lazy(() =>
-  import('./services/EventService').then((m) => ({ default: m.EventService })),
-);
+// Redirect component for backward compatibility from /e/:slug to /event/:slug
+const SlugRedirect = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const queryString = searchParams.toString();
+  return <Navigate to={`/event/${slug}${queryString ? `?${queryString}` : ''}`} replace />;
+};
 
+// Types for unified dashboard metrics
 interface DashboardMetrics {
   activeEvents: number;
   draftEvents: number;
@@ -252,7 +279,7 @@ export const ConsoleDashboard = () => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
             Your Thittam1Hub Dashboard
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Live overview of your events, participants, and marketplace activity in one place.
           </p>
         </div>
@@ -271,14 +298,14 @@ export const ConsoleDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Events Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Event Management</h3>
+                <h3 className="text-xl font-bold text-foreground">Event Management</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Create, publish, and track your events and participants.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Create, publish, and track your events and participants.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Active Events</span>
                 <span className="font-semibold text-coral">{metrics?.activeEvents ?? 0}</span>
@@ -293,7 +320,7 @@ export const ConsoleDashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span>Total Registrations</span>
-                <span className="font-semibold text-gray-900">{metrics?.totalRegistrations ?? 0}</span>
+                <span className="font-semibold text-foreground">{metrics?.totalRegistrations ?? 0}</span>
               </div>
             </div>
             <button onClick={() => {
@@ -309,14 +336,14 @@ export const ConsoleDashboard = () => {
           </div>
 
           {/* Workspaces Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Workspaces</h3>
+                <h3 className="text-xl font-bold text-foreground">Workspaces</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Collaborate with your team on event prep and execution.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Collaborate with your team on event prep and execution.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Active Workspaces</span>
                 <span className="font-semibold text-teal">{metrics?.activeWorkspaces ?? 0}</span>
@@ -339,14 +366,14 @@ export const ConsoleDashboard = () => {
           </div>
 
           {/* Marketplace Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Marketplace</h3>
+                <h3 className="text-xl font-bold text-foreground">Marketplace</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Discover and book verified vendors for your events.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Discover and book verified vendors for your events.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Available Services</span>
                 <span className="font-semibold text-sunny">{metrics?.availableServices ?? 0}</span>
@@ -357,13 +384,13 @@ export const ConsoleDashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span>Total Revenue</span>
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-foreground">
                   {metrics ? `$${metrics.totalRevenue.toLocaleString()}` : '$0'}
                 </span>
               </div>
             </div>
             <button
-              onClick={() => window.location.href = '/marketplace'}
+              onClick={() => navigate('/marketplace')}
               className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
             >
               Go to Marketplace
@@ -372,17 +399,17 @@ export const ConsoleDashboard = () => {
         </div>
 
         <div className="mt-16 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Quick Actions</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-white/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Create Event
             </button>
-            <button className="bg-white/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Join Workspace
             </button>
             <button
-              onClick={() => window.location.href = '/marketplace'}
-              className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+              onClick={() => navigate('/marketplace')}
+              className="bg-card/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Browse Services
             </button>
@@ -393,84 +420,7 @@ export const ConsoleDashboard = () => {
   );
 };
 
-const WorkspaceService = () => {
-  return (
-    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal/5 to-mint/10 min-h-screen">
-      <div className="max-w-7xl mx-auto py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal to-mint bg-clip-text text-transparent mb-4">
-            Workspace Service
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Collaborate, create, and achieve amazing things together.
-          </p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 shadow-soft">
-          <div className="flex items-center space-x-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Coming Soon!</h2>
-              <p className="text-gray-600">Workspace functionality will be implemented in later tasks.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-4 bg-teal/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Team Collaboration</h3>
-              <p className="text-sm text-gray-600">Work together seamlessly.</p>
-            </div>
-            <div className="text-center p-4 bg-mint/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Project Management</h3>
-              <p className="text-sm text-gray-600">Organize your projects.</p>
-            </div>
-            <div className="text-center p-4 bg-teal/5 rounded-xl">
-              <h3 className="font-semibold text-teal mb-2">Real-time Updates</h3>
-              <p className="text-sm text-gray-600">Stay in sync with your team.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AnalyticsService = () => {
-  return (
-    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-sunny/5 to-coral/10 min-h-screen">
-      <div className="max-w-7xl mx-auto py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-sunny to-coral bg-clip-text text-transparent mb-4">
-            Analytics Service
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover insights and track your success with analytics.
-          </p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-soft">
-          <div className="flex items-center space-x-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Powerful Analytics Coming Soon!</h2>
-              <p className="text-gray-600">Analytics functionality will be implemented in later tasks.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-4 bg-sunny/5 rounded-xl">
-              <h3 className="font-semibold text-sunny mb-2">Event Metrics</h3>
-              <p className="text-sm text-gray-600">Track event performance.</p>
-            </div>
-            <div className="text-center p-4 bg-coral/5 rounded-xl">
-              <h3 className="font-semibold text-coral mb-2">User Insights</h3>
-              <p className="text-sm text-gray-600">Understand your audience.</p>
-            </div>
-            <div className="text-center p-4 bg-sunny/5 rounded-xl">
-              <h3 className="font-semibold text-sunny mb-2">Revenue Reports</h3>
-              <p className="text-sm text-gray-600">Monitor your earnings.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
+// Profile service routes
 const ProfileService = () => {
   return (
     <Routes>
@@ -483,10 +433,19 @@ const ProfileService = () => {
 };
 
 const RootLandingRoute: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
+
+  if (authLoading) {
+    return <RouteLoadingFallback />;
+  }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    // Wait for org data before redirecting
+    if (orgLoading) {
+      return <RouteLoadingFallback />;
+    }
+    return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
   }
 
   return <AttendflowLanding />;
@@ -499,7 +458,11 @@ const SupportService = () => {
       window.location.pathname.includes('/marketplace') ? 'marketplace' :
         undefined;
 
-  return <HelpPage currentContext={currentContext} />;
+  return (
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <HelpPage currentContext={currentContext} />
+    </Suspense>
+  );
 };
 
 const NotificationService = () => {
@@ -508,6 +471,43 @@ const NotificationService = () => {
 
 const CommunicationService = () => {
   return <CommunicationPage />;
+};
+
+const EmbedPortfolioRoute: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+
+  useEffect(() => {
+    document.title = 'Participant Portfolio Preview | Thittam1Hub';
+
+    const description =
+      'Compact public portfolio preview card for embedding participant profiles from Thittam1Hub.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
+  }, []);
+
+  if (!userId) return null;
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-md w-full p-4">
+        <PortfolioPreviewCard userId={userId} />
+      </div>
+    </main>
+  );
 };
 
 export const AppRouter: React.FC = () => {
@@ -519,6 +519,9 @@ export const AppRouter: React.FC = () => {
              {/* Attendflow-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
              <Route path="/pricing" element={<PricingPage />} />
+             
+             {/* Dev tools */}
+             <Route path="/dev/illustrations" element={<IllustrationGalleryPage />} />
 
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
@@ -531,7 +534,9 @@ export const AppRouter: React.FC = () => {
               path="/dashboard/onboarding/organizer"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <OrganizerOnboardingPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizerOnboardingPage />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
@@ -546,19 +551,53 @@ export const AppRouter: React.FC = () => {
               }
             />
 
-            {/* Create organization page */}
             <Route
               path="/organizations/create"
               element={
                 <ConsoleRoute requireEmailVerification={false}>
-                  <OrganizationRegistrationPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizationRegistrationPage />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
 
-            {/* Public participant event listing */}
+            {/* Public certificate verification */}
+            <Route path="/verify" element={<CertificateVerification />} />
+            <Route path="/verify/:certificateId" element={<CertificateVerification />} />
+
+            {/* Payment success/callback */}
+            <Route path="/payment-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
+            <Route path="/registration-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
+
+            {/* Public event routes */}
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
+            <Route path="/event/:slug" element={<PublicEventPage />} />
+            {/* Backward compatibility redirect from old /e/:slug to /event/:slug */}
+            <Route path="/e/:slug" element={<SlugRedirect />} />
+
+            <Route path="/portfolio/:userId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <ParticipantPortfolioPage />
+              </Suspense>
+            } />
+            <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
+
+            {/* Public vendor profile */}
+            <Route path="/vendor/:vendorId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <VendorPublicProfilePage />
+              </Suspense>
+            } />
 
             {/* Public organization landing by slug */}
             <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
@@ -573,7 +612,9 @@ export const AppRouter: React.FC = () => {
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <GlobalErrorBoundary>
-                    <OrgScopedLayout />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrgScopedLayout />
+                    </Suspense>
                   </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
@@ -585,7 +626,9 @@ export const AppRouter: React.FC = () => {
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <GlobalErrorBoundary>
-                    <ConsoleLayout />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizerDashboardLayout />
+                    </Suspense>
                   </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
@@ -626,33 +669,9 @@ export const AppRouter: React.FC = () => {
                 path="organizations/join"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
-                    <JoinOrganizationPage />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="eventmanagement/*"
-                element={
-                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <Suspense fallback={<div className="p-6">Loading Event Management…</div>}>
-                      <EventServiceLazy />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <JoinOrganizationPage />
                     </Suspense>
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="workspaces/*"
-                element={
-                  <ConsoleRoute>
-                    <WorkspaceService />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="marketplace/*"
-                element={
-                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <MarketplaceService />
                   </ConsoleRoute>
                 }
               />
@@ -660,34 +679,14 @@ export const AppRouter: React.FC = () => {
                 path="organizations/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <OrganizationServiceComponent />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizationServiceComponent />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
-              <Route
-                path="analytics/*"
-                element={
-                  <ConsoleRoute>
-                    <AnalyticsService />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="admin/users"
-                element={
-                  <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
-                    <AdminUserRolesPage />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="admin/organizers"
-                element={
-                  <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
-                    <PendingOrganizersAdminPage />
-                  </ConsoleRoute>
-                }
-              />
+              {/* Admin routes moved to /:orgSlug/admin - redirect legacy paths */}
+              <Route path="admin/*" element={<Navigate to="/dashboard" replace />} />
               <Route
                 path="profile/*"
                 element={
@@ -732,15 +731,9 @@ export const AppRouter: React.FC = () => {
                 path="data-lab"
                 element={
                   <ConsoleRoute>
-                    <DashboardDataLab />
-                  </ConsoleRoute>
-                }
-              />
-              <Route
-                path="assets"
-                element={
-                  <ConsoleRoute requireEmailVerification={false}>
-                    <AssetsGalleryPage />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <DashboardDataLab />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
@@ -750,14 +743,26 @@ export const AppRouter: React.FC = () => {
             <Route
               path="/marketplace/*"
               element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <MarketplaceService />
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN, UserRole.VENDOR]}>
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <MarketplaceService />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
 
             {/* Legacy console redirect */}
             <Route path="/console/*" element={<Navigate to="/dashboard" replace />} />
+
+            {/* Admin Routes */}
+            <Route
+              path="/admin/generate-backgrounds"
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <GenerateBackgroundsPage />
+                </Suspense>
+              }
+            />
 
             {/* 404 Not Found - must be last */}
             <Route path="*" element={<NotFoundPage />} />

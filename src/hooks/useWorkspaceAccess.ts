@@ -5,6 +5,9 @@ import { useAuth } from './useAuth';
 interface WorkspaceAccessResult {
   canView: boolean;
   canManage: boolean;
+  isOwner: boolean;
+  isMember: boolean;
+  memberRole?: string;
   isLoading: boolean;
   error: Error | null;
 }
@@ -13,6 +16,10 @@ interface WorkspaceAccessQueryResult {
   workspace: {
     id: string;
     organizer_id: string;
+  } | null;
+  membership: {
+    role: string;
+    status: string;
   } | null;
 }
 
@@ -28,9 +35,10 @@ export function useWorkspaceAccess(workspaceId?: string): WorkspaceAccessResult 
     enabled: !!workspaceId && !authLoading,
     queryFn: async () => {
       if (!workspaceId) {
-        return { workspace: null };
+        return { workspace: null, membership: null };
       }
 
+      // Fetch workspace info
       const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
         .select('id, organizer_id')
@@ -39,26 +47,53 @@ export function useWorkspaceAccess(workspaceId?: string): WorkspaceAccessResult 
 
       if (workspaceError) throw workspaceError;
 
-      return { workspace: workspace ?? null };
+      // Fetch team membership if user is logged in
+      let membership = null;
+      if (user) {
+        const { data: memberData } = await supabase
+          .from('workspace_team_members')
+          .select('role, status')
+          .eq('workspace_id', workspaceId)
+          .eq('user_id', user.id)
+          .eq('status', 'ACTIVE')
+          .maybeSingle();
+        
+        membership = memberData ?? null;
+      }
+
+      return { workspace: workspace ?? null, membership };
     },
   });
 
   const isLoading = authLoading || accessLoading;
 
   if (isLoading) {
-    return { canView: false, canManage: false, isLoading: true, error: null };
+    return { canView: false, canManage: false, isOwner: false, isMember: false, isLoading: true, error: null };
   }
 
   if (error) {
-    return { canView: false, canManage: false, isLoading: false, error: error as Error };
+    return { canView: false, canManage: false, isOwner: false, isMember: false, isLoading: false, error: error as Error };
   }
 
   const workspace = data?.workspace ?? null;
+  const membership = data?.membership ?? null;
 
-  const canView = !!workspace;
   const isOwner = !!user && !!workspace && workspace.organizer_id === user.id;
+  const isMember = !!membership && membership.status === 'ACTIVE';
 
-  const canManage = !!user && isOwner;
+  // Can view if owner OR active member
+  const canView = !!workspace && (isOwner || isMember);
+  
+  // Can manage only if owner
+  const canManage = isOwner;
 
-  return { canView, canManage, isLoading: false, error: null };
+  return { 
+    canView, 
+    canManage, 
+    isOwner, 
+    isMember, 
+    memberRole: membership?.role,
+    isLoading: false, 
+    error: null 
+  };
 }

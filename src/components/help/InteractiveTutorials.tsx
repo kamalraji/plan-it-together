@@ -300,7 +300,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
       case 'beginner': return 'bg-green-100 text-green-800';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800';
       case 'advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -313,18 +313,18 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <div>
-              <h3 className="font-semibold text-gray-900">{activeTutorial.title}</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-semibold text-foreground">{activeTutorial.title}</h3>
+              <p className="text-sm text-muted-foreground">
                 Step {currentStep + 1} of {activeTutorial.steps.length}
               </p>
             </div>
             <button
               onClick={exitTutorial}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-muted-foreground"
             >
               <X className="w-5 h-5" />
             </button>
@@ -332,7 +332,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
           {/* Progress bar */}
           <div className="px-4 py-2">
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / activeTutorial.steps.length) * 100}%` }}
@@ -342,8 +342,8 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
           {/* Step content */}
           <div className="p-4">
-            <h4 className="font-medium text-gray-900 mb-2">{step.title}</h4>
-            <p className="text-gray-600 text-sm mb-4">{step.content}</p>
+            <h4 className="font-medium text-foreground mb-2">{step.title}</h4>
+            <p className="text-muted-foreground text-sm mb-4">{step.content}</p>
             
             {step.hints && step.hints.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
@@ -358,11 +358,11 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between p-4 border-t border-gray-200">
+          <div className="flex items-center justify-between p-4 border-t border-border">
             <button
               onClick={previousStep}
               disabled={currentStep === 0}
-              className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center px-3 py-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
               Previous
@@ -393,11 +393,11 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
+      <div className="bg-card rounded-lg border border-border p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-4 bg-muted rounded w-1/4"></div>
+          <div className="h-4 bg-muted rounded w-1/2"></div>
+          <div className="h-4 bg-muted rounded w-1/3"></div>
         </div>
       </div>
     );
@@ -408,25 +408,25 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
       <div className="space-y-6">
         {/* Featured Tutorials */}
         {!searchQuery && featuredTutorials.length > 0 && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Featured Tutorials</h2>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Featured Tutorials</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {featuredTutorials.map((tutorial) => {
                 const tutorialProgress = getTutorialProgress(tutorial.id);
                 return (
                   <div
                     key={tutorial.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                    className="border border-border rounded-lg p-4 hover:border-blue-300 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <h3 className="font-medium text-gray-900">{tutorial.title}</h3>
+                      <h3 className="font-medium text-foreground">{tutorial.title}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${getDifficultyColor(tutorial.difficulty)}`}>
                         {tutorial.difficulty}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{tutorial.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{tutorial.description}</p>
                     
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                       <span className="flex items-center">
                         <Clock className="w-3 h-3 mr-1" />
                         {tutorial.duration} min
@@ -443,11 +443,11 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
                     {tutorialProgress && (
                       <div className="mb-3">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                           <span>Progress</span>
                           <span>{tutorialProgress.currentStep + 1}/{tutorial.steps.length}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div className="w-full bg-muted rounded-full h-1">
                           <div
                             className="bg-blue-600 h-1 rounded-full"
                             style={{ width: `${((tutorialProgress.currentStep + 1) / tutorial.steps.length) * 100}%` }}
@@ -471,14 +471,14 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
         )}
 
         {/* All Tutorials */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="bg-card rounded-lg border border-border">
+          <div className="p-6 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">
               {searchQuery ? `Search Results (${filteredTutorials.length})` : 'All Tutorials'}
             </h2>
           </div>
 
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-border">
             {filteredTutorials.map((tutorial) => {
               const tutorialProgress = getTutorialProgress(tutorial.id);
               return (
@@ -486,7 +486,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-medium text-gray-900">{tutorial.title}</h3>
+                        <h3 className="font-medium text-foreground">{tutorial.title}</h3>
                         <span className={`px-2 py-1 text-xs rounded-full ${getDifficultyColor(tutorial.difficulty)}`}>
                           {tutorial.difficulty}
                         </span>
@@ -494,9 +494,9 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
                           <CheckCircle className="w-4 h-4 text-green-600" />
                         )}
                       </div>
-                      <p className="text-gray-600 text-sm mb-3">{tutorial.description}</p>
+                      <p className="text-muted-foreground text-sm mb-3">{tutorial.description}</p>
                       
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <span className="flex items-center">
                           <Clock className="w-3 h-3 mr-1" />
                           {tutorial.duration} min
@@ -513,11 +513,11 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
                       {tutorialProgress && !tutorialProgress.completed && (
                         <div className="mt-3">
-                          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                             <span>Progress</span>
                             <span>{tutorialProgress.currentStep + 1}/{tutorial.steps.length}</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1">
+                          <div className="w-full bg-muted rounded-full h-1">
                             <div
                               className="bg-blue-600 h-1 rounded-full"
                               style={{ width: `${((tutorialProgress.currentStep + 1) / tutorial.steps.length) * 100}%` }}
@@ -541,8 +541,8 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           </div>
 
           {filteredTutorials.length === 0 && (
-            <div className="p-8 text-center text-gray-500">
-              <Play className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <div className="p-8 text-center text-muted-foreground">
+              <Play className="w-12 h-12 mx-auto mb-4 text-muted-foreground/70" />
               <p>No tutorials found matching your criteria.</p>
             </div>
           )}

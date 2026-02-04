@@ -46,10 +46,10 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+      <div className="bg-card rounded-lg shadow-sm border border-border">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-900 flex items-center space-x-2">
+            <h3 className="text-sm font-medium text-foreground flex items-center space-x-2">
               <FunnelIcon className="h-4 w-4" />
               <span>Filters</span>
               {activeFilterCount > 0 && (
@@ -72,7 +72,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
         <div className="p-4 space-y-4">
           {filters.map((filter) => (
             <div key={filter.type}>
-              <h4 className="text-sm font-medium text-gray-700 mb-2">{filter.label}</h4>
+              <h4 className="text-sm font-medium text-foreground mb-2">{filter.label}</h4>
               <div className="space-y-2">
                 {filter.options.map((option) => (
                   <label key={option.value} className="flex items-center space-x-2 group cursor-pointer">
@@ -80,13 +80,13 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                       type="checkbox"
                       checked={(activeFilters[filter.type] || []).includes(option.value)}
                       onChange={(e) => onFilterChange(filter.type, option.value, e.target.checked)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0"
+                      className="rounded border-input text-indigo-600 focus-visible:ring-ring focus:ring-offset-0"
                     />
-                    <span className="text-sm text-gray-600 flex-1 group-hover:text-gray-900">
+                    <span className="text-sm text-muted-foreground flex-1 group-hover:text-foreground">
                       {option.label}
                     </span>
                     {option.count !== undefined && (
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
                         {option.count}
                       </span>
                     )}
@@ -98,9 +98,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           
           {filters.length === 0 && (
             <div className="text-center py-4">
-              <FunnelIcon className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">No filters available</p>
-              <p className="text-xs text-gray-400">Perform a search to see filter options</p>
+              <FunnelIcon className="h-8 w-8 text-muted-foreground/70 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No filters available</p>
+              <p className="text-xs text-muted-foreground">Perform a search to see filter options</p>
             </div>
           )}
         </div>
@@ -108,8 +108,8 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
       {/* Recent Searches */}
       {recentSearches.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center space-x-2">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center space-x-2">
             <ClockIcon className="h-4 w-4" />
             <span>Recent Searches</span>
           </h3>
@@ -118,7 +118,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               <button
                 key={index}
                 onClick={() => onRecentSearchClick(recentQuery)}
-                className="w-full text-left text-sm text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-md transition-colors"
+                className="w-full text-left text-sm text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-md transition-colors"
               >
                 {recentQuery}
               </button>
@@ -129,8 +129,8 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
       {/* Saved Searches */}
       {savedSearches.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center space-x-2">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4">
+          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center space-x-2">
             <BookmarkIcon className="h-4 w-4" />
             <span>Saved Searches</span>
           </h3>
@@ -139,13 +139,13 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               <div key={index} className="flex items-center justify-between group">
                 <button
                   onClick={() => onSavedSearchClick(savedQuery)}
-                  className="flex-1 text-left text-sm text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-md transition-colors"
+                  className="flex-1 text-left text-sm text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 py-2 px-3 rounded-md transition-colors"
                 >
                   {savedQuery}
                 </button>
                 <button
                   onClick={() => onRemoveSavedSearch(savedQuery)}
-                  className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 p-1 rounded transition-all"
+                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-600 p-1 rounded transition-all"
                   title="Remove saved search"
                 >
                   <XMarkIcon className="h-3 w-3" />

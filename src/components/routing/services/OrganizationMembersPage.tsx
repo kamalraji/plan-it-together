@@ -1,321 +1,186 @@
-import React, { useMemo, useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { PageHeader } from '../PageHeader';
-import OrganizationAdminManagement from '../../organization/OrganizationAdminManagement';
-import { useAuth } from '../../../hooks/useAuth';
-import { useOrganizerOrganizations } from '@/hooks/useOrganizerOrganizations';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Check, X } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
+import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { 
+  Users, 
+  UserPlus, 
+  Shield, 
+  Settings2,
+  ArrowLeft
+} from 'lucide-react';
 
 /**
- * OrganizationMembersPage provides AWS-style interface for organization member management.
- * Now backed by Supabase organizations via useOrganizerOrganizations and owner-based access control.
+ * OrganizationMembersPage - Modern member management interface
+ * Uses org-scoped routing (/:orgSlug/organizations/members)
  */
 export const OrganizationMembersPage: React.FC = () => {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { orgSlug } = useParams<{ orgSlug: string }>();
+  const organization = useCurrentOrganization();
   const { user } = useAuth();
-  const { organizations, managedOrganizations, isLoadingOrganizations } = useOrganizerOrganizations();
-  const { toast } = useToast();
-  const [pendingOrganizers, setPendingOrganizers] = useState<any[]>([]);
-  const [isLoadingPending, setIsLoadingPending] = useState(false);
-  const [pendingError, setPendingError] = useState<string | null>(null);
+  const { data: memberships, isLoading: membershipsLoading } = useMyOrganizationMemberships();
 
-  const organization = useMemo(
-    () => organizations?.find((org) => org.id === organizationId) ?? null,
-    [organizations, organizationId],
-  );
+  // Get user's role in this organization
+  const activeMembership = useMemo(() => {
+    if (!memberships || !organization) return null;
+    return memberships.find(
+      (m: any) => m.organization_id === organization.id && m.status === 'ACTIVE'
+    );
+  }, [memberships, organization]);
 
-  const managedOrg = useMemo(
-    () => managedOrganizations.find((org) => org.id === organizationId) ?? null,
-    [managedOrganizations, organizationId],
-  );
+  const userRole = activeMembership?.role?.toLowerCase() || null;
+  const isOwner = organization?.owner_id === user?.id;
+  const canManage = isOwner || userRole === 'admin' || userRole === 'organizer';
 
-  if (isLoadingOrganizations && !organizations) {
+  // Loading state
+  if (membershipsLoading) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8" />
-            <div className="h-64 bg-gray-200 rounded" />
-          </div>
+      <div className="space-y-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-32 bg-muted rounded-xl" />
+          <div className="h-64 bg-muted rounded-lg" />
         </div>
       </div>
     );
   }
 
+  // Organization not found
   if (!organization) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Organization Not Found</h2>
-          <p className="text-gray-600 mb-4">The organization you are looking for does not exist.</p>
-          <Link
-            to="/dashboard/organizations"
-            className="text-blue-600 hover:text-blue-500 font-medium"
-          >
-            ← Back to Organizations
-          </Link>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+          <Users className="w-8 h-8 text-destructive" />
         </div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
+        <p className="text-muted-foreground mb-6 max-w-md">
+          The organization you're looking for doesn't exist or you don't have access.
+        </p>
+        <Button asChild variant="outline">
+          <Link to={`/${orgSlug}/organizations/list`}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Organizations
+          </Link>
+        </Button>
       </div>
     );
   }
 
-  useEffect(() => {
-    const loadPendingOrganizers = async () => {
-      if (!managedOrg) return;
-      setIsLoadingPending(true);
-      setPendingError(null);
-      try {
-        const { data, error } = await supabase.functions.invoke('pending-organizers');
-        if (error) throw error;
-        const all = (data as any)?.organizers ?? [];
-        const filtered = all.filter(
-          (o: any) => !organizationId || o.firstOrganizationId === organizationId,
-        );
-        setPendingOrganizers(filtered);
-      } catch (err: any) {
-        console.error('Failed to load pending organizers', err);
-        setPendingError(err?.message || 'Failed to load pending organizer requests.');
-      } finally {
-        setIsLoadingPending(false);
-      }
-    };
-
-    loadPendingOrganizers();
-  }, [managedOrg, organizationId]);
-
-  // Only owners can manage members from this console
-  if (!managedOrg || !user) {
+  // Access denied
+  if (!canManage || !user) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600 mb-4">
-            You don't have permission to manage members for this organization.
-          </p>
-          <Link
-            to={`/dashboard/organizations/${organization.id}`}
-            className="text-blue-600 hover:text-blue-500 font-medium"
-          >
-            ← Back to Organization
-          </Link>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+          <Shield className="w-8 h-8 text-destructive" />
         </div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
+        <p className="text-muted-foreground mb-6 max-w-md">
+          You don't have permission to manage members for this organization.
+        </p>
+        <Button asChild variant="outline">
+          <Link to={`/${orgSlug}/dashboard`}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </Button>
       </div>
     );
   }
-
-  const pageActions = [
-    {
-      label: 'View Organization',
-      action: () => {
-        window.location.href = `/dashboard/organizations/${organization.id}`;
-      },
-      variant: 'secondary' as const,
-    },
-    {
-      label: 'Organization Settings',
-      action: () => {
-        window.location.href = `/dashboard/organizations/${organization.id}/settings`;
-      },
-      variant: 'secondary' as const,
-    },
-  ];
-
-  const breadcrumbs = [
-    { label: 'Organizations', href: '/dashboard/organizations' },
-    { label: organization.name, href: `/dashboard/organizations/${organization.id}` },
-    { label: 'Members', href: `/dashboard/organizations/${organization.id}/members` },
-  ];
-
-  const handleUpdate = () => {
-    // Placeholder for refresh after member changes; data is driven by Supabase hooks now.
-  };
-
-  const organizationForAdmin: any = {
-    ...organization,
-    role: 'OWNER',
-    memberCount: 0,
-  };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <PageHeader
-          title="Member Management"
-          subtitle={`Manage members and roles for ${organization.name}`}
-          breadcrumbs={breadcrumbs}
-          actions={pageActions}
-        />
-
-        <div className="mt-8">
-          <OrganizationAdminManagement
-            organization={organizationForAdmin}
-            currentUser={user}
-            onUpdate={handleUpdate}
-          />
-        </div>
-        {/* Pending organizer approvals */}
-        {(pendingError || isLoadingPending || pendingOrganizers.length > 0) && (
-          <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-medium text-gray-900">Organizer access requests</h3>
-              {isLoadingPending && (
-                <span className="text-xs text-gray-500">Loading requests...</span>
-              )}
-            </div>
-            {pendingError && (
-              <p className="text-sm text-red-600 mb-2">{pendingError}</p>
-            )}
-            {pendingOrganizers.length === 0 && !isLoadingPending ? (
-              <p className="text-sm text-gray-500">No pending organizer requests for this organization.</p>
-            ) : (
-              <div className="space-y-3">
-                {pendingOrganizers.map((req) => (
-                  <div
-                    key={req.userId}
-                    className="flex items-center justify-between p-3 rounded-md border border-gray-200"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {req.name || req.email || req.userId}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {req.email}
-                        {req.requestedAt && ` • Requested at ${new Date(req.requestedAt).toLocaleString()}`}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            const { error } = await supabase.functions.invoke('approve-organizer', {
-                              body: { userId: req.userId, organizationId },
-                            });
-                            if (error) throw error;
-                            setPendingOrganizers((prev) =>
-                              prev.filter((p) => p.userId !== req.userId),
-                            );
-                            toast({
-                              title: 'Organizer approved',
-                              description: 'The user now has organizer access.',
-                            });
-                          } catch (err: any) {
-                            console.error('Failed to approve organizer', err);
-                            toast({
-                              title: 'Failed to approve organizer',
-                              description: err?.message || 'Please try again.',
-                              variant: 'destructive',
-                            });
-                          }
-                        }}
-                        className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700"
-                      >
-                        <Check className="w-3 h-3 mr-1" /> Approve
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPendingOrganizers((prev) => prev.filter((p) => p.userId !== req.userId))
-                        }
-                        className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200"
-                      >
-                        <X className="w-3 h-3 mr-1" /> Deny
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Existing member management helper content remains unchanged */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Member Statistics */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Member Statistics</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Total Members</span>
-                <span className="text-lg font-semibold text-gray-900">0</span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Owners</span>
-                <span className="text-lg font-semibold text-purple-600">1</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Admins</span>
-                <span className="text-lg font-semibold text-blue-600">3</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Members</span>
-                <span className="text-lg font-semibold text-gray-600">11</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <span className="text-xl">📧</span>
-                  <div>
-                    <h4 className="font-medium text-gray-900">Bulk Invite Members</h4>
-                    <p className="text-sm text-gray-600">Invite multiple members at once via CSV upload</p>
-                  </div>
-                </div>
-              </button>
-
-              <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <span className="text-xl">📊</span>
-                  <div>
-                    <h4 className="font-medium text-gray-900">Member Activity Report</h4>
-                    <p className="text-sm text-gray-600">Generate report of member activity and engagement</p>
-                  </div>
-                </div>
-              </button>
-
-              <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <span className="text-xl">⚙️</span>
-                  <div>
-                    <h4 className="font-medium text-gray-900">Role Permissions</h4>
-                    <p className="text-sm text-gray-600">Configure permissions for different member roles</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Member Management Tips */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-blue-900 mb-2">Member Management Best Practices</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+    <div className="space-y-6">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-border p-6 md:p-8">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+        <div className="relative">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h4 className="font-medium text-blue-900 mb-1">Role Assignment</h4>
-              <p className="text-blue-700">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                    Member Management
+                  </h1>
+                  <p className="text-muted-foreground">
+                    {organization.name}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" asChild>
+                <Link to={`/${orgSlug}/settings`}>
+                  <Settings2 className="w-4 h-4 mr-2" />
+                  Settings
+                </Link>
+              </Button>
+              <Button>
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite Member
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Members Card */}
+      <Card className="border-border">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                Team Members
+              </CardTitle>
+              <CardDescription>Manage your organization's team</CardDescription>
+            </div>
+            <Button size="sm">
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12 text-muted-foreground">
+            <Users className="w-16 h-16 mx-auto mb-4 opacity-20" />
+            <h3 className="font-medium text-foreground mb-2">Member List</h3>
+            <p className="text-sm max-w-sm mx-auto">
+              Team member management is integrated with the organization admin panel. 
+              Use the invite button above to add new members.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tips Section */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            Member Management Tips
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <h4 className="font-medium text-foreground mb-1">Role Assignment</h4>
+              <p className="text-muted-foreground">
                 Assign roles based on responsibilities. Owners have full access, Admins can manage
                 events and members, Members have basic access.
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-blue-900 mb-1">Regular Reviews</h4>
-              <p className="text-blue-700">
+              <h4 className="font-medium text-foreground mb-1">Regular Reviews</h4>
+              <p className="text-muted-foreground">
                 Regularly review member access and remove inactive members to maintain security and
                 organization.
               </p>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

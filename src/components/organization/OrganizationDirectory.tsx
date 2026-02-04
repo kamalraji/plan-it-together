@@ -140,13 +140,13 @@ export const OrganizationDirectory: React.FC = () => {
             placeholder="Search by name or description"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-white/80 border-border/60"
+            className="bg-card/80 border-border/60"
           />
           <Select
             value={categoryFilter ?? 'all'}
             onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value)}
           >
-            <SelectTrigger className="bg-white/80 border-border/60">
+            <SelectTrigger className="bg-card/80 border-border/60">
               <SelectValue placeholder="All categories" />
             </SelectTrigger>
             <SelectContent>
@@ -158,7 +158,7 @@ export const OrganizationDirectory: React.FC = () => {
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="bg-white/80 border-border/60">
+            <SelectTrigger className="bg-card/80 border-border/60">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -171,7 +171,7 @@ export const OrganizationDirectory: React.FC = () => {
           </Select>
         </section>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-border/60 p-4 sm:p-6 shadow-sm">
+        <div className="bg-card/80 backdrop-blur-sm rounded-3xl border border-border/60 p-4 sm:p-6 shadow-sm">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {Array.from({ length: 6 }).map((_, idx) => (
@@ -220,7 +220,7 @@ function OrganizationCard({ organization }: OrganizationCardProps) {
   return (
     <Link
       to={`/${organization.slug}`}
-      className="block bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
+      className="block bg-card rounded-lg shadow-sm border border-border hover:shadow-md transition-shadow duration-200"
     >
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
@@ -232,7 +232,7 @@ function OrganizationCard({ organization }: OrganizationCardProps) {
                 className="h-12 w-12 rounded-lg object-cover"
               />
             ) : (
-              <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
+              <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-2xl">
                 {categoryIcon}
               </div>
             )}
@@ -245,19 +245,19 @@ function OrganizationCard({ organization }: OrganizationCardProps) {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
+          <h3 className="text-lg font-semibold text-foreground mb-1 line-clamp-1">
             {organization.name}
           </h3>
-          <div className="flex items-center text-sm text-gray-500 mb-2">
+          <div className="flex items-center text-sm text-muted-foreground mb-2">
             <span className="mr-1">{categoryIcon}</span>
             {categoryLabels[organization.category as keyof typeof categoryLabels]}
           </div>
           {organization.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">{organization.description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{organization.description}</p>
           )}
         </div>
 
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center">
             <span className="mr-1">Followers:</span>
             {organization.follower_count} follower

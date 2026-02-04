@@ -66,7 +66,7 @@ export const EventOpsConsole: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title="Event-Day Ops Console"
         subtitle="Monitor live check-ins, print badges, and coordinate volunteers for this event."
@@ -93,16 +93,16 @@ export const EventOpsConsole: React.FC = () => {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Top summary bar */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-sm font-medium text-gray-500 mb-1">Total registrations</p>
-              <p className="text-2xl font-semibold text-gray-900">{totalRegistrations}</p>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Total registrations</p>
+              <p className="text-2xl font-semibold text-foreground">{totalRegistrations}</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-sm font-medium text-gray-500 mb-1">Checked-in</p>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Checked-in</p>
               <p className="text-2xl font-semibold text-green-600">{attendedCount}</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-sm font-medium text-gray-500 mb-1">Attendance rate</p>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Attendance rate</p>
               <p className="text-2xl font-semibold text-indigo-600">
                 {checkInRate.toFixed(1)}%
               </p>
@@ -119,14 +119,14 @@ export const EventOpsConsole: React.FC = () => {
 
             {/* Right: Recent check-ins + volunteer helpers */}
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Recent check-ins</h3>
-                <p className="text-sm text-gray-500 mb-4">
+              <div className="bg-card rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold text-foreground mb-2">Recent check-ins</h3>
+                <p className="text-sm text-muted-foreground mb-4">
                   Live feed of the most recent attendees checked in to this event.
                 </p>
                 <div className="space-y-3 max-h-80 overflow-y-auto">
                   {recentCheckIns.length === 0 ? (
-                    <p className="text-sm text-gray-500">No check-ins yet.</p>
+                    <p className="text-sm text-muted-foreground">No check-ins yet.</p>
                   ) : (
                     recentCheckIns.map((record) => {
                       const initials = (record.userName || '?')
@@ -138,7 +138,7 @@ export const EventOpsConsole: React.FC = () => {
                       return (
                         <div
                           key={record.registrationId}
-                          className="flex items-start justify-between border border-gray-100 rounded-md px-3 py-2"
+                          className="flex items-start justify-between border border-border rounded-md px-3 py-2"
                         >
                           <div className="flex items-center gap-3">
                             <TooltipProvider>
@@ -168,11 +168,11 @@ export const EventOpsConsole: React.FC = () => {
                             </TooltipProvider>
 
                             <div>
-                              <p className="text-sm font-medium text-gray-900">{record.userName}</p>
-                              <p className="text-xs text-gray-500">{record.userEmail}</p>
+                              <p className="text-sm font-medium text-foreground">{record.userName}</p>
+                              <p className="text-xs text-muted-foreground">{record.userEmail}</p>
                             </div>
                           </div>
-                          <div className="text-right text-xs text-gray-500">
+                          <div className="text-right text-xs text-muted-foreground">
                             <p>{record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : '-'}</p>
                             <p className="mt-0.5">
                               {record.checkInMethod === 'QR_SCAN' ? 'QR scan' : 'Manual'}
@@ -185,15 +185,15 @@ export const EventOpsConsole: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Volunteer coordination</h3>
-                <p className="text-sm text-gray-500 mb-3">
+              <div className="bg-card rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold text-foreground mb-2">Volunteer coordination</h3>
+                <p className="text-sm text-muted-foreground mb-3">
                   Share the Volunteer Console with on-site staff so they can scan QR codes, print badges,
                   and help manage the check-in line.
                 </p>
                 <button
                   onClick={handleOpenVolunteerConsole}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
                 >
                   Open Volunteer Console
                 </button>

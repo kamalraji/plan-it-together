@@ -244,19 +244,19 @@ export const PaginationControls: React.FC<{
   }, [currentPage, totalPages, maxVisiblePages]);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+    <div className="flex items-center justify-between px-4 py-3 bg-card border-t border-border sm:px-6">
       <div className="flex justify-between flex-1 sm:hidden">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-foreground bg-card border border-input rounded-md hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative ml-3 inline-flex items-center px-4 py-2 text-sm font-medium text-foreground bg-card border border-input rounded-md hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>
@@ -264,7 +264,7 @@ export const PaginationControls: React.FC<{
 
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-foreground">
             Page <span className="font-medium">{currentPage}</span> of{' '}
             <span className="font-medium">{totalPages}</span>
           </p>
@@ -276,7 +276,7 @@ export const PaginationControls: React.FC<{
               <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -288,7 +288,7 @@ export const PaginationControls: React.FC<{
                   className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                     page === currentPage
                       ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      : 'bg-card border-input text-muted-foreground hover:bg-muted/50'
                   }`}
                 >
                   {page}
@@ -298,7 +298,7 @@ export const PaginationControls: React.FC<{
               <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -339,9 +339,9 @@ export const LazyImage: React.FC<{
       )}
       
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
           {placeholder ? (
-            <span className="text-gray-400 text-sm">{placeholder}</span>
+            <span className="text-muted-foreground text-sm">{placeholder}</span>
           ) : (
             <LoadingSpinner size="sm" />
           )}
@@ -349,8 +349,8 @@ export const LazyImage: React.FC<{
       )}
       
       {hasError && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <span className="text-gray-400 text-sm">Failed to load image</span>
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Failed to load image</span>
         </div>
       )}
     </div>
@@ -373,13 +373,13 @@ export const PerformanceMetrics: React.FC = () => {
     <div className="fixed bottom-4 right-4 z-50">
       <button
         onClick={() => setShowMetrics(!showMetrics)}
-        className="bg-gray-800 text-white px-3 py-2 rounded-md text-xs hover:bg-gray-700"
+        className="bg-foreground/80 text-white px-3 py-2 rounded-md text-xs hover:bg-muted-foreground/50"
       >
         Perf
       </button>
       
       {showMetrics && (
-        <div className="absolute bottom-full right-0 mb-2 bg-gray-800 text-white p-3 rounded-md text-xs min-w-[200px]">
+        <div className="absolute bottom-full right-0 mb-2 bg-foreground/80 text-white p-3 rounded-md text-xs min-w-[200px]">
           <div className="space-y-1">
             <div>Load Time: {metrics.loadTime.toFixed(2)}ms</div>
             <div>Memory: {(metrics.memoryUsage * 100).toFixed(1)}%</div>

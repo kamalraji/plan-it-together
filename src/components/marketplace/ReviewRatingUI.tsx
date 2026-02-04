@@ -1,61 +1,53 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
-
-interface VendorReview {
-  id: string;
-  vendorId: string;
-  bookingId: string;
-  organizerId: string;
-  rating: number;
-  title: string;
-  comment: string;
-  serviceQuality: number;
-  communication: number;
-  timeliness: number;
-  value: number;
-  wouldRecommend: boolean;
-  vendorResponse?: string;
-  vendorResponseAt?: string;
-  verifiedPurchase: boolean;
-  helpful: number;
-  createdAt: string;
-  updatedAt: string;
-  vendor: {
-    id: string;
-    businessName: string;
-    verificationStatus: string;
-  };
-  booking: {
-    id: string;
-    serviceListing: {
-      title: string;
-      category: string;
-    };
-  };
-}
-
-interface CompletedBooking {
-  id: string;
-  serviceListing: {
-    id: string;
-    title: string;
-    category: string;
-  };
-  vendor: {
-    id: string;
-    businessName: string;
-    verificationStatus: string;
-  };
-  serviceDate: string;
-  finalPrice?: number;
-  currency: string;
-  hasReview: boolean;
-}
+import api from '@/lib/api';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, Star, CheckCircle, ThumbsUp } from 'lucide-react';
+import { VendorReview, CompletedBooking, formatCategory } from './types';
+import { useToast } from '@/hooks/use-toast';
 
 interface ReviewRatingUIProps {
   eventId?: string;
 }
+
+// Star Rating Component
+const StarRating: React.FC<{
+  rating: number;
+  size?: 'sm' | 'md';
+  interactive?: boolean;
+  onChange?: (rating: number) => void;
+}> = ({ rating, size = 'sm', interactive = false, onChange }) => {
+  const sizeClass = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
+  
+  return (
+    <div className="flex items-center">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <button
+          key={i}
+          type="button"
+          disabled={!interactive}
+          onClick={() => onChange?.(i)}
+          className={interactive ? 'hover:scale-110 transition-transform' : ''}
+        >
+          <Star
+            className={`${sizeClass} ${
+              i <= rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/30'
+            }`}
+          />
+        </button>
+      ))}
+      {!interactive && <span className="ml-1 text-sm text-muted-foreground">{rating.toFixed(1)}</span>}
+    </div>
+  );
+};
 
 const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
   const [activeTab, setActiveTab] = useState<'my-reviews' | 'pending-reviews'>('my-reviews');
@@ -93,232 +85,186 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
     setShowReviewModal(true);
   };
 
-  const renderStars = (rating: number, size: 'sm' | 'md' = 'sm') => {
-    const sizeClass = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
-    
-    return (
-      <div className="flex items-center">
-        {[...Array(5)].map((_, i) => (
-          <svg
-            key={i}
-            className={`${sizeClass} ${
-              i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'
-            }`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-        <span className="ml-1 text-sm text-gray-600">{rating.toFixed(1)}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          {[
-            { id: 'my-reviews', name: 'My Reviews', count: reviews?.length || 0 },
-            { id: 'pending-reviews', name: 'Pending Reviews', count: pendingReviews?.length || 0 },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {tab.name}
-              {tab.count > 0 && (
-                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'my-reviews' | 'pending-reviews')}>
+        <TabsList>
+          <TabsTrigger value="my-reviews" className="gap-2">
+            My Reviews
+            {(reviews?.length || 0) > 0 && (
+              <Badge variant="secondary" className="text-xs">{reviews?.length}</Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="pending-reviews" className="gap-2">
+            Pending Reviews
+            {(pendingReviews?.length || 0) > 0 && (
+              <Badge variant="secondary" className="text-xs">{pendingReviews?.length}</Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-      {/* My Reviews Tab */}
-      {activeTab === 'my-reviews' && (
-        <div className="space-y-4">
+        {/* My Reviews Tab */}
+        <TabsContent value="my-reviews" className="mt-6 space-y-4">
           {reviewsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : reviews && reviews.length > 0 ? (
             reviews.map((review) => (
-              <div key={review.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                      {review.booking.serviceListing.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {review.vendor.businessName}
-                      {review.vendor.verificationStatus === 'VERIFIED' && (
-                        <svg className="inline ml-1 w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span>{review.booking.serviceListing.category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}</span>
-                      <span>•</span>
-                      <span>{new Date(review.createdAt).toLocaleDateString()}</span>
-                      {review.verifiedPurchase && (
-                        <>
-                          <span>•</span>
-                          <span className="text-green-600 font-medium">Verified Purchase</span>
-                        </>
+              <Card key={review.id} className="border-border/60">
+                <CardContent className="p-5">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-1">
+                        {review.booking.serviceListing.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
+                        {review.vendor.businessName}
+                        {review.vendor.verificationStatus === 'VERIFIED' && (
+                          <CheckCircle className="h-4 w-4 text-emerald-500" />
+                        )}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          {formatCategory(review.booking.serviceListing.category)}
+                        </Badge>
+                        <span>•</span>
+                        <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+                        {review.verifiedPurchase && (
+                          <>
+                            <span>•</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Verified Purchase</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <StarRating rating={review.rating} size="md" />
+                  </div>
+
+                  <div className="mb-4">
+                    <h4 className="font-medium text-foreground mb-2">{review.title}</h4>
+                    <p className="text-muted-foreground">{review.comment}</p>
+                  </div>
+
+                  {/* Detailed Ratings */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-muted rounded-lg">
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Service Quality</p>
+                      <StarRating rating={review.serviceQuality} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Communication</p>
+                      <StarRating rating={review.communication} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Timeliness</p>
+                      <StarRating rating={review.timeliness} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Value</p>
+                      <StarRating rating={review.value} />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className={review.wouldRecommend ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}>
+                        {review.wouldRecommend ? '✓ Would recommend' : '✗ Would not recommend'}
+                      </span>
+                      {review.helpful > 0 && (
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <ThumbsUp className="h-3.5 w-3.5" />
+                          {review.helpful} found this helpful
+                        </span>
                       )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    {renderStars(review.rating, 'md')}
-                  </div>
-                </div>
 
-                <div className="mb-4">
-                  <h4 className="font-medium text-gray-900 mb-2">{review.title}</h4>
-                  <p className="text-gray-700">{review.comment}</p>
-                </div>
-
-                {/* Detailed Ratings */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-700">Service Quality</p>
-                    {renderStars(review.serviceQuality)}
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-700">Communication</p>
-                    {renderStars(review.communication)}
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-700">Timeliness</p>
-                    {renderStars(review.timeliness)}
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-700">Value</p>
-                    {renderStars(review.value)}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <span className={`text-sm ${review.wouldRecommend ? 'text-green-600' : 'text-red-600'}`}>
-                      {review.wouldRecommend ? '✓ Would recommend' : '✗ Would not recommend'}
-                    </span>
-                    {review.helpful > 0 && (
-                      <span className="text-sm text-gray-500">
-                        {review.helpful} found this helpful
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Vendor Response */}
-                {review.vendorResponse && (
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <span className="text-sm font-medium text-blue-900">Response from {review.vendor.businessName}</span>
-                      <span className="ml-2 text-xs text-blue-600">
-                        {new Date(review.vendorResponseAt!).toLocaleDateString()}
-                      </span>
+                  {/* Vendor Response */}
+                  {review.vendorResponse && (
+                    <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center mb-2">
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-300">Response from {review.vendor.businessName}</span>
+                        <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+                          {new Date(review.vendorResponseAt!).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800 dark:text-blue-200">{review.vendorResponse}</p>
                     </div>
-                    <p className="text-sm text-blue-800">{review.vendorResponse}</p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </CardContent>
+              </Card>
             ))
           ) : (
             <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
-              <p className="text-gray-600">You haven't written any reviews for vendors yet.</p>
+              <Star className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No reviews yet</h3>
+              <p className="text-muted-foreground">You haven't written any reviews for vendors yet.</p>
             </div>
           )}
-        </div>
-      )}
+        </TabsContent>
 
-      {/* Pending Reviews Tab */}
-      {activeTab === 'pending-reviews' && (
-        <div className="space-y-4">
+        {/* Pending Reviews Tab */}
+        <TabsContent value="pending-reviews" className="mt-6 space-y-4">
           {pendingLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : pendingReviews && pendingReviews.length > 0 ? (
             pendingReviews.map((booking) => (
-              <div key={booking.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {booking.serviceListing.title}
-                    </h3>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <p>
-                        <span className="font-medium">Vendor:</span> {booking.vendor.businessName}
-                        {booking.vendor.verificationStatus === 'VERIFIED' && (
-                          <svg className="inline ml-1 w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </p>
-                      <p>
-                        <span className="font-medium">Category:</span> {booking.serviceListing.category.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
-                      </p>
-                      <p>
-                        <span className="font-medium">Service Date:</span> {new Date(booking.serviceDate).toLocaleDateString()}
-                      </p>
-                      {booking.finalPrice && (
-                        <p>
-                          <span className="font-medium">Final Price:</span> {booking.currency} {booking.finalPrice.toLocaleString()}
+              <Card key={booking.id} className="border-border/60">
+                <CardContent className="p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {booking.serviceListing.title}
+                      </h3>
+                      <div className="space-y-1 text-sm text-muted-foreground">
+                        <p className="flex items-center gap-1">
+                          <span className="font-medium text-foreground">Vendor:</span> {booking.vendor.businessName}
+                          {booking.vendor.verificationStatus === 'VERIFIED' && (
+                            <CheckCircle className="h-4 w-4 text-emerald-500" />
+                          )}
                         </p>
-                      )}
+                        <p>
+                          <span className="font-medium text-foreground">Category:</span> {formatCategory(booking.serviceListing.category)}
+                        </p>
+                        <p>
+                          <span className="font-medium text-foreground">Service Date:</span> {new Date(booking.serviceDate).toLocaleDateString()}
+                        </p>
+                        {booking.finalPrice && (
+                          <p>
+                            <span className="font-medium text-foreground">Final Price:</span> {booking.currency} {booking.finalPrice.toLocaleString()}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-6">
-                    <button
-                      onClick={() => handleWriteReview(booking)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                    >
+                    <Button onClick={() => handleWriteReview(booking)}>
                       Write Review
-                    </button>
+                    </Button>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))
           ) : (
             <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No pending reviews</h3>
-              <p className="text-gray-600">All your completed bookings have been reviewed.</p>
+              <CheckCircle className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No pending reviews</h3>
+              <p className="text-muted-foreground">All your completed bookings have been reviewed.</p>
             </div>
           )}
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
 
       {/* Review Modal */}
       {showReviewModal && selectedBooking && (
         <ReviewModal
           booking={selectedBooking}
-          onClose={() => {
-            setShowReviewModal(false);
-            setSelectedBooking(null);
+          open={showReviewModal}
+          onOpenChange={(open) => {
+            setShowReviewModal(open);
+            if (!open) setSelectedBooking(null);
           }}
           onReviewSubmitted={() => {
             refetchReviews();
@@ -333,11 +279,13 @@ const ReviewRatingUI: React.FC<ReviewRatingUIProps> = ({ eventId }) => {
 // Review Modal Component
 interface ReviewModalProps {
   booking: CompletedBooking;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onReviewSubmitted: () => void;
 }
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ booking, onClose, onReviewSubmitted }) => {
+const ReviewModal: React.FC<ReviewModalProps> = ({ booking, open, onOpenChange, onReviewSubmitted }) => {
+  const { toast } = useToast();
   const [reviewData, setReviewData] = useState({
     rating: 5,
     title: '',
@@ -365,153 +313,110 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ booking, onClose, onReviewSub
         ...reviewData
       });
 
-      alert('Review submitted successfully!');
+      toast({ title: 'Review submitted', description: 'Thank you for your feedback!' });
       onReviewSubmitted();
-      onClose();
+      onOpenChange(false);
     } catch (error) {
       console.error('Failed to submit review:', error);
-      alert('Failed to submit review. Please try again.');
+      toast({ title: 'Error', description: 'Failed to submit review. Please try again.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const renderRatingInput = (label: string, field: string, value: number) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((rating) => (
-          <button
-            key={rating}
-            type="button"
-            onClick={() => handleRatingChange(field, rating)}
-            className={`w-8 h-8 ${
-              rating <= value ? 'text-yellow-400' : 'text-gray-300'
-            } hover:text-yellow-400 transition-colors`}
-          >
-            <svg fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </button>
-        ))}
-        <span className="ml-2 text-sm text-gray-600">{value}/5</span>
+  const RatingInput: React.FC<{ label: string; field: string; value: number }> = ({ label, field, value }) => (
+    <div className="space-y-2">
+      <Label className="text-sm">{label}</Label>
+      <div className="flex items-center gap-2">
+        <StarRating rating={value} interactive onChange={(r) => handleRatingChange(field, r)} />
+        <span className="text-sm text-muted-foreground">{value}/5</span>
       </div>
     </div>
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Write Review</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Write Review</DialogTitle>
+        </DialogHeader>
 
-          {/* Service Summary */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-medium text-gray-900 mb-2">{booking.serviceListing.title}</h3>
-            <p className="text-sm text-gray-600">{booking.vendor.businessName}</p>
-            <p className="text-sm text-gray-600">Service Date: {new Date(booking.serviceDate).toLocaleDateString()}</p>
-          </div>
-
-          {/* Review Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Overall Rating */}
-            {renderRatingInput('Overall Rating', 'rating', reviewData.rating)}
-
-            {/* Review Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Review Title *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="Summarize your experience..."
-                value={reviewData.title}
-                onChange={(e) => setReviewData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Review Comment */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Review *
-              </label>
-              <textarea
-                required
-                rows={4}
-                placeholder="Share details about your experience with this vendor..."
-                value={reviewData.comment}
-                onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Detailed Ratings */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {renderRatingInput('Service Quality', 'serviceQuality', reviewData.serviceQuality)}
-              {renderRatingInput('Communication', 'communication', reviewData.communication)}
-              {renderRatingInput('Timeliness', 'timeliness', reviewData.timeliness)}
-              {renderRatingInput('Value for Money', 'value', reviewData.value)}
-            </div>
-
-            {/* Would Recommend */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Would you recommend this vendor?
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={reviewData.wouldRecommend}
-                    onChange={() => setReviewData(prev => ({ ...prev, wouldRecommend: true }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Yes</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    checked={!reviewData.wouldRecommend}
-                    onChange={() => setReviewData(prev => ({ ...prev, wouldRecommend: false }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">No</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Review'}
-              </button>
-            </div>
-          </form>
+        {/* Service Summary */}
+        <div className="bg-muted rounded-lg p-4 mb-4">
+          <h3 className="font-medium text-foreground mb-1">{booking.serviceListing.title}</h3>
+          <p className="text-sm text-muted-foreground">{booking.vendor.businessName}</p>
+          <p className="text-sm text-muted-foreground">Service Date: {new Date(booking.serviceDate).toLocaleDateString()}</p>
         </div>
-      </div>
-    </div>
+
+        {/* Review Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Overall Rating */}
+          <RatingInput label="Overall Rating" field="rating" value={reviewData.rating} />
+
+          {/* Review Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">Review Title *</Label>
+            <Input
+              id="title"
+              required
+              placeholder="Summarize your experience..."
+              value={reviewData.title}
+              onChange={(e) => setReviewData(prev => ({ ...prev, title: e.target.value }))}
+            />
+          </div>
+
+          {/* Review Comment */}
+          <div className="space-y-2">
+            <Label htmlFor="comment">Your Review *</Label>
+            <Textarea
+              id="comment"
+              required
+              rows={4}
+              placeholder="Share details about your experience with this vendor..."
+              value={reviewData.comment}
+              onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))}
+            />
+          </div>
+
+          {/* Detailed Ratings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <RatingInput label="Service Quality" field="serviceQuality" value={reviewData.serviceQuality} />
+            <RatingInput label="Communication" field="communication" value={reviewData.communication} />
+            <RatingInput label="Timeliness" field="timeliness" value={reviewData.timeliness} />
+            <RatingInput label="Value for Money" field="value" value={reviewData.value} />
+          </div>
+
+          {/* Would Recommend */}
+          <div className="space-y-2">
+            <Label>Would you recommend this vendor?</Label>
+            <RadioGroup
+              value={reviewData.wouldRecommend ? 'yes' : 'no'}
+              onValueChange={(v) => setReviewData(prev => ({ ...prev, wouldRecommend: v === 'yes' }))}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="yes" id="recommend-yes" />
+                <Label htmlFor="recommend-yes" className="cursor-pointer">Yes</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="no" id="recommend-no" />
+                <Label htmlFor="recommend-no" className="cursor-pointer">No</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isSubmitting ? 'Submitting...' : 'Submit Review'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

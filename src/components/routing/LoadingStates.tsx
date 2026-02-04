@@ -145,8 +145,11 @@ export const ProgressBar: React.FC<{
   );
 };
 
-// Button loading state
-export const LoadingButton: React.FC<{
+// Button loading state - Re-export ActionButton for backwards compatibility
+export { ActionButton as LoadingButton } from '@/components/ui/action-button';
+
+// Legacy LoadingButton for existing usage (will be deprecated)
+export const LegacyLoadingButton: React.FC<{
   loading: boolean;
   children: React.ReactNode;
   className?: string;
@@ -261,10 +264,10 @@ export const LoadingOverlay: React.FC<{
       </div>
       
       {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-card bg-opacity-75 flex items-center justify-center z-10">
           <div className="flex flex-col items-center space-y-3">
             <LoadingSpinner size="lg" />
-            <p className="text-gray-600 text-sm">{message}</p>
+            <p className="text-muted-foreground text-sm">{message}</p>
           </div>
         </div>
       )}
@@ -315,8 +318,8 @@ export const PulseLoader: React.FC<{
 // Typing indicator component
 export const TypingIndicator: React.FC = () => {
   return (
-    <div className="flex items-center space-x-2 text-gray-500">
-      <PulseLoader size="sm" color="bg-gray-400" />
+    <div className="flex items-center space-x-2 text-muted-foreground">
+      <PulseLoader size="sm" color="bg-muted-foreground/20" />
       <span className="text-sm">Loading...</span>
     </div>
   );
@@ -335,17 +338,17 @@ export const ContentPlaceholder: React.FC<{
   return (
     <div className="text-center py-12">
       {icon && (
-        <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+        <div className="mx-auto h-12 w-12 text-muted-foreground mb-4">
           {icon}
         </div>
       )}
-      <h3 className="mt-2 text-sm font-medium text-gray-900">{title}</h3>
-      <p className="mt-1 text-sm text-gray-500">{description}</p>
+      <h3 className="mt-2 text-sm font-medium text-foreground">{title}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       {action && (
         <div className="mt-6">
           <button
             onClick={action.onClick}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
           >
             {action.label}
           </button>

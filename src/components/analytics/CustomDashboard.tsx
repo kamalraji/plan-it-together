@@ -203,14 +203,14 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-medium text-gray-900">Customize Dashboard</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg font-medium text-foreground">Customize Dashboard</h2>
+          <p className="text-sm text-muted-foreground">
             Add, remove, and rearrange widgets to create your perfect dashboard
           </p>
         </div>
         <button
           onClick={() => setShowAddWidget(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
           Add Widget
@@ -226,21 +226,21 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
             onDragStart={() => handleDragStart(widget.id)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, widget.id)}
-            className={`bg-white rounded-lg shadow border-2 border-dashed border-gray-300 hover:border-indigo-400 transition-colors cursor-move ${getSizeClasses(widget.size)}`}
+            className={`bg-card rounded-lg shadow border-2 border-dashed border-input hover:border-indigo-400 transition-colors cursor-move ${getSizeClasses(widget.size)}`}
           >
             <div className="p-4">
               {/* Widget Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
-                  <Bars3Icon className="h-4 w-4 text-gray-400" />
-                  <h3 className="text-sm font-medium text-gray-900">{widget.title}</h3>
+                  <Bars3Icon className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium text-foreground">{widget.title}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
                   {/* Size Controls */}
                   <select
                     value={widget.size}
                     onChange={(e) => handleWidgetSizeChange(widget.id, e.target.value as any)}
-                    className="text-xs border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                    className="text-xs border-input rounded focus-visible:ring-ring focus-visible:border-primary"
                   >
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
@@ -248,7 +248,7 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                   </select>
                   <button
                     onClick={() => handleRemoveWidget(widget.id)}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                    className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
                   >
                     <XMarkIcon className="h-4 w-4" />
                   </button>
@@ -256,9 +256,9 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
               </div>
 
               {/* Widget Preview */}
-              <div className="bg-gray-50 rounded p-3 text-center">
-                <p className="text-xs text-gray-500 mb-2">{widget.type} widget</p>
-                <div className="text-sm text-gray-700">
+              <div className="bg-muted/50 rounded p-3 text-center">
+                <p className="text-xs text-muted-foreground mb-2">{widget.type} widget</p>
+                <div className="text-sm text-foreground">
                   {widget.type === 'metric' && (
                     <div>
                       <div className="text-lg font-bold">123</div>
@@ -266,8 +266,8 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                     </div>
                   )}
                   {widget.type === 'chart' && (
-                    <div className="h-16 bg-gray-200 rounded flex items-center justify-center">
-                      <ChartBarIcon className="h-6 w-6 text-gray-400" />
+                    <div className="h-16 bg-muted rounded flex items-center justify-center">
+                      <ChartBarIcon className="h-6 w-6 text-muted-foreground" />
                     </div>
                   )}
                   {widget.type === 'table' && (
@@ -276,7 +276,7 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                         <span>Header 1</span>
                         <span>Header 2</span>
                       </div>
-                      <div className="flex justify-between text-xs text-gray-500">
+                      <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Data 1</span>
                         <span>Data 2</span>
                       </div>
@@ -319,9 +319,9 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
         {/* Empty State */}
         {widgets.length === 0 && (
           <div className="col-span-full text-center py-12">
-            <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No widgets added</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">No widgets added</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               Start customizing your dashboard by adding some widgets.
             </p>
           </div>
@@ -330,13 +330,13 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
 
       {/* Add Widget Modal */}
       {showAddWidget && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
-          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto p-5">
+        <div className="fixed inset-0 bg-muted-foreground/40 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
+          <div className="bg-card w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Add Widget</h3>
+              <h3 className="text-lg font-medium text-foreground">Add Widget</h3>
               <button
                 onClick={() => setShowAddWidget(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
@@ -349,13 +349,13 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                   <button
                     key={template.type}
                     onClick={() => handleAddWidget(template)}
-                    className="w-full p-3 text-left border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
+                    className="w-full p-3 text-left border border-border rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
                   >
                     <div className="flex items-center space-x-3">
-                      <template.icon className="h-6 w-6 text-gray-400" />
+                      <template.icon className="h-6 w-6 text-muted-foreground" />
                       <div>
-                        <div className="font-medium text-gray-900">{template.name}</div>
-                        <div className="text-sm text-gray-500">{template.description}</div>
+                        <div className="font-medium text-foreground">{template.name}</div>
+                        <div className="text-sm text-muted-foreground">{template.description}</div>
                       </div>
                     </div>
                   </button>

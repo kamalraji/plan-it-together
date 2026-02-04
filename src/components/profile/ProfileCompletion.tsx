@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 import { profileSchema, type ProfileFormData } from './profileSchema';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 
 export function ProfileCompletion() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +14,7 @@ export function ProfileCompletion() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: primaryOrg } = usePrimaryOrganization();
 
   const {
     register,
@@ -36,7 +38,12 @@ export function ProfileCompletion() {
     onSuccess: () => {
       // Update the auth context with the new user data
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-      navigate('/dashboard');
+      // Navigate to primary org dashboard to avoid redirect chain
+      if (primaryOrg?.slug) {
+        navigate(`/${primaryOrg.slug}/dashboard`);
+      } else {
+        navigate('/dashboard');
+      }
     },
   });
 
@@ -54,17 +61,21 @@ export function ProfileCompletion() {
   };
 
   const skipProfile = () => {
-    navigate('/dashboard');
+    if (primaryOrg?.slug) {
+      navigate(`/${primaryOrg.slug}/dashboard`);
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-muted/50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             Complete Your Profile
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Help others get to know you better by completing your profile.
           </p>
         </div>
@@ -78,13 +89,13 @@ export function ProfileCompletion() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-foreground">
                 Full Name *
               </label>
               <input
                 {...register('name')}
                 type="text"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Enter your full name"
               />
               {errors.name && (
@@ -93,49 +104,49 @@ export function ProfileCompletion() {
             </div>
 
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="bio" className="block text-sm font-medium text-foreground">
                 Bio
               </label>
               <textarea
                 {...register('bio')}
                 rows={3}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Tell us about yourself..."
               />
             </div>
 
             <div>
-              <label htmlFor="organization" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="organization" className="block text-sm font-medium text-foreground">
                 Organization
               </label>
               <input
                 {...register('organization')}
                 type="text"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your company, school, or organization"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="phone" className="block text-sm font-medium text-foreground">
                 Phone Number
               </label>
               <input
                 {...register('phone')}
                 type="tel"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="Your phone number"
               />
             </div>
 
             <div>
-              <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="website" className="block text-sm font-medium text-foreground">
                 Website
               </label>
               <input
                 {...register('website')}
                 type="url"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                 placeholder="https://your-website.com"
               />
               {errors.website && (
@@ -144,7 +155,7 @@ export function ProfileCompletion() {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-foreground">
                 Social Links (Optional)
               </label>
               
@@ -152,7 +163,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.linkedin')}
                   type="url"
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="LinkedIn profile URL"
                 />
                 {errors.socialLinks?.linkedin && (
@@ -164,7 +175,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.twitter')}
                   type="url"
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="Twitter profile URL"
                 />
                 {errors.socialLinks?.twitter && (
@@ -176,7 +187,7 @@ export function ProfileCompletion() {
                 <input
                   {...register('socialLinks.github')}
                   type="url"
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-input placeholder:text-muted-foreground text-foreground rounded-md focus:outline-none focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
                   placeholder="GitHub profile URL"
                 />
                 {errors.socialLinks?.github && (
@@ -190,14 +201,14 @@ export function ProfileCompletion() {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Saving...' : 'Complete Profile'}
             </button>
             <button
               type="button"
               onClick={skipProfile}
-              className="flex-1 group relative flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="flex-1 group relative flex justify-center py-2 px-4 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
             >
               Skip for Now
             </button>

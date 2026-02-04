@@ -198,11 +198,11 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
   return (
     <div className="space-y-6">
       {/* Submission Selection */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Judge Scoring Interface</h2>
+      <div className="bg-card rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold text-foreground mb-4">Judge Scoring Interface</h2>
         
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Select Submission to Score
           </label>
           <select
@@ -211,7 +211,7 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
               const submission = submissions.find(s => s.id === e.target.value);
               setSelectedSubmission(submission || null);
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
           >
             {submissions.map(submission => (
               <option key={submission.id} value={submission.id}>
@@ -221,7 +221,7 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
           </select>
         </div>
 
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           Assigned Submissions: {submissions.length}
         </div>
       </div>
@@ -229,26 +229,26 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
       {selectedSubmission && (
         <>
           {/* Submission Details */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Submission Details: {selectedSubmission.teamName}
             </h3>
             
             {selectedSubmission.description && (
               <div className="mb-4">
-                <h4 className="font-medium text-gray-700 mb-2">Description</h4>
-                <p className="text-gray-600">{selectedSubmission.description}</p>
+                <h4 className="font-medium text-foreground mb-2">Description</h4>
+                <p className="text-muted-foreground">{selectedSubmission.description}</p>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Submitted by:</span>
-                <span className="ml-2 text-gray-600">{selectedSubmission.submittedBy}</span>
+                <span className="font-medium text-foreground">Submitted by:</span>
+                <span className="ml-2 text-muted-foreground">{selectedSubmission.submittedBy}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Submitted at:</span>
-                <span className="ml-2 text-gray-600">
+                <span className="font-medium text-foreground">Submitted at:</span>
+                <span className="ml-2 text-muted-foreground">
                   {new Date(selectedSubmission.submittedAt).toLocaleString()}
                 </span>
               </div>
@@ -256,7 +256,7 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
 
             {selectedSubmission.files && selectedSubmission.files.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-medium text-gray-700 mb-2">Attachments</h4>
+                <h4 className="font-medium text-foreground mb-2">Attachments</h4>
                 <div className="space-y-2">
                   {selectedSubmission.files.map((file, index) => (
                     <a
@@ -275,13 +275,13 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
           </div>
 
           {/* Scoring Form */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-card rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-foreground">
                 Score Submission
               </h3>
               <div className="text-right">
-                <div className="text-sm text-gray-600">Total Score</div>
+                <div className="text-sm text-muted-foreground">Total Score</div>
                 <div className="text-2xl font-bold text-blue-600">
                   {calculateTotalScore().toFixed(1)}%
                 </div>
@@ -308,15 +308,15 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
                 const percentage = criterion.maxScore > 0 ? (currentScore / criterion.maxScore) * 100 : 0;
 
                 return (
-                  <div key={criterion.id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={criterion.id} className="border border-border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{criterion.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{criterion.description}</p>
+                        <h4 className="font-medium text-foreground">{criterion.name}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">{criterion.description}</p>
                       </div>
                       <div className="text-right ml-4">
-                        <div className="text-sm text-gray-600">Weight: {criterion.weight}%</div>
-                        <div className="text-sm text-gray-600">Max: {criterion.maxScore}</div>
+                        <div className="text-sm text-muted-foreground">Weight: {criterion.weight}%</div>
+                        <div className="text-sm text-muted-foreground">Max: {criterion.maxScore}</div>
                       </div>
                     </div>
 
@@ -329,9 +329,9 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
                           step="0.1"
                           value={currentScore}
                           onChange={(e) => updateScore(criterion.id!, parseFloat(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                         />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
                           <span>0</span>
                           <span>{criterion.maxScore}</span>
                         </div>
@@ -345,9 +345,9 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
                           step="0.1"
                           value={currentScore}
                           onChange={(e) => updateScore(criterion.id!, parseFloat(e.target.value) || 0)}
-                          className="w-20 px-2 py-1 border border-gray-300 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-20 px-2 py-1 border border-input rounded text-center focus:outline-none focus:ring-2 focus-visible:ring-ring"
                         />
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-muted-foreground">
                           ({percentage.toFixed(1)}%)
                         </span>
                       </div>
@@ -358,14 +358,14 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
             </div>
 
             <div className="mt-6 flex justify-between items-center">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 {existingScore ? 'Last updated: ' + new Date(existingScore.submittedAt).toLocaleString() : 'Not yet scored'}
               </div>
               
               <button
                 onClick={handleSubmitScore}
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Submitting...' : existingScore ? 'Update Score' : 'Submit Score'}
               </button>

@@ -292,3 +292,4 @@ export const ParticipantPortfolioPage: React.FC = () => {
   );
 };
 
+export default ParticipantPortfolioPage;

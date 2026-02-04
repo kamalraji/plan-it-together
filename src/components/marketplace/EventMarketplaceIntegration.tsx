@@ -122,7 +122,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -130,13 +130,13 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Recommendations</p>
-              <p className="text-xs text-gray-600">AI-powered suggestions</p>
+              <p className="text-sm font-medium text-foreground">Recommendations</p>
+              <p className="text-xs text-muted-foreground">AI-powered suggestions</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -144,13 +144,13 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Shortlist</p>
-              <p className="text-xs text-gray-600">Saved vendors</p>
+              <p className="text-sm font-medium text-foreground">Shortlist</p>
+              <p className="text-xs text-muted-foreground">Saved vendors</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -158,13 +158,13 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Coordination</p>
-              <p className="text-xs text-gray-600">Timeline & communication</p>
+              <p className="text-sm font-medium text-foreground">Coordination</p>
+              <p className="text-xs text-muted-foreground">Timeline & communication</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
@@ -172,15 +172,15 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">Browse All</p>
-              <p className="text-xs text-gray-600">Full marketplace</p>
+              <p className="text-sm font-medium text-foreground">Browse All</p>
+              <p className="text-xs text-muted-foreground">Full marketplace</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'recommendations', name: 'Recommendations', icon: '🎯', description: 'AI-suggested services' },
@@ -194,7 +194,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               className={`group py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
               <div className="flex items-center space-x-2">
@@ -202,7 +202,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                 <span>{tab.name}</span>
               </div>
               <div className={`text-xs mt-1 ${
-                activeTab === tab.id ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-600'
+                activeTab === tab.id ? 'text-blue-500' : 'text-muted-foreground group-hover:text-muted-foreground'
               }`}>
                 {tab.description}
               </div>
@@ -244,16 +244,16 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
       {/* Booking Modal */}
       {showBookingModal && selectedService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Request Quote</h2>
+                <h2 className="text-xl font-semibold text-foreground">Request Quote</h2>
                 <button
                   onClick={() => {
                     setShowBookingModal(false);
                     setSelectedService(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-muted-foreground"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -262,10 +262,10 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               </div>
 
               {/* Service Summary */}
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <h3 className="font-medium text-gray-900 mb-2">{selectedService.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{selectedService.vendor.businessName}</p>
-                <p className="text-sm text-gray-600">
+              <div className="bg-muted/50 rounded-lg p-4 mb-6">
+                <h3 className="font-medium text-foreground mb-2">{selectedService.title}</h3>
+                <p className="text-sm text-muted-foreground mb-2">{selectedService.vendor.businessName}</p>
+                <p className="text-sm text-muted-foreground">
                   {selectedService.pricing.type === 'CUSTOM_QUOTE' 
                     ? 'Custom Quote' 
                     : `${selectedService.pricing.currency} ${selectedService.pricing.basePrice?.toLocaleString()}`
@@ -276,7 +276,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               {/* Booking Form */}
               <form onSubmit={handleSubmitBooking} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Service Date *
                   </label>
                   <input
@@ -284,12 +284,12 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                     required
                     value={bookingData.serviceDate}
                     onChange={(e) => setBookingData(prev => ({ ...prev, serviceDate: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Requirements *
                   </label>
                   <textarea
@@ -298,13 +298,13 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                     placeholder="Describe your specific requirements for this service..."
                     value={bookingData.requirements}
                     onChange={(e) => setBookingData(prev => ({ ...prev, requirements: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Budget Range (Min)
                     </label>
                     <input
@@ -312,11 +312,11 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                       placeholder="0"
                       value={bookingData.budgetMin}
                       onChange={(e) => setBookingData(prev => ({ ...prev, budgetMin: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Budget Range (Max)
                     </label>
                     <input
@@ -324,13 +324,13 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                       placeholder="0"
                       value={bookingData.budgetMax}
                       onChange={(e) => setBookingData(prev => ({ ...prev, budgetMax: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Additional Notes
                   </label>
                   <textarea
@@ -338,7 +338,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                     placeholder="Any additional information or special requests..."
                     value={bookingData.additionalNotes}
                     onChange={(e) => setBookingData(prev => ({ ...prev, additionalNotes: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring"
                   />
                 </div>
 
@@ -349,7 +349,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                       setShowBookingModal(false);
                       setSelectedService(null);
                     }}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-input text-foreground rounded-md hover:bg-muted/50 transition-colors"
                   >
                     Cancel
                   </button>

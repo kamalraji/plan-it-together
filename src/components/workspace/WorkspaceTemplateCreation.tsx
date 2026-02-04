@@ -98,10 +98,10 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">Create Workspace Template</h2>
-        <p className="text-sm text-gray-600 mt-1">
+    <div className="max-w-2xl mx-auto bg-card shadow-lg rounded-lg">
+      <div className="px-6 py-4 border-b border-border">
+        <h2 className="text-xl font-semibold text-foreground">Create Workspace Template</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Save this workspace structure as a reusable template for future events
         </p>
       </div>
@@ -123,9 +123,9 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
         )}
 
         {/* Workspace Preview */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Source Workspace</h3>
-          <div className="text-sm text-gray-600">
+        <div className="bg-muted/50 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-foreground mb-2">Source Workspace</h3>
+          <div className="text-sm text-muted-foreground">
             <p><strong>Name:</strong> {workspaceData.name}</p>
             <p><strong>Team Members:</strong> {workspaceData.teamMembers?.length || 0}</p>
             <p><strong>Tasks:</strong> {workspaceData.tasks?.length || 0}</p>
@@ -135,7 +135,7 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
 
         {/* Template Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="name" className="block text-sm font-medium text-foreground">
             Template Name *
           </label>
           <input
@@ -144,14 +144,14 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             required
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             placeholder="Enter template name"
           />
         </div>
 
         {/* Template Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="description" className="block text-sm font-medium text-foreground">
             Description *
           </label>
           <textarea
@@ -160,21 +160,21 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             rows={3}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             placeholder="Describe what this template is best used for"
           />
         </div>
 
         {/* Category */}
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="category" className="block text-sm font-medium text-foreground">
             Event Category *
           </label>
           <select
             id="category"
             value={formData.category}
             onChange={(e) => handleInputChange('category', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
           >
             <option value="GENERAL">General</option>
             <option value="CONFERENCE">Conference</option>
@@ -187,7 +187,7 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
 
         {/* Tags */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Tags</label>
+          <label className="block text-sm font-medium text-foreground">Tags</label>
           <div className="mt-1 flex flex-wrap gap-2 mb-2">
             {formData.tags.map((tag, index) => (
               <span
@@ -211,13 +211,13 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-              className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="flex-1 border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               placeholder="Add tags (e.g., tech, startup, corporate)"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="px-3 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
             >
               Add
             </button>
@@ -231,26 +231,26 @@ export function WorkspaceTemplateCreation({ workspaceId, onTemplateCreated, onCa
             type="checkbox"
             checked={formData.isPublic}
             onChange={(e) => handleInputChange('isPublic', e.target.checked)}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
           />
-          <label htmlFor="isPublic" className="ml-2 block text-sm text-gray-900">
+          <label htmlFor="isPublic" className="ml-2 block text-sm text-foreground">
             Make this template publicly available to all users
           </label>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-border">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Template'}
           </button>

@@ -54,9 +54,9 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication History</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Communication History</h2>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
           <span>Loading communication history...</span>
         </div>
@@ -68,12 +68,12 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication History</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Communication History</h2>
         </div>
         <div className="text-center py-8">
           <div className="text-red-400 text-3xl mb-2 font-bold">!</div>
-          <p className="text-gray-600">Failed to load communication history</p>
-          <p className="text-sm text-gray-500 mt-1">Please try again later</p>
+          <p className="text-muted-foreground">Failed to load communication history</p>
+          <p className="text-sm text-muted-foreground mt-1">Please try again later</p>
         </div>
       </div>
     );
@@ -83,15 +83,15 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication History</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Communication History</h2>
+          <p className="text-muted-foreground">
             View all communications sent for this event.
           </p>
         </div>
         <div className="text-center py-12">
-          <div className="text-gray-400 text-4xl mb-2">📭</div>
-          <p className="text-gray-600">No communications sent yet</p>
-          <p className="text-sm text-gray-500 mt-1">
+          <div className="text-muted-foreground text-4xl mb-2">📭</div>
+          <p className="text-muted-foreground">No communications sent yet</p>
+          <p className="text-sm text-muted-foreground mt-1">
             Communications you send will appear here
           </p>
         </div>
@@ -102,8 +102,8 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication History</h2>
-        <p className="text-gray-600">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Communication History</h2>
+        <p className="text-muted-foreground">
           View all communications sent for this event, including delivery status and recipient counts.
         </p>
       </div>
@@ -111,7 +111,7 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Communication List */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Recent Communications</h3>
+          <h3 className="text-lg font-medium text-foreground">Recent Communications</h3>
           
           <div className="space-y-3">
             {logs.map((log) => (
@@ -120,23 +120,23 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
                 className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                   selectedLog?.id === log.id
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                    : 'border-border hover:border-input hover:shadow-sm'
                 }`}
                 onClick={() => setSelectedLog(log)}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 truncate pr-2">
+                  <h4 className="font-medium text-foreground truncate pr-2">
                     {log.subject}
                   </h4>
                   {getStatusBadge(log.status)}
                 </div>
 
-                <div className="space-y-1 text-sm text-gray-600">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   <div className="flex items-center justify-between">
                     <span>Sent by: {log.sender.name}</span>
                     <span>{log.recipientCount} recipients</span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {formatDate(log.sentAt)}
                   </div>
                 </div>
@@ -155,54 +155,54 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
 
         {/* Communication Details */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Communication Details</h3>
+          <h3 className="text-lg font-medium text-foreground">Communication Details</h3>
           
           {selectedLog ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6">
               {detailLoading ? (
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
                   <span>Loading details...</span>
                 </div>
               ) : detailedLog ? (
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Subject</h4>
-                    <p className="text-gray-700">{detailedLog.subject}</p>
+                    <h4 className="font-medium text-foreground mb-2">Subject</h4>
+                    <p className="text-foreground">{detailedLog.subject}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Status</h4>
+                      <h4 className="font-medium text-foreground mb-1">Status</h4>
                       {getStatusBadge(detailedLog.status)}
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Recipients</h4>
-                      <p className="text-gray-700">{detailedLog.recipientCount}</p>
+                      <h4 className="font-medium text-foreground mb-1">Recipients</h4>
+                      <p className="text-foreground">{detailedLog.recipientCount}</p>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Sent By</h4>
-                    <p className="text-gray-700">
+                    <h4 className="font-medium text-foreground mb-1">Sent By</h4>
+                    <p className="text-foreground">
                       {detailedLog.sender.name} ({detailedLog.sender.email})
                     </p>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Sent At</h4>
-                    <p className="text-gray-700">{formatDate(detailedLog.sentAt)}</p>
+                    <h4 className="font-medium text-foreground mb-1">Sent At</h4>
+                    <p className="text-foreground">{formatDate(detailedLog.sentAt)}</p>
                   </div>
 
                   {detailedLog.event && (
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Event</h4>
-                      <p className="text-gray-700">{detailedLog.event.name}</p>
+                      <h4 className="font-medium text-foreground mb-1">Event</h4>
+                      <p className="text-foreground">{detailedLog.event.name}</p>
                     </div>
                   )}
 
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="pt-4 border-t border-border">
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                       </svg>
@@ -212,14 +212,14 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-gray-600">Failed to load communication details</p>
+                  <p className="text-muted-foreground">Failed to load communication details</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-              <div className="text-gray-400 text-3xl mb-2">📄</div>
-              <p className="text-gray-600">Select a communication to view details</p>
+            <div className="bg-muted/50 border border-border rounded-lg p-6 text-center">
+              <div className="text-muted-foreground text-3xl mb-2">📄</div>
+              <p className="text-muted-foreground">Select a communication to view details</p>
             </div>
           )}
         </div>

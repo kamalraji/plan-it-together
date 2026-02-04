@@ -30,7 +30,7 @@ export function OrganizerSpecificDashboard() {
                 Organizer Dashboard
               </h1>
               <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-                Welcome back, {displayName}. Use this hub to access and manage all of your organizations.
+                Use this hub to access and manage all of your organizations.
               </p>
             </AfCard>
 
@@ -149,3 +149,5 @@ export function OrganizerSpecificDashboard() {
     </div>
   );
 }
+
+export default OrganizerSpecificDashboard;

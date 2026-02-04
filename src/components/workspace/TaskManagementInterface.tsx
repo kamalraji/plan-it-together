@@ -1,14 +1,33 @@
 import { useState, useEffect, useMemo } from 'react';
-import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope } from '../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { WorkspaceTask, TaskStatus, TeamMember, WorkspaceRoleScope, TaskPriority, TaskCategory } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
 import { TaskFilterBar, TaskFilters } from './TaskFilterBar';
+import { TaskFormModal } from './TaskFormModal';
+import { TaskFormData } from './TaskForm';
+import { TaskAISuggestionsPanel } from './TaskAISuggestionsPanel';
+import { TaskDependencyGraph } from './TaskDependencyGraph';
+import { LayoutList, Columns3, Plus, GitBranch, GanttChart } from 'lucide-react';
+import { TaskGanttChart } from './gantt';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { TaskSuggestion } from '@/hooks/useTaskAISuggestions';
 
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
   teamMembers: TeamMember[];
+  workspaceId?: string;
+  eventId?: string;
+  workspaceType?: string;
   roleScope?: WorkspaceRoleScope;
+  eventName?: string;
+  eventCategory?: string;
+  startDate?: string;
+  endDate?: string;
   onTaskEdit?: (task: WorkspaceTask) => void;
   onTaskDelete?: (taskId: string) => void;
   onTaskStatusChange?: (taskId: string, status: TaskStatus) => void;
@@ -17,12 +36,19 @@ interface TaskManagementInterfaceProps {
   initialTaskId?: string;
 }
 
-type ViewMode = 'list' | 'kanban';
+type ViewMode = 'list' | 'kanban' | 'dependencies' | 'gantt';
 
 export function TaskManagementInterface({
   tasks,
   teamMembers,
+  workspaceId,
+  eventId,
+  workspaceType,
   roleScope,
+  eventName,
+  eventCategory,
+  startDate,
+  endDate,
   onTaskEdit,
   onTaskDelete,
   onTaskStatusChange,
@@ -32,12 +58,118 @@ export function TaskManagementInterface({
 }: TaskManagementInterfaceProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<WorkspaceTask | null>(null);
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'ALL',
     assigneeId: 'ALL',
+    priority: 'ALL',
+    category: 'ALL',
+    phase: 'ALL',
+    datePreset: 'ALL',
     sortKey: 'dueDate',
     sortDirection: 'asc',
+  });
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Create task mutation with cross-workspace support
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: TaskFormData) => {
+      if (!workspaceId) throw new Error('Workspace ID is required');
+      
+      // Create the main task
+      const { data: mainTask, error: mainError } = await supabase
+        .from('workspace_tasks')
+        .insert({
+          workspace_id: workspaceId,
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority || TaskPriority.MEDIUM,
+          status: TaskStatus.NOT_STARTED,
+          due_date: taskData.dueDate || null,
+          role_scope: taskData.roleScope || (roleScope === 'ALL' ? null : roleScope),
+          assigned_to: taskData.assigneeId || null,
+        })
+        .select('id')
+        .single();
+
+      if (mainError) throw mainError;
+
+      // Create linked tasks in child workspaces for cross-workspace assignees
+      if (taskData.crossWorkspaceAssignees?.length && mainTask?.id) {
+        const linkedTasks = taskData.crossWorkspaceAssignees.map(({ userId, targetWorkspaceId }) => ({
+          workspace_id: targetWorkspaceId,
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority || TaskPriority.MEDIUM,
+          status: TaskStatus.NOT_STARTED,
+          due_date: taskData.dueDate || null,
+          assigned_to: userId,
+          source_workspace_id: workspaceId,
+          parent_task_id: mainTask.id, // Link to parent for status sync
+        }));
+
+        const { error: linkedError } = await supabase
+          .from('workspace_tasks')
+          .insert(linkedTasks);
+
+        if (linkedError) {
+          console.error('Failed to create linked tasks:', linkedError);
+          // Don't throw - main task was created successfully
+        }
+      }
+
+      return mainTask;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast({ title: 'Task created', description: 'Your new task has been created successfully.' });
+      setShowCreateModal(false);
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Failed to create task', 
+        description: error?.message || 'Please try again.',
+        variant: 'destructive' 
+      });
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ taskId, taskData }: { taskId: string; taskData: TaskFormData }) => {
+      if (!workspaceId) throw new Error('Workspace ID is required');
+      
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .update({
+          title: taskData.title,
+          description: taskData.description,
+          priority: taskData.priority,
+          due_date: taskData.dueDate || null,
+          role_scope: taskData.roleScope || null,
+          assigned_to: taskData.assigneeId || null,
+        })
+        .eq('id', taskId)
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast({ title: 'Task updated', description: 'Your task has been updated successfully.' });
+      setEditingTask(null);
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: 'Failed to update task', 
+        description: error?.message || 'Please try again.',
+        variant: 'destructive' 
+      });
+    },
   });
 
   useEffect(() => {
@@ -56,6 +188,37 @@ export function TaskManagementInterface({
     setSelectedTask(null);
   };
 
+  const handleCreateClick = () => {
+    // If workspaceId is available, use the built-in modal
+    if (workspaceId) {
+      setShowCreateModal(true);
+    } else if (onCreateTask) {
+      // Fallback to parent handler if no workspaceId
+      onCreateTask();
+    }
+  };
+
+  const handleEditClick = (task: WorkspaceTask) => {
+    if (workspaceId) {
+      setEditingTask(task);
+    } else if (onTaskEdit) {
+      onTaskEdit(task);
+    }
+  };
+
+  const handleFormSubmit = (taskData: TaskFormData) => {
+    if (editingTask) {
+      updateTaskMutation.mutate({ taskId: editingTask.id, taskData });
+    } else {
+      createTaskMutation.mutate(taskData);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    setEditingTask(null);
+  };
+
   const filteredTasks = useMemo(() => {
     const base = [...tasks];
 
@@ -71,12 +234,42 @@ export function TaskManagementInterface({
         return false;
       }
 
+      if (filters.priority !== 'ALL' && task.priority !== filters.priority) {
+        return false;
+      }
+
+      if (filters.category !== 'ALL' && task.category !== filters.category) {
+        return false;
+      }
+
       if (filters.assigneeId !== 'ALL') {
         if (filters.assigneeId === 'UNASSIGNED' && task.assignee) {
           return false;
         }
         if (filters.assigneeId !== 'UNASSIGNED' && task.assignee?.userId !== filters.assigneeId) {
           return false;
+        }
+      }
+
+      // Date preset filtering
+      if (filters.datePreset !== 'ALL') {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekEnd = new Date(today);
+        weekEnd.setDate(weekEnd.getDate() + 7);
+
+        if (filters.datePreset === 'NO_DUE_DATE' && task.dueDate) return false;
+        if (filters.datePreset === 'TODAY' && task.dueDate) {
+          const due = new Date(task.dueDate);
+          if (due.toDateString() !== today.toDateString()) return false;
+        }
+        if (filters.datePreset === 'THIS_WEEK' && task.dueDate) {
+          const due = new Date(task.dueDate);
+          if (due < today || due > weekEnd) return false;
+        }
+        if (filters.datePreset === 'OVERDUE') {
+          if (!task.dueDate || task.status === TaskStatus.COMPLETED) return false;
+          if (new Date(task.dueDate) >= now) return false;
         }
       }
 
@@ -93,6 +286,11 @@ export function TaskManagementInterface({
     scoped.sort((a, b) => {
       const direction = filters.sortDirection === 'asc' ? 1 : -1;
 
+      if (filters.sortKey === 'priority') {
+        const priorityOrder = { URGENT: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
+        return (priorityOrder[b.priority as keyof typeof priorityOrder] - priorityOrder[a.priority as keyof typeof priorityOrder]) * direction;
+      }
+
       if (filters.sortKey === 'createdAt') {
         const aTime = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
         const bTime = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
@@ -108,13 +306,13 @@ export function TaskManagementInterface({
   }, [tasks, filters, roleScope]);
 
   const commonProps = {
-    tasks,
+    tasks: filteredTasks,
     teamMembers,
     onTaskClick: handleTaskClick,
-    onTaskEdit,
+    onTaskEdit: handleEditClick,
     onTaskDelete,
     onTaskStatusChange,
-    onCreateTask,
+    onCreateTask: handleCreateClick,
     isLoading,
   };
 
@@ -122,68 +320,124 @@ export function TaskManagementInterface({
     setFilters((prev) => ({ ...prev, ...next }));
   };
 
+  const handleAddAISuggestion = (suggestion: TaskSuggestion) => {
+    createTaskMutation.mutate({
+      title: suggestion.title,
+      description: suggestion.description,
+      priority: suggestion.priority as TaskPriority,
+      category: suggestion.category as TaskCategory,
+      dependencies: [],
+      tags: [],
+    });
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* AI Suggestions Panel */}
+      {eventName && (
+        <TaskAISuggestionsPanel
+          eventName={eventName}
+          eventCategory={eventCategory}
+          startDate={startDate}
+          endDate={endDate}
+          existingTasks={tasks.map(t => t.title)}
+          workspaceType={workspaceType}
+          onAddTask={handleAddAISuggestion}
+        />
+      )}
+
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Task Management</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Organize and track your event tasks
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground">Task Management</h2>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            {filteredTasks.length} of {tasks.length} tasks
           </p>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex self-start rounded-md shadow-sm md:self-auto">
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-4 py-2 text-sm font-medium rounded-l-md border ${viewMode === 'list'
-                ? 'bg-primary/10 border-primary text-primary z-10'
-                : 'bg-background border-border text-muted-foreground hover:bg-muted'
-              }`}
-          >
-            <div className="flex items-center space-x-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                />
-              </svg>
-              <span>List view</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setViewMode('kanban')}
-            className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${viewMode === 'kanban'
-                ? 'bg-primary/10 border-primary text-primary z-10'
-                : 'bg-background border-border text-muted-foreground hover:bg-muted'
-              }`}
-          >
-            <div className="flex items-center space-x-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
-                />
-              </svg>
-              <span>Kanban board</span>
-            </div>
-          </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {/* View Mode Toggle */}
+          <div className="flex items-center p-1 rounded-lg bg-muted/60 border border-border">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'list'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <LayoutList className="h-4 w-4" />
+              <span className="hidden sm:inline">List</span>
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'kanban'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Columns3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Kanban</span>
+            </button>
+            <button
+              onClick={() => setViewMode('dependencies')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'dependencies'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <GitBranch className="h-4 w-4" />
+              <span className="hidden sm:inline">Deps</span>
+            </button>
+            <button
+              onClick={() => setViewMode('gantt')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'gantt'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <GanttChart className="h-4 w-4" />
+              <span className="hidden sm:inline">Gantt</span>
+            </button>
+          </div>
+
+          {/* Create Task Button */}
+          <Button onClick={handleCreateClick} size="sm" className="hidden sm:flex">
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Task
+          </Button>
+          <Button onClick={handleCreateClick} size="icon" className="sm:hidden h-9 w-9">
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      {/* Shared filters for workspace tasks */}
+      {/* Filters */}
       <TaskFilterBar filters={filters} onChange={handleFilterChange} teamMembers={teamMembers} />
 
       {/* Task Views */}
-      {viewMode === 'list' ? (
-        <TaskList {...commonProps} />
-      ) : (
-        <TaskKanbanBoard {...commonProps} tasks={filteredTasks} />
+      {viewMode === 'list' && <TaskList {...commonProps} />}
+      {viewMode === 'kanban' && <TaskKanbanBoard {...commonProps} />}
+      {viewMode === 'dependencies' && (
+        <TaskDependencyGraph
+          tasks={filteredTasks}
+          selectedTaskId={selectedTask?.id}
+          onTaskClick={handleTaskClick}
+        />
+      )}
+      {viewMode === 'gantt' && workspaceId && (
+        <TaskGanttChart
+          tasks={filteredTasks}
+          workspaceId={workspaceId}
+          onTaskClick={handleTaskClick}
+        />
       )}
 
       {/* Task Detail Modal */}
@@ -192,37 +446,44 @@ export function TaskManagementInterface({
           task={selectedTask}
           teamMembers={teamMembers}
           onTaskUpdate={(taskId, updates) => {
-            // Handle task updates - this would typically call an API
             console.log('Update task:', taskId, updates);
           }}
           onStatusChange={onTaskStatusChange}
           onProgressUpdate={(taskId, progress) => {
-            // Handle progress updates - this would typically call an API
             console.log('Update progress:', taskId, progress);
           }}
           onCommentAdd={(taskId, content) => {
-            // Handle comment addition - this would typically call an API
             console.log('Add comment:', taskId, content);
           }}
           onCommentEdit={(commentId, content) => {
-            // Handle comment editing - this would typically call an API
             console.log('Edit comment:', commentId, content);
           }}
           onCommentDelete={(commentId) => {
-            // Handle comment deletion - this would typically call an API
             console.log('Delete comment:', commentId);
           }}
           onFileUpload={(taskId, files) => {
-            // Handle file upload - this would typically call an API
             console.log('Upload files:', taskId, files);
           }}
           onFileDelete={(fileId) => {
-            // Handle file deletion - this would typically call an API
             console.log('Delete file:', fileId);
           }}
           onClose={handleTaskDetailClose}
         />
       )}
+
+      {/* Create/Edit Task Modal */}
+      <TaskFormModal
+        isOpen={showCreateModal || !!editingTask}
+        task={editingTask ?? undefined}
+        teamMembers={teamMembers}
+        availableTasks={tasks}
+        workspaceId={workspaceId}
+        eventId={eventId}
+        enableCrossWorkspaceAssignment={workspaceType === 'ROOT' || workspaceType === 'DEPARTMENT'}
+        onSubmit={handleFormSubmit}
+        onClose={handleModalClose}
+        isLoading={createTaskMutation.isPending || updateTaskMutation.isPending}
+      />
     </div>
   );
 }

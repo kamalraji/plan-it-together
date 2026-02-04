@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory } from '../../types';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface TaskKanbanBoardProps {
   tasks: WorkspaceTask[];
@@ -22,8 +23,8 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
   {
     status: TaskStatus.NOT_STARTED,
     title: 'Not Started',
-    color: 'text-gray-700',
-    bgColor: 'bg-gray-50'
+    color: 'text-foreground',
+    bgColor: 'bg-muted/50'
   },
   {
     status: TaskStatus.IN_PROGRESS,
@@ -62,6 +63,7 @@ export function TaskKanbanBoard({
 }: TaskKanbanBoardProps) {
   const [draggedTask, setDraggedTask] = useState<WorkspaceTask | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const tasksByStatus = React.useMemo(() => {
     const grouped: Record<TaskStatus, WorkspaceTask[]> = {
@@ -163,9 +165,9 @@ export function TaskKanbanBoard({
       case TaskCategory.REGISTRATION:
         return 'bg-yellow-100 text-yellow-800';
       case TaskCategory.POST_EVENT:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -183,15 +185,15 @@ export function TaskKanbanBoard({
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <div className="animate-pulse">
           <div className="grid grid-cols-5 gap-6">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="space-y-3">
-                <div className="h-8 bg-gray-200 rounded"></div>
+                <div className="h-8 bg-muted rounded"></div>
                 <div className="space-y-2">
                   {[...Array(3)].map((_, j) => (
-                    <div key={j} className="h-24 bg-gray-200 rounded"></div>
+                    <div key={j} className="h-24 bg-muted rounded"></div>
                   ))}
                 </div>
               </div>
@@ -203,20 +205,20 @@ export function TaskKanbanBoard({
   }
 
   return (
-    <div className="bg-white shadow rounded-lg">
+    <div className="bg-card shadow rounded-lg">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900">Task Board</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-medium text-foreground">Task Board</h3>
+            <p className="text-sm text-muted-foreground">
               Drag and drop tasks to update their status
             </p>
           </div>
           {onCreateTask && (
             <button
               onClick={onCreateTask}
-              className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -244,7 +246,7 @@ export function TaskKanbanBoard({
                 <h4 className={`font-medium ${column.color}`}>
                   {column.title}
                 </h4>
-                <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-medium rounded-full bg-white ${column.color}`}>
+                <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-medium rounded-full bg-card ${column.color}`}>
                   {tasksByStatus[column.status].length}
                 </span>
               </div>
@@ -252,8 +254,8 @@ export function TaskKanbanBoard({
               {/* Tasks */}
               <div className="flex-1 space-y-3">
                 {tasksByStatus[column.status].length === 0 ? (
-                  <div className="flex items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg">
-                    <p className="text-sm text-gray-500">No tasks</p>
+                  <div className="flex items-center justify-center h-32 border-2 border-dashed border-input rounded-lg">
+                    <p className="text-sm text-muted-foreground">No tasks</p>
                   </div>
                 ) : (
                   tasksByStatus[column.status].map((task) => (
@@ -262,13 +264,13 @@ export function TaskKanbanBoard({
                       draggable
                       onDragStart={(e) => handleDragStart(e, task)}
                       onDragEnd={handleDragEnd}
-                      className={`bg-white rounded-lg p-3 shadow-sm border-l-4 ${getPriorityColor(task.priority)} cursor-move hover:shadow-md transition-shadow ${draggedTask?.id === task.id ? 'opacity-50' : ''
+                      className={`bg-card rounded-lg p-3 shadow-sm border-l-4 ${getPriorityColor(task.priority)} cursor-move hover:shadow-md transition-shadow ${draggedTask?.id === task.id ? 'opacity-50' : ''
                         }`}
                       onClick={() => onTaskClick?.(task)}
                     >
                       {/* Task Header */}
                       <div className="flex items-start justify-between mb-2">
-                        <h5 className="text-sm font-medium text-gray-900 line-clamp-2">
+                        <h5 className="text-sm font-medium text-foreground line-clamp-2">
                           {task.title}
                         </h5>
                         {isOverdue(task) && (
@@ -280,7 +282,7 @@ export function TaskKanbanBoard({
 
                       {/* Task Description */}
                       {task.description && (
-                        <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                           {task.description}
                         </p>
                       )}
@@ -292,14 +294,14 @@ export function TaskKanbanBoard({
                           <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getCategoryColor(task.category)}`}>
                             {task.category.replace('_', ' ')}
                           </span>
-                          <span className="text-xs text-gray-500 font-medium">
+                          <span className="text-xs text-muted-foreground font-medium">
                             {task.priority}
                           </span>
                         </div>
 
                         {/* Due Date */}
                         {task.dueDate && (
-                          <div className="flex items-center text-xs text-gray-500">
+                          <div className="flex items-center text-xs text-muted-foreground">
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -311,7 +313,7 @@ export function TaskKanbanBoard({
 
                         {/* Assignee */}
                         {task.assignee && (
-                          <div className="flex items-center text-xs text-gray-600">
+                          <div className="flex items-center text-xs text-muted-foreground">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <div className="h-5 w-5 rounded-full bg-indigo-500 flex items-center justify-center">
                                 <span className="text-xs font-medium text-white">
@@ -331,13 +333,13 @@ export function TaskKanbanBoard({
                             {task.tags.slice(0, 2).map(tag => (
                               <span
                                 key={tag}
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-muted text-foreground"
                               >
                                 {tag}
                               </span>
                             ))}
                             {task.tags.length > 2 && (
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-muted-foreground">
                                 +{task.tags.length - 2}
                               </span>
                             )}
@@ -346,7 +348,7 @@ export function TaskKanbanBoard({
 
                         {/* Progress Bar */}
                         {task.progress > 0 && (
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="w-full bg-muted rounded-full h-1.5">
                             <div
                               className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
                               style={{ width: `${task.progress}%` }}
@@ -356,10 +358,10 @@ export function TaskKanbanBoard({
                       </div>
 
                       {/* Task Actions */}
-                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-border">
                         <div className="flex items-center space-x-1">
                           {task.dependencies.length > 0 && (
-                            <span className="inline-flex items-center text-xs text-gray-500">
+                            <span className="inline-flex items-center text-xs text-muted-foreground">
                               <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                               </svg>
@@ -386,9 +388,7 @@ export function TaskKanbanBoard({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (window.confirm('Are you sure you want to delete this task?')) {
-                                  onTaskDelete(task.id);
-                                }
+                                setTaskToDelete(task.id);
                               }}
                               className="text-red-600 hover:text-red-900 text-xs p-1"
                               title="Delete task"
@@ -408,6 +408,21 @@ export function TaskKanbanBoard({
           ))}
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={!!taskToDelete}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        title="Delete task"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => {
+          if (taskToDelete && onTaskDelete) {
+            onTaskDelete(taskToDelete);
+            setTaskToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

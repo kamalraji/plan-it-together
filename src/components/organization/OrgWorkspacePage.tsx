@@ -1,242 +1,480 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace, WorkspaceStatus } from '@/types';
+import { WorkspaceStatus, UserRole } from '@/types';
 import { useCurrentOrganization } from './OrganizationContext';
 import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
+import { WorkspaceDashboard } from '@/components/workspace/WorkspaceDashboard';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { 
+  parseWorkspaceUrl, 
+  buildWorkspaceUrl, 
+  buildHierarchyChain, 
+  slugify,
+  WorkspaceLevel,
+} from '@/lib/workspaceNavigation';
+import { 
+  PlusIcon, 
+  CheckIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+import { cn } from '@/lib/utils';
+import { ENHANCED_WORKSPACE_TEMPLATES, EnhancedWorkspaceTemplate } from '@/lib/workspaceTemplates';
+import { WorkspaceTemplateSelector } from '@/components/workspace/WorkspaceTemplateSelector';
+import { useWorkspaceProvisioning } from '@/hooks/useWorkspaceProvisioning';
+import { TeamCollaboration } from '@/components/illustrations';
+
+// Workspace list item component with sub-workspace support
+interface WorkspaceListItemProps {
+  workspace: any;
+  selectedWorkspaceId?: string;
+  onSelect: (id: string) => void;
+  showEvent?: boolean;
+  isSubWorkspace?: boolean;
+}
+
+const WorkspaceListItem: React.FC<WorkspaceListItemProps> = ({
+  workspace,
+  selectedWorkspaceId,
+  onSelect,
+  showEvent = false,
+  isSubWorkspace = false,
+}) => {
+  const isSelected = selectedWorkspaceId === workspace.id;
+  
+  return (
+    <>
+      <button
+        onClick={() => onSelect(workspace.id)}
+        className={cn(
+          "w-full text-left px-3 py-2.5 rounded-lg transition-colors",
+          "hover:bg-muted/50",
+          isSelected
+            ? "bg-primary/10 border border-primary/20"
+            : "border border-transparent",
+          isSubWorkspace && "ml-4"
+        )}
+      >
+        <div className="flex items-center gap-2">
+          <Squares2X2Icon className={cn(
+            "h-4 w-4 flex-shrink-0",
+            isSelected ? "text-primary" : "text-muted-foreground"
+          )} />
+          <div className="min-w-0 flex-1">
+            <p className={cn(
+              "text-sm font-medium truncate",
+              isSelected ? "text-primary" : "text-foreground"
+            )}>
+              {workspace.name}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {showEvent && workspace.event?.name 
+                ? workspace.event.name 
+                : workspace.status === 'ACTIVE' ? 'Active' : workspace.status}
+            </p>
+          </div>
+          {isSelected && (
+            <CheckIcon className="h-4 w-4 text-primary flex-shrink-0" />
+          )}
+        </div>
+      </button>
+      {workspace.subWorkspaces?.map((subWorkspace: any) => (
+        <WorkspaceListItem
+          key={subWorkspace.id}
+          workspace={subWorkspace}
+          selectedWorkspaceId={selectedWorkspaceId}
+          onSelect={onSelect}
+          showEvent={showEvent}
+          isSubWorkspace
+        />
+      ))}
+    </>
+  );
+};
 
 /**
- * OrgWorkspacePage
- *
- * Organization-scoped workspace portal for the route `/:orgSlug/workspaces`.
- * This page now focuses on the general "workspace service" overview for an
- * organization, and links out to event-specific workspaces instead of
- * embedding the full WorkspaceDashboard inline.
- *
- * On mobile, the workspace list is optimized for small screens with filters
- * and pill-style badges.
+ * OrgWorkspacePage - Organization-scoped workspace portal
  */
 export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { orgSlug } = useParams<{ orgSlug: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const baseWorkspacePath = `/${orgSlug}/workspaces`;
+  // Parse hierarchical URL
+  const parsedUrl = parseWorkspaceUrl(location.pathname, location.search);
+  
+  // Get eventId from query params (hierarchical URL) or route params (legacy)
+  const eventIdFromQuery = searchParams.get('eventId') || undefined;
+  const { eventId: eventIdFromRoute } = useParams<{ eventId: string }>();
+  const eventId = eventIdFromQuery || eventIdFromRoute;
+  
+  // Get workspace from query params
+  const selectedWorkspaceId = searchParams.get('workspaceId') || undefined;
+  
+  // Determine current workspace level from URL path
+  const currentLevel: WorkspaceLevel | undefined = 
+    parsedUrl.teamSlug ? 'team' :
+    parsedUrl.committeeSlug ? 'committee' :
+    parsedUrl.departmentSlug ? 'department' :
+    parsedUrl.rootSlug ? 'root' : undefined;
+  
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState<EnhancedWorkspaceTemplate>(ENHANCED_WORKSPACE_TEMPLATES[0]);
 
-  // Load workspaces the current user can access. RLS on `workspaces` ensures
-  // we only see rows where the current user is allowed to manage them.
-  const { data: workspaces, isLoading } = useQuery<Workspace[]>({
-    queryKey: ['org-workspaces', organization?.id],
+  const { provisionWorkspaceAsync, isPending: isProvisioning } = useWorkspaceProvisioning();
+
+  // Load all workspaces for this organization
+  const { data: workspacesData, isLoading: workspacesLoading } = useQuery({
+    queryKey: ['org-workspaces', organization?.id, eventId, user?.id],
     queryFn: async () => {
-      if (!organization?.id) return [] as Workspace[];
+      if (!organization?.id) return { myWorkspaces: [], orgWorkspaces: [] };
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('workspaces')
-        .select(
-          'id, name, status, created_at, updated_at, event_id, events!inner(id, name, organization_id)'
-        )
+        .select(`
+          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id, workspace_type,
+          events!inner(id, name, organization_id),
+          workspace_team_members(user_id)
+        `)
         .eq('events.organization_id', organization.id)
         .order('created_at', { ascending: false });
 
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
 
-      return ((data || []).map((row: any) => ({
+      const allWorkspaces = (data || []).map((row: any) => ({
         id: row.id,
         eventId: row.event_id,
         name: row.name,
         status: row.status as WorkspaceStatus,
+        workspaceType: row.workspace_type, // Include workspace_type
         createdAt: row.created_at,
         updatedAt: row.updated_at,
-        description: undefined,
-        event: row.events
-          ? {
-            id: row.events.id,
-            name: row.events.name,
-          }
-          : undefined,
-        teamMembers: [],
-        taskSummary: undefined,
-        channels: [],
-      })) as unknown) as Workspace[];
+        organizerId: row.organizer_id,
+        parentWorkspaceId: row.parent_workspace_id,
+        isOwner: row.organizer_id === user?.id,
+        isMember: row.workspace_team_members?.some((m: any) => m.user_id === user?.id),
+        event: row.events ? { id: row.events.id, name: row.events.name } : undefined,
+      }));
+
+      const myWorkspaces = allWorkspaces.filter((w: any) => w.isOwner || w.isMember);
+      const orgWorkspaces = allWorkspaces.filter((w: any) => !w.isOwner && !w.isMember);
+
+      const buildHierarchy = (workspaces: any[]) => {
+        const roots = workspaces.filter((w: any) => !w.parentWorkspaceId);
+        const children = workspaces.filter((w: any) => w.parentWorkspaceId);
+        return roots.map((root: any) => ({
+          ...root,
+          subWorkspaces: children.filter((c: any) => c.parentWorkspaceId === root.id),
+        }));
+      };
+
+      return {
+        myWorkspaces: buildHierarchy(myWorkspaces),
+        orgWorkspaces: buildHierarchy(orgWorkspaces),
+        allFlat: allWorkspaces,
+      };
     },
-    enabled: !!organization?.id,
+    enabled: !!organization?.id && !!user?.id,
   });
 
-  const [statusFilter, setStatusFilter] = React.useState<'ALL' | WorkspaceStatus>('ALL');
-  const [sortOrder, setSortOrder] = React.useState<'recent' | 'oldest'>('recent');
+  const workspaces = workspacesData?.allFlat || [];
+  const myWorkspaces = workspacesData?.myWorkspaces || [];
+  const orgWorkspaces = workspacesData?.orgWorkspaces || [];
 
-  const filteredWorkspaces = (workspaces || [])
-    .filter((ws) => (statusFilter === 'ALL' ? true : ws.status === statusFilter))
-    .sort((a, b) => {
-      const aTime = new Date(a.updatedAt ?? a.createdAt).getTime();
-      const bTime = new Date(b.updatedAt ?? b.createdAt).getTime();
-      return sortOrder === 'recent' ? bTime - aTime : aTime - bTime;
-    });
+  // Get event details
+  const { data: event } = useQuery({
+    queryKey: ['event-name', eventId],
+    queryFn: async () => {
+      if (!eventId) return null;
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, name')
+        .eq('id', eventId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!eventId,
+  });
 
-  const getStatusBadgeClass = (status: WorkspaceStatus) => {
-    switch (status) {
-      case WorkspaceStatus.ACTIVE:
-        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200';
-      case WorkspaceStatus.PROVISIONING:
-        return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200';
-      case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200';
-      case WorkspaceStatus.DISSOLVED:
-      default:
-        return 'bg-muted text-muted-foreground';
+  // Auto-select first workspace if none selected
+  useEffect(() => {
+    if (!selectedWorkspaceId && workspaces && workspaces.length > 0) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaces[0].id);
+        return next;
+      }, { replace: true });
+    }
+  }, [selectedWorkspaceId, workspaces, setSearchParams]);
+
+  const canManageWorkspaces =
+    !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
+
+  const hasNoWorkspaces = !workspacesLoading && (!workspaces || workspaces.length === 0);
+
+  const handleCreateWorkspace = async () => {
+    if (!newWorkspaceName.trim()) {
+      toast.error('Please enter a workspace name');
+      return;
+    }
+    if (!eventId || !user?.id) {
+      toast.error('Missing required data');
+      return;
+    }
+
+    try {
+      const result = await provisionWorkspaceAsync({
+        name: newWorkspaceName.trim(),
+        eventId,
+        userId: user.id,
+        template: selectedTemplate,
+        organizationId: organization?.id,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['org-workspaces', organization?.id, eventId] });
+      setIsCreateDialogOpen(false);
+      setNewWorkspaceName('');
+      setSelectedTemplate(ENHANCED_WORKSPACE_TEMPLATES[0]);
+      
+      // Select the newly created workspace
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', result.rootWorkspace.id);
+        return next;
+      });
+    } catch (error) {
+      // Error already handled by the hook
     }
   };
 
-  const handleOpenWorkspace = (workspace: Workspace) => {
-    // Navigate directly to the dedicated workspace console detail page.
-    navigate(`${baseWorkspacePath}/${workspace.id}`);
+  const handleSelectWorkspace = async (workspaceId: string, _workspace?: any) => {
+    if (!orgSlug || !eventId) {
+      // Fallback to query param approach
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaceId);
+        return next;
+      });
+      return;
+    }
+
+    // Fetch event data for slug
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('slug, name')
+      .eq('id', eventId)
+      .single();
+    
+    // Fetch all workspaces for hierarchy building
+    const { data: workspacesData } = await supabase
+      .from('workspaces')
+      .select('id, name, slug, workspace_type, parent_workspace_id')
+      .eq('event_id', eventId);
+    
+    if (eventData && workspacesData) {
+      const eventSlug = eventData.slug || slugify(eventData.name);
+      const hierarchy = buildHierarchyChain(workspaceId, workspacesData.map(ws => ({
+        id: ws.id,
+        slug: ws.slug || slugify(ws.name),
+        name: ws.name,
+        workspaceType: ws.workspace_type,
+        parentWorkspaceId: ws.parent_workspace_id,
+      })));
+      
+      const newUrl = buildWorkspaceUrl(
+        { orgSlug, eventSlug, eventId, hierarchy }
+      );
+      navigate(newUrl);
+    } else {
+      // Fallback
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('workspaceId', workspaceId);
+        return next;
+      });
+    }
   };
+
+  // Log current URL context for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[OrgWorkspacePage] URL context:', { parsedUrl, currentLevel, selectedWorkspaceId });
+  }
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="space-y-2">
-        <OrganizationBreadcrumbs
-          items={[
-            {
-              label: organization?.name ?? 'Organization',
-              href: orgSlug ? `/${orgSlug}` : undefined,
-            },
-            {
-              label: 'Workspaces',
-              isCurrent: true,
-            },
-          ]}
-          className="text-xs"
-        />
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          {organization?.name ?? 'Organization workspaces'}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Use workspaces to organize collaboration around your events. Select a workspace from the list
-          to open its dedicated console with tasks, team, communication, and reports.
-        </p>
-      </header>
-
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
-        {/* Workspace list */}
-        <aside className="rounded-2xl border border-border/70 bg-card/70 p-3 sm:p-4 shadow-sm">
-          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* Page header when no workspace selected */}
+      {!selectedWorkspaceId && (
+        <header className="space-y-2">
+          <OrganizationBreadcrumbs
+            items={[
+              { label: organization?.name ?? 'Organization', href: orgSlug ? `/${orgSlug}` : undefined },
+              { label: 'Events', href: `/${orgSlug}/eventmanagement` },
+              { label: event?.name ?? 'Event', href: `/${orgSlug}/eventmanagement/${eventId}` },
+              { label: 'Workspaces', isCurrent: true },
+            ]}
+            className="text-xs"
+          />
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-sm font-medium text-foreground">Event workspaces</h2>
-              <p className="text-xs text-muted-foreground">
-                {isLoading
-                  ? 'Loading workspaces…'
-                  : workspaces && workspaces.length > 0
-                    ? `${workspaces.length} workspace${workspaces.length === 1 ? '' : 's'} linked to events`
-                    : 'No event workspaces have been created yet'}
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                {event?.name ? `${event.name} Workspaces` : 'Event Workspaces'}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Manage workspaces for this event with tasks, team, and communication.
               </p>
             </div>
-            <div className="flex w-full sm:w-auto flex-wrap items-center gap-2 justify-between sm:justify-end">
-              <div className="flex items-center gap-1">
-                <label className="sr-only" htmlFor="workspace-status-filter">
-                  Filter by status
-                </label>
-                <select
-                  id="workspace-status-filter"
-                  value={statusFilter}
-                  onChange={(e) =>
-                    setStatusFilter(e.target.value === 'ALL' ? 'ALL' : (e.target.value as WorkspaceStatus))
-                  }
-                  className="h-8 rounded-full border border-border/70 bg-card px-2 text-xs text-foreground"
-                >
-                  <option value="ALL">All statuses</option>
-                  <option value={WorkspaceStatus.ACTIVE}>Active</option>
-                  <option value={WorkspaceStatus.PROVISIONING}>Provisioning</option>
-                  <option value={WorkspaceStatus.WINDING_DOWN}>Winding down</option>
-                  <option value={WorkspaceStatus.DISSOLVED}>Dissolved</option>
-                </select>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSortOrder(sortOrder === 'recent' ? 'oldest' : 'recent')}
-                className="inline-flex items-center rounded-full border border-border/70 bg-card px-3 py-1 text-[11px] font-medium text-muted-foreground hover:bg-muted/60"
-              >
-                Sort: {sortOrder === 'recent' ? 'Newest first' : 'Oldest first'}
-              </button>
-              <a
-                href={`${baseWorkspacePath}/create`}
-                className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-              >
-                Create workspace
-              </a>
+            {canManageWorkspaces && (
+              <Button onClick={() => setIsCreateDialogOpen(true)} size="sm" className="gap-2">
+                <PlusIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">New Workspace</span>
+              </Button>
+            )}
+          </div>
+        </header>
+      )}
+
+      {/* Main content */}
+      <main className="min-h-[500px]">
+        {selectedWorkspaceId ? (
+          <WorkspaceDashboard workspaceId={selectedWorkspaceId} orgSlug={orgSlug} />
+        ) : hasNoWorkspaces ? (
+          <div className="rounded-2xl border border-border/70 bg-card/80 p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+            <TeamCollaboration size="sm" showBackground={false} />
+            <h2 className="text-lg font-semibold text-foreground mb-2 mt-4">No workspaces yet</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
+              Create your first workspace to start organizing tasks, managing your team, and coordinating communication for this event.
+            </p>
+            {canManageWorkspaces && (
+              <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2">
+                <PlusIcon className="h-4 w-4" />
+                Create Workspace
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
+            <h2 className="text-base font-semibold text-foreground mb-2">Select a workspace</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-md">
+              Choose a workspace from the sidebar to view tasks, team members, and communication.
+            </p>
+          </div>
+        )}
+      </main>
+
+      {/* Mobile workspace selector */}
+      {!hasNoWorkspaces && workspaces && workspaces.length > 0 && (
+        <div className="md:hidden">
+          <Label className="text-xs text-muted-foreground mb-1.5 block">Select Workspace</Label>
+          <select
+            value={selectedWorkspaceId || ''}
+            onChange={(e) => handleSelectWorkspace(e.target.value)}
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
+          >
+            {myWorkspaces.length > 0 && (
+              <optgroup label="My Workspaces">
+                {myWorkspaces.map((workspace: any) => (
+                  <React.Fragment key={workspace.id}>
+                    <option value={workspace.id}>{workspace.name}</option>
+                    {workspace.subWorkspaces?.map((sub: any) => (
+                      <option key={sub.id} value={sub.id}>↳ {sub.name}</option>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </optgroup>
+            )}
+            {orgWorkspaces.length > 0 && (
+              <optgroup label="Organization Workspaces">
+                {orgWorkspaces.map((workspace: any) => (
+                  <React.Fragment key={workspace.id}>
+                    <option value={workspace.id}>{workspace.name}</option>
+                    {workspace.subWorkspaces?.map((sub: any) => (
+                      <option key={sub.id} value={sub.id}>↳ {sub.name}</option>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </optgroup>
+            )}
+          </select>
+        </div>
+      )}
+
+      {/* Create Workspace Dialog with Enhanced Templates */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Create Workspace</DialogTitle>
+            <DialogDescription>
+              Create a new workspace for {event?.name || 'this event'}. Choose a template to auto-generate departments, committees, tasks, and milestones.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            {/* Workspace Name */}
+            <div className="space-y-2">
+              <Label htmlFor="workspace-name">Workspace Name</Label>
+              <Input
+                id="workspace-name"
+                placeholder="e.g., Main Operations, Event HQ"
+                value={newWorkspaceName}
+                onChange={(e) => setNewWorkspaceName(e.target.value)}
+              />
+            </div>
+
+            {/* Enhanced Template Selection */}
+            <div className="space-y-3">
+              <Label>Choose a Template</Label>
+              <WorkspaceTemplateSelector
+                selectedTemplate={selectedTemplate}
+                onSelectTemplate={setSelectedTemplate}
+              />
             </div>
           </div>
 
-          {isLoading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className="h-10 rounded-xl bg-muted/70 animate-pulse"
-                />
-              ))}
-            </div>
-          ) : !filteredWorkspaces || filteredWorkspaces.length === 0 ? (
-            <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border/80 bg-muted/40 px-3 py-4 text-xs text-muted-foreground">
-              <span>No workspaces match the current filters.</span>
-              <span>
-                Try adjusting the status filter or create a workspace from an event detail page.
-              </span>
-            </div>
-          ) : (
-            <ul className="space-y-1">
-              {filteredWorkspaces.map((workspace) => (
-                <li key={workspace.id}>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenWorkspace(workspace)}
-                    className="group flex w-full flex-col rounded-xl border border-transparent bg-muted/40 px-3 py-2 text-left transition-colors hover:border-border/70 hover:bg-muted/60"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium text-foreground">
-                        {workspace.name}
-                      </span>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${getStatusBadgeClass(
-                          workspace.status,
-                        )}`}
-                      >
-                        {workspace.status}
-                      </span>
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                      <span>
-                        Updated {new Date(workspace.updatedAt ?? workspace.createdAt).toLocaleDateString()}
-                      </span>
-                      {workspace.event && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          {workspace.event.name}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
-
-        {/* General workspace overview */}
-        <main className="min-h-[260px] rounded-2xl border border-border/70 bg-card/80 p-4 lg:p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-foreground mb-2">Workspace service overview</h2>
-          <p className="text-sm text-muted-foreground mb-4 max-w-2xl">
-            Workspaces are collaboration hubs tied to your events. Each workspace centralizes tasks,
-            team members, communication, and reports for a single event.
-          </p>
-          <ul className="mt-2 space-y-2 text-sm text-muted-foreground list-disc list-inside">
-            <li>Create a workspace directly from an event detail page.</li>
-            <li>Track preparation progress with tasks and health metrics.</li>
-            <li>Coordinate your organizing team and volunteers in one place.</li>
-          </ul>
-        </main>
-      </div>
+          <DialogFooter className="border-t border-border/50 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCreateDialogOpen(false);
+                setNewWorkspaceName('');
+                setSelectedTemplate(ENHANCED_WORKSPACE_TEMPLATES[0]);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateWorkspace}
+              disabled={isProvisioning || !newWorkspaceName.trim()}
+            >
+              {isProvisioning ? 'Creating...' : 'Create Workspace'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

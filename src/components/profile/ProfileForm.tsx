@@ -1,22 +1,28 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from './profileSchema';
+import { UsernameInput } from './UsernameInput';
 
 interface ProfileFormProps {
   initialValues: Partial<ProfileFormData>;
   onSubmit: (values: ProfileFormData) => Promise<void> | void;
   submitLabel?: string;
+  currentUsername?: string | null;
+  usernameChangedAt?: string | null;
 }
 
 export const ProfileForm: React.FC<ProfileFormProps> = ({
   initialValues,
   onSubmit,
   submitLabel = 'Save changes',
+  currentUsername,
+  usernameChangedAt,
 }) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -41,6 +47,21 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>
           )}
         </div>
+
+        {/* Username Input */}
+        <Controller
+          name="username"
+          control={control}
+          render={({ field }) => (
+            <UsernameInput
+              value={field.value || ''}
+              onChange={field.onChange}
+              currentUsername={currentUsername}
+              usernameChangedAt={usernameChangedAt}
+              error={errors.username?.message}
+            />
+          )}
+        />
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-1">Bio</label>

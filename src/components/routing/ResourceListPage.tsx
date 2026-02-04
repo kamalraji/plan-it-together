@@ -6,6 +6,7 @@ import {
   ChevronDownIcon,
   EllipsisHorizontalIcon,
 } from '@heroicons/react/24/outline';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 interface TableColumn {
   key: string;
@@ -70,6 +71,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   onRowClick,
   pageSize = 20,
 }) => {
+  const { confirm, dialogProps } = useConfirmation();
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
   const [filterValues, setFilterValues] = useState<Record<string, any>>({});
@@ -165,10 +167,16 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
     setSelectedItems(newSelected);
   };
 
-  const handleBulkAction = (action: BulkAction) => {
+  const handleBulkAction = async (action: BulkAction) => {
     const selectedData = data.filter(item => selectedItems.has(item.id));
     if (action.confirmationRequired) {
-      if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()} ${selectedItems.size} items?`)) {
+      const confirmed = await confirm({
+        title: action.label,
+        description: `Are you sure you want to ${action.label.toLowerCase()} ${selectedItems.size} items?`,
+        confirmLabel: action.label,
+        variant: action.variant === 'danger' ? 'danger' : 'warning',
+      });
+      if (confirmed) {
         action.action(selectedData);
         setSelectedItems(new Set());
       }
@@ -180,12 +188,12 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
 
   const getSortIcon = (columnKey: string) => {
     if (sortConfig?.key !== columnKey) {
-      return <ChevronUpDownIcon className="h-4 w-4 text-gray-400" />;
+      return <ChevronUpDownIcon className="h-4 w-4 text-muted-foreground" />;
     }
     return sortConfig.direction === 'asc' ? (
-      <ChevronUpIcon className="h-4 w-4 text-gray-600" />
+      <ChevronUpIcon className="h-4 w-4 text-muted-foreground" />
     ) : (
-      <ChevronDownIcon className="h-4 w-4 text-gray-600" />
+      <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
     );
   };
 
@@ -235,7 +243,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title={title}
         subtitle={subtitle}
@@ -247,15 +255,15 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Bulk Actions Bar */}
         {selectedItems.size > 0 && bulkActions.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+          <div className="bg-card border border-border rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-foreground">
                   {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
                 </span>
                 <button
                   onClick={() => setSelectedItems(new Set())}
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Clear selection
                 </button>
@@ -267,7 +275,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                     onClick={() => handleBulkAction(action)}
                     className={`inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${action.variant === 'danger'
                         ? 'border-red-300 text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500'
-                        : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500'
+                        : 'border-input text-foreground bg-card hover:bg-muted/50 focus-visible:ring-ring'
                       }`}
                   >
                     {action.icon && <action.icon className="h-4 w-4 mr-2" />}
@@ -280,16 +288,16 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
         )}
 
         {/* Data Display */}
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-card shadow rounded-lg">
           {loading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-500">Loading...</p>
+              <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
             </div>
           ) : viewType === 'table' ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted/50">
                   <tr>
                     {bulkActions.length > 0 && (
                       <th className="px-6 py-3 text-left">
@@ -297,21 +305,21 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                           type="checkbox"
                           checked={selectedItems.size === paginatedData.length && paginatedData.length > 0}
                           onChange={handleSelectAll}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                         />
                       </th>
                     )}
                     {columns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
+                        className={`px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider ${column.align === 'center' ? 'text-center' : column.align === 'right' ? 'text-right' : 'text-left'
                           }`}
                         style={{ width: column.width }}
                       >
                         {column.sortable ? (
                           <button
                             onClick={() => handleSort(column.key)}
-                            className="group inline-flex items-center space-x-1 hover:text-gray-700"
+                            className="group inline-flex items-center space-x-1 hover:text-foreground"
                           >
                             <span>{column.label}</span>
                             {getSortIcon(column.key)}
@@ -321,16 +329,16 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                         )}
                       </th>
                     ))}
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-card divide-y divide-border">
                   {paginatedData.map((item) => (
                     <tr
                       key={item.id}
-                      className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                      className={`hover:bg-muted/50 ${onRowClick ? 'cursor-pointer' : ''}`}
                       onClick={() => onRowClick?.(item)}
                     >
                       {bulkActions.length > 0 && (
@@ -340,7 +348,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                             checked={selectedItems.has(item.id)}
                             onChange={() => handleSelectItem(item.id)}
                             onClick={(e) => e.stopPropagation()}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
                           />
                         </td>
                       )}
@@ -359,7 +367,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                             e.stopPropagation();
                             // Handle row actions menu
                           }}
-                          className="text-gray-400 hover:text-gray-600"
+                          className="text-muted-foreground hover:text-muted-foreground"
                         >
                           <EllipsisHorizontalIcon className="h-5 w-5" />
                         </button>
@@ -371,7 +379,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
             </div>
           ) : (
             <div className="p-6">
-              <p className="text-gray-500 text-center">
+              <p className="text-muted-foreground text-center">
                 {viewType.charAt(0).toUpperCase() + viewType.slice(1)} view not implemented yet
               </p>
             </div>
@@ -379,26 +387,26 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div className="bg-card px-4 py-3 flex items-center justify-between border-t border-border sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative inline-flex items-center px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
               </div>
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-foreground">
                     Showing{' '}
                     <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span>
                     {' '}to{' '}
@@ -415,7 +423,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
@@ -427,7 +435,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                           onClick={() => setCurrentPage(page)}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === currentPage
                               ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              : 'bg-card border-input text-muted-foreground hover:bg-muted/50'
                             }`}
                         >
                           {page}
@@ -437,7 +445,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
@@ -448,6 +456,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
           )}
         </div>
       </div>
+      <ConfirmationDialog {...dialogProps} />
     </div>
   );
 };

@@ -44,9 +44,9 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
       case WorkspaceStatus.WINDING_DOWN:
         return { text: 'Wrapping Up', color: 'text-orange-600' };
       case WorkspaceStatus.DISSOLVED:
-        return { text: 'Completed', color: 'text-gray-600' };
+        return { text: 'Completed', color: 'text-muted-foreground' };
       default:
-        return { text: 'Unknown', color: 'text-gray-600' };
+        return { text: 'Unknown', color: 'text-muted-foreground' };
     }
   };
 
@@ -95,7 +95,7 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
         );
       default:
         return (
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
           </svg>
         );
@@ -104,27 +104,27 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
   return (
     <React.Fragment>
-      <div className="bg-white overflow-hidden shadow rounded-lg">
+      <div className="bg-card overflow-hidden shadow rounded-lg">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-medium text-gray-900">Workspace Health</h3>
+            <h3 className="text-lg font-medium text-foreground">Workspace Health</h3>
             <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${healthStatus.bgColor} ${healthStatus.color}`}>
               {healthStatus.status.charAt(0).toUpperCase() + healthStatus.status.slice(1)}
             </div>
           </div>
 
           {/* Overall Status */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-900">Workspace Status</p>
+                <p className="text-sm font-medium text-foreground">Workspace Status</p>
                 <p className={`text-lg font-semibold ${statusInfo.color}`}>
                   {statusInfo.text}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600">Since</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm text-muted-foreground">Since</p>
+                <p className="text-sm font-medium text-foreground">
                   {new Date(workspace.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -140,7 +140,7 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
                     {getTrendIcon(metric.trend)}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{metric.label}</p>
+                    <p className="text-sm font-medium text-foreground">{metric.label}</p>
                   </div>
                 </div>
                 <div className={`text-lg font-semibold ${metric.color}`}>
@@ -152,16 +152,16 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
           {/* Health Indicators */}
           {taskSummary.total > 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h4 className="text-sm font-medium text-gray-900 mb-4">Health Indicators</h4>
+            <div className="mt-6 pt-6 border-t border-border">
+              <h4 className="text-sm font-medium text-foreground mb-4">Health Indicators</h4>
               <div className="space-y-3">
                 {/* Completion Progress */}
                 <div>
-                  <div className="flex justify-between text-xs text-gray-600 mb-1">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Task Completion</span>
                     <span>{completionRate}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-300 ${completionRate > 70 ? 'bg-green-500' :
                           completionRate > 40 ? 'bg-yellow-500' : 'bg-red-500'
@@ -188,8 +188,8 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
                 {/* Team Activity */}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Team Activity</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="text-muted-foreground">Team Activity</span>
+                  <span className="font-medium text-foreground">
                     {teamSize} member{teamSize !== 1 ? 's' : ''} active
                   </span>
                 </div>
@@ -199,12 +199,12 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
           {/* Empty State */}
           {taskSummary.total === 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-              <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mt-6 pt-6 border-t border-border text-center">
+              <svg className="mx-auto h-8 w-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <p className="mt-2 text-sm text-gray-500">No tasks yet</p>
-              <p className="text-xs text-gray-400">Create tasks to see health metrics</p>
+              <p className="mt-2 text-sm text-muted-foreground">No tasks yet</p>
+              <p className="text-xs text-muted-foreground">Create tasks to see health metrics</p>
             </div>
           )}
         </div>

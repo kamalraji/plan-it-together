@@ -1,4 +1,3 @@
-// React import removed as it's not needed in React 18+
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { logging } from '@/lib/logging';

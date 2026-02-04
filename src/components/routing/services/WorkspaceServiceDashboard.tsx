@@ -1,12 +1,15 @@
-import React from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/useAuth';
 import { PageHeader } from '../PageHeader';
-import { Workspace, WorkspaceStatus } from '../../../types';
-import api from '../../../lib/api';
+import { WorkspaceStatus } from '../../../types';
 import { UserRole } from '@/types';
-import { useApiHealth } from '@/hooks/useApiHealth';
+import { supabase } from '@/integrations/supabase/client';
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
+import { ChevronDown, ChevronRight, Users, Building2, Folder, FolderOpen } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 /**
@@ -20,7 +23,8 @@ import { useApiHealth } from '@/hooks/useApiHealth';
 export const WorkspaceServiceDashboard: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const organization = useCurrentOrganization();
  
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
@@ -30,26 +34,85 @@ export const WorkspaceServiceDashboard: React.FC = () => {
   const baseWorkspacePath = isOrgContext && orgSlugCandidate
     ? `/${orgSlugCandidate}/workspaces`
     : '/dashboard/workspaces';
- 
-  const { isHealthy } = useApiHealth();
- 
-  // Fetch user's workspaces (scoped by org/event via query params when available)
-  const { data: workspaces, isLoading } = useQuery<Workspace[]>({
-    queryKey: ['user-workspaces', orgSlugCandidate, eventId],
+
+  // Fetch user's workspaces directly from Supabase (grouped by user/org)
+  const { data: workspacesData, isLoading } = useQuery({
+    queryKey: ['user-workspaces-supabase', organization?.id, eventId, user?.id],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: {
-          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
-          eventId: eventId || undefined,
-        },
-      });
-      return response.data.workspaces as Workspace[];
+      if (!user?.id) return { myWorkspaces: [], orgWorkspaces: [], allFlat: [] };
+
+      // Build query based on context
+      let query = supabase
+        .from('workspaces')
+        .select(`
+          id, name, status, created_at, updated_at, event_id, organizer_id, parent_workspace_id,
+          events!inner(id, name, organization_id),
+          workspace_team_members(user_id)
+        `)
+        .order('created_at', { ascending: false });
+
+      // If in org context, filter by organization
+      if (organization?.id) {
+        query = query.eq('events.organization_id', organization.id);
+      }
+
+      // If eventId is provided, filter by event
+      if (eventId) {
+        query = query.eq('event_id', eventId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const allWorkspaces = (data || []).map((row: any) => ({
+        id: row.id,
+        eventId: row.event_id,
+        name: row.name,
+        status: row.status as WorkspaceStatus,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        organizerId: row.organizer_id,
+        parentWorkspaceId: row.parent_workspace_id,
+        isOwner: row.organizer_id === user?.id,
+        isMember: row.workspace_team_members?.some((m: any) => m.user_id === user?.id),
+        event: row.events
+          ? {
+            id: row.events.id,
+            name: row.events.name,
+          }
+          : undefined,
+        teamMembers: row.workspace_team_members || [],
+        channels: [],
+        taskSummary: undefined,
+        description: undefined,
+      }));
+
+      // Separate into my workspaces (created or member) and organization workspaces
+      const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
+      const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
+
+      // Build hierarchy for display (root workspaces with their children)
+      const buildHierarchy = (workspaces: typeof allWorkspaces) => {
+        const roots = workspaces.filter((w) => !w.parentWorkspaceId);
+        const children = workspaces.filter((w) => w.parentWorkspaceId);
+        
+        return roots.map((root) => ({
+          ...root,
+          subWorkspaces: children.filter((c) => c.parentWorkspaceId === root.id),
+        }));
+      };
+
+      return {
+        myWorkspaces: buildHierarchy(myWorkspaces),
+        orgWorkspaces: buildHierarchy(orgWorkspaces),
+        allFlat: allWorkspaces,
+      };
     },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    enabled: isHealthy !== false,
+    enabled: !!user?.id,
   });
+
+  const workspaces = workspacesData?.allFlat || [];
 
   // Calculate dashboard metrics, optionally scoped by event
   const dashboardData = React.useMemo(() => {
@@ -78,8 +141,8 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     const provisioningWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.PROVISIONING);
     const windingDownWorkspaces = scopedWorkspaces.filter((w) => w.status === WorkspaceStatus.WINDING_DOWN);
  
-    const totalTasks = scopedWorkspaces.reduce((sum, w) => sum + (w.taskSummary?.total || 0), 0);
-    const totalTeamMembers = scopedWorkspaces.reduce((sum, w) => sum + (w.teamMembers?.length || 0), 0);
+    const totalTasks = scopedWorkspaces.reduce((sum, w: any) => sum + (w.taskSummary?.total || 0), 0);
+    const totalTeamMembers = scopedWorkspaces.reduce((sum, w: any) => sum + (w.teamMembers?.length || 0), 0);
  
     return {
       metrics: {
@@ -133,9 +196,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     ? [
         {
           label: 'Create Workspace',
-          action: () => {
-            window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`;
-          },
+          action: () => navigate(`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`),
           variant: 'primary' as const,
         },
         {
@@ -147,26 +208,151 @@ export const WorkspaceServiceDashboard: React.FC = () => {
     : [];
 
 
-  const getStatusColor = (status: WorkspaceStatus) => {
-    switch (status) {
-      case WorkspaceStatus.ACTIVE:
-        return 'bg-emerald-100 text-emerald-800';
-      case WorkspaceStatus.PROVISIONING:
-        return 'bg-amber-100 text-amber-800';
-      case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-sky-100 text-sky-800';
-      case WorkspaceStatus.DISSOLVED:
-        return 'bg-muted text-muted-foreground';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
+
+  const isWorkspacesLoading = isLoading;
+
+  // Sidebar state
+  const [myWorkspacesExpanded, setMyWorkspacesExpanded] = useState(true);
+  const [orgWorkspacesExpanded, setOrgWorkspacesExpanded] = useState(true);
+  const navigate = useNavigate();
+
+  // Helper to render workspace item in sidebar
+  const WorkspaceSidebarItem = ({ workspace, depth = 0 }: { workspace: any; depth?: number }) => {
+    const [expanded, setExpanded] = useState(true);
+    const hasChildren = workspace.subWorkspaces && workspace.subWorkspaces.length > 0;
+    
+    return (
+      <div>
+        <button
+          onClick={() => {
+            if (workspace.eventId) {
+              navigate(`${baseWorkspacePath}/${workspace.eventId}?workspaceId=${workspace.id}`);
+            } else {
+              navigate(`${baseWorkspacePath}/${workspace.id}`);
+            }
+          }}
+          className={cn(
+            "w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors text-left",
+            "text-foreground"
+          )}
+          style={{ paddingLeft: `${12 + depth * 16}px` }}
+        >
+          {hasChildren ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(!expanded);
+              }}
+              className="p-0.5 hover:bg-muted-foreground/20 rounded"
+            >
+              {expanded ? (
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
+            </button>
+          ) : (
+            <span className="w-4" />
+          )}
+          {expanded && hasChildren ? (
+            <FolderOpen className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          ) : (
+            <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          )}
+          <span className="truncate flex-1">{workspace.name}</span>
+          {workspace.isOwner && (
+            <span className="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary rounded">Owner</span>
+          )}
+        </button>
+        {hasChildren && expanded && (
+          <div>
+            {workspace.subWorkspaces.map((sub: any) => (
+              <WorkspaceSidebarItem key={sub.id} workspace={sub} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
-  const isWorkspacesLoading = isLoading && isHealthy !== false;
-
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+    <div className="flex min-h-[calc(100vh-4rem)]">
+      {/* Sidebar */}
+      <aside className="hidden lg:flex w-72 flex-col border-r border-border bg-card">
+        <ScrollArea className="flex-1 py-4">
+          {/* My Workspaces Section */}
+          <div className="px-3 mb-4">
+            <button
+              onClick={() => setMyWorkspacesExpanded(!myWorkspacesExpanded)}
+              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                <span>My Workspaces</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  {workspacesData?.myWorkspaces?.length || 0}
+                </span>
+                {myWorkspacesExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            </button>
+            {myWorkspacesExpanded && (
+              <div className="mt-1 space-y-0.5">
+                {workspacesData?.myWorkspaces?.length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-muted-foreground">No workspaces yet</p>
+                ) : (
+                  workspacesData?.myWorkspaces?.map((workspace: any) => (
+                    <WorkspaceSidebarItem key={workspace.id} workspace={workspace} />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Organization Workspaces Section */}
+          <div className="px-3">
+            <button
+              onClick={() => setOrgWorkspacesExpanded(!orgWorkspacesExpanded)}
+              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <span>Organization Workspaces</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  {workspacesData?.orgWorkspaces?.length || 0}
+                </span>
+                {orgWorkspacesExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                )}
+              </div>
+            </button>
+            {orgWorkspacesExpanded && (
+              <div className="mt-1 space-y-0.5">
+                {workspacesData?.orgWorkspaces?.length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-muted-foreground">No other workspaces</p>
+                ) : (
+                  workspacesData?.orgWorkspaces?.map((workspace: any) => (
+                    <WorkspaceSidebarItem key={workspace.id} workspace={workspace} />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-auto">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Page Header */}
         <PageHeader
           title="Workspace Management"
@@ -188,40 +374,6 @@ export const WorkspaceServiceDashboard: React.FC = () => {
         )}
 
  
-        {/* Event Filter (org-scoped) */}
-        {dashboardData && (
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">Filter by event:</span>
-            <select
-              className="border border-border rounded-md px-3 py-1.5 text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              value={eventId || ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                const params = new URLSearchParams(searchParams);
-                if (value) {
-                  params.set('eventId', value);
-                } else {
-                  params.delete('eventId');
-                }
-                setSearchParams(params);
-              }}
-            >
-              <option value="">All events</option>
-              {workspaces &&
-                Array.from(
-                  new Map(
-                    workspaces
-                      .filter((w) => w.event)
-                      .map((w) => [w.event!.id, w.event!.name] as [string, string])
-                  ).entries()
-                ).map(([id, name]) => (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                ))}
-            </select>
-          </div>
-        )}
 
         {/* Service Overview / Empty state */}
         <section>
@@ -294,200 +446,102 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
-                    {/* existing metric cards unchanged */}
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">🏗️</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Workspaces</p>
-                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalWorkspaces}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">🟢</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Workspaces</p>
-                          <p className="text-xl sm:text-2xl font-bold text-primary">{dashboardData.metrics.activeWorkspaces}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">📝</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Provisioning</p>
-                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.provisioningWorkspaces}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">⏳</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Winding Down</p>
-                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.windingDownWorkspaces}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">📋</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</p>
-                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTasks}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <span className="text-xl sm:text-2xl">👥</span>
-                        </div>
-                        <div className="ml-3 sm:ml-4">
-                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Team Members</p>
-                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTeamMembers}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                ) : null}
               </>
             )
           )}
         </section>
 
-
-        {/* Quick Actions */}
-        {dashboardData && (
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-medium text-foreground">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {dashboardData.quickActions.map((action, index) => (
-                <Link
-                  key={index}
-                  to={action.href}
-                  className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                    action.primary
-                      ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                      : 'border-border bg-card hover:bg-muted'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-3">
-                    <span className="text-xl sm:text-2xl">{action.icon}</span>
-                    <h4 className={`text-sm sm:text-base font-medium ${action.primary ? 'text-primary' : 'text-foreground'}`}>
-                      {action.title}
-                    </h4>
-                  </div>
-                  <p className={`text-xs sm:text-sm ${action.primary ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {action.description}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recent Workspaces */}
+        {/* Recent Workspaces - Innovative Card Design */}
         {dashboardData && dashboardData.recentWorkspaces.length > 0 && (
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
-              <h3 className="text-base sm:text-lg font-medium text-foreground">Recent Workspaces</h3>
+          <div className="space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-1 bg-gradient-to-b from-primary to-primary/30 rounded-full" />
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
+                  Recent Workspaces
+                </h3>
+              </div>
               <Link
                 to={`${baseWorkspacePath}/list${eventId ? `?eventId=${eventId}` : ''}`}
-                className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium"
+                className="group flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                View all workspaces →
+                <span>View all</span>
+                <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
             
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-border">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Workspace Name
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Event
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Team Size
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Last Updated
-                      </th>
-                      <th className="px-4 sm:px-6 py-3 text-left text-[11px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-background divide-y divide-border">
-                    {dashboardData.recentWorkspaces.map((workspace) => (
-                      <tr key={workspace.id} className="hover:bg-muted/60">
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">{workspace.name}</div>
-                          {workspace.description && (
-                            <div className="text-xs sm:text-sm text-muted-foreground truncate max-w-xs">
-                              {workspace.description}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-[11px] sm:text-xs font-semibold rounded-full ${getStatusColor(workspace.status)}`}>
-                            {workspace.status}
-                          </span>
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {workspace.event ? workspace.event.name : 'No event'}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {workspace.teamMembers?.length || 0} members
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                          {new Date(workspace.updatedAt).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                          <Link
-                            to={`${baseWorkspacePath}/${workspace.id}`}
-                            className="text-primary hover:text-primary/80 mr-3 sm:mr-4"
-                          >
-                            View
-                          </Link>
-                          <Link
-                            to={`${baseWorkspacePath}/${workspace.id}/tasks`}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            Tasks
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {dashboardData.recentWorkspaces.map((workspace, index) => (
+                <Link
+                  key={workspace.id}
+                  to={`${baseWorkspacePath}/${workspace.id}`}
+                  className="group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card via-card to-muted/20 p-5 transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {/* Status indicator bar */}
+                  <div className={cn(
+                    "absolute top-0 left-0 right-0 h-1 transition-all duration-300",
+                    workspace.status === WorkspaceStatus.ACTIVE && "bg-gradient-to-r from-emerald-500 to-emerald-400",
+                    workspace.status === WorkspaceStatus.PROVISIONING && "bg-gradient-to-r from-amber-500 to-amber-400",
+                    workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-gradient-to-r from-sky-500 to-sky-400",
+                    workspace.status === WorkspaceStatus.DISSOLVED && "bg-gradient-to-r from-muted-foreground/50 to-muted-foreground/30"
+                  )} />
+                  
+                  <div className="space-y-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                          {workspace.name}
+                        </h4>
+                        {workspace.event && (
+                          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                            {workspace.event.name}
+                          </p>
+                        )}
+                      </div>
+                      <span className={cn(
+                        "shrink-0 inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wide",
+                        workspace.status === WorkspaceStatus.ACTIVE && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+                        workspace.status === WorkspaceStatus.PROVISIONING && "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+                        workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+                        workspace.status === WorkspaceStatus.DISSOLVED && "bg-muted text-muted-foreground"
+                      )}>
+                        {workspace.status}
+                      </span>
+                    </div>
+                    
+                    {/* Description */}
+                    {workspace.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {workspace.description}
+                      </p>
+                    )}
+                    
+                    {/* Footer stats */}
+                    <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-3.5 w-3.5" />
+                          <span>{workspace.teamMembers?.length || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground/60">Updated</span>
+                          <span>{new Date(workspace.updatedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-xs font-medium">Open</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Hover glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                </Link>
+              ))}
             </div>
           </div>
         )}
@@ -514,6 +568,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
               <p className="text-muted-foreground">Centralized communication with messaging, announcements, and file sharing.</p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

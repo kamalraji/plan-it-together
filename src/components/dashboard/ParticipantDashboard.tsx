@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
+import { Home, ChevronRight, LayoutDashboard } from 'lucide-react';
 import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
@@ -71,7 +72,6 @@ export function ParticipantDashboard() {
     const stored = preferenceStorage.getString('organizer_summary_banner_dismissed');
     return stored !== '1';
   });
-  const [registrationsLoadTimedOut, setRegistrationsLoadTimedOut] = useState(false);
 
   const { isHealthy } = useApiHealth();
 
@@ -93,11 +93,7 @@ export function ParticipantDashboard() {
     void checkOrganizerSignup();
   }, [user]);
 
-  const {
-    data: registrations,
-    isLoading: registrationsLoading,
-    error: registrationsError,
-  } = useQuery<Registration[]>({
+  const { data: registrations, isLoading } = useQuery<Registration[]>({
     queryKey: ['participant-registrations'],
     queryFn: async () => {
       if (!user) {
@@ -105,7 +101,7 @@ export function ParticipantDashboard() {
       }
 
       // Fetch user registrations joined with events
-      const { data: rawRegistrations, error: registrationsErrorInner } = await supabase
+      const { data: rawRegistrations, error: registrationsError } = await supabase
         .from('registrations')
         .select(
           `id, status, created_at, updated_at,
@@ -113,8 +109,8 @@ export function ParticipantDashboard() {
         )
         .eq('user_id', user.id);
 
-      if (registrationsErrorInner) {
-        throw registrationsErrorInner;
+      if (registrationsError) {
+        throw registrationsError;
       }
 
       const registrationIds = (rawRegistrations ?? []).map((r: any) => r.id);
@@ -173,22 +169,7 @@ export function ParticipantDashboard() {
     refetchOnWindowFocus: false,
     enabled: isHealthy !== false,
   });
-
-  useEffect(() => {
-    if (!registrationsLoading) {
-      setRegistrationsLoadTimedOut(false);
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setRegistrationsLoadTimedOut(true);
-    }, 15000);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [registrationsLoading]);
-
+ 
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
@@ -226,6 +207,7 @@ export function ParticipantDashboard() {
   });
 
   const hasCompletedOrganizerOnboarding = !!organizerOnboardingStatus?.completed_at;
+
 
   const isProfileIncomplete = !user?.profileCompleted;
 
@@ -269,9 +251,7 @@ export function ParticipantDashboard() {
     currentPage * rowsPerPage,
   );
 
-  const showRegistrationsSpinner = registrationsLoading && !registrationsError && !registrationsLoadTimedOut;
-
-  if (showRegistrationsSpinner) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
@@ -300,11 +280,28 @@ export function ParticipantDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
-        <span className="text-muted-foreground/70">Home</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Participant Dashboard</span>
-      </div>
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <ol className="flex items-center gap-2 text-sm">
+          <li>
+            <Link 
+              to="/dashboard"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </li>
+          <li>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+          </li>
+          <li>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary font-medium">
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
 
       {/* Hero with glassmorphic profile summary */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -320,8 +317,7 @@ export function ParticipantDashboard() {
                 Participant Dashboard
               </h1>
               <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-                Welcome back{user?.name ? `, ${user.name}` : ''}. Track your event journey, certificates, and
-                profile in one place.
+                Track your event journey, certificates, and profile in one place.
               </p>
             </div>
 

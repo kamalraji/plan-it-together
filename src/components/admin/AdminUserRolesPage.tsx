@@ -8,10 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useMyOrganizations } from '@/hooks/useOrganization';
+import { VendorApprovalPanel } from './VendorApprovalPanel';
 
 // Use untyped Supabase client here because generated types are empty until DB introspection runs
 const supabaseAny = supabase as any;
@@ -41,7 +44,9 @@ export const AdminUserRolesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
+  const { data: primaryOrg } = usePrimaryOrganization();
 
   const [search, setSearch] = useState('');
   const [newUserId, setNewUserId] = useState('');
@@ -75,7 +80,7 @@ export const AdminUserRolesPage: React.FC = () => {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', window.location.origin + '/dashboard/admin/users');
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
   }, []);
 
   useEffect(() => {
@@ -84,9 +89,9 @@ export const AdminUserRolesPage: React.FC = () => {
 
     const isThittamAdmin = myOrganizations?.some((org: any) => org.slug === 'thittam1hub');
     if (!isThittamAdmin) {
-      window.location.href = '/dashboard';
+      navigate(primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard', { replace: true });
     }
-  }, [user, myOrganizations, orgsLoading]);
+  }, [user, myOrganizations, orgsLoading, navigate, primaryOrg]);
 
   const { data, isLoading } = useQuery<UserRoleRow[]>({
     queryKey: ['admin-user-roles'],
@@ -339,11 +344,10 @@ export const AdminUserRolesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent">
-            Application Role Management
+            Admin Console
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            SUPER_ADMIN users can manage entries in the secure <code className="font-mono text-xs">user_roles</code> table
-            to promote or demote organizers, judges, volunteers, and other roles. Every change requires an audit note.
+            Manage user roles, vendor applications, and other administrative tasks.
           </p>
         </div>
 
@@ -352,12 +356,24 @@ export const AdminUserRolesPage: React.FC = () => {
             This admin console is scoped to the{' '}
             <span className="font-semibold text-foreground">Thittam1Hub</span> organization.
           </span>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button asChild size="sm" variant="outline">
+              <Link to="/console/admin/roles-diagram">View role model & access matrix</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>
+            </Button>
+          </div>
         </div>
 
-        <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">
+        <Tabs defaultValue="roles" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="roles">User Roles</TabsTrigger>
+            <TabsTrigger value="vendors">Vendor Applications</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="roles" className="space-y-6">
+        <Card className="shadow-soft border-coral/20 bg-card/80 backdrop-blur-sm">
           <CardHeader className="flex flex-col gap-4">
             <CardTitle className="text-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <span>Assign Roles to Users</span>
@@ -469,7 +485,7 @@ export const AdminUserRolesPage: React.FC = () => {
                 No role assignments found.
               </div>
             ) : (
-              <div className="rounded-xl border border-border bg-white/60 overflow-hidden">
+              <div className="rounded-xl border border-border bg-card/60 overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -564,7 +580,15 @@ export const AdminUserRolesPage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="vendors" className="space-y-6">
+            <VendorApprovalPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
 };
+
+export default AdminUserRolesPage;

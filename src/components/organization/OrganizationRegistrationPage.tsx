@@ -90,13 +90,13 @@ export const OrganizationRegistrationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-cream/20 px-4">
-      <div className="max-w-2xl w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-soft border border-coral/10 p-8">
+      <div className="max-w-2xl w-full bg-card/90 backdrop-blur-sm rounded-2xl shadow-soft border border-coral/10 p-8">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-2">
               Set up your organization
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Tell us about your organization so we can personalize your organizer dashboard.
             </p>
           </div>
@@ -118,7 +118,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
         <form id="organization-onboarding-form" onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="name">
                 Organization name
               </label>
               <input
@@ -128,16 +128,16 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 required
                 value={formState.name}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral"
+                className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral"
               />
               {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="slug">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="slug">
                 URL handle
               </label>
               <div className="flex rounded-lg shadow-sm">
-                <span className="inline-flex items-center rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">
+                <span className="inline-flex items-center rounded-l-lg border border-r-0 border-input bg-muted/50 px-3 text-sm text-muted-foreground">
                   {window.location.origin}/
                 </span>
                 <input
@@ -147,18 +147,18 @@ export const OrganizationRegistrationPage: React.FC = () => {
                   required
                   value={formState.slug}
                   onChange={handleChange}
-                  className="mt-0 flex-1 rounded-r-lg border border-gray-300 focus:border-coral focus:ring-coral text-sm"
+                  className="mt-0 flex-1 rounded-r-lg border border-input focus:border-coral focus:ring-coral text-sm"
                   placeholder="your-organization"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
               {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="category">
                 Category
               </label>
               <select
@@ -166,7 +166,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 name="category"
                 value={formState.category}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
+                className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral text-sm"
               >
                 <option value="COLLEGE">College / University</option>
                 <option value="COMPANY">Company</option>
@@ -175,7 +175,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="website">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="website">
                 Website
               </label>
               <input
@@ -184,7 +184,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 type="url"
                 value={formState.website}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
+                className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral text-sm"
                 placeholder="https://example.com"
               />
             </div>
@@ -192,7 +192,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="email">
                 Contact email
               </label>
               <input
@@ -201,11 +201,11 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 type="email"
                 value={formState.email}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
+                className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="phone">
+              <label className="block text-sm font-medium text-foreground mb-1" htmlFor="phone">
                 Contact phone
               </label>
               <input
@@ -214,13 +214,13 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 type="tel"
                 value={formState.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
+                className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral text-sm"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="description">
+            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="description">
               Description
             </label>
             <textarea
@@ -229,13 +229,13 @@ export const OrganizationRegistrationPage: React.FC = () => {
               rows={4}
               value={formState.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral text-sm"
+              className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral text-sm"
               placeholder="Briefly describe your organization and the kind of events you run."
             />
           </div>
 
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pt-4">
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               <p>You can update these details later from your organization settings.</p>
             </div>
             <button
@@ -251,3 +251,5 @@ export const OrganizationRegistrationPage: React.FC = () => {
     </div>
   );
 };
+
+export default OrganizationRegistrationPage;

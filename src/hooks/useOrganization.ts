@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { organizationService, CreateOrganizationDTO, UpdateOrganizationDTO, SearchOrganizationsParams } from '@/services/organizationService';
 import { useToast } from '@/hooks/use-toast';
+import { queryPresets } from '@/lib/query-config';
 
 // Query keys
 const orgKeys = {
@@ -99,6 +100,8 @@ export function useOrganization(organizationId: string) {
     queryKey: orgKeys.detail(organizationId),
     queryFn: () => organizationService.getOrganization(organizationId),
     enabled: !!organizationId,
+    staleTime: queryPresets.static.staleTime,
+    gcTime: queryPresets.static.gcTime,
   });
 }
 
@@ -110,6 +113,8 @@ export function useOrganizationBySlug(slug: string) {
     queryKey: orgKeys.bySlug(slug),
     queryFn: () => organizationService.getOrganizationBySlug(slug),
     enabled: !!slug,
+    staleTime: queryPresets.static.staleTime,
+    gcTime: queryPresets.static.gcTime,
   });
 }
 
@@ -120,6 +125,8 @@ export function useSearchOrganizations(params: SearchOrganizationsParams) {
   return useQuery({
     queryKey: orgKeys.list(params),
     queryFn: () => organizationService.searchOrganizations(params),
+    staleTime: queryPresets.standard.staleTime,
+    gcTime: queryPresets.standard.gcTime,
   });
 }
 
@@ -134,6 +141,8 @@ export function useOrganizationEvents(
     queryKey: orgKeys.events(organizationId),
     queryFn: () => organizationService.getOrganizationEvents(organizationId, visibility),
     enabled: !!organizationId,
+    staleTime: queryPresets.standard.staleTime,
+    gcTime: queryPresets.standard.gcTime,
   });
 }
 

@@ -1,11 +1,18 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z, uuidSchema, parseAndValidate } from "../_shared/validation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Zod schema for manual check-in request (strict mode)
+const manualCheckinSchema = z.object({
+  registrationId: uuidSchema,
+  sessionId: uuidSchema.optional().nullable(),
+}).strict();
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -51,15 +58,13 @@ serve(async (req) => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
-    const { registrationId, sessionId } = body as { registrationId?: string; sessionId?: string };
-
-    if (!registrationId) {
-      return new Response(JSON.stringify({ error: "registrationId is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Parse and validate request body
+    const parseResult = await parseAndValidate(req, manualCheckinSchema, corsHeaders);
+    if (!parseResult.success) {
+      return parseResult.response;
     }
+
+    const { registrationId, sessionId } = parseResult.data;
 
     const { data: roles, error: rolesError } = await supabase
       .from("user_roles")

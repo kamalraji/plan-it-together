@@ -163,7 +163,7 @@ export const ExampleResourceListPage: React.FC = () => {
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
           value === 'Active' ? 'bg-green-100 text-green-800' :
           value === 'Published' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'
+          'bg-muted text-foreground'
         }`}>
           {value}
         </span>
@@ -380,7 +380,7 @@ export const ExamplePageHeader: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       <PageHeader
         title="Event Analytics"
         subtitle="Comprehensive analytics for your events"
@@ -392,11 +392,11 @@ export const ExamplePageHeader: React.FC = () => {
       />
       
       <div className="px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">
             {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Content
           </h3>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             This is the content for the {activeTab} tab in {viewType} view.
             {searchQuery && ` Searching for: "${searchQuery}"`}
           </p>

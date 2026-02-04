@@ -189,14 +189,14 @@ export const SupportContact: React.FC<SupportContactProps> = ({
       case 'open': return 'bg-blue-100 text-blue-800';
       case 'in_progress': return 'bg-yellow-100 text-yellow-800';
       case 'resolved': return 'bg-green-100 text-green-800';
-      case 'closed': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'closed': return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     const priorityObj = priorities.find(p => p.value === priority);
-    return priorityObj?.color || 'text-gray-600';
+    return priorityObj?.color || 'text-muted-foreground';
   };
 
   React.useEffect(() => {
@@ -205,10 +205,10 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+      <div className="bg-card rounded-lg border border-border p-8 text-center">
         <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Ticket Submitted Successfully!</h2>
-        <p className="text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold text-foreground mb-2">Ticket Submitted Successfully!</h2>
+        <p className="text-muted-foreground mb-6">
           We've received your support request and will get back to you soon. 
           You can track the progress of your ticket below.
         </p>
@@ -224,13 +224,13 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
   if (showTicketForm) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-card rounded-lg border border-border">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Submit Support Ticket</h2>
+            <h2 className="text-lg font-semibold text-foreground">Submit Support Ticket</h2>
             <button
               onClick={() => setShowTicketForm(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-muted-foreground"
             >
               ×
             </button>
@@ -240,7 +240,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
         <form onSubmit={handleSubmitTicket} className="p-6 space-y-6">
           {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Subject *
             </label>
             <input
@@ -248,7 +248,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
               required
               value={ticketForm.subject}
               onChange={(e) => setTicketForm(prev => ({ ...prev, subject: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
               placeholder="Brief description of your issue"
             />
           </div>
@@ -256,13 +256,13 @@ export const SupportContact: React.FC<SupportContactProps> = ({
           {/* Category and Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Category
               </label>
               <select
                 value={ticketForm.category}
                 onChange={(e) => setTicketForm(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
               >
                 {categories.map(category => (
                   <option key={category.value} value={category.value}>
@@ -273,13 +273,13 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Priority
               </label>
               <select
                 value={ticketForm.priority}
                 onChange={(e) => setTicketForm(prev => ({ ...prev, priority: e.target.value as any }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
               >
                 {priorities.map(priority => (
                   <option key={priority.value} value={priority.value}>
@@ -292,7 +292,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Description *
             </label>
             <textarea
@@ -300,17 +300,17 @@ export const SupportContact: React.FC<SupportContactProps> = ({
               rows={6}
               value={ticketForm.description}
               onChange={(e) => setTicketForm(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
               placeholder="Please provide as much detail as possible about your issue..."
             />
           </div>
 
           {/* File Attachments */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Attachments
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+            <div className="border-2 border-dashed border-input rounded-lg p-4">
               <input
                 type="file"
                 multiple
@@ -321,12 +321,12 @@ export const SupportContact: React.FC<SupportContactProps> = ({
               />
               <label
                 htmlFor="file-upload"
-                className="cursor-pointer flex items-center justify-center space-x-2 text-gray-600 hover:text-gray-800"
+                className="cursor-pointer flex items-center justify-center space-x-2 text-muted-foreground hover:text-foreground"
               >
                 <Paperclip className="w-5 h-5" />
                 <span>Click to attach files or drag and drop</span>
               </label>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Supported formats: JPG, PNG, PDF, DOC, TXT (max 10MB each)
               </p>
             </div>
@@ -335,8 +335,8 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             {ticketForm.attachments.length > 0 && (
               <div className="mt-3 space-y-2">
                 {ticketForm.attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{file.name}</span>
+                  <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                    <span className="text-sm text-foreground">{file.name}</span>
                     <button
                       type="button"
                       onClick={() => removeAttachment(index)}
@@ -355,7 +355,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             <button
               type="button"
               onClick={() => setShowTicketForm(false)}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-foreground border border-input rounded-lg hover:bg-muted/50"
             >
               Cancel
             </button>
@@ -366,7 +366,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             >
               {submitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background mr-2"></div>
                   Submitting...
                 </>
               ) : (
@@ -385,22 +385,22 @@ export const SupportContact: React.FC<SupportContactProps> = ({
   return (
     <div className="space-y-6">
       {/* Contact Methods */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Get in Touch</h2>
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Get in Touch</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {contactMethods.map((method) => {
             const Icon = method.icon;
             return (
               <div
                 key={method.id}
-                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                className="border border-border rounded-lg p-4 hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-center mb-3">
                   <Icon className="w-6 h-6 text-blue-600 mr-3" />
-                  <h3 className="font-medium text-gray-900">{method.name}</h3>
+                  <h3 className="font-medium text-foreground">{method.name}</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">{method.description}</p>
-                <div className="space-y-1 text-xs text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground mb-3">{method.description}</p>
+                <div className="space-y-1 text-xs text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {method.availability}
@@ -440,17 +440,17 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
       {/* My Tickets */}
       {myTickets.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">My Support Tickets</h2>
+        <div className="bg-card rounded-lg border border-border">
+          <div className="p-6 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">My Support Tickets</h2>
           </div>
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-border">
             {myTickets.map((ticket) => (
               <div key={ticket.id} className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="font-medium text-gray-900">{ticket.subject}</h3>
+                      <h3 className="font-medium text-foreground">{ticket.subject}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(ticket.status)}`}>
                         {ticket.status.replace('_', ' ')}
                       </span>
@@ -458,8 +458,8 @@ export const SupportContact: React.FC<SupportContactProps> = ({
                         {ticket.priority.toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{ticket.description}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <p className="text-sm text-muted-foreground mb-2">{ticket.description}</p>
+                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                       <span>Ticket #{ticket.id}</span>
                       <span>Created {new Date(ticket.createdAt).toLocaleDateString()}</span>
                       <span>Updated {new Date(ticket.updatedAt).toLocaleDateString()}</span>
@@ -476,11 +476,11 @@ export const SupportContact: React.FC<SupportContactProps> = ({
       )}
 
       {/* Support Resources */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Resources</h2>
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Additional Resources</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
-            <h3 className="font-medium text-gray-900">Self-Service Options</h3>
+            <h3 className="font-medium text-foreground">Self-Service Options</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a href="#" className="text-blue-600 hover:text-blue-800">
@@ -500,7 +500,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             </ul>
           </div>
           <div className="space-y-3">
-            <h3 className="font-medium text-gray-900">Community</h3>
+            <h3 className="font-medium text-foreground">Community</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a href="#" className="text-blue-600 hover:text-blue-800">

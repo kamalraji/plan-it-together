@@ -19,7 +19,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
             <div className="flex items-center">
               {index > 0 && (
                 <svg
-                  className="flex-shrink-0 h-4 w-4 text-gray-400 mr-4"
+                  className="flex-shrink-0 h-4 w-4 text-muted-foreground mr-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -35,14 +35,14 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
               {item.href && !item.current ? (
                 <Link
                   to={item.href}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
                   className={`text-sm font-medium ${
-                    item.current ? 'text-gray-900' : 'text-gray-500'
+                    item.current ? 'text-foreground' : 'text-muted-foreground'
                   }`}
                   aria-current={item.current ? 'page' : undefined}
                 >

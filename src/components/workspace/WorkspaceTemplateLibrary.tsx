@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { WorkspaceTemplate } from '../../types/workspace-template';
 import api from '../../lib/api';
+import { ThinkingPerson } from '@/components/illustrations';
 
 interface WorkspaceTemplateLibraryProps {
   onTemplateSelect?: (template: WorkspaceTemplate) => void;
@@ -108,7 +109,7 @@ export function WorkspaceTemplateLibrary({
       case 'COMPLEX':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -136,7 +137,7 @@ export function WorkspaceTemplateLibrary({
           <svg
             key={star}
             className={`h-4 w-4 ${
-              star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              star <= rating ? 'text-yellow-400' : 'text-muted-foreground/70'
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -144,7 +145,7 @@ export function WorkspaceTemplateLibrary({
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
         ))}
-        <span className="ml-1 text-sm text-gray-600">({rating.toFixed(1)})</span>
+        <span className="ml-1 text-sm text-muted-foreground">({rating.toFixed(1)})</span>
       </div>
     );
   };
@@ -179,36 +180,36 @@ export function WorkspaceTemplateLibrary({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Workspace Templates</h2>
-          <p className="text-gray-600">Choose from proven workspace structures for your event</p>
+          <h2 className="text-2xl font-bold text-foreground">Workspace Templates</h2>
+          <p className="text-muted-foreground">Choose from proven workspace structures for your event</p>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           {filteredTemplates.length} of {templates.length} templates
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+      <div className="bg-card p-4 rounded-lg shadow border border-border">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Search</label>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search templates..."
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             />
           </div>
 
           {/* Category Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Category</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             >
               <option value="ALL">All Categories</option>
               <option value="CONFERENCE">Conference</option>
@@ -222,11 +223,11 @@ export function WorkspaceTemplateLibrary({
 
           {/* Complexity Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Complexity</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Complexity</label>
             <select
               value={selectedComplexity}
               onChange={(e) => setSelectedComplexity(e.target.value)}
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             >
               <option value="ALL">All Levels</option>
               <option value="SIMPLE">Simple</option>
@@ -237,11 +238,11 @@ export function WorkspaceTemplateLibrary({
 
           {/* Sort By */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Sort By</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
             >
               <option value="rating">Rating</option>
               <option value="usage">Most Used</option>
@@ -257,7 +258,7 @@ export function WorkspaceTemplateLibrary({
         {filteredTemplates.map((template) => (
           <div
             key={template.id}
-            className="bg-white rounded-lg shadow border border-gray-200 hover:shadow-md transition-shadow"
+            className="bg-card rounded-lg shadow border border-border hover:shadow-md transition-shadow"
           >
             <div className="p-6">
               {/* Header */}
@@ -265,8 +266,8 @@ export function WorkspaceTemplateLibrary({
                 <div className="flex items-center">
                   <span className="text-2xl mr-2">{getCategoryIcon(template.category)}</span>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{template.name}</h3>
-                    <p className="text-sm text-gray-500">{template.category}</p>
+                    <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
+                    <p className="text-sm text-muted-foreground">{template.category}</p>
                   </div>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(template.complexity)}`}>
@@ -275,28 +276,28 @@ export function WorkspaceTemplateLibrary({
               </div>
 
               {/* Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">{template.description}</p>
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{template.description}</p>
 
               {/* Stats */}
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Team Size:</span>
-                  <span className="text-gray-900">{template.eventSizeMin}-{template.eventSizeMax} people</span>
+                  <span className="text-muted-foreground">Team Size:</span>
+                  <span className="text-foreground">{template.eventSizeMin}-{template.eventSizeMax} people</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Used:</span>
-                  <span className="text-gray-900">{template.usageCount} times</span>
+                  <span className="text-muted-foreground">Used:</span>
+                  <span className="text-foreground">{template.usageCount} times</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Rating:</span>
+                  <span className="text-muted-foreground">Rating:</span>
                   {renderStars(template.averageRating)}
                 </div>
               </div>
 
               {/* Structure Preview */}
               {template.structure && (
-                <div className="bg-gray-50 rounded-md p-3 mb-4">
-                  <div className="text-xs text-gray-600 space-y-1">
+                <div className="bg-muted/50 rounded-md p-3 mb-4">
+                  <div className="text-xs text-muted-foreground space-y-1">
                     <div>Roles: {template.structure.roles?.length || 0}</div>
                     <div>Task Categories: {template.structure.taskCategories?.length || 0}</div>
                     <div>Channels: {template.structure.channels?.length || 0}</div>
@@ -310,7 +311,7 @@ export function WorkspaceTemplateLibrary({
                   {onTemplatePreview && (
                     <button
                       onClick={() => onTemplatePreview(template)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      className="flex-1 px-3 py-2 border border-input rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted/50"
                     >
                       Preview
                     </button>
@@ -332,22 +333,10 @@ export function WorkspaceTemplateLibrary({
 
       {/* Empty State */}
       {filteredTemplates.length === 0 && (
-        <div className="text-center py-12">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No templates found</h3>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="text-center py-12 flex flex-col items-center">
+          <ThinkingPerson size="sm" showBackground={false} />
+          <h3 className="mt-4 text-sm font-medium text-foreground">No templates found</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Try adjusting your filters or search terms.
           </p>
         </div>

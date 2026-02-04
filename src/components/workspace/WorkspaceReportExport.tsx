@@ -85,7 +85,11 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
   const currentMember = teamMembers?.find((member) => member.userId === user?.id);
   const managerWorkspaceRoles: WorkspaceRole[] = [
     WorkspaceRole.WORKSPACE_OWNER,
-    WorkspaceRole.TEAM_LEAD,
+    WorkspaceRole.OPERATIONS_MANAGER,
+    WorkspaceRole.GROWTH_MANAGER,
+    WorkspaceRole.CONTENT_MANAGER,
+    WorkspaceRole.TECH_FINANCE_MANAGER,
+    WorkspaceRole.VOLUNTEERS_MANAGER,
     WorkspaceRole.EVENT_COORDINATOR,
   ];
   const isWorkspaceManager = currentMember
@@ -279,24 +283,24 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
           {REPORT_TEMPLATES.map((template) => (
             <div
               key={template.id}
-              className={`relative rounded-lg border p-4 cursor-pointer hover:bg-gray-50 ${
+              className={`relative rounded-lg border p-4 cursor-pointer hover:bg-muted/50 ${
                 selectedTemplate.id === template.id
                   ? 'border-indigo-500 ring-2 ring-indigo-500'
-                  : 'border-gray-300'
+                  : 'border-input'
               }`}
               onClick={() => handleTemplateChange(template)}
             >
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
                 <div className="ml-3 flex-1">
-                  <h4 className="text-sm font-medium text-gray-900">{template.name}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{template.description}</p>
+                  <h4 className="text-sm font-medium text-foreground">{template.name}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
                   <div className="mt-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-muted text-foreground">
                       Default: {template.defaultFormat}
                     </span>
                   </div>
@@ -315,15 +319,15 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
       </div>
 
       {/* Report Configuration */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Report Configuration</h3>
+      <div className="bg-card shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">Report Configuration</h3>
         
         {/* Date Range */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Date Range</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Date Range</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="startDate" className="block text-sm font-medium text-foreground">
                 Start Date
               </label>
               <input
@@ -334,11 +338,11 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                   ...prev,
                   dateRange: { ...prev.dateRange, startDate: e.target.value }
                 }))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="endDate" className="block text-sm font-medium text-foreground">
                 End Date
               </label>
               <input
@@ -349,7 +353,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                   ...prev,
                   dateRange: { ...prev.dateRange, endDate: e.target.value }
                 }))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary sm:text-sm"
               />
             </div>
           </div>
@@ -357,7 +361,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
 
         {/* Format Selection */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Export Format</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Export Format</h4>
           <div className="flex space-x-4">
             <label className="flex items-center">
               <input
@@ -366,9 +370,9 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 value="PDF"
                 checked={reportOptions.format === 'PDF'}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, format: e.target.value as 'PDF' | 'CSV' }))}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input"
               />
-              <span className="ml-2 text-sm text-gray-700">PDF (Formatted Report)</span>
+              <span className="ml-2 text-sm text-foreground">PDF (Formatted Report)</span>
             </label>
             <label className="flex items-center">
               <input
@@ -377,16 +381,16 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 value="CSV"
                 checked={reportOptions.format === 'CSV'}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, format: e.target.value as 'PDF' | 'CSV' }))}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input"
               />
-              <span className="ml-2 text-sm text-gray-700">CSV (Data Export)</span>
+              <span className="ml-2 text-sm text-foreground">CSV (Data Export)</span>
             </label>
           </div>
         </div>
 
         {/* Section Selection */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Include Sections</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Include Sections</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {selectedTemplate.sections.map((section) => (
               <label key={section} className="flex items-center">
@@ -394,9 +398,9 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                   type="checkbox"
                   checked={reportOptions.includeSections.includes(section)}
                   onChange={() => handleSectionToggle(section)}
-                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                  className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">{getSectionDisplayName(section)}</span>
+                <span className="ml-2 text-sm text-foreground">{getSectionDisplayName(section)}</span>
               </label>
             ))}
           </div>
@@ -404,25 +408,25 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
 
         {/* Additional Options */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Additional Options</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Additional Options</h4>
           <div className="space-y-3">
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={reportOptions.includeCharts}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, includeCharts: e.target.checked }))}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
               />
-              <span className="ml-2 text-sm text-gray-700">Include Charts and Visualizations</span>
+              <span className="ml-2 text-sm text-foreground">Include Charts and Visualizations</span>
             </label>
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={reportOptions.includeRawData}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, includeRawData: e.target.checked }))}
-                className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
               />
-              <span className="ml-2 text-sm text-gray-700">Include Raw Data Tables</span>
+              <span className="ml-2 text-sm text-foreground">Include Raw Data Tables</span>
             </label>
           </div>
         </div>
@@ -480,14 +484,14 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
 
       {/* Scheduled Reports */}
       {scheduledReports.length > 0 && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Scheduled Reports</h3>
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">Scheduled Reports</h3>
           <div className="space-y-3">
             {scheduledReports.map((report, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{report.templateName}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium text-foreground">{report.templateName}</p>
+                  <p className="text-sm text-muted-foreground">
                     {report.frequency} • Next run: {new Date(report.nextRun).toLocaleDateString()}
                   </p>
                 </div>

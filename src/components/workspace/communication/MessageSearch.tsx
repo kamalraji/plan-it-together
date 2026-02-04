@@ -81,8 +81,8 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Search Messages</h3>
-        <p className="text-gray-600">
+        <h3 className="text-lg font-medium text-foreground mb-2">Search Messages</h3>
+        <p className="text-muted-foreground">
           Search through all workspace messages and conversations.
         </p>
       </div>
@@ -91,7 +91,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
       <form onSubmit={handleSearch} className="mb-6">
         <div className="flex space-x-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Search query
             </label>
             <input
@@ -99,18 +99,18 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for messages, keywords, or phrases..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
             />
           </div>
 
           <div className="w-64">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Channel (optional)
             </label>
             <select
               value={selectedChannelId}
               onChange={(e) => setSelectedChannelId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
             >
               <option value="">All channels</option>
               {channels.map((channel) => (
@@ -129,7 +129,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background"></div>
                   <span>Searching...</span>
                 </>
               ) : (
@@ -148,14 +148,14 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
         {isLoading && (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Searching messages...</p>
+            <p className="text-muted-foreground">Searching messages...</p>
           </div>
         )}
 
         {hasSearched && !isLoading && (
           <>
             <div className="mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {searchResults.length > 0 ? (
                   <>
                     Found {searchResults.length} message{searchResults.length !== 1 ? 's' : ''} 
@@ -181,17 +181,17 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
             </div>
 
             {searchResults.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <div className="text-gray-400 text-4xl mb-4">🔍</div>
-                <p className="text-gray-600 mb-2">No messages found</p>
-                <p className="text-gray-500 text-sm">
+              <div className="text-center py-12 bg-muted/50 rounded-lg">
+                <div className="text-muted-foreground text-4xl mb-4">🔍</div>
+                <p className="text-muted-foreground mb-2">No messages found</p>
+                <p className="text-muted-foreground text-sm">
                   Try different keywords or search in all channels
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {searchResults.map((message) => (
-                  <div key={message.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={message.id} className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {message.senderId.charAt(0).toUpperCase()}
@@ -199,23 +199,23 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-foreground">
                             User {message.senderId.slice(-4)}
                           </span>
-                          <span className="text-gray-400">in</span>
+                          <span className="text-muted-foreground">in</span>
                           <div className="flex items-center space-x-1">
                             <span>{getChannelIcon(message.channelId)}</span>
                             <span className="text-indigo-600 font-medium">
                               {getChannelName(message.channelId)}
                             </span>
                           </div>
-                          <span className="text-gray-400">•</span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-sm text-muted-foreground">
                             {formatMessageTime(message.sentAt)}
                           </span>
                         </div>
                         
-                        <div className="text-gray-700 leading-relaxed">
+                        <div className="text-foreground leading-relaxed">
                           {message.content.startsWith('**Task Update**:') ? (
                             <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
                               <div className="flex items-center space-x-2 mb-1">
@@ -233,7 +233,7 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
                           <div className="mt-3 space-y-2">
                             {message.attachments.map((attachment, idx) => (
                               <div key={idx} className="flex items-center space-x-2 text-sm">
-                                <span className="text-gray-500 text-xs uppercase">Attachment</span>
+                                <span className="text-muted-foreground text-xs uppercase">Attachment</span>
                                 <a
                                   href={attachment.url}
                                   target="_blank"
@@ -256,10 +256,10 @@ export function MessageSearch({ workspaceId, channels }: MessageSearchProps) {
         )}
 
         {!hasSearched && (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <div className="text-gray-400 text-sm mb-2 uppercase tracking-wide">Search messages</div>
-            <p className="text-gray-600 mb-2">Search workspace messages</p>
-            <p className="text-gray-500 text-sm">
+          <div className="text-center py-12 bg-muted/50 rounded-lg">
+            <div className="text-muted-foreground text-sm mb-2 uppercase tracking-wide">Search messages</div>
+            <p className="text-muted-foreground mb-2">Search workspace messages</p>
+            <p className="text-muted-foreground text-sm">
               Enter keywords to find messages across all channels
             </p>
           </div>

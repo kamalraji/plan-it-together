@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import type { Tables } from '@/integrations/supabase/types';
+import { USER_PROFILE_COLUMNS } from '@/lib/supabase-columns';
 
 export type UserProfileRow = Tables<'user_profiles'>;
 
@@ -32,7 +33,7 @@ export function useUserProfile() {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('*')
+        .select(USER_PROFILE_COLUMNS.detail)
         .eq('id', user.id)
         .maybeSingle();
 
@@ -62,7 +63,7 @@ export function useUserProfile() {
           .from('user_profiles')
           .update(updates)
           .eq('id', user.id)
-          .select('*')
+          .select(USER_PROFILE_COLUMNS.detail)
           .maybeSingle();
 
         if (error) {

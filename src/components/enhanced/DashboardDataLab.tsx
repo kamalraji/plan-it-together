@@ -270,8 +270,8 @@ export const DashboardDataLab: React.FC = () => {
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <header className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Data Lab: Workspaces & Marketplace</h1>
-          <p className="text-gray-600 text-sm max-w-2xl">
+          <h1 className="text-2xl font-bold text-foreground">Data Lab: Workspaces & Marketplace</h1>
+          <p className="text-muted-foreground text-sm max-w-2xl">
             Create a few workspaces, services, and bookings for your account so the main dashboard metrics
             show real activity instead of zeros.
           </p>
@@ -289,17 +289,17 @@ export const DashboardDataLab: React.FC = () => {
         )}
 
         {/* Workspaces */}
-        <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <section className="bg-card rounded-xl border border-border p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Workspaces</h2>
-            <p className="text-sm text-gray-500">Active workspaces power the workspace card on /dashboard.</p>
+            <h2 className="text-lg font-semibold text-foreground">Workspaces</h2>
+            <p className="text-sm text-muted-foreground">Active workspaces power the workspace card on /dashboard.</p>
           </div>
 
           <form onSubmit={handleCreateWorkspace} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Event</label>
               <select
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-coral focus:border-coral"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-coral focus:border-coral"
                 value={workspaceForm.eventId}
                 onChange={(e) => setWorkspaceForm((prev) => ({ ...prev, eventId: e.target.value }))}
               >
@@ -312,10 +312,10 @@ export const DashboardDataLab: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Workspace name</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Workspace name</label>
               <input
                 type="text"
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-coral focus:border-coral"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-coral focus:border-coral"
                 placeholder="Backstage crew, Registration ops..."
                 value={workspaceForm.name}
                 onChange={(e) => setWorkspaceForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -329,15 +329,15 @@ export const DashboardDataLab: React.FC = () => {
             </button>
           </form>
 
-          <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Your workspaces</h3>
+          <div className="border-t border-border pt-4">
+            <h3 className="text-sm font-medium text-foreground mb-2">Your workspaces</h3>
             {workspaces && workspaces.length > 0 ? (
-              <ul className="divide-y divide-gray-100 text-sm">
+              <ul className="divide-y divide-border text-sm">
                 {workspaces.map((ws: any) => (
                   <li key={ws.id} className="flex items-center justify-between py-2">
                     <div>
-                      <div className="font-medium text-gray-900">{ws.name}</div>
-                      <div className="text-gray-500 text-xs">Status: {ws.status}</div>
+                      <div className="font-medium text-foreground">{ws.name}</div>
+                      <div className="text-muted-foreground text-xs">Status: {ws.status}</div>
                     </div>
                     <button
                       type="button"
@@ -350,34 +350,34 @@ export const DashboardDataLab: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">No workspaces yet. Create one above to get started.</p>
+              <p className="text-sm text-muted-foreground">No workspaces yet. Create one above to get started.</p>
             )}
           </div>
         </section>
 
         {/* Services */}
-        <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <section className="bg-card rounded-xl border border-border p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Marketplace services</h2>
-            <p className="text-sm text-gray-500">Active services power the marketplace card.</p>
+            <h2 className="text-lg font-semibold text-foreground">Marketplace services</h2>
+            <p className="text-sm text-muted-foreground">Active services power the marketplace card.</p>
           </div>
 
           <form onSubmit={handleCreateService} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Service name</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Service name</label>
               <input
                 type="text"
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
                 placeholder="Photography, Catering..."
                 value={serviceForm.name}
                 onChange={(e) => setServiceForm((prev) => ({ ...prev, name: e.target.value }))}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Category</label>
               <input
                 type="text"
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
                 placeholder="CATERING, VENUE, AV..."
                 value={serviceForm.category}
                 onChange={(e) => setServiceForm((prev) => ({ ...prev, category: e.target.value }))}
@@ -385,12 +385,12 @@ export const DashboardDataLab: React.FC = () => {
             </div>
             <div className="flex items-end space-x-2">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Base price</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Base price</label>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
+                  className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal focus:border-teal"
                   placeholder="2500"
                   value={serviceForm.basePrice}
                   onChange={(e) => setServiceForm((prev) => ({ ...prev, basePrice: e.target.value }))}
@@ -405,15 +405,15 @@ export const DashboardDataLab: React.FC = () => {
             </div>
           </form>
 
-          <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Your services</h3>
+          <div className="border-t border-border pt-4">
+            <h3 className="text-sm font-medium text-foreground mb-2">Your services</h3>
             {services && services.length > 0 ? (
-              <ul className="divide-y divide-gray-100 text-sm">
+              <ul className="divide-y divide-border text-sm">
                 {services.map((s: any) => (
                   <li key={s.id} className="flex items-center justify-between py-2">
                     <div>
-                      <div className="font-medium text-gray-900">{s.name}</div>
-                      <div className="text-gray-500 text-xs">
+                      <div className="font-medium text-foreground">{s.name}</div>
+                      <div className="text-muted-foreground text-xs">
                         {s.category} • ${Number(s.base_price ?? 0).toLocaleString()}
                       </div>
                     </div>
@@ -428,23 +428,23 @@ export const DashboardDataLab: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">No services yet. Create one above to seed the marketplace.</p>
+              <p className="text-sm text-muted-foreground">No services yet. Create one above to seed the marketplace.</p>
             )}
           </div>
         </section>
 
         {/* Bookings */}
-        <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <section className="bg-card rounded-xl border border-border p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Bookings & revenue</h2>
-            <p className="text-sm text-gray-500">Bookings and completed amounts drive active bookings and revenue metrics.</p>
+            <h2 className="text-lg font-semibold text-foreground">Bookings & revenue</h2>
+            <p className="text-sm text-muted-foreground">Bookings and completed amounts drive active bookings and revenue metrics.</p>
           </div>
 
           <form onSubmit={handleCreateBooking} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Service</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Service</label>
               <select
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
                 value={bookingForm.serviceId}
                 onChange={(e) => setBookingForm((prev) => ({ ...prev, serviceId: e.target.value }))}
               >
@@ -457,21 +457,21 @@ export const DashboardDataLab: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Amount</label>
               <input
                 type="number"
                 min="0"
                 step="0.01"
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
                 placeholder="2500"
                 value={bookingForm.amount}
                 onChange={(e) => setBookingForm((prev) => ({ ...prev, amount: e.target.value }))}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Status</label>
               <select
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
+                className="block w-full rounded-md border border-input px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sunny focus:border-sunny"
                 value={bookingForm.status}
                 onChange={(e) => setBookingForm((prev) => ({ ...prev, status: e.target.value }))}
               >
@@ -489,15 +489,15 @@ export const DashboardDataLab: React.FC = () => {
             </button>
           </form>
 
-          <div className="border-t border-gray-100 pt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Your bookings</h3>
+          <div className="border-t border-border pt-4">
+            <h3 className="text-sm font-medium text-foreground mb-2">Your bookings</h3>
             {bookings && bookings.length > 0 ? (
-              <ul className="divide-y divide-gray-100 text-sm">
+              <ul className="divide-y divide-border text-sm">
                 {bookings.map((b: any) => (
                   <li key={b.id} className="flex items-center justify-between py-2">
                     <div>
-                      <div className="font-medium text-gray-900">${Number(b.amount ?? 0).toLocaleString()}</div>
-                      <div className="text-gray-500 text-xs">Status: {b.status}</div>
+                      <div className="font-medium text-foreground">${Number(b.amount ?? 0).toLocaleString()}</div>
+                      <div className="text-muted-foreground text-xs">Status: {b.status}</div>
                     </div>
                     <button
                       type="button"
@@ -510,7 +510,7 @@ export const DashboardDataLab: React.FC = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">No bookings yet. Create at least one completed booking to see revenue.</p>
+              <p className="text-sm text-muted-foreground">No bookings yet. Create at least one completed booking to see revenue.</p>
             )}
           </div>
         </section>

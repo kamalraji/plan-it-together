@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
-import BookingManagementUI from '../../marketplace/BookingManagementUI';
+import OrganizerBookingsManager from '../../organizer/OrganizerBookingsManager';
 
 /**
  * BookingListPage provides AWS-style booking management interface for the marketplace.
@@ -15,18 +15,19 @@ import BookingManagementUI from '../../marketplace/BookingManagementUI';
  */
 export const BookingListPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId?: string }>();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const pageActions = [
     {
       label: 'Browse Services',
-      action: () => { window.location.href = '/console/marketplace/services'; },
+      action: () => navigate('/console/marketplace/services'),
       icon: MagnifyingGlassIcon,
       variant: 'primary' as const,
     },
     {
       label: 'Vendor Dashboard',
-      action: () => { window.location.href = '/console/marketplace/vendors'; },
+      action: () => navigate('/console/marketplace/vendors'),
       icon: BuildingStorefrontIcon,
       variant: 'secondary' as const,
     },
@@ -101,7 +102,7 @@ export const BookingListPage: React.FC = () => {
                 { status: 'QUOTE_SENT', label: 'Quote Sent', color: 'bg-blue-100 text-blue-800', icon: '💰' },
                 { status: 'CONFIRMED', label: 'Confirmed', color: 'bg-green-100 text-green-800', icon: '✅' },
                 { status: 'IN_PROGRESS', label: 'In Progress', color: 'bg-purple-100 text-purple-800', icon: '🔄' },
-                { status: 'COMPLETED', label: 'Completed', color: 'bg-gray-100 text-gray-800', icon: '🎉' },
+                { status: 'COMPLETED', label: 'Completed', color: 'bg-muted text-foreground', icon: '🎉' },
               ].map((item) => (
                 <button
                   key={item.status}
@@ -109,7 +110,7 @@ export const BookingListPage: React.FC = () => {
                   className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
                     statusFilter === item.status
                       ? 'border-blue-300 bg-blue-50'
-                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                      : 'border-border bg-card hover:bg-muted/50'
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-2">
@@ -125,28 +126,28 @@ export const BookingListPage: React.FC = () => {
         )}
 
         {/* Booking Management Interface */}
-        <div className="bg-white rounded-lg border border-gray-200">
-          <BookingManagementUI eventId={undefined} />
+        <div className="rounded-lg">
+          <OrganizerBookingsManager />
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Booking Management Tips</h3>
-          <p className="text-gray-600 mb-4">
+        <div className="mt-8 bg-muted/50 rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-2">Booking Management Tips</h3>
+          <p className="text-muted-foreground mb-4">
             Manage your service bookings effectively to ensure smooth event planning and vendor coordination.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">📋 Track Status</h4>
-              <p className="text-gray-600">Monitor booking progress from initial request to completion.</p>
+              <h4 className="font-medium text-foreground mb-1">📋 Track Status</h4>
+              <p className="text-muted-foreground">Monitor booking progress from initial request to completion.</p>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">💬 Communicate</h4>
-              <p className="text-gray-600">Use the built-in messaging system to coordinate with vendors.</p>
+              <h4 className="font-medium text-foreground mb-1">💬 Communicate</h4>
+              <p className="text-muted-foreground">Use the built-in messaging system to coordinate with vendors.</p>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">⭐ Review</h4>
-              <p className="text-gray-600">Leave reviews after service completion to help other organizers.</p>
+              <h4 className="font-medium text-foreground mb-1">⭐ Review</h4>
+              <p className="text-muted-foreground">Leave reviews after service completion to help other organizers.</p>
             </div>
           </div>
         </div>
