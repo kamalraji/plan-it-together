@@ -487,6 +487,27 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     ? 'bg-white'
     : 'bg-indigo-50';
 
+  const getWorkspaceDeepLink = () => {
+    const metadata: any = (notification as any).metadata;
+    if (!metadata) return undefined;
+
+    const eventId = metadata.eventId as string | undefined;
+    const workspaceId = metadata.workspaceId as string | undefined;
+    const taskId = metadata.taskId as string | undefined;
+
+    if (!eventId) return undefined;
+
+    const params = new URLSearchParams();
+    if (workspaceId) params.set('workspaceId', workspaceId);
+    if (taskId) params.set('taskId', taskId);
+
+    const query = params.toString();
+    const basePath = `/console/events/${eventId}/workspace`;
+    return query ? `${basePath}?${query}` : basePath;
+  };
+
+  const deepLinkUrl = notification.actionUrl || getWorkspaceDeepLink();
+
   return (
     <div className={`px-4 py-3 ${containerClasses}`}>
       <div className="flex items-start space-x-3">
@@ -508,9 +529,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="mt-2 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {getCategoryLabel()}
-              {notification.actionLabel && notification.actionUrl && (
+              {notification.actionLabel && deepLinkUrl && (
                 <Link
-                  to={notification.actionUrl}
+                  to={deepLinkUrl}
                   className="inline-flex items-center px-2.5 py-1 border border-gray-200 rounded-full text-xs font-medium text-indigo-600 hover:bg-indigo-50"
                 >
                   {notification.actionLabel}

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { WorkspaceServiceDashboard } from './WorkspaceServiceDashboard';
 import { WorkspaceListPage } from './WorkspaceListPage';
 import { WorkspaceDetailPage } from './WorkspaceDetailPage';
 import { WorkspaceCreatePage } from './WorkspaceCreatePage';
+import { OrgWorkspacePage } from '@/components/organization/OrgWorkspacePage';
 
 /**
  * WorkspaceService component provides the main routing structure for the Workspace Management Service.
@@ -13,11 +14,25 @@ import { WorkspaceCreatePage } from './WorkspaceCreatePage';
  * - Resource detail view (workspace details with tabs for tasks, team, communication)
  * - Workspace context switching and navigation
  */
+
+const WorkspaceIndexRoute: React.FC = () => {
+  const { orgSlug } = useParams<{ orgSlug?: string }>();
+
+  // When under an organization route (/:orgSlug/workspaces), render the
+  // organization-scoped workspace portal. For global dashboard routes
+  // (/dashboard/workspaces) keep using the generic service dashboard.
+  if (orgSlug) {
+    return <OrgWorkspacePage />;
+  }
+
+  return <WorkspaceServiceDashboard />;
+};
+
 export const WorkspaceService: React.FC = () => {
   return (
     <Routes>
-      {/* Service Dashboard - default route */}
-      <Route index element={<WorkspaceServiceDashboard />} />
+      {/* Service Dashboard or Org Workspace Page - default route */}
+      <Route index element={<WorkspaceIndexRoute />} />
       
       {/* Workspace List Page */}
       <Route path="list" element={<WorkspaceListPage />} />

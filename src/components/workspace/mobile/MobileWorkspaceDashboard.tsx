@@ -99,7 +99,7 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen w-full bg-gray-50 flex flex-col overflow-y-auto">
       {/* Mobile Header */}
       <MobileWorkspaceHeader
         workspace={workspace}
@@ -127,7 +127,7 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
       )}
 
       {/* Main Content */}
-      <div className="pt-16 pb-20 px-4">
+      <div className="w-full pt-16 pb-24 px-4">
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Quick Actions */}

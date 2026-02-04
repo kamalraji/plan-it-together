@@ -493,7 +493,7 @@ class OrganizationService {
       .eq('organization_id', organizationId);
 
     const eventIds = (events || []).map((e: any) => e.id);
-    
+
     let totalRegistrations = 0;
     if (eventIds.length > 0) {
       const { count } = await supabase
@@ -503,18 +503,17 @@ class OrganizationService {
       totalRegistrations = count || 0;
     }
 
-    // Get followers
-    const { data: organization } = await supabase
-      .from('organizations')
-      .select('follower_count')
-      .eq('id', organizationId)
-      .single();
+    // Get followers from follows table (organization followers)
+    const { count: followerCount } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', organizationId);
 
     return {
       totalEvents: totalEvents || 0,
       activeEvents: activeEvents || 0,
       totalRegistrations,
-      followerCount: organization?.follower_count || 0,
+      followerCount: followerCount || 0,
     };
   }
 }

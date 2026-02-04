@@ -83,8 +83,9 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
   ];
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto">
+
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center">

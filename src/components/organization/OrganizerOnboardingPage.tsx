@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Info } from 'lucide-react';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
+import { useEventCreatePath } from '@/hooks/useEventCreatePath';
 
 interface OnboardingChecklistRow {
   id: string;
@@ -192,7 +193,10 @@ export const OrganizerOnboardingPage: React.FC = () => {
                   <div className="mt-2 flex items-center gap-3 flex-wrap">
                     <Button
                       size="sm"
-                      onClick={() => navigate('/dashboard/eventmanagement/events/create')}
+                      onClick={() => {
+                        const target = useEventCreatePath();
+                        navigate(target);
+                      }}
                     >
                       Create event
                     </Button>

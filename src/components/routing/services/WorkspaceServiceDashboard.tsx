@@ -179,6 +179,14 @@ export const WorkspaceServiceDashboard: React.FC = () => {
           }
           actions={pageActions}
         />
+
+        {/* Role-aware notice */}
+        {!canManageWorkspaces && (
+          <div className="rounded-md border border-border/80 bg-muted/40 px-4 py-3 text-xs sm:text-sm text-muted-foreground">
+            You have view-only access to workspace analytics. Organizers and admins can create and manage workspaces.
+          </div>
+        )}
+
  
         {/* Event Filter (org-scoped) */}
         {dashboardData && (
@@ -215,7 +223,7 @@ export const WorkspaceServiceDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Service Overview Metrics */}
+        {/* Service Overview / Empty state */}
         <section>
           {isWorkspacesLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6 animate-pulse">
@@ -228,85 +236,145 @@ export const WorkspaceServiceDashboard: React.FC = () => {
             </div>
           ) : (
             dashboardData && (
-              <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
-                  {/* existing metric cards unchanged */}
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">🏗️</span>
+              <>
+                {dashboardData.metrics.totalWorkspaces === 0 ? (
+                  <div className="bg-card rounded-lg border border-dashed border-border/80 p-5 sm:p-6">
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                      <div className="space-y-3">
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                          No workspaces yet
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {eventId
+                            ? 'No workspaces have been provisioned for this event in this organization yet.'
+                            : isOrgContext
+                              ? 'This organization has no workspaces yet.'
+                              : "You don’t have any workspaces yet."}
+                        </p>
+                        {eventId && (
+                          <p className="text-[11px] sm:text-xs text-muted-foreground">
+                            You can also provision a workspace for this event from the Event Management console.
+                          </p>
+                        )}
+
+                        <div className="mt-2">
+                          <p className="text-[11px] sm:text-xs font-medium text-muted-foreground mb-1.5">
+                            Get started in three steps:
+                          </p>
+                          <ol className="space-y-1.5 text-[11px] sm:text-xs text-muted-foreground list-decimal list-inside">
+                            <li>Create a workspace for your event or organizing team.</li>
+                            <li>Invite team members so everyone has a shared home.</li>
+                            <li>Add tasks, assign owners, and track progress together.</li>
+                          </ol>
+                        </div>
                       </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Workspaces</p>
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalWorkspaces}</p>
+
+                      <div className="flex flex-col sm:items-end gap-2 min-w-[200px]">
+                        {canManageWorkspaces ? (
+                          <>
+                            <Link
+                              to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
+                              className="inline-flex items-center justify-center rounded-md bg-primary px-3.5 py-2 text-xs sm:text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+                            >
+                              Create workspace
+                            </Link>
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-[11px] sm:text-xs font-medium text-muted-foreground hover:bg-muted"
+                            >
+                              Learn more about workspaces
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-[11px] sm:text-xs text-muted-foreground">
+                            Ask an organizer or admin to create a workspace for you.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">🟢</span>
-                      </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Workspaces</p>
-                        <p className="text-xl sm:text-2xl font-bold text-primary">{dashboardData.metrics.activeWorkspaces}</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
+                    {/* existing metric cards unchanged */}
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">🏗️</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Workspaces</p>
+                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalWorkspaces}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">📝</span>
-                      </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Provisioning</p>
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.provisioningWorkspaces}</p>
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">🟢</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Workspaces</p>
+                          <p className="text-xl sm:text-2xl font-bold text-primary">{dashboardData.metrics.activeWorkspaces}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">⏳</span>
-                      </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Winding Down</p>
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.windingDownWorkspaces}</p>
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">📝</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Provisioning</p>
+                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.provisioningWorkspaces}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">📋</span>
-                      </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</p>
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTasks}</p>
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">⏳</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Winding Down</p>
+                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.windingDownWorkspaces}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-xl sm:text-2xl">👥</span>
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">📋</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Tasks</p>
+                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTasks}</p>
+                        </div>
                       </div>
-                      <div className="ml-3 sm:ml-4">
-                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Team Members</p>
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTeamMembers}</p>
+                    </div>
+
+                    <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-xl sm:text-2xl">👥</span>
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Team Members</p>
+                          <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalTeamMembers}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                )}
+              </>
             )
           )}
         </section>
+
 
         {/* Quick Actions */}
         {dashboardData && (

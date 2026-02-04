@@ -1,7 +1,10 @@
-import React from 'react';
+import { useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../../hooks/useAuth';
+import { supabase } from '@/integrations/supabase/looseClient';
+import { useAuth } from '@/hooks/useAuth';
 import { PageHeader } from '../PageHeader';
+import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 
 /**
  * EventServiceDashboard provides the AWS-style service landing page for Event Management.
@@ -11,70 +14,130 @@ import { PageHeader } from '../PageHeader';
  * - Recent events and activity
  * - Service-specific widgets and analytics
  */
+type DashboardEventRow = {
+  id: string;
+  name: string;
+  status: string;
+  start_date: string | null;
+};
+
 export const EventServiceDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { createPath, listPath } = useEventManagementPaths();
 
-  // Mock data - in real implementation, this would come from API
-  const dashboardData = {
-    metrics: {
-      totalEvents: 12,
-      activeEvents: 3,
-      draftEvents: 2,
-      totalRegistrations: 1247,
-      upcomingEvents: 5,
+  useEffect(() => {
+    document.title = 'Event Management Dashboard | Thittam1Hub';
+
+    const description =
+      'Manage your events, track registrations, and view recent activity in one place.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.href);
+  }, []);
+
+  const { data: events } = useQuery<DashboardEventRow[]>({
+    queryKey: ['event-service-dashboard-events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, name, status, start_date')
+        .order('start_date', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return data as DashboardEventRow[];
     },
-    recentEvents: [
-      {
-        id: '1',
-        name: 'Tech Innovation Summit 2024',
-        status: 'PUBLISHED',
-        startDate: '2024-03-15',
-        registrations: 156,
-      },
-      {
-        id: '2',
-        name: 'AI Workshop Series',
-        status: 'DRAFT',
-        startDate: '2024-03-20',
-        registrations: 0,
-      },
-      {
-        id: '3',
-        name: 'Startup Pitch Competition',
-        status: 'ONGOING',
-        startDate: '2024-02-28',
-        registrations: 89,
-      },
-    ],
-    quickActions: [
-      {
-        title: 'Create New Event',
-        description: 'Start planning your next event',
-        href: '/console/events/create',
-        primary: true,
-      },
-      {
-        title: 'Browse Templates',
-        description: 'Use pre-built event templates',
-        href: '/console/events/templates',
-      },
-      {
-        title: 'View All Events',
-        description: 'Manage your existing events',
-        href: '/console/events/list',
-      },
-      {
-        title: 'Analytics Dashboard',
-        description: 'View event performance metrics',
-        href: '/console/analytics',
-      },
-    ],
-  };
+  });
+
+  const { data: registrationsByEvent } = useQuery<Record<string, number>>({
+    queryKey: ['event-service-dashboard-registrations', (events ?? []).map((e) => e.id)],
+    enabled: !!events && events.length > 0,
+    queryFn: async () => {
+      const eventIds = (events ?? []).map((e) => e.id);
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('id, event_id')
+        .in('event_id', eventIds);
+
+      if (error) throw error;
+
+      const counts: Record<string, number> = {};
+      (data as { id: string; event_id: string }[]).forEach((row) => {
+        counts[row.event_id] = (counts[row.event_id] ?? 0) + 1;
+      });
+      return counts;
+    },
+  });
+
+  const metrics = useMemo(() => {
+    const allEvents = events ?? [];
+    const totalEvents = allEvents.length;
+    const activeEvents = allEvents.filter((evt) =>
+      ['PUBLISHED', 'ONGOING'].includes(evt.status),
+    ).length;
+    const draftEvents = allEvents.filter((evt) => evt.status === 'DRAFT').length;
+    const upcomingEvents = allEvents.filter((evt) => {
+      if (!evt.start_date) return false;
+      return new Date(evt.start_date).getTime() > Date.now();
+    }).length;
+
+    const totalRegistrations = Object.values(registrationsByEvent ?? {}).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
+
+    return {
+      totalEvents,
+      activeEvents,
+      draftEvents,
+      totalRegistrations,
+      upcomingEvents,
+    };
+  }, [events, registrationsByEvent]);
+
+  const quickActions = [
+    {
+      title: 'Create New Event',
+      description: 'Start planning your next event',
+      href: createPath,
+      primary: true,
+    },
+    {
+      title: 'Browse Templates',
+      description: 'Use pre-built event templates',
+      href: '/console/events/templates',
+    },
+    {
+      title: 'View All Events',
+      description: 'Manage your existing events',
+      href: listPath,
+    },
+    {
+      title: 'Analytics Dashboard',
+      description: 'View event performance metrics',
+      href: '/console/analytics',
+    },
+  ];
 
   const pageActions = [
     {
       label: 'Create Event',
-      action: () => { window.location.href = '/console/events/create'; },
+      action: () => {
+        window.location.href = createPath;
+      },
       variant: 'primary' as const,
     },
     {
@@ -116,11 +179,11 @@ export const EventServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Events</p>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{dashboardData.metrics.totalEvents}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">{metrics.totalEvents}</p>
                 </div>
               </div>
             </div>
- 
+
             <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -130,11 +193,11 @@ export const EventServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Events</p>
-                  <p className="text-xl sm:text-2xl font-bold text-emerald-500">{dashboardData.metrics.activeEvents}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-emerald-500">{metrics.activeEvents}</p>
                 </div>
               </div>
             </div>
- 
+
             <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -144,11 +207,11 @@ export const EventServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Draft Events</p>
-                  <p className="text-xl sm:text-2xl font-bold text-amber-500">{dashboardData.metrics.draftEvents}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-amber-500">{metrics.draftEvents}</p>
                 </div>
               </div>
             </div>
- 
+
             <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -158,11 +221,11 @@ export const EventServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Registrations</p>
-                  <p className="text-xl sm:text-2xl font-bold text-primary">{dashboardData.metrics.totalRegistrations}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary">{metrics.totalRegistrations}</p>
                 </div>
               </div>
             </div>
- 
+
             <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -172,7 +235,7 @@ export const EventServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Upcoming Events</p>
-                  <p className="text-xl sm:text-2xl font-bold text-violet-500">{dashboardData.metrics.upcomingEvents}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-violet-500">{metrics.upcomingEvents}</p>
                 </div>
               </div>
             </div>
@@ -183,14 +246,15 @@ export const EventServiceDashboard: React.FC = () => {
         <div className="space-y-3 sm:space-y-4">
           <h3 className="text-base sm:text-lg font-medium text-foreground">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {dashboardData.quickActions.map((action, index) => (
-              <div
+            {quickActions.map((action, index) => (
+              <Link
                 key={index}
-                className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                  action.primary
+                to={action.href}
+                className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${{
+                  true: action.primary
                     ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                    : 'border-border bg-card hover:bg-muted'
-                }`}
+                    : 'border-border bg-card hover:bg-muted',
+                }.true}`}
               >
                 <div className="flex items-center mb-2 sm:mb-3">
                   <h4
@@ -208,7 +272,7 @@ export const EventServiceDashboard: React.FC = () => {
                 >
                   {action.description}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -248,7 +312,7 @@ export const EventServiceDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-background divide-y divide-border">
-                  {dashboardData.recentEvents.map((event) => (
+                  {(events ?? []).map((event: DashboardEventRow) => (
                     <tr key={event.id} className="hover:bg-muted/60">
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-foreground">{event.name}</div>
@@ -269,10 +333,10 @@ export const EventServiceDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                        {new Date(event.startDate).toLocaleDateString()}
+                        {event.start_date ? new Date(event.start_date).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-foreground">
-                        {event.registrations}
+                        {registrationsByEvent?.[event.id] ?? 0}
                       </td>
                       <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                         <Link

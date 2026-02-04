@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
-import api from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import { useOrganizationEvents } from '@/hooks/useOrganization';
@@ -33,9 +33,9 @@ export const WorkspaceCreatePage: React.FC = () => {
   const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
   const eventIdFromQuery = searchParams.get('eventId') || '';
 
-  const organizationCtx = isOrgContext ? useCurrentOrganization() : null;
-  const organizationId = organizationCtx?.organization?.id as string | undefined;
-  const { data: orgEvents } = useOrganizationEvents(organizationId || '', undefined);
+  const organization = isOrgContext ? useCurrentOrganization() : null;
+  const organizationId = organization?.id as string | undefined;
+  const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(organizationId || '', undefined);
 
   const [formValues, setFormValues] = useState({
     name: '',
@@ -59,7 +59,7 @@ export const WorkspaceCreatePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canManageWorkspaces) return;
+    if (!canManageWorkspaces || !user) return;
 
     const parseResult = workspaceCreateSchema.safeParse(formValues);
     if (!parseResult.success) {
@@ -76,14 +76,19 @@ export const WorkspaceCreatePage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const payload = {
-        name: parseResult.data.name,
-        eventId: parseResult.data.eventId,
-        orgSlug: isOrgContext ? orgSlugCandidate : undefined,
-      };
+      const { data, error } = await supabase
+        .from('workspaces')
+        .insert({
+          event_id: parseResult.data.eventId,
+          name: parseResult.data.name,
+          organizer_id: user.id,
+        })
+        .select('id')
+        .maybeSingle();
 
-      const response = await api.post('/workspaces', payload);
-      const created = response.data?.workspace ?? response.data;
+      if (error) throw error;
+
+      const createdId = data?.id as string | undefined;
 
       toast({
         title: 'Workspace created',
@@ -94,8 +99,8 @@ export const WorkspaceCreatePage: React.FC = () => {
         ? `/${orgSlugCandidate}/workspaces`
         : '/dashboard/workspaces';
 
-      if (created?.id) {
-        navigate(`${baseWorkspacePath}/${created.id}`, { replace: true });
+      if (createdId) {
+        navigate(`${baseWorkspacePath}/${createdId}`, { replace: true });
       } else {
         navigate(`${baseWorkspacePath}/list`, { replace: true });
       }
@@ -103,7 +108,7 @@ export const WorkspaceCreatePage: React.FC = () => {
       console.error('Failed to create workspace', error);
       toast({
         title: 'Failed to create workspace',
-        description: error?.response?.data?.message ?? 'Please try again.',
+        description: error?.message ?? 'Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -162,19 +167,29 @@ export const WorkspaceCreatePage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="event-id">
               Associated event
             </label>
-            {isOrgContext && orgEvents && orgEvents.length > 0 ? (
+            {isOrgContext ? (
               <select
                 id="event-id"
                 value={formValues.eventId}
                 onChange={handleChange('eventId')}
                 className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               >
-                <option value="">Select an event</option>
-                {orgEvents.map((event: any) => (
-                  <option key={event.id} value={event.id}>
-                    {event.name}
+                {orgEventsLoading && <option value="">Loading events…</option>}
+                {!orgEventsLoading && (!orgEvents || orgEvents.length === 0) && (
+                  <option value="" disabled>
+                    No events available
                   </option>
-                ))}
+                )}
+                {!orgEventsLoading && orgEvents && orgEvents.length > 0 && (
+                  <>
+                    <option value="">Select an event</option>
+                    {orgEvents.map((event: any) => (
+                      <option key={event.id} value={event.id}>
+                        {event.name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             ) : (
               <input

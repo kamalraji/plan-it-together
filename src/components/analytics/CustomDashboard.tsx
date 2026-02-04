@@ -330,8 +330,8 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
 
       {/* Add Widget Modal */}
       {showAddWidget && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
+          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">Add Widget</h3>
               <button

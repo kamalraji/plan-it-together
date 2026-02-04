@@ -65,6 +65,94 @@ export type Database = {
           },
         ]
       }
+      certificate_criteria: {
+        Row: {
+          conditions: Json
+          created_at: string
+          event_id: string
+          id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          conditions?: Json
+          created_at?: string
+          event_id: string
+          id?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: Json
+          created_at?: string
+          event_id?: string
+          id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_criteria_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      certificates: {
+        Row: {
+          certificate_id: string
+          created_at: string
+          distributed_at: string | null
+          event_id: string
+          id: string
+          issued_at: string
+          metadata: Json
+          pdf_url: string | null
+          qr_payload: string
+          recipient_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          certificate_id: string
+          created_at?: string
+          distributed_at?: string | null
+          event_id: string
+          id?: string
+          issued_at?: string
+          metadata?: Json
+          pdf_url?: string | null
+          qr_payload: string
+          recipient_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          certificate_id?: string
+          created_at?: string
+          distributed_at?: string | null
+          event_id?: string
+          id?: string
+          issued_at?: string
+          metadata?: Json
+          pdf_url?: string | null
+          qr_payload?: string
+          recipient_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           branding: Json | null
@@ -566,6 +654,10 @@ export type Database = {
           linkedin_url: string | null
           organization: string | null
           phone: string | null
+          portfolio_accent_color: string | null
+          portfolio_is_public: boolean
+          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections: string[]
           qr_code: string
           twitter_url: string | null
           website: string | null
@@ -580,6 +672,10 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
+          portfolio_accent_color?: string | null
+          portfolio_is_public?: boolean
+          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections?: string[]
           qr_code: string
           twitter_url?: string | null
           website?: string | null
@@ -594,6 +690,10 @@ export type Database = {
           linkedin_url?: string | null
           organization?: string | null
           phone?: string | null
+          portfolio_accent_color?: string | null
+          portfolio_is_public?: boolean
+          portfolio_layout?: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections?: string[]
           qr_code?: string
           twitter_url?: string | null
           website?: string | null
@@ -654,11 +754,152 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          left_at: string | null
+          role: string
+          status: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          role?: string
+          status?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          role?: string
+          status?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_team_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          name: string
+          organizer_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          name: string
+          organizer_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          name?: string
+          organizer_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspaces_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_public_portfolio: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          created_at: string
+          full_name: string
+          github_url: string
+          id: string
+          linkedin_url: string
+          organization: string
+          portfolio_accent_color: string
+          portfolio_layout: Database["public"]["Enums"]["portfolio_layout"]
+          portfolio_sections: string[]
+          twitter_url: string
+          website: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -696,6 +937,7 @@ export type Database = {
         | "ACTIVE"
         | "REJECTED"
         | "REMOVED"
+      portfolio_layout: "stacked" | "grid"
       registration_status: "PENDING" | "CONFIRMED" | "WAITLISTED" | "CANCELLED"
       user_role:
         | "SUPER_ADMIN"
@@ -855,6 +1097,7 @@ export const Constants = {
         "REJECTED",
         "REMOVED",
       ],
+      portfolio_layout: ["stacked", "grid"],
       registration_status: ["PENDING", "CONFIRMED", "WAITLISTED", "CANCELLED"],
       user_role: [
         "SUPER_ADMIN",

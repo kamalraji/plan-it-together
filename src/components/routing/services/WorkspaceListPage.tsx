@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
-import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 
@@ -46,19 +46,39 @@ export const WorkspaceListPage: React.FC = () => {
   const canManageWorkspaces =
     !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
 
-  // Fetch workspaces
+  // Fetch workspaces from Supabase workspaces table
   const { data: workspaces, isLoading, error } = useQuery({
     queryKey: ['user-workspaces', orgSlugCandidate, eventId],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: {
-          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
-          eventId: eventId || undefined,
-        },
-      });
-      return response.data.workspaces as Workspace[];
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('id, name, status, created_at, updated_at, event_id')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Map to minimal Workspace-like shape for this page
+      return ((data || []).map((row: any) => ({
+        id: row.id,
+        eventId: row.event_id,
+        name: row.name,
+        status: row.status as WorkspaceStatus,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        event: undefined,
+        description: undefined,
+        teamMembers: [],
+        taskSummary: undefined,
+        channels: [],
+      })) as unknown) as Workspace[];
     },
   });
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+  };
+
 
   // Filter workspaces based on search and status
   const filteredWorkspaces = React.useMemo(() => {
@@ -252,30 +272,16 @@ export const WorkspaceListPage: React.FC = () => {
 
 
   const handleDeleteWorkspace = (workspaceId: string) => {
-    if (window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
-      console.log('Delete workspace:', workspaceId);
-      // Implement delete logic
+    if (!window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
+      return;
     }
+    console.log('Delete workspace:', workspaceId);
+    // TODO: Wire to backend delete endpoint and refresh list via React Query
   };
 
-  if (error) {
-    return (
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Workspaces</h2>
-            <p className="text-gray-600 mb-4">There was an error loading your workspaces. Please try again.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
+  const hasAnyWorkspaces = (workspaces?.length || 0) > 0;
+
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -286,6 +292,21 @@ export const WorkspaceListPage: React.FC = () => {
           subtitle={`Manage your ${filteredWorkspaces.length} workspace${filteredWorkspaces.length !== 1 ? 's' : ''}`}
           actions={pageActions}
         />
+
+        {/* Role-aware helper */}
+        {!canManageWorkspaces && (
+          <div className="mb-4 rounded-md border border-border/80 bg-muted/40 px-4 py-3 text-xs sm:text-sm text-muted-foreground">
+            You can view workspaces but cannot create, edit, or delete them in this organization. Ask an organizer or admin if you need changes.
+          </div>
+        )}
+
+        {/* Error banner */}
+        {error && (
+          <div className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs sm:text-sm text-destructive">
+            We couldn’t load your workspaces. Please try again or contact support.
+          </div>
+        )}
+
 
         {/* Search and Filters */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -318,45 +339,81 @@ export const WorkspaceListPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Workspace Table */}
+        {/* Workspace Table or Empty States */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedWorkspaces(filteredWorkspaces.map(w => w.id));
-                        } else {
-                          setSelectedWorkspaces([]);
-                        }
-                      }}
-                      checked={selectedWorkspaces.length === filteredWorkspaces.length && filteredWorkspaces.length > 0}
-                    />
-                  </th>
-                  {columns.slice(0, -1).map((column) => (
-                    <th key={column.key} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {isLoading ? (
+          {isLoading ? (
+            <div className="py-12 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            </div>
+          ) : !hasAnyWorkspaces ? (
+            <div className="text-center py-12 px-4">
+              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🏗️</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces yet</h3>
+              <p className="text-gray-600 mb-6">
+                Get started by creating your first workspace for event collaboration.
+              </p>
+              {canManageWorkspaces && (
+                <Link
+                  to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  Create Workspace
+                </Link>
+              )}
+            </div>
+          ) : filteredWorkspaces.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🔍</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces match your search or filters</h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your search term or status filter to see more workspaces.
+              </p>
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td colSpan={columns.length + 1} className="px-6 py-12 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedWorkspaces(filteredWorkspaces.map((w) => w.id));
+                          } else {
+                            setSelectedWorkspaces([]);
+                          }
+                        }}
+                        checked={
+                          selectedWorkspaces.length === filteredWorkspaces.length &&
+                          filteredWorkspaces.length > 0
+                        }
+                      />
+                    </th>
+                    {columns.slice(0, -1).map((column) => (
+                      <th
+                        key={column.key}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {column.label}
+                      </th>
+                    ))}
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ) : (
-                  filteredWorkspaces.map((workspace) => (
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredWorkspaces.map((workspace) => (
                     <tr key={workspace.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
@@ -367,25 +424,33 @@ export const WorkspaceListPage: React.FC = () => {
                             if (e.target.checked) {
                               setSelectedWorkspaces([...selectedWorkspaces, workspace.id]);
                             } else {
-                              setSelectedWorkspaces(selectedWorkspaces.filter(id => id !== workspace.id));
+                              setSelectedWorkspaces(
+                                selectedWorkspaces.filter((id) => id !== workspace.id)
+                              );
                             }
                           }}
                         />
                       </td>
                       {columns.slice(0, -1).map((column) => (
                         <td key={column.key} className="px-6 py-4 whitespace-nowrap">
-                          {column.render ? column.render(workspace[column.key as keyof Workspace] as any, workspace) : String(workspace[column.key as keyof Workspace] || '')}
+                          {column.render
+                            ? column.render(
+                                workspace[column.key as keyof Workspace] as any,
+                                workspace
+                              )
+                            : String(workspace[column.key as keyof Workspace] || '')}
                         </td>
                       ))}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {columns[columns.length - 1].render && columns[columns.length - 1].render(undefined as any, workspace)}
+                        {columns[columns.length - 1].render &&
+                          columns[columns.length - 1].render(undefined as any, workspace)}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Bulk Actions */}

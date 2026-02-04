@@ -426,8 +426,8 @@ export function ParticipantDashboard() {
 
       {/* QR Pass Modal */}
       {canShowQrPass && qrCoreRegistration && qrRegistration && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
-          <div className="max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center p-4 sm:p-6 z-50">
+          <div className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
                 <h2 className="text-base sm:text-lg font-semibold text-foreground">Event Pass</h2>

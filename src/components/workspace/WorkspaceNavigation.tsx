@@ -5,8 +5,30 @@ import { Breadcrumb } from '../common/Breadcrumb';
 interface WorkspaceNavigationProps {
   workspace: Workspace;
   userWorkspaces: Workspace[];
-  activeTab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'reports' | 'marketplace' | 'templates';
-  onTabChange: (tab: 'overview' | 'tasks' | 'team' | 'communication' | 'analytics' | 'reports' | 'marketplace' | 'templates') => void;
+  activeTab:
+    | 'overview'
+    | 'tasks'
+    | 'team'
+    | 'communication'
+    | 'analytics'
+    | 'reports'
+    | 'marketplace'
+    | 'templates'
+    | 'audit'
+    | 'role-management';
+  onTabChange: (
+    tab:
+      | 'overview'
+      | 'tasks'
+      | 'team'
+      | 'communication'
+      | 'analytics'
+      | 'reports'
+      | 'marketplace'
+      | 'templates'
+      | 'audit'
+      | 'role-management'
+  ) => void;
   onWorkspaceSwitch: (workspaceId: string) => void;
 }
 
@@ -89,6 +111,24 @@ export function WorkspaceNavigation({
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    },
+    {
+      id: 'audit' as const,
+      name: 'Audit Log',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'role-management' as const,
+      name: 'Roles',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       )
     }

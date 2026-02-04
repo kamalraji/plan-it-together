@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WorkspaceTask, TaskStatus, TeamMember } from '../../types';
 import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
@@ -12,6 +12,7 @@ interface TaskManagementInterfaceProps {
   onTaskStatusChange?: (taskId: string, status: TaskStatus) => void;
   onCreateTask?: () => void;
   isLoading?: boolean;
+  initialTaskId?: string;
 }
 
 type ViewMode = 'list' | 'kanban';
@@ -23,10 +24,19 @@ export function TaskManagementInterface({
   onTaskDelete,
   onTaskStatusChange,
   onCreateTask,
-  isLoading = false
+  isLoading = false,
+  initialTaskId,
 }: TaskManagementInterfaceProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
+
+  useEffect(() => {
+    if (!initialTaskId) return;
+    const match = tasks.find((task) => task.id === initialTaskId);
+    if (match) {
+      setSelectedTask(match);
+    }
+  }, [initialTaskId, tasks]);
 
   const handleTaskClick = (task: WorkspaceTask) => {
     setSelectedTask(task);
@@ -52,8 +62,8 @@ export function TaskManagementInterface({
       {/* View Mode Toggle */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Task Management</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 className="text-xl font-semibold text-foreground">Task Management</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Organize and track your event tasks
           </p>
         </div>
@@ -63,8 +73,8 @@ export function TaskManagementInterface({
             onClick={() => setViewMode('list')}
             className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
               viewMode === 'list'
-                ? 'bg-indigo-50 border-indigo-500 text-indigo-700 z-10'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-primary/10 border-primary text-primary z-10'
+                : 'bg-background border-border text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center space-x-2">
@@ -78,8 +88,8 @@ export function TaskManagementInterface({
             onClick={() => setViewMode('kanban')}
             className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${
               viewMode === 'kanban'
-                ? 'bg-indigo-50 border-indigo-500 text-indigo-700 z-10'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-primary/10 border-primary text-primary z-10'
+                : 'bg-background border-border text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center space-x-2">

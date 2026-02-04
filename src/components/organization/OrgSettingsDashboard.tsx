@@ -19,15 +19,15 @@ export const OrgSettingsDashboard: React.FC = () => {
   return (
     <main className="min-h-screen bg-transparent">
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
         <span className="text-muted-foreground/70">Settings</span>
         <span>/</span>
         <span className="text-foreground font-medium">Organization</span>
       </div>
-
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[140px] sm:min-h-[180px] animate-fade-in">
+ 
+       {/* Hero */}
+       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+         <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[140px] sm:min-h-[180px] animate-fade-in">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
 
           <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -56,12 +56,12 @@ export const OrgSettingsDashboard: React.FC = () => {
       </section>
 
       {/* Settings cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-12 pb-10 sm:pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-          {/* Organization profile */}
-          <Link
-            to={orgSettingsPath}
-            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-4 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-8 sm:mt-12 pb-8 sm:pb-16">
+         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+           {/* Organization profile */}
+           <Link
+             to={orgSettingsPath}
+             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -80,8 +80,8 @@ export const OrgSettingsDashboard: React.FC = () => {
 
           {/* Team & roles */}
           <Link
-            to={teamPath}
-            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-4 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+             to={teamPath}
+             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -100,8 +100,8 @@ export const OrgSettingsDashboard: React.FC = () => {
 
           {/* Personal notifications & profile */}
           <Link
-            to={profileSettingsPath}
-            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-4 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+             to={profileSettingsPath}
+             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>

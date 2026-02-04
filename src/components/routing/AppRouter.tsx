@@ -8,7 +8,7 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
@@ -607,7 +607,7 @@ export const AppRouter: React.FC = () => {
                 path="eventmanagement/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <Navigate to="/dashboard" replace />
+                    <EventService />
                   </ConsoleRoute>
                 } 
               />

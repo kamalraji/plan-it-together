@@ -41,6 +41,8 @@ export const DashboardDataLab: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  type OwnedOrganization = { id: string };
+
   const [workspaceForm, setWorkspaceForm] = useState({ eventId: '', name: '' });
   const [serviceForm, setServiceForm] = useState({ name: '', category: '', basePrice: '' });
   const [bookingForm, setBookingForm] = useState({ serviceId: '', amount: '', status: 'CONFIRMED' });
@@ -51,10 +53,23 @@ export const DashboardDataLab: React.FC = () => {
     queryKey: ['organizer-events'],
     enabled: !!user,
     queryFn: async () => {
+      if (!user) return [];
+
+      // Fetch organizations owned by this user, then their events
+      const { data: organizations, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('owner_id', user.id);
+
+      if (orgError) throw orgError;
+      const orgIds = (organizations as OwnedOrganization[] | null ?? []).map((o) => o.id);
+      if (orgIds.length === 0) return [];
+
       const { data, error } = await supabase
         .from('events')
-        .select('id, name, status')
-        .eq('organizer_id', user!.id);
+        .select('id, name, status, organization_id')
+        .in('organization_id', orgIds);
+
       if (error) throw error;
       return data ?? [];
     },

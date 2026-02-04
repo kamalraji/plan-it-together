@@ -39,6 +39,9 @@ export const EventService: React.FC = () => {
       {/* Event Templates */}
       <Route path="templates" element={<EventListPage filterBy="templates" />} />
       
+      {/* Event Workspace (event-specific workspace tab) */}
+      <Route path=":eventId/workspace" element={<EventDetailPage defaultTab="workspace" />} />
+      
       {/* Event Analytics */}
       <Route path=":eventId/analytics" element={<EventDetailPage defaultTab="analytics" />} />
 

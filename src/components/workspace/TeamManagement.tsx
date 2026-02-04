@@ -10,7 +10,6 @@ import { Workspace, TeamMember, WorkspaceRole } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
 import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
-import api from '../../lib/api';
 
 interface TeamManagementProps {
   workspace: Workspace;
@@ -24,35 +23,47 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch team members with details
+  // Fetch team members from Supabase
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ['workspace-team-members', workspace.id],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('*')
+        .eq('workspace_id', workspace.id)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        role: row.role as WorkspaceRole,
+        status: row.status,
+        joinedAt: row.joined_at,
+        leftAt: row.left_at || undefined,
+        user: {
+          id: row.user_id,
+          name: 'Member',
+          email: '',
+        },
+      })) as TeamMember[];
     },
   });
 
-  // Fetch pending invitations
-  const { data: pendingInvitations } = useQuery({
-    queryKey: ['workspace-invitations', workspace.id],
-    queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/invitations`);
-      return response.data.invitations as Array<{
-        id: string;
-        email: string;
-        role: WorkspaceRole;
-        status: string;
-        invitedAt: string;
-        invitedBy: { name: string };
-      }>;
-    },
-  });
+  // Pending invitations not yet backed by Supabase; show none for now
+  const pendingInvitations: any[] = [];
 
   // Remove team member mutation
   const removeTeamMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      await api.delete(`/workspaces/${workspace.id}/team-members/${memberId}`);
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .delete()
+        .eq('id', memberId)
+        .eq('workspace_id', workspace.id);
+
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
@@ -74,7 +85,14 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   // Update role mutation with optimistic UI
   const updateRoleMutation = useMutation({
     mutationFn: async ({ memberId, role }: { memberId: string; role: WorkspaceRole }) => {
-      await api.patch(`/workspaces/${workspace.id}/team-members/${memberId}`, { role });
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .update({ role })
+        .eq('id', memberId)
+        .eq('workspace_id', workspace.id);
+
+      if (error) throw error;
+
       // Fire-and-forget activity log; errors here shouldn't block role update
       await supabase.from('workspace_activities').insert({
         workspace_id: workspace.id,

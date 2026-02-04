@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   ArrowLeftIcon,
   BuildingStorefrontIcon,
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
-import { Workspace, WorkspaceStatus } from '../../../types';
+import { Workspace, WorkspaceStatus, TaskCategory, TaskPriority, TaskStatus, WorkspaceTask, WorkspaceRole, TeamMember } from '../../../types';
 import { TaskManagementInterface } from '../../workspace/TaskManagementInterface';
 import { TeamManagement } from '../../workspace/TeamManagement';
 import { WorkspaceCommunication } from '../../workspace/WorkspaceCommunication';
@@ -14,7 +14,7 @@ import { WorkspaceAnalyticsDashboard } from '../../workspace/WorkspaceAnalyticsD
 import { WorkspaceReportExport } from '../../workspace/WorkspaceReportExport';
 import { EventMarketplaceIntegration } from '../../marketplace';
 import { WorkspaceTemplateManagement } from '../../workspace/WorkspaceTemplateManagement';
-import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WorkspaceDetailPageProps {
   defaultTab?: string;
@@ -33,32 +33,148 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  // Fetch workspace data
+  // Fetch workspace data from Supabase
   const { data: workspace, isLoading, error } = useQuery({
     queryKey: ['workspace', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}`);
-      return response.data.workspace as Workspace;
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('id, name, status, created_at, updated_at')
+        .eq('id', workspaceId as string)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error('Workspace not found');
+
+      const mapped = {
+        id: data.id as string,
+        eventId: '',
+        name: data.name as string,
+        status: data.status as WorkspaceStatus,
+        createdAt: data.created_at as string,
+        updatedAt: data.updated_at as string,
+        description: '',
+        event: undefined,
+        teamMembers: [],
+        taskSummary: undefined,
+        channels: [],
+      } as Workspace;
+
+      return mapped;
     },
     enabled: !!workspaceId,
   });
 
-  // Fetch workspace tasks
-  const { data: tasks } = useQuery({
+  // Fetch workspace tasks from Supabase
+  const { data: tasks = [] } = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/tasks`);
-      return response.data.tasks;
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .select('*')
+        .eq('workspace_id', workspaceId as string)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row.id,
+        workspaceId: row.workspace_id,
+        title: row.title,
+        description: row.description || '',
+        category: TaskCategory.LOGISTICS,
+        priority: row.priority as TaskPriority,
+        status: row.status as TaskStatus,
+        progress: 0,
+        dueDate: row.due_date || undefined,
+        dependencies: [],
+        tags: [],
+        metadata: {},
+      })) as unknown as WorkspaceTask[];
     },
     enabled: !!workspaceId,
   });
 
-  // Fetch team members
-  const { data: teamMembers } = useQuery({
+  const queryClient = useQueryClient();
+
+  const createTaskMutation = useMutation({
+    mutationFn: async () => {
+      if (!workspaceId) throw new Error('Workspace ID is required');
+      const { data, error } = await supabase
+        .from('workspace_tasks')
+        .insert({
+          workspace_id: workspaceId,
+          title: 'New task',
+          description: '',
+          priority: TaskPriority.MEDIUM,
+          status: TaskStatus.NOT_STARTED,
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+    },
+  });
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: TaskStatus }) => {
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .update({ status })
+        .eq('id', taskId)
+        .eq('workspace_id', workspaceId as string);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const { error } = await supabase
+        .from('workspace_tasks')
+        .delete()
+        .eq('id', taskId)
+        .eq('workspace_id', workspaceId as string);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+    },
+  });
+
+  // Fetch team members from Supabase
+  const { data: teamMembers = [] } = useQuery({
     queryKey: ['workspace-team-members', workspaceId],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspaceId}/team-members`);
-      return response.data.teamMembers;
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('*')
+        .eq('workspace_id', workspaceId as string)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        role: row.role as WorkspaceRole,
+        status: row.status,
+        joinedAt: row.joined_at,
+        leftAt: row.left_at || undefined,
+        user: {
+          id: row.user_id,
+          name: 'Member',
+          email: '',
+        },
+      })) as TeamMember[];
     },
     enabled: !!workspaceId,
   });
@@ -169,9 +285,9 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
           tasks={tasks || []}
           teamMembers={teamMembers || []}
           onTaskEdit={(task) => console.log('Edit task:', task)}
-          onTaskDelete={(taskId) => console.log('Delete task:', taskId)}
-          onTaskStatusChange={(taskId, status) => console.log('Update task status:', taskId, status)}
-          onCreateTask={() => console.log('Create task')}
+          onTaskDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
+          onTaskStatusChange={(taskId, status) => updateTaskStatusMutation.mutate({ taskId, status })}
+          onCreateTask={() => createTaskMutation.mutate()}
         />
       ),
     },
