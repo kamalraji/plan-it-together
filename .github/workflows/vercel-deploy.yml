@@ -1,0 +1,267 @@
+# =============================================================================
+# THITTAM1HUB VERCEL MULTI-ENVIRONMENT DEPLOYMENT
+# =============================================================================
+# 
+# Branch Strategy:
+#   main       → Production  (organizer.thittam1hub.com)
+#   staging    → Staging     (staging.thittam1hub.com)
+#   feature/*  → Preview     (feature-*.thittam1hub.vercel.app)
+#
+# Required Secrets:
+#   VERCEL_TOKEN      - Vercel API token
+#   VERCEL_ORG_ID     - Vercel organization/team ID
+#   VERCEL_PROJECT_ID - Vercel project ID
+#
+# =============================================================================
+
+name: Vercel Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - staging
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  # ===========================================================================
+  # QUALITY GATES
+  # ===========================================================================
+  
+  quality-check:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Type check
+        run: npx tsc --noEmit
+      
+      - name: Lint
+        run: npm run lint
+      
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+
+  # ===========================================================================
+  # PREVIEW DEPLOYMENT (Feature Branches & PRs)
+  # ===========================================================================
+  
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: quality-check
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/')
+    
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build Project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_ENVIRONMENT: preview
+      
+      - name: Deploy to Vercel (Preview)
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "🚀 Preview deployed to: $url"
+      
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚀 Preview Deployment Ready!\n\n**URL:** ${{ steps.deploy.outputs.url }}\n\n**Commit:** \`${context.sha.substring(0, 7)}\`\n**Branch:** \`${context.ref.replace('refs/heads/', '')}\``
+            })
+
+  # ===========================================================================
+  # STAGING DEPLOYMENT
+  # ===========================================================================
+  
+  deploy-staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    needs: quality-check
+    if: github.ref == 'refs/heads/staging'
+    
+    environment:
+      name: staging
+      url: https://staging.thittam1hub.com
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build Project
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_STAGING }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY_STAGING }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_ENVIRONMENT: staging
+          VITE_ENABLE_API_LOGGING: true
+      
+      - name: Deploy to Vercel (Staging)
+        run: |
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+          echo "🎭 Staging deployed to: https://staging.thittam1hub.com"
+      
+      - name: Run Smoke Tests
+        run: |
+          echo "🔍 Running smoke tests against staging..."
+          sleep 30
+          curl -f https://staging.thittam1hub.com || exit 1
+          echo "✅ Staging smoke tests passed!"
+
+  # ===========================================================================
+  # PRODUCTION DEPLOYMENT
+  # ===========================================================================
+  
+  deploy-production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    needs: quality-check
+    if: github.ref == 'refs/heads/main'
+    
+    environment:
+      name: production
+      url: https://organizer.thittam1hub.com
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build Project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_ENVIRONMENT: production
+          VITE_ENABLE_API_LOGGING: false
+      
+      - name: Deploy to Vercel (Production)
+        run: |
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          echo "🚀 Production deployed to: https://organizer.thittam1hub.com"
+      
+      - name: Run Production Health Check
+        run: |
+          echo "🏥 Running production health checks..."
+          sleep 30
+          curl -f https://organizer.thittam1hub.com || exit 1
+          echo "✅ Production health check passed!"
+      
+      - name: Notify Sentry of Release
+        if: success()
+        run: |
+          echo "📊 Notifying Sentry of new release..."
+          # Uncomment when Sentry CLI is configured:
+          # npx @sentry/cli releases new ${{ github.sha }}
+          # npx @sentry/cli releases set-commits ${{ github.sha }} --auto
+          # npx @sentry/cli releases finalize ${{ github.sha }}
+      
+      - name: Create GitHub Release Tag
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const tag = `v${date}-${context.sha.substring(0, 7)}`;
+            
+            try {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${tag}`,
+                sha: context.sha
+              });
+              console.log(`✅ Created release tag: ${tag}`);
+            } catch (error) {
+              console.log(`⚠️ Could not create tag: ${error.message}`);
+            }
+
+  # ===========================================================================
+  # CLEANUP OLD PREVIEW DEPLOYMENTS
+  # ===========================================================================
+  
+  cleanup-previews:
+    name: Cleanup Old Previews
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    
+    steps:
+      - name: Delete Preview Deployment
+        run: |
+          echo "🧹 Cleaning up preview deployment for closed PR..."
+          # Vercel automatically handles preview cleanup, but you can add
+          # custom cleanup logic here if needed
