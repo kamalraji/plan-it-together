@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Bars3Icon,
   PlusIcon,
   UserPlusIcon,
@@ -127,32 +127,83 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
       )}
 
       {/* Main Content */}
-      <div className="w-full pt-16 pb-24 px-4">
+      <div className="w-full pt-16 pb-24 px-4 space-y-6">
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-3">
+            {/* Overview Cards */}
+            <section aria-label="Workspace overview" className="space-y-4">
+              <h2 className="text-base font-semibold text-gray-900">Workspace overview</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {/* Tasks Card */}
                 <button
-                  onClick={() => handleQuickAction('create-task')}
-                  className="flex items-center justify-center p-3 bg-indigo-50 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition-colors"
+                  type="button"
+                  onClick={() => handleQuickAction('view-tasks')}
+                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
                 >
-                  <PlusIcon className="w-5 h-5 text-indigo-600 mr-2" />
-                  <span className="text-sm font-medium text-indigo-700">New Task</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50">
+                      <PlusIcon className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Tasks</p>
+                      <p className="text-xs text-gray-500">View and update all workspace tasks</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {workspace.taskSummary?.total ?? 0}
+                    </p>
+                    <p className="text-xs text-gray-400">total</p>
+                  </div>
                 </button>
+
+                {/* Team Card */}
                 <button
-                  onClick={() => handleQuickAction('invite-member')}
-                  className="flex items-center justify-center p-3 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+                  type="button"
+                  onClick={() => handleQuickAction('view-team')}
+                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
                 >
-                  <UserPlusIcon className="w-5 h-5 text-green-600 mr-2" />
-                  <span className="text-sm font-medium text-green-700">Invite</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                      <UserPlusIcon className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Team</p>
+                      <p className="text-xs text-gray-500">See who is in your workspace</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {workspace.teamMembers?.length ?? 0}
+                    </p>
+                    <p className="text-xs text-gray-400">members</p>
+                  </div>
+                </button>
+
+                {/* Communication Card */}
+                <button
+                  type="button"
+                  onClick={() => handleQuickAction('view-communication')}
+                  className="w-full text-left rounded-2xl bg-white shadow-sm border border-gray-200 p-4 flex items-center justify-between active:bg-gray-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                      <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Communication</p>
+                      <p className="text-xs text-gray-500">Jump into workspace conversations</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-indigo-600">Open communication</p>
+                  </div>
                 </button>
               </div>
-            </div>
+            </section>
 
-            {/* Mobile Features Panel */}
-            <MobileFeaturesPanel 
+            {/* Existing rich panels below the overview cards */}
+            <MobileFeaturesPanel
               workspaceId={workspace.id}
               onLocationUpdate={(location) => {
                 console.log('Location updated:', location);
@@ -165,16 +216,14 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
               }}
             />
 
-            {/* Task Summary */}
-            <MobileTaskSummary 
-              workspace={workspace} 
-              onViewTasks={() => handleQuickAction('view-tasks')} 
+            <MobileTaskSummary
+              workspace={workspace}
+              onViewTasks={() => handleQuickAction('view-tasks')}
             />
-            
-            {/* Team Overview */}
-            <MobileTeamOverview 
-              workspace={workspace} 
-              onViewTeam={() => handleQuickAction('view-team')} 
+
+            <MobileTeamOverview
+              workspace={workspace}
+              onViewTeam={() => handleQuickAction('view-team')}
             />
           </div>
         )}
@@ -213,55 +262,50 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
         <div className="flex justify-around">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'overview' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'overview'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <Bars3Icon className="w-5 h-5" />
             <span className="text-xs mt-1">Overview</span>
           </button>
           <button
             onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'tasks' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'tasks'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <PlusIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Tasks</span>
           </button>
           <button
             onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'team' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'team'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <UserPlusIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Team</span>
           </button>
           <button
             onClick={() => setActiveTab('communication')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'communication' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'communication'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <ChatBubbleLeftRightIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Chat</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg ${
-              activeTab === 'analytics' 
-                ? 'text-indigo-600 bg-indigo-50' 
+            className={`flex flex-col items-center py-2 px-3 rounded-lg ${activeTab === 'analytics'
+                ? 'text-indigo-600 bg-indigo-50'
                 : 'text-gray-500 hover:text-gray-700'
-            }`}
+              }`}
           >
             <ChartBarIcon className="w-5 h-5" />
             <span className="text-xs mt-1">Stats</span>

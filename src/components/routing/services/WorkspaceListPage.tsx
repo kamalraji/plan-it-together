@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '../PageHeader';
 import { Workspace, WorkspaceStatus } from '../../../types';
-import api from '../../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 
@@ -46,17 +46,31 @@ export const WorkspaceListPage: React.FC = () => {
   const canManageWorkspaces =
     !isOrgContext || (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ORGANIZER);
 
-  // Fetch workspaces
+  // Fetch workspaces from Supabase workspaces table
   const { data: workspaces, isLoading, error } = useQuery({
     queryKey: ['user-workspaces', orgSlugCandidate, eventId],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: {
-          orgSlug: isOrgContext ? orgSlugCandidate : undefined,
-          eventId: eventId || undefined,
-        },
-      });
-      return response.data.workspaces as Workspace[];
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select('id, name, status, created_at, updated_at, event_id')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Map to minimal Workspace-like shape for this page
+      return ((data || []).map((row: any) => ({
+        id: row.id,
+        eventId: row.event_id,
+        name: row.name,
+        status: row.status as WorkspaceStatus,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        event: undefined,
+        description: undefined,
+        teamMembers: [],
+        taskSummary: undefined,
+        channels: [],
+      })) as unknown) as Workspace[];
     },
   });
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -9,7 +9,16 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
-
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 interface EventFormPageProps {
   mode: 'create' | 'edit';
 }
@@ -36,6 +45,10 @@ const eventSchema = z
     registrationDeadline: z.string().optional(),
     primaryColor: z.string().optional(),
     logoUrl: z.string().url('Logo URL must be a valid URL').optional().or(z.literal('')),
+    heroSubtitle: z.string().trim().optional(),
+    bannerUrl: z.string().url('Banner URL must be a valid URL').optional().or(z.literal('')),
+    primaryCtaLabel: z.string().trim().optional(),
+    secondaryCtaLabel: z.string().trim().optional(),
   })
   .refine(
     (data) => {
@@ -58,11 +71,11 @@ type EventFormValues = z.infer<typeof eventSchema>;
 export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { listPath } = useEventManagementPaths();
   const { data: myOrganizations = [], isLoading: isLoadingOrganizations } =
     useMyMemberOrganizations();
-  const [submitIntent, setSubmitIntent] = useState<'draft' | 'publish'>('publish');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingEvent, setIsLoadingEvent] = useState(mode === 'edit');
   const [serverError, setServerError] = useState<string | null>(null);
@@ -81,14 +94,18 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       registrationDeadline: '',
       primaryColor: '#2563eb',
       logoUrl: '',
+      heroSubtitle: '',
+      bannerUrl: '',
+      primaryCtaLabel: '',
+      secondaryCtaLabel: '',
     },
   });
 
   const {
-    register,
     handleSubmit,
-    formState: { errors },
     reset,
+    control,
+    watch,
   } = form;
 
   useEffect(() => {
@@ -124,6 +141,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           registrationDeadline: '',
           primaryColor: (data.branding as any)?.primaryColor ?? '#2563eb',
           logoUrl: (data.branding as any)?.logoUrl ?? '',
+          heroSubtitle: (data.branding as any)?.heroSubtitle ?? '',
+          bannerUrl: (data.branding as any)?.bannerUrl ?? '',
+          primaryCtaLabel: (data.branding as any)?.primaryCtaLabel ?? '',
+          secondaryCtaLabel: (data.branding as any)?.secondaryCtaLabel ?? '',
         });
       } catch (err: any) {
         console.error('Failed to load event', err);
@@ -154,7 +175,28 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
     try {
       setIsSubmitting(true);
-      const status = submitIntent === 'draft' ? 'DRAFT' : 'PUBLISHED';
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+
+      if (!user) {
+        throw new Error('You must be logged in to create events.');
+      }
+
+      if (mode === 'create' && values.organizationId) {
+        const { data: membership, error: membershipError } = await supabase
+          .from('organization_memberships')
+          .select('status, role')
+          .eq('user_id', user.id)
+          .eq('organization_id', values.organizationId)
+          .maybeSingle();
+
+        if (membershipError) throw membershipError;
+
+        if (!membership || membership.status !== 'ACTIVE' || !['OWNER', 'ADMIN', 'ORGANIZER'].includes(membership.role)) {
+          throw new Error('You must be an active organizer for this organization to create events.');
+        }
+      }
 
       const payload: any = {
         name: values.name.trim(),
@@ -166,48 +208,64 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
         organization_id: values.organizationId,
         visibility: 'PUBLIC',
-        status,
-      };
-
-      if (values.primaryColor || values.logoUrl) {
-        payload.branding = {
+        branding: {
           primaryColor: values.primaryColor,
           logoUrl: values.logoUrl || undefined,
-        };
-      }
+          heroSubtitle: values.heroSubtitle?.trim() || undefined,
+          bannerUrl: values.bannerUrl || undefined,
+          primaryCtaLabel: values.primaryCtaLabel?.trim() || undefined,
+          secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
+        },
+        owner_id: user.id,
+      };
 
-      let error;
+      let createdEventId: string | undefined;
+
       if (mode === 'create') {
-        ({ error } = await supabase.from('events').insert(payload));
-      } else {
-        ({ error } = await supabase.from('events').update(payload).eq('id', eventId));
-      }
+        payload.status = 'DRAFT';
 
-      if (error) throw error;
+        const { data, error } = await supabase
+          .from('events')
+          .insert(payload)
+          .select('id')
+          .maybeSingle();
+
+        if (error) throw error;
+        createdEventId = data?.id as string | undefined;
+      } else {
+        const { error } = await supabase.from('events').update(payload).eq('id', eventId);
+        if (error) throw error;
+      }
 
       toast({
-        title:
-          mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Draft saved'
-              : 'Event created'
-            : 'Event updated',
+        title: mode === 'create' ? 'Event draft saved' : 'Event updated',
         description:
           mode === 'create'
-            ? submitIntent === 'draft'
-              ? 'Your event draft has been saved.'
-              : 'Your event has been created successfully.'
+            ? 'Your event has been saved as a draft. Next, create a workspace to manage and publish it.'
             : 'Your changes have been saved.',
       });
 
-      navigate(listPath);
+      if (mode === 'create') {
+        const currentPath = location.pathname;
+        const orgSlugCandidate = currentPath.split('/')[1];
+        const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+        const baseWorkspacePath = isOrgContext
+          ? `/${orgSlugCandidate}/workspaces`
+          : '/dashboard/workspaces';
+
+        if (createdEventId) {
+          navigate(`${baseWorkspacePath}/create?eventId=${createdEventId}`);
+        } else {
+          navigate(listPath);
+        }
+      } else {
+        navigate(listPath);
+      }
     } catch (err: any) {
       console.error('Failed to save event', err);
       const rawMessage = err?.message || 'Please try again.';
 
-      // Surface the exact Supabase error so we can properly debug issues
       const message = rawMessage;
-
 
       setServerError(message);
       toast({
@@ -228,11 +286,10 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       variant: 'secondary' as const,
     },
     {
-      label: mode === 'create' ? 'Create Event' : 'Save Changes',
+      label: mode === 'create' ? 'Save & continue to workspace' : 'Save Changes',
       action: () => {
         const formEl = document.getElementById('event-form') as HTMLFormElement | null;
         if (formEl) {
-          setSubmitIntent('publish');
           if (typeof formEl.requestSubmit === 'function') {
             formEl.requestSubmit();
           } else {
@@ -250,288 +307,545 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       <div className="max-w-4xl mx-auto">
         <PageHeader title={pageTitle} subtitle={pageSubtitle} actions={pageActions} />
 
-        <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
+        <div className="mt-6 rounded-2xl border border-border bg-card/60 p-6 shadow-soft">
           {isLoadingEvent ? (
-            <div className="py-12 text-center text-gray-500 text-sm">Loading event...</div>
+            <div className="py-12 text-center text-sm text-muted-foreground">Loading event...</div>
           ) : (
-            <form
-              id="event-form"
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-6"
-              noValidate
-            >
-              {serverError && (
-                <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-2 space-y-2">
-                  <p>{serverError}</p>
-                  {serverError.includes('organizer/admin permissions') && (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (isRequestingAccess) return;
-                        setIsRequestingAccess(true);
-                        try {
-                          const { error } = await supabase.functions.invoke('self-approve-organizer');
-                          if (error) throw error;
-                          toast({
-                            title: 'Organizer access requested',
-                            description:
-                              'We have recorded your request to become an organizer. Try again after your access updates.',
-                          });
-                        } catch (err: any) {
-                          toast({
-                            title: 'Failed to request organizer access',
-                            description: err?.message || 'Please try again.',
-                            variant: 'destructive',
-                          });
-                        } finally {
-                          setIsRequestingAccess(false);
-                        }
-                      }}
-                      className="inline-flex items-center px-3 py-1.5 rounded-md border border-red-300 text-xs font-medium text-red-700 bg-white hover:bg-red-50"
-                    >
-                      {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
-                    </button>
-                  )}
-                </div>
-              )}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label
-                      htmlFor="organization-id"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Organization *
-                    </label>
-                    <select
-                      id="organization-id"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
-                      {...register('organizationId')}
-                    >
-                      <option value="">
-                        {isLoadingOrganizations
-                          ? 'Loading organizations...'
-                          : myOrganizations.length === 0
-                            ? 'No organizations available'
-                            : 'Select an organization'}
-                      </option>
-                      {myOrganizations.map((org: any) => (
-                        <option key={org.id} value={org.id}>
-                          {org.name}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.organizationId && (
-                      <p className="mt-1 text-sm text-red-600">{errors.organizationId.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="event-name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Event Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="event-name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter event name"
-                      {...register('name')}
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="event-description"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Description *
-                    </label>
-                    <textarea
-                      id="event-description"
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Describe your event"
-                      {...register('description')}
-                    />
-                    {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="event-mode" className="block text-sm font-medium text-gray-700 mb-2">
-                        Event Mode *
-                      </label>
-                      <select
-                        id="event-mode"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        {...register('mode')}
-                      >
-                        <option value="ONLINE">Online</option>
-                        <option value="OFFLINE">Offline</option>
-                        <option value="HYBRID">Hybrid</option>
-                      </select>
-                      {errors.mode && (
-                        <p className="mt-1 text-sm text-red-600">{errors.mode.message}</p>
+            <Form {...form}>
+              <form
+                id="event-form"
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-8"
+                noValidate
+              >
+                {serverError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertTitle>Failed to save event</AlertTitle>
+                    <AlertDescription>
+                      <p>{serverError}</p>
+                      {serverError.includes('organizer/admin permissions') && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 border-destructive text-destructive hover:bg-destructive/10"
+                          disabled={isRequestingAccess}
+                          onClick={async () => {
+                            if (isRequestingAccess) return;
+                            setIsRequestingAccess(true);
+                            try {
+                              const { error } = await supabase.functions.invoke('self-approve-organizer');
+                              if (error) throw error;
+                              toast({
+                                title: 'Organizer access requested',
+                                description:
+                                  'We have recorded your request to become an organizer. Try again after your access updates.',
+                              });
+                            } catch (err: any) {
+                              toast({
+                                title: 'Failed to request organizer access',
+                                description: err?.message || 'Please try again.',
+                                variant: 'destructive',
+                              });
+                            } finally {
+                              setIsRequestingAccess(false);
+                            }
+                          }}
+                        >
+                          {isRequestingAccess ? 'Requesting…' : 'Request organizer access'}
+                        </Button>
                       )}
-                    </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <div>
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Basic Information</h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    <FormField
+                      control={control}
+                      name="organizationId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Organization *</FormLabel>
+                          <FormControl>
+                            <select
+                              className="flex h-12 w-full rounded-xl border-2 border-border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              disabled={isLoadingOrganizations || myOrganizations.length === 0 || isSubmitting}
+                              {...field}
+                            >
+                              <option value="">
+                                {isLoadingOrganizations
+                                  ? 'Loading organizations...'
+                                  : myOrganizations.length === 0
+                                    ? 'No organizations available'
+                                    : 'Select an organization'}
+                              </option>
+                              {myOrganizations.map((org: any) => (
+                                <option key={org.id} value={org.id}>
+                                  {org.name}
+                                </option>
+                              ))}
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                    <div>
-                      <label
-                        htmlFor="event-capacity"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Capacity
-                      </label>
-                      <input
-                        type="number"
-                        id="event-capacity"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter capacity (optional)"
-                        {...register('capacity')}
+                    <FormField
+                      control={control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Event Name *</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="Enter event name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description *</FormLabel>
+                          <FormControl>
+                            <Textarea rows={4} placeholder="Describe your event" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event Mode *</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full rounded-xl border-2 border-border bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                {...field}
+                              >
+                                <option value="ONLINE">Online</option>
+                                <option value="OFFLINE">Offline</option>
+                                <option value="HYBRID">Hybrid</option>
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                      {errors.capacity && (
-                        <p className="mt-1 text-sm text-red-600">{errors.capacity.message as string}</p>
-                      )}
+
+                      <FormField
+                        control={control}
+                        name="capacity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Capacity</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Enter capacity (optional)"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>Leave blank if there is no fixed capacity.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Date and Time</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-2">
-                      Start Date *
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="start-date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      {...register('startDate')}
+                <div className="border-t border-border pt-6">
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Date and Time</h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <FormField
+                      control={control}
+                      name="startDate"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <FormItem>
+                            <FormLabel>Start Date *</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select start date & time</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>Times are saved using your current timezone.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
-                    {errors.startDate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
-                    )}
-                  </div>
 
-                  <div>
-                    <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-2">
-                      End Date *
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="end-date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      {...register('endDate')}
+                    <FormField
+                      control={control}
+                      name="endDate"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <FormItem>
+                            <FormLabel>End Date *</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select end date & time</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>Must be after the start date.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
-                    {errors.endDate && (
-                      <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
-                    )}
-                  </div>
 
-                  <div>
-                    <label
-                      htmlFor="registration-deadline"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Registration Deadline
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="registration-deadline"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      {...register('registrationDeadline')}
+                    <FormField
+                      control={control}
+                      name="registrationDeadline"
+                      render={({ field }) => {
+                        const dateValue = field.value ? new Date(field.value) : undefined;
+                        return (
+                          <FormItem>
+                            <FormLabel>Registration Deadline</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !dateValue && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateValue ? (
+                                      format(dateValue, 'PPP p')
+                                    ) : (
+                                      <span>Select registration deadline (optional)</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={dateValue}
+                                    onSelect={(date) => {
+                                      if (!date) {
+                                        field.onChange('');
+                                        return;
+                                      }
+                                      const formatted = format(date, "yyyy-MM-dd'T'HH:mm");
+                                      field.onChange(formatted);
+                                    }}
+                                    initialFocus
+                                    className={cn('p-3 pointer-events-auto')}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormDescription>
+                              Optional: registrations will be closed after this time.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
-                    {errors.registrationDeadline && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.registrationDeadline.message as string}
-                      </p>
-                    )}
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Branding</h3>
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label
-                      htmlFor="primary-color"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Primary Color
-                    </label>
-                    <input
-                      type="color"
-                      id="primary-color"
-                      className="h-10 w-20 border border-gray-300 rounded-md"
-                      {...register('primaryColor')}
-                    />
-                    {errors.primaryColor && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.primaryColor.message as string}
-                      </p>
-                    )}
-                  </div>
+                <div className="border-t border-border pt-6">
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">Branding</h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="space-y-6">
+                      <FormField
+                        control={control}
+                        name="primaryColor"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Color</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="color"
+                                className="h-10 w-24 cursor-pointer px-2 py-1"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              This color will be used as the accent for your event branding.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <div>
-                    <label htmlFor="logo-url" className="block text-sm font-medium text-gray-700 mb-2">
-                      Logo URL
-                    </label>
-                    <input
-                      type="url"
-                      id="logo-url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://example.com/logo.png"
-                      {...register('logoUrl')}
-                    />
-                    {errors.logoUrl && (
-                      <p className="mt-1 text-sm text-red-600">{errors.logoUrl.message}</p>
-                    )}
+                      <FormField
+                        control={control}
+                        name="logoUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Logo URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://example.com/logo.png"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional: link to an image that will appear on your public event page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="heroSubtitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero Subtitle</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Short tagline shown under the event name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional short sentence to make your landing hero more compelling.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="bannerUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hero Banner Image URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://example.com/hero-banner.jpg"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional background image for the top section of your public event page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="primaryCtaLabel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Button Label</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Register now"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Text for the main call-to-action button on your landing page.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="secondaryCtaLabel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Secondary Button Label</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Learn more (optional)"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Optional secondary action shown next to the main button.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      {(() => {
+                        const primaryColor = watch('primaryColor') || '#2563eb';
+                        const logoUrl = watch('logoUrl');
+                        const name = watch('name') || 'Your event name';
+                        const heroSubtitle = watch('heroSubtitle');
+                        const primaryCtaLabel = watch('primaryCtaLabel') || 'Register now';
+
+                        return (
+                          <div
+                            className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-card shadow-sm"
+                            style={{ borderColor: primaryColor }}
+                            aria-label="Event landing preview"
+                          >
+                            <div
+                              className="p-4 text-white"
+                              style={{
+                                backgroundColor: primaryColor,
+                              }}
+                            >
+                              <p className="text-xs font-medium opacity-80">Landing preview</p>
+                              <div className="mt-3 flex items-center gap-3">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/10 overflow-hidden">
+                                  {logoUrl ? (
+                                    <img
+                                      src={logoUrl}
+                                      alt="Event logo preview"
+                                      className="h-full w-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="text-xs font-semibold opacity-80">Logo</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-base font-semibold">{name}</p>
+                                  <p className="text-xs opacity-90">
+                                    {heroSubtitle || 'Add a short subtitle to describe your event at a glance.'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="p-4 flex items-center justify-between bg-card">
+                              <div className="space-y-1">
+                                <div className="h-2 w-24 rounded-full bg-muted" />
+                                <div className="h-2 w-32 rounded-full bg-muted" />
+                              </div>
+                              <div
+                                className="rounded-full px-3 py-1 text-xs font-medium text-primary-foreground"
+                                style={{ backgroundColor: primaryColor }}
+                              >
+                                {primaryCtaLabel}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-gray-200 pt-6 flex items-center justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => navigate('../list')}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => setSubmitIntent('draft')}
-                  disabled={isSubmitting || myOrganizations.length === 0}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
-                >
-                  Save as Draft
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => setSubmitIntent('publish')}
-                  disabled={isSubmitting || myOrganizations.length === 0}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60"
-                >
-                  {isSubmitting
-                    ? mode === 'create'
-                      ? 'Creating...'
-                      : 'Saving...'
-                    : mode === 'create'
-                      ? 'Create Event'
-                      : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+                <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => navigate('../list')}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="default"
+                    disabled={isSubmitting || myOrganizations.length === 0}
+                  >
+                    {isSubmitting
+                      ? mode === 'create'
+                        ? 'Saving...'
+                        : 'Saving...'
+                      : mode === 'create'
+                        ? 'Save & continue to workspace'
+                        : 'Save changes'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           )}
         </div>
 
@@ -539,7 +853,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           <h4 className="text-sm font-medium text-blue-900 mb-2">Need Help?</h4>
           <p className="text-sm text-blue-700">
             {mode === 'create'
-              ? 'Fill in the required fields to create your event. You can save as draft and continue editing later.'
+              ? 'Fill in the required fields to create your event. After saving, you will be guided to create a workspace before publishing.'
               : 'Update your event information. Changes will be reflected immediately after saving.'}
           </p>
         </div>

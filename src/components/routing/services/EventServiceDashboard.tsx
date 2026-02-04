@@ -247,13 +247,14 @@ export const EventServiceDashboard: React.FC = () => {
           <h3 className="text-base sm:text-lg font-medium text-foreground">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {quickActions.map((action, index) => (
-              <div
+              <Link
                 key={index}
-                className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                  action.primary
+                to={action.href}
+                className={`block p-4 sm:p-6 rounded-lg border transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${{
+                  true: action.primary
                     ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                    : 'border-border bg-card hover:bg-muted'
-                }`}
+                    : 'border-border bg-card hover:bg-muted',
+                }.true}`}
               >
                 <div className="flex items-center mb-2 sm:mb-3">
                   <h4
@@ -271,7 +272,7 @@ export const EventServiceDashboard: React.FC = () => {
                 >
                   {action.description}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

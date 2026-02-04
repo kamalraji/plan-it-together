@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventStatus } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
 
 interface SupabaseEventRow {
   id: string;
@@ -48,12 +47,12 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
   };
 }
 
+type DateFilter = 'ALL' | 'UPCOMING' | 'PAST';
+
 export function ParticipantEventsPage() {
-  const { user } = useAuth();
-  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>(EventStatus.PUBLISHED);
+  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
-  const [showPastArchive, setShowPastArchive] = useState(false);
-  const [registeredFilter, setRegisteredFilter] = useState<'ALL' | 'ONLY_REGISTERED' | 'HIDE_REGISTERED'>('ALL');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
 
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ['participant-events'],
@@ -61,7 +60,6 @@ export function ParticipantEventsPage() {
       const { data, error } = await supabase
         .from('events')
         .select('id, name, description, mode, start_date, end_date, capacity, visibility, status')
-        .eq('visibility', 'PUBLIC')
         .order('start_date', { ascending: true });
 
       if (error) throw error;
@@ -69,23 +67,6 @@ export function ParticipantEventsPage() {
       const mapped = (data as SupabaseEventRow[]).map(mapRowToEvent).filter(Boolean) as Event[];
       return mapped;
     },
-  });
-
-  const { data: registrationStatusMap } = useQuery<Map<string, string>>({
-    queryKey: ['user-registered-events', user?.id],
-    queryFn: async () => {
-      if (!user) return new Map<string, string>();
-
-      const { data, error } = await supabase
-        .from('registrations')
-        .select('event_id, status')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      return new Map((data || []).map((r: any) => [r.event_id, r.status]));
-    },
-    enabled: !!user,
   });
 
   useEffect(() => {
@@ -111,25 +92,19 @@ export function ParticipantEventsPage() {
   }, []);
 
   const now = new Date().getTime();
-  const registrationMap = registrationStatusMap ?? new Map<string, string>();
 
   const filteredEvents = (events || []).filter((event) => {
     const startTime = new Date(event.startDate).getTime();
-    const isPast = startTime < now;
 
-    if (!showPastArchive && isPast) {
-      return false;
-    }
+    const matchesDate =
+      dateFilter === 'ALL' ||
+      (dateFilter === 'UPCOMING' && startTime >= now) ||
+      (dateFilter === 'PAST' && startTime < now);
 
-    const isRegistered = registrationMap.has(event.id);
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
-    const matchesRegistrationFilter =
-      registeredFilter === 'ALL' ||
-      (registeredFilter === 'ONLY_REGISTERED' && isRegistered) ||
-      (registeredFilter === 'HIDE_REGISTERED' && !isRegistered);
 
-    return matchesStatus && matchesMode && matchesRegistrationFilter;
+    return matchesDate && matchesStatus && matchesMode;
   });
 
   return (
@@ -154,19 +129,16 @@ export function ParticipantEventsPage() {
         <div className="bg-card rounded-lg shadow-sm border border-border p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="flex flex-wrap gap-3">
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Archive</label>
-              <div className="flex items-center gap-2">
-                <input
-                  id="show-archive"
-                  type="checkbox"
-                  checked={showPastArchive}
-                  onChange={(e) => setShowPastArchive(e.target.checked)}
-                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-                />
-                <label htmlFor="show-archive" className="text-sm text-foreground">
-                  Include past events (archive)
-                </label>
-              </div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Date</label>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value as DateFilter)}
+                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
+              >
+                <option value="ALL">All dates</option>
+                <option value="UPCOMING">Upcoming only</option>
+                <option value="PAST">Past only</option>
+              </select>
             </div>
 
             <div>
@@ -196,19 +168,6 @@ export function ParticipantEventsPage() {
                 <option value={EventMode.HYBRID}>Hybrid</option>
               </select>
             </div>
-
-            <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Registration</label>
-              <select
-                value={registeredFilter}
-                onChange={(e) => setRegisteredFilter(e.target.value as any)}
-                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
-              >
-                <option value="ALL">All events</option>
-                <option value="ONLY_REGISTERED">Only registered</option>
-                <option value="HIDE_REGISTERED">Hide registered</option>
-              </select>
-            </div>
           </div>
 
           <div className="text-sm text-muted-foreground mt-2 md:mt-0">
@@ -234,30 +193,14 @@ export function ParticipantEventsPage() {
           {filteredEvents.map((event) => {
             const start = new Date(event.startDate);
             const end = new Date(event.endDate);
-            const registrationStatus = registrationMap.get(event.id);
-            const isRegistered = !!registrationStatus;
 
             return (
               <div
                 key={event.id}
-                className={`rounded-lg border p-5 flex flex-col justify-between hover:shadow-md transition-shadow ${
-                  isRegistered
-                    ? 'bg-primary/5 border-primary/30'
-                    : 'bg-card border-border'
-                }`}
+                className="bg-card rounded-lg border border-border p-5 flex flex-col justify-between hover:shadow-md transition-shadow"
               >
                 <div>
-                  <div className="flex items-start justify-between mb-1 gap-2">
-                    <h2 className="text-lg font-semibold text-foreground line-clamp-1">{event.name}</h2>
-                    {isRegistered && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground whitespace-nowrap">
-                        Registered  b7 {registrationStatus === 'PENDING' && 'Pending'}
-                        {registrationStatus === 'CONFIRMED' && 'Confirmed'}
-                        {registrationStatus === 'WAITLISTED' && 'Waitlisted'}
-                        {registrationStatus === 'CANCELLED' && 'Cancelled'}
-                      </span>
-                    )}
-                  </div>
+                  <h2 className="text-lg font-semibold text-foreground mb-1 line-clamp-1">{event.name}</h2>
                   <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
 
                   <div className="space-y-2 text-sm mb-4">
@@ -284,21 +227,13 @@ export function ParticipantEventsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-border mt-2 gap-3">
-                  <div className="flex items-center gap-2">
-                    <Link
-                      to={`/events/${event.id}#register`}
-                      className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                    >
-                      {isRegistered ? 'View registration' : 'Quick register'}
-                    </Link>
-                    <Link
-                      to={`/events/${event.id}`}
-                      className="text-xs font-medium text-primary hover:text-primary/80"
-                    >
-                      View details
-                    </Link>
-                  </div>
+                <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                  <Link
+                    to={`/events/${event.id}`}
+                    className="text-sm font-medium text-primary hover:text-primary/80"
+                  >
+                    View details
+                  </Link>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
                     {event.status === EventStatus.ONGOING && 'Ongoing'}
                     {event.status === EventStatus.PUBLISHED && 'Upcoming'}

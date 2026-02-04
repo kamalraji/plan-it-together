@@ -346,7 +346,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${isMobile ? 'w-full' : collapsed ? 'w-16' : 'w-64'}`}>
+    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${collapsed && !isMobile ? 'w-16' : 'w-64'}`}>
       {/* Mobile Header */}
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -409,13 +409,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Search Results */}
         {searchQuery.trim() && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3
-              className={`text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 ${
-                isMobile
-                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
-                  : ''
-              }`}
-            >
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
               Search Results ({filteredServices.length})
             </h3>
             <div className="space-y-1">
@@ -464,13 +458,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Favorites Section */}
         {!searchQuery.trim() && favoriteServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3
-              className={`text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 flex items-center ${
-                isMobile
-                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
-                  : ''
-              }`}
-            >
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center">
               <StarIcon className="h-3 w-3 mr-1" />
               Favorites
             </h3>
@@ -495,13 +483,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Recent Services Section */}
         {!searchQuery.trim() && recentServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3
-              className={`text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 flex items-center ${
-                isMobile
-                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
-                  : ''
-              }`}
-            >
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center">
               <ClockIcon className="h-3 w-3 mr-1" />
               Recent
             </h3>

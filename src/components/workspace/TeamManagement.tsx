@@ -1,22 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  UserPlusIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { UserPlusIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Workspace, TeamMember, WorkspaceRole } from '../../types';
+import { Workspace, TeamMember, WorkspaceRole, WorkspaceRoleScope } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
 import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
-import api from '../../lib/api';
 
 interface TeamManagementProps {
   workspace: Workspace;
+  roleScope?: WorkspaceRoleScope;
 }
 
-export function TeamManagement({ workspace }: TeamManagementProps) {
+export function TeamManagement({ workspace, roleScope }: TeamManagementProps) {
   const [activeView, setActiveView] = useState<'roster' | 'invite' | 'bulk-invite'>('roster');
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<WorkspaceRole | 'all'>('all');
@@ -24,35 +21,47 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch team members with details
+  // Fetch team members from Supabase
   const { data: teamMembers, isLoading } = useQuery({
     queryKey: ['workspace-team-members', workspace.id],
     queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/team-members`);
-      return response.data.teamMembers as TeamMember[];
+      const { data, error } = await supabase
+        .from('workspace_team_members')
+        .select('*')
+        .eq('workspace_id', workspace.id)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        role: row.role as WorkspaceRole,
+        status: row.status,
+        joinedAt: row.joined_at,
+        leftAt: row.left_at || undefined,
+        user: {
+          id: row.user_id,
+          name: 'Member',
+          email: '',
+        },
+      })) as TeamMember[];
     },
   });
 
-  // Fetch pending invitations
-  const { data: pendingInvitations } = useQuery({
-    queryKey: ['workspace-invitations', workspace.id],
-    queryFn: async () => {
-      const response = await api.get(`/workspaces/${workspace.id}/invitations`);
-      return response.data.invitations as Array<{
-        id: string;
-        email: string;
-        role: WorkspaceRole;
-        status: string;
-        invitedAt: string;
-        invitedBy: { name: string };
-      }>;
-    },
-  });
+  // Pending invitations not yet backed by Supabase; show none for now
+  const pendingInvitations: any[] = [];
 
   // Remove team member mutation
   const removeTeamMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      await api.delete(`/workspaces/${workspace.id}/team-members/${memberId}`);
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .delete()
+        .eq('id', memberId)
+        .eq('workspace_id', workspace.id);
+
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
@@ -74,7 +83,14 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   // Update role mutation with optimistic UI
   const updateRoleMutation = useMutation({
     mutationFn: async ({ memberId, role }: { memberId: string; role: WorkspaceRole }) => {
-      await api.patch(`/workspaces/${workspace.id}/team-members/${memberId}`, { role });
+      const { error } = await supabase
+        .from('workspace_team_members')
+        .update({ role })
+        .eq('id', memberId)
+        .eq('workspace_id', workspace.id);
+
+      if (error) throw error;
+
       // Fire-and-forget activity log; errors here shouldn't block role update
       await supabase.from('workspace_activities').insert({
         workspace_id: workspace.id,
@@ -127,7 +143,11 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   });
 
   const handleRemoveTeamMember = async (memberId: string) => {
-    if (window.confirm('Are you sure you want to remove this team member? They will lose access to the workspace immediately.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to remove this team member? They will lose access to the workspace immediately.',
+      )
+    ) {
       await removeTeamMemberMutation.mutateAsync(memberId);
     }
   };
@@ -136,17 +156,24 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
     await updateRoleMutation.mutateAsync({ memberId, role });
   };
 
-  const filteredMembers = teamMembers?.filter(member => {
-    const matchesSearch = member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || member.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'active' && member.status === 'ACTIVE') ||
-                         (statusFilter === 'pending' && member.status === 'PENDING') ||
-                         (statusFilter === 'inactive' && member.status === 'INACTIVE');
-    
-    return matchesSearch && matchesRole && matchesStatus;
-  }) || [];
+  const filteredMembers =
+    teamMembers?.filter((member) => {
+      if (roleScope && roleScope !== 'ALL' && member.role !== roleScope) {
+        return false;
+      }
+
+      const matchesSearch =
+        member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = roleFilter === 'all' || member.role === roleFilter;
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && member.status === 'ACTIVE') ||
+        (statusFilter === 'pending' && member.status === 'PENDING') ||
+        (statusFilter === 'inactive' && member.status === 'INACTIVE');
+
+      return matchesSearch && matchesRole && matchesStatus;
+    }) || [];
 
   const getStatusBadge = (status: string) => {
     return <WorkspaceStatusBadge status={status} />;
@@ -155,6 +182,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   const getRoleBadge = (role: WorkspaceRole) => {
     return <WorkspaceRoleBadge role={role} />;
   };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -196,31 +224,28 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveView('roster')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'roster'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'roster'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Team Roster ({filteredMembers.length})
           </button>
           <button
             onClick={() => setActiveView('invite')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'invite'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'invite'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Invite Members
           </button>
           <button
             onClick={() => setActiveView('bulk-invite')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeView === 'bulk-invite'
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${activeView === 'bulk-invite'
                 ? 'border-indigo-500 text-indigo-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+              }`}
           >
             Bulk Invite
             {pendingInvitations && pendingInvitations.length > 0 && (

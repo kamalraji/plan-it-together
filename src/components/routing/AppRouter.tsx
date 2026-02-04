@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider } from '../../hooks/useAuth';
@@ -31,8 +31,7 @@ import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
-import { ParticipantPortfolioPage } from '../portfolio/ParticipantPortfolioPage';
-import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
+import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -290,13 +289,13 @@ export const ConsoleDashboard = () => {
               </div>
             </div>
             <button onClick={() => {
-      const orgSlugCandidate = location.pathname.split('/')[1];
-      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
-        navigate(`/${orgSlugCandidate}/eventmanagement`);
-      } else {
-        navigate('/dashboard/eventmanagement');
-      }
-    }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              const orgSlugCandidate = location.pathname.split('/')[1];
+              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+                navigate(`/${orgSlugCandidate}/eventmanagement`);
+              } else {
+                navigate('/dashboard/eventmanagement');
+              }
+            }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Events
             </button>
           </div>
@@ -320,13 +319,13 @@ export const ConsoleDashboard = () => {
               </div>
             </div>
             <button onClick={() => {
-      const orgSlugCandidate = location.pathname.split('/')[1];
-      if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
-        navigate(`/${orgSlugCandidate}/workspaces`);
-      } else {
-        navigate('/dashboard/workspaces');
-      }
-    }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+              const orgSlugCandidate = location.pathname.split('/')[1];
+              if (orgSlugCandidate && orgSlugCandidate !== 'dashboard') {
+                navigate(`/${orgSlugCandidate}/workspaces`);
+              } else {
+                navigate('/dashboard/workspaces');
+              }
+            }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Workspaces
             </button>
           </div>
@@ -355,7 +354,7 @@ export const ConsoleDashboard = () => {
                 </span>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => window.location.href = '/marketplace'}
               className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
             >
@@ -373,7 +372,7 @@ export const ConsoleDashboard = () => {
             <button className="bg-white/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Join Workspace
             </button>
-            <button 
+            <button
               onClick={() => window.location.href = '/marketplace'}
               className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
@@ -478,9 +477,9 @@ const ProfileService = () => {
 const SupportService = () => {
   // Get current context from URL or other means
   const currentContext = window.location.pathname.includes('/events') ? 'events' :
-                         window.location.pathname.includes('/workspaces') ? 'workspaces' :
-                         window.location.pathname.includes('/marketplace') ? 'marketplace' :
-                         undefined;
+    window.location.pathname.includes('/workspaces') ? 'workspaces' :
+      window.location.pathname.includes('/marketplace') ? 'marketplace' :
+        undefined;
 
   return <HelpPage currentContext={currentContext} />;
 };
@@ -493,43 +492,6 @@ const CommunicationService = () => {
   return <CommunicationPage />;
 };
 
-const EmbedPortfolioRoute: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
-
-  useEffect(() => {
-    document.title = 'Participant Portfolio Preview | Thittam1Hub';
-
-    const description =
-      'Compact public portfolio preview card for embedding participant profiles from Thittam1Hub.';
-
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'description');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', description);
-
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', window.location.origin + window.location.pathname);
-  }, []);
-
-  if (!userId) return null;
-
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-4">
-        <PortfolioPreviewCard userId={userId} />
-      </div>
-    </main>
-  );
-};
-
 export const AppRouter: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -538,7 +500,7 @@ export const AppRouter: React.FC = () => {
           <Routes>
             {/* Root redirect to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
+
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
@@ -579,9 +541,8 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
 
-            {/* Public participant portfolio */}
-            <Route path="/portfolio/:userId" element={<ParticipantPortfolioPage />} />
-            <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
+            {/* Public organization landing by slug */}
+            <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
 
             {/* Organization-scoped organizer console */}
             <Route
@@ -646,48 +607,48 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-              <Route 
-                path="eventmanagement/*" 
+              <Route
+                path="eventmanagement/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <EventService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="workspaces/*" 
+              <Route
+                path="workspaces/*"
                 element={
                   <ConsoleRoute>
                     <WorkspaceService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="marketplace/*" 
+              <Route
+                path="marketplace/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <MarketplaceService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="organizations/*" 
+              <Route
+                path="organizations/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <OrganizationServiceComponent />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="analytics/*" 
+              <Route
+                path="analytics/*"
                 element={
                   <ConsoleRoute>
                     <AnalyticsService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="admin/users" 
+              <Route
+                path="admin/users"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.SUPER_ADMIN]}>
                     <AdminUserRolesPage />
@@ -702,48 +663,48 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-              <Route 
-                path="profile/*" 
+              <Route
+                path="profile/*"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <ProfileService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="support/*" 
+              <Route
+                path="support/*"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <SupportService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="notifications/*" 
+              <Route
+                path="notifications/*"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <NotificationService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="communications/*" 
+              <Route
+                path="communications/*"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <CommunicationService />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="search" 
+              <Route
+                path="search"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
                     <SearchPage />
                   </ConsoleRoute>
-                } 
+                }
               />
-              <Route 
-                path="data-lab" 
+              <Route
+                path="data-lab"
                 element={
                   <ConsoleRoute>
                     <DashboardDataLab />
@@ -753,24 +714,24 @@ export const AppRouter: React.FC = () => {
             </Route>
 
             {/* Standalone Marketplace - public marketplace for browsing services */}
-            <Route 
-              path="/marketplace/*" 
+            <Route
+              path="/marketplace/*"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <MarketplaceService />
                 </ConsoleRoute>
-              } 
+              }
             />
 
             {/* Legacy console redirect */}
             <Route path="/console/*" element={<Navigate to="/dashboard" replace />} />
-            
+
             {/* 404 Not Found - must be last */}
             <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+          </Routes >
+        </BrowserRouter >
+      </AuthProvider >
+    </QueryClientProvider >
   );
 };
 

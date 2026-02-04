@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '../../lib/api';
 
 // Types for certificate verification
 export interface CertificateVerificationResult {
@@ -41,29 +41,37 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
   }, [certificateId]);
 
   // Query for certificate verification
-  const {
-    data: verificationResult,
-    isLoading,
+  const { 
+    data: verificationResult, 
+    isLoading, 
     error,
-    refetch,
+    refetch 
   } = useQuery({
     queryKey: ['certificate-verification', verificationId],
     queryFn: async () => {
       if (!verificationId) return null;
-
-      const { data, error } = await supabase.functions.invoke('certificates', {
-        body: { action: 'verify', certificateId: verificationId },
-      });
-      if (error) {
-        if ((error as any).status === 404) {
+      
+      try {
+        // Create a new axios instance without auth interceptors for public verification
+        const axios = (await import('axios')).default;
+        const publicApi = axios.create({
+          baseURL: api.defaults.baseURL,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const response = await publicApi.get(`/certificates/verify/${verificationId}`);
+        return response.data.data as CertificateVerificationResult;
+      } catch (error: any) {
+        if (error.response?.status === 404) {
           return {
             valid: false,
-            error: 'Certificate not found. Please check the certificate ID and try again.',
+            error: 'Certificate not found. Please check the certificate ID and try again.'
           } as CertificateVerificationResult;
         }
         throw error;
       }
-      return data as CertificateVerificationResult;
     },
     enabled: !!verificationId,
     retry: false, // Don't retry on 404s
