@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../../hooks/useAuth';
 import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
+import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
 
 
@@ -66,6 +67,8 @@ export function ParticipantDashboard() {
     return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
   });
   const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
+
+  const { isHealthy } = useApiHealth();
 
   useEffect(() => {
     const checkOrganizerSignup = async () => {
@@ -156,14 +159,22 @@ export function ParticipantDashboard() {
         return registration;
       });
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
-
+ 
   const { data: certificates } = useQuery<Certificate[]>({
     queryKey: ['participant-certificates'],
     queryFn: async () => {
       const response = await api.get('/certificates/my-certificates');
       return response.data.certificates as Certificate[];
     },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isHealthy !== false,
   });
 
   const isProfileIncomplete = !user?.profileCompleted;
@@ -292,14 +303,14 @@ export function ParticipantDashboard() {
         <div className="bg-accent/80 text-accent-foreground border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
             <span>
-              You signed up as an organizer. To unlock organizer tools, first create your organization.
+              You signed up as an organizer. To unlock organizer tools, first join or create an organization.
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate('/onboarding/organization')}
+                onClick={() => navigate('/dashboard/organizations/join')}
                 className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-3 py-1 text-xs font-medium hover:bg-primary/90"
               >
-                Set up organization
+                Join or create organization
               </button>
               <button
                 onClick={() => setShowOrganizerBanner(false)}

@@ -7,6 +7,7 @@ import { OrganizationMembersPage } from './OrganizationMembersPage';
 import { OrganizationSettingsPage } from './OrganizationSettingsPage';
 import { OrganizationAnalyticsPage } from './OrganizationAnalyticsPage';
 
+
 /**
  * OrganizationService component provides the main routing structure for the Organization Management Service.
  * It implements AWS-style service interface with:
@@ -34,7 +35,7 @@ export const OrganizationService: React.FC = () => {
       
       {/* Multi-organization management */}
       <Route path="multi-org" element={<OrganizationListPage filterBy="managed" />} />
-      
+
       {/* Redirect unknown routes to dashboard */}
       <Route path="*" element={<Navigate to="/dashboard/organizations" replace />} />
     </Routes>

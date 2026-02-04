@@ -17,6 +17,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { PageHeader } from './PageHeader';
 import type { Notification } from './NotificationCenter';
+import { useNotificationFeed } from '@/hooks/useNotificationFeed';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+
 interface NotificationPageProps {
   notifications?: Notification[];
   onMarkAsRead?: (notificationId: string) => void;
@@ -25,113 +29,27 @@ interface NotificationPageProps {
   onClearAll?: () => void;
 }
 
-// Extended mock notifications for the full page view
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'New Task Assignment',
-    message: 'Sarah assigned you to "Design event brochure" in Marketing Workspace',
-    type: 'task',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    read: false,
-    actionUrl: '/console/workspaces/marketing/tasks/123',
-    actionLabel: 'View Task',
-    metadata: { workspaceId: 'marketing', taskId: '123' }
-  },
-  {
-    id: '2',
-    title: 'Event Registration Milestone',
-    message: 'Annual Conference 2024 has reached 500 registrations!',
-    type: 'success',
-    category: 'event',
-    timestamp: new Date(Date.now() - 30 * 60 * 1000),
-    read: false,
-    actionUrl: '/console/events/annual-conference-2024',
-    actionLabel: 'View Event',
-    metadata: { eventId: 'annual-conference-2024', registrations: 500 }
-  },
-  {
-    id: '3',
-    title: 'Service Booking Confirmed',
-    message: 'Photography service booking confirmed for March 15, 2024',
-    type: 'info',
-    category: 'marketplace',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    read: true,
-    actionUrl: '/console/marketplace/bookings/photo-service-123',
-    actionLabel: 'View Booking',
-    metadata: { serviceId: 'photo-service-123', date: '2024-03-15' }
-  },
-  {
-    id: '4',
-    title: 'Task Deadline Approaching',
-    message: 'Task "Finalize venue contract" is due in 2 hours',
-    type: 'warning',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    read: false,
-    actionUrl: '/console/workspaces/event-planning/tasks/456',
-    actionLabel: 'Complete Task',
-    metadata: { workspaceId: 'event-planning', taskId: '456', hoursUntilDue: 2 }
-  },
-  {
-    id: '5',
-    title: 'System Maintenance Scheduled',
-    message: 'Scheduled maintenance on March 20, 2024 from 2:00 AM - 4:00 AM EST',
-    type: 'info',
-    category: 'system',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    read: true,
-    actionUrl: '/console/system/maintenance',
-    actionLabel: 'Learn More',
-    metadata: { maintenanceDate: '2024-03-20', duration: '2 hours' }
-  },
-  {
-    id: '6',
-    title: 'New Team Member',
-    message: 'John Doe joined the Marketing Workspace',
-    type: 'info',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    read: true,
-    actionUrl: '/console/workspaces/marketing/team',
-    actionLabel: 'View Team',
-    metadata: { workspaceId: 'marketing', newMember: 'John Doe' }
-  },
-  {
-    id: '7',
-    title: 'Organization Invitation',
-    message: 'You have been invited to join "Tech Innovators" organization',
-    type: 'info',
-    category: 'organization',
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    read: false,
-    actionUrl: '/console/organizations/tech-innovators/invitation',
-    actionLabel: 'Accept Invitation',
-    metadata: { organizationId: 'tech-innovators' }
-  },
-  {
-    id: '8',
-    title: 'Payment Processed',
-    message: 'Payment of $299.99 for venue booking has been processed successfully',
-    type: 'success',
-    category: 'marketplace',
-    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    read: true,
-    actionUrl: '/console/marketplace/bookings/venue-123/payment',
-    actionLabel: 'View Receipt',
-    metadata: { amount: 299.99, bookingId: 'venue-123' }
-  }
-];
+// Notifications are now loaded from Supabase via the notification feed hook.
 
 export const NotificationPage: React.FC<NotificationPageProps> = ({
-  notifications = mockNotifications,
+  notifications,
   onMarkAsRead,
   onMarkAllAsRead,
   onDeleteNotification,
   onClearAll,
 }) => {
+  const { user } = useAuth();
+
+  const {
+    notifications: liveNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+  } = useNotificationFeed();
+
+  const effectiveNotifications = notifications ?? liveNotifications ?? [];
+
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -139,51 +57,52 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
 
   // Filter and search notifications
   const filteredNotifications = useMemo(() => {
-    let filtered = notifications;
+    let filtered = effectiveNotifications;
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(n => n.category === selectedCategory);
+      filtered = filtered.filter((n) => n.category === selectedCategory);
     }
 
     // Filter by type
     if (selectedType !== 'all') {
-      filtered = filtered.filter(n => n.type === selectedType);
+      filtered = filtered.filter((n) => n.type === selectedType);
     }
 
     // Filter by read status
     if (showUnreadOnly) {
-      filtered = filtered.filter(n => !n.read);
+      filtered = filtered.filter((n) => !n.read);
     }
 
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(query) ||
-        n.message.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (n) =>
+          n.title.toLowerCase().includes(query) ||
+          n.message.toLowerCase().includes(query),
       );
     }
 
     // Sort by timestamp (newest first)
     return filtered.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }, [notifications, selectedCategory, selectedType, showUnreadOnly, searchQuery]);
+  }, [effectiveNotifications, selectedCategory, selectedType, showUnreadOnly, searchQuery]);
 
   // Statistics
   const stats = useMemo(() => {
-    const total = notifications.length;
-    const unread = notifications.filter(n => !n.read).length;
-    const categories = notifications.reduce((acc, n) => {
+    const total = effectiveNotifications.length;
+    const unread = effectiveNotifications.filter((n) => !n.read).length;
+    const categories = effectiveNotifications.reduce((acc, n) => {
       acc[n.category] = (acc[n.category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    const types = notifications.reduce((acc, n) => {
+    const types = effectiveNotifications.reduce((acc, n) => {
       acc[n.type] = (acc[n.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return { total, unread, categories, types };
-  }, [notifications]);
+  }, [effectiveNotifications]);
 
   const categories = [
     { id: 'all', label: 'All', count: stats.total, icon: BellIcon },
@@ -203,27 +122,69 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
     { id: 'task', label: 'Tasks', count: stats.types.task || 0 },
   ].filter(type => type.count > 0);
 
+  const seedSampleNotifications = async () => {
+    if (!user) return;
+
+    const { error } = await supabase.from('notifications').insert([
+      {
+        title: 'New Task Assignment',
+        message: 'You have been assigned a new task in Marketing Workspace.',
+        type: 'task',
+        category: 'workspace',
+        user_id: user.id,
+        metadata: { workspace: 'Marketing', priority: 'high' },
+      },
+      {
+        title: 'Event Registration Milestone',
+        message: 'Annual Conference 2025 has reached 500 registrations.',
+        type: 'event',
+        category: 'event',
+        user_id: user.id,
+        metadata: { eventName: 'Annual Conference 2025' },
+      },
+      {
+        title: 'System Update',
+        message: 'We have shipped improvements to the dashboard experience.',
+        type: 'system',
+        category: 'system',
+        user_id: user.id,
+      },
+    ]);
+
+    if (error) {
+      console.error('Failed to seed notifications:', error.message);
+    }
+  };
+
   const handleMarkAsRead = (notificationId: string) => {
     if (onMarkAsRead) {
       onMarkAsRead(notificationId);
+    } else {
+      void markAsRead(notificationId);
     }
   };
-
+ 
   const handleMarkAllAsRead = () => {
     if (onMarkAllAsRead) {
       onMarkAllAsRead();
+    } else {
+      void markAllAsRead();
     }
   };
-
+ 
   const handleDeleteNotification = (notificationId: string) => {
     if (onDeleteNotification) {
       onDeleteNotification(notificationId);
+    } else {
+      void deleteNotification(notificationId);
     }
   };
-
+ 
   const handleClearAll = () => {
     if (onClearAll) {
       onClearAll();
+    } else {
+      void clearAll();
     }
   };
 
@@ -241,9 +202,10 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
       disabled: stats.total === 0,
     },
     {
-      label: 'Settings',
-      action: () => {/* Navigate to notification settings */},
+      label: 'Create Sample Notifications',
+      action: () => { void seedSampleNotifications(); },
       variant: 'secondary' as const,
+      disabled: !user,
     },
   ];
 

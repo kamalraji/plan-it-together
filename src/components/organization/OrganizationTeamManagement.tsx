@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useCurrentOrganization } from './OrganizationContext';
 import {
-  useOrganizationAdmins,
-  useRemoveOrganizationAdmin,
+  useOrganizationMemberships,
+  useUpdateMembershipStatus,
 } from '@/hooks/useOrganization';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,8 +20,9 @@ import { useToast } from '@/hooks/use-toast';
 
 export const OrganizationTeamManagement: React.FC = () => {
   const organization = useCurrentOrganization();
-  const { data: admins, isLoading } = useOrganizationAdmins(organization?.id);
-  const removeAdmin = useRemoveOrganizationAdmin(organization?.id);
+  const { data: activeMembers, isLoading: loadingActive } = useOrganizationMemberships(organization?.id || '', 'ACTIVE');
+  const { data: pendingMembers, isLoading: loadingPending } = useOrganizationMemberships(organization?.id || '', 'PENDING');
+  const updateMembership = useUpdateMembershipStatus(organization?.id || '');
   const { toast } = useToast();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,11 +52,13 @@ export const OrganizationTeamManagement: React.FC = () => {
     }
   };
 
-  const handleRemoveAdmin = async (userId: string) => {
+  const handleRemoveAdmin = async (membershipId: string) => {
     if (window.confirm('Are you sure you want to remove this team member?')) {
-      await removeAdmin.mutateAsync(userId);
+      await updateMembership.mutateAsync({ membershipId, status: 'REMOVED' });
     }
   };
+
+  const isLoading = loadingActive || loadingPending;
 
   if (isLoading) {
     return (
@@ -106,23 +109,23 @@ export const OrganizationTeamManagement: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Team Members ({admins?.length || 0})</CardTitle>
+          <CardTitle>Active Members ({activeMembers?.length || 0})</CardTitle>
         </CardHeader>
         <CardContent>
-          {admins && admins.length > 0 ? (
+          {activeMembers && activeMembers.length > 0 ? (
             <ul className="divide-y">
-              {admins.map((admin: any) => (
-                <li key={admin.id} className="py-4 flex items-center justify-between">
+              {activeMembers.map((member: any) => (
+                <li key={member.id} className="py-4 flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{admin.user_id}</p>
+                    <p className="font-medium">{member.user_id}</p>
                     <p className="text-sm text-muted-foreground">
-                      {admin.role || 'Admin'} • Added {new Date(admin.created_at).toLocaleDateString()}
+                      {member.role} • Joined {new Date(member.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleRemoveAdmin(admin.user_id)}
+                    onClick={() => handleRemoveAdmin(member.id)}
                   >
                     <TrashIcon className="h-4 w-4 text-destructive" />
                   </Button>
@@ -131,7 +134,53 @@ export const OrganizationTeamManagement: React.FC = () => {
             </ul>
           ) : (
             <p className="text-center text-muted-foreground py-8">
-              No team members yet. Invite someone to get started!
+              No active members yet. Invite someone to get started!
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Pending Join Requests ({pendingMembers?.length || 0})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {pendingMembers && pendingMembers.length > 0 ? (
+            <ul className="divide-y">
+              {pendingMembers.map((member: any) => (
+                <li key={member.id} className="py-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{member.user_id}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Requested on {new Date(member.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        updateMembership.mutate({ membershipId: member.id, status: 'ACTIVE' })
+                      }
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() =>
+                        updateMembership.mutate({ membershipId: member.id, status: 'REJECTED' })
+                      }
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center text-muted-foreground py-8">
+              No pending join requests at the moment.
             </p>
           )}
         </CardContent>
@@ -139,3 +188,4 @@ export const OrganizationTeamManagement: React.FC = () => {
     </div>
   );
 };
+

@@ -22,11 +22,13 @@ import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
+import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
+import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
@@ -502,9 +504,19 @@ export const AppRouter: React.FC = () => {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Organizer onboarding */}
+            {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
             <Route
               path="/onboarding/organization"
+              element={
+                <ConsoleRoute requireEmailVerification={false}>
+                  <Navigate to="/dashboard/organizations/join" replace />
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Create organization page */}
+            <Route
+              path="/organizations/create"
               element={
                 <ConsoleRoute requireEmailVerification={false}>
                   <OrganizationRegistrationPage />
@@ -521,7 +533,9 @@ export const AppRouter: React.FC = () => {
               path="/:orgSlug/*"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <OrgScopedLayout />
+                  <GlobalErrorBoundary>
+                    <OrgScopedLayout />
+                  </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
             />
@@ -531,7 +545,9 @@ export const AppRouter: React.FC = () => {
               path="/dashboard"
               element={
                 <ConsoleRoute>
-                  <ConsoleLayout />
+                  <GlobalErrorBoundary>
+                    <ConsoleLayout />
+                  </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
             >
@@ -553,8 +569,14 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-
-              {/* Service routes with role-based access control */}
+              <Route
+                path="organizations/join"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <JoinOrganizationPage />
+                  </ConsoleRoute>
+                }
+              />
               <Route 
                 path="eventmanagement/*" 
                 element={

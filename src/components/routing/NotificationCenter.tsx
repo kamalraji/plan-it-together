@@ -13,6 +13,7 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { BellIcon as BellIconSolid } from '@heroicons/react/24/solid';
+import { useNotificationFeed } from '@/hooks/useNotificationFeed';
 
 export interface Notification {
   id: string;
@@ -36,90 +37,24 @@ interface NotificationCenterProps {
   className?: string;
 }
 
-// Mock notifications - in a real app, this would come from an API
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'New Task Assignment',
-    message: 'Sarah assigned you to "Design event brochure" in Marketing Workspace',
-    type: 'task',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    read: false,
-    actionUrl: '/dashboard/workspaces/marketing/tasks/123',
-    actionLabel: 'View Task',
-    metadata: { workspaceId: 'marketing', taskId: '123' },
-  },
-  {
-    id: '2',
-    title: 'Event Registration Milestone',
-    message: 'Annual Conference 2024 has reached 500 registrations!',
-    type: 'success',
-    category: 'event',
-    timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-    read: false,
-    actionUrl: '/dashboard/eventmanagement/annual-conference-2024',
-    actionLabel: 'View Event',
-    metadata: { eventId: 'annual-conference-2024', registrations: 500 },
-  },
-  {
-    id: '3',
-    title: 'Service Booking Confirmed',
-    message: 'Photography service booking confirmed for March 15, 2024',
-    type: 'info',
-    category: 'marketplace',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    read: true,
-    actionUrl: '/marketplace/bookings/photo-service-123',
-    actionLabel: 'View Booking',
-    metadata: { serviceId: 'photo-service-123', date: '2024-03-15' },
-  },
-  {
-    id: '4',
-    title: 'Task Deadline Approaching',
-    message: 'Task "Finalize venue contract" is due in 2 hours',
-    type: 'warning',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-    read: false,
-    actionUrl: '/dashboard/workspaces/event-planning/tasks/456',
-    actionLabel: 'Complete Task',
-    metadata: { workspaceId: 'event-planning', taskId: '456', hoursUntilDue: 2 },
-  },
-  {
-    id: '5',
-    title: 'System Maintenance Scheduled',
-    message: 'Scheduled maintenance on March 20, 2024 from 2:00 AM - 4:00 AM EST',
-    type: 'info',
-    category: 'system',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    read: true,
-    actionUrl: '/dashboard/system/maintenance',
-    actionLabel: 'Learn More',
-    metadata: { maintenanceDate: '2024-03-20', duration: '2 hours' },
-  },
-  {
-    id: '6',
-    title: 'New Team Member',
-    message: 'John Doe joined the Marketing Workspace',
-    type: 'info',
-    category: 'workspace',
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    read: true,
-    actionUrl: '/dashboard/workspaces/marketing/team',
-    actionLabel: 'View Team',
-    metadata: { workspaceId: 'marketing', newMember: 'John Doe' },
-  },
-];
-
 export const NotificationCenter: React.FC<NotificationCenterProps> = ({
-  notifications = mockNotifications,
+  notifications,
   onMarkAsRead,
   onMarkAllAsRead,
   onDeleteNotification,
   onClearAll,
   className = '',
 }) => {
+  const {
+    notifications: liveNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+  } = useNotificationFeed();
+
+  const effectiveNotifications = notifications ?? liveNotifications ?? [];
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -155,8 +90,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   // Filter notifications by category
   const filteredNotifications =
     selectedCategory === 'all'
-      ? notifications
-      : notifications.filter((n) => n.category === selectedCategory);
+      ? effectiveNotifications
+      : effectiveNotifications.filter((n) => n.category === selectedCategory);
 
   // Sort notifications by timestamp (newest first)
   const sortedNotifications = [...filteredNotifications].sort(
@@ -164,16 +99,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   );
 
   // Count unread notifications
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = effectiveNotifications.filter((n) => !n.read).length;
 
   // Group notifications by category for stats
-  const categoryStats = notifications.reduce((acc, notification) => {
+  const categoryStats = effectiveNotifications.reduce((acc, notification) => {
     acc[notification.category] = (acc[notification.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   const categories = [
-    { id: 'all', label: 'All', count: notifications.length },
+    { id: 'all', label: 'All', count: effectiveNotifications.length },
     { id: 'workspace', label: 'Workspace', count: categoryStats.workspace || 0 },
     { id: 'event', label: 'Events', count: categoryStats.event || 0 },
     { id: 'marketplace', label: 'Marketplace', count: categoryStats.marketplace || 0 },
@@ -184,24 +119,32 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const handleMarkAsRead = (notificationId: string) => {
     if (onMarkAsRead) {
       onMarkAsRead(notificationId);
+    } else {
+      void markAsRead(notificationId);
     }
   };
 
   const handleMarkAllAsRead = () => {
     if (onMarkAllAsRead) {
       onMarkAllAsRead();
+    } else {
+      void markAllAsRead();
     }
   };
 
   const handleDeleteNotification = (notificationId: string) => {
     if (onDeleteNotification) {
       onDeleteNotification(notificationId);
+    } else {
+      void deleteNotification(notificationId);
     }
   };
 
   const handleClearAll = () => {
     if (onClearAll) {
       onClearAll();
+    } else {
+      void clearAll();
     }
   };
 
@@ -330,7 +273,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </div>
 
             {/* Footer */}
-            {notifications.length > 0 && (
+            {effectiveNotifications.length > 0 && (
               <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <Link
@@ -407,9 +350,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               <div className="p-8 text-center">
                 <BellIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">No notifications</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  You're all caught up!
-                </p>
+                <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
@@ -426,7 +367,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           </div>
 
           {/* Footer */}
-          {notifications.length > 0 && (
+          {effectiveNotifications.length > 0 && (
             <div className="p-4 border-t border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <Link
@@ -485,130 +426,117 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'task':
         return <ClockIcon className="h-5 w-5 text-blue-500" />;
       case 'event':
-        return <CalendarIcon className="h-5 w-5 text-purple-500" />;
+        return <CalendarIcon className="h-5 w-5 text-indigo-500" />;
       case 'marketplace':
-        return <ShoppingBagIcon className="h-5 w-5 text-orange-500" />;
+        return <ShoppingBagIcon className="h-5 w-5 text-purple-500" />;
       case 'system':
         return <Cog6ToothIcon className="h-5 w-5 text-gray-500" />;
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
+        return <InformationCircleIcon className="h-5 w-5 text-gray-400" />;
     }
   };
 
-  const getCategoryIcon = () => {
+  const getCategoryLabel = () => {
     switch (notification.category) {
       case 'workspace':
-        return <UserGroupIcon className="h-4 w-4 text-gray-400" />;
+        return (
+          <span className="inline-flex items-center text-xs text-gray-500">
+            <UserGroupIcon className="h-3.5 w-3.5 mr-1" /> Workspace
+          </span>
+        );
       case 'event':
-        return <CalendarIcon className="h-4 w-4 text-gray-400" />;
+        return (
+          <span className="inline-flex items-center text-xs text-gray-500">
+            <CalendarIcon className="h-3.5 w-3.5 mr-1" /> Event
+          </span>
+        );
       case 'marketplace':
-        return <ShoppingBagIcon className="h-4 w-4 text-gray-400" />;
+        return (
+          <span className="inline-flex items-center text-xs text-gray-500">
+            <ShoppingBagIcon className="h-3.5 w-3.5 mr-1" /> Marketplace
+          </span>
+        );
+      case 'organization':
+        return (
+          <span className="inline-flex items-center text-xs text-gray-500">
+            <UserGroupIcon className="h-3.5 w-3.5 mr-1" /> Organization
+          </span>
+        );
       case 'system':
-        return <Cog6ToothIcon className="h-4 w-4 text-gray-400" />;
       default:
-        return <InformationCircleIcon className="h-4 w-4 text-gray-400" />;
+        return (
+          <span className="inline-flex items-center text-xs text-gray-500">
+            <Cog6ToothIcon className="h-3.5 w-3.5 mr-1" /> System
+          </span>
+        );
     }
   };
 
-  const formatTimestamp = (timestamp: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - timestamp.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return timestamp.toLocaleDateString();
+  const timeAgo = () => {
+    const diffMs = Date.now() - notification.timestamp.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
   };
 
-  const NotificationContent = () => (
-    <div className={`p-4 hover:bg-gray-50 transition-colors ${!notification.read ? 'bg-blue-50' : ''}`}>
-      <div className="flex items-start space-x-3">
-        {/* Type Icon */}
-        <div className="flex-shrink-0 mt-0.5">{getTypeIcon()}</div>
+  const containerClasses = notification.read
+    ? 'bg-white'
+    : 'bg-indigo-50';
 
-        {/* Content */}
+  return (
+    <div className={`px-4 py-3 ${containerClasses}`}>
+      <div className="flex items-start space-x-3">
+        <div className="mt-1 flex-shrink-0">{getTypeIcon()}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p
-                className={`text-sm font-medium ${
-                  !notification.read ? 'text-gray-900' : 'text-gray-700'
-                }`}
-              >
-                {notification.title}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+            <div>
+              <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+              <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
+            </div>
+            <div className="ml-2 flex flex-col items-end space-y-1">
+              <span className="text-xs text-gray-400 whitespace-nowrap">{timeAgo()}</span>
+              {!notification.read && (
+                <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" aria-hidden="true" />
+              )}
+            </div>
+          </div>
 
-              {/* Metadata */}
-              <div className="flex items-center space-x-2 mt-2">
-                {getCategoryIcon()}
-                <span className="text-xs text-gray-500 capitalize">
-                  {notification.category}
-                </span>
-                <span className="text-xs text-gray-400">•</span>
-                <span className="text-xs text-gray-500">
-                  {formatTimestamp(notification.timestamp)}
-                </span>
-              </div>
-
-              {/* Action Button */}
-              {notification.actionUrl && notification.actionLabel && (
-                <div className="mt-3">
-                  <Link
-                    to={notification.actionUrl}
-                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-100 rounded-md hover:bg-indigo-200 transition-colors"
-                  >
-                    {notification.actionLabel}
-                  </Link>
-                </div>
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              {getCategoryLabel()}
+              {notification.actionLabel && notification.actionUrl && (
+                <Link
+                  to={notification.actionUrl}
+                  className="inline-flex items-center px-2.5 py-1 border border-gray-200 rounded-full text-xs font-medium text-indigo-600 hover:bg-indigo-50"
+                >
+                  {notification.actionLabel}
+                </Link>
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center space-x-1 ml-2">
+            <div className="flex items-center space-x-1">
               {!notification.read && (
                 <button
                   onClick={handleMarkAsRead}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-md"
-                  title="Mark as read"
+                  className="text-xs text-indigo-600 hover:text-indigo-700 px-2 py-1"
                 >
-                  <CheckIcon className="h-4 w-4" />
+                  Mark read
                 </button>
               )}
               <button
                 onClick={handleDelete}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md"
-                title="Delete notification"
+                className="p-1 text-gray-400 hover:text-gray-600 rounded-md"
               >
                 <XMarkIcon className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
-
-        {/* Unread Indicator */}
-        {!notification.read && (
-          <div className="flex-shrink-0 mt-2">
-            <div className="h-2 w-2 bg-indigo-600 rounded-full" />
-          </div>
-        )}
       </div>
     </div>
   );
-
-  return notification.actionUrl ? (
-    <Link to={notification.actionUrl} className="block">
-      <NotificationContent />
-    </Link>
-  ) : (
-    <div>
-      <NotificationContent />
-    </div>
-  );
 };
-
-export default NotificationCenter;
