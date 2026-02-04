@@ -1,6 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider, useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
@@ -787,6 +788,7 @@ export const AppRouter: React.FC = () => {
           </Routes >
         </BrowserRouter >
       </AuthProvider >
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider >
   );
 };
