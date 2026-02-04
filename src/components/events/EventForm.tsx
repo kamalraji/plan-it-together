@@ -14,8 +14,8 @@ import {
   EventVisibility,
   Organization,
 } from '../../types';
-import { WorkspaceTemplateLibrary } from '@/components/workspace/WorkspaceTemplateLibrary';
-import type { WorkspaceTemplate as WorkspaceWorkspaceTemplate } from '@/types/workspace-template';
+import { WorkspaceTemplateLibrary, LibraryTemplate } from '@/components/workspace/WorkspaceTemplateLibrary';
+import { getEventFormDefaults, getEmptyEventFormDefaults } from '@/lib/event-form-utils';
 
 interface EventFormProps {
   event?: Event;
@@ -28,35 +28,14 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   const { user } = useAuth();
   const organizationContext = useCurrentOrganization();
   const [selectedTemplate, setSelectedTemplate] = useState<EventTemplate | null>(null);
-  const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = useState<WorkspaceWorkspaceTemplate | null>(null);
+  const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = useState<LibraryTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'branding' | 'timeline' | 'details'>('basic');
   const [inviteLink, setInviteLink] = useState<string | null>(event?.inviteLink || null);
 
   const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm<CreateEventDTO>({
-    defaultValues: event ? {
-      name: event.name,
-      description: event.description,
-      mode: event.mode,
-      startDate: event.startDate.slice(0, 16), // Format for datetime-local input
-      endDate: event.endDate.slice(0, 16),
-      capacity: event.capacity,
-      registrationDeadline: event.registrationDeadline?.slice(0, 16),
-      organizationId: event.organizationId,
-      visibility: event.visibility,
-      branding: event.branding,
-      venue: event.venue,
-      virtualLinks: event.virtualLinks,
-      timeline: event.timeline || [],
-      prizes: event.prizes || [],
-      sponsors: event.sponsors || []
-    } : {
-      mode: EventMode.OFFLINE,
-      visibility: EventVisibility.PUBLIC,
-      branding: {},
-      timeline: [],
-      prizes: [],
-      sponsors: []
-    }
+    defaultValues: event 
+      ? getEventFormDefaults(event) 
+      : getEmptyEventFormDefaults(EventMode.OFFLINE, EventVisibility.PUBLIC)
   });
 
   useEffect(() => {

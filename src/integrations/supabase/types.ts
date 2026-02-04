@@ -13070,16 +13070,25 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -22740,6 +22749,10 @@ export type Database = {
         Args: { experiment_name: string; target_user_id: string }
         Returns: string
       }
+      get_user_roles: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"][]
+      }
       get_visible_spark_posts: {
         Args: { p_event_id?: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -22839,6 +22852,7 @@ export type Database = {
         Args: { quantity: number; ticket_id: string }
         Returns: undefined
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_chat_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_confirmed_event_attendee: {
         Args: { _event_id: string; _user_id?: string }
@@ -22860,6 +22874,7 @@ export type Database = {
         Args: { _organization_id: string; _user_id: string }
         Returns: boolean
       }
+      is_organizer: { Args: { _user_id: string }; Returns: boolean }
       is_workspace_member: {
         Args: { _user_id?: string; _workspace_id: string }
         Returns: boolean
