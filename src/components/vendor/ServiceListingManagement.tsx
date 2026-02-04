@@ -174,9 +174,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
       setError(null);
 
       const response = await fetch(`/api/vendors/${vendorId}/services`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -313,9 +311,9 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
       const response = await fetch(url, {
         method,
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(formData),
       });
@@ -359,9 +357,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
     try {
       const response = await fetch(`/api/vendors/${vendorId}/services/${serviceId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -380,9 +376,9 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
     try {
       const response = await fetch(`/api/vendors/${vendorId}/services/${serviceId}/status`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });

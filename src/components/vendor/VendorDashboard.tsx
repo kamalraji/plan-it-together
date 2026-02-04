@@ -36,9 +36,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
       setError(null);
 
       const response = await fetch(`/api/vendors/profile/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {

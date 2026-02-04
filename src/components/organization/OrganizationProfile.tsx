@@ -33,7 +33,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
   const { data: organization, isLoading, error } = useOrganization(organizationId!);
   const { data: events, isLoading: eventsLoading } = useOrganizationEvents(organizationId!, 'PUBLIC');
   const { data: isFollowing, isLoading: followLoading } = useIsFollowing(organizationId!, user?.id || '');
-  
+
   const followMutation = useFollowOrganization(organizationId!);
   const unfollowMutation = useUnfollowOrganization(organizationId!);
 
@@ -70,8 +70,24 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
     );
   }
 
-  const socialLinks = organization.social_links as Record<string, string> || {};
-  const location = organization.location as Record<string, any> || {};
+  const location = {
+    city: organization.city as string | null,
+    state: organization.state as string | null,
+    country: organization.country as string | null,
+  };
+
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/${organization.slug}`
+    : `/${organization.slug}`;
+
+  const handleCopyPublicLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Public link copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy link', err);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -81,30 +97,30 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
           <img
             src={organization.banner_url}
             alt={`${organization.name} banner`}
-            className="w-full h-64 object-cover rounded-lg"
+            className="w-full h-40 sm:h-56 md:h-64 object-cover rounded-2xl"
           />
         ) : (
-          <div className="w-full h-64 bg-gradient-to-r from-primary to-primary/70 rounded-lg" />
+          <div className="w-full h-40 sm:h-56 md:h-64 bg-gradient-to-r from-primary to-primary/70 rounded-2xl" />
         )}
-        
-        <div className="absolute -bottom-16 left-8">
+
+        <div className="absolute left-4 sm:left-8 -bottom-12 sm:-bottom-16">
           {organization.logo_url ? (
             <img
               src={organization.logo_url}
               alt={`${organization.name} logo`}
-              className="w-32 h-32 rounded-lg border-4 border-background object-cover shadow-lg"
+              className="w-20 h-20 sm:w-32 sm:h-32 rounded-lg border-4 border-background object-cover shadow-lg"
             />
           ) : (
-            <div className="w-32 h-32 rounded-lg border-4 border-background bg-muted flex items-center justify-center shadow-lg">
-              <Building className="h-16 w-16 text-muted-foreground" />
+            <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-lg border-4 border-background bg-muted flex items-center justify-center shadow-lg">
+              <Building className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground" />
             </div>
           )}
         </div>
       </div>
 
       {/* Organization Info */}
-      <div className="mt-20 mb-8">
-        <div className="flex items-start justify-between">
+      <div className="mt-16 sm:mt-20 mb-8">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-4xl font-bold">{organization.name}</h1>
@@ -115,7 +131,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                 </Badge>
               )}
             </div>
-            
+
             <div className="flex items-center gap-4 text-muted-foreground mb-4">
               <Badge variant="outline">{categoryLabels[organization.category as keyof typeof categoryLabels]}</Badge>
               <div className="flex items-center gap-1">
@@ -133,13 +149,23 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
             )}
           </div>
 
-          <Button
-            onClick={handleFollowToggle}
-            disabled={followLoading || followMutation.isPending || unfollowMutation.isPending}
-            variant={isFollowing ? 'outline' : 'default'}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            <Button
+              onClick={handleFollowToggle}
+              disabled={followLoading || followMutation.isPending || unfollowMutation.isPending}
+              variant={isFollowing ? 'outline' : 'default'}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </Button>
+            <button
+              type="button"
+              onClick={handleCopyPublicLink}
+              className="inline-flex items-center justify-center rounded-full border border-border bg-background/80 px-3 py-1.5 text-[11px] font-medium text-foreground shadow-sm hover:bg-muted/80 transition-colors"
+            >
+              <span className="mr-1 text-xs">🔗</span>
+              Copy public link
+            </button>
+          </div>
         </div>
 
         {/* Contact Info */}
@@ -248,7 +274,7 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                   {categoryLabels[organization.category as keyof typeof categoryLabels]}
                 </p>
               </div>
-              
+
               {organization.description && (
                 <div>
                   <h4 className="font-semibold mb-2">Description</h4>
@@ -256,24 +282,6 @@ export const OrganizationProfile: React.FC<OrganizationProfileProps> = ({ organi
                 </div>
               )}
 
-              {Object.keys(socialLinks).length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Social Links</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(socialLinks).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {platform}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </TabsContent>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember } from '../../types';
-
+import { WorkspaceTask, TaskStatus, TaskPriority, TaskCategory, TeamMember, WorkspaceRoleScope } from '../../types';
+import { supabase } from '@/integrations/supabase/client';
 interface TaskComment {
   id: string;
   userId: string;
@@ -49,6 +49,7 @@ interface TaskDetailViewProps {
 
 export function TaskDetailView({
   task,
+  teamMembers,
   comments = [],
   files = [],
   activities = [],
@@ -67,7 +68,10 @@ export function TaskDetailView({
   const [editCommentContent, setEditCommentContent] = useState('');
   const [progressValue, setProgressValue] = useState(task.progress);
   const [isEditingProgress, setIsEditingProgress] = useState(false);
-
+  const [isSavingRoleScope, setIsSavingRoleScope] = useState(false);
+  const [roleScopeValue, setRoleScopeValue] = useState<string>(
+    (task.roleScope || (task.metadata?.roleScope as WorkspaceRoleScope | undefined) || '') as string,
+  );
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.NOT_STARTED:
@@ -177,6 +181,22 @@ export function TaskDetailView({
     }
   };
 
+  const handleRoleScopeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as WorkspaceRoleScope | '';
+    setRoleScopeValue(value || '');
+    setIsSavingRoleScope(true);
+
+    const { error } = await supabase
+      .from('workspace_tasks')
+      .update({ role_scope: value || null })
+      .eq('id', task.id);
+
+    if (error) {
+      console.error('Failed to update task role scope', error);
+    }
+
+    setIsSavingRoleScope(false);
+  };
   const tabs = [
     { id: 'details', name: 'Details' },
     { id: 'comments', name: 'Comments', count: comments.length },
@@ -188,7 +208,7 @@ export function TaskDetailView({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
-        <div 
+        <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           onClick={onClose}
         />
@@ -237,22 +257,20 @@ export function TaskDetailView({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === tab.id
+                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === tab.id
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
-                <span className="flex items-center space-x-2">
-                  <span>{tab.name}</span>
-                  {tab.count !== undefined && (
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      activeTab === tab.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {tab.count}
-                    </span>
-                  )}
-                </span>
+                  <span className="flex items-center space-x-2">
+                    <span>{tab.name}</span>
+                    {tab.count !== undefined && (
+                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </span>
                 </button>
               ))}
             </nav>
@@ -327,6 +345,23 @@ export function TaskDetailView({
                   </div>
                 </div>
 
+                {/* Role Space (sub workspace) */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Role Space (sub workspace)</h4>
+                  <select
+                    value={roleScopeValue}
+                    onChange={handleRoleScopeChange}
+                    disabled={isSavingRoleScope}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="">All teams (no specific role)</option>
+                    {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
+                      <option key={role} value={role}>
+                        {role.replace('_', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {/* Progress */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -359,7 +394,7 @@ export function TaskDetailView({
                   ) : (
                     <div className="flex items-center space-x-3">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${task.progress}%` }}
                         ></div>

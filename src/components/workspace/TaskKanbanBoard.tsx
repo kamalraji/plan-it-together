@@ -86,7 +86,7 @@ export function TaskKanbanBoard({
           [TaskPriority.MEDIUM]: 2,
           [TaskPriority.LOW]: 1
         };
-        
+
         const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
         if (priorityDiff !== 0) return priorityDiff;
 
@@ -96,7 +96,7 @@ export function TaskKanbanBoard({
         }
         if (a.dueDate) return -1;
         if (b.dueDate) return 1;
-        
+
         // Finally by creation date
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       });
@@ -128,7 +128,7 @@ export function TaskKanbanBoard({
   const handleDrop = useCallback((e: React.DragEvent, status: TaskStatus) => {
     e.preventDefault();
     setDragOverColumn(null);
-    
+
     if (draggedTask && draggedTask.status !== status && onTaskStatusChange) {
       onTaskStatusChange(draggedTask.id, status);
     }
@@ -216,7 +216,7 @@ export function TaskKanbanBoard({
           {onCreateTask && (
             <button
               onClick={onCreateTask}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -233,9 +233,8 @@ export function TaskKanbanBoard({
           {KANBAN_COLUMNS.map((column) => (
             <div
               key={column.status}
-              className={`flex flex-col ${column.bgColor} rounded-lg p-4 ${
-                dragOverColumn === column.status ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''
-              }`}
+              className={`flex flex-col ${column.bgColor} rounded-lg p-4 ${dragOverColumn === column.status ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''
+                }`}
               onDragOver={(e) => handleDragOver(e, column.status)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, column.status)}
@@ -263,9 +262,8 @@ export function TaskKanbanBoard({
                       draggable
                       onDragStart={(e) => handleDragStart(e, task)}
                       onDragEnd={handleDragEnd}
-                      className={`bg-white rounded-lg p-3 shadow-sm border-l-4 ${getPriorityColor(task.priority)} cursor-move hover:shadow-md transition-shadow ${
-                        draggedTask?.id === task.id ? 'opacity-50' : ''
-                      }`}
+                      className={`bg-white rounded-lg p-3 shadow-sm border-l-4 ${getPriorityColor(task.priority)} cursor-move hover:shadow-md transition-shadow ${draggedTask?.id === task.id ? 'opacity-50' : ''
+                        }`}
                       onClick={() => onTaskClick?.(task)}
                     >
                       {/* Task Header */}
@@ -349,7 +347,7 @@ export function TaskKanbanBoard({
                         {/* Progress Bar */}
                         {task.progress > 0 && (
                           <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div 
+                            <div
                               className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
                               style={{ width: `${task.progress}%` }}
                             ></div>

@@ -40,8 +40,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
       const response = await fetch(`/api/events/${eventId}/analytics`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
       });
@@ -77,8 +77,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
       const response = await fetch(`/api/events/${eventId}/analytics/export`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ format }),

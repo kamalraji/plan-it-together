@@ -3,18 +3,41 @@ import { useCurrentOrganization } from './OrganizationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OrgTestimonialsManager } from './OrgTestimonialsManager';
 import { OrgSponsorsManager } from './OrgSponsorsManager';
+import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
 
 export const OrgStorySettingsPage: React.FC = () => {
   const organization = useCurrentOrganization();
 
   return (
     <main className="min-h-screen bg-transparent">
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        <OrganizationBreadcrumbs
+          items={[
+            {
+              label: organization.name,
+              href: `/${organization.slug}`,
+              icon: (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                  {organization.name.charAt(0).toUpperCase()}
+                </span>
+              ),
+            },
+            {
+              label: 'Settings',
+              href: `/${organization.slug}/settings/dashboard`,
+            },
+            {
+              label: 'Story',
+              isCurrent: true,
+            },
+          ]}
+          className="mb-3 text-xs sm:text-sm"
+        />
         <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[140px] sm:min-h-[180px] animate-fade-in">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
           <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-xl rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl px-4 sm:px-6 py-4 shadow-2xl">
-              <p className="text-xs sm:text-sm text-muted-foreground mb-1">/ Settings / Story</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Story settings</p>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 Story &amp; social proof
               </h1>

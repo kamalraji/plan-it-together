@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrganizationProfile } from '@/components/organization/OrganizationProfile';
-import { Calendar, Quote, Star } from 'lucide-react';
+import { Calendar, Quote, Star, Package } from 'lucide-react';
+import { OrganizationProductsSection } from '@/components/organization/OrganizationProductsSection';
 
 
 type OrganizationRow = Tables<'organizations'>;
@@ -13,6 +14,7 @@ type OrganizationRow = Tables<'organizations'>;
 type TestimonialRow = Tables<'organization_testimonials'>;
 type SponsorRow = Tables<'organization_sponsors'>;
 type EventRow = Tables<'events'>;
+type ProductRow = Tables<'organization_products'>;
 
 export const OrganizationLandingPage: React.FC = () => {
   const { orgSlug } = useParams<{ orgSlug: string }>();
@@ -20,6 +22,7 @@ export const OrganizationLandingPage: React.FC = () => {
   const [featuredEvents, setFeaturedEvents] = useState<EventRow[]>([]);
   const [testimonials, setTestimonials] = useState<TestimonialRow[]>([]);
   const [sponsors, setSponsors] = useState<SponsorRow[]>([]);
+  const [products, setProducts] = useState<ProductRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,11 +56,13 @@ export const OrganizationLandingPage: React.FC = () => {
       setOrganization(org as OrganizationRow);
 
       try {
-        document.title = `${org.name} | Thittam1Hub`;
-
+        const pageTitle = org.seo_title || `${org.name} | Thittam1Hub`;
         const description =
+          org.seo_description ||
           org.description ||
           `Discover events and updates from ${org.name} on Thittam1Hub.`;
+
+        document.title = pageTitle;
 
         let meta = document.querySelector('meta[name="description"]');
         if (!meta) {
@@ -66,6 +71,32 @@ export const OrganizationLandingPage: React.FC = () => {
           document.head.appendChild(meta);
         }
         meta.setAttribute('content', description);
+
+        let ogTitle = document.querySelector('meta[property="og:title"]');
+        if (!ogTitle) {
+          ogTitle = document.createElement('meta');
+          ogTitle.setAttribute('property', 'og:title');
+          document.head.appendChild(ogTitle);
+        }
+        ogTitle.setAttribute('content', pageTitle);
+
+        let ogDescription = document.querySelector('meta[property="og:description"]');
+        if (!ogDescription) {
+          ogDescription = document.createElement('meta');
+          ogDescription.setAttribute('property', 'og:description');
+          document.head.appendChild(ogDescription);
+        }
+        ogDescription.setAttribute('content', description);
+
+        if (org.seo_image_url) {
+          let ogImage = document.querySelector('meta[property="og:image"]');
+          if (!ogImage) {
+            ogImage = document.createElement('meta');
+            ogImage.setAttribute('property', 'og:image');
+            document.head.appendChild(ogImage);
+          }
+          ogImage.setAttribute('content', org.seo_image_url);
+        }
 
         let canonical = document.querySelector('link[rel="canonical"]');
         if (!canonical) {
@@ -82,7 +113,12 @@ export const OrganizationLandingPage: React.FC = () => {
       }
 
       try {
-        const [eventsResult, testimonialsResult, sponsorsResult] = await Promise.all([
+        const [
+          eventsResult,
+          testimonialsResult,
+          sponsorsResult,
+          productsResult,
+        ] = await Promise.all([
           supabase
             .from('events')
             .select('*')
@@ -104,6 +140,13 @@ export const OrganizationLandingPage: React.FC = () => {
             .eq('organization_id', org.id)
             .order('position', { ascending: true })
             .limit(8),
+          supabase
+            .from('organization_products')
+            .select('*')
+            .eq('organization_id', org.id)
+            .eq('status', 'ACTIVE')
+            .order('position', { ascending: true })
+            .order('created_at', { ascending: false }),
         ]);
 
         if (eventsResult.data) {
@@ -116,6 +159,10 @@ export const OrganizationLandingPage: React.FC = () => {
 
         if (sponsorsResult.data) {
           setSponsors(sponsorsResult.data as SponsorRow[]);
+        }
+
+        if (productsResult.data) {
+          setProducts(productsResult.data as ProductRow[]);
         }
       } catch (sidebarError) {
         console.error('Failed to load organization sidebar content', sidebarError);
@@ -154,26 +201,29 @@ export const OrganizationLandingPage: React.FC = () => {
     );
   }
 
-  const shareUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/${organization.slug}`
-    : `/${organization.slug}`;
-
-  const copyShareUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('Public link copied to clipboard');
-    } catch (err) {
-      console.error('Failed to copy link', err);
-    }
-  };
-
   return (
-    <main className="bg-gradient-to-b from-background to-accent/20 min-h-screen">
-      <section className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main className="min-h-screen" style={organization.primary_color ? {
+      backgroundImage: `linear-gradient(to bottom, ${organization.primary_color}, rgba(0,0,0,0))`,
+    } : undefined}>
+      <section
+        className="container mx-auto px-4 pt-8 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">Organization</p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Welcome to <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{organization.name}</span>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight flex items-center gap-3">
+            {organization.logo_url && (
+              <img
+                src={organization.logo_url}
+                alt={`${organization.name} logo`}
+                className="h-9 w-9 rounded-md object-cover border border-border"
+              />
+            )}
+            <span>
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {organization.name}
+              </span>
+            </span>
           </h1>
           {organization.city && (
             <p className="mt-2 text-sm text-muted-foreground">
@@ -183,28 +233,108 @@ export const OrganizationLandingPage: React.FC = () => {
             </p>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <button
-            onClick={copyShareUrl}
-            className="inline-flex items-center justify-center rounded-full border border-border bg-background/80 px-4 py-2 text-xs sm:text-sm font-medium text-foreground shadow-sm hover:bg-muted/80 transition-colors"
-          >
-            <span className="mr-2 text-xs">🔗</span>
-            Copy public link
-          </button>
-          <a
-            href={shareUrl}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs sm:text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-shadow"
-          >
-            Open public page
-          </a>
-        </div>
       </section>
 
       <section className="container mx-auto px-4 pb-10">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-[0.2em]">
+            Products
+          </h2>
+          <Link
+            to={`/${organization.slug}/products`}
+            className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:translate-y-px"
+          >
+            <Package className="h-3 w-3" aria-hidden="true" />
+            <span>View all products</span>
+          </Link>
+        </div>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <div>
+          <div className="space-y-8">
+            <OrganizationProductsSection products={products} />
             <OrganizationProfile organizationId={organization.id} />
+
+            <Card className="border-border/60 bg-background/80 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle>About {organization.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <div>
+                  <span className="font-medium text-foreground">Category:</span>{' '}
+                  <span>{organization.category}</span>
+                </div>
+                {organization.description && (
+                  <div>
+                    <span className="font-medium text-foreground">Summary:</span>{' '}
+                    <span className="whitespace-pre-line">{organization.description}</span>
+                  </div>
+                )}
+                {(organization.city || organization.state || organization.country) && (
+                  <div>
+                    <span className="font-medium text-foreground">Location:</span>{' '}
+                    <span>
+                      {[organization.city, organization.state, organization.country]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </span>
+                  </div>
+                )}
+                {(organization.website || organization.email || organization.phone) && (
+                  <div className="flex flex-col gap-1">
+                    {organization.website && (
+                      <div>
+                        <span className="font-medium text-foreground">Website:</span>{' '}
+                        <a
+                          href={organization.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.website}
+                        </a>
+                      </div>
+                    )}
+                    {organization.email && (
+                      <div>
+                        <span className="font-medium text-foreground">Email:</span>{' '}
+                        <a
+                          href={`mailto:${organization.email}`}
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.email}
+                        </a>
+                      </div>
+                    )}
+                    {organization.phone && (
+                      <div>
+                        <span className="font-medium text-foreground">Phone:</span>{' '}
+                        <a
+                          href={`tel:${organization.phone}`}
+                          className="underline-offset-2 hover:underline text-primary"
+                        >
+                          {organization.phone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {(organization.gov_registration_id || organization.verification_status) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {organization.gov_registration_id && (
+                      <span className="text-xs rounded-full bg-muted px-2 py-1">
+                        Reg. ID: {organization.gov_registration_id}
+                      </span>
+                    )}
+                    {organization.verification_status && (
+                      <span className="text-xs rounded-full px-2 py-1 bg-muted">
+                        Status: {organization.verification_status}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
+
 
           <aside className="space-y-4">
             <Card className="border-dashed border-primary/30 bg-card/70 backdrop-blur-sm">

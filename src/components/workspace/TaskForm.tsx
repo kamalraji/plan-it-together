@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember } from '../../types';
-
+import { WorkspaceTask, TaskCategory, TaskPriority, TeamMember, WorkspaceRoleScope, TaskStatus } from '../../types';
+import { supabase } from '@/integrations/supabase/client';
 interface TaskFormProps {
   task?: WorkspaceTask;
   teamMembers: TeamMember[];
   availableTasks: WorkspaceTask[];
-  onSubmit: (taskData: TaskFormData) => void;
+  workspaceId?: string;
+  onSubmit?: (taskData: TaskFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
-
 export interface TaskFormData {
   title: string;
   description: string;
@@ -20,6 +20,7 @@ export interface TaskFormData {
   dependencies: string[];
   tags: string[];
   templateId?: string;
+  roleScope?: WorkspaceRoleScope;
 }
 
 const TASK_TEMPLATES = [
@@ -65,13 +66,14 @@ const TASK_TEMPLATES = [
   }
 ];
 
-export function TaskForm({ 
-  task, 
-  teamMembers, 
-  availableTasks, 
-  onSubmit, 
-  onCancel, 
-  isLoading = false 
+export function TaskForm({
+  task,
+  teamMembers,
+  availableTasks,
+  workspaceId,
+  onSubmit,
+  onCancel,
+  isLoading = false
 }: TaskFormProps) {
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
@@ -82,7 +84,8 @@ export function TaskForm({
     dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
     dependencies: task?.dependencies || [],
     tags: task?.tags || [],
-    templateId: ''
+    templateId: '',
+    roleScope: task?.roleScope || (task?.metadata?.roleScope as WorkspaceRoleScope | undefined),
   });
 
   const [newTag, setNewTag] = useState('');
@@ -136,7 +139,7 @@ export function TaskForm({
     const newDependencies = selectedDependencies.includes(taskId)
       ? selectedDependencies.filter(id => id !== taskId)
       : [...selectedDependencies, taskId];
-    
+
     setSelectedDependencies(newDependencies);
     setFormData(prev => ({ ...prev, dependencies: newDependencies }));
   };
@@ -144,20 +147,20 @@ export function TaskForm({
   // Check for circular dependencies
   const wouldCreateCircularDependency = (taskId: string): boolean => {
     if (!task?.id) return false;
-    
+
     const checkCircular = (currentTaskId: string, targetTaskId: string, visited: Set<string>): boolean => {
       if (visited.has(currentTaskId)) return true;
       if (currentTaskId === targetTaskId) return true;
-      
+
       visited.add(currentTaskId);
       const currentTask = availableTasks.find(t => t.id === currentTaskId);
       if (!currentTask) return false;
-      
-      return currentTask.dependencies.some(depId => 
+
+      return currentTask.dependencies.some(depId =>
         checkCircular(depId, targetTaskId, new Set(visited))
       );
     };
-    
+
     return checkCircular(taskId, task.id, new Set());
   };
 
@@ -176,7 +179,7 @@ export function TaskForm({
       const dueDate = new Date(formData.dueDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (dueDate < today) {
         newErrors.dueDate = 'Due date cannot be in the past';
       }
@@ -186,16 +189,34 @@ export function TaskForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
-    onSubmit(formData);
-  };
+    // Persist to Supabase workspace_tasks when a workspaceId is provided
+    if (workspaceId) {
+      const payload: any = {
+        id: task?.id,
+        workspace_id: workspaceId,
+        title: formData.title,
+        description: formData.description,
+        priority: formData.priority,
+        status: task?.status || TaskStatus.NOT_STARTED,
+        due_date: formData.dueDate || null,
+        role_scope: formData.roleScope ?? null,
+      };
 
+      const { error } = await supabase.from('workspace_tasks').upsert(payload, { onConflict: 'id' });
+      if (error) {
+        console.error('Failed to upsert workspace task', error);
+      }
+    }
+
+    onSubmit?.(formData);
+  };
   return (
     <div className="bg-white shadow-lg rounded-lg">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -236,9 +257,8 @@ export function TaskForm({
             id="title"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-            }`}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+              }`}
             placeholder="Enter task title"
           />
           {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
@@ -254,9 +274,8 @@ export function TaskForm({
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-            }`}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+              }`}
             placeholder="Describe the task in detail"
           />
           {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
@@ -302,7 +321,7 @@ export function TaskForm({
         </div>
 
         {/* Assignee and Due Date */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="assignee" className="block text-sm font-medium text-gray-700 mb-1">
               Assignee
@@ -314,7 +333,7 @@ export function TaskForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">Unassigned</option>
-              {teamMembers.map(member => (
+              {teamMembers.map((member) => (
                 <option key={member.id} value={member.userId}>
                   {member.user.name} ({member.role.replace('_', ' ')})
                 </option>
@@ -331,11 +350,31 @@ export function TaskForm({
               id="dueDate"
               value={formData.dueDate}
               onChange={(e) => handleInputChange('dueDate', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.dueDate ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
-              }`}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.dueDate ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+                }`}
             />
             {errors.dueDate && <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="roleScope" className="block text-sm font-medium text-gray-700 mb-1">
+              Role Space (sub workspace)
+            </label>
+            <select
+              id="roleScope"
+              value={formData.roleScope || ''}
+              onChange={(e) =>
+                handleInputChange('roleScope', (e.target.value || undefined) as WorkspaceRoleScope | undefined)
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">All teams (no specific role)</option>
+              {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
+                <option key={role} value={role}>
+                  {role.replace('_', ' ')}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -351,9 +390,8 @@ export function TaskForm({
                 return (
                   <label
                     key={availableTask.id}
-                    className={`flex items-center space-x-2 py-1 ${
-                      wouldCreateCircular ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
+                    className={`flex items-center space-x-2 py-1 ${wouldCreateCircular ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                      }`}
                   >
                     <input
                       type="checkbox"

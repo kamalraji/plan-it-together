@@ -1,10 +1,12 @@
 import React, { Component, ReactNode, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { handleApiError } from '@/lib/api';
+import { logging } from '@/lib/logging';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ErrorBoundaryInnerProps {
   children: ReactNode;
-  onError?: (error: unknown, info: React.ErrorInfo) => void;
+  onError?: (error: unknown, info?: React.ErrorInfo) => void;
 }
 
 interface ErrorBoundaryInnerState {
@@ -13,6 +15,25 @@ interface ErrorBoundaryInnerState {
 
 class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundaryInnerState> {
   override state: ErrorBoundaryInnerState = { hasError: false };
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryInnerState {
+    // Ensure a consistent fallback UI is shown after an error is thrown
+    console.error('GlobalErrorBoundary getDerivedStateFromError:', error);
+    return { hasError: true };
+  }
+
+  override componentDidCatch(error: Error, info: React.ErrorInfo) {
+    // Log the error for debugging and send it to any external handler
+    console.error('GlobalErrorBoundary caught an error:', error, info);
+
+    if (this.props.onError) {
+      try {
+        this.props.onError(error, info);
+      } catch (handlerError) {
+        console.error('Error in GlobalErrorBoundary onError handler:', handlerError);
+      }
+    }
+  }
 
   override render() {
     if (this.state.hasError) {
@@ -41,9 +62,19 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryInnerProps, ErrorBoundar
 
 export const GlobalErrorBoundary: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { toast } = useToast();
+  const { user, session } = useAuth();
 
   const handleError = useCallback(
-    (error: unknown) => {
+    (error: unknown, info?: React.ErrorInfo) => {
+      logging.captureError(error, {
+        react_component_stack: info?.componentStack,
+        user_id: user?.id,
+        user_role: user?.role,
+        session_expires_at: session?.expires_at
+          ? new Date(session.expires_at * 1000).toISOString()
+          : undefined,
+      });
+
       const message = handleApiError(error as any);
       toast({
         variant: 'destructive',
@@ -51,7 +82,7 @@ export const GlobalErrorBoundary: React.FC<{ children: ReactNode }> = ({ childre
         description: message,
       });
     },
-    [toast],
+    [toast, user, session],
   );
 
   return <ErrorBoundaryInner onError={handleError}>{children}</ErrorBoundaryInner>;

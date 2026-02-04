@@ -9,6 +9,7 @@ const RETRY_DELAY = 1000; // 1 second
 export const api = axios.create({
   baseURL: API_URL,
   timeout: REQUEST_TIMEOUT,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,15 +32,9 @@ const isRetryableError = (error: AxiosError): boolean => {
   return status >= 500 || status === 429;
 };
 
-// Request interceptor for adding auth token and request logging
+// Request interceptor for adding request metadata and logging
 api.interceptors.request.use(
   (config) => {
-    // Add authentication token
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     // Add request ID for tracking
     config.headers['X-Request-ID'] = crypto.randomUUID();
 
@@ -85,55 +80,28 @@ api.interceptors.response.use(
       });
     }
 
-    // Handle 401 errors (token expired) - Token refresh logic
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
-        }
-
-        const response = await axios.post(`${API_URL}/auth/refresh-token`, {
-          refreshToken,
-        });
-
-        const { accessToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
-
-        // Update the original request with new token
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        
-        // Dispatch custom event for auth failure
-        window.dispatchEvent(new CustomEvent('auth:logout', { 
-          detail: { reason: 'token_refresh_failed' } 
-        }));
-        
-        return Promise.reject(refreshError);
-      }
+    // On 401, rely on backend cookie-based session; do not attempt token refresh here
+    if (error.response?.status === 401) {
+      // Optional: dispatch auth logout event so UI can redirect to login
+      window.dispatchEvent(
+        new CustomEvent('auth:logout', {
+          detail: { reason: 'unauthorized' },
+        }),
+      );
     }
 
     // Retry logic for retryable errors
     if (isRetryableError(error) && originalRequest) {
       const retryCount = originalRequest._retryCount || 0;
-      
+
       if (retryCount < MAX_RETRY_ATTEMPTS) {
         originalRequest._retryCount = retryCount + 1;
-        
+
         // Wait before retrying with exponential backoff
-        await new Promise(resolve => 
-          setTimeout(resolve, getRetryDelay(originalRequest._retryCount!))
+        await new Promise((resolve) =>
+          setTimeout(resolve, getRetryDelay(originalRequest._retryCount!)),
         );
-        
+
         console.log(`[API Retry] Attempt ${originalRequest._retryCount} for ${originalRequest.url}`);
         return api(originalRequest);
       }

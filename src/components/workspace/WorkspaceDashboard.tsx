@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -11,6 +11,7 @@ import {
   TaskStatus,
   UserRole,
   WorkspaceRole,
+  WorkspaceRoleScope,
 } from '../../types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { TaskSummaryCards } from './TaskSummaryCards';
@@ -31,6 +32,8 @@ import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { TablesInsert } from '@/integrations/supabase/types';
 
 interface WorkspaceDashboardProps {
   workspaceId?: string;
@@ -40,7 +43,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
   const workspaceId = (propWorkspaceId || paramWorkspaceId) as string | undefined;
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskIdFromUrl = searchParams.get('taskId') || undefined;
   const [activeTab, setActiveTab] = useState<
     | 'overview'
@@ -62,7 +65,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     queryFn: async () => {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
         .eq('id', workspaceId as string)
         .maybeSingle();
 
@@ -81,6 +84,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         teamMembers: [],
         taskSummary: undefined,
         channels: [],
+        parentWorkspaceId: data.parent_workspace_id as string | null,
       };
 
       return mapped as unknown as Workspace;
@@ -106,7 +110,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
       let query = supabase
         .from('workspaces')
-        .select('id, name, status, created_at, updated_at')
+        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
         .order('created_at', { ascending: false });
 
       if (eventId) {
@@ -119,7 +123,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
       const mapped = (data || []).map((row: any) => ({
         id: row.id as string,
-        eventId: eventId,
+        eventId: row.event_id as string | undefined,
         name: row.name as string,
         status: row.status as WorkspaceStatus,
         createdAt: row.created_at as string,
@@ -129,6 +133,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         teamMembers: [],
         taskSummary: undefined,
         channels: [],
+        parentWorkspaceId: row.parent_workspace_id as string | null,
       }));
 
       return mapped as unknown as Workspace[];
@@ -136,6 +141,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   });
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: tasks, isLoading: isTasksLoading } = useQuery({
     queryKey: ['workspace-tasks', workspaceId],
@@ -161,6 +167,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         dependencies: [],
         tags: [],
         metadata: {},
+        roleScope: row.role_scope as WorkspaceRoleScope | undefined,
       })) as unknown as WorkspaceTask[];
     },
     enabled: !!workspaceId,
@@ -178,6 +185,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           description: '',
           priority: TaskPriority.MEDIUM,
           status: TaskStatus.NOT_STARTED,
+          role_scope: activeRoleSpace === 'ALL' ? null : activeRoleSpace,
         })
         .select('*')
         .single();
@@ -248,6 +256,60 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     enabled: !!workspaceId,
   });
 
+  const initialRoleScopeParam = searchParams.get('roleSpace') as WorkspaceRoleScope | null;
+  const [activeRoleSpace, setActiveRoleSpace] = useState<WorkspaceRoleScope>(
+    initialRoleScopeParam || 'ALL',
+  );
+  const roleSpaces: WorkspaceRoleScope[] = ['ALL', ...(teamMembers?.map((m) => m.role) || [])];
+
+  type WorkspaceRoleViewInsert = TablesInsert<'workspace_role_views'>;
+
+  const upsertRoleViewMutation = useMutation({
+    mutationFn: async ({
+      roleScope,
+      lastActiveTab,
+    }: {
+      roleScope: WorkspaceRoleScope;
+      lastActiveTab: string;
+    }) => {
+      if (!workspaceId || !user?.id) return;
+
+      const payload: WorkspaceRoleViewInsert = {
+        workspace_id: workspaceId,
+        user_id: user.id,
+        role_scope: roleScope,
+        last_active_tab: lastActiveTab,
+      };
+
+      const { error } = await supabase
+        .from('workspace_role_views')
+        .upsert(payload, { onConflict: 'workspace_id,user_id,role_scope' });
+
+      if (error) throw error;
+    },
+  });
+
+  useEffect(() => {
+    if (!workspaceId || !user?.id) return;
+
+    const loadInitialView = async () => {
+      const { data, error } = await supabase
+        .from('workspace_role_views')
+        .select('*')
+        .eq('workspace_id', workspaceId)
+        .eq('user_id', user.id);
+
+      if (error || !data || data.length === 0) return;
+
+      const currentRoleView = data.find((view) => view.role_scope === activeRoleSpace);
+      if (currentRoleView && activeTab === 'overview') {
+        setActiveTab(currentRoleView.last_active_tab as typeof activeTab);
+      }
+    };
+
+    void loadInitialView();
+  }, [workspaceId, user?.id, activeRoleSpace, activeTab]);
+
   const isGlobalWorkspaceManager =
     !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
@@ -262,6 +324,36 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
     : false;
 
   const canManageTasks = isGlobalWorkspaceManager || isWorkspaceRoleManager;
+  const canPublishEvent = isGlobalWorkspaceManager && !!workspace?.eventId;
+
+  const publishEventMutation = useMutation({
+    mutationFn: async () => {
+      if (!workspace?.eventId) throw new Error('No event linked to this workspace');
+
+      const { error } = await supabase
+        .from('events')
+        .update({ status: 'PUBLISHED' })
+        .eq('id', workspace.eventId as string);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Event published',
+        description: 'Your event has been marked as published.',
+      });
+      if (workspace?.eventId) {
+        queryClient.invalidateQueries({ queryKey: ['event', workspace.eventId] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to publish event',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleInviteTeamMember = () => {
     if (!workspaceId) return;
@@ -280,6 +372,10 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
   const handleViewTasks = () => {
     setActiveTab('tasks');
+    upsertRoleViewMutation.mutate({
+      roleScope: activeRoleSpace,
+      lastActiveTab: 'tasks',
+    });
   };
 
   const handleWorkspaceSwitch = (newWorkspaceId: string) => {
@@ -333,17 +429,74 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
         onManageSettings={isGlobalWorkspaceManager ? handleManageSettings : undefined}
       />
 
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
+        {/* Role-based sub workspace selector */}
+        <div className="flex flex-wrap gap-2">
+          {roleSpaces.map((roleSpace) => (
+            <button
+              key={roleSpace}
+              onClick={() => {
+                setActiveRoleSpace(roleSpace);
+                const next = new URLSearchParams(searchParams);
+                if (roleSpace === 'ALL') {
+                  next.delete('roleSpace');
+                } else {
+                  next.set('roleSpace', roleSpace);
+                }
+                setSearchParams(next);
+
+                upsertRoleViewMutation.mutate({
+                  roleScope: roleSpace,
+                  lastActiveTab: activeTab,
+                });
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${activeRoleSpace === roleSpace
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-border hover:bg-muted'
+                }`}
+            >
+              {roleSpace === 'ALL' ? 'All teams' : roleSpace.replace(/_/g, ' ').toLowerCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <WorkspaceNavigation
         workspace={workspace}
         userWorkspaces={userWorkspaces || []}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          upsertRoleViewMutation.mutate({
+            roleScope: activeRoleSpace,
+            lastActiveTab: tab,
+          });
+        }}
         onWorkspaceSwitch={handleWorkspaceSwitch}
       />
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'overview' && (
           <div className="space-y-8">
+            {canPublishEvent && (
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted p-4">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">Publish event</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This workspace is linked to an event. Publish it here to make the landing page public.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => publishEventMutation.mutate()}
+                  disabled={publishEventMutation.isPending}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm font-semibold"
+                >
+                  {publishEventMutation.isPending ? 'Publishing…' : 'Publish event'}
+                </button>
+              </div>
+            )}
+
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
@@ -363,6 +516,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
             <TaskManagementInterface
               tasks={tasks || []}
               teamMembers={teamMembers || []}
+              roleScope={activeRoleSpace}
               onTaskEdit={(task) => {
                 if (!canManageTasks) return;
                 console.log('Edit task:', task);
@@ -380,13 +534,19 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
           <EventMarketplaceIntegration eventId={workspace.event.id} eventName={workspace.event.name} />
         )}
 
-        {activeTab === 'team' && <TeamManagement workspace={workspace} />}
+        {activeTab === 'team' && <TeamManagement workspace={workspace} roleScope={activeRoleSpace} />}
 
         {activeTab === 'communication' && (
-          <WorkspaceCommunication workspaceId={workspace.id} teamMembers={teamMembers} />
+          <WorkspaceCommunication
+            workspaceId={workspace.id}
+            teamMembers={teamMembers}
+            roleScope={activeRoleSpace}
+          />
         )}
 
-        {activeTab === 'analytics' && <WorkspaceAnalyticsDashboard workspace={workspace} />}
+        {activeTab === 'analytics' && (
+          <WorkspaceAnalyticsDashboard workspace={workspace} roleScope={activeRoleSpace} />
+        )}
 
         {activeTab === 'reports' && <WorkspaceReportExport workspace={workspace} teamMembers={teamMembers} />}
 

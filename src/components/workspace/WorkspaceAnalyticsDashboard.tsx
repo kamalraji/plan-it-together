@@ -59,9 +59,10 @@ interface WorkspaceAnalytics {
 
 interface WorkspaceAnalyticsDashboardProps {
   workspace: Workspace;
+  roleScope: string;
 }
 
-export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDashboardProps) {
+export function WorkspaceAnalyticsDashboard({ workspace, roleScope }: WorkspaceAnalyticsDashboardProps) {
   const [analytics, setAnalytics] = useState<WorkspaceAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,14 +80,15 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await api.get(`/workspaces/${workspace.id}/analytics`, {
         params: {
           startDate: dateRange.startDate,
-          endDate: dateRange.endDate
-        }
+          endDate: dateRange.endDate,
+          roleScope,
+        },
       });
-      
+
       setAnalytics(response.data.analytics);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch analytics');
@@ -98,7 +100,7 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
   const handleExportReport = async (format: 'CSV' | 'PDF') => {
     try {
       setExportLoading(true);
-      
+
       const response = await api.post(`/workspaces/${workspace.id}/analytics/export`, {
         format,
         dateRange
@@ -107,8 +109,8 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
       });
 
       // Create download link
-      const blob = new Blob([response.data], { 
-        type: format === 'PDF' ? 'application/pdf' : 'text/csv' 
+      const blob = new Blob([response.data], {
+        type: format === 'PDF' ? 'application/pdf' : 'text/csv'
       });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -192,7 +194,7 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
             {workspace.name} • {workspace.event?.name}
           </p>
         </div>
-        
+
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button
             onClick={() => handleExportReport('CSV')}
@@ -204,7 +206,7 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
             </svg>
             Export CSV
           </button>
-          
+
           <button
             onClick={() => handleExportReport('PDF')}
             disabled={exportLoading}
@@ -257,7 +259,7 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
             {analytics.healthIndicators.overallHealth}
           </span>
         </div>
-        
+
         {analytics.healthIndicators.bottlenecks.length > 0 && (
           <div className="mb-4">
             <h4 className="text-sm font-medium text-gray-900 mb-2">Identified Issues</h4>
@@ -413,7 +415,7 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
               </div>
               <div className="flex items-center space-x-4">
                 <div className="w-32 bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-indigo-600 h-2 rounded-full"
                     style={{ width: `${(member.completedTasks / member.assignedTasks) * 100}%` }}
                   ></div>
@@ -421,11 +423,10 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
                 <span className="text-sm font-medium text-gray-900 w-12 text-right">
                   {((member.completedTasks / member.assignedTasks) * 100).toFixed(0)}%
                 </span>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${
-                  member.workloadScore > 80 ? 'text-red-600 bg-red-100' :
-                  member.workloadScore > 60 ? 'text-yellow-600 bg-yellow-100' :
-                  'text-green-600 bg-green-100'
-                }`}>
+                <div className={`px-2 py-1 rounded text-xs font-medium ${member.workloadScore > 80 ? 'text-red-600 bg-red-100' :
+                    member.workloadScore > 60 ? 'text-yellow-600 bg-yellow-100' :
+                      'text-green-600 bg-green-100'
+                  }`}>
                   Load: {member.workloadScore}%
                 </div>
               </div>
@@ -445,19 +446,18 @@ export function WorkspaceAnalyticsDashboard({ workspace }: WorkspaceAnalyticsDas
                 <p className="text-sm text-gray-500">Assigned to {deadline.assigneeName}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                  deadline.priority === 'URGENT' ? 'text-red-600 bg-red-100' :
-                  deadline.priority === 'HIGH' ? 'text-orange-600 bg-orange-100' :
-                  deadline.priority === 'MEDIUM' ? 'text-yellow-600 bg-yellow-100' :
-                  'text-green-600 bg-green-100'
-                }`}>
+                <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${deadline.priority === 'URGENT' ? 'text-red-600 bg-red-100' :
+                    deadline.priority === 'HIGH' ? 'text-orange-600 bg-orange-100' :
+                      deadline.priority === 'MEDIUM' ? 'text-yellow-600 bg-yellow-100' :
+                        'text-green-600 bg-green-100'
+                  }`}>
                   {deadline.priority}
                 </span>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">
                     {deadline.daysUntilDue === 0 ? 'Today' :
-                     deadline.daysUntilDue === 1 ? 'Tomorrow' :
-                     `${deadline.daysUntilDue} days`}
+                      deadline.daysUntilDue === 1 ? 'Tomorrow' :
+                        `${deadline.daysUntilDue} days`}
                   </p>
                   <p className="text-xs text-gray-500">
                     {new Date(deadline.dueDate).toLocaleDateString()}

@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { UserRole } from '../../types';
+import { preferenceStorage } from '@/lib/storage';
 
 interface ServiceNavigationProps {
   user: any;
@@ -210,26 +211,21 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
     recentServices: [],
   });
 
-  // Load preferences from localStorage on mount
+  // Load preferences from centralized preference storage on mount
   useEffect(() => {
-    const savedPreferences = localStorage.getItem('navigation-preferences');
+    const savedPreferences = preferenceStorage.getJSON<NavigationPreferences>('navigation-preferences');
     if (savedPreferences) {
-      try {
-        const parsed = JSON.parse(savedPreferences);
-        setPreferences(parsed);
-        setExpandedCategories(prev => 
-          prev.filter(cat => !parsed.collapsedCategories.includes(cat))
-        );
-      } catch (error) {
-        console.warn('Failed to parse navigation preferences:', error);
-      }
+      setPreferences(savedPreferences);
+      setExpandedCategories(prev =>
+        prev.filter(cat => !savedPreferences.collapsedCategories.includes(cat)),
+      );
     }
   }, []);
 
-  // Save preferences to localStorage
+  // Save preferences via centralized preference storage
   const savePreferences = (newPreferences: NavigationPreferences) => {
     setPreferences(newPreferences);
-    localStorage.setItem('navigation-preferences', JSON.stringify(newPreferences));
+    preferenceStorage.setJSON('navigation-preferences', newPreferences);
   };
 
   // Update recent services when navigating

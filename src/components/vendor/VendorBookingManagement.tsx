@@ -63,9 +63,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
       setError(null);
 
       const response = await fetch(`/api/vendors/${vendorId}/bookings`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -84,9 +82,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
   const fetchMessages = async (bookingId: string) => {
     try {
       const response = await fetch(`/api/bookings/${bookingId}/messages`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -104,9 +100,9 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
     try {
       const response = await fetch(`/api/bookings/${bookingId}/status`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ 
           status,
@@ -136,9 +132,9 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
     try {
       const response = await fetch(`/api/bookings/${selectedBooking.id}/messages`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           message: newMessage.trim(),

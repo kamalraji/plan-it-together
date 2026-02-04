@@ -14,6 +14,10 @@ export interface CreateOrganizationDTO {
   website?: string;
   email?: string;
   phone?: string;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  gov_registration_id?: string | null;
   location?: Record<string, any>;
   social_links?: Record<string, string>;
 }
@@ -23,13 +27,22 @@ export interface UpdateOrganizationDTO {
   slug?: string;
   description?: string;
   category?: 'COLLEGE' | 'COMPANY' | 'INDUSTRY' | 'NON_PROFIT';
-  logo_url?: string;
-  banner_url?: string;
-  website?: string;
-  email?: string;
-  phone?: string;
-  location?: Record<string, any>;
-  social_links?: Record<string, string>;
+  logo_url?: string | null;
+  banner_url?: string | null;
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_image_url?: string | null;
+  website?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  gov_registration_id?: string | null;
+  location?: Record<string, any> | null;
+  social_links?: Record<string, string> | null;
 }
 
 export interface SearchOrganizationsParams {
@@ -157,7 +170,8 @@ class OrganizationService {
       .from('organization_memberships')
       .select('organizations(*)')
       .eq('user_id', user.id)
-      .eq('status', 'ACTIVE');
+      .eq('status', 'ACTIVE')
+      .in('role', ['OWNER', 'ADMIN', 'ORGANIZER']);
 
     if (error) throw new Error(error.message);
 
@@ -234,7 +248,7 @@ class OrganizationService {
     role: string = 'ADMIN'
   ): Promise<OrganizationAdmin> {
     const { data: session } = await supabase.auth.getSession();
-    
+
     const { data: admin, error } = await supabase
       .from('organization_admins')
       .insert({
@@ -449,7 +463,7 @@ class OrganizationService {
       .eq('user_id', userId);
 
     if (error) throw new Error(error.message);
-    
+
     return (data || [])
       .map((item: any) => item.organizations)
       .filter(Boolean);

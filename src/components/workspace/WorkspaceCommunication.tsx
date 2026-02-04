@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  WorkspaceChannel, 
-  SendMessageDTO, 
+import {
+  WorkspaceChannel,
+  SendMessageDTO,
   BroadcastMessageDTO,
   CreateChannelDTO,
   WorkspaceRole,
   UserRole,
-  TeamMember
+  TeamMember,
+  WorkspaceRoleScope,
 } from '../../types';
 import { ChannelList } from './communication/ChannelList';
 import { MessageThread } from './communication/MessageThread';
@@ -19,22 +20,27 @@ import { useAuth } from '@/hooks/useAuth';
 
 /**
  * WorkspaceCommunication Component
- * 
+ *
  * Provides comprehensive team communication features for workspace collaboration:
  * - Channel-based messaging with different channel types (General, Announcements, Role-based, Task-specific)
  * - Broadcast messaging to all members or specific role groups
  * - Message search across all workspace channels
  * - Priority messaging with immediate notifications
  * - Integration with task management for task-specific discussions
- * 
+ *
  * Requirements validated: 7.1, 7.2, 7.3, 7.4, 7.5
  */
 interface WorkspaceCommunicationProps {
   workspaceId: string;
   teamMembers?: TeamMember[];
+  roleScope?: WorkspaceRoleScope;
 }
 
-export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCommunicationProps) {
+export function WorkspaceCommunication({
+  workspaceId,
+  teamMembers,
+  roleScope,
+}: WorkspaceCommunicationProps) {
   const [activeTab, setActiveTab] = useState<'channels' | 'broadcast' | 'search'>('channels');
   const [selectedChannel, setSelectedChannel] = useState<WorkspaceChannel | null>(null);
   const [showCreateChannel, setShowCreateChannel] = useState(false);
@@ -66,6 +72,13 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
     },
   });
 
+  const scopedChannels = (channels || []).filter((channel) => {
+    if (!roleScope || roleScope === 'ALL') return true;
+    const chScope = channel.roleScope as WorkspaceRoleScope | undefined;
+    if (!chScope) return false;
+    return chScope === roleScope;
+  });
+
   // Fetch workspace details for team member info
   const { data: workspace } = useQuery({
     queryKey: ['workspace', workspaceId],
@@ -89,7 +102,13 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ channelId, messageData }: { channelId: string; messageData: SendMessageDTO & { isPriority?: boolean } }) => {
+    mutationFn: async ({
+      channelId,
+      messageData,
+    }: {
+      channelId: string;
+      messageData: SendMessageDTO & { isPriority?: boolean };
+    }) => {
       const response = await api.post(`/workspaces/channels/${channelId}/messages`, messageData);
 
       // Log workspace activity (non-blocking)
@@ -97,7 +116,8 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
         workspace_id: workspaceId,
         type: 'communication',
         title: 'New channel message',
-        description: messageData.content?.slice(0, 140) || 'A new message was posted in a channel.',
+        description:
+          messageData.content?.slice(0, 140) || 'A new message was posted in a channel.',
         metadata: { channelId },
       });
 
@@ -118,7 +138,8 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
         workspace_id: workspaceId,
         type: 'communication',
         title: 'Broadcast sent to workspace',
-        description: broadcastData.content?.slice(0, 140) || 'A broadcast was sent to the workspace.',
+        description:
+          broadcastData.content?.slice(0, 140) || 'A broadcast was sent to the workspace.',
       });
 
       return response.data.messages;
@@ -130,11 +151,12 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
 
   // Auto-select general channel if available
   useEffect(() => {
-    if (channels && channels.length > 0 && !selectedChannel) {
-      const generalChannel = channels.find(ch => ch.name === 'general') || channels[0];
+    if (scopedChannels && scopedChannels.length > 0 && !selectedChannel) {
+      const generalChannel =
+        scopedChannels.find((ch) => ch.name === 'general') || scopedChannels[0];
       setSelectedChannel(generalChannel);
     }
-  }, [channels, selectedChannel]);
+  }, [scopedChannels, selectedChannel]);
 
   const handleChannelSelect = (channel: WorkspaceChannel) => {
     setSelectedChannel(channel);
@@ -143,19 +165,24 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
 
   const handleSendMessage = async (messageData: SendMessageDTO & { isPriority?: boolean }) => {
     if (!selectedChannel) return;
-    
+
     await sendMessageMutation.mutateAsync({
       channelId: selectedChannel.id,
       messageData,
     });
   };
 
-  const handleSendBroadcast = async (broadcastData: BroadcastMessageDTO & { isPriority?: boolean }) => {
+  const handleSendBroadcast = async (
+    broadcastData: BroadcastMessageDTO & { isPriority?: boolean },
+  ) => {
     await sendBroadcastMutation.mutateAsync(broadcastData);
   };
 
   const handleCreateChannel = async (channelData: CreateChannelDTO) => {
-    await createChannelMutation.mutateAsync(channelData);
+    await createChannelMutation.mutateAsync({
+      ...channelData,
+      roleScope: roleScope === 'ALL' ? undefined : roleScope,
+    });
   };
 
   if (channelsLoading) {
@@ -175,8 +202,8 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
           {!canPostMessages && (
             <div className="mb-4 rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 px-3 py-2">
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                <strong>Read-only access:</strong> You can view messages but cannot post or broadcast. Contact a
-                manager for posting permissions.
+                <strong>Read-only access:</strong> You can view messages but cannot post or broadcast.
+                Contact a manager for posting permissions.
               </p>
             </div>
           )}
@@ -190,13 +217,12 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
                 key={tab.key}
                 onClick={() => !tab.disabled && setActiveTab(tab.key as any)}
                 disabled={tab.disabled}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                  activeTab === tab.key
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.key
                     ? 'border-primary text-primary'
                     : tab.disabled
-                    ? 'border-transparent text-muted-foreground/40 cursor-not-allowed'
-                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                }`}
+                      ? 'border-transparent text-muted-foreground/40 cursor-not-allowed'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                  }`}
               >
                 <span>{tab.label}</span>
               </button>
@@ -212,7 +238,7 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
             {/* Channel List */}
             <div className="lg:col-span-1">
               <ChannelList
-                channels={channels || []}
+                channels={scopedChannels}
                 selectedChannel={selectedChannel}
                 onChannelSelect={handleChannelSelect}
                 onCreateChannel={() => setShowCreateChannel(true)}
@@ -251,10 +277,7 @@ export function WorkspaceCommunication({ workspaceId, teamMembers }: WorkspaceCo
         )}
 
         {activeTab === 'search' && (
-          <MessageSearch
-            workspaceId={workspaceId}
-            channels={channels || []}
-          />
+          <MessageSearch workspaceId={workspaceId} channels={scopedChannels} />
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
+import {
   PlusIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
@@ -30,10 +30,10 @@ type ViewMode = 'list' | 'kanban';
 type FilterStatus = 'all' | TaskStatus;
 type FilterPriority = 'all' | TaskPriority;
 
-export function MobileTaskManagement({ 
-  workspaceId, 
-  onCreateTask, 
-  onTaskClick 
+export function MobileTaskManagement({
+  workspaceId,
+  onCreateTask,
+  onTaskClick
 }: MobileTaskManagementProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,10 +61,10 @@ export function MobileTaskManagement({
 
   const filteredTasks = tasks?.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      task.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority;
   }) || [];
 
@@ -135,7 +135,7 @@ export function MobileTaskManagement({
 
         const { latitude, longitude } = position.coords;
         const timestamp = new Date().toISOString();
-        
+
         // Update task with location check-in
         await api.patch(`/workspaces/${workspaceId}/tasks/${taskId}/checkin`, {
           location: { latitude, longitude },
@@ -256,26 +256,24 @@ export function MobileTaskManagement({
             <FunnelIcon className="w-4 h-4 mr-2" />
             Filters
           </button>
-          
+
           {/* View Mode Toggle */}
           <div className="flex rounded-md shadow-sm">
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-1 text-xs font-medium rounded-l-md border ${
-                viewMode === 'list'
+              className={`px-3 py-1 text-xs font-medium rounded-l-md border ${viewMode === 'list'
                   ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                   : 'bg-white border-gray-300 text-gray-700'
-              }`}
+                }`}
             >
               <ListBulletIcon className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('kanban')}
-              className={`px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b ${
-                viewMode === 'kanban'
+              className={`px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b ${viewMode === 'kanban'
                   ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                   : 'bg-white border-gray-300 text-gray-700'
-              }`}
+                }`}
             >
               <Squares2X2Icon className="w-4 h-4" />
             </button>
@@ -360,7 +358,7 @@ export function MobileTaskManagement({
                     </h3>
                     <ChevronRightIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   </div>
-                  
+
                   {task.description && (
                     <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                       {task.description}
@@ -377,9 +375,8 @@ export function MobileTaskManagement({
 
                     {/* Due Date */}
                     {task.dueDate && (
-                      <div className={`flex items-center text-xs ${
-                        isOverdue(task.dueDate, task.status) ? 'text-red-600' : 'text-gray-500'
-                      }`}>
+                      <div className={`flex items-center text-xs ${isOverdue(task.dueDate, task.status) ? 'text-red-600' : 'text-gray-500'
+                        }`}>
                         <CalendarIcon className="w-3 h-3 mr-1" />
                         <span>{new Date(task.dueDate).toLocaleDateString()}</span>
                       </div>

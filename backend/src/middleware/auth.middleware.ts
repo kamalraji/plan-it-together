@@ -16,15 +16,41 @@ declare global {
 }
 
 /**
+ * Helper to read a cookie from the incoming request without relying on external middleware.
+ */
+function getCookie(req: Request, name: string): string | null {
+  const header = req.headers.cookie;
+  if (!header) return null;
+
+  const parts = header.split(';');
+  for (const part of parts) {
+    const [rawKey, rawValue] = part.split('=');
+    if (!rawKey) continue;
+    if (rawKey.trim() === name) {
+      return decodeURIComponent(rawValue ?? '');
+    }
+  }
+  return null;
+}
+
+/**
  * Authentication middleware
  * Verifies JWT token and attaches user to request
  */
 export function authenticate(req: Request, res: Response, next: NextFunction): void {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    // Prefer httpOnly cookie-based authentication for access tokens
+    const cookieToken = getCookie(req, 'accessToken');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // For backward compatibility, fall back to Authorization: Bearer header if no cookie is present
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader && authHeader.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : undefined;
+
+    const token = cookieToken || bearerToken;
+
+    if (!token) {
       res.status(401).json({
         success: false,
         error: {
@@ -35,8 +61,6 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
       });
       return;
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Verify token
     const payload = authService.verifyAccessToken(token);
@@ -128,10 +152,17 @@ export function isOrganizerOrAdmin(req: Request, res: Response, next: NextFuncti
  */
 export function optionalAuthenticate(req: Request, _res: Response, next: NextFunction): void {
   try {
-    const authHeader = req.headers.authorization;
+    // Prefer cookie-based token when available
+    const cookieToken = getCookie(req, 'accessToken');
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader && authHeader.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : undefined;
+
+    const token = cookieToken || bearerToken;
+
+    if (token) {
       const payload = authService.verifyAccessToken(token);
       req.user = payload;
     }

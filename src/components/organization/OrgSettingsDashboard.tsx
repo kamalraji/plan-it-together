@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCurrentOrganization } from './OrganizationContext';
+import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
 
 /**
  * OrgSettingsDashboard
@@ -14,20 +15,38 @@ export const OrgSettingsDashboard: React.FC = () => {
 
   const orgSettingsPath = `/dashboard/organizations/${organization.id}/settings`;
   const teamPath = `/${organization.slug}/team`;
-  const profileSettingsPath = '/dashboard/profile/settings';
+  const storySettingsPath = `/${organization.slug}/settings/story`;
 
   return (
     <main className="min-h-screen bg-transparent">
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
-        <span className="text-muted-foreground/70">Settings</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Organization</span>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2">
+        <OrganizationBreadcrumbs
+          items={[
+            {
+              label: organization.name,
+              href: `/${organization.slug}`,
+              icon: (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                  {organization.name.charAt(0).toUpperCase()}
+                </span>
+              ),
+            },
+            {
+              label: 'Settings',
+            },
+            {
+              label: 'Organization',
+              isCurrent: true,
+            },
+          ]}
+          className="text-xs sm:text-sm"
+        />
       </div>
- 
-       {/* Hero */}
-       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-         <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[140px] sm:min-h-[180px] animate-fade-in">
+
+      {/* Hero */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl shadow-xl min-h-[140px] sm:min-h-[180px] animate-fade-in">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
 
           <div className="relative px-6 sm:px-10 py-6 sm:py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -56,12 +75,12 @@ export const OrgSettingsDashboard: React.FC = () => {
       </section>
 
       {/* Settings cards */}
-       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-8 sm:mt-12 pb-8 sm:pb-16">
-         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
-           {/* Organization profile */}
-           <Link
-             to={orgSettingsPath}
-             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-8 sm:mt-12 pb-8 sm:pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+          {/* Organization profile */}
+          <Link
+            to={orgSettingsPath}
+            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -80,8 +99,8 @@ export const OrgSettingsDashboard: React.FC = () => {
 
           {/* Team & roles */}
           <Link
-             to={teamPath}
-             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+            to={teamPath}
+            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -98,23 +117,23 @@ export const OrgSettingsDashboard: React.FC = () => {
             </span>
           </Link>
 
-          {/* Personal notifications & profile */}
+          {/* Story & social proof */}
           <Link
-             to={profileSettingsPath}
-             className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
+            to={storySettingsPath}
+            className="group bg-card border border-border/70 rounded-2xl shadow-sm px-4 py-3 sm:px-5 sm:py-5 flex flex-col gap-2 hover-scale"
           >
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-0.5">Your preferences</p>
-                <p className="text-sm sm:text-base font-semibold text-foreground">Profile & notifications</p>
+                <p className="text-xs font-medium text-muted-foreground mb-0.5">Story & social proof</p>
+                <p className="text-sm sm:text-base font-semibold text-foreground">Testimonials & sponsors</p>
               </div>
-              <span className="text-lg sm:text-xl">🔔</span>
+              <span className="text-lg sm:text-xl">✨</span>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Adjust your personal profile, notification channels, and other per-user settings.
+              Manage the testimonials and sponsor logos shown on your public organization page.
             </p>
             <span className="mt-1 text-xs sm:text-sm font-medium text-primary story-link">
-              Open your settings
+              Open story settings
             </span>
           </Link>
         </div>

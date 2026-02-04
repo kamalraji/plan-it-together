@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, WorkspaceStatus } from '@/types';
 import { useCurrentOrganization } from './OrganizationContext';
+import { OrganizationBreadcrumbs } from '@/components/organization/OrganizationBreadcrumbs';
 
 /**
  * OrgWorkspacePage
@@ -12,6 +13,9 @@ import { useCurrentOrganization } from './OrganizationContext';
  * This page now focuses on the general "workspace service" overview for an
  * organization, and links out to event-specific workspaces instead of
  * embedding the full WorkspaceDashboard inline.
+ *
+ * On mobile, the workspace list is optimized for small screens with filters
+ * and pill-style badges.
  */
 export const OrgWorkspacePage: React.FC = () => {
   const organization = useCurrentOrganization();
@@ -47,9 +51,9 @@ export const OrgWorkspacePage: React.FC = () => {
         description: undefined,
         event: row.events
           ? {
-              id: row.events.id,
-              name: row.events.name,
-            }
+            id: row.events.id,
+            name: row.events.name,
+          }
           : undefined,
         teamMembers: [],
         taskSummary: undefined,
@@ -58,6 +62,17 @@ export const OrgWorkspacePage: React.FC = () => {
     },
     enabled: !!organization?.id,
   });
+
+  const [statusFilter, setStatusFilter] = React.useState<'ALL' | WorkspaceStatus>('ALL');
+  const [sortOrder, setSortOrder] = React.useState<'recent' | 'oldest'>('recent');
+
+  const filteredWorkspaces = (workspaces || [])
+    .filter((ws) => (statusFilter === 'ALL' ? true : ws.status === statusFilter))
+    .sort((a, b) => {
+      const aTime = new Date(a.updatedAt ?? a.createdAt).getTime();
+      const bTime = new Date(b.updatedAt ?? b.createdAt).getTime();
+      return sortOrder === 'recent' ? bTime - aTime : aTime - bTime;
+    });
 
   const getStatusBadgeClass = (status: WorkspaceStatus) => {
     switch (status) {
@@ -74,33 +89,39 @@ export const OrgWorkspacePage: React.FC = () => {
   };
 
   const handleOpenWorkspace = (workspace: Workspace) => {
-    // Navigate to the event-specific workspace tab on the Event detail page.
-    const baseEventPath = orgSlug
-      ? `/${orgSlug}/eventmanagement`
-      : '/dashboard/eventmanagement';
-    const eventId = (workspace as any).eventId;
-
-    if (eventId) {
-      navigate(`${baseEventPath}/${eventId}/workspace`);
-    }
+    // Navigate directly to the dedicated workspace console detail page.
+    navigate(`${baseWorkspacePath}/${workspace.id}`);
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="space-y-1">
+      <header className="space-y-2">
+        <OrganizationBreadcrumbs
+          items={[
+            {
+              label: organization?.name ?? 'Organization',
+              href: orgSlug ? `/${orgSlug}` : undefined,
+            },
+            {
+              label: 'Workspaces',
+              isCurrent: true,
+            },
+          ]}
+          className="text-xs"
+        />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {organization?.name ?? 'Organization workspaces'}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Use workspaces to organize collaboration around your events. Open an event to access its
-          dedicated workspace with tasks, team, communication, and reports.
+          Use workspaces to organize collaboration around your events. Select a workspace from the list
+          to open its dedicated console with tasks, team, communication, and reports.
         </p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* Workspace list */}
         <aside className="rounded-2xl border border-border/70 bg-card/70 p-3 sm:p-4 shadow-sm">
-          <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-sm font-medium text-foreground">Event workspaces</h2>
               <p className="text-xs text-muted-foreground">
@@ -111,12 +132,40 @@ export const OrgWorkspacePage: React.FC = () => {
                     : 'No event workspaces have been created yet'}
               </p>
             </div>
-            <a
-              href={`${baseWorkspacePath}/create`}
-              className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
-            >
-              New
-            </a>
+            <div className="flex w-full sm:w-auto flex-wrap items-center gap-2 justify-between sm:justify-end">
+              <div className="flex items-center gap-1">
+                <label className="sr-only" htmlFor="workspace-status-filter">
+                  Filter by status
+                </label>
+                <select
+                  id="workspace-status-filter"
+                  value={statusFilter}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value === 'ALL' ? 'ALL' : (e.target.value as WorkspaceStatus))
+                  }
+                  className="h-8 rounded-full border border-border/70 bg-card px-2 text-xs text-foreground"
+                >
+                  <option value="ALL">All statuses</option>
+                  <option value={WorkspaceStatus.ACTIVE}>Active</option>
+                  <option value={WorkspaceStatus.PROVISIONING}>Provisioning</option>
+                  <option value={WorkspaceStatus.WINDING_DOWN}>Winding down</option>
+                  <option value={WorkspaceStatus.DISSOLVED}>Dissolved</option>
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSortOrder(sortOrder === 'recent' ? 'oldest' : 'recent')}
+                className="inline-flex items-center rounded-full border border-border/70 bg-card px-3 py-1 text-[11px] font-medium text-muted-foreground hover:bg-muted/60"
+              >
+                Sort: {sortOrder === 'recent' ? 'Newest first' : 'Oldest first'}
+              </button>
+              <a
+                href={`${baseWorkspacePath}/create`}
+                className="inline-flex items-center rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+              >
+                Create workspace
+              </a>
+            </div>
           </div>
 
           {isLoading ? (
@@ -128,17 +177,16 @@ export const OrgWorkspacePage: React.FC = () => {
                 />
               ))}
             </div>
-          ) : !workspaces || workspaces.length === 0 ? (
+          ) : !filteredWorkspaces || filteredWorkspaces.length === 0 ? (
             <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border/80 bg-muted/40 px-3 py-4 text-xs text-muted-foreground">
-              <span>No workspaces have been created for this organization yet.</span>
+              <span>No workspaces match the current filters.</span>
               <span>
-                Use the <span className="font-medium text-foreground">New</span> button above or create a
-                workspace from an event detail page.
+                Try adjusting the status filter or create a workspace from an event detail page.
               </span>
             </div>
           ) : (
             <ul className="space-y-1">
-              {workspaces.map((workspace) => (
+              {filteredWorkspaces.map((workspace) => (
                 <li key={workspace.id}>
                   <button
                     type="button"
@@ -157,13 +205,14 @@ export const OrgWorkspacePage: React.FC = () => {
                         {workspace.status}
                       </span>
                     </div>
-                    <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
                       <span>
                         Updated {new Date(workspace.updatedAt ?? workspace.createdAt).toLocaleDateString()}
                       </span>
                       {workspace.event && (
-                        <span className="truncate">
-                          Event: <span className="font-medium text-foreground">{workspace.event.name}</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          {workspace.event.name}
                         </span>
                       )}
                     </div>
@@ -179,9 +228,7 @@ export const OrgWorkspacePage: React.FC = () => {
           <h2 className="text-base font-semibold text-foreground mb-2">Workspace service overview</h2>
           <p className="text-sm text-muted-foreground mb-4 max-w-2xl">
             Workspaces are collaboration hubs tied to your events. Each workspace centralizes tasks,
-            team members, communication, and reports for a single event. To work inside a specific
-            workspace, open the event in Event Management and switch to the <span className="font-medium">Workspace</span>{' '}
-            tab.
+            team members, communication, and reports for a single event.
           </p>
           <ul className="mt-2 space-y-2 text-sm text-muted-foreground list-disc list-inside">
             <li>Create a workspace directly from an event detail page.</li>
@@ -195,4 +242,3 @@ export const OrgWorkspacePage: React.FC = () => {
 };
 
 export default OrgWorkspacePage;
-

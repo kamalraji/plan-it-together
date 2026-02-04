@@ -29,9 +29,9 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
 
       const response = await fetch(endpoint, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(formData),
       });

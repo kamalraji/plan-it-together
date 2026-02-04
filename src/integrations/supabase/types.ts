@@ -164,6 +164,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
+          owner_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
           updated_at: string
@@ -179,6 +180,7 @@ export type Database = {
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -194,6 +196,7 @@ export type Database = {
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
+          owner_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
           updated_at?: string
@@ -387,8 +390,156 @@ export type Database = {
           },
         ]
       }
+      organization_products: {
+        Row: {
+          category: string | null
+          click_count: number
+          created_at: string
+          description: string | null
+          featured_position: number | null
+          id: string
+          impression_count: number
+          is_featured: boolean
+          link_url: string | null
+          name: string
+          organization_id: string
+          position: number | null
+          price: string | null
+          status: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          featured_position?: number | null
+          id?: string
+          impression_count?: number
+          is_featured?: boolean
+          link_url?: string | null
+          name: string
+          organization_id: string
+          position?: number | null
+          price?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          featured_position?: number | null
+          id?: string
+          impression_count?: number
+          is_featured?: boolean
+          link_url?: string | null
+          name?: string
+          organization_id?: string
+          position?: number | null
+          price?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_products_org_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_sponsors: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          organization_id: string
+          position: number | null
+          tier: string | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          organization_id: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          organization_id?: string
+          position?: number | null
+          tier?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_sponsors_organization_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_testimonials: {
+        Row: {
+          author_name: string
+          author_role: string | null
+          created_at: string
+          highlight: boolean
+          id: string
+          organization_id: string
+          position: number | null
+          quote: string
+        }
+        Insert: {
+          author_name: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id: string
+          position?: number | null
+          quote: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string | null
+          created_at?: string
+          highlight?: boolean
+          id?: string
+          organization_id?: string
+          position?: number | null
+          quote?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_testimonials_organization_fk"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
+          banner_url: string | null
           category: string
           city: string | null
           country: string | null
@@ -397,9 +548,15 @@ export type Database = {
           email: string | null
           gov_registration_id: string | null
           id: string
+          logo_url: string | null
           name: string
           owner_id: string
           phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          seo_description: string | null
+          seo_image_url: string | null
+          seo_title: string | null
           slug: string
           state: string | null
           verification_source: string | null
@@ -407,6 +564,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          banner_url?: string | null
           category: string
           city?: string | null
           country?: string | null
@@ -415,9 +573,15 @@ export type Database = {
           email?: string | null
           gov_registration_id?: string | null
           id?: string
+          logo_url?: string | null
           name: string
           owner_id: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
           slug: string
           state?: string | null
           verification_source?: string | null
@@ -425,6 +589,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          banner_url?: string | null
           category?: string
           city?: string | null
           country?: string | null
@@ -433,9 +598,15 @@ export type Database = {
           email?: string | null
           gov_registration_id?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
           owner_id?: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
           slug?: string
           state?: string | null
           verification_source?: string | null
@@ -754,6 +925,47 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_role_views: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          last_active_tab: string
+          role_scope: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_active_tab?: string
+          role_scope: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_active_tab?: string
+          role_scope?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_role_views_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_tasks: {
         Row: {
           assigned_to: string | null
@@ -762,6 +974,7 @@ export type Database = {
           due_date: string | null
           id: string
           priority: string
+          role_scope: string | null
           status: string
           title: string
           updated_at: string
@@ -774,6 +987,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -786,6 +1000,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           priority?: string
+          role_scope?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -846,6 +1061,7 @@ export type Database = {
           id: string
           name: string
           organizer_id: string
+          parent_workspace_id: string | null
           status: string
           updated_at: string
         }
@@ -855,6 +1071,7 @@ export type Database = {
           id?: string
           name: string
           organizer_id: string
+          parent_workspace_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -864,6 +1081,7 @@ export type Database = {
           id?: string
           name?: string
           organizer_id?: string
+          parent_workspace_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -873,6 +1091,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspaces_parent_workspace_id_fkey"
+            columns: ["parent_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -910,6 +1135,10 @@ export type Database = {
       is_org_admin_for_org: {
         Args: { _organization_id: string; _user_id: string }
         Returns: boolean
+      }
+      record_organization_product_metrics: {
+        Args: { _event_type: string; _product_ids: string[] }
+        Returns: undefined
       }
     }
     Enums: {

@@ -8,7 +8,7 @@ import { FollowedOrganizations } from '@/components/organization';
 import { QRCodeDisplay } from '@/components/attendance';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { Registration as CoreRegistration, RegistrationStatus } from '../../types';
-
+import { preferenceStorage } from '@/lib/storage';
 
 interface Registration {
   id: string;
@@ -63,13 +63,13 @@ export function ParticipantDashboard() {
   const [activeTab, setActiveTab] = useState<'events' | 'certificates' | 'profile'>('events');
   const [qrRegistration, setQrRegistration] = useState<Registration | null>(null);
   const [showProfileBanner, setShowProfileBanner] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('th1_profile_banner_dismissed') !== '1';
+    const stored = preferenceStorage.getString('profile_banner_dismissed');
+    return stored !== '1';
   });
   const [showOrganizerBanner, setShowOrganizerBanner] = useState(false);
   const [showOrganizerSummaryBanner, setShowOrganizerSummaryBanner] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('th1_organizer_summary_banner_dismissed') !== '1';
+    const stored = preferenceStorage.getString('organizer_summary_banner_dismissed');
+    return stored !== '1';
   });
 
   const { isHealthy } = useApiHealth();
@@ -380,9 +380,7 @@ export function ParticipantDashboard() {
               <button
                 onClick={() => {
                   setShowOrganizerSummaryBanner(false);
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('th1_organizer_summary_banner_dismissed', '1');
-                  }
+                  preferenceStorage.setString('organizer_summary_banner_dismissed', '1');
                 }}
                 className="text-xs text-muted-foreground hover:text-foreground ml-1"
               >
@@ -410,9 +408,7 @@ export function ParticipantDashboard() {
               <button
                 onClick={() => {
                   setShowProfileBanner(false);
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('th1_profile_banner_dismissed', '1');
-                  }
+                  preferenceStorage.setString('profile_banner_dismissed', '1');
                 }}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
