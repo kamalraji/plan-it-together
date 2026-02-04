@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
+import { useMyOrganizations } from '@/hooks/useOrganization';
 
 // Use untyped Supabase client here because generated types are empty until DB introspection runs
 const supabaseAny = supabase as any;
@@ -39,6 +41,7 @@ export const AdminUserRolesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
 
   const [search, setSearch] = useState('');
   const [newUserId, setNewUserId] = useState('');
@@ -74,6 +77,16 @@ export const AdminUserRolesPage: React.FC = () => {
     }
     canonical.setAttribute('href', window.location.origin + '/dashboard/admin/users');
   }, []);
+
+  useEffect(() => {
+    if (!user || user.role !== 'SUPER_ADMIN') return;
+    if (orgsLoading) return;
+
+    const isThittamAdmin = myOrganizations?.some((org: any) => org.slug === 'thittam1hub');
+    if (!isThittamAdmin) {
+      window.location.href = '/dashboard';
+    }
+  }, [user, myOrganizations, orgsLoading]);
 
   const { data, isLoading } = useQuery<UserRoleRow[]>({
     queryKey: ['admin-user-roles'],
@@ -332,6 +345,16 @@ export const AdminUserRolesPage: React.FC = () => {
             SUPER_ADMIN users can manage entries in the secure <code className="font-mono text-xs">user_roles</code> table
             to promote or demote organizers, judges, volunteers, and other roles. Every change requires an audit note.
           </p>
+        </div>
+
+        <div className="rounded-md border border-coral/30 bg-coral/5 px-4 py-2 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          <span>
+            This admin console is scoped to the{' '}
+            <span className="font-semibold text-foreground">Thittam1Hub</span> organization.
+          </span>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>
+          </Button>
         </div>
 
         <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">

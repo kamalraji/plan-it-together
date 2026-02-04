@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventStatus } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SupabaseEventRow {
   id: string;
@@ -47,12 +48,12 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
   };
 }
 
-type DateFilter = 'ALL' | 'UPCOMING' | 'PAST';
-
 export function ParticipantEventsPage() {
-  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
+  const { user } = useAuth();
+  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>(EventStatus.PUBLISHED);
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
-  const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
+  const [showPastArchive, setShowPastArchive] = useState(false);
+  const [registeredFilter, setRegisteredFilter] = useState<'ALL' | 'ONLY_REGISTERED' | 'HIDE_REGISTERED'>('ALL');
 
   const { data: events, isLoading, error } = useQuery<Event[]>({
     queryKey: ['participant-events'],
@@ -60,6 +61,7 @@ export function ParticipantEventsPage() {
       const { data, error } = await supabase
         .from('events')
         .select('id, name, description, mode, start_date, end_date, capacity, visibility, status')
+        .eq('visibility', 'PUBLIC')
         .order('start_date', { ascending: true });
 
       if (error) throw error;
@@ -67,6 +69,23 @@ export function ParticipantEventsPage() {
       const mapped = (data as SupabaseEventRow[]).map(mapRowToEvent).filter(Boolean) as Event[];
       return mapped;
     },
+  });
+
+  const { data: registrationStatusMap } = useQuery<Map<string, string>>({
+    queryKey: ['user-registered-events', user?.id],
+    queryFn: async () => {
+      if (!user) return new Map<string, string>();
+
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('event_id, status')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      return new Map((data || []).map((r: any) => [r.event_id, r.status]));
+    },
+    enabled: !!user,
   });
 
   useEffect(() => {
@@ -92,61 +111,70 @@ export function ParticipantEventsPage() {
   }, []);
 
   const now = new Date().getTime();
+  const registrationMap = registrationStatusMap ?? new Map<string, string>();
 
   const filteredEvents = (events || []).filter((event) => {
     const startTime = new Date(event.startDate).getTime();
+    const isPast = startTime < now;
 
-    const matchesDate =
-      dateFilter === 'ALL' ||
-      (dateFilter === 'UPCOMING' && startTime >= now) ||
-      (dateFilter === 'PAST' && startTime < now);
+    if (!showPastArchive && isPast) {
+      return false;
+    }
 
+    const isRegistered = registrationMap.has(event.id);
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
+    const matchesRegistrationFilter =
+      registeredFilter === 'ALL' ||
+      (registeredFilter === 'ONLY_REGISTERED' && isRegistered) ||
+      (registeredFilter === 'HIDE_REGISTERED' && !isRegistered);
 
-    return matchesDate && matchesStatus && matchesMode;
+    return matchesStatus && matchesMode && matchesRegistrationFilter;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Explore Events</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-foreground">Explore Events</h1>
+            <p className="text-muted-foreground mt-2">
               Browse all upcoming and past events. Use filters to quickly find what interests you.
             </p>
           </div>
           <Link
             to="/dashboard"
-            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800"
+            className="inline-flex items-center text-sm text-primary hover:text-primary/80"
           >
             ← Back to dashboard
           </Link>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="flex flex-wrap gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
-              <select
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value as DateFilter)}
-                className="block w-full border-gray-300 rounded-md text-sm shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="ALL">All dates</option>
-                <option value="UPCOMING">Upcoming only</option>
-                <option value="PAST">Past only</option>
-              </select>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Archive</label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="show-archive"
+                  type="checkbox"
+                  checked={showPastArchive}
+                  onChange={(e) => setShowPastArchive(e.target.checked)}
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                />
+                <label htmlFor="show-archive" className="text-sm text-foreground">
+                  Include past events (archive)
+                </label>
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="block w-full border-gray-300 rounded-md text-sm shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
               >
                 <option value="ALL">All statuses</option>
                 <option value={EventStatus.PUBLISHED}>Published</option>
@@ -156,11 +184,11 @@ export function ParticipantEventsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Type</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Type</label>
               <select
                 value={modeFilter}
                 onChange={(e) => setModeFilter(e.target.value as any)}
-                className="block w-full border-gray-300 rounded-md text-sm shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
               >
                 <option value="ALL">All types</option>
                 <option value={EventMode.ONLINE}>Online</option>
@@ -168,9 +196,22 @@ export function ParticipantEventsPage() {
                 <option value={EventMode.HYBRID}>Hybrid</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Registration</label>
+              <select
+                value={registeredFilter}
+                onChange={(e) => setRegisteredFilter(e.target.value as any)}
+                className="block w-full border-input rounded-md text-sm shadow-sm focus:ring-primary focus:border-primary bg-background/80"
+              >
+                <option value="ALL">All events</option>
+                <option value="ONLY_REGISTERED">Only registered</option>
+                <option value="HIDE_REGISTERED">Hide registered</option>
+              </select>
+            </div>
           </div>
 
-          <div className="text-sm text-gray-500 mt-2 md:mt-0">
+          <div className="text-sm text-muted-foreground mt-2 md:mt-0">
             Showing <span className="font-medium">{filteredEvents.length}</span> event
             {filteredEvents.length === 1 ? '' : 's'}
           </div>
@@ -178,7 +219,7 @@ export function ParticipantEventsPage() {
 
         {isLoading && (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
           </div>
         )}
 
@@ -193,32 +234,48 @@ export function ParticipantEventsPage() {
           {filteredEvents.map((event) => {
             const start = new Date(event.startDate);
             const end = new Date(event.endDate);
+            const registrationStatus = registrationMap.get(event.id);
+            const isRegistered = !!registrationStatus;
 
             return (
               <div
                 key={event.id}
-                className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col justify-between hover:shadow-md transition-shadow"
+                className={`rounded-lg border p-5 flex flex-col justify-between hover:shadow-md transition-shadow ${
+                  isRegistered
+                    ? 'bg-primary/5 border-primary/30'
+                    : 'bg-card border-border'
+                }`}
               >
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">{event.name}</h2>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{event.description}</p>
+                  <div className="flex items-start justify-between mb-1 gap-2">
+                    <h2 className="text-lg font-semibold text-foreground line-clamp-1">{event.name}</h2>
+                    {isRegistered && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground whitespace-nowrap">
+                        Registered  b7 {registrationStatus === 'PENDING' && 'Pending'}
+                        {registrationStatus === 'CONFIRMED' && 'Confirmed'}
+                        {registrationStatus === 'WAITLISTED' && 'Waitlisted'}
+                        {registrationStatus === 'CANCELLED' && 'Cancelled'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
 
                   <div className="space-y-2 text-sm mb-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-500">When</span>
-                      <span className="text-gray-900 text-right">
+                      <span className="text-muted-foreground">When</span>
+                      <span className="text-foreground text-right">
                         {start.toLocaleDateString()} • {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-500">Until</span>
-                      <span className="text-gray-900 text-right">
+                      <span className="text-muted-foreground">Until</span>
+                      <span className="text-foreground text-right">
                         {end.toLocaleDateString()} • {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-500">Type</span>
-                      <span className="text-gray-900">
+                      <span className="text-muted-foreground">Type</span>
+                      <span className="text-foreground">
                         {event.mode === EventMode.ONLINE && 'Online'}
                         {event.mode === EventMode.OFFLINE && 'In person'}
                         {event.mode === EventMode.HYBRID && 'Hybrid'}
@@ -227,14 +284,22 @@ export function ParticipantEventsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-2">
-                  <Link
-                    to={`/events/${event.id}`}
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    View details
-                  </Link>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
+                <div className="flex items-center justify-between pt-4 border-t border-border mt-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={`/events/${event.id}#register`}
+                      className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    >
+                      {isRegistered ? 'View registration' : 'Quick register'}
+                    </Link>
+                    <Link
+                      to={`/events/${event.id}`}
+                      className="text-xs font-medium text-primary hover:text-primary/80"
+                    >
+                      View details
+                    </Link>
+                  </div>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
                     {event.status === EventStatus.ONGOING && 'Ongoing'}
                     {event.status === EventStatus.PUBLISHED && 'Upcoming'}
                     {event.status === EventStatus.COMPLETED && 'Completed'}
@@ -247,8 +312,8 @@ export function ParticipantEventsPage() {
 
         {!isLoading && filteredEvents.length === 0 && !error && (
           <div className="text-center py-16">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">No events match your filters</h2>
-            <p className="text-gray-500 mb-4">
+            <h2 className="text-lg font-semibold text-foreground mb-2">No events match your filters</h2>
+            <p className="text-muted-foreground mb-4">
               Try changing the date, status, or type filters to see more events.
             </p>
           </div>

@@ -393,6 +393,7 @@ export function TeamRosterManagement({
                           onClick={() => onRemoveMember(member.id)}
                           className="p-1 text-red-400 hover:text-red-600"
                           title="Remove Member"
+                          aria-label={`Remove ${member.user.name} from workspace`}
                         >
                           <UserMinusIcon className="w-4 h-4" />
                         </button>
@@ -421,7 +422,7 @@ export function TeamRosterManagement({
 
       {/* Member Profile Modal */}
       {showMemberProfile && selectedMember && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">

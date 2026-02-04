@@ -1,12 +1,12 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/routing/PageHeader';
 import { AttendanceList } from '@/components/attendance';
 import { QRCodeScanner } from '@/components/attendance/QRCodeScanner';
 import { supabase } from '@/integrations/supabase/client';
 import type { AttendanceReport } from '@/types';
-
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 export const EventOpsConsole: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
@@ -128,25 +128,59 @@ export const EventOpsConsole: React.FC = () => {
                   {recentCheckIns.length === 0 ? (
                     <p className="text-sm text-gray-500">No check-ins yet.</p>
                   ) : (
-                    recentCheckIns.map((record) => (
-                      <div
-                        key={record.registrationId}
-                        className="flex items-start justify-between border border-gray-100 rounded-md px-3 py-2"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {record.userName}
-                          </p>
-                          <p className="text-xs text-gray-500">{record.userEmail}</p>
+                    recentCheckIns.map((record) => {
+                      const initials = (record.userName || '?')
+                        .split(' ')
+                        .map((n) => n.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join('');
+
+                      return (
+                        <div
+                          key={record.registrationId}
+                          className="flex items-start justify-between border border-gray-100 rounded-md px-3 py-2"
+                        >
+                          <div className="flex items-center gap-3">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Link
+                                    to={`/dashboard/profile/${record.userId}/public`}
+                                    className="inline-flex flex-shrink-0 group"
+                                  >
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold overflow-hidden ring-1 ring-transparent transition-all group-hover:ring-primary/40 group-hover:shadow-sm">
+                                      {record.avatarUrl ? (
+                                        <img
+                                          src={record.avatarUrl}
+                                          alt={`Avatar for ${record.userName}`}
+                                          className="h-full w-full object-cover rounded-full transition-transform group-hover:scale-105"
+                                        />
+                                      ) : (
+                                        <span>{initials}</span>
+                                      )}
+                                    </div>
+                                  </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">View public profile for {record.userName}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{record.userName}</p>
+                              <p className="text-xs text-gray-500">{record.userEmail}</p>
+                            </div>
+                          </div>
+                          <div className="text-right text-xs text-gray-500">
+                            <p>{record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : '-'}</p>
+                            <p className="mt-0.5">
+                              {record.checkInMethod === 'QR_SCAN' ? 'QR scan' : 'Manual'}
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-right text-xs text-gray-500">
-                          <p>{record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : '-'}</p>
-                          <p className="mt-0.5">
-                            {record.checkInMethod === 'QR_SCAN' ? 'QR scan' : 'Manual'}
-                          </p>
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>

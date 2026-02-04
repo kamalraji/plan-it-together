@@ -121,6 +121,18 @@ serve(async (req) => {
         );
       }
 
+      // Handle row-level security or permission errors with a clearer message
+      const message = String((insertError as any).message || "");
+      if (message.includes("violates row-level security policy")) {
+        return new Response(
+          JSON.stringify({ error: "You must be an organizer to create an organization" }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
       return new Response(JSON.stringify({ error: "Failed to create organization" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

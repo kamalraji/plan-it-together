@@ -35,7 +35,7 @@ export const WorkspaceCreatePage: React.FC = () => {
 
   const organizationCtx = isOrgContext ? useCurrentOrganization() : null;
   const organizationId = organizationCtx?.organization?.id as string | undefined;
-  const { data: orgEvents } = useOrganizationEvents(organizationId || '', undefined);
+  const { data: orgEvents, isLoading: orgEventsLoading } = useOrganizationEvents(organizationId || '', undefined);
 
   const [formValues, setFormValues] = useState({
     name: '',
@@ -162,19 +162,29 @@ export const WorkspaceCreatePage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="event-id">
               Associated event
             </label>
-            {isOrgContext && orgEvents && orgEvents.length > 0 ? (
+            {isOrgContext ? (
               <select
                 id="event-id"
                 value={formValues.eventId}
                 onChange={handleChange('eventId')}
                 className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               >
-                <option value="">Select an event</option>
-                {orgEvents.map((event: any) => (
-                  <option key={event.id} value={event.id}>
-                    {event.name}
+                {orgEventsLoading && <option value="">Loading events…</option>}
+                {!orgEventsLoading && (!orgEvents || orgEvents.length === 0) && (
+                  <option value="" disabled>
+                    No events available
                   </option>
-                ))}
+                )}
+                {!orgEventsLoading && orgEvents && orgEvents.length > 0 && (
+                  <>
+                    <option value="">Select an event</option>
+                    {orgEvents.map((event: any) => (
+                      <option key={event.id} value={event.id}>
+                        {event.name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             ) : (
               <input

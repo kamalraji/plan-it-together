@@ -9,6 +9,7 @@ export interface NotificationPayload {
   data?: any;
   actions?: NotificationAction[];
   requireInteraction?: boolean;
+  critical?: boolean;
 }
 
 export interface NotificationAction {
@@ -122,6 +123,27 @@ class NotificationService {
         throw new Error('Notification permission denied');
       }
 
+      // Play sound & vibration for critical notifications (best-effort)
+      if (payload.critical) {
+        try {
+          const audio = new Audio('/notification-sound.mp3');
+          // Fire and forget; some browsers may block without user interaction
+          void audio.play();
+        } catch (error) {
+          console.warn('Notification sound failed:', error);
+        }
+
+        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          try {
+            // Short vibration pattern for critical alerts
+            // @ts-ignore
+            navigator.vibrate([80, 40, 80]);
+          } catch (error) {
+            console.warn('Notification vibration failed:', error);
+          }
+        }
+      }
+
       if (this.registration) {
         await this.registration.showNotification(payload.title, {
           body: payload.body,
@@ -130,7 +152,7 @@ class NotificationService {
           tag: payload.tag || 'workspace-notification',
           data: payload.data,
           // actions: payload.actions, // Commented out as actions is not supported in all browsers
-          requireInteraction: payload.requireInteraction || false
+          requireInteraction: payload.requireInteraction || false,
         });
       } else {
         // Fallback to browser notification
@@ -138,7 +160,7 @@ class NotificationService {
           body: payload.body,
           icon: payload.icon || '/icon-192x192.png',
           tag: payload.tag || 'workspace-notification',
-          data: payload.data
+          data: payload.data,
         });
       }
     } catch (error) {
@@ -163,9 +185,10 @@ class NotificationService {
 
   async notifyTaskDeadline(taskTitle: string, hoursUntilDeadline: number, workspaceId: string): Promise<void> {
     const urgency = hoursUntilDeadline <= 2 ? 'urgent' : 'reminder';
-    const body = hoursUntilDeadline <= 2 
-      ? `Task "${taskTitle}" is due in ${hoursUntilDeadline} hours!`
-      : `Reminder: Task "${taskTitle}" is due in ${hoursUntilDeadline} hours`;
+    const body =
+      hoursUntilDeadline <= 2
+        ? `Task "${taskTitle}" is due in ${hoursUntilDeadline} hours!`
+        : `Reminder: Task "${taskTitle}" is due in ${hoursUntilDeadline} hours`;
 
     await this.showLocalNotification({
       title: urgency === 'urgent' ? 'Urgent: Task Due Soon' : 'Task Deadline Reminder',
@@ -175,9 +198,10 @@ class NotificationService {
       actions: [
         { action: 'view-task', title: 'View Task' },
         { action: 'mark-complete', title: 'Mark Complete' },
-        { action: 'dismiss', title: 'Dismiss' }
+        { action: 'dismiss', title: 'Dismiss' },
       ],
-      requireInteraction: urgency === 'urgent'
+      requireInteraction: urgency === 'urgent',
+      critical: urgency === 'urgent',
     });
   }
 

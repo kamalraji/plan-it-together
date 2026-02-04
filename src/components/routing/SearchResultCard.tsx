@@ -204,7 +204,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-gray-300 transition-all cursor-pointer group ${className}`}
+      className={`bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md hover:border-border/70 transition-all cursor-pointer group ${className}`}
       onClick={() => navigate(result.url)}
     >
       <div className="flex items-start space-x-4">
@@ -218,10 +218,10 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
           {/* Header */}
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center space-x-2 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+              <h3 className="text-lg font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                 {result.title}
               </h3>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full capitalize flex-shrink-0">
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full capitalize flex-shrink-0">
                 {result.type}
               </span>
               {result.metadata?.status && (
@@ -231,14 +231,14 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
               )}
             </div>
             {showRelevanceScore && result.relevanceScore && (
-              <div className="text-xs text-gray-400 flex-shrink-0 ml-2">
+              <div className="text-xs text-muted-foreground flex-shrink-0 ml-2">
                 {Math.round(result.relevanceScore * 100)}% match
               </div>
             )}
           </div>
 
           {/* Description */}
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-muted-foreground text-sm mb-3 line-clamp-2 leading-relaxed">
             {result.description}
           </p>
 
@@ -246,14 +246,14 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
           {formatMetadata()}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/60">
             {result.lastUpdated && (
-              <div className="flex items-center space-x-1 text-xs text-gray-400">
+              <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                 <ClockIcon className="h-3 w-3" />
                 <span>Updated {new Date(result.lastUpdated).toLocaleDateString()}</span>
               </div>
             )}
-            <div className="text-xs text-indigo-600 group-hover:text-indigo-800 font-medium">
+            <div className="text-xs text-primary group-hover:text-primary/80 font-medium">
               View details →
             </div>
           </div>

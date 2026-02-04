@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Leaderboard as LeaderboardType } from '../../types';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LeaderboardProps {
   eventId: string;
@@ -8,22 +8,19 @@ interface LeaderboardProps {
   showControls?: boolean;
 }
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ 
-  eventId, 
-  isOrganizer = false, 
-  showControls = false 
+const Leaderboard: React.FC<LeaderboardProps> = ({
+  eventId,
+  isOrganizer = false,
+  showControls = false,
 }) => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardType | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
-    
-    // Set up real-time updates
-    const interval = setInterval(fetchLeaderboard, 30000); // Update every 30 seconds
-    
+
+    const interval = setInterval(fetchLeaderboard, 30000);
     return () => clearInterval(interval);
   }, [eventId]);
 
@@ -32,45 +29,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     setError(null);
 
     try {
-      const response = await api.get(`/events/${eventId}/leaderboard`);
-      setLeaderboard(response.data);
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        setLeaderboard(null);
-      } else {
-        setError(error.response?.data?.error?.message || 'Failed to load leaderboard');
-      }
+      const { data, error } = await supabase.functions.invoke('judging-leaderboard', {
+        body: { eventId },
+      });
+
+      if (error) throw error;
+      setLeaderboard(data.leaderboard as LeaderboardType);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load leaderboard');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const toggleLeaderboardVisibility = async () => {
-    if (!leaderboard) return;
-
-    setUpdating(true);
-    try {
-      const response = await api.put(`/events/${eventId}/leaderboard/visibility`, {
-        enabled: !leaderboard.enabled
-      });
-      
-      setLeaderboard(response.data);
-    } catch (error: any) {
-      setError(error.response?.data?.error?.message || 'Failed to update leaderboard visibility');
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const refreshLeaderboard = async () => {
-    setUpdating(true);
-    try {
-      const response = await api.post(`/events/${eventId}/leaderboard/refresh`);
-      setLeaderboard(response.data);
-    } catch (error: any) {
-      setError(error.response?.data?.error?.message || 'Failed to refresh leaderboard');
-    } finally {
-      setUpdating(false);
     }
   };
 
@@ -122,15 +90,6 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           <div className="text-4xl mb-4">📊</div>
           <h3 className="text-lg font-medium mb-2">No Scores Yet</h3>
           <p>The leaderboard will appear once judges start scoring submissions.</p>
-          {showControls && isOrganizer && (
-            <button
-              onClick={refreshLeaderboard}
-              disabled={updating}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {updating ? 'Refreshing...' : 'Refresh Leaderboard'}
-            </button>
-          )}
         </div>
       </div>
     );
@@ -160,37 +119,17 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
               Last updated: {new Date(leaderboard.lastUpdated).toLocaleString()}
             </p>
           </div>
-          
+
           {showControls && isOrganizer && (
             <div className="flex space-x-2">
-              <button
-                onClick={refreshLeaderboard}
-                disabled={updating}
-                className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50"
-              >
-                {updating ? 'Refreshing...' : 'Refresh'}
-              </button>
-              
-              <button
-                onClick={toggleLeaderboardVisibility}
-                disabled={updating}
-                className={`px-3 py-1 text-sm rounded-md disabled:opacity-50 ${
-                  leaderboard.enabled
-                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                    : 'bg-green-100 text-green-700 hover:bg-green-200'
-                }`}
-              >
-                {leaderboard.enabled ? 'Hide' : 'Show'} Public
-              </button>
+              {/* Controls removed in Supabase version; auto-refresh keeps data fresh */}
             </div>
           )}
         </div>
 
         {!leaderboard.enabled && isOrganizer && (
           <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-sm text-yellow-800">
-              ⚠️ Leaderboard is currently hidden from public view
-            </p>
+            <p className="text-sm text-yellow-800">⚠️ Leaderboard is currently hidden from public view</p>
           </div>
         )}
       </div>

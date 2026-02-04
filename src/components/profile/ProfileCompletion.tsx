@@ -1,26 +1,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
-
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  bio: z.string().optional(),
-  organization: z.string().optional(),
-  phone: z.string().optional(),
-  website: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  socialLinks: z.object({
-    linkedin: z.string().url('Please enter a valid LinkedIn URL').optional().or(z.literal('')),
-    twitter: z.string().url('Please enter a valid Twitter URL').optional().or(z.literal('')),
-    github: z.string().url('Please enter a valid GitHub URL').optional().or(z.literal('')),
-  }).optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
+import { profileSchema, type ProfileFormData } from './profileSchema';
 
 export function ProfileCompletion() {
   const [isLoading, setIsLoading] = useState(false);

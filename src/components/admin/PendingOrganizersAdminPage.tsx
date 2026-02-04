@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { AppRole } from './AdminUserRolesPage';
+import { useAuth } from '@/hooks/useAuth';
+import { useMyOrganizations } from '@/hooks/useOrganization';
+import { Link } from 'react-router-dom';
 
 interface PendingOrganizer {
   userId: string;
@@ -19,6 +22,8 @@ interface PendingOrganizer {
 export const PendingOrganizersAdminPage: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { data: myOrganizations, isLoading: orgsLoading } = useMyOrganizations();
 
   const { data, isLoading } = useQuery<PendingOrganizer[]>({
     queryKey: ['pending-organizers'],
@@ -28,6 +33,16 @@ export const PendingOrganizersAdminPage: React.FC = () => {
       return (data as { organizers: PendingOrganizer[] }).organizers;
     },
   });
+
+  useEffect(() => {
+    if (!user || user.role !== 'SUPER_ADMIN') return;
+    if (orgsLoading) return;
+
+    const isThittamAdmin = myOrganizations?.some((org: any) => org.slug === 'thittam1hub');
+    if (!isThittamAdmin) {
+      window.location.href = '/dashboard';
+    }
+  }, [user, myOrganizations, orgsLoading]);
 
   const approveMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -72,6 +87,16 @@ export const PendingOrganizersAdminPage: React.FC = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Review organizer candidates sourced from onboarding activity and approve or reject access.
           </p>
+        </div>
+
+        <div className="rounded-md border border-coral/30 bg-coral/5 px-4 py-2 text-sm text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+          <span>
+            This admin console is scoped to the{' '}
+            <span className="font-semibold text-foreground">Thittam1Hub</span> organization.
+          </span>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/thittam1hub/dashboard">Back to Thittam1Hub dashboard</Link>
+          </Button>
         </div>
 
         <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">

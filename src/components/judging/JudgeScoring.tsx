@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Rubric, Submission, Score, SubmitScoreDTO } from '../../types';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JudgeScoringProps {
   eventId: string;
@@ -31,19 +31,27 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
   const fetchRubricAndSubmissions = async () => {
     setLoading(true);
     try {
-      const [rubricResponse, submissionsResponse] = await Promise.all([
-        api.get(`/events/${eventId}/rubric`),
-        api.get(`/events/${eventId}/submissions/assigned/${judgeId}`)
+      const [rubricResult, submissionsResult] = await Promise.all([
+        supabase.functions.invoke('judging-rubric', { body: { action: 'get', eventId } }),
+        supabase.functions.invoke('judging-submissions', {
+          body: { action: 'assignedSubmissions', eventId, judgeId },
+        }),
       ]);
 
-      setRubric(rubricResponse.data);
-      setSubmissions(submissionsResponse.data);
+      if (rubricResult.error) throw rubricResult.error;
+      if (submissionsResult.error) throw submissionsResult.error;
 
-      if (submissionsResponse.data.length > 0) {
-        setSelectedSubmission(submissionsResponse.data[0]);
+      const fetchedRubric = rubricResult.data?.rubric as Rubric | null;
+      const fetchedSubmissions = (submissionsResult.data?.submissions || []) as Submission[];
+
+      setRubric(fetchedRubric);
+      setSubmissions(fetchedSubmissions);
+
+      if (fetchedSubmissions.length > 0) {
+        setSelectedSubmission(fetchedSubmissions[0]);
       }
-    } catch (error: any) {
-      setError(error.response?.data?.error?.message || 'Failed to load judging data');
+    } catch (err: any) {
+      setError(err.message || 'Failed to load judging data');
     } finally {
       setLoading(false);
     }
@@ -53,25 +61,31 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
     if (!selectedSubmission || !rubric) return;
 
     try {
-      const response = await api.get(`/scores/${selectedSubmission.id}/${judgeId}`);
-      const score = response.data;
-      setExistingScore(score);
-      setScores(score.scores);
-    } catch (error: any) {
-      // If no existing score, that's fine - we'll create a new one
-      if (error.response?.status === 404) {
+      const { data, error } = await supabase.functions.invoke('judging-submissions', {
+        body: {
+          action: 'getScoreForSubmission',
+          submissionId: selectedSubmission.id,
+        },
+      });
+
+      if (error) throw error;
+
+      const score = data?.score as Score | null;
+      if (!score) {
         setExistingScore(null);
-        // Initialize scores with 0 for all criteria
         const initialScores: Record<string, number> = {};
-        rubric.criteria.forEach(criterion => {
+        rubric.criteria.forEach((criterion) => {
           if (criterion.id) {
             initialScores[criterion.id] = 0;
           }
         });
         setScores(initialScores);
       } else {
-        console.error('Error fetching existing score:', error);
+        setExistingScore(score);
+        setScores(score.scores as any);
       }
+    } catch (err) {
+      console.error('Error fetching existing score:', err);
     }
   };
 
@@ -134,17 +148,24 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
     try {
       const scoreData: SubmitScoreDTO = {
         submissionId: selectedSubmission.id,
-        scores
+        scores,
       };
 
-      const response = existingScore
-        ? await api.put(`/scores/${existingScore.id}`, scoreData)
-        : await api.post('/scores', scoreData);
+      const { data, error } = await supabase.functions.invoke('judging-submissions', {
+        body: {
+          action: 'submitScore',
+          submissionId: scoreData.submissionId,
+          scores: scoreData.scores,
+        },
+      });
 
-      setExistingScore(response.data);
+      if (error) throw error;
+
+      const savedScore = data.score as Score;
+      setExistingScore(savedScore);
       setSuccess(existingScore ? 'Score updated successfully!' : 'Score submitted successfully!');
-    } catch (error: any) {
-      setError(error.response?.data?.error?.message || 'Failed to submit score');
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit score');
     } finally {
       setSubmitting(false);
     }

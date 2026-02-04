@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Workspace, WorkspaceStatus } from '../../types';
+import { Workspace, WorkspaceStatus, WorkspaceTask, TeamMember } from '../../types';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { TaskSummaryCards } from './TaskSummaryCards';
 import { TeamMemberRoster } from './TeamMemberRoster';
@@ -14,6 +14,7 @@ import { WorkspaceReportExport } from './WorkspaceReportExport';
 import { WorkspaceTemplateManagement } from './WorkspaceTemplateManagement';
 import { EventMarketplaceIntegration } from '../marketplace';
 import { WorkspaceCollaborationTimeline } from './WorkspaceCollaborationTimeline';
+import { TaskManagementInterface } from './TaskManagementInterface';
 import api from '../../lib/api';
 
 interface WorkspaceDashboardProps {
@@ -43,6 +44,26 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
       const response = await api.get('/workspaces/my-workspaces');
       return response.data.workspaces as Workspace[];
     },
+  });
+
+  // Fetch workspace tasks
+  const { data: tasks, isLoading: isTasksLoading } = useQuery({
+    queryKey: ['workspace-tasks', workspaceId],
+    queryFn: async () => {
+      const response = await api.get(`/workspaces/${workspaceId}/tasks`);
+      return response.data.tasks as WorkspaceTask[];
+    },
+    enabled: !!workspaceId,
+  });
+
+  // Fetch team members
+  const { data: teamMembers } = useQuery({
+    queryKey: ['workspace-team-members', workspaceId],
+    queryFn: async () => {
+      const response = await api.get(`/workspaces/${workspaceId}/team-members`);
+      return response.data.teamMembers as TeamMember[];
+    },
+    enabled: !!workspaceId,
   });
 
   const handleInviteTeamMember = () => {
@@ -92,7 +113,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen w-full bg-gray-50 flex flex-col">
       {/* Workspace Header */}
       <WorkspaceHeader
         workspace={workspace}
@@ -111,7 +132,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'overview' && (
           <div className="space-y-8">
             {/* Task Summary */}
@@ -132,8 +153,21 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId }: WorkspaceDa
 
         {activeTab === 'tasks' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Task Management</h2>
-            <p className="text-gray-600">Task management interface will be implemented in a separate task.</p>
+            <TaskManagementInterface
+              tasks={tasks || []}
+              teamMembers={teamMembers || []}
+              onTaskEdit={(task) => {
+                console.log('Edit task:', task);
+              }}
+              onTaskDelete={(taskId) => {
+                console.log('Delete task:', taskId);
+              }}
+              onTaskStatusChange={(taskId, status) => {
+                console.log('Update task status:', taskId, status);
+              }}
+              onCreateTask={handleCreateTask}
+              isLoading={isTasksLoading}
+            />
           </div>
         )}
 

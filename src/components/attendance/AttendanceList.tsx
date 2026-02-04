@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AttendanceReport } from '../../types';
-
+import { Link } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip';
 interface AttendanceListProps {
   eventId: string;
   sessionId?: string;
@@ -168,27 +169,90 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
           <div className="px-6 py-8 text-center">
             <p className="text-gray-500">No participants match your search criteria.</p>
           </div>
-        ) : (
-          filteredRecords.map((record) => (
-            <div key={record.registrationId} className="px-6 py-4 hover:bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900">{record.userName}</h4>
-                      <p className="text-sm text-gray-600">{record.userEmail}</p>
+          ) : (
+            filteredRecords.map((record) => {
+              const initials = (record.userName || '?')
+                .split(' ')
+                .map((n) => n.charAt(0).toUpperCase())
+                .slice(0, 2)
+                .join('');
+
+              return (
+                <div key={record.registrationId} className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 flex items-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link
+                              to={`/dashboard/profile/${record.userId}/public`}
+                              className="mr-3 inline-flex flex-shrink-0 group"
+                            >
+                              <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold overflow-hidden ring-1 ring-transparent transition-all group-hover:ring-primary/40 group-hover:shadow-sm">
+                                {record.avatarUrl ? (
+                                  <img
+                                    src={record.avatarUrl}
+                                    alt={`Avatar for ${record.userName}`}
+                                    className="h-full w-full object-cover rounded-full transition-transform group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <span>{initials}</span>
+                                )}
+                              </div>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs">View public profile for {record.userName}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-gray-900">{record.userName}</h4>
+                        <p className="text-sm text-gray-600">{record.userEmail}</p>
+                      </div>
+                      <div className="ml-4">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            record.attended
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {record.attended ? 'Checked In' : 'Not Checked In'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        record.attended
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {record.attended ? 'Checked In' : 'Not Checked In'}
-                      </span>
+
+                    <div className="ml-4 flex items-center space-x-2">
+                      {record.attended ? (
+                        <svg
+                          className="h-5 w-5 text-green-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedRegistration(record.registrationId);
+                            setShowManualCheckIn(true);
+                          }}
+                          className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                        >
+                          Check In
+                        </button>
+                      )}
                     </div>
                   </div>
-                  
+
                   {record.attended && record.checkInTime && (
                     <div className="mt-2 text-xs text-gray-500">
                       <div className="flex items-center space-x-4">
@@ -202,34 +266,15 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                     </div>
                   )}
                 </div>
-
-                <div className="ml-4 flex items-center space-x-2">
-                  {record.attended ? (
-                    <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setSelectedRegistration(record.registrationId);
-                        setShowManualCheckIn(true);
-                      }}
-                      className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                    >
-                      Check In
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
 
       {/* Manual Check-in Modal */}
       {showManualCheckIn && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 sm:p-6 z-50">
+          <div className="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg rounded-md border mx-auto p-5">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Manual Check-in</h3>
               

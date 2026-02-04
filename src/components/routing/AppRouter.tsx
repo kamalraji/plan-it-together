@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider } from '../../hooks/useAuth';
@@ -8,12 +8,13 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
+import { MarketplaceService, OrganizationService as OrganizationServiceComponent, EventService } from './services';
 import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
+import { AuthLayout } from '../auth/AuthLayout';
 import { DashboardDataLab } from '../enhanced/DashboardDataLab';
 import { DashboardRouter } from '../dashboard/DashboardRouter';
 import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
@@ -21,8 +22,18 @@ import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
 import { OrgScopedLayout } from '../organization/OrgScopedLayout';
 import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
+import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
+import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
+import { ProfilePage } from '../profile/ProfilePage';
+import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
+import { PublicProfilePage } from '../profile/PublicProfilePage';
+import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
+import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
+import { ParticipantPortfolioPage } from '../portfolio/ParticipantPortfolioPage';
+import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
+
 // Create a query client instance with optimized settings for the console application
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,35 +48,72 @@ const queryClient = new QueryClient({
   },
 });
 
-// Enhanced Forgot Password page without doodle illustrations
+// Forgot Password page using shared AuthLayout
 const ForgotPasswordPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender/5 to-mint/10">
-      <div className="max-w-md w-full space-y-8">
+    <AuthLayout>
+      <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
-            Reset Password
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
+            Forgot your password?
           </h2>
-          <p className="text-gray-600 mb-8">
-            Don't worry! Password reset functionality will be implemented in later tasks.
+          <p className="text-sm text-muted-foreground">
+            Password reset functionality will be implemented in upcoming updates.
           </p>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-soft">
-            <div className="flex items-center justify-center space-x-4 mb-6">
-              <div className="text-left">
-                <h3 className="font-semibold text-gray-900">Coming Soon!</h3>
-                <p className="text-sm text-gray-600">We're working on this feature.</p>
-              </div>
+        </div>
+
+        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+          <div className="space-y-4 text-center">
+            <div>
+              <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
+              <p className="text-sm text-muted-foreground">
+                You&apos;ll be able to request a secure reset link to your email from here.
+              </p>
             </div>
-            <Link 
-              to="/login" 
-              className="inline-flex items-center justify-center w-full py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle transition-all duration-200 hover:scale-105"
+
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
             >
-              Back to Login
+              Back to login
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </AuthLayout>
+  );
+};
+
+// Password Reset page placeholder using shared AuthLayout
+const ResetPasswordPage = () => {
+  return (
+    <AuthLayout>
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
+            Reset your password
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            The secure password reset experience will be available soon.
+          </p>
+        </div>
+
+        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+          <div className="space-y-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Once implemented, this page will let you choose a new password after opening a
+              verified reset link from your email.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              Back to login
+            </Link>
+          </div>
+        </div>
+      </div>
+    </AuthLayout>
   );
 };
 
@@ -418,40 +466,12 @@ const AnalyticsService = () => {
 
 const ProfileService = () => {
   return (
-    <div className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-lavender/5 to-cream/20 min-h-screen">
-      <div className="max-w-7xl mx-auto py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-coral to-lavender bg-clip-text text-transparent mb-4">
-            Profile Management
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Customize your profile and showcase your achievements.
-          </p>
-        </div>
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 shadow-soft">
-          <div className="flex items-center space-x-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Your Profile Awaits!</h2>
-              <p className="text-gray-600">Profile management functionality will be implemented in later tasks.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-4 bg-coral/5 rounded-xl">
-              <h3 className="font-semibold text-coral mb-2">Personal Info</h3>
-              <p className="text-sm text-gray-600">Update your details.</p>
-            </div>
-            <div className="text-center p-4 bg-lavender/5 rounded-xl">
-              <h3 className="font-semibold text-lavender mb-2">Achievements</h3>
-              <p className="text-sm text-gray-600">Show off your badges.</p>
-            </div>
-            <div className="text-center p-4 bg-coral/5 rounded-xl">
-              <h3 className="font-semibold text-coral mb-2">Preferences</h3>
-              <p className="text-sm text-gray-600">Customize your experience.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Routes>
+      <Route index element={<ProfilePage />} />
+      <Route path="settings" element={<ProfileSettingsPage />} />
+      <Route path=":userId/public" element={<PublicProfilePage />} />
+      <Route path="*" element={<Navigate to="." replace />} />
+    </Routes>
   );
 };
 
@@ -473,6 +493,43 @@ const CommunicationService = () => {
   return <CommunicationPage />;
 };
 
+const EmbedPortfolioRoute: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+
+  useEffect(() => {
+    document.title = 'Participant Portfolio Preview | Thittam1Hub';
+
+    const description =
+      'Compact public portfolio preview card for embedding participant profiles from Thittam1Hub.';
+
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'description');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.origin + window.location.pathname);
+  }, []);
+
+  if (!userId) return null;
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-md w-full p-4">
+        <PortfolioPreviewCard userId={userId} />
+      </div>
+    </main>
+  );
+};
+
 export const AppRouter: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -486,12 +543,33 @@ export const AppRouter: React.FC = () => {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Organizer onboarding */}
+            {/* Organizer onboarding - appears for new organizers */}
+            <Route
+              path="/dashboard/onboarding/organizer"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <OrganizerOnboardingPage />
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Organizer onboarding - legacy entry point now redirects to organization discovery */}
             <Route
               path="/onboarding/organization"
               element={
-                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]} requireEmailVerification={false}>
+                <ConsoleRoute requireEmailVerification={false}>
+                  <Navigate to="/dashboard/organizations/join" replace />
+                </ConsoleRoute>
+              }
+            />
+
+            {/* Create organization page */}
+            <Route
+              path="/organizations/create"
+              element={
+                <ConsoleRoute requireEmailVerification={false}>
                   <OrganizationRegistrationPage />
                 </ConsoleRoute>
               }
@@ -501,22 +579,44 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
 
+            {/* Public participant portfolio */}
+            <Route path="/portfolio/:userId" element={<ParticipantPortfolioPage />} />
+            <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
+
             {/* Organization-scoped organizer console */}
             <Route
               path="/:orgSlug/*"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <OrgScopedLayout />
+                  <GlobalErrorBoundary>
+                    <OrgScopedLayout />
+                  </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
             />
+
+            {/* Organizer root dashboard (org-agnostic) */}
+            <Route
+              path="/organizer/dashboard"
+              element={
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
+                  <GlobalErrorBoundary>
+                    <ConsoleLayout />
+                  </GlobalErrorBoundary>
+                </ConsoleRoute>
+              }
+            >
+              <Route index element={<OrganizerSpecificDashboard />} />
+            </Route>
 
             {/* Dashboard routes - all protected with enhanced authentication */}
             <Route
               path="/dashboard"
               element={
                 <ConsoleRoute>
-                  <ConsoleLayout />
+                  <GlobalErrorBoundary>
+                    <ConsoleLayout />
+                  </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
             >
@@ -538,13 +638,19 @@ export const AppRouter: React.FC = () => {
                   </ConsoleRoute>
                 }
               />
-
-              {/* Service routes with role-based access control */}
+              <Route
+                path="organizations/join"
+                element={
+                  <ConsoleRoute requireEmailVerification={false}>
+                    <JoinOrganizationPage />
+                  </ConsoleRoute>
+                }
+              />
               <Route 
                 path="eventmanagement/*" 
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <Navigate to="/dashboard" replace />
+                    <EventService />
                   </ConsoleRoute>
                 } 
               />
@@ -559,7 +665,7 @@ export const AppRouter: React.FC = () => {
               <Route 
                 path="marketplace/*" 
                 element={
-                  <ConsoleRoute>
+                  <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                     <MarketplaceService />
                   </ConsoleRoute>
                 } 
@@ -650,7 +756,7 @@ export const AppRouter: React.FC = () => {
             <Route 
               path="/marketplace/*" 
               element={
-                <ConsoleRoute>
+                <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <MarketplaceService />
                 </ConsoleRoute>
               } 

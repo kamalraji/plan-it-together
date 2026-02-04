@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Event, 
-  EventMode, 
-  EventTemplate, 
-  CreateEventDTO, 
+import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
+import {
+  Event,
+  EventMode,
+  EventTemplate,
+  CreateEventDTO,
   EventVisibility,
-  Organization
+  Organization,
 } from '../../types';
+import { WorkspaceTemplateLibrary } from '@/components/workspace/WorkspaceTemplateLibrary';
+import type { WorkspaceTemplate as WorkspaceWorkspaceTemplate } from '@/types/workspace-template';
 
 interface EventFormProps {
   event?: Event;
@@ -23,7 +26,9 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const organizationContext = useCurrentOrganization();
   const [selectedTemplate, setSelectedTemplate] = useState<EventTemplate | null>(null);
+  const [selectedWorkspaceTemplate, setSelectedWorkspaceTemplate] = useState<WorkspaceWorkspaceTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'branding' | 'timeline' | 'details'>('basic');
   const [inviteLink, setInviteLink] = useState<string | null>(event?.inviteLink || null);
 
@@ -54,6 +59,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     }
   });
 
+  useEffect(() => {
+    if (!isEditing && organizationContext && !event) {
+      setValue('organizationId', (organizationContext as any).id);
+    }
+  }, [isEditing, organizationContext, event, setValue]);
+
   const { fields: timelineFields, append: appendTimeline, remove: removeTimeline } = useFieldArray({
     control,
     name: 'timeline'
@@ -82,34 +93,44 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
     },
   });
 
-  // Fetch user's organizations from Lovable Cloud (Requirements 19.1)
+  // Fetch user's organizations via memberships, so they only see orgs they belong to
   const { data: organizations } = useQuery({
     queryKey: ['user-organizations'],
     queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      const userSession = session?.session;
+
+      if (!userSession?.user) {
+        return [] as Organization[];
+      }
+
       const { data, error } = await supabase
-        .from('organizations')
-        .select('id, name, category, verification_status')
-        .order('name');
+        .from('organization_memberships')
+        .select('organizations ( id, name, category, verification_status )')
+        .eq('user_id', userSession.user.id)
+        .eq('status', 'ACTIVE');
 
       if (error) {
         throw error;
       }
 
-      // Map Supabase rows into the minimal shape EventForm needs
-      return (data || []).map((org: any) => ({
-        id: org.id,
-        name: org.name,
-        description: '',
-        category: org.category,
-        verificationStatus: org.verification_status,
-        branding: {},
-        socialLinks: {},
-        pageUrl: '',
-        followerCount: 0,
-        eventCount: 0,
-        createdAt: '',
-        updatedAt: '',
-      })) as Organization[];
+      return (data || [])
+        .map((row: any) => row.organizations)
+        .filter(Boolean)
+        .map((org: any) => ({
+          id: org.id,
+          name: org.name,
+          description: '',
+          category: org.category,
+          verificationStatus: org.verification_status,
+          branding: {},
+          socialLinks: {},
+          pageUrl: '',
+          followerCount: 0,
+          eventCount: 0,
+          createdAt: '',
+          updatedAt: '',
+        })) as Organization[];
     },
   });
 
@@ -142,7 +163,10 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         registration_deadline: data.registrationDeadline,
         organization_id: data.organizationId || null,
         visibility: data.visibility,
-        branding: (data.branding || {}) as any,
+        branding: {
+          ...(data.branding || {}),
+          workspaceTemplateId: selectedWorkspaceTemplate?.id,
+        } as any,
         venue: (data.venue || null) as any,
         virtual_links: (data.virtualLinks || null) as any,
       };
@@ -238,13 +262,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             {isEditing ? 'Edit Event' : 'Create New Event'}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-muted-foreground mt-2">
             {isEditing ? 'Update your event details' : 'Set up your event with customizable settings and branding'}
           </p>
         </div>
@@ -252,38 +276,38 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Template Selection (Requirements 4.1) */}
           {!isEditing && templates && templates.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Choose a Template (Optional)</h2>
+            <div className="bg-card rounded-lg shadow p-6 border border-border">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Choose a Template (Optional)</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {templates.map((template) => (
-                  <div
-                    key={template.id}
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      selectedTemplate?.id === template.id
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => applyTemplate(template)}
-                  >
-                    <h3 className="font-medium text-gray-900">{template.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{template.description}</p>
-                    <div className="mt-2 flex items-center space-x-2">
-                      <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                        {template.category}
-                      </span>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {template.defaultMode}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+            {templates.map((template) => (
+              <div
+                key={template.id}
+                className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                  selectedTemplate?.id === template.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-foreground/40'
+                }`}
+                onClick={() => applyTemplate(template)}
+              >
+                <h3 className="font-medium text-foreground">{template.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+                <div className="mt-2 flex items-center space-x-2">
+                  <span className="text-xs bg-muted text-foreground px-2 py-1 rounded">
+                    {template.category}
+                  </span>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                    {template.defaultMode}
+                  </span>
+                </div>
+              </div>
+            ))}
               </div>
             </div>
           )}
 
           {/* Tab Navigation */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="border-b border-gray-200">
+          <div className="bg-card rounded-lg shadow border border-border">
+            <div className="border-b border-border">
               <nav className="-mb-px flex space-x-8 px-6">
                 {[
                   { key: 'basic', label: 'Basic Details' },
@@ -297,8 +321,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                     onClick={() => setActiveTab(tab.key as any)}
                     className={`py-4 px-1 border-b-2 font-medium text-sm ${
                       activeTab === tab.key
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                     }`}
                   >
                     {tab.label}
@@ -312,13 +336,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
               {activeTab === 'basic' && (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Event Name *
                     </label>
                     <input
                       type="text"
                       {...register('name', { required: 'Event name is required' })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="Enter event name"
                     />
                     {errors.name && (
@@ -327,13 +351,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Description *
                     </label>
                     <textarea
                       {...register('description', { required: 'Description is required' })}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       placeholder="Describe your event"
                     />
                     {errors.description && (
@@ -344,12 +368,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Organization Selection (Requirements 19.1) */}
                   {organizations && organizations.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Organization (Optional)
                       </label>
                       <select
                         {...register('organizationId')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       >
                         <option value="">Select an organization</option>
                         {organizations.map((org) => (
@@ -358,15 +382,43 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           </option>
                         ))}
                       </select>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Publishing under an organization will display their branding on your event page
                       </p>
                     </div>
                   )}
 
+                  {/* Workspace Template Selection (Workspace templates into event creation) */}
+                  {!isEditing && (
+                    <div className="border border-dashed border-border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="text-sm font-medium text-foreground">Workspace template (optional)</h4>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Choose a workspace template to pre-structure tasks, roles, and communication for this event.
+                          </p>
+                        </div>
+                        {selectedWorkspaceTemplate && (
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                            {selectedWorkspaceTemplate.name}
+                          </span>
+                        )}
+                      </div>
+
+
+                      <div className="mt-4">
+                        <WorkspaceTemplateLibrary
+                          onTemplateSelect={(tpl) => setSelectedWorkspaceTemplate(tpl)}
+                          showActions
+                          eventSize={watch('capacity')}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Event Visibility (Requirements 19.3, 19.4, 19.5) */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Event Visibility *
                     </label>
                     <div className="space-y-3">
@@ -376,7 +428,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             type="radio"
                             value={visibility}
                             {...register('visibility', { required: 'Event visibility is required' })}
-                            className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                            className="mt-1 h-4 w-4 text-primary focus:ring-primary border-border"
                           />
                           <div className="ml-3">
                             <div className="text-sm font-medium text-gray-900">

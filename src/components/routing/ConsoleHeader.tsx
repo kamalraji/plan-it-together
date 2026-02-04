@@ -97,8 +97,11 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
   const currentPath = location.pathname;
   const orgSlugCandidate = currentPath.split('/')[1];
   const isOrgContext = !!orgSlugCandidate && orgSlugCandidate !== 'dashboard';
+  const PRIMARY_ADMIN_ORG_SLUG = 'thittam1hub';
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   const getServicePath = (serviceId: string): string => {
+    // If we are already in an org context, keep using that org
     if (isOrgContext && orgSlugCandidate) {
       switch (serviceId) {
         case 'dashboard':
@@ -118,6 +121,28 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
       }
     }
 
+    // For SUPER_ADMINs outside an org context, default to the primary admin org
+    if (isSuperAdmin) {
+      const base = `/${PRIMARY_ADMIN_ORG_SLUG}`;
+      switch (serviceId) {
+        case 'dashboard':
+          return `${base}/dashboard`;
+        case 'events':
+          return `${base}/eventmanagement`;
+        case 'workspaces':
+          return `${base}/workspaces`;
+        case 'marketplace':
+          return `${base}/marketplace`;
+        case 'organizations':
+          return `${base}/organizations`;
+        case 'analytics':
+          return `${base}/analytics`;
+        default:
+          return `${base}/dashboard`;
+      }
+    }
+
+    // Generic dashboard console for non-admin contexts
     switch (serviceId) {
       case 'dashboard':
         return '/dashboard';
@@ -186,14 +211,14 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({
            </button>
  
            {/* Logo */}
-           <Link to="/dashboard" className="flex items-center gap-2">
-             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-               <span className="text-primary-foreground font-bold text-xs sm:text-sm">T1</span>
-             </div>
-             <span className="hidden sm:block text-lg sm:text-xl font-semibold text-foreground">
-               Thittam1Hub
-             </span>
-           </Link>
+           <Link to={getServicePath('dashboard')} className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs sm:text-sm">T1</span>
+              </div>
+              <span className="hidden sm:block text-lg sm:text-xl font-semibold text-foreground">
+                Thittam1Hub
+              </span>
+            </Link>
 
           {/* Service Switcher - visible only for organizer/admin roles */}
            {(user?.role === 'ORGANIZER' || user?.role === 'SUPER_ADMIN') && (

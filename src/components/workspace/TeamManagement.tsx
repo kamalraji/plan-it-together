@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  UserPlusIcon, 
-  UserGroupIcon, 
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon
+  UserPlusIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Workspace, TeamMember, WorkspaceRole } from '../../types';
 import { TeamInvitation } from './TeamInvitation';
 import { TeamRosterManagement } from './TeamRosterManagement';
+import { WorkspaceRoleBadge, WorkspaceStatusBadge } from './WorkspaceBadges';
 import api from '../../lib/api';
 
 interface TeamManagementProps {
@@ -73,7 +71,7 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
     },
   });
 
-  // Update role mutation
+  // Update role mutation with optimistic UI
   const updateRoleMutation = useMutation({
     mutationFn: async ({ memberId, role }: { memberId: string; role: WorkspaceRole }) => {
       await api.patch(`/workspaces/${workspace.id}/team-members/${memberId}`, { role });
@@ -86,20 +84,45 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
         metadata: { memberId, role },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
-      queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
-      toast({
-        title: 'Role updated',
-        description: 'The team member role has been updated successfully.',
-      });
+    onMutate: async ({ memberId, role }) => {
+      await queryClient.cancelQueries({ queryKey: ['workspace-team-members', workspace.id] });
+
+      const previousMembers = queryClient.getQueryData<TeamMember[]>([
+        'workspace-team-members',
+        workspace.id,
+      ]);
+
+      if (previousMembers) {
+        const nextMembers = previousMembers.map((member) =>
+          member.id === memberId ? { ...member, role } : member,
+        );
+        queryClient.setQueryData(['workspace-team-members', workspace.id], nextMembers);
+      }
+
+      return { previousMembers };
     },
-    onError: () => {
+    onError: (_error, _variables, context) => {
+      if (context?.previousMembers) {
+        queryClient.setQueryData(
+          ['workspace-team-members', workspace.id],
+          context.previousMembers,
+        );
+      }
       toast({
         title: 'Failed to update role',
         description: 'Please try again or check your permissions.',
         variant: 'destructive',
       });
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Role updated',
+        description: 'The team member role has been updated successfully.',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspace-team-members', workspace.id] });
+      queryClient.invalidateQueries({ queryKey: ['workspace', workspace.id] });
     },
   });
 
@@ -126,61 +149,12 @@ export function TeamManagement({ workspace }: TeamManagementProps) {
   }) || [];
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircleIcon className="w-3 h-3 mr-1" />
-            Active
-          </span>
-        );
-      case 'PENDING':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <ClockIcon className="w-3 h-3 mr-1" />
-            Pending
-          </span>
-        );
-      case 'INACTIVE':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            <XCircleIcon className="w-3 h-3 mr-1" />
-            Inactive
-          </span>
-        );
-      default:
-        return null;
-    }
+    return <WorkspaceStatusBadge status={status} />;
   };
 
   const getRoleBadge = (role: WorkspaceRole) => {
-    const roleColors = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
-      [WorkspaceRole.TEAM_LEAD]: 'bg-blue-100 text-blue-800',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
-      [WorkspaceRole.VOLUNTEER_MANAGER]: 'bg-green-100 text-green-800',
-      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'bg-orange-100 text-orange-800',
-      [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
-      [WorkspaceRole.GENERAL_VOLUNTEER]: 'bg-gray-100 text-gray-800',
-    };
-
-    const roleLabels = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'Owner',
-      [WorkspaceRole.TEAM_LEAD]: 'Team Lead',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'Coordinator',
-      [WorkspaceRole.VOLUNTEER_MANAGER]: 'Vol. Manager',
-      [WorkspaceRole.TECHNICAL_SPECIALIST]: 'Tech Specialist',
-      [WorkspaceRole.MARKETING_LEAD]: 'Marketing Lead',
-      [WorkspaceRole.GENERAL_VOLUNTEER]: 'Volunteer',
-    };
-
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[role]}`}>
-        {roleLabels[role]}
-      </span>
-    );
+    return <WorkspaceRoleBadge role={role} />;
   };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">

@@ -19,8 +19,8 @@ export function ProtectedRoute({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -31,19 +31,19 @@ export function ProtectedRoute({
 
   if (requireEmailVerification && !user?.emailVerified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-3xl font-extrabold text-foreground">
               Email Verification Required
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Please check your email and click the verification link to continue.
             </p>
             <div className="mt-4">
               <button
                 onClick={() => window.location.reload()}
-                className="text-indigo-600 hover:text-indigo-500 font-medium"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 I've verified my email
               </button>
@@ -56,13 +56,13 @@ export function ProtectedRoute({
 
   if (requiredRoles.length > 0 && user && !requiredRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-3xl font-extrabold text-foreground">
               Access Denied
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               You don't have permission to access this page.
             </p>
             <div className="mt-4">

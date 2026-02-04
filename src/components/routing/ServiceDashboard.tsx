@@ -249,8 +249,8 @@ const DashboardWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
     default:
       return (
         <div className="p-6">
-          <h3 className="font-medium text-gray-900 mb-2">{widget.title}</h3>
-          <p className="text-sm text-gray-500">Widget type not supported</p>
+          <h3 className="font-medium text-foreground mb-2">{widget.title}</h3>
+          <p className="text-sm text-muted-foreground">Widget type not supported</p>
         </div>
       );
   }

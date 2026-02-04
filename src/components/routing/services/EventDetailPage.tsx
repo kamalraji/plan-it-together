@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { Event, EventStatus, EventMode, UserRole } from '../../../types';
+import { useAuth } from '@/hooks/useAuth';
 import {
   PencilIcon,
   ShareIcon,
@@ -13,7 +15,7 @@ import {
   CogIcon,
 } from '@heroicons/react/24/outline';
 import { AttendanceList } from '@/components/attendance';
-import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/looseClient';
 
 interface EventDetailPageProps {
   defaultTab?: string;
@@ -22,29 +24,65 @@ interface EventDetailPageProps {
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = 'overview' }) => {
   const { eventId } = useParams<{ eventId: string }>();
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const { user } = useAuth();
 
-  // Mock data - in real implementation, this would come from API
-  const mockEvent: Event = {
-    id: eventId || '1',
-    name: 'Tech Innovation Summit 2024',
-    description:
-      'Annual technology innovation summit featuring the latest trends in AI, blockchain, and IoT. Join industry leaders, innovators, and tech enthusiasts for a day of learning, networking, and inspiration.',
-    mode: EventMode.HYBRID,
-    startDate: '2024-03-15T09:00:00Z',
-    endDate: '2024-03-15T17:00:00Z',
-    capacity: 500,
-    registrationDeadline: '2024-03-10T23:59:59Z',
-    organizerId: 'org1',
-    visibility: 'PUBLIC' as any,
-    branding: {
-      primaryColor: '#3B82F6',
-      logoUrl: '/logos/tech-summit.png',
+  const canManageEvents =
+    user?.role === UserRole.ORGANIZER || user?.role === UserRole.SUPER_ADMIN;
+
+  const { data: event, isLoading, error } = useQuery<Event | null>({
+    queryKey: ['organizer-event', eventId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', eventId as string)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description || '',
+        mode: data.mode as EventMode,
+        startDate: data.start_date,
+        endDate: data.end_date,
+        capacity: data.capacity ?? undefined,
+        registrationDeadline: undefined,
+        organizerId: '',
+        visibility: data.visibility,
+        branding: (data.branding as any) || {},
+        status: data.status as EventStatus,
+        landingPageUrl: `/events/${data.id}`,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      } as Event;
     },
-    status: EventStatus.PUBLISHED,
-    landingPageUrl: '/events/tech-summit-2024',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-02-01T14:30:00Z',
-  };
+    enabled: !!eventId,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event not found</h1>
+          <Link to="/console/events/list" className="text-indigo-600 hover:text-indigo-800">
+            Back to events
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
 
   const getStatusBadge = (status: EventStatus) => {
     const statusConfig = {
@@ -84,15 +122,19 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   };
 
   const pageActions = [
-    {
-      label: 'Edit Event',
-      action: () => (window.location.href = `/dashboard/events/${eventId}/edit`),
-      icon: PencilIcon,
-      variant: 'primary' as const,
-    },
+    ...(canManageEvents
+      ? [
+          {
+            label: 'Edit Event',
+            action: () => (window.location.href = `/console/events/${eventId}/edit`),
+            icon: PencilIcon,
+            variant: 'primary' as const,
+          },
+        ]
+      : []),
     {
       label: 'Share Event',
-      action: () => console.log('Share event'),
+      action: () => window.open(event.landingPageUrl || `/events/${eventId}`, '_blank'),
       icon: ShareIcon,
       variant: 'secondary' as const,
     },
@@ -102,6 +144,16 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       icon: ChartBarIcon,
       variant: 'secondary' as const,
     },
+    ...(canManageEvents
+      ? [
+          {
+            label: 'Open Ops Console',
+            action: () => (window.location.href = `/console/events/${eventId}/ops`),
+            icon: UsersIcon,
+            variant: 'secondary' as const,
+          },
+        ]
+      : []),
   ];
 
   const tabs = [
@@ -116,38 +168,48 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       badge: '156',
       component: RegistrationsTab,
     },
-    {
-      id: 'workspace',
-      label: 'Workspace',
-      component: WorkspaceTab,
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      component: AnalyticsTab,
-    },
-    {
-      id: 'attendance',
-      label: 'Attendance',
-      component: AttendanceTab,
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      component: SettingsTab,
-    },
+    ...(canManageEvents
+      ? [
+          {
+            id: 'workspace',
+            label: 'Workspace',
+            component: WorkspaceTab,
+          },
+          {
+            id: 'analytics',
+            label: 'Analytics',
+            component: AnalyticsTab,
+          },
+          {
+            id: 'attendance',
+            label: 'Attendance',
+            component: AttendanceTab,
+          },
+          {
+            id: 'settings',
+            label: 'Settings',
+            component: SettingsTab,
+          },
+        ]
+      : [
+          {
+            id: 'analytics',
+            label: 'Analytics',
+            component: AnalyticsTab,
+          },
+        ]),
   ];
 
   const breadcrumbs = [
-    { label: 'Events', href: '/dashboard/eventmanagement' },
-    { label: mockEvent.name, href: `/dashboard/eventmanagement/${eventId}` },
+    { label: 'Events', href: '/console/events/list' },
+    { label: event.name, href: `/console/events/${eventId}` },
   ];
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <PageHeader
-          title={mockEvent.name}
+          title={event.name}
           subtitle={`Event ID: ${eventId}`}
           breadcrumbs={breadcrumbs}
           actions={pageActions}
@@ -160,15 +222,22 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
           }))}
         />
 
+        {!canManageEvents && (
+          <div className="mt-4 bg-blue-50 border border-blue-100 rounded-md p-3 text-xs sm:text-sm text-blue-800">
+            You’re viewing this event as a participant or viewer. Editing, attendance, and ops tools are
+            available only to organizers and admins of the hosting organization.
+          </div>
+        )}
+
         {/* Event Status and Quick Info */}
         <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
-              {getStatusBadge(mockEvent.status)}
-              {getModeBadge(mockEvent.mode)}
+              {getStatusBadge(event.status)}
+              {getModeBadge(event.mode)}
             </div>
             <div className="text-sm text-gray-500">
-              Last updated: {new Date(mockEvent.updatedAt).toLocaleDateString()}
+              Last updated: {new Date(event.updatedAt).toLocaleDateString()}
             </div>
           </div>
 
@@ -178,7 +247,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <div>
                 <p className="text-sm font-medium text-gray-900">Start Date</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(mockEvent.startDate).toLocaleString()}
+                  {new Date(event.startDate).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -188,7 +257,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <div>
                 <p className="text-sm font-medium text-gray-900">End Date</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(mockEvent.endDate).toLocaleString()}
+                  {new Date(event.endDate).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -197,7 +266,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <UsersIcon className="h-5 w-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">Capacity</p>
-                <p className="text-sm text-gray-600">{mockEvent.capacity || 'Unlimited'}</p>
+                <p className="text-sm text-gray-600">{event.capacity || 'Unlimited'}</p>
               </div>
             </div>
 
@@ -206,8 +275,8 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
               <div>
                 <p className="text-sm font-medium text-gray-900">Registration</p>
                 <p className="text-sm text-gray-600">
-                  {mockEvent.registrationDeadline
-                    ? `Until ${new Date(mockEvent.registrationDeadline).toLocaleDateString()}`
+                  {event.registrationDeadline
+                    ? `Until ${new Date(event.registrationDeadline).toLocaleDateString()}`
                     : 'Open'}
                 </p>
               </div>
@@ -221,7 +290,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
             (tab) =>
               activeTab === tab.id && (
                 <div key={tab.id}>
-                  <tab.component event={mockEvent} />
+                  <tab.component event={event} />
                 </div>
               ),
           )}
@@ -259,7 +328,7 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
       </div>
 
       <div>
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Branding</h4>
+        <h4 className="text-sm font-medium text-gray-900 mb-2">Branding & workspace template</h4>
         <dl className="space-y-2">
           <div className="flex justify-between">
             <dt className="text-sm text-gray-500">Primary Color:</dt>
@@ -282,6 +351,20 @@ const OverviewTab: React.FC<{ event: Event }> = ({ event }) => (
             </div>
           )}
         </dl>
+
+        {event.branding?.workspaceTemplateId && (
+          <div className="mt-4 border-t border-gray-200 pt-3">
+            <p className="text-sm font-medium text-gray-900">Workspace template</p>
+            <p className="mt-1 text-sm text-gray-700">
+              This event will provision a workspace using template
+              <span className="font-semibold"> {event.branding.workspaceTemplateId}</span>.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              The template preconfigures team roles, task categories, communication channels, and milestone
+              timeline for your organizers.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   </div>

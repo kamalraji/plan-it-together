@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types';
+import { motion } from 'framer-motion';
+import { AuthLayout } from './AuthLayout';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -64,8 +66,13 @@ export function RegisterForm() {
         return;
       }
       
-      // After registration, redirect to login so they can sign in after email verification
-      navigate('/login');
+      // After registration, redirect to login. Organizer signups will be guided
+      // into the organization onboarding flow after login.
+      if (data.role === UserRole.ORGANIZER) {
+        navigate('/login?next=/onboarding/organization');
+      } else {
+        navigate('/login');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -74,10 +81,10 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sunny/5 to-teal/10 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <AuthLayout>
+      <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-sunny to-teal bg-clip-text text-transparent mb-4">
             Join the Adventure!
           </h2>
           <p className="text-gray-600 mb-2">
@@ -95,7 +102,9 @@ export function RegisterForm() {
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 shadow-doodle">
+        <motion.div
+          className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]"
+        >
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="rounded-xl bg-coral/10 border border-coral/20 p-4">
@@ -107,44 +116,56 @@ export function RegisterForm() {
             )}
             
             <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12 }}
+              >
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Full Name
                 </label>
                 <input
                   {...register('name')}
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Enter your full name"
                 />
                 {errors.name && (
                   <p className="mt-2 text-sm text-coral">{errors.name.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.16 }}
+              >
+                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email Address
                 </label>
                 <input
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Enter your email address"
                 />
                 {errors.email && (
                   <p className="mt-2 text-sm text-coral">{errors.email.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
+                <label htmlFor="role" className="block text-sm font-medium text-foreground mb-2">
                   Account Type
                 </label>
                 <select
                   {...register('role')}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                 >
                   <option value={UserRole.PARTICIPANT}>Participant</option>
                   <option value={UserRole.ORGANIZER}>Organizer</option>
@@ -152,84 +173,107 @@ export function RegisterForm() {
                 {errors.role && (
                   <p className="mt-2 text-sm text-coral">{errors.role.message}</p>
                 )}
-              </div>
+              </motion.div>
 
               {selectedRole === UserRole.PARTICIPANT && (
-                <div>
-                  <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700 mb-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.28 }}
+                >
+                  <label htmlFor="eventCode" className="block text-sm font-medium text-foreground mb-2">
                     Event Code (Optional)
                   </label>
                   <input
                     {...register('eventCode')}
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                     placeholder="Enter event code if you have one"
                   />
                   {errors.eventCode && (
                     <p className="mt-2 text-sm text-coral">{errors.eventCode.message}</p>
                   )}
-                </div>
+                </motion.div>
               )}
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.32 }}
+              >
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                   Password
                 </label>
                 <input
                   {...register('password')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Create a secure password"
                 />
                 {errors.password && (
                   <p className="mt-2 text-sm text-coral">{errors.password.message}</p>
                 )}
-              </div>
+              </motion.div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.36 }}
+              >
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
                   Confirm Password
                 </label>
                 <input
                   {...register('confirmPassword')}
                   type="password"
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="w-full px-4 py-3 border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sunny/20 focus:border-sunny transition-all duration-200 bg-card/70 backdrop-blur-sm"
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
                   <p className="mt-2 text-sm text-coral">{errors.confirmPassword.message}</p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl text-base font-medium text-white bg-gradient-to-r from-sunny to-teal hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sunny disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="w-full flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl text-base font-medium bg-primary text-primary-foreground shadow-sm hover:shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-transform transition-shadow duration-200 hover:-translate-y-0.5"
+              whileHover={!isLoading ? { scale: 1.02 } : undefined}
+              whileTap={!isLoading ? { scale: 0.99 } : undefined}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.4, ease: 'easeOut' }}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground" />
                   <span>Creating account...</span>
                 </div>
               ) : (
                 <span>Create account</span>
               )}
-            </button>
+            </motion.button>
 
             {selectedRole === UserRole.ORGANIZER && (
-              <div className="rounded-xl bg-teal/10 border border-teal/20 p-4">
+              <motion.div
+                className="rounded-xl bg-teal/10 border border-teal/20 p-4"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.44 }}
+              >
                 <div className="text-sm text-teal">
-                  <strong>Organizer Account:</strong> Your account will need approval from a Super-Admin. 
-                  You'll receive an email once your account is approved and ready to go!
+                  <strong>Organizer Account:</strong> After you verify your email and sign in,
+                  you'll be guided to set up your organization. Once your first organization is
+                  created, you'll automatically get organizer access.
                 </div>
-              </div>
+              </motion.div>
             )}
           </form>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

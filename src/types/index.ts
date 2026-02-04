@@ -100,6 +100,7 @@ export interface BrandingConfig {
   primaryColor?: string;
   secondaryColor?: string;
   customCss?: string;
+  workspaceTemplateId?: string;
 }
 
 export interface VenueConfig {
@@ -273,6 +274,7 @@ export interface AttendanceReport {
     checkInMethod: 'QR_SCAN' | 'MANUAL' | null;
     sessionId?: string | null;
     volunteerId?: string | null;
+    avatarUrl?: string | null;
   }>;
 }
 

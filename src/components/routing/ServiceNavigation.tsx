@@ -111,7 +111,7 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
         path: '/marketplace',
         icon: '🛍️',
         description: 'Find and book services',
-        roles: [UserRole.ORGANIZER, UserRole.PARTICIPANT, UserRole.SUPER_ADMIN],
+        roles: [UserRole.ORGANIZER, UserRole.SUPER_ADMIN],
       },
     ],
   },
@@ -183,29 +183,8 @@ const getServiceCategories = (orgSlug?: string): ServiceCategory[] => [
       },
     ],
   },
-  {
-    id: 'admin',
-    label: 'Admin',
-    icon: '🛡️',
-    items: [
-      {
-        id: 'admin-users',
-        label: 'User Roles',
-        path: '/dashboard/admin/users',
-        icon: '👥',
-        description: 'Manage high-level app roles',
-        roles: [UserRole.SUPER_ADMIN],
-      },
-      {
-        id: 'admin-organizers',
-        label: 'Pending Organizers',
-        path: '/dashboard/admin/organizers',
-        icon: '📋',
-        description: 'Approve or reject organizer signups',
-        roles: [UserRole.SUPER_ADMIN],
-      },
-    ],
-  },
+  // Admin-only routes are now exposed via the organization-scoped sidebar
+  // when viewing the primary Thittam1Hub console at /thittam1hub/dashboard.
 ];
 
 export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
@@ -367,7 +346,7 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${collapsed && !isMobile ? 'w-16' : 'w-64'}`}>
+    <div className={`bg-white border-r border-gray-200 h-full flex flex-col ${isMobile ? 'w-full' : collapsed ? 'w-16' : 'w-64'}`}>
       {/* Mobile Header */}
       {isMobile && (
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -430,7 +409,13 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Search Results */}
         {searchQuery.trim() && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <h3
+              className={`text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1 ${
+                isMobile
+                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
+                  : ''
+              }`}
+            >
               Search Results ({filteredServices.length})
             </h3>
             <div className="space-y-1">
@@ -440,8 +425,8 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
                   onClick={() => handleServiceClick(service)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isItemActive(service)
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
                   }`}
                 >
                     <div className="flex-1 text-left">
@@ -479,7 +464,13 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Favorites Section */}
         {!searchQuery.trim() && favoriteServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
+            <h3
+              className={`text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 flex items-center ${
+                isMobile
+                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
+                  : ''
+              }`}
+            >
               <StarIcon className="h-3 w-3 mr-1" />
               Favorites
             </h3>
@@ -504,7 +495,13 @@ export const ServiceNavigation: React.FC<ServiceNavigationProps> = ({
         {/* Recent Services Section */}
         {!searchQuery.trim() && recentServices.length > 0 && (!collapsed || isMobile) && (
           <div className="px-3 mb-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
+            <h3
+              className={`text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 flex items-center ${
+                isMobile
+                  ? 'sticky top-0 z-10 bg-white/95 backdrop-blur-sm py-1 -mx-3 px-3 border-b border-gray-100'
+                  : ''
+              }`}
+            >
               <ClockIcon className="h-3 w-3 mr-1" />
               Recent
             </h3>

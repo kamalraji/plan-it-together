@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RubricCriterion, CreateRubricDTO, Rubric } from '../../types';
-import api from '../../lib/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RubricManagementProps {
   eventId: string;
@@ -9,7 +9,7 @@ interface RubricManagementProps {
 
 const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCreated }) => {
   const [criteria, setCriteria] = useState<Omit<RubricCriterion, 'id'>[]>([
-    { name: '', description: '', weight: 0, maxScore: 100 }
+    { name: '', description: '', weight: 0, maxScore: 100 },
   ]);
   const [existingRubric, setExistingRubric] = useState<Rubric | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,16 +22,21 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
 
   const fetchExistingRubric = async () => {
     try {
-      const response = await api.get(`/events/${eventId}/rubric`);
-      setExistingRubric(response.data);
-      if (response.data.criteria) {
-        setCriteria(response.data.criteria);
+      const { data, error } = await supabase.functions.invoke('judging-rubric', {
+        body: { action: 'get', eventId },
+      });
+
+      if (error) throw error;
+
+      if (data?.rubric) {
+        const rubric = data.rubric as Rubric;
+        setExistingRubric(rubric);
+        if (rubric.criteria) {
+          setCriteria(rubric.criteria as any);
+        }
       }
-    } catch (error: any) {
-      // If no rubric exists, that's fine - we'll create a new one
-      if (error.response?.status !== 404) {
-        console.error('Error fetching rubric:', error);
-      }
+    } catch (err) {
+      console.error('Error fetching rubric:', err);
     }
   };
 
@@ -97,32 +102,40 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
     try {
       const rubricData: CreateRubricDTO = {
         eventId,
-        criteria: criteria.map(c => ({
+        criteria: criteria.map((c) => ({
           name: c.name.trim(),
           description: c.description.trim(),
           weight: c.weight,
-          maxScore: c.maxScore
-        }))
+          maxScore: c.maxScore,
+        })),
       };
 
-      const response = existingRubric 
-        ? await api.put(`/rubrics/${existingRubric.id}`, rubricData)
-        : await api.post('/rubrics', rubricData);
+      const action = existingRubric ? 'update' : 'create';
 
-      const rubric = response.data;
+      const { data, error } = await supabase.functions.invoke('judging-rubric', {
+        body: {
+          action,
+          eventId,
+          rubricId: existingRubric?.id,
+          criteria: rubricData.criteria,
+        },
+      });
+
+      if (error) throw error;
+
+      const rubric = data.rubric as Rubric;
       setExistingRubric(rubric);
       setSuccess(existingRubric ? 'Rubric updated successfully!' : 'Rubric created successfully!');
-      
+
       if (onRubricCreated) {
         onRubricCreated(rubric);
       }
     } catch (error: any) {
-      setError(error.response?.data?.error?.message || 'Failed to save rubric');
+      setError(error.message || 'Failed to save rubric');
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="mb-6">

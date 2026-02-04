@@ -7,13 +7,13 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.pending-organizers]
-verify_jwt = true
+verify_jwt = false
 
 [functions.create-organization]
 verify_jwt = false
 
 [functions.attendance-qr]
-verify_jwt = true
+verify_jwt = false
 
 [functions.attendance-checkin]
 verify_jwt = true
@@ -23,3 +23,15 @@ verify_jwt = true
 
 [functions.attendance-manual-checkin]
 verify_jwt = true
+
+[functions.judging-rubric]
+verify_jwt = true
+
+[functions.judging-submissions]
+verify_jwt = true
+
+[functions.judging-leaderboard]
+verify_jwt = false
+
+[functions.certificates]
+verify_jwt = false

@@ -158,6 +158,7 @@ serve(async (req) => {
         checkInMethod: att?.check_in_method ?? null,
         sessionId: att?.session_id ?? null,
         volunteerId: att?.volunteer_id ?? null,
+        avatarUrl: profile?.avatar_url ?? null,
       };
     });
 

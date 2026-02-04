@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateOrganization } from '@/hooks/useOrganization';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/looseClient';
-import { useToast } from '@/hooks/use-toast';
 
 export const OrganizationRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
   const createOrganization = useCreateOrganization();
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [formState, setFormState] = useState({
     name: '',
     slug: '',
@@ -20,6 +15,8 @@ export const OrganizationRegistrationPage: React.FC = () => {
     phone: '',
   });
   const [errors, setErrors] = useState<{ name?: string; slug?: string; form?: string }>({});
+
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -107,7 +104,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
             type="submit"
             form="organization-onboarding-form"
             disabled={createOrganization.isPending}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-60"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-transparent shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
           >
             {createOrganization.isPending ? 'Creating…' : 'Create organization'}
           </button>
@@ -133,9 +130,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-coral focus:ring-coral"
               />
-              {errors.name && (
-                <p className="mt-1 text-xs text-red-600">{errors.name}</p>
-              )}
+              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="slug">
@@ -157,9 +152,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 />
               </div>
               <p className="mt-1 text-xs text-gray-500">Lowercase letters, numbers, and hyphens only.</p>
-              {errors.slug && (
-                <p className="mt-1 text-xs text-red-600">{errors.slug}</p>
-              )}
+              {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
             </div>
           </div>
 
@@ -244,31 +237,11 @@ export const OrganizationRegistrationPage: React.FC = () => {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pt-4">
             <div className="text-xs text-gray-500">
               <p>You can update these details later from your organization settings.</p>
-              {user?.role === 'SUPER_ADMIN' && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!user) return;
-                    try {
-                      const { error } = await supabase.functions.invoke('approve-organizer', {
-                        body: { userId: user.id },
-                      });
-                      if (error) throw error;
-                      toast({ title: 'Organizer approved', description: 'You now have organizer-level access.' });
-                    } catch (err: any) {
-                      toast({ title: 'Approval failed', description: err?.message || 'Please try again.', variant: 'destructive' });
-                    }
-                  }}
-                  className="mt-2 inline-flex items-center text-[11px] font-medium text-coral hover:text-coral-light"
-                >
-                  Approve organizer access for this user
-                </button>
-              )}
             </div>
             <button
               type="submit"
               disabled={createOrganization.isPending}
-              className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-coral to-coral-light hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral disabled:opacity-60"
+              className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-doodle focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
             >
               {createOrganization.isPending ? 'Creating…' : 'Create organization'}
             </button>

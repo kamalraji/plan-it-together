@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global Styles for Design System Merger */
 /* This file contains merged global styles from both projects */
 

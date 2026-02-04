@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../PageHeader';
 import { Event, EventStatus, EventMode } from '../../../types';
+import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/looseClient';
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -15,81 +18,61 @@ interface EventListPageProps {
 }
 
 export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
+  const navigate = useNavigate();
+  const { createPath, eventDetailPath, eventEditPath } = useEventManagementPaths();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
-  // Mock data - in real implementation, this would come from API
-  const mockEvents: Event[] = [
-    {
-      id: '1',
-      name: 'Tech Innovation Summit 2024',
-      description: 'Annual technology innovation summit featuring the latest trends in AI, blockchain, and IoT.',
-      mode: EventMode.HYBRID,
-      startDate: '2024-03-15T09:00:00Z',
-      endDate: '2024-03-15T17:00:00Z',
-      capacity: 500,
-      registrationDeadline: '2024-03-10T23:59:59Z',
-      organizerId: 'org1',
-      visibility: 'PUBLIC' as any,
-      branding: {
-        primaryColor: '#3B82F6',
-        logoUrl: '/logos/tech-summit.png',
-      },
-      status: EventStatus.PUBLISHED,
-      landingPageUrl: '/events/tech-summit-2024',
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-02-01T14:30:00Z',
-    },
-    {
-      id: '2',
-      name: 'AI Workshop Series',
-      description: 'Hands-on workshop series covering machine learning fundamentals and practical applications.',
-      mode: EventMode.ONLINE,
-      startDate: '2024-03-20T14:00:00Z',
-      endDate: '2024-03-22T16:00:00Z',
-      capacity: 100,
-      organizerId: 'org1',
-      visibility: 'PUBLIC' as any,
-      branding: {
-        primaryColor: '#10B981',
-      },
-      status: EventStatus.DRAFT,
-      landingPageUrl: '/events/ai-workshop-series',
-      createdAt: '2024-02-01T09:00:00Z',
-      updatedAt: '2024-02-15T11:20:00Z',
-    },
-    {
-      id: '3',
-      name: 'Startup Pitch Competition',
-      description: 'Annual startup pitch competition for emerging entrepreneurs and innovative business ideas.',
-      mode: EventMode.OFFLINE,
-      startDate: '2024-02-28T10:00:00Z',
-      endDate: '2024-02-28T18:00:00Z',
-      capacity: 200,
-      organizerId: 'org1',
-      visibility: 'PUBLIC' as any,
-      branding: {
-        primaryColor: '#F59E0B',
-      },
-      status: EventStatus.ONGOING,
-      landingPageUrl: '/events/startup-pitch-2024',
-      createdAt: '2024-01-10T08:00:00Z',
-      updatedAt: '2024-02-25T16:45:00Z',
-    },
-  ];
+  // Load events for the organizer from Supabase (RLS + active organization will scope visibility)
+  const { data: events = [] } = useQuery<Event[]>({
+    queryKey: ['organizer-events', filterBy],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select(
+          'id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id',
+        )
+        .order('start_date', { ascending: true });
 
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
+      if (error) throw error;
+
+      return (data as any[]).map(
+        (row) =>
+          ({
+            id: row.id,
+            name: row.name,
+            description: row.description || '',
+            mode: row.mode as EventMode,
+            startDate: row.start_date,
+            endDate: row.end_date,
+            capacity: row.capacity ?? undefined,
+            registrationDeadline: undefined,
+            organizerId: '',
+            visibility: row.visibility,
+            branding: {},
+            status: row.status as EventStatus,
+            landingPageUrl: `/events/${row.id}`,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+          } as Event),
+      );
+    },
+  });
+
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch =
+      event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
-    const matchesFilterBy = !filterBy || 
-                           (filterBy === 'active' && event.status === EventStatus.PUBLISHED) ||
-                           (filterBy === 'draft' && event.status === EventStatus.DRAFT) ||
-                           (filterBy === 'completed' && event.status === EventStatus.COMPLETED) ||
-                           (filterBy === 'templates' && false); // Templates would be a separate data source
+    const matchesFilterBy =
+      !filterBy ||
+      (filterBy === 'active' && event.status === EventStatus.PUBLISHED) ||
+      (filterBy === 'draft' && event.status === EventStatus.DRAFT) ||
+      (filterBy === 'completed' && event.status === EventStatus.COMPLETED) ||
+      (filterBy === 'templates' && false); // Templates would be a separate data source
 
     return matchesSearch && matchesStatus && matchesMode && matchesFilterBy;
   });
@@ -134,7 +117,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
   const pageActions = [
     {
       label: filterBy === 'templates' ? 'Create Template' : 'Create Event',
-      action: () => window.location.href = '/console/events/create',
+      action: () => navigate(createPath),
       icon: PlusIcon,
       variant: 'primary' as const,
     },
@@ -256,14 +239,14 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
                             <Link
-                              to={`/console/events/${event.id}`}
+                              to={eventDetailPath(event.id)}
                               className="text-indigo-600 hover:text-indigo-500"
                               title="View Event"
                             >
                               <EyeIcon className="h-4 w-4" />
                             </Link>
                             <Link
-                              to={`/console/events/${event.id}/edit`}
+                              to={eventEditPath(event.id)}
                               className="text-gray-600 hover:text-gray-500"
                               title="Edit Event"
                             >
@@ -354,7 +337,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                   : 'Get started by creating your first event.'}
               </p>
               <Link
-                to="/console/events/create"
+                to={createPath}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />

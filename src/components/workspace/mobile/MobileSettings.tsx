@@ -10,11 +10,14 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNotifications } from '../../../hooks/useNotifications';
 import { useOffline } from '../../../hooks/useOffline';
+import { useAuth } from '../../../hooks/useAuth';
 
 export function MobileSettings() {
   const [showStorageInfo, setShowStorageInfo] = useState(false);
   const [storageUsage, setStorageUsage] = useState<{ used: number; quota: number } | null>(null);
   
+  const { user } = useAuth();
+
   const {
     isSupported: notificationSupported,
     permission,
@@ -22,8 +25,11 @@ export function MobileSettings() {
     subscribe,
     unsubscribe,
     canEnable,
-    isEnabled
-  } = useNotifications();
+    isEnabled,
+    preferences,
+    updatePreferences,
+  } = useNotifications(user?.id);
+
 
   const {
     isOnline,
@@ -150,45 +156,93 @@ export function MobileSettings() {
           </div>
 
           {/* Notification Types */}
-          {isEnabled() && (
+          {isEnabled() && preferences && (
             <div className="space-y-3 pt-3 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-700">Notification Types</p>
-              
+              <p className="text-sm font-medium text-gray-700">Notification Categories</p>
+
               <div className="space-y-2">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    defaultChecked
+                    checked={preferences.workspace_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ workspace_enabled: e.target.checked })
+                    }
                     className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Task assignments</span>
+                  <span className="ml-2 text-sm text-gray-700">Workspace activity</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    defaultChecked
+                    checked={preferences.event_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ event_enabled: e.target.checked })
+                    }
                     className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Task deadlines</span>
+                  <span className="ml-2 text-sm text-gray-700">Events</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    defaultChecked
+                    checked={preferences.marketplace_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ marketplace_enabled: e.target.checked })
+                    }
                     className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">New messages</span>
+                  <span className="ml-2 text-sm text-gray-700">Marketplace</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    defaultChecked
+                    checked={preferences.organization_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ organization_enabled: e.target.checked })
+                    }
                     className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Team invitations</span>
+                  <span className="ml-2 text-sm text-gray-700">Organization updates</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={preferences.system_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ system_enabled: e.target.checked })
+                    }
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">System alerts</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={preferences.sound_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ sound_enabled: e.target.checked })
+                    }
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Play sound for important alerts</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={preferences.vibration_enabled}
+                    onChange={(e) =>
+                      updatePreferences?.({ vibration_enabled: e.target.checked })
+                    }
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Vibrate on critical alerts</span>
                 </label>
               </div>
             </div>

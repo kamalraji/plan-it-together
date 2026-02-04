@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { Badge } from '@/components/ui/badge';
 
 interface BreadcrumbItem {
   label: string;
@@ -158,25 +159,25 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
         {/* Tabs */}
         {tabs && tabs.length > 0 && (
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+          <div className="border-b border-border">
+            <nav className="-mb-px flex space-x-8 overflow-x-auto">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={tab.onClick}
                   className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${tab.current
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                     }`}
                 >
                   {tab.label}
                   {tab.badge && (
-                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tab.current
-                        ? 'bg-indigo-100 text-indigo-600'
-                        : 'bg-gray-100 text-gray-600'
-                      }`}>
+                    <Badge
+                      variant={tab.current ? 'default' : 'outline'}
+                      className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium"
+                    >
                       {tab.badge}
-                    </span>
+                    </Badge>
                   )}
                 </button>
               ))}
@@ -192,14 +193,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               <div className="flex items-center space-x-4">
                 {filters.map((filter) => (
                   <div key={filter.id} className="flex items-center space-x-2">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground">
                       {filter.label}:
                     </label>
                     {filter.type === 'select' && (
                       <select
                         value={filter.value}
                         onChange={(e) => filter.onChange(e.target.value)}
-                        className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        className="border-input rounded-md text-sm focus:ring-primary focus:border-primary bg-background/80"
                       >
                         {filter.options?.map((option) => (
                           <option key={option.value} value={option.value}>
