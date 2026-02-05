@@ -1,6 +1,6 @@
- #!/usr/bin/env node
- /**
-  * Color Migration Script - Industrial Grade
+#!/usr/bin/env node
+/**
+ * Color Migration Script - Industrial Grade
   * 
   * Safely migrates hardcoded Tailwind colors to semantic design tokens.
   * 

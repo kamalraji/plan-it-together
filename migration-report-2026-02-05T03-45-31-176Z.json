@@ -1,0 +1,2440 @@
+{
+  "timestamp": "2026-02-05T03:45:31.176Z",
+  "summary": {
+    "filesScanned": 1676,
+    "filesModified": 0,
+    "totalReplacements": 0,
+    "skippedSafePatterns": 0,
+    "filesNeedingManualReview": 578,
+    "errors": 0
+  },
+  "colorMappings": {
+    "backgrounds": {
+      "bg-green-50": "bg-success/10",
+      "bg-green-100": "bg-success/20",
+      "bg-green-200": "bg-success/30",
+      "bg-green-500": "bg-success",
+      "bg-green-600": "bg-success",
+      "bg-green-700": "bg-success",
+      "bg-red-50": "bg-destructive/10",
+      "bg-red-100": "bg-destructive/20",
+      "bg-red-500": "bg-destructive",
+      "bg-red-600": "bg-destructive",
+      "bg-red-700": "bg-destructive",
+      "bg-yellow-50": "bg-warning/10",
+      "bg-yellow-100": "bg-warning/20",
+      "bg-yellow-500": "bg-warning",
+      "bg-yellow-600": "bg-warning",
+      "bg-amber-50": "bg-warning/10",
+      "bg-amber-100": "bg-warning/20",
+      "bg-amber-500": "bg-warning",
+      "bg-amber-600": "bg-warning",
+      "bg-blue-50": "bg-info/10",
+      "bg-blue-100": "bg-info/20",
+      "bg-blue-500": "bg-info",
+      "bg-blue-600": "bg-primary",
+      "bg-blue-700": "bg-primary",
+      "bg-indigo-50": "bg-primary/10",
+      "bg-indigo-100": "bg-primary/20",
+      "bg-indigo-500": "bg-primary",
+      "bg-indigo-600": "bg-primary",
+      "bg-indigo-700": "bg-primary",
+      "bg-violet-500": "bg-primary",
+      "bg-violet-600": "bg-primary",
+      "bg-purple-500": "bg-primary",
+      "bg-purple-600": "bg-primary",
+      "bg-gray-50": "bg-muted/50",
+      "bg-gray-100": "bg-muted",
+      "bg-gray-200": "bg-muted",
+      "bg-gray-300": "bg-muted",
+      "bg-gray-800": "bg-card",
+      "bg-gray-900": "bg-background",
+      "bg-slate-50": "bg-muted/50",
+      "bg-slate-100": "bg-muted",
+      "bg-slate-200": "bg-muted",
+      "bg-slate-800": "bg-card",
+      "bg-slate-900": "bg-background",
+      "bg-white": "bg-background",
+      "bg-black": "bg-foreground"
+    },
+    "text": {
+      "text-green-500": "text-success",
+      "text-green-600": "text-success",
+      "text-green-700": "text-success",
+      "text-green-800": "text-success",
+      "text-red-500": "text-destructive",
+      "text-red-600": "text-destructive",
+      "text-red-700": "text-destructive",
+      "text-yellow-500": "text-warning",
+      "text-yellow-600": "text-warning",
+      "text-yellow-700": "text-warning",
+      "text-amber-500": "text-warning",
+      "text-amber-600": "text-warning",
+      "text-blue-500": "text-info",
+      "text-blue-600": "text-info",
+      "text-blue-700": "text-info",
+      "text-indigo-500": "text-primary",
+      "text-indigo-600": "text-primary",
+      "text-indigo-700": "text-primary",
+      "text-violet-500": "text-primary",
+      "text-violet-600": "text-primary",
+      "text-purple-500": "text-primary",
+      "text-purple-600": "text-primary",
+      "text-gray-400": "text-muted-foreground",
+      "text-gray-500": "text-muted-foreground",
+      "text-gray-600": "text-muted-foreground",
+      "text-gray-700": "text-foreground",
+      "text-gray-800": "text-foreground",
+      "text-gray-900": "text-foreground",
+      "text-slate-400": "text-muted-foreground",
+      "text-slate-500": "text-muted-foreground",
+      "text-slate-600": "text-muted-foreground",
+      "text-slate-700": "text-foreground",
+      "text-slate-800": "text-foreground",
+      "text-slate-900": "text-foreground",
+      "text-white": "text-primary-foreground",
+      "text-black": "text-foreground"
+    },
+    "borders": {
+      "border-green-500": "border-success",
+      "border-green-600": "border-success",
+      "border-red-500": "border-destructive",
+      "border-red-600": "border-destructive",
+      "border-yellow-500": "border-warning",
+      "border-amber-500": "border-warning",
+      "border-blue-500": "border-info",
+      "border-blue-600": "border-primary",
+      "border-indigo-500": "border-primary",
+      "border-indigo-600": "border-primary",
+      "border-gray-200": "border-border",
+      "border-gray-300": "border-border",
+      "border-gray-400": "border-border",
+      "border-slate-200": "border-border",
+      "border-slate-300": "border-border",
+      "border-white": "border-border",
+      "border-black": "border-foreground"
+    },
+    "rings": {
+      "ring-green-500": "ring-success",
+      "ring-red-500": "ring-destructive",
+      "ring-blue-500": "ring-primary",
+      "ring-indigo-500": "ring-primary"
+    }
+  },
+  "changes": [],
+  "manualReview": [
+    {
+      "file": "src/components/AnimateOnScroll.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/NavLink.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/accessibility/SkipLink.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/admin/SecurityAuditDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/analytics/CustomDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/analytics/RealTimeMetrics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/attendance/AttendanceStats.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/certificates/CertificateTemplateDesigner.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/certificates/CertificateVerification.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/certificates/designer/AIDesignDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/common/OptimizedImage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/communication/CommunicationHistory.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/dashboard/CompactDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/dashboard/MyAssignmentsDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/dashboard/OrganizerDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/dashboard/OrganizerSidebar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/doodles/utils.ts",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/enhanced/DashboardDataLab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/EventLandingPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/EventPageBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/EventScrollSpy.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/ParticipantEventsPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/DraftRestorationPrompt.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/DraftStatusIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/EventFAQsSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/EventFormPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/EventImageGallery.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/SectionComponents.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/SectionProgressIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/form/sections/TemplateSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/CanvasArea.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/LeftPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/PreviewOverlay.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/PublishDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/SEOValidator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/SaveIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/TemplatesGallery.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/page-builder/VersionHistory.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/EventApprovalStatus.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/EventPublishChecklist.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/EventPublishStatusIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/EventStatusActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/EventStatusHistory.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/publish/SettingsCompletionProgress.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/registration/RegistrationManagementTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/registration/RegistrationMobileCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/registration/TicketTierSelector.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/settings/PromoCodeCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/settings/TicketTierCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/AccessibilityBadges.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventCapacityIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventCountdown.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventDateDisplay.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventLocationDisplay.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventSocialLinks.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/EventStatusBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/RegistrationButton.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/events/shared/SectionErrorBoundary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/help/FeedbackCollection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/help/InteractiveTutorials.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/help/SupportContact.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/id-cards/designer/AIDesignDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/illustrations/utils.ts",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/judging/Leaderboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/judging/RubricManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/ContactSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/FAQSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/FlagshipEventCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/HeroCarousel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/NewsletterSignup.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/TestimonialsSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/landing/TrustBadges.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/layout/GlobalFooter.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/layout/PublicHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/layout/PublicPageLayout.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/CategoryStrip.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/ProductCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/PromoBanner.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/ReviewRatingUI.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/ServiceCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/ServiceFilters.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/VendorCoordination.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/VendorReviews.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/marketplace/VendorTrustScore.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/mobile/shared/MobileSkeleton.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/mobile/shared/OfflineModeBanner.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/mobile/shared/PullToRefresh.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/mobile/shared/SyncProgressIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/onboarding/components/InterestSelector.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/onboarding/components/RoleCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/onboarding/components/SkillSelector.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/onboarding/components/WizardProgress.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/FollowedOrganizations.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/MembershipBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrgPageWrapper.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrgScopedLayout.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrgWorkspaceListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrgWorkspacePage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrganizationAnalyticsDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrganizationPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrganizationSidebar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrganizationSwitcher.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/OrganizerOnboardingPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/SidebarUserFooter.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/sidebar/SidebarHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/sidebar/SidebarNavLink.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/sidebar/SidebarServiceItem.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/workspace-list/MyWorkspacesHierarchy.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/workspace-list/WorkspaceCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/workspace-list/WorkspaceGroup.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/workspace-list/WorkspaceListHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/organization/workspace-list/WorkspaceListSkeleton.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/profile/UsernameInput.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/registration/RegistrationConfirmation.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/registration/RegistrationForm.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/CommunicationPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/GlobalSearch.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/LoadingStates.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/NotificationCenter.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/NotificationPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/PerformanceOptimizedPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/PerformanceUtils.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/ResourceListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/SearchFilters.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/SearchPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/SearchResultCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/ServiceDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/ServiceNavigation.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/ServiceSwitcher.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/BookingCreatePage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/BookingListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/EventDetailPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/EventListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/EventServiceDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/OrgMarketplacePage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/OrganizationListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/OrganizationServiceDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/ServiceDashboardPrimitives.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/VendorRegistrationPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/WorkspaceListPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/routing/services/WorkspaceServiceDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/theme/ThemeToggle.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/thittam1hub/ThCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/accordion.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/action-button.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/alert-dialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/alert.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/avatar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/badge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/breadcrumb.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/button.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/calendar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/card.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/carousel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/chart.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/checkbox.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/command.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/confirmation-dialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/datetime-picker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/dialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/drawer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/empty-state.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/form-field-feedback.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/form.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/image-upload.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/input.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/label.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/lazy-avatar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/lazy-image.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/page-skeletons.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/pagination.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/popover.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/prefetch-link.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/progress.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/query-error-boundary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/radio-group.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/resizable.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/rich-text-editor.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/scroll-area.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/select.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/separator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/sheet.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/sidebar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/simple-dropdown.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/simple-tooltip.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/skeleton-patterns.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/skeleton.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/slider.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/switch.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/table.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/tabs.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/tag-input-autocomplete.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/textarea.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/toast.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/toggle-group.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/toggle.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/ui/tooltip.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/vendor/VendorAnalyticsDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/vendor/VendorBookingManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/vendor/VendorBookingManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/vendor/VendorRegistration.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/ActivityFeedWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/AutomationRuleBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/AutomationRulesPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/CommitteeActionsMenu.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/CreateSubWorkspaceModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/CrossWorkspaceTasksPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/CustomTemplateBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/DepartmentActionsMenu.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/GlobalTimerWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/HierarchyTreeCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/MemberDirectoryPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/OfflineSyncIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/PostEventRatingPrompt.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/RecurringTaskForm.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/RecurringTasksPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/ResponsibleRoleHolder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/RoleBasedActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/RoleDelegationModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskAISuggestionsPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskDependencyGraph.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskDependencyStatus.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskDetailView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskEditModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskFilterBar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskForm.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskKanbanBoard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskManagementInterface.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskStatsSummary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskSummaryCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TaskTimeTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TeamMemberRoster.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TeamRosterManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TemplateCustomizationModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TemplatePreviewModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/TimeLogsView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/VirtualizedTaskList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceAnalyticsDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceAuditLog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceBreadcrumbs.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceBreadcrumbsMobile.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceCollaborationTimeline.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceHealthMetrics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceHierarchyMiniMap.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceHierarchyStats.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceHierarchyTree.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceLinkGenerator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceRolePermissionsTable.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceSettingsContent.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceSettingsPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceSidebar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceStructureOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceTemplateLibrary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceTemplatePreview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/WorkspaceTemplateSelector.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/ai/SmartComposeInput.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/ai/TaskSummarizer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/analytics/VelocityChart.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approval/ApprovalChainVisualizer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/AllPendingApprovalsWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/ApprovalsSummaryCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/EventPublishApprovalList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/IncomingApprovalsSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/OutgoingRequestsList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/OutgoingSummaryCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/PriorityBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/PrioritySelect.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/SortByPriorityToggle.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/UnifiedApprovalsList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/task/ApprovalPolicyBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/task/TaskApprovalBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/approvals/task/TaskApprovalDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/budgeting/TimeBudgetingPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/calendar/CalendarDayDetail.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/calendar/TaskCalendarView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/CateringQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/CateringStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/DietaryRequirementsTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/InventoryTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/MenuPlanner.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/catering/VendorManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/certificates/DelegatedCertificatePanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/CategorySuggestionsCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/ChecklistCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/ChecklistsSummaryCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/CreateChecklistDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/CreateSharedChecklistDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/DeadlineExtensionReviewCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/DelegateChecklistDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/DelegatedChecklistBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/DelegationProgressDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/RequestDeadlineExtensionDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/checklists/SharedChecklistCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/comments/CommentItem.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/comments/MentionInput.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/comments/TaskActivityFeed.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/BudgetRequestForm.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/CommitteeChecklist.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/CommitteeHeaderCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/GoalTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/MilestoneTimeline.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/ResourceRequestsList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/catering/tabs/CheckInventoryTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/catering/tabs/ConfirmHeadcountTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/catering/tabs/DietaryReportTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/catering/tabs/UpdateMenuTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/BroadcastMessageTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/ContactStakeholdersTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/CreateEmailTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/DraftPressReleaseTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/ScheduleUpdateTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/communication/tabs/SendAnnouncementTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/content/tabs/ContentCalendarTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/content/tabs/ContentPipelineTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/content/tabs/ReviewContentTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/event/tabs/RunOfShowTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/event/tabs/VIPTrackerTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/facility/tabs/RoomStatusTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/facility/tabs/VenueWalkthroughTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/judge/tabs/JudgeScoringPortalTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/judge/tabs/ViewScoresTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/marketing/tabs/CreateCampaignMarketingTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/marketing/tabs/SchedulePostMarketingTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/marketing/tabs/ViewAnalyticsMarketingTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/shared/ContentApprovalWorkflowTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/shared/SocialApiCredentialsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/shared/SocialPostQueueTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/social-media/tabs/ManagePlatformsSocialTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/social-media/tabs/MonitorHashtagsSocialTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/social-media/tabs/PostNowSocialTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/social-media/tabs/ScheduleContentSocialTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/speaker-liaison/tabs/CommunicationLogTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/speaker-liaison/tabs/SessionScheduleTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/speaker-liaison/tabs/SpeakerRosterTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/speaker-liaison/tabs/TravelCoordinationTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/AddSponsorTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/BenefitsManagerTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/RevenueReportTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/SendProposalTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/SponsorCommunicationsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee/sponsorship/tabs/TrackDeliverablesTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/AddAttendeeTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/ApproveRequestTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/CateringInventoryTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/ContingencyChecklistTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/EquipmentCheckoutTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/ExportListTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/LogisticsShipmentsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/PerformanceReviewTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/PowerDistributionTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/RecordExpenseTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/ServiceStatusTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/TechCheckTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/TrainingStatusTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/ViewWaitlistTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/VolunteerCheckInTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/committee-tabs/VolunteerPerformanceTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/AnnouncementManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/BroadcastComposer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ChannelCategoryManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ChannelPermissionsEditor.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/CommunicationStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/EmailCampaignTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/EnhancedMessageThread.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MessageActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MessageDeliveryAnalytics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MessageReactions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MessageThread.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MessagingChannels.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/MobileWorkspaceCommunication.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ModerationToolsPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ParticipantChannelManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ParticipantEngagementMetrics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/PressReleaseTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/RealtimeMessageThread.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ScheduledBroadcastsManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/ScheduledMessageComposer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/StakeholderDirectory.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/threads/MobileThreadView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/threads/ThreadNotifications.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/threads/ThreadPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/communication/threads/ThreadPreviewBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/BlogArticleTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/ContentCalendar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/ContentQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/ContentStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/MediaAssetsLibrary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/PageBuilderStatusCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/PublicationPipeline.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/content/SocialMediaTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/dashboards/DashboardBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/dashboards/WidgetLibrary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/BudgetTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/CommitteeOverviewCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/ResourceApprovalPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/ResourceManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/AssignJudgeModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentCommitteeHub.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentPipelineDragDrop.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentPipelineOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/ContentStatsConnected.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/JudgingOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/JudgingOverviewConnected.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/MediaAssetsConnected.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/MediaAssetsWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/tabs/AddSpeakerTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/tabs/AssignJudgesTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/tabs/CreateContentTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/tabs/ScheduleSessionTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/content/tabs/UploadMediaTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/finance/FinanceCommitteeConnectionsPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/finance/FinanceDepartmentStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/finance/tabs/BudgetForecastTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/finance/tabs/FinancialReportsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/CampaignOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/GrowthCommitteeOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/GrowthGoalsTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/GrowthQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/GrowthStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/SocialMediaSummary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/SponsorshipSummary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/AddSponsorTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/LaunchCampaignTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/ManagePartnersTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/ScheduleContentTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/SendAnnouncementTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/SetGoalsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/growth/tabs/ViewAnalyticsTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/OperationsCommitteePanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/OperationsOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/OperationsQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/OperationsStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/modals/LogisticsStatusModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/modals/MasterChecklistModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/tabs/EventBriefingTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/tabs/LogisticsStatusTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/operations/tabs/MasterChecklistTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/tech/CommitteeConnectionsPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/tech/TechDepartmentStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/tech/tabs/DocumentationTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/tech/tabs/NetworkStatusTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/volunteers/VolunteersDeptQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/volunteers/VolunteersDeptStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/volunteers/tabs/RecognitionTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/department/volunteers/tabs/ShiftOverviewTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/dnd/CrossWorkspaceDrop.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/dnd/DragToAssign.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/dnd/DraggableTaskCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/documents/DocumentEditor.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/documents/DocumentSidebar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/documents/DocumentVersionHistory.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/documents/DocumentsPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/escalation/OverdueItemsWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event/EventScheduleManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event/EventTimeline.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event/RunOfShowChecklist.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event/VIPGuestTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event/VenueBriefing.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event-settings/ContributeToPublishCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event-settings/EventOverviewPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/event-settings/EventQuickStats.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/facility/FacilityQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/facility/FacilityStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/finance/FinancialSummaryCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/finance/InvoiceFormDialog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/finance/InvoiceManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/forms/FormBuilder.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/gantt/GanttTaskRow.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/gantt/GanttTimelineHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/gantt/TaskGanttChart.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/integrations/IntegrationManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/integrations/IntegrationsHub.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/it/ITStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/it/SoftwareLicenses.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/it/SystemHealthMonitor.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/EvaluationProgress.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/JudgeQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/JudgeRoster.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/JudgeStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/LeaderboardPreview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/judge/SubmissionAssignments.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/CreateStreamModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/LiveIndicator.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/LiveStreamDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/StreamControlPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/StreamStatusBanner.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/ViewerCounter.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/livestream/YouTubeChannelCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/logistics/EquipmentManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/logistics/LogisticsQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/logistics/LogisticsStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/management/AllWorkspacesTable.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/management/WorkspaceHealthDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/AdPerformancePanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/BrandingAssetsManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/CampaignTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/MarketingCalendar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/MarketingQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/marketing/MarketingStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/media/CoverageSchedule.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/media/MediaStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/media/MediaUploadModal.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/memoized/MemoizedStatCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/memoized/MemoizedTaskCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/memoized/MemoizedTeamMemberRow.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileCommunication.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileFeaturesPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileNavigation.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileRoleEditor.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileSettings.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTaskCard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTaskForm.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTaskList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTaskManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTaskSummary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTeamManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileTeamOverview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileWorkspaceAnalytics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/mobile/MobileWorkspaceHeader.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/notifications/NotificationDigestView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/presence/ActiveNowBadge.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/presence/OnlineUsersWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/presence/PresenceAvatar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/registration/AttendeeList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/registration/RegistrationStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/reports/ReportHistoryViewer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/root/RootDashboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/search/SearchResultsPanel.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/settings/MemberRoleManagement.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/ContentCalendar.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/ContentLibrary.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/EngagementTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/PlatformManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/SocialMediaQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/social-media/SocialMediaStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/CommunicationLog.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/SessionScheduleGrid.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/SpeakerLiaisonQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/SpeakerLiaisonStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/SpeakerRoster.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/speaker-liaison/TravelLogistics.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/BenefitsManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/DeliverableTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/ProposalPipeline.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/SponsorCommunications.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/SponsorTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/sponsorship/SponsorshipStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/tabs/WorkspaceManagementTab.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/task-form/CustomTemplateManager.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/task-form/MultiAssigneeSelector.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/task-form/SubtaskSection.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/task-form/useTaskFormKeyboard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/team/TimesheetView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/team/WorkloadReport.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/technical/NetworkStatus.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/technical/TechnicalStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/technical/VenueSetupChecklist.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/templates/IndustryTemplatePreview.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/templates/TemplateImportWizard.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/templates/TemplateManagementPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/timeline/TaskTimelineView.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/voice/VoiceChannelRoom.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/voice/VoiceChannelWidget.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/voice/VoiceParticipantList.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/volunteers/VolunteerQuickActions.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/volunteers/VolunteerShiftScheduler.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/volunteers/VolunteerStatsCards.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/volunteers/VolunteerTrainingTracker.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/workload/WorkloadBalancer.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/components/workspace/workload/WorkloadForecast.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/lib/utils.ts",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/pages/MinimalLanding.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    },
+    {
+      "file": "src/pages/admin/AdminRolesDiagramPage.tsx",
+      "reason": "Contains dynamic class names or utility functions"
+    }
+  ],
+  "errors": []
+}
