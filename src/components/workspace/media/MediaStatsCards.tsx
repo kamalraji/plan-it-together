@@ -30,28 +30,28 @@ export function MediaStatsCards({ workspaceId }: MediaStatsCardsProps) {
       value: data?.pressCredentials ?? 0,
       icon: Users,
       color: 'text-info',
-      bgColor: 'bg-blue-100 dark:bg-blue-500/10',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Media Assets',
       value: data?.mediaAssets ?? 0,
       icon: FolderOpen,
       color: 'text-primary',
-      bgColor: 'bg-purple-100 dark:bg-purple-500/10',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Coverage Hours',
       value: data?.coverageHours ?? 0,
       icon: Clock,
       color: 'text-warning',
-      bgColor: 'bg-amber-100 dark:bg-amber-500/10',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Deliverables',
       value: data?.deliverables ?? 0,
       icon: Award,
       color: 'text-success',
-      bgColor: 'bg-green-100 dark:bg-green-500/10',
+      bgColor: 'bg-success/10',
     },
   ];
 

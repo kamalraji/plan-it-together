@@ -50,9 +50,9 @@ export function RecurringTasksPanel({ workspaceId }: RecurringTasksPanelProps) {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'URGENT': return 'bg-red-500/10 text-red-700 dark:text-red-400';
-      case 'HIGH': return 'bg-orange-500/10 text-orange-700 dark:text-orange-400';
-      case 'MEDIUM': return 'bg-blue-500/10 text-blue-700 dark:text-blue-400';
+      case 'URGENT': return 'bg-destructive/10 text-destructive';
+      case 'HIGH': return 'bg-warning/10 text-warning';
+      case 'MEDIUM': return 'bg-info/10 text-info';
       case 'LOW': return 'bg-slate-500/10 text-slate-700 dark:text-slate-400';
       default: return 'bg-muted text-muted-foreground';
     }

@@ -39,8 +39,8 @@ export function ForgotPasswordForm() {
     return (
       <div className="space-y-6">
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+          <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mb-4">
+            <CheckCircle className="w-8 h-8 text-success" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Check your email</h2>
           <p className="text-muted-foreground">

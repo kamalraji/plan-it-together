@@ -152,7 +152,7 @@ export function ChannelList({
               <button
                 type="submit"
                 disabled={isCreating || !newChannelData.name.trim()}
-                className="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-primary text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCreating ? 'Creating...' : 'Create Channel'}
               </button>

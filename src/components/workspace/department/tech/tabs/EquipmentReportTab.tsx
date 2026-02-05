@@ -30,7 +30,7 @@ const getTypeIcon = (type: string) => {
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case 'in-use': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">In Use</Badge>;
+    case 'in-use': return <Badge className="bg-success/10 text-success border-success/20">In Use</Badge>;
     case 'available': return <Badge className="bg-info/10 text-info border-info/20">Available</Badge>;
     case 'maintenance': return <Badge className="bg-warning/10 text-warning border-warning/20">Maintenance</Badge>;
     default: return null;
@@ -71,9 +71,9 @@ export function EquipmentReportTab({ workspaceId: _workspaceId }: EquipmentRepor
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Monitor className="h-8 w-8 text-emerald-500" />
+              <Monitor className="h-8 w-8 text-success" />
               <div>
-                <p className="text-2xl font-bold text-emerald-500">{inUse}</p>
+                <p className="text-2xl font-bold text-success">{inUse}</p>
                 <p className="text-sm text-muted-foreground">In Use</p>
               </div>
             </div>

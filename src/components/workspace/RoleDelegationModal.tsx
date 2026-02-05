@@ -118,13 +118,13 @@ export function RoleDelegationModal({
   const getLevelBadgeStyle = (level: WorkspaceHierarchyLevel): string => {
     switch (level) {
       case WorkspaceHierarchyLevel.OWNER:
-        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+        return 'bg-warning/20 text-warning';
       case WorkspaceHierarchyLevel.MANAGER:
-        return 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300';
+        return 'bg-primary/20 text-primary';
       case WorkspaceHierarchyLevel.LEAD:
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-info/20 text-info';
       case WorkspaceHierarchyLevel.COORDINATOR:
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+        return 'bg-success/20 text-success';
     }
   };
 
@@ -170,9 +170,9 @@ export function RoleDelegationModal({
 
             {/* Permission Warning */}
             {isCurrentUserHolder && (
-              <div className="flex items-start gap-2 p-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
-                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700 dark:text-amber-300">
+              <div className="flex items-start gap-2 p-3 rounded-lg border border-warning/30 bg-warning/10">
+                <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                <p className="text-xs text-warning">
                   You are delegating your own role. You will lose the privileges associated with this role.
                 </p>
               </div>

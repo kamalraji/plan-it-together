@@ -133,14 +133,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
 
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
-      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-purple-100 text-purple-800',
-      [WorkspaceRole.OPERATIONS_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.GROWTH_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.CONTENT_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.TECH_FINANCE_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.VOLUNTEERS_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-primary/20 text-indigo-800',
-      [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
+      [WorkspaceRole.WORKSPACE_OWNER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.OPERATIONS_MANAGER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.GROWTH_MANAGER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.CONTENT_MANAGER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.TECH_FINANCE_MANAGER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.VOLUNTEERS_MANAGER]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-primary/20 text-primary',
+      [WorkspaceRole.MARKETING_LEAD]: 'bg-accent/20 text-accent',
     };
 
     const roleLabels: Record<string, string> = {
@@ -211,7 +211,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
         </div>
         <button
           onClick={onInviteMember}
-          className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 min-h-[48px]"
+          className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 min-h-[48px]"
         >
           <UserPlusIcon className="w-4 h-4 mr-2" />
           Invite

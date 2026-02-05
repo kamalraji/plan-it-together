@@ -359,7 +359,7 @@ export function TaskDetailView({
                       <span className="text-sm text-foreground w-12">{progressValue}%</span>
                       <button
                         onClick={handleProgressUpdate}
-                        className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700"
+                        className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90"
                       >
                         Save
                       </button>

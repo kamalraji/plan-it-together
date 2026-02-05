@@ -46,7 +46,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       value: venueCount,
       subValue: `${roomsReady} ready`,
       icon: Building,
-      color: 'text-blue-600 dark:text-blue-400',
+      color: 'text-info',
       bgColor: 'bg-info/10',
     },
     {
@@ -54,7 +54,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       value: roomsReady,
       subValue: `of ${venueCount}`,
       icon: DoorOpen,
-      color: 'text-green-600 dark:text-green-400',
+      color: 'text-success',
       bgColor: 'bg-success/10',
     },
     {
@@ -62,7 +62,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       value: safetyCompleted,
       subValue: `of ${safetyChecks}`,
       icon: Shield,
-      color: 'text-purple-600 dark:text-purple-400',
+      color: 'text-primary',
       bgColor: 'bg-primary/10',
     },
     {
@@ -70,7 +70,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       value: maintenanceTasks,
       subValue: `${pendingMaintenance} pending`,
       icon: Wrench,
-      color: 'text-amber-600 dark:text-amber-400',
+      color: 'text-warning',
       bgColor: 'bg-warning/10',
     },
     {
@@ -78,15 +78,15 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       value: tasks.filter(t => t.status === 'DONE').length,
       subValue: 'tasks done',
       icon: CheckCircle,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bgColor: 'bg-emerald-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'Urgent Issues',
       value: urgentIssues,
       subValue: 'need attention',
       icon: AlertTriangle,
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive',
       bgColor: 'bg-destructive/10',
     },
   ];

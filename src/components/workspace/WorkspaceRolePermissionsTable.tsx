@@ -226,7 +226,7 @@ export function WorkspaceRolePermissionsTable({
                         </span>
                       )}
                       {currentUserRole && canUserManageThisRole && !isHighlighted && (
-                        <span className="inline-flex items-center rounded-md bg-green-500/10 px-1.5 py-0.5 text-[10px] font-medium text-green-600 dark:text-green-400 ring-1 ring-inset ring-green-500/20">
+                        <span className="inline-flex items-center rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success ring-1 ring-inset ring-success/20">
                           Can manage
                         </span>
                       )}
