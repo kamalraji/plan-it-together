@@ -81,9 +81,9 @@ export function EventApprovalStatus({
   const getPriorityBadge = (priority: string) => {
     const styles = {
       low: 'bg-muted text-muted-foreground',
-      medium: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
-      high: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
-      urgent: 'bg-red-500/20 text-red-600 dark:text-red-400',
+      medium: 'bg-info/20 text-info',
+      high: 'bg-warning/20 text-warning',
+      urgent: 'bg-destructive/20 text-destructive',
     };
     return styles[priority as keyof typeof styles] || styles.medium;
   };
@@ -142,7 +142,7 @@ export function EventApprovalStatus({
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium text-red-700 dark:text-red-400">
+                  <p className="text-sm font-medium text-destructive">
                     Reviewer Feedback
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">

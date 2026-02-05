@@ -82,15 +82,15 @@ export const EventPublishStatusIndicator: React.FC<EventPublishStatusIndicatorPr
         return {
           label: 'Approved',
           icon: CheckCircle,
-          className: 'bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400',
-          badgeClass: 'bg-green-500/20 text-green-700 dark:text-green-400',
+          className: 'bg-success/10 border-success/20 text-success',
+          badgeClass: 'bg-success/20 text-success',
         };
       case 'rejected':
         return {
           label: 'Rejected',
           icon: XCircle,
-          className: 'bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400',
-          badgeClass: 'bg-red-500/20 text-red-700 dark:text-red-400',
+          className: 'bg-destructive/10 border-destructive/20 text-destructive',
+          badgeClass: 'bg-destructive/20 text-destructive',
         };
       default:
         return {

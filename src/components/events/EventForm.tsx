@@ -432,12 +432,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Private Event Invite Link (Requirements 24.1) */}
                   {watchedVisibility === EventVisibility.PRIVATE && (
                     <div className="bg-info/10 border border-blue-200 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-blue-900 mb-2">Private Event Access</h4>
+                      <h4 className="text-sm font-medium text-info mb-2">Private Event Access</h4>
                       {isEditing && event ? (
                         <div>
                           {inviteLink ? (
                             <div>
-                              <label className="block text-sm font-medium text-blue-800 mb-2">
+                              <label className="block text-sm font-medium text-info mb-2">
                                 Invite Link
                               </label>
                               <div className="flex items-center space-x-2">
@@ -445,12 +445,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                                   type="text"
                                   value={inviteLink}
                                   readOnly
-                                  className="flex-1 px-3 py-2 bg-background border border-blue-300 rounded-md text-sm"
+                                  className="flex-1 px-3 py-2 bg-background border border-info/40 rounded-md text-sm"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => navigator.clipboard.writeText(inviteLink)}
-                                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                                  className="px-3 py-2 bg-info text-info-foreground text-sm rounded-md hover:bg-info/90"
                                 >
                                   Copy
                                 </button>
@@ -458,20 +458,20 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                               <button
                                 type="button"
                                 onClick={generateInviteLink}
-                                className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                                className="mt-2 text-sm text-info hover:text-info/80"
                               >
                                 Generate New Link
                               </button>
                             </div>
                           ) : (
                             <div>
-                              <p className="text-sm text-blue-800 mb-2">
+                              <p className="text-sm text-info mb-2">
                                 Generate an invite link to share with specific people
                               </p>
                               <button
                                 type="button"
                                 onClick={generateInviteLink}
-                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                                className="px-4 py-2 bg-info text-info-foreground text-sm rounded-md hover:bg-info/90"
                               >
                                 Generate Invite Link
                               </button>
@@ -479,7 +479,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           )}
                         </div>
                       ) : (
-                        <p className="text-sm text-blue-800">
+                        <p className="text-sm text-info">
                           An invite link will be generated after creating the event
                         </p>
                       )}

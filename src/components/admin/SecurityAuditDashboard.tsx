@@ -50,7 +50,7 @@ interface AdminAuditLog {
 const severityConfig = {
   low: { color: 'bg-info/10 text-info border-info/30', icon: Activity },
   medium: { color: 'bg-warning/10 text-warning border-warning/30', icon: AlertTriangle },
-  high: { color: 'bg-orange-500/10 text-orange-700 border-orange-500/30', icon: AlertTriangle },
+  high: { color: 'bg-warning/10 text-warning border-warning/30', icon: AlertTriangle },
   critical: { color: 'bg-destructive/10 text-destructive border-destructive/30', icon: Ban },
 };
 
@@ -288,7 +288,7 @@ export const SecurityAuditDashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-500" />
+                <AlertTriangle className="h-5 w-5 text-warning" />
                 Suspicious Activity Alerts
               </CardTitle>
               <CardDescription>

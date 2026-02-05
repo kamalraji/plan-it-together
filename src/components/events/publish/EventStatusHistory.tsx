@@ -19,11 +19,11 @@ export function EventStatusHistory({ eventId }: EventStatusHistoryProps) {
 
   const getStatusStyle = (status: string) => {
     const styles: Record<string, string> = {
-      DRAFT: 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400',
-      PUBLISHED: 'bg-green-500/20 text-green-600 dark:text-green-400',
-      ONGOING: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
+      DRAFT: 'bg-warning/20 text-warning',
+      PUBLISHED: 'bg-success/20 text-success',
+      ONGOING: 'bg-info/20 text-info',
       COMPLETED: 'bg-muted text-muted-foreground',
-      CANCELLED: 'bg-red-500/20 text-red-600 dark:text-red-400',
+      CANCELLED: 'bg-destructive/20 text-destructive',
     };
     return styles[status] || 'bg-muted text-muted-foreground';
   };

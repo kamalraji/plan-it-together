@@ -44,10 +44,10 @@ export const DelegatedSettingsAlert: React.FC<DelegatedSettingsAlertProps> = ({
   return (
     <Alert variant="destructive" className="border-warning/50 bg-warning/10">
       <AlertTriangle className="h-4 w-4 text-warning" />
-      <AlertTitle className="text-yellow-700 dark:text-yellow-400">
+      <AlertTitle className="text-warning">
         Delegated Settings Incomplete
       </AlertTitle>
-      <AlertDescription className="text-yellow-700/80 dark:text-yellow-400/80">
+      <AlertDescription className="text-warning/80">
         <p className="mb-3">
           Some settings delegated to child workspaces are not yet complete. 
           Contact the responsible workspace leads to complete these before publishing.

@@ -22,7 +22,7 @@ const recentIncidents = [
 const getSeverityBadge = (severity: string) => {
   switch (severity) {
     case 'critical': return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Critical</Badge>;
-    case 'high': return <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">High</Badge>;
+    case 'high': return <Badge className="bg-warning/10 text-warning border-warning/20">High</Badge>;
     case 'medium': return <Badge className="bg-warning/10 text-warning border-warning/20">Medium</Badge>;
     case 'low': return <Badge className="bg-info/10 text-info border-info/20">Low</Badge>;
     default: return null;
@@ -33,7 +33,7 @@ const getStatusBadge = (status: string) => {
   switch (status) {
     case 'open': return <Badge variant="outline">Open</Badge>;
     case 'investigating': return <Badge className="bg-warning/10 text-warning border-warning/20">Investigating</Badge>;
-    case 'resolved': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Resolved</Badge>;
+    case 'resolved': return <Badge className="bg-success/10 text-success border-success/20">Resolved</Badge>;
     default: return null;
   }
 };

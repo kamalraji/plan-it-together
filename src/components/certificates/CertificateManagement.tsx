@@ -240,7 +240,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
               <h2 className="text-xl font-semibold text-foreground">Certificate Criteria Configuration</h2>
               <button
                 onClick={addCriterion}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
               >
                 Add Criterion
               </button>
@@ -259,7 +259,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                       <h3 className="text-lg font-medium text-foreground">Criterion {index + 1}</h3>
                       <button
                         onClick={() => removeCriterion(index)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-destructive hover:text-destructive/80"
                       >
                         Remove
                       </button>
@@ -377,7 +377,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                   <button
                     onClick={handleSaveCriteria}
                     disabled={storeCriteriaMutation.isPending}
-                    className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="bg-success text-success-foreground px-6 py-2 rounded-md hover:bg-success/90 transition-colors disabled:opacity-50"
                   >
                     {storeCriteriaMutation.isPending ? 'Saving...' : 'Save Criteria'}
                   </button>
@@ -397,7 +397,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
               <button
                 onClick={handleBatchGenerate}
                 disabled={batchGenerateMutation.isPending}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {batchGenerateMutation.isPending ? 'Generating...' : 'Batch Generate'}
               </button>
@@ -432,7 +432,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                   <button
                     onClick={handleDistribute}
                     disabled={selectedCertificates.length === 0 || distributeMutation.isPending}
-                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="bg-success text-success-foreground px-4 py-2 rounded-md hover:bg-success/90 transition-colors disabled:opacity-50"
                   >
                     {distributeMutation.isPending ? 'Distributing...' : 'Distribute Selected'}
                   </button>
@@ -489,9 +489,9 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.type === 'MERIT' ? 'bg-warning/20 text-yellow-800' :
+                              certificate.type === 'MERIT' ? 'bg-warning/20 text-warning' :
                               certificate.type === 'COMPLETION' ? 'bg-success/20 text-success' :
-                              'bg-info/20 text-blue-800'
+                              'bg-info/20 text-info'
                             }`}>
                               {certificate.type}
                             </span>
@@ -619,9 +619,9 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.type === 'MERIT' ? 'bg-warning/20 text-yellow-800' :
+                              certificate.type === 'MERIT' ? 'bg-warning/20 text-warning' :
                               certificate.type === 'COMPLETION' ? 'bg-success/20 text-success' :
-                              'bg-info/20 text-blue-800'
+                              'bg-info/20 text-info'
                             }`}>
                               {certificate.type}
                             </span>
@@ -631,7 +631,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.distributedAt ? 'bg-success/20 text-success' : 'bg-warning/20 text-yellow-800'
+                              certificate.distributedAt ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
                             }`}>
                               {certificate.distributedAt ? 'Distributed' : 'Pending Distribution'}
                             </span>

@@ -220,13 +220,13 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
               )}
               
               {selectedTemplate && selectedTemplate.variables.length > 0 && (
-                <div className="mt-2 p-3 bg-info/10 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800 font-medium mb-1">Available Variables:</p>
+                <div className="mt-2 p-3 bg-info/10 border border-info/30 rounded-md">
+                  <p className="text-sm text-info font-medium mb-1">Available Variables:</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedTemplate.variables.map((variable) => (
                       <span
                         key={variable}
-                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-info/20 text-blue-800"
+                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-info/20 text-info"
                       >
                         {`{{${variable}}}`}
                       </span>
@@ -246,7 +246,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
               <button
                 type="button"
                 onClick={handlePreviewToggle}
-                className="text-sm text-indigo-600 hover:text-indigo-800"
+                className="text-sm text-primary hover:text-primary/80"
               >
                 {showPreview ? 'Hide Preview' : 'Show Preview'}
               </button>
@@ -296,7 +296,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
             <button
               type="submit"
               disabled={sendEmailMutation.isPending || !recipientPreview || recipientPreview.count === 0}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendEmailMutation.isPending ? 'Sending...' : 'Send Email'}
             </button>

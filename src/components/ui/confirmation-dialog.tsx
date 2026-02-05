@@ -32,7 +32,7 @@ const variantStyles: Record<ConfirmationVariant, { action: string; icon: string 
     icon: 'text-destructive',
   },
   warning: {
-    action: 'bg-amber-600 text-white hover:bg-amber-700',
+    action: 'bg-warning text-warning-foreground hover:bg-warning/90',
     icon: 'text-warning',
   },
   info: {

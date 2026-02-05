@@ -42,7 +42,7 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
       case WorkspaceStatus.PROVISIONING:
         return { text: 'Setting Up', color: 'text-warning' };
       case WorkspaceStatus.WINDING_DOWN:
-        return { text: 'Wrapping Up', color: 'text-orange-600' };
+        return { text: 'Wrapping Up', color: 'text-warning' };
       case WorkspaceStatus.DISSOLVED:
         return { text: 'Completed', color: 'text-muted-foreground' };
       default:
@@ -178,7 +178,7 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                     <div>
-                      <p className="text-sm font-medium text-red-800">
+                      <p className="text-sm font-medium text-destructive">
                         {taskSummary.overdue} overdue task{taskSummary.overdue !== 1 ? 's' : ''}
                       </p>
                       <p className="text-xs text-destructive">Requires immediate attention</p>

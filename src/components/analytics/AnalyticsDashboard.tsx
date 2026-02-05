@@ -152,19 +152,19 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-5 w-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
+            <h3 className="text-sm font-medium text-destructive">Error loading analytics</h3>
             <p className="mt-1 text-sm text-destructive">{error}</p>
             <button
               onClick={fetchAnalyticsData}
-              className="mt-2 text-sm text-red-800 underline hover:text-red-900"
+              className="mt-2 text-sm text-destructive underline hover:text-destructive/80"
             >
               Try again
             </button>
@@ -222,7 +222,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
             <button
               onClick={() => handleExport('PDF')}
               disabled={exportState.isExporting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {exportState.isExporting && exportState.format === 'PDF' ? (
                 <>
@@ -246,18 +246,18 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
 
         {/* Export Progress */}
         {exportState.isExporting && (
-          <div className="bg-info/10 border border-blue-200 rounded-md p-4">
+          <div className="bg-info/10 border border-info/30 rounded-md p-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-blue-800">
+                <p className="text-sm font-medium text-info">
                   Exporting {exportState.format} report...
                 </p>
-                <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+                <div className="mt-2 w-full bg-info/30 rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${exportState.progress}%` }}

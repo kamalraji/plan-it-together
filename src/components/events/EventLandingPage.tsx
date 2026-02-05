@@ -555,7 +555,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   <button
                     onClick={() => setShowRegistrationModal(true)}
                     disabled={registrationMutation.isPending}
-                    className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                    className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
                     {registrationMutation.isPending ? 'Registering...' : 'Register Now'}
                   </button>
@@ -563,13 +563,13 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   <div className="space-y-3">
                     <button
                       onClick={() => navigate('/register')}
-                      className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                      className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors"
                     >
                       Sign Up to Register
                     </button>
                     <button
                       onClick={() => navigate('/login')}
-                      className="w-full border border-indigo-600 text-indigo-600 py-3 px-4 rounded-lg font-medium hover:bg-indigo-50 transition-colors"
+                      className="w-full border border-primary text-primary py-3 px-4 rounded-lg font-medium hover:bg-primary/10 transition-colors"
                     >
                       Already have an account?
                     </button>
@@ -668,9 +668,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
                           <h3 className="text-lg font-medium text-foreground">{item.title}</h3>
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-info/20 text-blue-800' :
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-info/20 text-info' :
                               item.type === 'break' ? 'bg-success/20 text-success' :
-                                item.type === 'networking' ? 'bg-purple-100 text-purple-800' :
+                                item.type === 'networking' ? 'bg-accent/20 text-accent-foreground' :
                                   'bg-muted text-foreground'
                             }`}>
                             {item.type}
@@ -867,7 +867,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               <button
                 onClick={() => registrationMutation.mutate()}
                 disabled={registrationMutation.isPending}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {registrationMutation.isPending ? 'Registering...' : 'Confirm'}
               </button>
