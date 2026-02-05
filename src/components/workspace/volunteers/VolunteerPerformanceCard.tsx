@@ -151,12 +151,12 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
             <p className="text-lg font-bold text-blue-900">{totals.hours}</p>
             <p className="text-xs text-info">Hours Logged</p>
           </div>
-          <div className="text-center p-3 bg-emerald-50 rounded-lg">
-            <UserCheck className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
-            <p className="text-lg font-bold text-emerald-900">{totals.attendance}%</p>
-            <p className="text-xs text-emerald-600">Attendance</p>
+          <div className="text-center p-3 bg-success/10 rounded-lg">
+            <UserCheck className="h-4 w-4 text-success mx-auto mb-1" />
+            <p className="text-lg font-bold text-success">{totals.attendance}%</p>
+            <p className="text-xs text-success">Attendance</p>
           </div>
-          <div className="text-center p-3 bg-violet-50 rounded-lg">
+          <div className="text-center p-3 bg-primary/10 rounded-lg">
             <TrendingUp className="h-4 w-4 text-primary mx-auto mb-1" />
             <p className="text-lg font-bold text-violet-900">{totals.reliability}%</p>
             <p className="text-xs text-primary">Reliability</p>

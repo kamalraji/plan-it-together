@@ -219,7 +219,7 @@ export function TimeLogsView({ workspaceId, userId, isManager = false }: TimeLog
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="text-green-600 hover:text-green-700"
+                                      className="text-success hover:text-success"
                                       onClick={() => teamTime.approveEntry(entry.id)}
                                     >
                                       Approve

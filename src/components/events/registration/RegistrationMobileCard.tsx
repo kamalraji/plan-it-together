@@ -35,11 +35,11 @@ import { formatDistanceToNow } from 'date-fns';
 import type { Registration, RegistrationStatus } from '@/hooks/useEventRegistrations';
 
 const STATUS_CONFIG: Record<RegistrationStatus | 'CHECKED_IN', { label: string; color: string; icon: React.ElementType }> = {
-  PENDING: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', icon: Clock },
-  CONFIRMED: { label: 'Confirmed', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400', icon: XCircle },
-  WAITLISTED: { label: 'Waitlisted', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400', icon: Users },
-  CHECKED_IN: { label: 'Checked In', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400', icon: UserCheck },
+  PENDING: { label: 'Pending', color: 'bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning', icon: Clock },
+  CONFIRMED: { label: 'Confirmed', color: 'bg-success/20 text-success dark:bg-success/10 dark:text-success', icon: CheckCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-destructive/20 text-destructive dark:bg-destructive/10 dark:text-destructive', icon: XCircle },
+  WAITLISTED: { label: 'Waitlisted', color: 'bg-info/20 text-info dark:bg-info/10 dark:text-info', icon: Users },
+  CHECKED_IN: { label: 'Checked In', color: 'bg-accent/20 text-accent-foreground dark:bg-accent/10 dark:text-accent-foreground', icon: UserCheck },
 };
 
 interface RegistrationMobileCardProps {

@@ -125,7 +125,7 @@ export function WaitlistManager({ workspaceId }: WaitlistManagerProps) {
           </div>
           <Button 
             size="sm" 
-            className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
+            className="gap-1.5 bg-success hover:bg-success/90"
             disabled={waitlist.length === 0 || availableSpots === 0 || !mutations}
             onClick={() => waitlist[0] && handlePromote(waitlist[0])}
           >
@@ -198,7 +198,7 @@ export function WaitlistManager({ workspaceId }: WaitlistManagerProps) {
                   <Button 
                     size="icon" 
                     variant="ghost" 
-                    className="h-7 w-7 text-emerald-600 hover:bg-emerald-500/10"
+                    className="h-7 w-7 text-success hover:bg-success/10"
                     disabled={availableSpots === 0 || mutations?.promoteEntry.isPending}
                     onClick={() => handlePromote(entry)}
                     aria-label={`Promote ${entry.name} to confirmed`}

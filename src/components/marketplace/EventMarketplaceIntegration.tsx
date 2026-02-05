@@ -409,7 +409,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                   <button
                     type="submit"
                     disabled={createBookingMutation.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
                     {createBookingMutation.isPending ? 'Sending...' : 'Send Request'}
                   </button>

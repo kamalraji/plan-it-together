@@ -45,7 +45,7 @@ export function LogisticsStatsCards({ workspaceId }: LogisticsStatsCardsProps) {
       value: equipmentCount,
       subValue: `${equipmentAvailable} available`,
       icon: Package,
-      color: 'text-blue-600 dark:text-blue-400',
+      color: 'text-info dark:text-info',
       bgColor: 'bg-info/10',
     },
     {
@@ -53,7 +53,7 @@ export function LogisticsStatsCards({ workspaceId }: LogisticsStatsCardsProps) {
       value: pendingTasks,
       subValue: 'in progress',
       icon: Truck,
-      color: 'text-amber-600 dark:text-amber-400',
+      color: 'text-warning dark:text-warning',
       bgColor: 'bg-warning/10',
     },
     {
@@ -77,7 +77,7 @@ export function LogisticsStatsCards({ workspaceId }: LogisticsStatsCardsProps) {
       value: completedTasks,
       subValue: 'deliveries',
       icon: CheckCircle,
-      color: 'text-green-600 dark:text-green-400',
+      color: 'text-success dark:text-success',
       bgColor: 'bg-success/10',
     },
     {
@@ -85,7 +85,7 @@ export function LogisticsStatsCards({ workspaceId }: LogisticsStatsCardsProps) {
       value: urgentTasks,
       subValue: 'need attention',
       icon: AlertTriangle,
-      color: 'text-red-600 dark:text-red-400',
+      color: 'text-destructive dark:text-destructive',
       bgColor: 'bg-destructive/10',
     },
   ];

@@ -62,7 +62,7 @@ const typeConfig = {
     label: 'Certificate of Appreciation', 
     gradient: 'from-blue-500 to-indigo-500',
     bg: 'bg-info/10',
-    text: 'text-blue-600 dark:text-blue-400',
+    text: 'text-info dark:text-info',
     border: 'border-info/20'
   },
 };

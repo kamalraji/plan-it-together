@@ -89,7 +89,7 @@ export function MessageComposer({
               <button
                 type="button"
                 onClick={() => removeAttachment(index)}
-                className="text-red-500 hover:text-red-700 text-sm"
+                className="text-destructive hover:text-destructive/80 text-sm"
               >
                 ✕
               </button>
@@ -155,8 +155,8 @@ export function MessageComposer({
           disabled={isSending || (!message.trim() && attachments.length === 0)}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             isPriority
-              ? 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300'
-              : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300'
+              ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:bg-destructive/30'
+              : 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30'
           } disabled:cursor-not-allowed`}
         >
           {isSending ? (

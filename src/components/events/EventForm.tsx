@@ -866,7 +866,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           speaker: '',
                           location: ''
                         })}
-                        className="bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700"
+                        className="bg-primary text-primary-foreground px-3 py-1 rounded-md text-sm hover:bg-primary/90"
                       >
                         Add Timeline Item
                       </button>
@@ -995,7 +995,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           position: prizeFields.length + 1,
                           category: ''
                         })}
-                        className="bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700"
+                        className="bg-primary text-primary-foreground px-3 py-1 rounded-md text-sm hover:bg-primary/90"
                       >
                         Add Prize
                       </button>
@@ -1082,7 +1082,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           tier: 'bronze',
                           description: ''
                         })}
-                        className="bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700"
+                        className="bg-primary text-primary-foreground px-3 py-1 rounded-md text-sm hover:bg-primary/90"
                       >
                         Add Sponsor
                       </button>
@@ -1190,7 +1190,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
             <button
               type="submit"
               disabled={eventMutation.isPending}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
               {eventMutation.isPending 
                 ? (isEditing ? 'Updating...' : 'Creating...') 

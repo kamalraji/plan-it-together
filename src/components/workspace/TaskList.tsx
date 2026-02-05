@@ -32,11 +32,11 @@ export function TaskList({
       case TaskStatus.NOT_STARTED:
         return 'bg-muted text-muted-foreground';
       case TaskStatus.IN_PROGRESS:
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+        return 'bg-info/10 text-info dark:text-info';
       case TaskStatus.REVIEW_REQUIRED:
-        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
+        return 'bg-warning/10 text-warning dark:text-warning';
       case TaskStatus.COMPLETED:
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+        return 'bg-success/10 text-success dark:text-success';
       case TaskStatus.BLOCKED:
         return 'bg-destructive/10 text-destructive';
       default:
@@ -49,7 +49,7 @@ export function TaskList({
       case TaskPriority.LOW:
         return 'bg-muted text-muted-foreground';
       case TaskPriority.MEDIUM:
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+        return 'bg-info/10 text-info dark:text-info';
       case TaskPriority.HIGH:
         return 'bg-orange-500/10 text-orange-600 dark:text-orange-400';
       case TaskPriority.URGENT:
@@ -66,11 +66,11 @@ export function TaskList({
       case TaskCategory.MARKETING:
         return 'bg-pink-500/10 text-pink-600 dark:text-pink-400';
       case TaskCategory.LOGISTICS:
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+        return 'bg-info/10 text-info dark:text-info';
       case TaskCategory.TECHNICAL:
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+        return 'bg-success/10 text-success dark:text-success';
       case TaskCategory.REGISTRATION:
-        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
+        return 'bg-warning/10 text-warning dark:text-warning';
       default:
         return 'bg-muted text-muted-foreground';
     }

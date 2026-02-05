@@ -91,7 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
         <div className="flex items-center gap-1.5 mb-2">
           {reviewCount > 0 ? (
             <>
-              <div className="flex items-center gap-0.5 bg-emerald-600 text-primary-foreground text-xs px-1.5 py-0.5 rounded">
+              <div className="flex items-center gap-0.5 bg-success text-primary-foreground text-xs px-1.5 py-0.5 rounded">
                 <span className="font-medium">{rating.toFixed(1)}</span>
                 <Star className="w-3 h-3 fill-current" />
               </div>
@@ -117,7 +117,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
               <span className="text-xs text-muted-foreground line-through">
                 ₹{Math.floor(service.base_price * 1.2).toLocaleString('en-IN')}
               </span>
-              <span className="text-xs text-emerald-600 font-medium">20% off</span>
+              <span className="text-xs text-success font-medium">20% off</span>
             </>
           )}
         </div>
