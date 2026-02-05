@@ -187,7 +187,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open': return 'bg-info/20 text-blue-800';
-      case 'in_progress': return 'bg-warning/20 text-yellow-800';
+      case 'in_progress': return 'bg-warning/20 text-warning';
       case 'resolved': return 'bg-success/20 text-success';
       case 'closed': return 'bg-muted text-foreground';
       default: return 'bg-muted text-foreground';
@@ -214,7 +214,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
         </p>
         <button
           onClick={() => setSubmitted(false)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-info text-info-foreground rounded-lg hover:bg-info/90"
         >
           View My Tickets
         </button>
@@ -362,7 +362,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center px-4 py-2 bg-info text-info-foreground rounded-lg hover:bg-info/90 disabled:opacity-50"
             >
               {submitting ? (
                 <>
@@ -393,7 +393,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
             return (
               <div
                 key={method.id}
-                className="border border-border rounded-lg p-4 hover:border-blue-300 transition-colors"
+                className="border border-border rounded-lg p-4 hover:border-info/50 transition-colors"
               >
                 <div className="flex items-center mb-3">
                   <Icon className="w-6 h-6 text-info mr-3" />
@@ -409,7 +409,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
                 </div>
                 <button
                   onClick={method.action}
-                  className="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                    className="w-full px-4 py-2 bg-info text-info-foreground text-sm rounded-lg hover:bg-info/90"
                 >
                   {method.name === 'Email Support' ? 'Create Ticket' : `Start ${method.name}`}
                 </button>
@@ -420,17 +420,17 @@ export const SupportContact: React.FC<SupportContactProps> = ({
       </div>
 
       {/* Emergency Contact */}
-      <div className="bg-destructive/10 border border-red-200 rounded-lg p-4">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
         <div className="flex items-start">
           <AlertCircle className="w-5 h-5 text-destructive mr-3 mt-0.5" />
           <div>
-            <h3 className="font-medium text-red-900 mb-1">Emergency Support</h3>
+            <h3 className="font-medium text-destructive mb-1">Emergency Support</h3>
             <p className="text-sm text-destructive mb-2">
               For critical issues affecting live events or system outages, contact our emergency line:
             </p>
             <a
               href="tel:+1-555-EMERGENCY"
-              className="text-sm font-medium text-red-800 hover:text-red-900"
+              className="text-sm font-medium text-destructive hover:text-destructive/80"
             >
               +1 (555) EMERGENCY
             </a>

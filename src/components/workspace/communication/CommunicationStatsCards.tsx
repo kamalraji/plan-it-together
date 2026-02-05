@@ -26,8 +26,8 @@ export function CommunicationStatsCards({
       label: 'Emails Sent',
       value: emailsSent.toLocaleString(),
       icon: Mail,
-      color: 'text-emerald-500',
-      bgColor: 'bg-emerald-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'Open Rate',

@@ -51,15 +51,15 @@ function getEventStatus(event: FlagshipEvent): EventStatus {
 
 const modeConfig = {
   ONLINE: { icon: Globe, label: "Virtual", className: "bg-info/10 text-info border-info/20" },
-  OFFLINE: { icon: MapPin, label: "In-Person", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  HYBRID: { icon: Users, label: "Hybrid", className: "bg-primary/10 text-primary border-purple-500/20" },
+  OFFLINE: { icon: MapPin, label: "In-Person", className: "bg-success/10 text-success border-success/20" },
+  HYBRID: { icon: Users, label: "Hybrid", className: "bg-primary/10 text-primary border-primary/20" },
 };
 
 const statusConfig: Record<EventStatus, { icon: typeof Clock; label: string; className: string }> = {
-  register_now: { icon: ArrowRight, label: "Register Now", className: "bg-emerald-600 hover:bg-emerald-700 text-white" },
-  coming_soon: { icon: Clock, label: "Coming Soon", className: "bg-blue-600 hover:bg-blue-700 text-white" },
+  register_now: { icon: ArrowRight, label: "Register Now", className: "bg-success hover:bg-success/90 text-success-foreground" },
+  coming_soon: { icon: Clock, label: "Coming Soon", className: "bg-info hover:bg-info/90 text-info-foreground" },
   registration_closed: { icon: XCircle, label: "Registration Closed", className: "bg-muted text-muted-foreground cursor-not-allowed" },
-  live: { icon: Zap, label: "Live Now", className: "bg-red-600 hover:bg-red-700 text-white animate-pulse" },
+  live: { icon: Zap, label: "Live Now", className: "bg-destructive hover:bg-destructive/90 text-destructive-foreground animate-pulse" },
   completed: { icon: CheckCircle, label: "Completed", className: "bg-muted text-muted-foreground cursor-not-allowed" },
   cancelled: { icon: XCircle, label: "Cancelled", className: "bg-destructive/20 text-destructive cursor-not-allowed" },
 };
@@ -111,7 +111,7 @@ export const FlagshipEventCard = forwardRef<HTMLDivElement, { event: FlagshipEve
         
         {/* Badges overlay */}
         <div className="absolute top-3 left-3 flex gap-2">
-          <Badge variant="outline" className="bg-emerald-500/90 text-primary-foreground border-0 text-xs font-medium">
+          <Badge variant="outline" className="bg-success/90 text-success-foreground border-0 text-xs font-medium">
             Free
           </Badge>
           <Badge variant="outline" className={`${modeConfig[event.mode].className} text-xs font-medium`}>

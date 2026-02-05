@@ -170,7 +170,7 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
               <button
                 onClick={() => handleHelpfulClick(selectedArticle.id, true)}
                 disabled={rateArticleMutation.isPending}
-                className="flex items-center space-x-2 px-4 py-2 border border-green-300 text-green-700 rounded-lg hover:bg-green-50 disabled:opacity-50"
+                className="flex items-center space-x-2 px-4 py-2 border border-success/40 text-success rounded-lg hover:bg-success/10 disabled:opacity-50"
               >
                 <ThumbsUp className="w-4 h-4" />
                 <span>Yes ({selectedArticle.helpful_count})</span>
@@ -178,7 +178,7 @@ export const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({
               <button
                 onClick={() => handleHelpfulClick(selectedArticle.id, false)}
                 disabled={rateArticleMutation.isPending}
-                className="flex items-center space-x-2 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 disabled:opacity-50"
+                className="flex items-center space-x-2 px-4 py-2 border border-destructive/40 text-destructive rounded-lg hover:bg-destructive/10 disabled:opacity-50"
               >
                 <ThumbsDown className="w-4 h-4" />
                 <span>No ({selectedArticle.not_helpful_count})</span>

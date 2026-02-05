@@ -21,8 +21,8 @@ export function CateringStatsCards({ workspaceId }: CateringStatsCardsProps) {
       label: 'Meals Planned',
       value: stats.mealsPlanned,
       icon: Utensils,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Menu Items',
@@ -49,8 +49,8 @@ export function CateringStatsCards({ workspaceId }: CateringStatsCardsProps) {
       label: 'Pending Deliveries',
       value: stats.pendingDeliveries,
       icon: Truck,
-      color: 'text-cyan-500',
-      bgColor: 'bg-cyan-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
   ];
 

@@ -53,7 +53,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     if (percentage >= 90) return 'text-success';
     if (percentage >= 80) return 'text-info';
     if (percentage >= 70) return 'text-warning';
-    if (percentage >= 60) return 'text-orange-600';
+    if (percentage >= 60) return 'text-warning';
     return 'text-destructive';
   };
 
@@ -74,7 +74,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           <div className="text-destructive mb-4">{error}</div>
           <button
             onClick={fetchLeaderboard}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-info text-info-foreground rounded-md hover:bg-info/90"
           >
             Retry
           </button>
@@ -128,8 +128,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
         </div>
 
         {!leaderboard.enabled && isOrganizer && (
-          <div className="mt-2 p-2 bg-warning/10 border border-yellow-200 rounded-md">
-            <p className="text-sm text-yellow-800">⚠️ Leaderboard is currently hidden from public view</p>
+          <div className="mt-2 p-2 bg-warning/10 border border-warning/30 rounded-md">
+            <p className="text-sm text-warning">⚠️ Leaderboard is currently hidden from public view</p>
           </div>
         )}
       </div>
@@ -177,7 +177,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     entry.percentage >= 90 ? 'bg-success' :
                     entry.percentage >= 80 ? 'bg-info' :
                     entry.percentage >= 70 ? 'bg-warning' :
-                    entry.percentage >= 60 ? 'bg-orange-500' :
+                    entry.percentage >= 60 ? 'bg-warning' :
                     'bg-destructive'
                   }`}
                   style={{ width: `${Math.min(entry.percentage, 100)}%` }}
@@ -208,7 +208,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
               <span>70-79%</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-warning rounded-full"></div>
               <span>60-69%</span>
             </div>
             <div className="flex items-center space-x-1">

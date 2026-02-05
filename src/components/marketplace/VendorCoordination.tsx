@@ -165,11 +165,11 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETED':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success/20 text-success';
       case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info/20 text-info';
       case 'OVERDUE':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        return 'bg-destructive/20 text-destructive';
       case 'UPCOMING':
       default:
         return 'bg-muted text-muted-foreground';
@@ -431,7 +431,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                   {booking.status === 'CONFIRMED' && (
                     <button
                       onClick={() => updateStatusMutation.mutate({ bookingId: booking.id, status: 'IN_PROGRESS' })}
-                      className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                      className="px-3 py-1 text-xs bg-info text-info-foreground rounded hover:bg-info/90"
                     >
                       Start Work
                     </button>
@@ -439,7 +439,7 @@ const VendorCoordination: React.FC<VendorCoordinationProps> = ({ eventId }) => {
                   {booking.status === 'IN_PROGRESS' && (
                     <button
                       onClick={() => updateStatusMutation.mutate({ bookingId: booking.id, status: 'COMPLETED' })}
-                      className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                      className="px-3 py-1 text-xs bg-success text-success-foreground rounded hover:bg-success/90"
                     >
                       Mark Complete
                     </button>
