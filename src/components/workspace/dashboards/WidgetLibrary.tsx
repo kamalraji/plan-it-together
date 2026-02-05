@@ -165,13 +165,13 @@ function WidgetCard({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'tasks':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info/10 text-info dark:bg-info/20 dark:text-info';
       case 'team':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success/10 text-success dark:bg-success/20 dark:text-success';
       case 'analytics':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary';
       case 'communication':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
+        return 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning';
       default:
         return 'bg-muted text-foreground';
     }

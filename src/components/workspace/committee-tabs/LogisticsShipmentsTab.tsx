@@ -74,10 +74,10 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
 
   const getStatusBadge = (status: string) => {
     const config = {
-      'pending': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Pending', icon: Clock },
+      'pending': { class: 'bg-muted text-muted-foreground border-muted-foreground/20', label: 'Pending', icon: Clock },
       'in_transit': { class: 'bg-info/10 text-info border-info/20', label: 'In Transit', icon: Truck },
-      'out_for_delivery': { class: 'bg-primary/10 text-primary border-purple-500/20', label: 'Out for Delivery', icon: Package },
-      'delivered': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Delivered', icon: CheckCircle2 },
+      'out_for_delivery': { class: 'bg-primary/10 text-primary border-primary/20', label: 'Out for Delivery', icon: Package },
+      'delivered': { class: 'bg-success/10 text-success border-success/20', label: 'Delivered', icon: CheckCircle2 },
       'delayed': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Delayed', icon: AlertTriangle },
     };
     const { class: className, label, icon: Icon } = config[status as keyof typeof config] || config.pending;
@@ -265,7 +265,7 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-500/10">
+              <div className="p-2 rounded-lg bg-muted">
                 <Clock className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>

@@ -78,9 +78,9 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
 
         {/* Promo code badge */}
         {promoCode && discountAmount > 0 && (
-          <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-950/30 rounded-lg">
+          <div className="flex items-center gap-2 p-2 bg-success/5 dark:bg-success/10 rounded-lg">
             <Tag className="h-4 w-4 text-success" />
-            <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+            <Badge variant="secondary" className="bg-success/10 text-success dark:bg-success/20 dark:text-success">
               {promoCode}
             </Badge>
             <CheckCircle2 className="h-4 w-4 text-success ml-auto" />

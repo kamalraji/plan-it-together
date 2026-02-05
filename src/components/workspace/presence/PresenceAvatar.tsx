@@ -22,7 +22,7 @@ const statusColors = {
   online: 'bg-success',
   away: 'bg-warning',
   busy: 'bg-destructive',
-  offline: 'bg-gray-400',
+  offline: 'bg-muted-foreground',
 };
 
 const statusLabels = {

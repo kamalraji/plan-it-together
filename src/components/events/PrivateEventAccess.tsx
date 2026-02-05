@@ -221,11 +221,11 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 p-3 bg-destructive/10 border border-red-200 rounded-md">
+            <div className="mt-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
               <div className="flex items-center">
-                <div className="text-red-400 text-lg mr-2">❌</div>
+                <div className="text-destructive text-lg mr-2">❌</div>
                 <div>
-                  <h3 className="text-sm font-medium text-red-800">Access Denied</h3>
+                  <h3 className="text-sm font-medium text-destructive">Access Denied</h3>
                   <p className="text-sm text-destructive mt-1">{error}</p>
                 </div>
               </div>

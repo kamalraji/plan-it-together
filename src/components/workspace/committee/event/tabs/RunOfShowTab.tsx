@@ -25,10 +25,10 @@ interface RunOfShowTabProps {
 }
 
 const PHASES = [
-  { value: 'pre-event', label: 'Pre-Event', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  { value: 'day-of', label: 'Day Of', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' },
-  { value: 'during', label: 'During Event', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' },
-  { value: 'post-event', label: 'Post-Event', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
+  { value: 'pre-event', label: 'Pre-Event', color: 'bg-info/10 text-info dark:bg-info/20 dark:text-info' },
+  { value: 'day-of', label: 'Day Of', color: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning' },
+  { value: 'during', label: 'During Event', color: 'bg-success/10 text-success dark:bg-success/20 dark:text-success' },
+  { value: 'post-event', label: 'Post-Event', color: 'bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground' },
 ];
 
 // Use same item type as hook
@@ -298,8 +298,8 @@ export const RunOfShowTab: React.FC<RunOfShowTabProps> = ({ workspaceId }) => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 rounded-lg bg-success/10 dark:bg-success/20">
+                <CheckCircle2 className="h-5 w-5 text-success dark:text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedItems}</p>
@@ -311,8 +311,8 @@ export const RunOfShowTab: React.FC<RunOfShowTabProps> = ({ workspaceId }) => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900">
-                <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="p-2 rounded-lg bg-warning/10 dark:bg-warning/20">
+                <AlertTriangle className="h-5 w-5 text-warning dark:text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{criticalItems}</p>

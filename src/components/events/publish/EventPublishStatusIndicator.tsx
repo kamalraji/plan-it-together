@@ -75,8 +75,8 @@ export const EventPublishStatusIndicator: React.FC<EventPublishStatusIndicatorPr
         return {
           label: 'Pending Approval',
           icon: Clock,
-          className: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-700 dark:text-yellow-400',
-          badgeClass: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400',
+          className: 'bg-warning/10 border-warning/20 text-warning dark:text-warning',
+          badgeClass: 'bg-warning/20 text-warning dark:text-warning',
         };
       case 'approved':
         return {

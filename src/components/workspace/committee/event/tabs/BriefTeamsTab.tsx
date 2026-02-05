@@ -24,17 +24,17 @@ interface BriefTeamsTabProps {
 
 const BRIEFING_TYPES = [
   { value: 'general', label: 'General', color: 'bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200' },
-  { value: 'pre-event', label: 'Pre-Event', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  { value: 'daily', label: 'Daily', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-  { value: 'emergency', label: 'Emergency', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
-  { value: 'debrief', label: 'Debrief', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' },
+  { value: 'pre-event', label: 'Pre-Event', color: 'bg-info/10 text-info dark:bg-info/20 dark:text-info' },
+  { value: 'daily', label: 'Daily', color: 'bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground' },
+  { value: 'emergency', label: 'Emergency', color: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive' },
+  { value: 'debrief', label: 'Debrief', color: 'bg-success/10 text-success dark:bg-success/20 dark:text-success' },
 ];
 
 const STATUSES = [
-  { value: 'scheduled', label: 'Scheduled', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  { value: 'in-progress', label: 'In Progress', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' },
-  { value: 'completed', label: 'Completed', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' },
-  { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
+  { value: 'scheduled', label: 'Scheduled', color: 'bg-info/10 text-info dark:bg-info/20 dark:text-info' },
+  { value: 'in-progress', label: 'In Progress', color: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning' },
+  { value: 'completed', label: 'Completed', color: 'bg-success/10 text-success dark:bg-success/20 dark:text-success' },
+  { value: 'cancelled', label: 'Cancelled', color: 'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive' },
 ];
 
 export const BriefTeamsTab: React.FC<BriefTeamsTabProps> = ({ workspaceId }) => {

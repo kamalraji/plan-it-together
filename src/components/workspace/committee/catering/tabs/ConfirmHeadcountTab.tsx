@@ -46,10 +46,10 @@ interface ConfirmHeadcountTabProps {
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Breakfast', color: 'bg-warning' },
-  { value: 'lunch', label: 'Lunch', color: 'bg-orange-500' },
-  { value: 'dinner', label: 'Dinner', color: 'bg-rose-500' },
+  { value: 'lunch', label: 'Lunch', color: 'bg-primary' },
+  { value: 'dinner', label: 'Dinner', color: 'bg-destructive' },
   { value: 'snack', label: 'Snack', color: 'bg-primary' },
-  { value: 'tea', label: 'Tea', color: 'bg-teal-500' },
+  { value: 'tea', label: 'Tea', color: 'bg-secondary' },
 ];
 
 const STATUS_CONFIG = {

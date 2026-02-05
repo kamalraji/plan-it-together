@@ -109,21 +109,21 @@ const getStatusBadge = (status: VendorStatus) => {
   switch (status) {
     case 'PENDING':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+        <Badge variant="secondary" className="gap-1.5 bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning">
           <Clock className="w-3 h-3" />
           Pending Review
         </Badge>
       );
     case 'VERIFIED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+        <Badge variant="secondary" className="gap-1.5 bg-success/10 text-success dark:bg-success/20 dark:text-success">
           <CheckCircle2 className="w-3 h-3" />
           Verified
         </Badge>
       );
     case 'REJECTED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        <Badge variant="secondary" className="gap-1.5 bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
           <XCircle className="w-3 h-3" />
           Rejected
         </Badge>
@@ -1144,12 +1144,12 @@ export const VendorRegistrationPage: React.FC = () => {
           </div>
           
           {vendor.verification_status === 'PENDING' && (
-            <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+            <div className="mt-4 p-4 bg-warning/5 dark:bg-warning/10 rounded-lg border border-warning/20 dark:border-warning/30">
               <div className="flex items-start gap-3">
                 <Clock className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Application Under Review</p>
-                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  <p className="text-sm font-medium text-warning dark:text-warning">Application Under Review</p>
+                  <p className="text-sm text-warning/80 dark:text-warning/80 mt-1">
                     Your vendor application is being reviewed by our team. This usually takes 1-2 business days.
                     You can still add services while waiting for approval.
                   </p>
@@ -1159,12 +1159,12 @@ export const VendorRegistrationPage: React.FC = () => {
           )}
 
           {vendor.verification_status === 'REJECTED' && vendor.rejection_reason && (
-            <div className="mt-4 p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="mt-4 p-4 bg-destructive/5 dark:bg-destructive/10 rounded-lg border border-destructive/20 dark:border-destructive/30">
               <div className="flex items-start gap-3">
                 <XCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">Application Rejected</p>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                  <p className="text-sm font-medium text-destructive dark:text-destructive">Application Rejected</p>
+                  <p className="text-sm text-destructive/80 dark:text-destructive/80 mt-1">
                     Reason: {vendor.rejection_reason}
                   </p>
                 </div>
@@ -1173,12 +1173,12 @@ export const VendorRegistrationPage: React.FC = () => {
           )}
 
           {vendor.verification_status === 'VERIFIED' && (
-            <div className="mt-4 p-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg border border-emerald-200 dark:border-emerald-800">
+            <div className="mt-4 p-4 bg-success/5 dark:bg-success/10 rounded-lg border border-success/20 dark:border-success/30">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Verified Vendor</p>
-                  <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+                  <p className="text-sm font-medium text-success dark:text-success">Verified Vendor</p>
+                  <p className="text-sm text-success/80 dark:text-success/80 mt-1">
                     Your business is verified! Your services are now visible to event organizers.
                   </p>
                 </div>
@@ -1251,7 +1251,7 @@ export const VendorRegistrationPage: React.FC = () => {
                           : `${service.price_unit || 'USD'} ${service.base_price}`}
                       </Badge>
                       {service.status === 'ACTIVE' ? (
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                        <Badge variant="secondary" className="bg-success/10 text-success dark:bg-success/20 dark:text-success">
                           Active
                         </Badge>
                       ) : (

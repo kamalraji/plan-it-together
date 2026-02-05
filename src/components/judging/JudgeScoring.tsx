@@ -181,16 +181,16 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
 
   if (!rubric) {
     return (
-      <div className="bg-warning/10 border border-yellow-200 rounded-md p-4">
-        <p className="text-yellow-800">No rubric has been created for this event yet.</p>
+      <div className="bg-warning/10 border border-warning/30 rounded-md p-4">
+        <p className="text-warning">No rubric has been created for this event yet.</p>
       </div>
     );
   }
 
   if (submissions.length === 0) {
     return (
-      <div className="bg-info/10 border border-blue-200 rounded-md p-4">
-        <p className="text-blue-800">No submissions have been assigned to you for judging.</p>
+      <div className="bg-info/10 border border-info/30 rounded-md p-4">
+        <p className="text-info">No submissions have been assigned to you for judging.</p>
       </div>
     );
   }
@@ -289,13 +289,13 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
             </div>
 
             {error && (
-              <div className="mb-4 p-4 bg-destructive/10 border border-red-200 rounded-md">
-                <p className="text-red-800">{error}</p>
+              <div className="mb-4 p-4 bg-destructive/10 border border-destructive/30 rounded-md">
+                <p className="text-destructive">{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-4 bg-success/10 border border-green-200 rounded-md">
+              <div className="mb-4 p-4 bg-success/10 border border-success/30 rounded-md">
                 <p className="text-success">{success}</p>
               </div>
             )}

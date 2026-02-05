@@ -144,9 +144,9 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
             <div>
               <span className={`inline-flex px-2.5 py-1 text-xs sm:text-sm font-semibold rounded-full ${
                 event.status === 'ONGOING' 
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                  ? 'bg-success/10 text-success dark:bg-success/20 dark:text-success'
                   : event.status === 'PUBLISHED'
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                  ? 'bg-info/10 text-info dark:bg-info/20 dark:text-info'
                   : 'bg-muted text-muted-foreground'
               }`}>
                 {event.status}

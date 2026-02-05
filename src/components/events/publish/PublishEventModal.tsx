@@ -116,7 +116,7 @@ export function PublishEventModal({
                 <p className="text-muted-foreground">{rootWorkspace.name}</p>
               </div>
               {requiresApproval && (
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">
+                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-warning/20 text-warning dark:text-warning">
                   Approval Required
                 </span>
               )}
@@ -265,7 +265,7 @@ export function PublishEventModal({
               <Button
                 onClick={() => setAcknowledgedIssues(true)}
                 variant="outline"
-                className="gap-2 border-yellow-500/50 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/10"
+                className="gap-2 border-warning/50 text-warning dark:text-warning hover:bg-warning/10"
               >
                 <AlertTriangle className="h-4 w-4" />
                 Acknowledge & Continue

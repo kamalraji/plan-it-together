@@ -729,7 +729,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                         <div className="text-center">
                           <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${prize.position === 1 ? 'bg-warning/20 text-warning' :
                               prize.position === 2 ? 'bg-muted text-muted-foreground' :
-                                prize.position === 3 ? 'bg-orange-100 text-orange-600' :
+                                prize.position === 3 ? 'bg-warning/10 text-warning' :
                                   'bg-info/20 text-info'
                             }`}>
                             <span className="text-lg font-bold">#{prize.position}</span>
@@ -778,7 +778,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                             tier === 'platinum' ? 'text-muted-foreground' :
                               tier === 'gold' ? 'text-warning' :
                                 tier === 'silver' ? 'text-muted-foreground' :
-                                  'text-orange-600'
+                                  'text-warning'
                           }`}>
                           {tier.charAt(0).toUpperCase() + tier.slice(1)} Sponsors
                         </h3>

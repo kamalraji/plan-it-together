@@ -9,10 +9,10 @@ interface BenefitsManagerProps {
 }
 
 const tiers = [
-  { key: 'platinum', label: 'Platinum', color: 'bg-slate-600' },
+  { key: 'platinum', label: 'Platinum', color: 'bg-muted-foreground' },
   { key: 'gold', label: 'Gold', color: 'bg-warning' },
   { key: 'silver', label: 'Silver', color: 'bg-muted-foreground/30' },
-  { key: 'bronze', label: 'Bronze', color: 'bg-orange-500' },
+  { key: 'bronze', label: 'Bronze', color: 'bg-primary' },
 ];
 
 export function BenefitsManager({ workspaceId }: BenefitsManagerProps) {
