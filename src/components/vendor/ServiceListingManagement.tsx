@@ -572,7 +572,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 <button
                   type="button"
                   onClick={() => removeArrayItem('serviceArea', index)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-destructive hover:text-destructive/80"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -583,7 +583,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             <button
               type="button"
               onClick={() => addArrayItem('serviceArea')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
             >
               + Add Service Area
             </button>
@@ -607,7 +607,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 <button
                   type="button"
                   onClick={() => removeArrayItem('inclusions', index)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-destructive hover:text-destructive/80"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -618,7 +618,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             <button
               type="button"
               onClick={() => addArrayItem('inclusions')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
             >
               + Add Inclusion
             </button>
@@ -642,7 +642,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 <button
                   type="button"
                   onClick={() => removeArrayItem('exclusions', index)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-destructive hover:text-destructive/80"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -653,7 +653,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
             <button
               type="button"
               onClick={() => addArrayItem('exclusions')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
             >
               + Add Exclusion
             </button>
@@ -770,7 +770,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
           <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -779,7 +779,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             </div>
           </div>
@@ -800,7 +800,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50"
           >
             {loading ? 'Saving...' : editingService ? 'Update Service' : 'Create Service'}
           </button>
@@ -819,17 +819,17 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
 
   if (error && !showCreateForm) {
     return (
-      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading services</h3>
+            <h3 className="text-sm font-medium text-destructive">Error loading services</h3>
             <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
               <button
                 onClick={fetchServices}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                className="bg-destructive/20 px-3 py-2 rounded-md text-sm font-medium text-destructive hover:bg-destructive/30"
               >
                 Try again
               </button>
@@ -856,7 +856,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
         >
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -888,7 +888,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
           <div className="mt-6">
             <button
               onClick={() => setShowCreateForm(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -938,20 +938,20 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                       className={`px-3 py-1 text-xs font-medium rounded-md ${
                         service.status === 'ACTIVE'
                           ? 'bg-muted text-foreground hover:bg-muted'
-                          : 'bg-green-100 text-green-800 hover:bg-green-200'
+                          : 'bg-success/20 text-success hover:bg-success/30'
                       }`}
                     >
                       {service.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => handleEdit(service)}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="text-primary hover:text-primary/80 text-sm font-medium"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(service.id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                      className="text-destructive hover:text-destructive/80 text-sm font-medium"
                     >
                       Delete
                     </button>

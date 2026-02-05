@@ -218,11 +218,11 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
                 <dt className="text-sm font-medium text-muted-foreground">Status</dt>
                 <dd className="mt-1">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${workspace?.status === WorkspaceStatus.ACTIVE
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      ? 'bg-success/20 text-success'
                       : workspace?.status === WorkspaceStatus.PROVISIONING
-                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                        ? 'bg-warning/20 text-warning'
                         : workspace?.status === WorkspaceStatus.WINDING_DOWN
-                          ? 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400'
+                          ? 'bg-info/20 text-info'
                           : 'bg-muted text-muted-foreground'
                     }`}>
                     {workspace?.status}

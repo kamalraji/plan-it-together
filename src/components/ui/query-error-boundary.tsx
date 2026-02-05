@@ -275,7 +275,7 @@ export function OfflineBanner() {
       'fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium transition-colors',
       isOnline
         ? 'bg-success text-primary-foreground'
-        : 'bg-orange-500 text-primary-foreground',
+        : 'bg-warning text-primary-foreground',
     )}>
       <div className="flex items-center justify-center gap-2">
         {isOnline ? (

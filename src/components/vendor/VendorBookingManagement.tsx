@@ -156,20 +156,20 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
     switch (status) {
       case 'PENDING':
       case 'VENDOR_REVIEWING':
-        return 'bg-warning/20 text-yellow-800';
+        return 'bg-warning/20 text-warning';
       case 'QUOTE_SENT':
-        return 'bg-info/20 text-blue-800';
+        return 'bg-info/20 text-info';
       case 'QUOTE_ACCEPTED':
       case 'CONFIRMED':
         return 'bg-success/20 text-success';
       case 'IN_PROGRESS':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-accent/20 text-accent-foreground';
       case 'COMPLETED':
         return 'bg-success/20 text-success';
       case 'CANCELLED':
         return 'bg-muted text-foreground';
       case 'DISPUTED':
-        return 'bg-destructive/20 text-red-800';
+        return 'bg-destructive/20 text-destructive';
       default:
         return 'bg-muted text-foreground';
     }
@@ -198,17 +198,17 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading bookings</h3>
+            <h3 className="text-sm font-medium text-destructive">Error loading bookings</h3>
             <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
               <button
                 onClick={fetchBookings}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                className="bg-destructive/20 px-3 py-2 rounded-md text-sm font-medium text-destructive hover:bg-destructive/30"
               >
                 Try again
               </button>
@@ -451,7 +451,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   <div className="flex space-x-3 mb-6">
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'COMPLETED')}
-                      className="px-4 py-2 bg-green-600 text-white text-white text-sm font-medium rounded-md hover:bg-green-700"
+                      className="px-4 py-2 bg-success text-primary-foreground text-sm font-medium rounded-md hover:bg-success/90"
                     >
                       Mark Complete
                     </button>
@@ -498,7 +498,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                     <button
                       onClick={sendMessage}
                       disabled={!newMessage.trim()}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Send
                     </button>
