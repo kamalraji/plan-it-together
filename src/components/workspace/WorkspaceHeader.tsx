@@ -41,11 +41,11 @@ export function WorkspaceHeader({
   const getStatusColor = (status: WorkspaceStatus) => {
     switch (status) {
       case WorkspaceStatus.ACTIVE:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-success/10 text-success dark:bg-success/20 dark:text-success';
       case WorkspaceStatus.PROVISIONING:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning';
       case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning';
       case WorkspaceStatus.DISSOLVED:
         return 'bg-muted text-foreground dark:bg-foreground/80 dark:text-muted-foreground/70';
       case WorkspaceStatus.ARCHIVED:

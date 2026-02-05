@@ -114,11 +114,11 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
   ];
 
   const statusColors = {
-    submitted: 'bg-info/20 text-blue-800',
-    under_review: 'bg-warning/20 text-yellow-800',
-    planned: 'bg-purple-100 text-purple-800',
+    submitted: 'bg-info/20 text-info',
+    under_review: 'bg-warning/20 text-warning',
+    planned: 'bg-secondary/20 text-secondary-foreground',
     implemented: 'bg-success/20 text-success',
-    declined: 'bg-destructive/20 text-red-800'
+    declined: 'bg-destructive/20 text-destructive'
   };
 
   React.useEffect(() => {

@@ -81,6 +81,6 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function PriorityBadge({ priority }: { priority: string }) {
-  const colors: Record<string, string> = { LOW: 'bg-muted text-foreground', MEDIUM: 'bg-info/20 text-info', HIGH: 'bg-orange-100 text-orange-700', CRITICAL: 'bg-destructive/20 text-destructive' };
+  const colors: Record<string, string> = { LOW: 'bg-muted text-foreground', MEDIUM: 'bg-info/20 text-info', HIGH: 'bg-warning/20 text-warning', CRITICAL: 'bg-destructive/20 text-destructive' };
   return <span className={cn('px-2 py-0.5 rounded-full', colors[priority] || 'bg-muted')}>{priority}</span>;
 }

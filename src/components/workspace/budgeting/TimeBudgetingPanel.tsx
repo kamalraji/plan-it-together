@@ -31,9 +31,9 @@ const categoryColors: Record<string, string> = {
   development: 'bg-info',
   design: 'bg-primary',
   meetings: 'bg-warning',
-  admin: 'bg-gray-500',
-  planning: 'bg-emerald-500',
-  review: 'bg-pink-500',
+  admin: 'bg-muted-foreground',
+  planning: 'bg-success',
+  review: 'bg-secondary',
 };
 
 export function TimeBudgetingPanel({
@@ -93,8 +93,8 @@ export function TimeBudgetingPanel({
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <TrendingUp className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.totalUsed}h</p>
@@ -204,7 +204,7 @@ export function TimeBudgetingPanel({
                         <div
                           className={cn(
                             'w-3 h-3 rounded-full',
-                            categoryColors[budget.category] || 'bg-gray-500'
+                            categoryColors[budget.category] || 'bg-muted-foreground'
                           )}
                         />
                         <span className="font-medium">{budget.name}</span>

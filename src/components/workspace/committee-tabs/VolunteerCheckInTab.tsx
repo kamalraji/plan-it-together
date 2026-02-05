@@ -134,8 +134,8 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
   const getStatusBadge = (status: string) => {
     const config = {
       'pending': { class: 'bg-warning/10 text-warning border-warning/20', label: 'Pending' },
-      'checked-in': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Checked In' },
-      'late': { class: 'bg-orange-500/10 text-orange-600 border-orange-500/20', label: 'Late' },
+      'checked-in': { class: 'bg-success/10 text-success border-success/20', label: 'Checked In' },
+      'late': { class: 'bg-warning/10 text-warning border-warning/20', label: 'Late' },
       'no-show': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'No Show' },
     };
     const { class: className, label } = config[status as keyof typeof config] || config.pending;
@@ -188,8 +188,8 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <CheckCircle2 className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{checkedInCount}</p>
@@ -285,9 +285,9 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
                   key={volunteer.id}
                   className={cn(
                     'flex items-center justify-between p-4 rounded-lg border transition-colors',
-                    volunteer.status === 'checked-in' && 'bg-emerald-50/50 border-emerald-200',
+                    volunteer.status === 'checked-in' && 'bg-success/5 border-success/20',
                     volunteer.status === 'pending' && 'hover:bg-muted/50',
-                    volunteer.status === 'no-show' && 'bg-destructive/10/50 border-red-200'
+                    volunteer.status === 'no-show' && 'bg-destructive/5 border-destructive/20'
                   )}
                 >
                   <div className="flex items-center gap-4">

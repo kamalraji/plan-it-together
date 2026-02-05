@@ -118,10 +118,10 @@ export function TaskGanttChart({
                     ) : (
                       <div className={cn(
                         "h-2 w-2 rounded-full shrink-0",
-                        task.status === TaskStatus.COMPLETED ? "bg-emerald-500" :
+                        task.status === TaskStatus.COMPLETED ? "bg-success" :
                         task.status === TaskStatus.IN_PROGRESS ? "bg-info" :
                         task.status === TaskStatus.BLOCKED ? "bg-destructive" :
-                        "bg-slate-400"
+                        "bg-muted-foreground"
                       )} />
                     )}
                     <span className="truncate">{task.title}</span>
@@ -258,11 +258,11 @@ export function TaskGanttChart({
           <span>In Progress</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-emerald-500 rounded-sm" />
+          <div className="w-3 h-3 bg-success rounded-sm" />
           <span>Completed</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-slate-400 rounded-sm" />
+          <div className="w-3 h-3 bg-muted-foreground rounded-sm" />
           <span>Not Started</span>
         </div>
         <div className="flex items-center gap-1.5">

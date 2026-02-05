@@ -547,16 +547,16 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {lastScanResult && (
         <div className={`mb-6 p-4 rounded-lg ${
           lastScanResult.success 
-            ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800' 
-            : 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800'
+            ? 'bg-success/10 border border-success/30 dark:bg-success/20 dark:border-success/30' 
+            : 'bg-destructive/10 border border-destructive/30 dark:bg-destructive/20 dark:border-destructive/30'
         }`}>
           <div className="flex items-start">
             {lastScanResult.success ? (
-              <svg className="h-6 w-6 text-green-600 dark:text-green-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6 text-success dark:text-success mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             ) : (
-              <svg className="h-6 w-6 text-red-600 dark:text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6 text-destructive dark:text-destructive mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}

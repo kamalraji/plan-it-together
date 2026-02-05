@@ -26,18 +26,18 @@ interface TaskTimelineViewProps {
 }
 
 const statusColors: Record<string, string> = {
-  todo: 'bg-gray-400',
+  todo: 'bg-muted-foreground',
   in_progress: 'bg-info',
   review: 'bg-warning',
-  done: 'bg-emerald-500',
+  done: 'bg-success',
   blocked: 'bg-destructive',
 };
 
 const priorityBorders: Record<string, string> = {
-  urgent: 'border-l-4 border-l-red-500',
-  high: 'border-l-4 border-l-amber-500',
-  medium: 'border-l-4 border-l-blue-500',
-  low: 'border-l-4 border-l-gray-400',
+  urgent: 'border-l-4 border-l-destructive',
+  high: 'border-l-4 border-l-warning',
+  medium: 'border-l-4 border-l-info',
+  low: 'border-l-4 border-l-muted-foreground',
 };
 
 export function TaskTimelineView({

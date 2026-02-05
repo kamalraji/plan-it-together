@@ -151,17 +151,17 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
 
   const getStatusBadge = (status: string) => {
     const config = {
-      'sufficient': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Sufficient' },
+      'sufficient': { class: 'bg-success/10 text-success border-success/20', label: 'Sufficient' },
       'low': { class: 'bg-warning/10 text-warning border-warning/20', label: 'Low Stock' },
       'critical': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Critical' },
-      'out': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Out of Stock' },
+      'out': { class: 'bg-muted text-muted-foreground border-muted-foreground/20', label: 'Out of Stock' },
     };
     const { class: className, label } = config[status as keyof typeof config] || config.sufficient;
     return <Badge variant="outline" className={className}>{label}</Badge>;
   };
 
   const getStockColor = (status: string) => {
-    if (status === 'sufficient') return 'bg-emerald-500';
+    if (status === 'sufficient') return 'bg-success';
     if (status === 'low') return 'bg-warning';
     return 'bg-destructive';
   };

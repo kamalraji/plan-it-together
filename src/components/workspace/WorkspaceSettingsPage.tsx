@@ -501,7 +501,7 @@ export function WorkspaceSettingsPage() {
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "w-3 h-3 rounded-full",
-                        isArchived ? "bg-slate-400" : "bg-emerald-500"
+                        isArchived ? "bg-muted-foreground" : "bg-success"
                       )} />
                       <div>
                         <p className="font-medium text-foreground">
@@ -520,7 +520,7 @@ export function WorkspaceSettingsPage() {
                         variant="outline" 
                         size="sm"
                         onClick={handleRestoreWorkspace}
-                        className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-950"
+                        className="text-success border-success/20 hover:bg-success/5 dark:text-success dark:border-success/30 dark:hover:bg-success/10"
                       >
                         <Archive className="h-4 w-4 mr-1.5" />
                         Restore

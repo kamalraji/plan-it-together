@@ -151,7 +151,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
           {/* Check-in Status */}
           {isCheckedIn ? (
-            <div className="bg-success/10 border border-green-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-success/10 border border-success/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-2">
                 <svg className="h-5 w-5 sm:h-6 sm:w-6 text-success mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -169,12 +169,12 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
               </p>
             </div>
           ) : (
-            <div className="bg-info/10 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-info/10 border border-info/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-2">
                 <svg className="h-5 w-5 sm:h-6 sm:w-6 text-info mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-blue-800 text-sm sm:text-base font-medium">Ready for Check-in</span>
+                <span className="text-info text-sm sm:text-base font-medium">Ready for Check-in</span>
               </div>
               <p className="text-xs sm:text-sm text-info">
                 Present this QR code to volunteers at the event entrance.
@@ -219,8 +219,8 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
                   registration.status === 'CONFIRMED'
                     ? 'bg-success/20 text-success'
                     : registration.status === 'WAITLISTED'
-                    ? 'bg-warning/20 text-yellow-800'
-                    : 'bg-info/20 text-blue-800'
+                    ? 'bg-warning/20 text-warning'
+                    : 'bg-info/20 text-info'
                 }`}
               >
                 {registration.status}
@@ -299,8 +299,8 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
       {/* Error Display */}
       {downloadError && (
-        <div className="mt-3 bg-destructive/10 border border-red-200 rounded-md p-2.5">
-          <p className="text-xs sm:text-sm text-red-800 text-center">{downloadError}</p>
+        <div className="mt-3 bg-destructive/10 border border-destructive/30 rounded-md p-2.5">
+          <p className="text-xs sm:text-sm text-destructive text-center">{downloadError}</p>
         </div>
       )}
     </div>

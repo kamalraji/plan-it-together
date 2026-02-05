@@ -104,8 +104,8 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       SENT: { color: 'bg-success/20 text-success', label: 'Sent' },
-      FAILED: { color: 'bg-destructive/20 text-red-800', label: 'Failed' },
-      PARTIAL: { color: 'bg-warning/20 text-yellow-800', label: 'Partial' },
+      FAILED: { color: 'bg-destructive/20 text-destructive', label: 'Failed' },
+      PARTIAL: { color: 'bg-warning/20 text-warning', label: 'Partial' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.FAILED;

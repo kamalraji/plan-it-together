@@ -278,12 +278,12 @@ export const DashboardDataLab: React.FC = () => {
         </header>
 
         {formError && (
-          <div className="rounded-md bg-destructive/10 border border-red-200 px-4 py-3 text-sm text-red-800">
+          <div className="rounded-md bg-destructive/10 border border-destructive/30 px-4 py-3 text-sm text-destructive">
             {formError}
           </div>
         )}
         {formSuccess && (
-          <div className="rounded-md bg-success/10 border border-green-200 px-4 py-3 text-sm text-success">
+          <div className="rounded-md bg-success/10 border border-success/30 px-4 py-3 text-sm text-success">
             {formSuccess}
           </div>
         )}

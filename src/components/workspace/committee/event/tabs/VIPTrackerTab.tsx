@@ -24,17 +24,17 @@ interface VIPTrackerTabProps {
 }
 
 const VIP_LEVELS = [
-  { value: 'standard', label: 'Standard', color: 'bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200' },
-  { value: 'gold', label: 'Gold', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' },
-  { value: 'platinum', label: 'Platinum', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
+  { value: 'standard', label: 'Standard', color: 'bg-muted text-foreground dark:bg-muted dark:text-foreground' },
+  { value: 'gold', label: 'Gold', color: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning' },
+  { value: 'platinum', label: 'Platinum', color: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' },
 ];
 
 const STATUSES = [
-  { value: 'pending', label: 'Pending', color: 'bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200' },
-  { value: 'confirmed', label: 'Confirmed', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  { value: 'traveling', label: 'Traveling', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' },
-  { value: 'arrived', label: 'Arrived', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' },
-  { value: 'departed', label: 'Departed', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
+  { value: 'pending', label: 'Pending', color: 'bg-muted text-foreground dark:bg-muted dark:text-foreground' },
+  { value: 'confirmed', label: 'Confirmed', color: 'bg-info/10 text-info dark:bg-info/20 dark:text-info' },
+  { value: 'traveling', label: 'Traveling', color: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning' },
+  { value: 'arrived', label: 'Arrived', color: 'bg-success/10 text-success dark:bg-success/20 dark:text-success' },
+  { value: 'departed', label: 'Departed', color: 'bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground' },
 ];
 
 export const VIPTrackerTab: React.FC<VIPTrackerTabProps> = ({ workspaceId }) => {

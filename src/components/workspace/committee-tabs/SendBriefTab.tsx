@@ -296,9 +296,9 @@ export function SendBriefTab({ workspace }: SendBriefTabProps) {
                 >
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
-                      brief.status === 'sent' ? 'bg-emerald-500/10' :
+                      brief.status === 'sent' ? 'bg-success/10' :
                       brief.status === 'scheduled' ? 'bg-warning/10' :
-                      'bg-slate-500/10'
+                      'bg-muted'
                     }`}>
                       {getStatusIcon(brief.status)}
                     </div>

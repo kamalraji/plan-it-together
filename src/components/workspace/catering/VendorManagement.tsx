@@ -49,8 +49,8 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
   });
 
   const vendorTypeConfig = {
-    caterer: { label: 'Caterer', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-    bakery: { label: 'Bakery', color: 'text-pink-500', bgColor: 'bg-pink-500/10' },
+    caterer: { label: 'Caterer', color: 'text-warning', bgColor: 'bg-warning/10' },
+    bakery: { label: 'Bakery', color: 'text-primary', bgColor: 'bg-primary/10' },
     beverage: { label: 'Beverage', color: 'text-info', bgColor: 'bg-info/10' },
     specialty: { label: 'Specialty', color: 'text-primary', bgColor: 'bg-primary/10' },
   };
@@ -132,7 +132,7 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ChefHat className="h-5 w-5 text-orange-500" />
+            <ChefHat className="h-5 w-5 text-warning" />
             Vendor Management
           </CardTitle>
         </CardHeader>
@@ -148,7 +148,7 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <ChefHat className="h-5 w-5 text-orange-500" />
+            <ChefHat className="h-5 w-5 text-warning" />
             Vendor Management
           </CardTitle>
           <p className="text-sm text-muted-foreground mt-1">

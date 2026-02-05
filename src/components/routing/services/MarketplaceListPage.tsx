@@ -89,7 +89,7 @@ export const MarketplaceListPage: React.FC = () => {
                 <a
                   key={cat.id}
                   href={`/marketplace/services/${cat.id}`}
-                  className="flex flex-col items-center p-4 bg-card rounded-lg border border-border hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                  className="flex flex-col items-center p-4 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
                 >
                   <span className="text-sm font-medium text-foreground text-center">{cat.name}</span>
                 </a>

@@ -65,8 +65,8 @@ export const EventOpsConsole: React.FC = () => {
     return (
       <div className="p-6">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
-            <h2 className="text-sm font-semibold text-red-800 mb-1">Missing event context</h2>
+          <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
+            <h2 className="text-sm font-semibold text-destructive mb-1">Missing event context</h2>
             <p className="text-sm text-destructive">
               The Event-Day Ops console needs a valid event id in the URL.
             </p>
