@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Thittam1HubLogo } from '@/components/brand/Thittam1HubLogo';
 
 interface PublicHeaderProps {
   className?: string;
@@ -13,18 +14,8 @@ export function PublicHeader({ className }: PublicHeaderProps) {
       <div className="container max-w-6xl">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-md">
-              TH
-            </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight text-foreground">
-                Thittam1Hub
-              </span>
-              <span className="text-[10px] text-muted-foreground hidden sm:block">
-                Event marketing workspaces
-              </span>
-            </div>
+          <Link to="/" className="flex items-center">
+            <Thittam1HubLogo size="md" />
           </Link>
 
           {/* Navigation */}
