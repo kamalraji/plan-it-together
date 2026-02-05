@@ -81,9 +81,9 @@ function DelegationCard({ delegation }: { delegation: DelegatedChecklistWithProg
             variant="outline" 
             className={cn(
               "shrink-0 text-xs",
-              delegation.computedStatus === 'completed' && "bg-green-50 border-green-200 text-green-700 dark:bg-green-950/30 dark:border-green-800 dark:text-green-400",
-              delegation.computedStatus === 'overdue' && "bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400",
-              delegation.computedStatus === 'in_progress' && "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-800 dark:text-blue-400",
+              delegation.computedStatus === 'completed' && "bg-success/10 border-success/30 text-success dark:bg-success/10 dark:border-success/30 dark:text-success",
+              delegation.computedStatus === 'overdue' && "bg-destructive/10 border-destructive/30 text-destructive dark:bg-destructive/10 dark:border-destructive/30 dark:text-destructive",
+              delegation.computedStatus === 'in_progress' && "bg-info/10 border-info/30 text-info dark:bg-info/10 dark:border-info/30 dark:text-info",
             )}
           >
             {config.label}

@@ -105,9 +105,9 @@ export function SettingsCompletionProgress({
                 className={cn(
                   'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs',
                   isComplete 
-                    ? 'bg-green-500/10 text-green-600 dark:text-green-400' 
+                    ? 'bg-success/10 text-success dark:text-success' 
                     : isRequired 
-                      ? 'bg-red-500/10 text-red-600 dark:text-red-400' 
+                      ? 'bg-destructive/10 text-destructive dark:text-destructive' 
                       : 'bg-muted text-muted-foreground'
                 )}
               >
@@ -171,9 +171,9 @@ export function SettingsCompletionProgress({
                   <Icon className={cn(
                     'h-4 w-4',
                     isComplete 
-                      ? 'text-green-600 dark:text-green-400' 
+                      ? 'text-success dark:text-success' 
                       : isRequired 
-                        ? 'text-red-600 dark:text-red-400' 
+                        ? 'text-destructive dark:text-destructive' 
                         : 'text-muted-foreground'
                   )} />
                 </div>

@@ -225,7 +225,7 @@ export function CreateStreamModal({
           <Button 
             onClick={handleSubmit}
             disabled={!title.trim() || createStream.isPending}
-            className="gap-2 bg-red-600 hover:bg-red-700"
+            className="gap-2 bg-destructive hover:bg-destructive/90"
           >
             <Video className="h-4 w-4" />
             {isScheduled ? 'Schedule Stream' : 'Create Stream'}

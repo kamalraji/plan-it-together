@@ -68,7 +68,7 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.WORKSHOP]: { icon: Presentation, label: 'Workshop', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.CONFERENCE]: { icon: Mic, label: 'Conference', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
   [EventCategory.MEETUP]: { icon: Users, label: 'Meetup', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
-  [EventCategory.STARTUP_PITCH]: { icon: Briefcase, label: 'Startup Pitch', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
+  [EventCategory.STARTUP_PITCH]: { icon: Briefcase, label: 'Startup Pitch', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.HIRING_CHALLENGE]: { icon: Trophy, label: 'Hiring Challenge', color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20' },
   [EventCategory.WEBINAR]: { icon: Video, label: 'Webinar', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
   [EventCategory.COMPETITION]: { icon: Award, label: 'Competition', color: 'bg-primary/10 text-primary border-primary/20' },
@@ -83,7 +83,7 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.CAREER_FAIR]: { icon: School, label: 'Career Fair', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.LECTURE]: { icon: MessageSquare, label: 'Lecture', color: 'bg-slate-500/10 text-muted-foreground border-slate-500/20' },
   [EventCategory.QUIZ]: { icon: ShieldQuestion, label: 'Quiz', color: 'bg-warning/10 text-warning border-warning/20' },
-  [EventCategory.DEBATE]: { icon: Megaphone, label: 'Debate', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
+  [EventCategory.DEBATE]: { icon: Megaphone, label: 'Debate', color: 'bg-warning/10 text-warning border-warning/20' },
   // Company
   [EventCategory.PRODUCT_LAUNCH]: { icon: Package, label: 'Product Launch', color: 'bg-info/10 text-info border-info/20' },
   [EventCategory.TOWN_HALL]: { icon: Building, label: 'Town Hall', color: 'bg-stone-500/10 text-stone-600 border-stone-500/20' },

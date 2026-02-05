@@ -112,7 +112,7 @@ export function WorkloadReport({ workspaceId, targetHoursPerWeek = 40 }: Workloa
                     variant="ghost"
                     size="sm"
                     onClick={() => approveEntry(entry.id)}
-                    className="text-green-600 hover:text-green-700 hover:bg-green-500/10"
+                    className="text-success hover:text-success hover:bg-success/10"
                   >
                     <CheckCircle className="h-4 w-4" />
                   </Button>

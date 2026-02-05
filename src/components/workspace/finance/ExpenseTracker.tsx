@@ -56,7 +56,7 @@ export function ExpenseTracker({ workspaceId, showApprovalActions = false }: Exp
     switch (status) {
       case 'approved':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+          <Badge className="bg-success/10 text-success border-success/20">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Approved
           </Badge>
@@ -116,8 +116,8 @@ export function ExpenseTracker({ workspaceId, showApprovalActions = false }: Exp
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <Receipt className="w-5 h-5 text-emerald-600" />
+            <div className="p-2 rounded-lg bg-success/10">
+              <Receipt className="w-5 h-5 text-success" />
               </div>
               <div>
                 <CardTitle className="text-lg">Expense Tracker</CardTitle>
@@ -218,7 +218,7 @@ export function ExpenseTracker({ workspaceId, showApprovalActions = false }: Exp
                         </Button>
                         <Button
                           size="sm"
-                          className="h-7 w-7 p-0 bg-emerald-600 hover:bg-emerald-700"
+                          className="h-7 w-7 p-0 bg-success hover:bg-success/90"
                           onClick={() => handleApprove(expense.id)}
                           disabled={isUpdating}
                         >

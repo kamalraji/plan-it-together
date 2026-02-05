@@ -371,7 +371,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
             {isLastStep ? (
               <button
                 onClick={completeTutorial}
-                className="flex items-center px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
+                className="flex items-center px-4 py-2 bg-success text-primary-foreground text-sm rounded-lg hover:bg-success/90"
               >
                 <CheckCircle className="w-4 h-4 mr-1" />
                 Complete
@@ -379,7 +379,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
             ) : (
               <button
                 onClick={nextStep}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                className="flex items-center px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-1" />
@@ -458,7 +458,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
                     <button
                       onClick={() => startTutorial(tutorial)}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                      className="w-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90"
                     >
                       <Play className="w-4 h-4 mr-2" />
                       {tutorialProgress?.completed ? 'Restart' : tutorialProgress ? 'Continue' : 'Start Tutorial'}

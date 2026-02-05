@@ -383,7 +383,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   <div className="flex space-x-3 mb-6">
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'VENDOR_REVIEWING')}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                      className="px-4 py-2 bg-info text-primary-foreground text-sm font-medium rounded-md hover:bg-info/90"
                     >
                       Start Review
                     </button>
@@ -417,7 +417,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                       <button
                         onClick={() => quotedPrice && updateBookingStatus(selectedBooking.id, 'QUOTE_SENT', quotedPrice as number)}
                         disabled={!quotedPrice}
-                        className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-success text-primary-foreground text-sm font-medium rounded-md hover:bg-success/90 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Send Quote
                       </button>
@@ -429,7 +429,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   <div className="flex space-x-3 mb-6">
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'CONFIRMED')}
-                      className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
+                      className="px-4 py-2 bg-success text-primary-foreground text-sm font-medium rounded-md hover:bg-success/90"
                     >
                       Confirm Booking
                     </button>
@@ -440,7 +440,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                   <div className="flex space-x-3 mb-6">
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'IN_PROGRESS')}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                      className="px-4 py-2 bg-info text-primary-foreground text-sm font-medium rounded-md hover:bg-info/90"
                     >
                       Start Work
                     </button>

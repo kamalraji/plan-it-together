@@ -55,19 +55,19 @@ const getStatusVariant = (status: string) => {
   switch (status) {
     case 'PENDING':
     case 'VENDOR_REVIEWING':
-      return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
+      return 'bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning';
     case 'QUOTE_SENT':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+      return 'bg-info/20 text-info dark:bg-info/10 dark:text-info';
     case 'QUOTE_ACCEPTED':
     case 'CONFIRMED':
-      return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400';
+      return 'bg-success/20 text-success dark:bg-success/10 dark:text-success';
     case 'IN_PROGRESS':
       return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
     case 'COMPLETED':
       return 'bg-muted text-muted-foreground';
     case 'CANCELLED':
     case 'DISPUTED':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+      return 'bg-destructive/20 text-destructive dark:bg-destructive/10 dark:text-destructive';
     default:
       return 'bg-muted text-muted-foreground';
   }
@@ -217,7 +217,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
                         <p className="text-muted-foreground">
                           <span className="font-medium text-foreground">Vendor:</span> {booking.vendors?.business_name}
                           {booking.vendors?.verification_status === 'verified' && (
-                            <CheckCircle className="inline ml-1 h-4 w-4 text-emerald-500" />
+                            <CheckCircle className="inline ml-1 h-4 w-4 text-success" />
                           )}
                         </p>
                         <p className="text-muted-foreground">
@@ -274,7 +274,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
                     {booking.status === 'QUOTE_SENT' && (
                       <Button
                         size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700"
+                        className="bg-success hover:bg-success/90"
                         onClick={() => handleAcceptQuote(booking.id)}
                         disabled={acceptQuoteMutation.isPending}
                       >
@@ -286,7 +286,7 @@ const BookingManagementUI: React.FC<BookingManagementUIProps> = ({ eventId }) =>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                        className="border-destructive/50 text-destructive hover:bg-destructive/10 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20"
                         onClick={() => handleCancelBooking(booking.id)}
                         disabled={cancelBookingMutation.isPending}
                       >

@@ -29,10 +29,10 @@ interface GanttTaskRowProps {
 }
 
 const PRIORITY_COLORS = {
-  [TaskPriority.URGENT]: 'bg-red-500 hover:bg-red-600',
-  [TaskPriority.HIGH]: 'bg-orange-500 hover:bg-orange-600',
-  [TaskPriority.MEDIUM]: 'bg-blue-500 hover:bg-blue-600',
-  [TaskPriority.LOW]: 'bg-green-500 hover:bg-green-600',
+  [TaskPriority.URGENT]: 'bg-destructive hover:bg-destructive/90',
+  [TaskPriority.HIGH]: 'bg-warning hover:bg-warning/90',
+  [TaskPriority.MEDIUM]: 'bg-info hover:bg-info/90',
+  [TaskPriority.LOW]: 'bg-success hover:bg-success/90',
 };
 
 const STATUS_OPACITY = {

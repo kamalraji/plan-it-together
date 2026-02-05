@@ -75,8 +75,8 @@ export const OrgMarketplacePage: React.FC = () => {
       label: 'Active Products', 
       value: activeProducts, 
       icon: Package, 
-      color: 'text-emerald-500',
-      bgColor: 'bg-emerald-100',
+      color: 'text-success',
+      bgColor: 'bg-success/20',
     },
     { 
       label: 'Total Views', 

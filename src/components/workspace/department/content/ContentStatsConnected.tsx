@@ -38,8 +38,8 @@ export function ContentStatsConnected({ workspaceId }: ContentStatsConnectedProp
       label: 'Speakers',
       value: stats.speakersConfirmed,
       icon: Mic2,
-      color: 'text-emerald-500',
-      bgColor: 'bg-emerald-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
       change: stats.speakersTotal > 0 
         ? `${stats.speakersConfirmed}/${stats.speakersTotal} confirmed`
         : 'No speakers yet',
