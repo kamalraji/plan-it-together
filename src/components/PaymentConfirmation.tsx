@@ -65,7 +65,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+        className="bg-success text-success-foreground px-4 py-2 rounded-lg hover:bg-success/90 transition-colors"
       >
         {buttonText}
       </button>
@@ -180,7 +180,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="flex-1 bg-success text-success-foreground px-4 py-2 rounded-lg hover:bg-success/90 transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Confirming...' : 'Confirm'}
                 </button>

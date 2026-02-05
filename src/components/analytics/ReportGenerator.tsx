@@ -192,13 +192,13 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
               onClick={() => handleTemplateSelect(template.id)}
               className={`p-4 border-2 rounded-lg text-left transition-all ${
                 selectedTemplate === template.id
-                  ? 'border-indigo-500 bg-indigo-50'
+                ? 'border-primary bg-primary/10'
                   : 'border-border hover:border-input'
               }`}
             >
               <div className="flex items-center space-x-3 mb-2">
                 <template.icon className={`h-6 w-6 ${
-                  selectedTemplate === template.id ? 'text-indigo-600' : 'text-muted-foreground'
+                selectedTemplate === template.id ? 'text-primary' : 'text-muted-foreground'
                 }`} />
                 <h3 className="font-medium text-foreground">{template.name}</h3>
               </div>
@@ -206,8 +206,8 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
               <div className="mt-2 flex items-center space-x-2">
                 <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
                   template.defaultFormat === 'PDF' 
-                    ? 'bg-red-100 text-red-800' 
-                    : 'bg-green-100 text-green-800'
+                  ? 'bg-destructive/10 text-destructive' 
+                  : 'bg-success/10 text-success'
                 }`}>
                   {template.defaultFormat}
                 </span>
@@ -281,7 +281,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                       ...prev,
                       format: e.target.value as ExportFormat
                     }))}
-                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input"
                   />
                   <span className="ml-2 text-sm text-foreground">{format}</span>
                 </label>
@@ -303,7 +303,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     includeCharts: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                 />
                 <span className="ml-2 text-sm text-foreground">Include charts and visualizations</span>
               </label>
@@ -315,7 +315,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     includeRawData: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                 />
                 <span className="ml-2 text-sm text-foreground">Include raw data tables</span>
               </label>
@@ -327,7 +327,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     ...prev,
                     compareWithPrevious: e.target.checked
                   }))}
-                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                 />
                 <span className="ml-2 text-sm text-foreground">Compare with previous period</span>
               </label>
@@ -346,7 +346,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
                     type="checkbox"
                     checked={reportOptions.sections.includes(section.id)}
                     onChange={() => handleSectionToggle(section.id)}
-                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded mt-1"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded mt-1"
                   />
                   <div>
                     <div className="text-sm font-medium text-foreground">{section.label}</div>
@@ -379,23 +379,23 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
 
       {/* Generation Progress */}
       {isGenerating && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-info/10 border border-info/20 rounded-lg p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <ClockIcon className="h-6 w-6 text-blue-600" />
+            <ClockIcon className="h-6 w-6 text-info" />
             <div>
-              <h3 className="text-sm font-medium text-blue-800">Generating Report</h3>
-              <p className="text-sm text-blue-600">
+              <h3 className="text-sm font-medium text-info">Generating Report</h3>
+              <p className="text-sm text-info/80">
                 Estimated time: {estimatedGenerationTime()} seconds
               </p>
             </div>
           </div>
-          <div className="w-full bg-blue-200 rounded-full h-2">
+          <div className="w-full bg-info/20 rounded-full h-2">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-info h-2 rounded-full transition-all duration-300"
               style={{ width: `${generationProgress}%` }}
             ></div>
           </div>
-          <p className="mt-2 text-xs text-blue-600">{generationProgress}% complete</p>
+          <p className="mt-2 text-xs text-info">{generationProgress}% complete</p>
         </div>
       )}
 
@@ -404,7 +404,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
         <button
           onClick={handleGenerateReport}
           disabled={isGenerating || reportOptions.sections.length === 0}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
