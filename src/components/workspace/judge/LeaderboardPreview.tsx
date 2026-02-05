@@ -105,11 +105,11 @@ export function LeaderboardPreview({ workspaceId, eventId }: LeaderboardPreviewP
   const getRankBg = (rank: number) => {
     switch (rank) {
       case 1:
-        return 'bg-yellow-50 border-yellow-200 dark:bg-yellow-500/10 dark:border-yellow-500/30';
+        return 'bg-warning/10 border-warning/30';
       case 2:
         return 'bg-muted/50 border-border';
       case 3:
-        return 'bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30';
+        return 'bg-warning/10 border-warning/30';
       default:
         return 'bg-muted/30 border-transparent';
     }

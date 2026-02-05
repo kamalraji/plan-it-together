@@ -15,8 +15,8 @@ export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
       label: 'Active Campaigns',
       value: data?.activeCampaigns?.toString() ?? '0',
       icon: Megaphone,
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-50 dark:bg-pink-500/10',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
     },
     {
       label: 'Total Reach',
@@ -29,14 +29,14 @@ export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
         : '0',
       icon: Users,
       color: 'text-info',
-      bgColor: 'bg-blue-50 dark:bg-blue-500/10',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Conversion Rate',
       value: `${data?.conversionRate ?? 0}%`,
       icon: TrendingUp,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'Ad Spend',
@@ -49,7 +49,7 @@ export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
       }`,
       icon: DollarSign,
       color: 'text-warning',
-      bgColor: 'bg-amber-50 dark:bg-amber-500/10',
+      bgColor: 'bg-warning/10',
     },
   ];
 

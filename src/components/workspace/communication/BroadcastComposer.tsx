@@ -276,8 +276,8 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
             disabled={isSending || !message.trim() || (targetType === 'ROLE_SPECIFIC' && selectedRoles.length === 0)}
             className={`px-6 py-3 rounded-md text-sm font-medium transition-colors ${
               isPriority
-                ? 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300'
+                ? 'bg-destructive text-white hover:bg-destructive/90 disabled:bg-destructive/50'
+                : 'bg-primary text-white hover:bg-primary/90 disabled:bg-primary/50'
             } disabled:cursor-not-allowed`}
           >
             {isSending ? (

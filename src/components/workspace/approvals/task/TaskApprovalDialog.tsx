@@ -231,7 +231,7 @@ export function TaskApprovalDialog({
                       size="sm"
                       onClick={() => setDecision('APPROVED')}
                       className={cn(
-                        decision === 'APPROVED' && 'bg-green-600 hover:bg-green-700'
+                        decision === 'APPROVED' && 'bg-success hover:bg-success/90'
                       )}
                     >
                       <CheckCircle className="h-4 w-4 mr-1" />
@@ -280,7 +280,7 @@ export function TaskApprovalDialog({
               onClick={handleSubmit}
               disabled={isSubmittingDecision}
               className={cn(
-                decision === 'APPROVED' && 'bg-green-600 hover:bg-green-700',
+                decision === 'APPROVED' && 'bg-success hover:bg-success/90',
                 decision === 'REJECTED' && 'bg-destructive hover:bg-destructive/90'
               )}
             >

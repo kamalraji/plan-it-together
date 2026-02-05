@@ -187,7 +187,7 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
             <p className="text-xs text-muted-foreground mb-4">Start building your team by inviting members</p>
             <button
               onClick={onViewTeam}
-              className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 min-h-[48px]"
+              className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 min-h-[48px]"
             >
               <UserPlusIcon className="w-4 h-4 mr-2" />
               Invite Members

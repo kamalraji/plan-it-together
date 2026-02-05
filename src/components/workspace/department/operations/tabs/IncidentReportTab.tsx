@@ -71,7 +71,7 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
   const getStatusBadge = (status: Incident['status']) => {
     switch (status) {
       case 'resolved':
-        return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Resolved</Badge>;
+        return <Badge className="bg-success/20 text-success border-success/30"><CheckCircle2 className="h-3 w-3 mr-1" />Resolved</Badge>;
       case 'closed':
         return <Badge className="bg-muted text-muted-foreground">Closed</Badge>;
       case 'investigating':
@@ -168,14 +168,14 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-emerald-500/10 border-emerald-500/20">
+        <Card className="bg-success/10 border-success/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-500/20 rounded-full">
-                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+              <div className="p-3 bg-success/20 rounded-full">
+                <CheckCircle2 className="h-6 w-6 text-success" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-emerald-500">{resolvedIncidents.length}</div>
+                <div className="text-3xl font-bold text-success">{resolvedIncidents.length}</div>
                 <p className="text-sm text-muted-foreground">Resolved</p>
               </div>
             </div>
@@ -262,7 +262,7 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
                   </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
-                    <CheckCircle2 className="h-12 w-12 mx-auto mb-4 opacity-50 text-emerald-500" />
+                    <CheckCircle2 className="h-12 w-12 mx-auto mb-4 opacity-50 text-success" />
                     <p>No active incidents</p>
                     <p className="text-sm">All clear! No open incidents at this time.</p>
                   </div>
@@ -293,7 +293,7 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
                           </div>
                         </div>
                         {incident.resolution_notes && (
-                          <p className="text-sm text-emerald-600 mt-2 p-2 bg-emerald-500/10 rounded">
+                          <p className="text-sm text-success mt-2 p-2 bg-success/10 rounded">
                             Resolution: {incident.resolution_notes}
                           </p>
                         )}

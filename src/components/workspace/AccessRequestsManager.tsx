@@ -152,7 +152,7 @@ export function AccessRequestsManager({ workspaceId }: AccessRequestsManagerProp
                 <button
                   onClick={() => respondMutation.mutate({ requestId: request.id, action: 'approve' })}
                   disabled={respondMutation.isPending}
-                  className="inline-flex items-center px-3 py-1.5 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-50"
+                  className="inline-flex items-center px-3 py-1.5 border border-success/40 text-xs font-medium rounded text-success bg-success/10 hover:bg-success/20 disabled:opacity-50"
                 >
                   <CheckIcon className="w-3.5 h-3.5 mr-1" />
                   Approve
@@ -160,7 +160,7 @@ export function AccessRequestsManager({ workspaceId }: AccessRequestsManagerProp
                 <button
                   onClick={() => respondMutation.mutate({ requestId: request.id, action: 'reject' })}
                   disabled={respondMutation.isPending}
-                  className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 disabled:opacity-50"
+                  className="inline-flex items-center px-3 py-1.5 border border-destructive/40 text-xs font-medium rounded text-destructive bg-destructive/10 hover:bg-destructive/20 disabled:opacity-50"
                 >
                   <XMarkIcon className="w-3.5 h-3.5 mr-1" />
                   Reject

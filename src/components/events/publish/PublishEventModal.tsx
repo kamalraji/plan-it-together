@@ -205,7 +205,7 @@ export function PublishEventModal({
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium text-green-700 dark:text-green-400">
+                  <p className="font-medium text-success">
                     Issues acknowledged
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">

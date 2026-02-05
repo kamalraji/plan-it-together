@@ -52,10 +52,10 @@ export function HelpdeskTickets({ workspaceId, eventId }: HelpdeskTicketsProps) 
     const styles: Record<ITTicket['status'], { className: string; label: string }> = {
       new: { className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400', label: 'New' },
       assigned: { className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400', label: 'Assigned' },
-      in_progress: { className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400', label: 'In Progress' },
-      pending_info: { className: 'bg-orange-500/10 text-orange-600 dark:text-orange-400', label: 'Pending Info' },
-      escalated: { className: 'bg-red-500/10 text-red-600 dark:text-red-400', label: 'Escalated' },
-      resolved: { className: 'bg-green-500/10 text-green-600 dark:text-green-400', label: 'Resolved' },
+      in_progress: { className: 'bg-warning/10 text-warning', label: 'In Progress' },
+      pending_info: { className: 'bg-warning/10 text-warning', label: 'Pending Info' },
+      escalated: { className: 'bg-destructive/10 text-destructive', label: 'Escalated' },
+      resolved: { className: 'bg-success/10 text-success', label: 'Resolved' },
       closed: { className: 'bg-muted text-muted-foreground', label: 'Closed' },
     };
     const style = styles[status];
@@ -245,19 +245,19 @@ export function HelpdeskTickets({ workspaceId, eventId }: HelpdeskTicketsProps) 
         {/* Stats Summary */}
         <div className="grid grid-cols-4 gap-2 mb-4">
           <div className="p-2 rounded-lg bg-info/10 text-center">
-            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{stats.new}</div>
+            <div className="text-lg font-bold text-info">{stats.new}</div>
             <div className="text-xs text-muted-foreground">New</div>
           </div>
           <div className="p-2 rounded-lg bg-warning/10 text-center">
-            <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{stats.inProgress}</div>
+            <div className="text-lg font-bold text-warning">{stats.inProgress}</div>
             <div className="text-xs text-muted-foreground">In Progress</div>
           </div>
           <div className="p-2 rounded-lg bg-destructive/10 text-center">
-            <div className="text-lg font-bold text-red-600 dark:text-red-400">{stats.escalated}</div>
+            <div className="text-lg font-bold text-destructive">{stats.escalated}</div>
             <div className="text-xs text-muted-foreground">Escalated</div>
           </div>
           <div className="p-2 rounded-lg bg-success/10 text-center">
-            <div className="text-lg font-bold text-green-600 dark:text-green-400">{stats.resolved}</div>
+            <div className="text-lg font-bold text-success">{stats.resolved}</div>
             <div className="text-xs text-muted-foreground">Resolved</div>
           </div>
         </div>

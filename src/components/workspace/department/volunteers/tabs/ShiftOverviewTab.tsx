@@ -62,19 +62,19 @@ export function ShiftOverviewTab({ workspace }: ShiftOverviewTabProps) {
             <div className="text-xs text-muted-foreground">Total Shifts</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-500/20">
+        <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{todayShifts.length}</div>
+            <div className="text-2xl font-bold text-success">{todayShifts.length}</div>
             <div className="text-xs text-muted-foreground">Today's Shifts</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+        <Card className="bg-gradient-to-br from-info/10 to-info/5 border-info/20">
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-info">{totalSlots}</div>
             <div className="text-xs text-muted-foreground">Total Slots</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
+        <Card className="bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-warning">{upcomingShifts.length}</div>
             <div className="text-xs text-muted-foreground">Upcoming</div>
@@ -90,10 +90,10 @@ export function ShiftOverviewTab({ workspace }: ShiftOverviewTabProps) {
         <div className="space-y-6">
           {/* Today's Shifts */}
           {todayShifts.length > 0 && (
-            <Card className="border-emerald-500/30">
+            <Card className="border-success/30">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
                   Today's Shifts
                 </CardTitle>
               </CardHeader>
@@ -159,10 +159,10 @@ export function ShiftOverviewTab({ workspace }: ShiftOverviewTabProps) {
 
 function ShiftCard({ shift, highlight }: { shift: any; highlight?: boolean }) {
   return (
-    <div className={`flex items-center justify-between p-4 rounded-lg border ${highlight ? 'bg-emerald-500/5 border-emerald-500/20' : ''}`}>
+    <div className={`flex items-center justify-between p-4 rounded-lg border ${highlight ? 'bg-success/5 border-success/20' : ''}`}>
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg ${highlight ? 'bg-emerald-500/10' : 'bg-muted'}`}>
-          <Clock className={`h-4 w-4 ${highlight ? 'text-emerald-500' : 'text-muted-foreground'}`} />
+        <div className={`p-2 rounded-lg ${highlight ? 'bg-success/10' : 'bg-muted'}`}>
+          <Clock className={`h-4 w-4 ${highlight ? 'text-success' : 'text-muted-foreground'}`} />
         </div>
         <div>
           <h4 className="font-medium text-foreground">{shift.name}</h4>

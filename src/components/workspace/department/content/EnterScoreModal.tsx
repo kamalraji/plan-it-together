@@ -188,7 +188,7 @@ export function EnterScoreModal({ open, onOpenChange, eventId }: EnterScoreModal
           </div>
         ) : unscoredSubmissions.length === 0 ? (
           <div className="text-center py-8">
-            <Trophy className="h-12 w-12 mx-auto mb-3 text-emerald-500" />
+            <Trophy className="h-12 w-12 mx-auto mb-3 text-success" />
             <p className="text-lg font-medium text-foreground">All Done!</p>
             <p className="text-sm text-muted-foreground mt-1">
               You've scored all your assigned submissions.

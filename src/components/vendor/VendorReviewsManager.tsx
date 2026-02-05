@@ -136,13 +136,13 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-warning flex items-center justify-center gap-1">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+              <Star className="h-5 w-5 fill-warning text-warning" />
               {stats.averageRating}
             </div>
             <div className="text-sm text-muted-foreground">Average Rating</div>
           </CardContent>
         </Card>
-        <Card className={stats.pending > 0 ? 'border-yellow-200' : ''}>
+        <Card className={stats.pending > 0 ? 'border-warning/30' : ''}>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-sm text-muted-foreground">Awaiting Response</div>
@@ -178,7 +178,7 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
       {filteredReviews && filteredReviews.length > 0 ? (
         <div className="space-y-4">
           {filteredReviews.map((review) => (
-            <Card key={review.id} className={!review.response_text ? 'border-yellow-200' : ''}>
+            <Card key={review.id} className={!review.response_text ? 'border-warning/30' : ''}>
               <CardContent className="p-5">
                 {/* Review Header */}
                 <div className="flex items-start justify-between gap-4 mb-4">
@@ -200,7 +200,7 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
                   <div className="flex items-center gap-2">
                     {renderStars(review.rating)}
                     {review.is_verified_booking && (
-                      <Badge variant="outline" className="text-success border-green-200">
+                      <Badge variant="outline" className="text-success border-success/30">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         Verified
                       </Badge>

@@ -94,7 +94,7 @@ export function WorkspaceHealthDashboard({ stats, workspaces }: WorkspaceHealthD
       </Card>
 
       {/* Needs Attention */}
-      <Card className={needsAttention.length > 0 ? 'border-amber-200 dark:border-amber-900' : ''}>
+      <Card className={needsAttention.length > 0 ? 'border-warning/30' : ''}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Needs Attention

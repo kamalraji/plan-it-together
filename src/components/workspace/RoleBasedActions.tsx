@@ -527,8 +527,8 @@ export function RoleBadge({
   
   const levelStyles: Record<WorkspaceHierarchyLevel, string> = {
     [WorkspaceHierarchyLevel.OWNER]: 'bg-primary/20 text-primary border-primary/30',
-    [WorkspaceHierarchyLevel.MANAGER]: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30',
-    [WorkspaceHierarchyLevel.LEAD]: 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30',
+    [WorkspaceHierarchyLevel.MANAGER]: 'bg-info/20 text-info border-info/30',
+    [WorkspaceHierarchyLevel.LEAD]: 'bg-accent/20 text-accent border-accent/30',
     [WorkspaceHierarchyLevel.COORDINATOR]: 'bg-muted text-muted-foreground border-border',
   };
   

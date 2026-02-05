@@ -64,7 +64,7 @@ export function TaskDependencyStatus({
         {status.blocking > 0 && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-warning/20 text-amber-700">
+              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-warning/20 text-warning">
                 <ArrowRight className="h-3 w-3" />
                 {showDetails && <span>{status.blocking}</span>}
               </div>

@@ -66,7 +66,7 @@ export function TaskDependencyGraph({
       case TaskStatus.BLOCKED:
         return { bg: 'fill-red-100', border: 'stroke-red-500', text: 'text-destructive' };
       case TaskStatus.REVIEW_REQUIRED:
-        return { bg: 'fill-amber-100', border: 'stroke-amber-500', text: 'text-amber-700' };
+        return { bg: 'fill-warning/20', border: 'stroke-warning', text: 'text-warning' };
       default:
         return { bg: 'fill-gray-100', border: 'stroke-gray-400', text: 'text-foreground' };
     }
