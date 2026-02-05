@@ -31,10 +31,10 @@ const channelOptions = [
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
-  scheduled: 'bg-blue-500/20 text-blue-600',
-  active: 'bg-green-500/20 text-green-600',
-  paused: 'bg-amber-500/20 text-amber-600',
-  completed: 'bg-purple-500/20 text-purple-600',
+  scheduled: 'bg-info/20 text-info',
+  active: 'bg-success/20 text-success',
+  paused: 'bg-warning/20 text-warning',
+  completed: 'bg-primary/20 text-primary',
 };
 
 export function LaunchCampaignTab({ workspace }: LaunchCampaignTabProps) {

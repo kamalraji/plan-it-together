@@ -292,7 +292,7 @@ export const ShimmerEffect: React.FC<{
 export const PulseLoader: React.FC<{
   size?: 'sm' | 'md' | 'lg';
   color?: string;
-}> = ({ size = 'md', color = 'bg-indigo-600' }) => {
+}> = ({ size = 'md', color = 'bg-primary' }) => {
   const sizeClasses = {
     sm: 'w-2 h-2',
     md: 'w-3 h-3',

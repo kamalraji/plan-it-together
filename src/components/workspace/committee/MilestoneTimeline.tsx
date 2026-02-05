@@ -18,7 +18,7 @@ interface MilestoneTimelineProps {
 
 const statusConfig = {
   pending: { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Pending' },
-  in_progress: { icon: ChevronRight, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' },
+  in_progress: { icon: ChevronRight, color: 'text-info', bg: 'bg-info/10', label: 'In Progress' },
   completed: { icon: Check, color: 'text-emerald-500', bg: 'bg-emerald-500/10', label: 'Completed' },
   overdue: { icon: AlertCircle, color: 'text-destructive', bg: 'bg-destructive/10', label: 'Overdue' },
 };

@@ -19,7 +19,7 @@ export const PHASE_CONFIG: Record<TaskPhase, { label: string; color: string; bgC
   PRE_EVENT: { 
     label: 'Pre-Event', 
     color: 'text-blue-600 dark:text-blue-400', 
-    bgColor: 'bg-blue-500/10 border-blue-500/20' 
+    bgColor: 'bg-info/10 border-info/20' 
   },
   DURING_EVENT: { 
     label: 'During Event', 
@@ -29,7 +29,7 @@ export const PHASE_CONFIG: Record<TaskPhase, { label: string; color: string; bgC
   POST_EVENT: { 
     label: 'Post-Event', 
     color: 'text-purple-600 dark:text-purple-400', 
-    bgColor: 'bg-purple-500/10 border-purple-500/20' 
+    bgColor: 'bg-primary/10 border-purple-500/20' 
   },
 };
 
@@ -43,20 +43,20 @@ export const PRIORITY_CONFIG_EXTENDED = {
   [TaskPriority.MEDIUM]: { 
     label: 'Medium', 
     color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-500/10 border-blue-500/20',
-    ringColor: 'ring-blue-500/30'
+    bgColor: 'bg-info/10 border-info/20',
+    ringColor: 'ring-primary/30'
   },
   [TaskPriority.HIGH]: { 
     label: 'High', 
     color: 'text-amber-600 dark:text-amber-400',
-    bgColor: 'bg-amber-500/10 border-amber-500/20',
+    bgColor: 'bg-warning/10 border-warning/20',
     ringColor: 'ring-amber-500/30'
   },
   [TaskPriority.URGENT]: { 
     label: 'Urgent', 
     color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-500/10 border-red-500/20',
-    ringColor: 'ring-red-500/30'
+    bgColor: 'bg-destructive/10 border-destructive/20',
+    ringColor: 'ring-destructive/30'
   },
 };
 

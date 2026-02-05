@@ -46,9 +46,9 @@ export interface MobileTaskFormData {
 
 const PRIORITY_OPTIONS = [
   { value: TaskPriority.LOW, label: 'Low', color: 'bg-emerald-500' },
-  { value: TaskPriority.MEDIUM, label: 'Medium', color: 'bg-amber-500' },
+  { value: TaskPriority.MEDIUM, label: 'Medium', color: 'bg-warning' },
   { value: TaskPriority.HIGH, label: 'High', color: 'bg-rose-500' },
-  { value: TaskPriority.URGENT, label: 'Urgent', color: 'bg-purple-500' },
+  { value: TaskPriority.URGENT, label: 'Urgent', color: 'bg-primary' },
 ];
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -206,7 +206,7 @@ export function MobileTaskForm({
                     className={cn(
                       "flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all",
                       formData.priority === option.value
-                        ? `${option.color} text-white`
+                        ? `${option.color} text-primary-foreground`
                         : "bg-muted text-muted-foreground"
                     )}
                   >

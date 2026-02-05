@@ -82,11 +82,11 @@ export function VenueSetupTracker({ workspaceId }: VenueSetupTrackerProps) {
       case 'not_started':
         return { label: 'Not Started', variant: 'secondary' as const, icon: Clock, color: 'text-muted-foreground' };
       case 'in_progress':
-        return { label: 'In Progress', variant: 'default' as const, icon: Settings, color: 'text-blue-600' };
+        return { label: 'In Progress', variant: 'default' as const, icon: Settings, color: 'text-info' };
       case 'blocked':
-        return { label: 'Blocked', variant: 'destructive' as const, icon: AlertTriangle, color: 'text-red-600' };
+        return { label: 'Blocked', variant: 'destructive' as const, icon: AlertTriangle, color: 'text-destructive' };
       case 'completed':
-        return { label: 'Completed', variant: 'outline' as const, icon: CheckCircle, color: 'text-green-600' };
+        return { label: 'Completed', variant: 'outline' as const, icon: CheckCircle, color: 'text-success' };
       default:
         return { label: status, variant: 'secondary' as const, icon: Clock, color: 'text-muted-foreground' };
     }

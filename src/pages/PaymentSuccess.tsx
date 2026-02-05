@@ -100,7 +100,7 @@ export default function PaymentSuccess() {
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-4 mb-4">
-              <XCircle className="h-12 w-12 text-red-600" />
+              <XCircle className="h-12 w-12 text-destructive" />
             </div>
             <h2 className="text-xl font-semibold mb-2">Payment Issue</h2>
             <p className="text-muted-foreground text-center mb-6">
@@ -127,7 +127,7 @@ export default function PaymentSuccess() {
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <div className="rounded-full bg-yellow-100 dark:bg-yellow-900/30 p-4 mb-4">
-              <Loader2 className="h-12 w-12 text-yellow-600 animate-spin" />
+              <Loader2 className="h-12 w-12 text-warning animate-spin" />
             </div>
             <h2 className="text-xl font-semibold mb-2">Payment Processing</h2>
             <p className="text-muted-foreground text-center mb-6">
@@ -150,7 +150,7 @@ export default function PaymentSuccess() {
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-4">
             <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-4">
-              <CheckCircle2 className="h-12 w-12 text-green-600" />
+              <CheckCircle2 className="h-12 w-12 text-success" />
             </div>
           </div>
           <CardTitle className="text-2xl">Payment Successful!</CardTitle>

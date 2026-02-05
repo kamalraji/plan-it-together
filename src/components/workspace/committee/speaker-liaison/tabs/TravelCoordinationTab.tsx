@@ -47,7 +47,7 @@ export function TravelCoordinationTab({ workspaceId }: TravelCoordinationTabProp
   const getStatusBadge = (status: string | null | undefined) => {
     const config: Record<string, { color: string; icon: React.ElementType; label: string }> = {
       confirmed: { color: 'bg-emerald-500/10 text-emerald-600', icon: CheckCircle, label: 'Confirmed' },
-      pending: { color: 'bg-amber-500/10 text-amber-600', icon: Clock, label: 'Pending' },
+      pending: { color: 'bg-warning/10 text-warning', icon: Clock, label: 'Pending' },
       not_needed: { color: 'bg-muted text-muted-foreground', icon: XCircle, label: 'N/A' },
     };
     const { color, icon: Icon, label } = config[status || 'pending'] || config.pending;
@@ -99,8 +99,8 @@ export function TravelCoordinationTab({ workspaceId }: TravelCoordinationTabProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Hotel className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Hotel className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{hotelConfirmed}</p>
@@ -125,8 +125,8 @@ export function TravelCoordinationTab({ workspaceId }: TravelCoordinationTabProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Utensils className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Utensils className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{speakers.length}</p>

@@ -94,7 +94,7 @@ export function ViewTimelineTab({ workspaceId }: ViewTimelineTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-blue-500" />
+              <Clock className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.inProgress}</p>
                 <p className="text-sm text-muted-foreground">In Progress</p>
@@ -105,7 +105,7 @@ export function ViewTimelineTab({ workspaceId }: ViewTimelineTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.completed}</p>
                 <p className="text-sm text-muted-foreground">Completed</p>
@@ -223,12 +223,12 @@ export function ViewTimelineTab({ workspaceId }: ViewTimelineTabProps) {
                     <div key={milestone.id} className="relative pl-10">
                       {/* Timeline dot */}
                       <div className={`absolute left-2 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        status === 'completed' ? 'bg-green-500 border-green-500' :
-                        status === 'in_progress' ? 'bg-blue-500 border-blue-500' :
+                        status === 'completed' ? 'bg-success border-success' :
+                        status === 'in_progress' ? 'bg-info border-info' :
                         isOverdue ? 'bg-destructive border-destructive' :
                         'bg-background border-border'
                       }`}>
-                        {status === 'completed' && <CheckCircle className="h-3 w-3 text-white" />}
+                        {status === 'completed' && <CheckCircle className="h-3 w-3 text-primary-foreground" />}
                       </div>
 
                       <div className={`p-4 border rounded-lg hover:bg-muted/50 transition-colors ${

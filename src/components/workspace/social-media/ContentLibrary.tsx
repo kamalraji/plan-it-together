@@ -64,11 +64,11 @@ export function ContentLibrary({ workspaceId }: ContentLibraryProps) {
       case 'image':
         return 'bg-pink-500/10 text-pink-500';
       case 'video':
-        return 'bg-red-500/10 text-red-500';
+        return 'bg-destructive/10 text-destructive';
       case 'graphic':
-        return 'bg-violet-500/10 text-violet-500';
+        return 'bg-primary/10 text-primary';
       default:
-        return 'bg-blue-500/10 text-blue-500';
+        return 'bg-info/10 text-info';
     }
   };
 

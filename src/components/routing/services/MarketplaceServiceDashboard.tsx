@@ -104,15 +104,15 @@ export const MarketplaceServiceDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONFIRMED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'QUOTE_SENT':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case 'IN_PROGRESS':
         return 'bg-purple-100 text-purple-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -174,7 +174,7 @@ export const MarketplaceServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Pending Bookings</p>
-                  <p className="text-xl sm:text-2xl font-bold text-amber-500">{dashboardData.metrics.pendingBookings}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-warning">{dashboardData.metrics.pendingBookings}</p>
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@ export const MarketplaceServiceDashboard: React.FC = () => {
                 </div>
                 <div className="ml-3 sm:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Revenue</p>
-                  <p className="text-xl sm:text-2xl font-bold text-violet-500">
+                  <p className="text-xl sm:text-2xl font-bold text-primary">
                     ${dashboardData.metrics.totalRevenue.toLocaleString()}
                   </p>
                 </div>

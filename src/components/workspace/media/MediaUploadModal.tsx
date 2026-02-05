@@ -100,8 +100,8 @@ export function MediaUploadModal({ open, onOpenChange, workspaceId }: MediaUploa
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) return <FileImage className="h-5 w-5 text-blue-500" />;
-    if (file.type.startsWith('video/')) return <FileVideo className="h-5 w-5 text-purple-500" />;
+    if (file.type.startsWith('image/')) return <FileImage className="h-5 w-5 text-info" />;
+    if (file.type.startsWith('video/')) return <FileVideo className="h-5 w-5 text-primary" />;
     return <FileImage className="h-5 w-5 text-muted-foreground" />;
   };
 
@@ -172,10 +172,10 @@ export function MediaUploadModal({ open, onOpenChange, workspaceId }: MediaUploa
                   </div>
                   <div className="flex items-center gap-2">
                     {f.status === 'done' && (
-                      <span className="text-xs text-green-600">Uploaded</span>
+                      <span className="text-xs text-success">Uploaded</span>
                     )}
                     {f.status === 'error' && (
-                      <span className="text-xs text-red-600">Failed</span>
+                      <span className="text-xs text-destructive">Failed</span>
                     )}
                     <Button
                       size="icon"

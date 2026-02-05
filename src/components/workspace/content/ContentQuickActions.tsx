@@ -32,7 +32,7 @@ export function ContentQuickActions({
       label: 'Create Post',
       description: 'Draft a new social media post',
       icon: PenSquare,
-      color: 'text-blue-500',
+      color: 'text-info',
       bgColor: 'bg-blue-500/10 hover:bg-blue-500/20',
       onClick: onCreatePost,
     },
@@ -40,7 +40,7 @@ export function ContentQuickActions({
       label: 'Upload Media',
       description: 'Add images or videos',
       icon: Upload,
-      color: 'text-purple-500',
+      color: 'text-primary',
       bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
       onClick: onUploadMedia,
     },
@@ -72,7 +72,7 @@ export function ContentQuickActions({
 
   const mediaShortcuts = [
     { label: 'Add Image', icon: Image, color: 'text-pink-500' },
-    { label: 'Add Video', icon: Video, color: 'text-red-500' },
+    { label: 'Add Video', icon: Video, color: 'text-destructive' },
     { label: 'Share Link', icon: Share2, color: 'text-sky-500' },
   ];
 

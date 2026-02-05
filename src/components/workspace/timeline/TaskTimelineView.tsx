@@ -27,10 +27,10 @@ interface TaskTimelineViewProps {
 
 const statusColors: Record<string, string> = {
   todo: 'bg-gray-400',
-  in_progress: 'bg-blue-500',
-  review: 'bg-amber-500',
+  in_progress: 'bg-info',
+  review: 'bg-warning',
   done: 'bg-emerald-500',
-  blocked: 'bg-red-500',
+  blocked: 'bg-destructive',
 };
 
 const priorityBorders: Record<string, string> = {
@@ -174,7 +174,7 @@ export function TaskTimelineView({
                       {/* Today indicator */}
                       {days.some((d) => isSameDay(d, today)) && (
                         <div
-                          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+                          className="absolute top-0 bottom-0 w-0.5 bg-destructive z-10"
                           style={{
                             left: `${((days.findIndex((d) => isSameDay(d, today)) + 0.5) / days.length) * 100}%`,
                           }}
@@ -196,7 +196,7 @@ export function TaskTimelineView({
                               }}
                               onClick={() => onTaskClick?.(task.id)}
                             >
-                              <span className="px-2 text-xs text-white font-medium truncate block leading-8">
+                              <span className="px-2 text-xs text-primary-foreground font-medium truncate block leading-8">
                                 {task.title}
                               </span>
                             </div>

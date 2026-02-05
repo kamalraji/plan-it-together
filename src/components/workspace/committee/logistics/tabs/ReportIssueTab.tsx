@@ -112,7 +112,7 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Search className="h-8 w-8 text-blue-500" />
+              <Search className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.investigating}</p>
                 <p className="text-sm text-muted-foreground">Investigating</p>
@@ -123,7 +123,7 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.resolved}</p>
                 <p className="text-sm text-muted-foreground">Resolved</p>
@@ -299,7 +299,7 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
                           <SeverityIcon className={`h-5 w-5 mt-0.5 ${
                             severity === 'critical' ? 'text-destructive' :
                             severity === 'high' ? 'text-orange-500' :
-                            severity === 'medium' ? 'text-amber-500' :
+                            severity === 'medium' ? 'text-warning' :
                             'text-muted-foreground'
                           }`} />
                           <div>

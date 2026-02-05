@@ -79,7 +79,7 @@ export function GlobalTimerWidget({ workspaceId, userId, taskTitle }: GlobalTime
       )}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
             <span className="text-xs text-muted-foreground">Recording</span>
           </div>
           <Button
@@ -104,7 +104,7 @@ export function GlobalTimerWidget({ workspaceId, userId, taskTitle }: GlobalTime
 
         {/* Alert for long sessions */}
         {displayTime > 8 * 3600 && (
-          <div className="text-xs text-amber-600 bg-amber-50 rounded p-2 text-center mb-2">
+          <div className="text-xs text-warning bg-warning/10 rounded p-2 text-center mb-2">
             Timer running for over 8 hours
           </div>
         )}

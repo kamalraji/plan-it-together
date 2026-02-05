@@ -25,8 +25,8 @@ export function GrowthQuickActions() {
       label: 'Launch Campaign',
       description: 'Start a new marketing campaign',
       icon: Megaphone,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Schedule Content',
@@ -39,8 +39,8 @@ export function GrowthQuickActions() {
       label: 'Add Sponsor',
       description: 'Register a new sponsor',
       icon: Handshake,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Send Announcement',
@@ -53,8 +53,8 @@ export function GrowthQuickActions() {
       label: 'View Analytics',
       description: 'Check growth metrics',
       icon: BarChart3,
-      color: 'text-violet-500',
-      bgColor: 'bg-violet-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Set Goals',
@@ -67,8 +67,8 @@ export function GrowthQuickActions() {
       label: 'Manage Partners',
       description: 'Track influencer partnerships',
       icon: Users,
-      color: 'text-indigo-500',
-      bgColor: 'bg-indigo-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'PR Outreach',

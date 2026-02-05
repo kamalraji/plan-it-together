@@ -80,7 +80,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                   className={cn(
                     'relative flex h-7 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-all duration-300',
                     isActive
-                      ? 'text-white'
+                      ? 'text-primary-foreground'
                       : 'text-[var(--gjs-text-muted)] hover:text-[var(--gjs-text-primary)]'
                   )}
                 >

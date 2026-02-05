@@ -30,16 +30,16 @@ const LEVEL_CONFIG = {
     color: 'from-violet-500/20 to-violet-500/5',
     borderColor: 'border-violet-500/30',
     textColor: 'text-violet-600 dark:text-violet-400',
-    bgColor: 'bg-violet-500/10',
+    bgColor: 'bg-primary/10',
     icon: FolderIcon,
   },
   DEPARTMENT: {
     label: 'Department',
     shortLabel: 'L2',
     color: 'from-blue-500/20 to-blue-500/5',
-    borderColor: 'border-blue-500/30',
+    borderColor: 'border-info/30',
     textColor: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-500/10',
+    bgColor: 'bg-info/10',
     icon: BuildingOffice2Icon,
   },
   COMMITTEE: {
@@ -55,9 +55,9 @@ const LEVEL_CONFIG = {
     label: 'Team',
     shortLabel: 'L4',
     color: 'from-amber-500/20 to-amber-500/5',
-    borderColor: 'border-amber-500/30',
+    borderColor: 'border-warning/30',
     textColor: 'text-amber-600 dark:text-amber-400',
-    bgColor: 'bg-amber-500/10',
+    bgColor: 'bg-warning/10',
     icon: UsersIcon,
   },
 };
@@ -85,7 +85,7 @@ const getStatusColor = (status: WorkspaceStatus) => {
     case WorkspaceStatus.ACTIVE:
       return 'bg-emerald-500';
     case WorkspaceStatus.PROVISIONING:
-      return 'bg-amber-500';
+      return 'bg-warning';
     case WorkspaceStatus.WINDING_DOWN:
       return 'bg-rose-500';
     default:

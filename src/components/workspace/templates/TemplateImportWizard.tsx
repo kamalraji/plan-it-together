@@ -78,7 +78,7 @@ export function TemplateImportWizard({ template, workspaceId, eventDate, onClose
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-foreground/50 flex items-center justify-center p-4">
       <div className="bg-card rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">

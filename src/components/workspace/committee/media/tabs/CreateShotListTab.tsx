@@ -152,9 +152,9 @@ export function CreateShotListTab({ workspaceId }: CreateShotListTabProps) {
       case 'captured':
       case 'reviewed':
       case 'published':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+        return <CheckCircle2 className="h-4 w-4 text-success" />;
       case 'in_progress':
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-warning" />;
       default:
         return <Circle className="h-4 w-4 text-muted-foreground" />;
     }
@@ -162,9 +162,9 @@ export function CreateShotListTab({ workspaceId }: CreateShotListTabProps) {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-500/10 text-red-600 border-red-200';
-      case 'medium': return 'bg-yellow-500/10 text-yellow-600 border-yellow-200';
-      case 'low': return 'bg-green-500/10 text-green-600 border-green-200';
+      case 'high': return 'bg-destructive/10 text-destructive border-red-200';
+      case 'medium': return 'bg-warning/10 text-warning border-yellow-200';
+      case 'low': return 'bg-success/10 text-success border-green-200';
       default: return 'bg-muted';
     }
   };
@@ -311,13 +311,13 @@ export function CreateShotListTab({ workspaceId }: CreateShotListTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <p className="text-sm text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.captured}</div>
+            <div className="text-2xl font-bold text-success">{stats.captured}</div>
             <p className="text-sm text-muted-foreground">Captured</p>
           </CardContent>
         </Card>

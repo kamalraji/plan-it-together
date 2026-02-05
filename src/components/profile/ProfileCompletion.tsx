@@ -95,8 +95,8 @@ export function ProfileCompletion() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+            <div className="rounded-md bg-destructive/10 p-4">
+              <div className="text-sm text-destructive">{error}</div>
             </div>
           )}
 
@@ -113,7 +113,7 @@ export function ProfileCompletion() {
                 placeholder="Enter your full name"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
 
@@ -167,7 +167,7 @@ export function ProfileCompletion() {
                 placeholder="https://your-website.com"
               />
               {errors.website && (
-                <p className="mt-1 text-sm text-red-600">{errors.website.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.website.message}</p>
               )}
             </div>
 
@@ -185,7 +185,7 @@ export function ProfileCompletion() {
                   placeholder="LinkedIn profile URL"
                 />
                 {errors.socialLinks?.linkedin && (
-                  <p className="mt-1 text-sm text-red-600">{errors.socialLinks.linkedin.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.socialLinks.linkedin.message}</p>
                 )}
               </div>
 
@@ -198,7 +198,7 @@ export function ProfileCompletion() {
                   placeholder="Twitter profile URL"
                 />
                 {errors.socialLinks?.twitter && (
-                  <p className="mt-1 text-sm text-red-600">{errors.socialLinks.twitter.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.socialLinks.twitter.message}</p>
                 )}
               </div>
 
@@ -211,7 +211,7 @@ export function ProfileCompletion() {
                   placeholder="GitHub profile URL"
                 />
                 {errors.socialLinks?.github && (
-                  <p className="mt-1 text-sm text-red-600">{errors.socialLinks.github.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.socialLinks.github.message}</p>
                 )}
               </div>
             </div>

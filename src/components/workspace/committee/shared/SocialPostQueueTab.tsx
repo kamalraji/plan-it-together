@@ -13,15 +13,15 @@ import { toast } from 'sonner';
 interface SocialPostQueueTabProps { workspaceId: string; }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  pending: { label: 'Pending', color: 'bg-amber-500', icon: Clock },
-  scheduled: { label: 'Scheduled', color: 'bg-blue-500', icon: Calendar },
-  processing: { label: 'Processing', color: 'bg-purple-500', icon: Loader2 },
-  posted: { label: 'Posted', color: 'bg-green-500', icon: CheckCircle },
-  failed: { label: 'Failed', color: 'bg-red-500', icon: XCircle },
+  pending: { label: 'Pending', color: 'bg-warning', icon: Clock },
+  scheduled: { label: 'Scheduled', color: 'bg-info', icon: Calendar },
+  processing: { label: 'Processing', color: 'bg-primary', icon: Loader2 },
+  posted: { label: 'Posted', color: 'bg-success', icon: CheckCircle },
+  failed: { label: 'Failed', color: 'bg-destructive', icon: XCircle },
   paused: { label: 'Paused', color: 'bg-slate-500', icon: Pause },
 };
 
-const PLATFORM_COLORS: Record<string, string> = { twitter: 'text-sky-500 bg-sky-500/10', linkedin: 'text-blue-600 bg-blue-600/10', instagram: 'text-pink-500 bg-pink-500/10' };
+const PLATFORM_COLORS: Record<string, string> = { twitter: 'text-sky-500 bg-sky-500/10', linkedin: 'text-info bg-primary/10', instagram: 'text-pink-500 bg-pink-500/10' };
 
 export function SocialPostQueueTab({ workspaceId }: SocialPostQueueTabProps) {
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -67,8 +67,8 @@ export function SocialPostQueueTab({ workspaceId }: SocialPostQueueTabProps) {
                     <div className="flex items-start gap-3">
                       <div className={cn('p-2 rounded-lg', PLATFORM_COLORS[post.platform] || 'bg-muted')}><span className="capitalize font-medium text-sm">{post.platform}</span></div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1"><Badge variant="outline" className={cn('text-xs', statusConfig.color, 'text-white border-0')}><StatusIcon className={cn('h-3 w-3 mr-1', post.status === 'processing' && 'animate-spin')} />{statusConfig.label}</Badge></div>
-                        <div className="text-xs text-muted-foreground">{post.scheduled_for && <p>Scheduled: {format(new Date(post.scheduled_for), 'PPp')}</p>}{post.posted_at && <p>Posted: {format(new Date(post.posted_at), 'PPp')}</p>}{post.error_message && <p className="text-red-500">{post.error_message}</p>}</div>
+                        <div className="flex items-center gap-2 mb-1"><Badge variant="outline" className={cn('text-xs', statusConfig.color, 'text-primary-foreground border-0')}><StatusIcon className={cn('h-3 w-3 mr-1', post.status === 'processing' && 'animate-spin')} />{statusConfig.label}</Badge></div>
+                        <div className="text-xs text-muted-foreground">{post.scheduled_for && <p>Scheduled: {format(new Date(post.scheduled_for), 'PPp')}</p>}{post.posted_at && <p>Posted: {format(new Date(post.posted_at), 'PPp')}</p>}{post.error_message && <p className="text-destructive">{post.error_message}</p>}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">

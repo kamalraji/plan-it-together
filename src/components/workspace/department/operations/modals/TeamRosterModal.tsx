@@ -49,9 +49,9 @@ export function TeamRosterModal({ open, onOpenChange }: TeamRosterModalProps) {
   const getStatusBadge = (status: StaffMember['status']) => {
     switch (status) {
       case 'on-duty':
-        return <Badge className="bg-green-500/10 text-green-600">On Duty</Badge>;
+        return <Badge className="bg-success/10 text-success">On Duty</Badge>;
       case 'break':
-        return <Badge className="bg-amber-500/10 text-amber-600">On Break</Badge>;
+        return <Badge className="bg-warning/10 text-warning">On Break</Badge>;
       case 'off-duty':
         return <Badge className="bg-muted-foreground/30/10 text-muted-foreground">Off Duty</Badge>;
     }
@@ -83,16 +83,16 @@ export function TeamRosterModal({ open, onOpenChange }: TeamRosterModalProps) {
         </DialogHeader>
 
         <div className="grid grid-cols-3 gap-4 py-4">
-          <div className="p-3 rounded-lg bg-green-500/10 text-center">
-            <p className="text-2xl font-bold text-green-600">{onDutyCount}</p>
+          <div className="p-3 rounded-lg bg-success/10 text-center">
+            <p className="text-2xl font-bold text-success">{onDutyCount}</p>
             <p className="text-xs text-muted-foreground">On Duty</p>
           </div>
-          <div className="p-3 rounded-lg bg-amber-500/10 text-center">
-            <p className="text-2xl font-bold text-amber-600">{onBreakCount}</p>
+          <div className="p-3 rounded-lg bg-warning/10 text-center">
+            <p className="text-2xl font-bold text-warning">{onBreakCount}</p>
             <p className="text-xs text-muted-foreground">On Break</p>
           </div>
-          <div className="p-3 rounded-lg bg-blue-500/10 text-center">
-            <p className="text-2xl font-bold text-blue-600">{staff.length}</p>
+          <div className="p-3 rounded-lg bg-info/10 text-center">
+            <p className="text-2xl font-bold text-info">{staff.length}</p>
             <p className="text-xs text-muted-foreground">Total Staff</p>
           </div>
         </div>

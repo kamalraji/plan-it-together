@@ -106,7 +106,7 @@ function getDefaultFeatures(): FeatureFlags {
  */
 export function PaymentUnavailableMessage() {
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+    <div className="bg-info/10 border border-blue-200 rounded-lg p-4 mb-4">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -117,7 +117,7 @@ export function PaymentUnavailableMessage() {
           <h3 className="text-sm font-medium text-blue-800">
             Payment Processing Coming Soon
           </h3>
-          <div className="mt-2 text-sm text-blue-700">
+          <div className="mt-2 text-sm text-info">
             <p>
               Integrated payment processing is planned for future implementation.
               For now, please arrange payment directly with the vendor using your preferred method.

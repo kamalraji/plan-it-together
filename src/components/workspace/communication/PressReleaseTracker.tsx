@@ -11,8 +11,8 @@ interface PressReleaseTrackerProps {
 
 const statusConfig: Record<PressReleaseStatus, { icon: typeof Edit; color: string; bgColor: string; label: string }> = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  review: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'In Review' },
-  approved: { icon: CheckCircle2, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Approved' },
+  review: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'In Review' },
+  approved: { icon: CheckCircle2, color: 'text-info', bgColor: 'bg-info/10', label: 'Approved' },
   distributed: { icon: Send, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Distributed' },
 };
 

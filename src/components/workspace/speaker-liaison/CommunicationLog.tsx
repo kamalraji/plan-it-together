@@ -62,8 +62,8 @@ export function CommunicationLog() {
 
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { color: string; label: string }> = {
-      sent: { color: 'bg-blue-500/10 text-blue-600', label: 'Sent' },
-      read: { color: 'bg-amber-500/10 text-amber-600', label: 'Read' },
+      sent: { color: 'bg-info/10 text-info', label: 'Sent' },
+      read: { color: 'bg-warning/10 text-warning', label: 'Read' },
       replied: { color: 'bg-emerald-500/10 text-emerald-600', label: 'Replied' },
       pending: { color: 'bg-muted text-muted-foreground', label: 'Pending' },
     };

@@ -91,9 +91,9 @@ export function MasterChecklistModal({ open, onOpenChange }: MasterChecklistModa
   const getPriorityBadge = (priority: ChecklistItem['priority']) => {
     switch (priority) {
       case 'high':
-        return <Badge className="bg-red-500/10 text-red-600 text-[10px]">High</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive text-[10px]">High</Badge>;
       case 'medium':
-        return <Badge className="bg-amber-500/10 text-amber-600 text-[10px]">Med</Badge>;
+        return <Badge className="bg-warning/10 text-warning text-[10px]">Med</Badge>;
       case 'low':
         return <Badge className="bg-muted-foreground/30/10 text-muted-foreground text-[10px]">Low</Badge>;
     }
@@ -108,7 +108,7 @@ export function MasterChecklistModal({ open, onOpenChange }: MasterChecklistModa
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-indigo-500" />
+            <ClipboardList className="h-5 w-5 text-primary" />
             Master Checklist - Operations Tasks
           </DialogTitle>
         </DialogHeader>

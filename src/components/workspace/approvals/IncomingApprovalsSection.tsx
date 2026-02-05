@@ -73,7 +73,7 @@ export function IncomingApprovalsSection({ workspace, userRole }: IncomingApprov
             <ClipboardCheck className="h-4 w-4" />
             <span className="hidden sm:inline">Tasks</span>
             {taskApprovalCount > 0 && (
-              <span className="text-xs bg-violet-500/20 text-violet-600 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
                 {taskApprovalCount}
               </span>
             )}
@@ -91,7 +91,7 @@ export function IncomingApprovalsSection({ workspace, userRole }: IncomingApprov
             <Package className="h-4 w-4" />
             <span className="hidden sm:inline">Resources</span>
             {resourceRequests.length > 0 && (
-              <span className="text-xs bg-blue-500/20 text-blue-600 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs bg-info/20 text-info px-1.5 py-0.5 rounded-full">
                 {resourceRequests.length}
               </span>
             )}
@@ -100,7 +100,7 @@ export function IncomingApprovalsSection({ workspace, userRole }: IncomingApprov
             <UserPlus className="h-4 w-4" />
             <span className="hidden sm:inline">Access</span>
             {accessRequests.length > 0 && (
-              <span className="text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs bg-warning/20 text-warning px-1.5 py-0.5 rounded-full">
                 {accessRequests.length}
               </span>
             )}
@@ -110,7 +110,7 @@ export function IncomingApprovalsSection({ workspace, userRole }: IncomingApprov
               <Rocket className="h-4 w-4" />
               <span className="hidden sm:inline">Publish</span>
               {eventPublishPending > 0 && (
-                <span className="text-xs bg-purple-500/20 text-purple-600 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
                   {eventPublishPending}
                 </span>
               )}

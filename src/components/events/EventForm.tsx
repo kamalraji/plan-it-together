@@ -325,7 +325,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                       placeholder="Enter event name"
                     />
                     {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
                     )}
                   </div>
 
@@ -340,7 +340,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                       placeholder="Describe your event"
                     />
                     {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>
                     )}
                   </div>
 
@@ -378,7 +378,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           </p>
                         </div>
                         {selectedWorkspaceTemplate && (
-                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                             {selectedWorkspaceTemplate.name}
                           </span>
                         )}
@@ -410,12 +410,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             className="mt-1 h-4 w-4 text-primary focus:ring-primary border-border"
                           />
                           <div className="ml-3">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-foreground">
                               {visibility === EventVisibility.PUBLIC && 'Public'}
                               {visibility === EventVisibility.PRIVATE && 'Private'}
                               {visibility === EventVisibility.UNLISTED && 'Unlisted'}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-muted-foreground">
                               {visibility === EventVisibility.PUBLIC && 'Anyone can find and register for this event'}
                               {visibility === EventVisibility.PRIVATE && 'Only people with invite links can access this event'}
                               {visibility === EventVisibility.UNLISTED && 'Accessible via direct link but not searchable'}
@@ -425,13 +425,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                       ))}
                     </div>
                     {errors.visibility && (
-                      <p className="mt-1 text-sm text-red-600">{errors.visibility.message}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.visibility.message}</p>
                     )}
                   </div>
 
                   {/* Private Event Invite Link (Requirements 24.1) */}
                   {watchedVisibility === EventVisibility.PRIVATE && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-info/10 border border-blue-200 rounded-lg p-4">
                       <h4 className="text-sm font-medium text-blue-900 mb-2">Private Event Access</h4>
                       {isEditing && event ? (
                         <div>
@@ -445,7 +445,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                                   type="text"
                                   value={inviteLink}
                                   readOnly
-                                  className="flex-1 px-3 py-2 bg-white border border-blue-300 rounded-md text-sm"
+                                  className="flex-1 px-3 py-2 bg-background border border-blue-300 rounded-md text-sm"
                                 />
                                 <button
                                   type="button"
@@ -488,7 +488,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                   {/* Event Mode Selection (Requirements 5.2, 5.3, 5.4) */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Event Mode *
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -502,12 +502,12 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                           />
                           <div className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
                             watchedMode === mode
-                              ? 'border-indigo-500 bg-indigo-50'
+                              ? 'border-primary bg-primary/10'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <div className="text-center">
-                              <h3 className="font-medium text-gray-900">{mode}</h3>
-                              <p className="text-sm text-gray-600 mt-1">
+                              <h3 className="font-medium text-foreground">{mode}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">
                                 {mode === EventMode.OFFLINE && 'In-person event at a physical venue'}
                                 {mode === EventMode.ONLINE && 'Virtual event with online participation'}
                                 {mode === EventMode.HYBRID && 'Both in-person and virtual participation'}
@@ -521,56 +521,56 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Start Date & Time *
                       </label>
                       <input
                         type="datetime-local"
                         {...register('startDate', { required: 'Start date is required' })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                       {errors.startDate && (
-                        <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.startDate.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         End Date & Time *
                       </label>
                       <input
                         type="datetime-local"
                         {...register('endDate', { required: 'End date is required' })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                       {errors.endDate && (
-                        <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.endDate.message}</p>
                       )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Capacity (Optional)
                       </label>
                       <input
                         type="number"
                         min="1"
                         {...register('capacity', { min: 1 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="Maximum participants"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Registration Deadline (Optional)
                       </label>
                       <input
                         type="datetime-local"
                         {...register('registrationDeadline')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                     </div>
                   </div>
@@ -578,10 +578,10 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Venue Configuration (Requirements 5.2) */}
                   {(watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID) && (
                     <div className="border-t pt-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Venue Information</h3>
+                      <h3 className="text-lg font-medium text-foreground mb-4">Venue Information</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground mb-2">
                             Venue Name *
                           </label>
                           <input
@@ -589,13 +589,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             {...register('venue.name', { 
                               required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Venue name is required' : false 
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="Enter venue name"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground mb-2">
                             Address *
                           </label>
                           <input
@@ -603,14 +603,14 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             {...register('venue.address', { 
                               required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Address is required' : false 
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="Street address"
                           />
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               City *
                             </label>
                             <input
@@ -618,11 +618,11 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                               {...register('venue.city', { 
                                 required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'City is required' : false 
                               })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               State *
                             </label>
                             <input
@@ -630,11 +630,11 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                               {...register('venue.state', { 
                                 required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'State is required' : false 
                               })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               Country *
                             </label>
                             <input
@@ -642,17 +642,17 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                               {...register('venue.country', { 
                                 required: watchedMode === EventMode.OFFLINE || watchedMode === EventMode.HYBRID ? 'Country is required' : false 
                               })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               Postal Code
                             </label>
                             <input
                               type="text"
                               {...register('venue.postalCode')}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                           </div>
                         </div>
@@ -663,10 +663,10 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Virtual Configuration (Requirements 5.3) */}
                   {(watchedMode === EventMode.ONLINE || watchedMode === EventMode.HYBRID) && (
                     <div className="border-t pt-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Virtual Meeting Information</h3>
+                      <h3 className="text-lg font-medium text-foreground mb-4">Virtual Meeting Information</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground mb-2">
                             Meeting URL *
                           </label>
                           <input
@@ -674,43 +674,43 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             {...register('virtualLinks.meetingUrl', { 
                               required: watchedMode === EventMode.ONLINE || watchedMode === EventMode.HYBRID ? 'Meeting URL is required' : false 
                             })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="https://zoom.us/j/..."
                           />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               Meeting ID
                             </label>
                             <input
                               type="text"
                               {...register('virtualLinks.meetingId')}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               placeholder="Meeting ID"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-foreground mb-2">
                               Password
                             </label>
                             <input
                               type="text"
                               {...register('virtualLinks.password')}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               placeholder="Meeting password"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground mb-2">
                             Platform
                           </label>
                           <select
                             {...register('virtualLinks.platform')}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           >
                             <option value="zoom">Zoom</option>
                             <option value="teams">Microsoft Teams</option>
@@ -721,13 +721,13 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground mb-2">
                             Instructions
                           </label>
                           <textarea
                             {...register('virtualLinks.instructions')}
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="Additional instructions for participants"
                           />
                         </div>
@@ -741,8 +741,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
               {activeTab === 'branding' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Event Branding</h3>
-                    <p className="text-gray-600 mb-6">
+                    <h3 className="text-lg font-medium text-foreground mb-4">Event Branding</h3>
+                    <p className="text-muted-foreground mb-6">
                       Customize your event's visual appearance and branding elements.
                       {watch('organizationId') && ' Organization branding will be automatically applied.'}
                     </p>
@@ -750,8 +750,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                   {/* Organization Branding Preview (Requirements 19.2) */}
                   {watch('organizationId') && organizations && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Organization Branding</h4>
+                    <div className="bg-muted/50 border border-border rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-foreground mb-2">Organization Branding</h4>
                       {(() => {
                         const selectedOrg = organizations.find(org => org.id === watch('organizationId'));
                         if (selectedOrg) {
@@ -765,8 +765,8 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                                 />
                               )}
                               <div>
-                                <p className="text-sm font-medium text-gray-900">{selectedOrg.name}</p>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm font-medium text-foreground">{selectedOrg.name}</p>
+                                <p className="text-sm text-muted-foreground">
                                   This organization's branding will be displayed on your event page
                                 </p>
                               </div>
@@ -780,25 +780,25 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Logo URL
                       </label>
                       <input
                         type="url"
                         {...register('branding.logoUrl')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="https://example.com/logo.png"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Banner URL
                       </label>
                       <input
                         type="url"
                         {...register('branding.bannerUrl')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="https://example.com/banner.jpg"
                       />
                     </div>
@@ -806,36 +806,36 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Primary Color
                       </label>
                       <input
                         type="color"
                         {...register('branding.primaryColor')}
-                        className="w-full h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full h-10 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Secondary Color
                       </label>
                       <input
                         type="color"
                         {...register('branding.secondaryColor')}
-                        className="w-full h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full h-10 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Custom CSS (Advanced)
                     </label>
                     <textarea
                       {...register('branding.customCss')}
                       rows={6}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+                      className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-mono text-sm"
                       placeholder="/* Custom CSS for your event page */"
                     />
                   </div>
@@ -846,15 +846,15 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
               {activeTab === 'timeline' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Event Timeline</h3>
-                    <p className="text-gray-600 mb-6">
+                    <h3 className="text-lg font-medium text-foreground mb-4">Event Timeline</h3>
+                    <p className="text-muted-foreground mb-6">
                       Define the schedule and agenda for your event.
                     </p>
                   </div>
 
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-md font-medium text-gray-900">Timeline Items</h4>
+                      <h4 className="text-md font-medium text-foreground">Timeline Items</h4>
                       <button
                         type="button"
                         onClick={() => appendTimeline({
@@ -874,9 +874,9 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                     <div className="space-y-4">
                       {timelineFields.map((field, index) => (
-                        <div key={field.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={field.id} className="border border-border rounded-lg p-4">
                           <div className="flex justify-between items-start mb-4">
-                            <h5 className="text-sm font-medium text-gray-900">Timeline Item {index + 1}</h5>
+                            <h5 className="text-sm font-medium text-foreground">Timeline Item {index + 1}</h5>
                             <button
                               type="button"
                               onClick={() => removeTimeline(index)}
@@ -888,24 +888,24 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Title *
                               </label>
                               <input
                                 type="text"
                                 {...register(`timeline.${index}.title`, { required: 'Title is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="Session title"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Type
                               </label>
                               <select
                                 {...register(`timeline.${index}.type`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               >
                                 <option value="session">Session</option>
                                 <option value="break">Break</option>
@@ -915,60 +915,60 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Start Time *
                               </label>
                               <input
                                 type="datetime-local"
                                 {...register(`timeline.${index}.startTime`, { required: 'Start time is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 End Time *
                               </label>
                               <input
                                 type="datetime-local"
                                 {...register(`timeline.${index}.endTime`, { required: 'End time is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Speaker
                               </label>
                               <input
                                 type="text"
                                 {...register(`timeline.${index}.speaker`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="Speaker name"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Location
                               </label>
                               <input
                                 type="text"
                                 {...register(`timeline.${index}.location`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="Room or virtual link"
                               />
                             </div>
                           </div>
 
                           <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Description
                             </label>
                             <textarea
                               {...register(`timeline.${index}.description`)}
                               rows={2}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               placeholder="Session description"
                             />
                           </div>
@@ -985,7 +985,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Prizes Section */}
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-md font-medium text-gray-900">Prizes</h4>
+                      <h4 className="text-md font-medium text-foreground">Prizes</h4>
                       <button
                         type="button"
                         onClick={() => appendPrize({
@@ -1003,9 +1003,9 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                     <div className="space-y-4">
                       {prizeFields.map((field, index) => (
-                        <div key={field.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={field.id} className="border border-border rounded-lg p-4">
                           <div className="flex justify-between items-start mb-4">
-                            <h5 className="text-sm font-medium text-gray-900">Prize {index + 1}</h5>
+                            <h5 className="text-sm font-medium text-foreground">Prize {index + 1}</h5>
                             <button
                               type="button"
                               onClick={() => removePrize(index)}
@@ -1017,50 +1017,50 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Title *
                               </label>
                               <input
                                 type="text"
                                 {...register(`prizes.${index}.title`, { required: 'Prize title is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="First Place"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Value
                               </label>
                               <input
                                 type="text"
                                 {...register(`prizes.${index}.value`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="$1000"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Position
                               </label>
                               <input
                                 type="number"
                                 min="1"
                                 {...register(`prizes.${index}.position`, { required: 'Position is required', min: 1 })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               />
                             </div>
                           </div>
 
                           <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Description *
                             </label>
                             <textarea
                               {...register(`prizes.${index}.description`, { required: 'Prize description is required' })}
                               rows={2}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               placeholder="Prize description"
                             />
                           </div>
@@ -1072,7 +1072,7 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
                   {/* Sponsors Section */}
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-md font-medium text-gray-900">Sponsors</h4>
+                      <h4 className="text-md font-medium text-foreground">Sponsors</h4>
                       <button
                         type="button"
                         onClick={() => appendSponsor({
@@ -1090,9 +1090,9 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                     <div className="space-y-4">
                       {sponsorFields.map((field, index) => (
-                        <div key={field.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={field.id} className="border border-border rounded-lg p-4">
                           <div className="flex justify-between items-start mb-4">
-                            <h5 className="text-sm font-medium text-gray-900">Sponsor {index + 1}</h5>
+                            <h5 className="text-sm font-medium text-foreground">Sponsor {index + 1}</h5>
                             <button
                               type="button"
                               onClick={() => removeSponsor(index)}
@@ -1104,36 +1104,36 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Name *
                               </label>
                               <input
                                 type="text"
                                 {...register(`sponsors.${index}.name`, { required: 'Sponsor name is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="Company name"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Logo URL *
                               </label>
                               <input
                                 type="url"
                                 {...register(`sponsors.${index}.logoUrl`, { required: 'Logo URL is required' })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="https://example.com/logo.png"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Tier
                               </label>
                               <select
                                 {...register(`sponsors.${index}.tier`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               >
                                 <option value="title">Title</option>
                                 <option value="platinum">Platinum</option>
@@ -1146,25 +1146,25 @@ export function EventForm({ event, isEditing = false }: EventFormProps) {
 
                           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Website
                               </label>
                               <input
                                 type="url"
                                 {...register(`sponsors.${index}.website`)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="https://company.com"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Description
                               </label>
                               <textarea
                                 {...register(`sponsors.${index}.description`)}
                                 rows={2}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder="Sponsor description"
                               />
                             </div>

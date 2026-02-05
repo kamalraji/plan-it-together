@@ -137,19 +137,19 @@ export function ScheduleSessionTab({ workspace }: ScheduleSessionTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{scheduledCount}</div>
+            <div className="text-2xl font-bold text-success">{scheduledCount}</div>
             <p className="text-xs text-muted-foreground">Scheduled</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{unscheduledSpeakers.length}</div>
+            <div className="text-2xl font-bold text-warning">{unscheduledSpeakers.length}</div>
             <p className="text-xs text-muted-foreground">Need Scheduling</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{todaySessions.length}</div>
+            <div className="text-2xl font-bold text-info">{todaySessions.length}</div>
             <p className="text-xs text-muted-foreground">Today's Sessions</p>
           </CardContent>
         </Card>
@@ -157,13 +157,13 @@ export function ScheduleSessionTab({ workspace }: ScheduleSessionTabProps) {
 
       {/* Conflict Warnings */}
       {conflicts.length > 0 && (
-        <Card className="border-amber-500/50 bg-amber-500/5">
+        <Card className="border-warning/50 bg-warning/5">
           <CardContent className="pt-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-medium text-amber-700">Scheduling Conflicts Detected</h4>
-                <ul className="text-sm text-amber-600 mt-1 space-y-1">
+                <ul className="text-sm text-warning mt-1 space-y-1">
                   {conflicts.map((conflict, i) => (
                     <li key={i}>{conflict}</li>
                   ))}
@@ -301,7 +301,7 @@ export function ScheduleSessionTab({ workspace }: ScheduleSessionTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-amber-500" />
+              <Clock className="h-5 w-5 text-warning" />
               Speakers Awaiting Schedule
             </CardTitle>
             <CardDescription>

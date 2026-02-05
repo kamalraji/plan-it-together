@@ -36,10 +36,10 @@ const platformIcons: Record<string, React.ElementType> = {
 };
 
 const platformColors: Record<string, string> = {
-  facebook: 'bg-blue-600',
+  facebook: 'bg-primary',
   instagram: 'bg-gradient-to-r from-purple-500 to-pink-500',
   twitter: 'bg-sky-500',
-  linkedin: 'bg-blue-700',
+  linkedin: 'bg-primary',
 };
 
 export function ScheduleContentTab({ workspace }: ScheduleContentTabProps) {
@@ -245,7 +245,7 @@ export function ScheduleContentTab({ workspace }: ScheduleContentTabProps) {
                         className="p-2 rounded-md bg-muted/50 border border-border/50 space-y-1"
                       >
                         <div className="flex items-center gap-1.5">
-                          <div className={`p-1 rounded ${platformColors[content.platform]} text-white`}>
+                          <div className={`p-1 rounded ${platformColors[content.platform]} text-primary-foreground`}>
                             <Icon className="h-3 w-3" />
                           </div>
                           <span className="text-xs font-medium truncate">{content.title}</span>
@@ -282,7 +282,7 @@ export function ScheduleContentTab({ workspace }: ScheduleContentTabProps) {
                 const Icon = platformIcons[content.platform] || Share2;
                 return (
                   <div key={content.id} className="flex items-center gap-4 p-3 rounded-lg border">
-                    <div className={`p-2 rounded-lg ${platformColors[content.platform]} text-white`}>
+                    <div className={`p-2 rounded-lg ${platformColors[content.platform]} text-primary-foreground`}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">

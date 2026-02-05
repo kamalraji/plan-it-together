@@ -86,7 +86,7 @@ export function RealtimeMessageThread({ channel, userName = 'User' }: RealtimeMe
               )}
             </div>
             {channel.is_private && (
-              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+              <span className="text-xs bg-warning/20 text-yellow-800 px-2 py-1 rounded-full">
                 🔒 Private
               </span>
             )}
@@ -94,7 +94,7 @@ export function RealtimeMessageThread({ channel, userName = 'User' }: RealtimeMe
           
           {/* Online indicator */}
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
             <span>{onlineMembers.length} online</span>
           </div>
         </div>

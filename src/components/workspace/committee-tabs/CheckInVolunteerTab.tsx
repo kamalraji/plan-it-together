@@ -77,19 +77,19 @@ export function CheckInVolunteerTab({ workspace }: CheckInVolunteerTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
+            <div className="text-2xl font-bold text-warning">{pendingCount}</div>
             <div className="text-xs text-muted-foreground">Pending</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{todaysShifts.length}</div>
+            <div className="text-2xl font-bold text-info">{todaysShifts.length}</div>
             <div className="text-xs text-muted-foreground">Today's Shifts</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-primary">
               {checkedInCount > 0 ? Math.round((checkedInCount / (checkedInCount + pendingCount)) * 100) : 0}%
             </div>
             <div className="text-xs text-muted-foreground">Check-in Rate</div>

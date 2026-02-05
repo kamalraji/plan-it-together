@@ -52,8 +52,8 @@ export const ApiHealthCheck: React.FC<ApiHealthCheckProps> = ({
           isHealthy === null
             ? 'bg-muted-foreground/20'
             : isHealthy
-            ? 'bg-green-500'
-            : 'bg-red-500'
+            ? 'bg-success'
+            : 'bg-destructive'
         }`}
         title={
           isHealthy === null

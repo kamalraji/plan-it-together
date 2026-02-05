@@ -167,8 +167,8 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 text-sm">🔍</span>
+              <div className="w-8 h-8 bg-info/20 rounded-full flex items-center justify-center">
+                <span className="text-info text-sm">🔍</span>
               </div>
             </div>
             <div className="ml-3">
@@ -181,8 +181,8 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-green-600 text-sm">⭐</span>
+              <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+                <span className="text-success text-sm">⭐</span>
               </div>
             </div>
             <div className="ml-3">
@@ -196,7 +196,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-purple-600 text-sm">📋</span>
+                <span className="text-primary text-sm">📋</span>
               </div>
             </div>
             <div className="ml-3">
@@ -235,7 +235,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
               onClick={() => setActiveTab(tab.id as any)}
               className={`group py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-info text-info'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
@@ -244,7 +244,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
                 <span>{tab.name}</span>
               </div>
               <div className={`text-xs mt-1 ${
-                activeTab === tab.id ? 'text-blue-500' : 'text-muted-foreground group-hover:text-muted-foreground'
+                activeTab === tab.id ? 'text-info' : 'text-muted-foreground group-hover:text-muted-foreground'
               }`}>
                 {tab.description}
               </div>
@@ -296,7 +296,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
 
       {/* Booking Modal */}
       {showBookingModal && selectedService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-foreground bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">

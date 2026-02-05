@@ -57,7 +57,7 @@ export function DeadlineExtensionReviewCard({
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1 flex-1">
             <CardTitle className="text-base font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4 text-amber-500" />
+              <Clock className="h-4 w-4 text-warning" />
               {extension.checklist_title || 'Checklist'}
             </CardTitle>
             {extension.workspace_name && (

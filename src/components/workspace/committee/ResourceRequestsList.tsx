@@ -13,8 +13,8 @@ export function ResourceRequestsList({ workspaceId }: ResourceRequestsListProps)
   const { requests, cancelRequest, returnResource, isLoading } = useResourceRequests(workspaceId);
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
-    approved: 'bg-green-500/20 text-green-600 border-green-500/30',
+    pending: 'bg-warning/20 text-warning border-warning/30',
+    approved: 'bg-success/20 text-success border-success/30',
     rejected: 'bg-destructive/20 text-destructive border-destructive/30',
     returned: 'bg-muted text-muted-foreground border-border',
   };

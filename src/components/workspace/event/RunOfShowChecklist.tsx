@@ -76,10 +76,10 @@ export function RunOfShowChecklist(_props: RunOfShowChecklistProps) {
 
   const getPhaseColor = (phase: ChecklistSection['phase']) => {
     switch (phase) {
-      case 'pre-event': return 'bg-purple-500/10 text-purple-600';
-      case 'day-of': return 'bg-blue-500/10 text-blue-600';
+      case 'pre-event': return 'bg-primary/10 text-primary';
+      case 'day-of': return 'bg-info/10 text-info';
       case 'during': return 'bg-emerald-500/10 text-emerald-600';
-      case 'post-event': return 'bg-amber-500/10 text-amber-600';
+      case 'post-event': return 'bg-warning/10 text-warning';
     }
   };
 
@@ -88,7 +88,7 @@ export function RunOfShowChecklist(_props: RunOfShowChecklistProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <ListChecks className="h-4 w-4 text-blue-500" />
+            <ListChecks className="h-4 w-4 text-info" />
             Run of Show Checklist
           </CardTitle>
           <Badge variant="outline" className="text-xs">

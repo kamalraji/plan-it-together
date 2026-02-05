@@ -20,26 +20,26 @@ export function ServiceStatusTab({ workspaceId: _workspaceId }: ServiceStatusTab
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "operational": return <Badge className="bg-green-500/10 text-green-600 text-xs">Operational</Badge>;
-      case "degraded": return <Badge className="bg-yellow-500/10 text-yellow-600 text-xs">Degraded</Badge>;
-      case "maintenance": return <Badge className="bg-blue-500/10 text-blue-600 text-xs">Maintenance</Badge>;
-      case "outage": return <Badge className="bg-red-500/10 text-red-600 text-xs">Outage</Badge>;
+      case "operational": return <Badge className="bg-success/10 text-success text-xs">Operational</Badge>;
+      case "degraded": return <Badge className="bg-warning/10 text-warning text-xs">Degraded</Badge>;
+      case "maintenance": return <Badge className="bg-info/10 text-info text-xs">Maintenance</Badge>;
+      case "outage": return <Badge className="bg-destructive/10 text-destructive text-xs">Outage</Badge>;
       default: return null;
     }
   };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "up": return <TrendingUp className="h-3 w-3 text-green-500" />;
-      case "down": return <TrendingDown className="h-3 w-3 text-red-500" />;
+      case "up": return <TrendingUp className="h-3 w-3 text-success" />;
+      case "down": return <TrendingDown className="h-3 w-3 text-destructive" />;
       default: return <Minus className="h-3 w-3 text-muted-foreground" />;
     }
   };
 
   const getLoadColor = (load: number) => {
-    if (load > 80) return "bg-red-500";
-    if (load > 60) return "bg-yellow-500";
-    return "bg-green-500";
+    if (load > 80) return "bg-destructive";
+    if (load > 60) return "bg-warning";
+    return "bg-success";
   };
 
   const operationalCount = services.filter(s => s.status === "operational").length;
@@ -60,21 +60,21 @@ export function ServiceStatusTab({ workspaceId: _workspaceId }: ServiceStatusTab
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Card className="border-green-500/20 bg-green-500/5">
+        <Card className="border-success/20 bg-success/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-green-600">{operationalCount}</div>
+            <div className="text-xl font-bold text-success">{operationalCount}</div>
             <p className="text-xs text-muted-foreground">Operational</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-yellow-600">{degradedCount}</div>
+            <div className="text-xl font-bold text-warning">{degradedCount}</div>
             <p className="text-xs text-muted-foreground">Degraded</p>
           </CardContent>
         </Card>
-        <Card className="border-blue-500/20 bg-blue-500/5">
+        <Card className="border-info/20 bg-info/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-blue-600">{maintenanceCount}</div>
+            <div className="text-xl font-bold text-info">{maintenanceCount}</div>
             <p className="text-xs text-muted-foreground">Maintenance</p>
           </CardContent>
         </Card>

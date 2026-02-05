@@ -25,7 +25,7 @@ interface GoalTrackerProps {
 
 const statusConfig = {
   on_track: { icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10', label: 'On Track' },
-  at_risk: { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'At Risk' },
+  at_risk: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-warning/10', label: 'At Risk' },
   behind: { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10', label: 'Behind' },
   achieved: { icon: CheckCircle2, color: 'text-primary', bg: 'bg-primary/10', label: 'Achieved' },
 };

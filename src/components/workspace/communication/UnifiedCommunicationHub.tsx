@@ -119,8 +119,8 @@ export function UnifiedCommunicationHub({
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Megaphone className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Megaphone className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{broadcastStats?.sent || 0}</p>
@@ -133,8 +133,8 @@ export function UnifiedCommunicationHub({
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Users className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Users className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{channelStats.participantChannels}</p>
@@ -268,8 +268,8 @@ export function UnifiedCommunicationHub({
                             className="flex items-center justify-between p-3 rounded-lg border border-border/50"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-amber-500/10">
-                                <Megaphone className="h-4 w-4 text-amber-500" />
+                              <div className="p-2 rounded-lg bg-warning/10">
+                                <Megaphone className="h-4 w-4 text-warning" />
                               </div>
                               <div>
                                 <Badge 

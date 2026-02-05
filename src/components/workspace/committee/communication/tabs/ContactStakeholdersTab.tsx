@@ -29,17 +29,17 @@ interface ContactStakeholdersTabProps {
 }
 
 const categoryConfig = {
-  vip: { icon: Star, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'VIP' },
-  media: { icon: Newspaper, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Media' },
-  sponsor: { icon: Handshake, color: 'text-purple-500', bgColor: 'bg-purple-500/10', label: 'Sponsor' },
+  vip: { icon: Star, color: 'text-warning', bgColor: 'bg-warning/10', label: 'VIP' },
+  media: { icon: Newspaper, color: 'text-info', bgColor: 'bg-info/10', label: 'Media' },
+  sponsor: { icon: Handshake, color: 'text-primary', bgColor: 'bg-primary/10', label: 'Sponsor' },
   partner: { icon: Building2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Partner' },
-  government: { icon: Landmark, color: 'text-red-500', bgColor: 'bg-red-500/10', label: 'Government' },
+  government: { icon: Landmark, color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'Government' },
   other: { icon: Users, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Other' },
 };
 
 const priorityConfig = {
-  high: { color: 'text-red-500', bgColor: 'bg-red-500/10', label: 'High' },
-  medium: { color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Medium' },
+  high: { color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'High' },
+  medium: { color: 'text-warning', bgColor: 'bg-warning/10', label: 'Medium' },
   low: { color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Low' },
 };
 

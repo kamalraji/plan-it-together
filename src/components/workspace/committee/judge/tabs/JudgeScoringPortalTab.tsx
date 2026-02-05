@@ -181,9 +181,9 @@ export function JudgeScoringPortalTab({ workspaceId }: JudgeScoringPortalTabProp
 
   if (!currentJudge) {
     return (
-      <Card className="border-amber-200 bg-amber-50/50">
+      <Card className="border-amber-200 bg-warning/10/50">
         <CardContent className="pt-6 text-center">
-          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-warning mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">Not Registered as Judge</h3>
           <p className="text-muted-foreground">
             You are not registered as a judge for this workspace. Please contact the committee lead to be added as a judge.
@@ -195,9 +195,9 @@ export function JudgeScoringPortalTab({ workspaceId }: JudgeScoringPortalTabProp
 
   if (!assignments || assignments.length === 0) {
     return (
-      <Card className="border-blue-200 bg-blue-50/50">
+      <Card className="border-blue-200 bg-info/10/50">
         <CardContent className="pt-6 text-center">
-          <Scale className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+          <Scale className="h-12 w-12 text-info mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">No Assignments Yet</h3>
           <p className="text-muted-foreground">
             You haven't been assigned any submissions to evaluate yet. Check back later or contact the committee lead.
@@ -284,7 +284,7 @@ export function JudgeScoringPortalTab({ workspaceId }: JudgeScoringPortalTabProp
                         {isCompleted ? (
                           <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                         ) : assignment.status === 'in_progress' ? (
-                          <Clock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                          <Clock className="h-4 w-4 text-warning flex-shrink-0" />
                         ) : (
                           <AlertCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         )}
@@ -490,7 +490,7 @@ export function JudgeScoringPortalTab({ workspaceId }: JudgeScoringPortalTabProp
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+                    <AlertCircle className="h-12 w-12 text-warning mx-auto mb-4" />
                     <p className="text-lg font-medium">No Rubric Assigned</p>
                     <p className="text-sm text-muted-foreground">
                       This submission does not have a rubric assigned. Please contact the committee lead.

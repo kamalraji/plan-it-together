@@ -26,14 +26,14 @@ interface CrossWorkspaceTasksPanelProps {
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   NOT_STARTED: { label: 'Not Started', icon: Circle, color: 'text-muted-foreground' },
-  IN_PROGRESS: { label: 'In Progress', icon: Loader2, color: 'text-blue-500' },
-  COMPLETED: { label: 'Completed', icon: CheckCircle2, color: 'text-green-500' },
-  BLOCKED: { label: 'Blocked', icon: AlertCircle, color: 'text-red-500' },
+  IN_PROGRESS: { label: 'In Progress', icon: Loader2, color: 'text-info' },
+  COMPLETED: { label: 'Completed', icon: CheckCircle2, color: 'text-success' },
+  BLOCKED: { label: 'Blocked', icon: AlertCircle, color: 'text-destructive' },
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
   LOW: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-  MEDIUM: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  MEDIUM: 'bg-warning/10 text-warning border-warning/20',
   HIGH: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
 };
 
@@ -135,12 +135,12 @@ export function CrossWorkspaceTasksPanel({ workspaceId }: CrossWorkspaceTasksPan
           <p className="text-2xl font-bold">{stats.total}</p>
           <p className="text-xs text-muted-foreground">Total Tasks</p>
         </div>
-        <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
-          <p className="text-2xl font-bold text-blue-600">{stats.inProgress}</p>
+        <div className="bg-info/10 rounded-lg p-3 border border-info/20">
+          <p className="text-2xl font-bold text-info">{stats.inProgress}</p>
           <p className="text-xs text-muted-foreground">In Progress</p>
         </div>
-        <div className="bg-green-500/10 rounded-lg p-3 border border-green-500/20">
-          <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+        <div className="bg-success/10 rounded-lg p-3 border border-success/20">
+          <p className="text-2xl font-bold text-success">{stats.completed}</p>
           <p className="text-xs text-muted-foreground">Completed</p>
         </div>
         <div className="bg-rose-500/10 rounded-lg p-3 border border-rose-500/20">
@@ -263,7 +263,7 @@ function TaskRow({ task }: { task: CrossWorkspaceTask }) {
       {task.dueDate && (
         <div className={cn(
           'flex items-center gap-1 text-xs shrink-0',
-          isOverdue ? 'text-red-500' : isDueToday ? 'text-amber-500' : 'text-muted-foreground'
+          isOverdue ? 'text-destructive' : isDueToday ? 'text-warning' : 'text-muted-foreground'
         )}>
           <Clock className="h-3 w-3" />
           <span>{format(new Date(task.dueDate), 'MMM d')}</span>

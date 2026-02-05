@@ -37,7 +37,7 @@ export function SpeakerRoster({ workspace, maxSpeakers = 5, onViewAll }: Speaker
     
     if (status === 'confirmed' && missingMaterials) {
       return { 
-        color: 'bg-blue-500/10 text-blue-600', 
+        color: 'bg-info/10 text-info', 
         icon: <AlertCircle className="h-3 w-3" />, 
         label: 'Awaiting Materials' 
       };
@@ -50,7 +50,7 @@ export function SpeakerRoster({ workspace, maxSpeakers = 5, onViewAll }: Speaker
         label: 'Confirmed' 
       },
       pending: { 
-        color: 'bg-amber-500/10 text-amber-600', 
+        color: 'bg-warning/10 text-warning', 
         icon: <Clock className="h-3 w-3" />, 
         label: 'Pending' 
       },

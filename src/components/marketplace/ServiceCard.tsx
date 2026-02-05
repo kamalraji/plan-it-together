@@ -165,7 +165,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                       'p-2 rounded-full backdrop-blur-sm transition-colors',
                       isComparing 
                         ? 'bg-primary text-primary-foreground' 
-                        : 'bg-card/20 text-white hover:bg-card/30'
+                        : 'bg-card/20 text-primary-foreground hover:bg-card/30'
                     )}
                     title="Compare"
                   >
@@ -177,8 +177,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                   className={cn(
                     'p-2 rounded-full backdrop-blur-sm transition-colors',
                     isFavorited 
-                      ? 'bg-rose-500 text-white' 
-                      : 'bg-card/20 text-white hover:bg-card/30'
+                      ? 'bg-rose-500 text-primary-foreground' 
+                      : 'bg-card/20 text-primary-foreground hover:bg-card/30'
                   )}
                   title="Save to favorites"
                 >
@@ -187,7 +187,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
               </div>
 
               {/* Quick View Count */}
-              <div className="flex items-center gap-1 text-xs text-white/80">
+              <div className="flex items-center gap-1 text-xs text-primary-foreground/80">
                 <Eye className="w-3.5 h-3.5" />
                 <span>1.2k views</span>
               </div>
@@ -300,7 +300,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                 </div>
                 
                 {/* Urgency Indicator */}
-                <div className="flex items-center gap-1 text-xs text-amber-600 mb-4 lg:justify-end">
+                <div className="flex items-center gap-1 text-xs text-warning mb-4 lg:justify-end">
                   <Zap className="w-3.5 h-3.5" />
                   <span>High demand this week</span>
                 </div>

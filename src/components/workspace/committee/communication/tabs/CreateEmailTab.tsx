@@ -19,8 +19,8 @@ interface CreateEmailTabProps {
 
 const statusConfig = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  scheduled: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Scheduled' },
-  sending: { icon: Send, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Sending' },
+  scheduled: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Scheduled' },
+  sending: { icon: Send, color: 'text-info', bgColor: 'bg-info/10', label: 'Sending' },
   sent: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Sent' },
   completed: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Completed' },
 };
@@ -241,8 +241,8 @@ export function CreateEmailTab({ workspaceId }: CreateEmailTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Send className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Send className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalSent}</p>
@@ -269,8 +269,8 @@ export function CreateEmailTab({ workspaceId }: CreateEmailTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <MousePointer className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <MousePointer className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">

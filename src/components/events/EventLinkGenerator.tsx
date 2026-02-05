@@ -165,7 +165,7 @@ export function EventLinkGenerator({ eventSlug, eventName }: EventLinkGeneratorP
                       {preset.label}
                     </span>
                     {isCopied ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                      <Check className="h-4 w-4 text-success" />
                     ) : (
                       <Copy className="h-4 w-4 text-muted-foreground" />
                     )}
@@ -239,7 +239,7 @@ export function EventLinkGenerator({ eventSlug, eventName }: EventLinkGeneratorP
                   onClick={() => copyToClipboard(customUrl, 'custom')}
                 >
                   {copiedId === 'custom' ? (
-                    <Check className="h-4 w-4 text-green-500" />
+                    <Check className="h-4 w-4 text-success" />
                   ) : (
                     <Copy className="h-4 w-4" />
                   )}

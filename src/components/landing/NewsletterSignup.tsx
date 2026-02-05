@@ -73,7 +73,7 @@ export function NewsletterSignup({
     return (
       <div className={className}>
         {status === 'success' ? (
-          <div className="flex items-center gap-2 text-sm text-green-600">
+          <div className="flex items-center gap-2 text-sm text-success">
             <Check className="w-4 h-4" />
             <span>Thanks for subscribing!</span>
           </div>
@@ -109,7 +109,7 @@ export function NewsletterSignup({
     return (
       <div className={`flex flex-col sm:flex-row gap-3 ${className ?? ''}`}>
         {status === 'success' ? (
-          <div className="flex items-center gap-2 text-sm text-green-600 py-2">
+          <div className="flex items-center gap-2 text-sm text-success py-2">
             <Check className="w-4 h-4" />
             <span>Thanks for subscribing! Check your inbox to confirm.</span>
           </div>
@@ -167,7 +167,7 @@ export function NewsletterSignup({
           </p>
 
           {status === 'success' ? (
-            <div className="flex items-center justify-center gap-2 text-green-600 py-4">
+            <div className="flex items-center justify-center gap-2 text-success py-4">
               <Check className="w-5 h-5" />
               <span>Thanks for subscribing! Check your inbox to confirm.</span>
             </div>

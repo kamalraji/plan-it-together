@@ -62,7 +62,7 @@ export function RoleCard({
             accentColor === 'coral' ? 'bg-coral' : 'bg-teal'
           )}
         >
-          <Check className="h-4 w-4 text-white" />
+          <Check className="h-4 w-4 text-primary-foreground" />
         </motion.div>
       )}
 

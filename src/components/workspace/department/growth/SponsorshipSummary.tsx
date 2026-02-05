@@ -16,7 +16,7 @@ export function SponsorshipSummary() {
     { tier: 'Platinum', count: 2, target: 3, revenue: 60000, color: 'bg-slate-400' },
     { tier: 'Gold', count: 4, target: 5, revenue: 40000, color: 'bg-amber-400' },
     { tier: 'Silver', count: 6, target: 10, revenue: 18000, color: 'bg-slate-300' },
-    { tier: 'Bronze', count: 8, target: 15, revenue: 8000, color: 'bg-amber-600' },
+    { tier: 'Bronze', count: 8, target: 15, revenue: 8000, color: 'bg-warning' },
   ];
 
   const totalRevenue = tiers.reduce((sum, t) => sum + t.revenue, 0);

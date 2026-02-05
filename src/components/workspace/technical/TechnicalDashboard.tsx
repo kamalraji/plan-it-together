@@ -46,7 +46,7 @@ export function TechnicalDashboard({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Video className="h-5 w-5 text-red-500" />
+              <Video className="h-5 w-5 text-destructive" />
               Live Streaming
             </h2>
             <Button variant="ghost" size="sm" onClick={() => setShowLiveStream(false)}>
@@ -63,7 +63,7 @@ export function TechnicalDashboard({
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-xl bg-red-500/10 group-hover:bg-red-500/20 transition-colors">
-                <Video className="h-6 w-6 text-red-500" />
+                <Video className="h-6 w-6 text-destructive" />
               </div>
               <div>
                 <CardTitle className="text-base">Live Streaming</CardTitle>
@@ -74,7 +74,7 @@ export function TechnicalDashboard({
             </div>
             <div className="flex items-center gap-3">
               {activeStreams.length > 0 && (
-                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-500 text-sm font-medium">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-destructive/10 text-destructive text-sm font-medium">
                   <Radio className="h-4 w-4 animate-pulse" />
                   {activeStreams.length} Live
                 </span>

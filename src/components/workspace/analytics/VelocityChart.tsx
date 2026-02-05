@@ -93,7 +93,7 @@ export function VelocityChart({ workspaceId, weeksToShow = 6 }: VelocityChartPro
       <Card className="border-border/50">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Zap className="h-5 w-5 text-amber-500" />
+            <Zap className="h-5 w-5 text-warning" />
             Velocity Chart
           </CardTitle>
         </CardHeader>
@@ -109,7 +109,7 @@ export function VelocityChart({ workspaceId, weeksToShow = 6 }: VelocityChartPro
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Zap className="h-5 w-5 text-amber-500" />
+            <Zap className="h-5 w-5 text-warning" />
             Velocity Chart
           </CardTitle>
           <div className="flex items-center gap-4 text-sm">

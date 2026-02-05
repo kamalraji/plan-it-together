@@ -188,19 +188,19 @@ export function WorkspaceStructureOverview({
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-blue-500" />
+            <Building2 className="h-4 w-4 text-info" />
             <span className="text-muted-foreground">Departments:</span>
             <span className="font-medium">{createdDepts}/{totalDepts}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-amber-500" />
+            <Users className="h-4 w-4 text-warning" />
             <span className="text-muted-foreground">Committees:</span>
             <span className="font-medium">{createdComms}/{totalComms}</span>
           </div>
         </div>
         <div className="flex gap-2 text-[10px]">
           <span className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3 text-green-500" />
+            <CheckCircle className="h-3 w-3 text-success" />
             Created
           </span>
           <span className="flex items-center gap-1">
@@ -237,12 +237,12 @@ export function WorkspaceStructureOverview({
                 </button>
 
                 {isCreated ? (
-                  <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-success shrink-0" />
                 ) : (
                   <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
                 )}
 
-                <Building2 className={cn("h-4 w-4", isCreated ? "text-blue-500" : "text-muted-foreground")} />
+                <Building2 className={cn("h-4 w-4", isCreated ? "text-info" : "text-muted-foreground")} />
                 
                 <span className={cn(
                   "flex-1 text-sm font-medium",
@@ -309,12 +309,12 @@ export function WorkspaceStructureOverview({
                         )}
                       >
                         {isCommCreated ? (
-                          <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                          <CheckCircle className="h-3.5 w-3.5 text-success shrink-0" />
                         ) : (
                           <Circle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         )}
 
-                        <Users className={cn("h-3.5 w-3.5", isCommCreated ? "text-amber-500" : "text-muted-foreground")} />
+                        <Users className={cn("h-3.5 w-3.5", isCommCreated ? "text-warning" : "text-muted-foreground")} />
                         
                         <span className={cn(
                           "flex-1 text-sm",
@@ -398,7 +398,7 @@ export function WorkspaceStructureOverview({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Archive className="h-5 w-5 text-amber-500" />
+              <Archive className="h-5 w-5 text-warning" />
               Archive Workspace
             </AlertDialogTitle>
             <AlertDialogDescription>

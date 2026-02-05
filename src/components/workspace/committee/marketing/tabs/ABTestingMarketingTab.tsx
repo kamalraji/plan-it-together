@@ -42,9 +42,9 @@ const testTypes = [
 const statusColors: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
   running: 'bg-emerald-500/20 text-emerald-600',
-  paused: 'bg-amber-500/20 text-amber-600',
-  completed: 'bg-blue-500/20 text-blue-600',
-  cancelled: 'bg-red-500/20 text-red-600',
+  paused: 'bg-warning/20 text-warning',
+  completed: 'bg-info/20 text-info',
+  cancelled: 'bg-destructive/20 text-destructive',
 };
 
 export function ABTestingMarketingTab({ workspaceId }: ABTestingMarketingTabProps) {
@@ -207,8 +207,8 @@ export function ABTestingMarketingTab({ workspaceId }: ABTestingMarketingTabProp
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <Trophy className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/20">
+                <Trophy className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedTests.length}</p>
@@ -314,10 +314,10 @@ export function ABTestingMarketingTab({ workspaceId }: ABTestingMarketingTabProp
             {/* Variants */}
             <div className="grid grid-cols-2 gap-6">
               {/* Variant A */}
-              <Card className="border-blue-500/30">
+              <Card className="border-info/30">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold">
+                    <div className="w-6 h-6 rounded-full bg-info text-primary-foreground text-xs flex items-center justify-center font-bold">
                       A
                     </div>
                     Variant A
@@ -350,7 +350,7 @@ export function ABTestingMarketingTab({ workspaceId }: ABTestingMarketingTabProp
               <Card className="border-purple-500/30">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-bold">
+                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
                       B
                     </div>
                     Variant B
@@ -497,7 +497,7 @@ function TestList({
                       </Badge>
                       <Badge variant="outline">{test.test_type}</Badge>
                       {test.winner && (
-                        <Badge className="bg-amber-500/20 text-amber-600">
+                        <Badge className="bg-warning/20 text-warning">
                           <Trophy className="h-3 w-3 mr-1" />
                           Winner: {test.winner.toUpperCase()}
                         </Badge>
@@ -548,13 +548,13 @@ function TestList({
 
                 {/* Metrics Comparison */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <div className="p-3 rounded-lg bg-info/10 border border-info/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold">
+                      <div className="w-5 h-5 rounded-full bg-info text-primary-foreground text-xs flex items-center justify-center font-bold">
                         A
                       </div>
                       <span className="text-sm font-medium">Variant A</span>
-                      {test.winner === 'a' && <Trophy className="h-4 w-4 text-amber-500" />}
+                      {test.winner === 'a' && <Trophy className="h-4 w-4 text-warning" />}
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div>
@@ -583,13 +583,13 @@ function TestList({
                     )}
                   </div>
 
-                  <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <div className="p-3 rounded-lg bg-primary/10 border border-purple-500/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-5 h-5 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-bold">
+                      <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
                         B
                       </div>
                       <span className="text-sm font-medium">Variant B</span>
-                      {test.winner === 'b' && <Trophy className="h-4 w-4 text-amber-500" />}
+                      {test.winner === 'b' && <Trophy className="h-4 w-4 text-warning" />}
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div>

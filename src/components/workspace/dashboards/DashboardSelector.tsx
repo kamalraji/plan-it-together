@@ -73,7 +73,7 @@ export function DashboardSelector({
                 {dashboard.name}
               </span>
               {dashboard.isDefault && (
-                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                <Star className="h-3 w-3 text-warning fill-yellow-500" />
               )}
             </div>
             <span className="text-xs text-muted-foreground">

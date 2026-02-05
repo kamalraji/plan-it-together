@@ -33,9 +33,9 @@ const stages: {
   bgColor: string;
 }[] = [
   { id: 'draft', label: 'Draft', icon: FileEdit, color: 'text-muted-foreground', bgColor: 'bg-muted' },
-  { id: 'review', label: 'Review', icon: Eye, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  { id: 'approved', label: 'Approved', icon: CheckCircle2, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { id: 'scheduled', label: 'Scheduled', icon: Clock, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+  { id: 'review', label: 'Review', icon: Eye, color: 'text-warning', bgColor: 'bg-warning/10' },
+  { id: 'approved', label: 'Approved', icon: CheckCircle2, color: 'text-info', bgColor: 'bg-info/10' },
+  { id: 'scheduled', label: 'Scheduled', icon: Clock, color: 'text-primary', bgColor: 'bg-primary/10' },
   { id: 'published', label: 'Published', icon: Send, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
 ];
 
@@ -48,8 +48,8 @@ const typeConfig: Record<string, { color: string; label: string }> = {
 
 const priorityConfig: Record<string, string> = {
   low: 'border-muted-foreground/30',
-  medium: 'border-amber-500/50',
-  high: 'border-red-500/50',
+  medium: 'border-warning/50',
+  high: 'border-destructive/50',
 };
 
 export function PublicationPipeline({ workspaceId }: PublicationPipelineProps) {

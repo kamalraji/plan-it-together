@@ -39,9 +39,9 @@ const platformIcons: Record<Platform, React.ReactNode> = {
 };
 
 const platformColors: Record<Platform, string> = {
-  slack: 'bg-purple-500/10 text-purple-500',
-  discord: 'bg-indigo-500/10 text-indigo-500',
-  teams: 'bg-blue-500/10 text-blue-500',
+  slack: 'bg-primary/10 text-primary',
+  discord: 'bg-primary/10 text-primary',
+  teams: 'bg-info/10 text-info',
   webhook: 'bg-muted-foreground/30/10 text-muted-foreground',
 };
 

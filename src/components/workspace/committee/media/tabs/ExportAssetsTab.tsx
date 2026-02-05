@@ -126,11 +126,11 @@ export function ExportAssetsTab({ workspaceId }: ExportAssetsTabProps) {
   const getUsageRightsBadge = (rights?: string) => {
     switch (rights) {
       case 'all':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-200">All Uses</Badge>;
+        return <Badge className="bg-success/10 text-success border-green-200">All Uses</Badge>;
       case 'press':
-        return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200">Press</Badge>;
+        return <Badge className="bg-info/10 text-info border-blue-200">Press</Badge>;
       case 'social':
-        return <Badge className="bg-purple-500/10 text-purple-600 border-purple-200">Social</Badge>;
+        return <Badge className="bg-primary/10 text-primary border-purple-200">Social</Badge>;
       default:
         return <Badge variant="outline">Internal</Badge>;
     }
@@ -257,7 +257,7 @@ export function ExportAssetsTab({ workspaceId }: ExportAssetsTabProps) {
                   </div>
                 ) : (
                   <div className="space-y-4 py-4">
-                    <div className="flex items-center justify-center text-green-500">
+                    <div className="flex items-center justify-center text-success">
                       <Check className="h-12 w-12" />
                     </div>
                     <p className="text-center font-medium">Export Ready!</p>
@@ -292,7 +292,7 @@ export function ExportAssetsTab({ workspaceId }: ExportAssetsTabProps) {
       <div className="grid grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.total}</div>
+            <div className="text-2xl font-bold text-success">{stats.total}</div>
             <p className="text-sm text-muted-foreground">Approved Assets</p>
           </CardContent>
         </Card>
@@ -305,7 +305,7 @@ export function ExportAssetsTab({ workspaceId }: ExportAssetsTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Image className="h-5 w-5 text-blue-500" />
+              <Image className="h-5 w-5 text-info" />
               <span className="text-2xl font-bold">{stats.images}</span>
             </div>
             <p className="text-sm text-muted-foreground">Images</p>
@@ -314,7 +314,7 @@ export function ExportAssetsTab({ workspaceId }: ExportAssetsTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Video className="h-5 w-5 text-purple-500" />
+              <Video className="h-5 w-5 text-primary" />
               <span className="text-2xl font-bold">{stats.videos}</span>
             </div>
             <p className="text-sm text-muted-foreground">Videos</p>

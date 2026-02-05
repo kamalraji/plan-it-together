@@ -237,7 +237,7 @@ function OrganizationCard({ organization }: OrganizationCardProps) {
             )}
           </div>
           {organization.verification_status === 'VERIFIED' && (
-            <span className="text-blue-500 text-xl" title="Verified Organization">
+            <span className="text-info text-xl" title="Verified Organization">
               ✓
             </span>
           )}

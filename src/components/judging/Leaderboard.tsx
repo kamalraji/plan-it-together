@@ -50,18 +50,18 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
   };
 
   const getScoreColor = (percentage: number): string => {
-    if (percentage >= 90) return 'text-green-600';
-    if (percentage >= 80) return 'text-blue-600';
-    if (percentage >= 70) return 'text-yellow-600';
+    if (percentage >= 90) return 'text-success';
+    if (percentage >= 80) return 'text-info';
+    if (percentage >= 70) return 'text-warning';
     if (percentage >= 60) return 'text-orange-600';
-    return 'text-red-600';
+    return 'text-destructive';
   };
 
   if (loading && !leaderboard) {
     return (
       <div className="bg-card rounded-lg shadow-md p-6">
         <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </div>
     );
@@ -71,7 +71,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     return (
       <div className="bg-card rounded-lg shadow-md p-6">
         <div className="text-center">
-          <div className="text-red-600 mb-4">{error}</div>
+          <div className="text-destructive mb-4">{error}</div>
           <button
             onClick={fetchLeaderboard}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -128,7 +128,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
         </div>
 
         {!leaderboard.enabled && isOrganizer && (
-          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="mt-2 p-2 bg-warning/10 border border-yellow-200 rounded-md">
             <p className="text-sm text-yellow-800">⚠️ Leaderboard is currently hidden from public view</p>
           </div>
         )}
@@ -174,11 +174,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
               <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all duration-300 ${
-                    entry.percentage >= 90 ? 'bg-green-500' :
-                    entry.percentage >= 80 ? 'bg-blue-500' :
-                    entry.percentage >= 70 ? 'bg-yellow-500' :
+                    entry.percentage >= 90 ? 'bg-success' :
+                    entry.percentage >= 80 ? 'bg-info' :
+                    entry.percentage >= 70 ? 'bg-warning' :
                     entry.percentage >= 60 ? 'bg-orange-500' :
-                    'bg-red-500'
+                    'bg-destructive'
                   }`}
                   style={{ width: `${Math.min(entry.percentage, 100)}%` }}
                 />
@@ -196,15 +196,15 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-success rounded-full"></div>
               <span>90%+</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-info rounded-full"></div>
               <span>80-89%</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-warning rounded-full"></div>
               <span>70-79%</span>
             </div>
             <div className="flex items-center space-x-1">
@@ -212,7 +212,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
               <span>60-69%</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-destructive rounded-full"></div>
               <span>&lt;60%</span>
             </div>
           </div>

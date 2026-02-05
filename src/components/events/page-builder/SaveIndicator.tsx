@@ -34,12 +34,12 @@ const statusConfig: Record<SaveStatus, {
   saved: {
     icon: Check,
     label: 'Saved',
-    className: 'text-green-500',
+    className: 'text-success',
   },
   unsaved: {
     icon: CloudOff,
     label: 'Unsaved changes',
-    className: 'text-amber-500',
+    className: 'text-warning',
   },
   error: {
     icon: AlertCircle,

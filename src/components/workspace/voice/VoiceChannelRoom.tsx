@@ -124,7 +124,7 @@ export const VoiceChannelRoom: React.FC<VoiceChannelRoomProps> = ({
               {isStageMode && speakers.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-amber-500" />
+                    <Crown className="h-4 w-4 text-warning" />
                     Speakers
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -286,7 +286,7 @@ const ParticipantCard: React.FC<ParticipantCardProps> = ({
         </div>
         
         {participant.isHost && (
-          <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-0.5">
+          <div className="absolute -top-1 -right-1 bg-warning rounded-full p-0.5">
             <Crown className="h-3 w-3 text-amber-950" />
           </div>
         )}

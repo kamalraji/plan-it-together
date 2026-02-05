@@ -41,17 +41,17 @@ export function InventoryTracker({ workspaceId }: InventoryTrackerProps) {
   });
 
   const categoryConfig = {
-    food: { label: 'Food', color: 'text-green-500', bgColor: 'bg-green-500/10' },
-    beverage: { label: 'Beverage', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-    equipment: { label: 'Equipment', color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+    food: { label: 'Food', color: 'text-success', bgColor: 'bg-success/10' },
+    beverage: { label: 'Beverage', color: 'text-info', bgColor: 'bg-info/10' },
+    equipment: { label: 'Equipment', color: 'text-primary', bgColor: 'bg-primary/10' },
     supplies: { label: 'Supplies', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
   };
 
   const statusConfig = {
-    adequate: { label: 'Adequate', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: Check },
-    low: { label: 'Low Stock', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: AlertTriangle },
-    critical: { label: 'Critical', color: 'bg-red-500/10 text-red-600 border-red-500/20', icon: AlertTriangle },
-    ordered: { label: 'Ordered', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: RefreshCw },
+    adequate: { label: 'Adequate', color: 'bg-success/10 text-success border-success/20', icon: Check },
+    low: { label: 'Low Stock', color: 'bg-warning/10 text-warning border-warning/20', icon: AlertTriangle },
+    critical: { label: 'Critical', color: 'bg-destructive/10 text-destructive border-destructive/20', icon: AlertTriangle },
+    ordered: { label: 'Ordered', color: 'bg-info/10 text-info border-info/20', icon: RefreshCw },
   };
 
   const calculateStatus = (current: number, required: number): CateringInventoryItem['status'] => {
@@ -104,7 +104,7 @@ export function InventoryTracker({ workspaceId }: InventoryTrackerProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-purple-500" />
+            <Package className="h-5 w-5 text-primary" />
             Inventory Tracker
           </CardTitle>
         </CardHeader>
@@ -120,17 +120,17 @@ export function InventoryTracker({ workspaceId }: InventoryTrackerProps) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-purple-500" />
+            <Package className="h-5 w-5 text-primary" />
             Inventory Tracker
           </CardTitle>
           <div className="flex gap-2 mt-1">
             {criticalItems > 0 && (
-              <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-500/20">
+              <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/20">
                 {criticalItems} critical
               </Badge>
             )}
             {lowItems > 0 && (
-              <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20">
+              <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">
                 {lowItems} low
               </Badge>
             )}

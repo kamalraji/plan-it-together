@@ -13,8 +13,8 @@ interface MessagingChannelsProps {
 
 const typeConfig: Record<string, { color: string; bgColor: string }> = {
   general: { color: 'text-primary', bgColor: 'bg-primary/10' },
-  announcement: { color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  private: { color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+  announcement: { color: 'text-warning', bgColor: 'bg-warning/10' },
+  private: { color: 'text-primary', bgColor: 'bg-primary/10' },
   task: { color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
 };
 

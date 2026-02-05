@@ -74,9 +74,9 @@ export function UnifiedSearchDialog({
       case 'task':
         return <CheckSquare className="h-4 w-4 text-primary" />;
       case 'message':
-        return <MessageSquare className="h-4 w-4 text-blue-500" />;
+        return <MessageSquare className="h-4 w-4 text-info" />;
       case 'member':
-        return <User className="h-4 w-4 text-green-500" />;
+        return <User className="h-4 w-4 text-success" />;
       default:
         return <FileText className="h-4 w-4 text-muted-foreground" />;
     }

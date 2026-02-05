@@ -18,9 +18,9 @@ export function OutgoingSummaryCards({
       label: 'Pending',
       count: pendingCount,
       icon: Clock,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-500/10',
-      borderColor: 'border-amber-500/20',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
+      borderColor: 'border-warning/20',
     },
     {
       label: 'Approved',
@@ -34,9 +34,9 @@ export function OutgoingSummaryCards({
       label: 'Rejected',
       count: rejectedCount,
       icon: XCircle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-500/10',
-      borderColor: 'border-red-500/20',
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
+      borderColor: 'border-destructive/20',
     },
   ];
 

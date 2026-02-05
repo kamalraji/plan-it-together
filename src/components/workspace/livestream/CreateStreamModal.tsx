@@ -79,8 +79,8 @@ export function CreateStreamModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-red-500/10">
-              <Video className="h-5 w-5 text-red-500" />
+            <div className="p-2.5 rounded-xl bg-destructive/10">
+              <Video className="h-5 w-5 text-destructive" />
             </div>
             <div>
               <DialogTitle>Create Live Stream</DialogTitle>

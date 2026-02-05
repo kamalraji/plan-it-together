@@ -38,7 +38,7 @@ export function EventCapacityIndicator({
           {showIcon && <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />}
           <span className={cn(
             isFull && 'text-destructive font-medium',
-            isAlmostFull && !isFull && 'text-amber-600 font-medium'
+            isAlmostFull && !isFull && 'text-warning font-medium'
           )}>
             {isFull 
               ? 'Sold Out' 
@@ -57,7 +57,7 @@ export function EventCapacityIndicator({
           className={cn(
             'h-2',
             isFull && '[&>div]:bg-destructive',
-            isAlmostFull && !isFull && '[&>div]:bg-amber-500'
+            isAlmostFull && !isFull && '[&>div]:bg-warning'
           )}
           aria-label={`${Math.round(percentage)}% capacity filled`}
         />

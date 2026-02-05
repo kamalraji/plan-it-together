@@ -146,25 +146,25 @@ export function ViewBudgetTab({ workspace }: ViewBudgetTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-red-500" />
+              <TrendingDown className="h-5 w-5 text-destructive" />
               <span className="text-sm text-muted-foreground">Used</span>
             </div>
-            <div className="text-2xl font-bold mt-1 text-red-600">₹{budget.used.toLocaleString()}</div>
+            <div className="text-2xl font-bold mt-1 text-destructive">₹{budget.used.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-500" />
+              <TrendingUp className="h-5 w-5 text-success" />
               <span className="text-sm text-muted-foreground">Remaining</span>
             </div>
-            <div className="text-2xl font-bold mt-1 text-green-600">₹{remaining.toLocaleString()}</div>
+            <div className="text-2xl font-bold mt-1 text-success">₹{remaining.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-blue-500" />
+              <PieChart className="h-5 w-5 text-info" />
               <span className="text-sm text-muted-foreground">Usage</span>
             </div>
             <div className="text-2xl font-bold mt-1">{usagePercent.toFixed(1)}%</div>
@@ -185,10 +185,10 @@ export function ViewBudgetTab({ workspace }: ViewBudgetTabProps) {
             </div>
             <Progress 
               value={usagePercent} 
-              className={usagePercent > 90 ? '[&>div]:bg-red-500' : usagePercent > 70 ? '[&>div]:bg-amber-500' : ''}
+              className={usagePercent > 90 ? '[&>div]:bg-destructive' : usagePercent > 70 ? '[&>div]:bg-warning' : ''}
             />
             {usagePercent > 90 && (
-              <p className="text-sm text-red-600">⚠️ Budget is nearly exhausted!</p>
+              <p className="text-sm text-destructive">⚠️ Budget is nearly exhausted!</p>
             )}
           </div>
         </CardContent>
@@ -199,7 +199,7 @@ export function ViewBudgetTab({ workspace }: ViewBudgetTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-blue-500" />
+              <PieChart className="h-5 w-5 text-info" />
               Spending by Category
             </CardTitle>
             <CardDescription>Breakdown of approved expenses</CardDescription>

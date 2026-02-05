@@ -89,7 +89,7 @@ export function ApproveTimesheetsTab({ workspace }: ApproveTimesheetsTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-xs text-muted-foreground">Pending Review</div>
           </CardContent>
         </Card>
@@ -107,7 +107,7 @@ export function ApproveTimesheetsTab({ workspace }: ApproveTimesheetsTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+            <div className="text-2xl font-bold text-info">{stats.total}</div>
             <div className="text-xs text-muted-foreground">Total Entries</div>
           </CardContent>
         </Card>
@@ -197,7 +197,7 @@ export function ApproveTimesheetsTab({ workspace }: ApproveTimesheetsTabProps) {
                             className={
                               timesheet.status === 'approved' 
                                 ? 'border-emerald-500/30 text-emerald-600' 
-                                : 'border-red-500/30 text-red-600'
+                                : 'border-destructive/30 text-destructive'
                             }
                           >
                             {timesheet.status === 'approved' ? (

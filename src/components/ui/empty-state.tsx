@@ -46,7 +46,7 @@ const variantDefaults: Record<EmptyStateVariant, { icon: LucideIcon; iconColor: 
   },
   'no-permission': {
     icon: ShieldOff,
-    iconColor: 'text-amber-500',
+    iconColor: 'text-warning',
   },
 };
 
@@ -77,7 +77,7 @@ export function EmptyState({
           className={cn(
             'h-14 w-14 rounded-full bg-muted/80 flex items-center justify-center mb-4',
             variant === 'error' && 'bg-destructive/10',
-            variant === 'no-permission' && 'bg-amber-500/10'
+            variant === 'no-permission' && 'bg-warning/10'
           )}
         >
           <IconComponent

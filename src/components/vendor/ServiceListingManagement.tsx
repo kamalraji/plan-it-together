@@ -753,7 +753,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                     <button
                       type="button"
                       onClick={() => removeMediaItem(item.id)}
-                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 bg-destructive text-primary-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -767,7 +767,7 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -812,18 +812,18 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
   if (loading && !showCreateForm) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error && !showCreateForm) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
             <h3 className="text-sm font-medium text-red-800">Error loading services</h3>
-            <div className="mt-2 text-sm text-red-700">
+            <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
@@ -907,14 +907,14 @@ const ServiceListingManagement: React.FC<ServiceListingManagementProps> = ({ ven
                     <div className="flex items-center">
                       <h3 className="text-lg font-medium text-foreground">{service.title}</h3>
                       <span className={`ml-3 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        service.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                        service.status === 'ACTIVE' ? 'bg-success/20 text-success' :
                         service.status === 'INACTIVE' ? 'bg-muted text-foreground' :
-                        'bg-red-100 text-red-800'
+                        'bg-destructive/20 text-red-800'
                       }`}>
                         {service.status}
                       </span>
                       {service.featured && (
-                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-warning/20 text-yellow-800">
                           Featured
                         </span>
                       )}

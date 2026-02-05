@@ -48,7 +48,7 @@ export function AudienceInsights({ workspaceId }: AudienceInsightsProps) {
       <Card className="border-border/50">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-indigo-600" />
+            <Users className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg font-semibold">Audience Insights</CardTitle>
           </div>
         </CardHeader>
@@ -77,7 +77,7 @@ export function AudienceInsights({ workspaceId }: AudienceInsightsProps) {
       <Card className="border-border/50">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-indigo-600" />
+            <Users className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg font-semibold">Audience Insights</CardTitle>
           </div>
         </CardHeader>
@@ -98,7 +98,7 @@ export function AudienceInsights({ workspaceId }: AudienceInsightsProps) {
     <Card className="border-border/50">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-indigo-600" />
+          <Users className="h-5 w-5 text-primary" />
           <CardTitle className="text-lg font-semibold">Audience Insights</CardTitle>
         </div>
       </CardHeader>

@@ -36,9 +36,9 @@ export function DraggableTaskCard({ task, onClick, className }: DraggableTaskCar
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
-      case TaskPriority.URGENT: return 'text-red-500';
+      case TaskPriority.URGENT: return 'text-destructive';
       case TaskPriority.HIGH: return 'text-orange-500';
-      case TaskPriority.MEDIUM: return 'text-blue-500';
+      case TaskPriority.MEDIUM: return 'text-info';
       case TaskPriority.LOW: return 'text-muted-foreground';
       default: return 'text-muted-foreground';
     }
@@ -47,9 +47,9 @@ export function DraggableTaskCard({ task, onClick, className }: DraggableTaskCar
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.COMPLETED: return 'bg-emerald-500/10 text-emerald-600';
-      case TaskStatus.IN_PROGRESS: return 'bg-blue-500/10 text-blue-600';
-      case TaskStatus.BLOCKED: return 'bg-red-500/10 text-red-600';
-      case TaskStatus.REVIEW_REQUIRED: return 'bg-amber-500/10 text-amber-600';
+      case TaskStatus.IN_PROGRESS: return 'bg-info/10 text-info';
+      case TaskStatus.BLOCKED: return 'bg-destructive/10 text-destructive';
+      case TaskStatus.REVIEW_REQUIRED: return 'bg-warning/10 text-warning';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -98,7 +98,7 @@ export function DraggableTaskCard({ task, onClick, className }: DraggableTaskCar
 
           {/* Due Date */}
           {task.dueDate && (
-            <div className={cn('flex items-center gap-1', isOverdue && 'text-red-500')}>
+            <div className={cn('flex items-center gap-1', isOverdue && 'text-destructive')}>
               <Calendar className="h-3 w-3" />
               {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>

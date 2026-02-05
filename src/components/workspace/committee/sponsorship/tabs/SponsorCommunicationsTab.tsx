@@ -41,17 +41,17 @@ interface SponsorCommunicationsTabProps {
 }
 
 const typeConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string; label: string }> = {
-  email: { icon: Mail, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Email' },
+  email: { icon: Mail, color: 'text-info', bgColor: 'bg-info/10', label: 'Email' },
   call: { icon: Phone, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Call' },
-  meeting: { icon: Calendar, color: 'text-purple-500', bgColor: 'bg-purple-500/10', label: 'Meeting' },
-  message: { icon: MessageSquare, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Message' },
+  meeting: { icon: Calendar, color: 'text-primary', bgColor: 'bg-primary/10', label: 'Meeting' },
+  message: { icon: MessageSquare, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Message' },
 };
 
 const statusConfig: Record<string, { color: string; bgColor: string; label: string }> = {
   draft: { color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10', label: 'Draft' },
   sent: { color: 'text-emerald-600', bgColor: 'bg-emerald-500/10', label: 'Sent' },
-  received: { color: 'text-blue-600', bgColor: 'bg-blue-500/10', label: 'Received' },
-  scheduled: { color: 'text-purple-600', bgColor: 'bg-purple-500/10', label: 'Scheduled' },
+  received: { color: 'text-info', bgColor: 'bg-info/10', label: 'Received' },
+  scheduled: { color: 'text-primary', bgColor: 'bg-primary/10', label: 'Scheduled' },
 };
 
 export function SponsorCommunicationsTab({ workspace }: SponsorCommunicationsTabProps) {
@@ -265,7 +265,7 @@ export function SponsorCommunicationsTab({ workspace }: SponsorCommunicationsTab
             <div className="flex items-center gap-2">
               <h4 className="font-medium text-foreground line-clamp-1">{comm.subject}</h4>
               {comm.direction === 'inbound' ? (
-                <ArrowDownLeft className="h-3.5 w-3.5 text-blue-500" />
+                <ArrowDownLeft className="h-3.5 w-3.5 text-info" />
               ) : (
                 <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
               )}
@@ -320,8 +320,8 @@ export function SponsorCommunicationsTab({ workspace }: SponsorCommunicationsTab
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-blue-500/10">
-                <Mail className="h-5 w-5 text-blue-500" />
+              <div className="p-2.5 rounded-lg bg-info/10">
+                <Mail className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{communications.length}</p>
@@ -361,8 +361,8 @@ export function SponsorCommunicationsTab({ workspace }: SponsorCommunicationsTab
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-purple-500/10">
-                <Calendar className="h-5 w-5 text-purple-500" />
+              <div className="p-2.5 rounded-lg bg-primary/10">
+                <Calendar className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{scheduledCommunications.length}</p>

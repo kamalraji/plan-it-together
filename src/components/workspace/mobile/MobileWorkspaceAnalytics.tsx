@@ -95,29 +95,29 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
       icon: CheckCircle2,
       label: 'Completed',
       value: analytics?.completedTasks ?? 0,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       icon: Clock,
       label: 'Overdue',
       value: analytics?.overdueTasks ?? 0,
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
     },
     {
       icon: BarChart3,
       label: 'Total Tasks',
       value: analytics?.totalTasks ?? 0,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       icon: Users,
       label: 'Team Size',
       value: analytics?.teamMembers ?? 0,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ];
 
@@ -127,7 +127,7 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
       <div className="bg-card border border-border rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-foreground">Task Completion</h3>
-          <TrendingUp className="w-5 h-5 text-green-500" />
+          <TrendingUp className="w-5 h-5 text-success" />
         </div>
         
         <div className="flex items-end gap-4">
@@ -189,7 +189,7 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
         <div className="space-y-3">
           {analytics && analytics.overdueTasks > 0 && (
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
+              <div className="w-2 h-2 rounded-full bg-destructive" />
               <span className="text-muted-foreground">
                 {analytics.overdueTasks} task{analytics.overdueTasks !== 1 ? 's' : ''} overdue
               </span>
@@ -197,7 +197,7 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
           )}
           {analytics && analytics.completionRate >= 80 && (
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <div className="w-2 h-2 rounded-full bg-success" />
               <span className="text-muted-foreground">
                 Great progress! Keep it up
               </span>
@@ -205,7 +205,7 @@ export function MobileWorkspaceAnalytics({ workspace }: MobileWorkspaceAnalytics
           )}
           {analytics && analytics.completionRate < 50 && (
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+              <div className="w-2 h-2 rounded-full bg-warning" />
               <span className="text-muted-foreground">
                 Focus on completing pending tasks
               </span>

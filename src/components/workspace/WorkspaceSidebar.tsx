@@ -94,11 +94,11 @@ const getWorkspaceTypeBadgeColor = (type?: string) => {
     case 'ROOT':
       return 'bg-primary/20 text-primary border-primary/30';
     case 'DEPARTMENT':
-      return 'bg-blue-500/20 text-blue-600 border-blue-500/30';
+      return 'bg-info/20 text-info border-info/30';
     case 'COMMITTEE':
-      return 'bg-amber-500/20 text-amber-600 border-amber-500/30';
+      return 'bg-warning/20 text-warning border-warning/30';
     case 'TEAM':
-      return 'bg-green-500/20 text-green-600 border-green-500/30';
+      return 'bg-success/20 text-success border-success/30';
     default:
       return 'bg-muted text-muted-foreground border-border';
   }

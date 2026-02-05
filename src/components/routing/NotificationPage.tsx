@@ -251,7 +251,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                     type="checkbox"
                     checked={showUnreadOnly}
                     onChange={(e) => setShowUnreadOnly(e.target.checked)}
-                    className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                    className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                   />
                   <span className="ml-2 text-sm text-foreground">Show unread only</span>
                 </label>
@@ -269,7 +269,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                         onClick={() => setSelectedCategory(category.id)}
                         className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                           selectedCategory === category.id
-                            ? 'bg-indigo-100 text-indigo-700'
+                            ? 'bg-primary/20 text-primary'
                             : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
@@ -296,7 +296,7 @@ export const NotificationPage: React.FC<NotificationPageProps> = ({
                       onClick={() => setSelectedType(type.id)}
                       className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                         selectedType === type.id
-                          ? 'bg-indigo-100 text-indigo-700'
+                          ? 'bg-primary/20 text-primary'
                           : 'text-muted-foreground hover:bg-muted'
                       }`}
                     >
@@ -388,21 +388,21 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
   const getTypeIcon = () => {
     switch (notification.type) {
       case 'success':
-        return <CheckIcon className="h-5 w-5 text-green-500" />;
+        return <CheckIcon className="h-5 w-5 text-success" />;
       case 'warning':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5 text-warning" />;
       case 'error':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />;
       case 'task':
-        return <ClockIcon className="h-5 w-5 text-blue-500" />;
+        return <ClockIcon className="h-5 w-5 text-info" />;
       case 'event':
-        return <CalendarIcon className="h-5 w-5 text-purple-500" />;
+        return <CalendarIcon className="h-5 w-5 text-primary" />;
       case 'marketplace':
         return <ShoppingBagIcon className="h-5 w-5 text-orange-500" />;
       case 'system':
         return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
+        return <InformationCircleIcon className="h-5 w-5 text-info" />;
     }
   };
 
@@ -421,7 +421,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
   };
 
   const NotificationContent = () => (
-    <div className={`p-6 hover:bg-muted/50 transition-colors ${!notification.read ? 'bg-blue-50' : ''}`}>
+    <div className={`p-6 hover:bg-muted/50 transition-colors ${!notification.read ? 'bg-info/10' : ''}`}>
       <div className="flex items-start space-x-4">
         {/* Type Icon */}
         <div className="flex-shrink-0 mt-1">
@@ -487,7 +487,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
         {/* Unread Indicator */}
         {!notification.read && (
           <div className="flex-shrink-0 mt-2">
-            <div className="h-3 w-3 bg-indigo-600 rounded-full"></div>
+            <div className="h-3 w-3 bg-primary rounded-full"></div>
           </div>
         )}
       </div>

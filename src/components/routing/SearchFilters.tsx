@@ -53,7 +53,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
               <FunnelIcon className="h-4 w-4" />
               <span>Filters</span>
               {activeFilterCount > 0 && (
-                <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full">
+                <span className="bg-primary/20 text-indigo-800 text-xs px-2 py-1 rounded-full">
                   {activeFilterCount}
                 </span>
               )}
@@ -80,7 +80,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                       type="checkbox"
                       checked={(activeFilters[filter.type] || []).includes(option.value)}
                       onChange={(e) => onFilterChange(filter.type, option.value, e.target.checked)}
-                      className="rounded border-input text-indigo-600 focus-visible:ring-ring focus:ring-offset-0"
+                      className="rounded border-input text-primary focus-visible:ring-ring focus:ring-offset-0"
                     />
                     <span className="text-sm text-muted-foreground flex-1 group-hover:text-foreground">
                       {option.label}
@@ -157,9 +157,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
       )}
 
       {/* Search Tips */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
+      <div className="bg-info/10 rounded-lg border border-blue-200 p-4">
         <h3 className="text-sm font-medium text-blue-900 mb-2">Search Tips</h3>
-        <ul className="text-xs text-blue-700 space-y-1">
+        <ul className="text-xs text-info space-y-1">
           <li>• Use quotes for exact phrases: "tech conference"</li>
           <li>• Search by location: events in "San Francisco"</li>
           <li>• Filter by type to narrow results</li>

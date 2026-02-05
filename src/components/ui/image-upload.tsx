@@ -217,7 +217,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-foreground/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <label className="cursor-pointer">
                 <input
                   type="file"

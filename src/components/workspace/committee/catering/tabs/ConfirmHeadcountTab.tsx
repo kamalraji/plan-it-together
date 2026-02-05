@@ -45,17 +45,17 @@ interface ConfirmHeadcountTabProps {
 }
 
 const MEAL_TYPES = [
-  { value: 'breakfast', label: 'Breakfast', color: 'bg-amber-500' },
+  { value: 'breakfast', label: 'Breakfast', color: 'bg-warning' },
   { value: 'lunch', label: 'Lunch', color: 'bg-orange-500' },
   { value: 'dinner', label: 'Dinner', color: 'bg-rose-500' },
-  { value: 'snack', label: 'Snack', color: 'bg-purple-500' },
+  { value: 'snack', label: 'Snack', color: 'bg-primary' },
   { value: 'tea', label: 'Tea', color: 'bg-teal-500' },
 ];
 
 const STATUS_CONFIG = {
-  pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: Clock },
-  confirmed: { label: 'Confirmed', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: Check },
-  revised: { label: 'Revised', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: RefreshCw },
+  pending: { label: 'Pending', color: 'bg-warning/10 text-warning border-warning/20', icon: Clock },
+  confirmed: { label: 'Confirmed', color: 'bg-success/10 text-success border-success/20', icon: Check },
+  revised: { label: 'Revised', color: 'bg-info/10 text-info border-info/20', icon: RefreshCw },
 };
 
 export function ConfirmHeadcountTab({ workspaceId, eventId }: ConfirmHeadcountTabProps) {
@@ -198,7 +198,7 @@ export function ConfirmHeadcountTab({ workspaceId, eventId }: ConfirmHeadcountTa
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6 text-blue-500" />
+            <Users className="h-6 w-6 text-info" />
             Confirm Headcount
           </h2>
           <p className="text-muted-foreground">Track and confirm meal headcounts</p>
@@ -310,15 +310,15 @@ export function ConfirmHeadcountTab({ workspaceId, eventId }: ConfirmHeadcountTa
             <div className="text-xs text-muted-foreground">Total Meals</div>
           </CardContent>
         </Card>
-        <Card className="border-amber-500/20">
+        <Card className="border-warning/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-xs text-muted-foreground">Pending Confirmation</div>
           </CardContent>
         </Card>
-        <Card className="border-green-500/20">
+        <Card className="border-success/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
+            <div className="text-2xl font-bold text-success">{stats.confirmed}</div>
             <div className="text-xs text-muted-foreground">Confirmed</div>
           </CardContent>
         </Card>
@@ -334,9 +334,9 @@ export function ConfirmHeadcountTab({ workspaceId, eventId }: ConfirmHeadcountTa
 
       {/* Pending Confirmations Alert */}
       {stats.pending > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
+        <Card className="border-warning/30 bg-warning/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2 text-amber-600">
+            <CardTitle className="text-base flex items-center gap-2 text-warning">
               <AlertCircle className="h-4 w-4" />
               {stats.pending} Pending Confirmation{stats.pending > 1 ? 's' : ''}
             </CardTitle>
@@ -405,7 +405,7 @@ export function ConfirmHeadcountTab({ workspaceId, eventId }: ConfirmHeadcountTa
                         {conf.confirmation_deadline && (
                           <div className="flex items-center gap-2 text-xs">
                             <Clock className="h-3 w-3" />
-                            <span className={isDeadlinePassed ? 'text-red-500' : 'text-muted-foreground'}>
+                            <span className={isDeadlinePassed ? 'text-destructive' : 'text-muted-foreground'}>
                               Deadline: {format(parseISO(conf.confirmation_deadline), 'MMM d, h:mm a')}
                               {isDeadlinePassed && ' (passed)'}
                             </span>

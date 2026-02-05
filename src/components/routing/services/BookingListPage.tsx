@@ -98,9 +98,9 @@ export const BookingListPage: React.FC = () => {
           <div className="mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {[
-                { status: 'PENDING', label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: '⏳' },
-                { status: 'QUOTE_SENT', label: 'Quote Sent', color: 'bg-blue-100 text-blue-800', icon: '💰' },
-                { status: 'CONFIRMED', label: 'Confirmed', color: 'bg-green-100 text-green-800', icon: '✅' },
+                { status: 'PENDING', label: 'Pending', color: 'bg-warning/20 text-yellow-800', icon: '⏳' },
+                { status: 'QUOTE_SENT', label: 'Quote Sent', color: 'bg-info/20 text-blue-800', icon: '💰' },
+                { status: 'CONFIRMED', label: 'Confirmed', color: 'bg-success/20 text-success', icon: '✅' },
                 { status: 'IN_PROGRESS', label: 'In Progress', color: 'bg-purple-100 text-purple-800', icon: '🔄' },
                 { status: 'COMPLETED', label: 'Completed', color: 'bg-muted text-foreground', icon: '🎉' },
               ].map((item) => (
@@ -109,7 +109,7 @@ export const BookingListPage: React.FC = () => {
                   onClick={() => setStatusFilter(item.status)}
                   className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${
                     statusFilter === item.status
-                      ? 'border-blue-300 bg-blue-50'
+                      ? 'border-blue-300 bg-info/10'
                       : 'border-border bg-card hover:bg-muted/50'
                   }`}
                 >

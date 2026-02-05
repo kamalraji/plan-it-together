@@ -24,15 +24,15 @@ import {
 
 const statusColumns: { id: ContentItemStatus; label: string; icon: React.ElementType; color: string; bgColor: string }[] = [
   { id: 'draft', label: 'Draft', icon: Edit3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
-  { id: 'review', label: 'In Review', icon: Eye, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
+  { id: 'review', label: 'In Review', icon: Eye, color: 'text-warning', bgColor: 'bg-warning/10' },
   { id: 'approved', label: 'Approved', icon: CheckCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  { id: 'published', label: 'Published', icon: Send, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  { id: 'published', label: 'Published', icon: Send, color: 'text-info', bgColor: 'bg-info/10' },
 ];
 
 const priorityConfig = {
   low: 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
-  medium: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  high: 'bg-red-500/10 text-red-500 border-red-500/20',
+  medium: 'bg-warning/10 text-warning border-warning/20',
+  high: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
 interface ContentPipelineDragDropProps {
@@ -71,8 +71,8 @@ export function ContentPipelineDragDrop({ workspaceId, onCreateContent }: Conten
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-blue-500/10">
-              <FileText className="h-4 w-4 text-blue-500" />
+            <div className="p-1.5 rounded-lg bg-info/10">
+              <FileText className="h-4 w-4 text-info" />
             </div>
             Content Pipeline
           </CardTitle>

@@ -17,9 +17,9 @@ export function DepartmentKPICard({ workspaceId, departmentId }: DepartmentKPICa
   const getTrendIcon = (trend: DepartmentKPI['trend']) => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="h-3 w-3 text-green-500" />;
+        return <TrendingUp className="h-3 w-3 text-success" />;
       case 'down':
-        return <TrendingDown className="h-3 w-3 text-red-500" />;
+        return <TrendingDown className="h-3 w-3 text-destructive" />;
       default:
         return <Minus className="h-3 w-3 text-muted-foreground" />;
     }
@@ -28,11 +28,11 @@ export function DepartmentKPICard({ workspaceId, departmentId }: DepartmentKPICa
   const getInsightIcon = (type: DepartmentInsight['type']) => {
     switch (type) {
       case 'success':
-        return <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />;
+        return <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />;
       case 'warning':
-        return <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />;
+        return <AlertCircle className="h-4 w-4 text-warning flex-shrink-0" />;
       default:
-        return <Lightbulb className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+        return <Lightbulb className="h-4 w-4 text-info flex-shrink-0" />;
     }
   };
 

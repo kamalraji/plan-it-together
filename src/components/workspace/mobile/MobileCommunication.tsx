@@ -294,7 +294,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
   if (channelsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -376,7 +376,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/50">
         {messagesLoading ? (
           <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         ) : messages && messages.length > 0 ? (
           messages.map((message, index) => {
@@ -387,8 +387,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
             return (
               <div key={message.id} className={`flex space-x-3 ${isConsecutive ? 'mt-1' : 'mt-4'}`}>
                 {!isConsecutive && (
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-indigo-600 font-medium text-xs">
+                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary font-medium text-xs">
                       {getInitials(message.sender_name || getMemberName(message.sender_id))}
                     </span>
                   </div>
@@ -465,7 +465,7 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
             onMouseUp={stopVoiceRecording}
             onMouseLeave={stopVoiceRecording}
             className={`p-3 rounded-md transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center ${
-              isRecording ? 'bg-red-100 text-red-600' : 'hover:bg-muted text-muted-foreground'
+              isRecording ? 'bg-destructive/20 text-destructive' : 'hover:bg-muted text-muted-foreground'
             }`}
           >
             <MicrophoneIcon className="w-5 h-5" />
@@ -484,8 +484,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         {isRecording && (
           <div className="mt-2 text-center">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-red-600 font-medium">
+              <div className="w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
+              <span className="text-xs text-destructive font-medium">
                 Recording: {formatRecordingTime(recordingTime)}
               </span>
             </div>

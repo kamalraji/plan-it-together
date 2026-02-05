@@ -51,7 +51,7 @@ export const ReportHistoryViewer: React.FC<ReportHistoryViewerProps> = ({
       return <XCircle className="h-4 w-4 text-muted-foreground" />;
     }
     if (report.last_run_at) {
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      return <CheckCircle2 className="h-4 w-4 text-success" />;
     }
     return <Clock className="h-4 w-4 text-warning" />;
   };

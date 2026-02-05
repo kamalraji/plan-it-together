@@ -22,14 +22,14 @@ export function LogisticsStatusModal({ open, onOpenChange, workspaceId }: Logist
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'delivered':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-500/30">Delivered</Badge>;
+        return <Badge className="bg-success/10 text-success border-success/30">Delivered</Badge>;
       case 'in_transit':
       case 'in-transit':
-        return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">In Transit</Badge>;
+        return <Badge className="bg-info/10 text-info border-info/30">In Transit</Badge>;
       case 'pending':
         return <Badge className="bg-muted-foreground/30/10 text-muted-foreground border-gray-500/30">Pending</Badge>;
       case 'delayed':
-        return <Badge className="bg-red-500/10 text-red-600 border-red-500/30">Delayed</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/30">Delayed</Badge>;
       default:
         return <Badge className="bg-muted text-muted-foreground">Unknown</Badge>;
     }
@@ -48,11 +48,11 @@ export function LogisticsStatusModal({ open, onOpenChange, workspaceId }: Logist
 
   const getProgressColor = (status: string) => {
     switch (status) {
-      case 'delivered': return 'bg-green-500';
+      case 'delivered': return 'bg-success';
       case 'in_transit':
-      case 'in-transit': return 'bg-blue-500';
+      case 'in-transit': return 'bg-info';
       case 'pending': return 'bg-muted-foreground/20';
-      case 'delayed': return 'bg-red-500';
+      case 'delayed': return 'bg-destructive';
       default: return 'bg-muted';
     }
   };
@@ -66,22 +66,22 @@ export function LogisticsStatusModal({ open, onOpenChange, workspaceId }: Logist
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Truck className="h-5 w-5 text-green-500" />
+            <Truck className="h-5 w-5 text-success" />
             Logistics Status - Shipment Tracking
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-3 gap-4 py-4">
-          <div className="p-3 rounded-lg bg-green-500/10 text-center">
-            <p className="text-2xl font-bold text-green-600">{deliveredCount}</p>
+          <div className="p-3 rounded-lg bg-success/10 text-center">
+            <p className="text-2xl font-bold text-success">{deliveredCount}</p>
             <p className="text-xs text-muted-foreground">Delivered</p>
           </div>
-          <div className="p-3 rounded-lg bg-blue-500/10 text-center">
-            <p className="text-2xl font-bold text-blue-600">{inTransitCount}</p>
+          <div className="p-3 rounded-lg bg-info/10 text-center">
+            <p className="text-2xl font-bold text-info">{inTransitCount}</p>
             <p className="text-xs text-muted-foreground">In Transit</p>
           </div>
-          <div className="p-3 rounded-lg bg-red-500/10 text-center">
-            <p className="text-2xl font-bold text-red-600">{delayedCount}</p>
+          <div className="p-3 rounded-lg bg-destructive/10 text-center">
+            <p className="text-2xl font-bold text-destructive">{delayedCount}</p>
             <p className="text-xs text-muted-foreground">Delayed</p>
           </div>
         </div>

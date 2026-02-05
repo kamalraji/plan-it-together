@@ -66,7 +66,7 @@ export function PendingApprovalsPanel({
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-500" />
+            <Clock className="h-4 w-4 text-warning" />
             Pending Approvals
           </CardTitle>
         </CardHeader>
@@ -84,7 +84,7 @@ export function PendingApprovalsPanel({
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-500" />
+            <Clock className="h-4 w-4 text-warning" />
             Pending Approvals
             <Badge variant="secondary" className="ml-auto">
               {approvableRequests.length}
@@ -173,12 +173,12 @@ function ApprovalRequestItem({ request, onClick }: ApprovalRequestItemProps) {
 function getPriorityColor(priority: string): string {
   switch (priority) {
     case 'URGENT':
-      return 'border-red-500 text-red-600';
+      return 'border-destructive text-destructive';
     case 'HIGH':
       return 'border-orange-500 text-orange-600';
     case 'MEDIUM':
-      return 'border-yellow-500 text-yellow-600';
+      return 'border-warning text-warning';
     default:
-      return 'border-gray-300 text-gray-500';
+      return 'border-border text-muted-foreground';
   }
 }

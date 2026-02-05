@@ -134,7 +134,7 @@ export function CreateTemplateTab({ workspaceId }: CreateTemplateTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Layers className="h-6 w-6 text-blue-500" />
+            <Layers className="h-6 w-6 text-info" />
             Content Templates
           </h2>
           <p className="text-muted-foreground mt-1">

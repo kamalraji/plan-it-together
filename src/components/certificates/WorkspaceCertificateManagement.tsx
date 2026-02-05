@@ -134,19 +134,19 @@ export function WorkspaceCertificateManagement({ workspaceId }: WorkspaceCertifi
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Distributed</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              <CheckCircle2 className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.distributed}</div>
+              <div className="text-2xl font-bold text-success">{stats.distributed}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-500" />
+              <Clock className="h-4 w-4 text-warning" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             </CardContent>
           </Card>
           <Card>
@@ -399,7 +399,7 @@ export function WorkspaceCertificateManagement({ workspaceId }: WorkspaceCertifi
                             <td className="px-4 py-3 font-mono text-sm">{cert.certificateId}</td>
                             <td className="px-4 py-3">
                               {cert.distributedAt ? (
-                                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                <Badge variant="secondary" className="bg-success/20 text-success">
                                   <CheckCircle2 className="h-3 w-3 mr-1" />
                                   Distributed
                                 </Badge>

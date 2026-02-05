@@ -39,9 +39,9 @@ export function VIPGuestTracker(_props: VIPGuestTrackerProps) {
   const getStatusStyle = (status: VIPGuest['status']) => {
     switch (status) {
       case 'arrived': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
-      case 'traveling': return 'bg-blue-500/10 text-blue-600 border-blue-500/30';
-      case 'confirmed': return 'bg-purple-500/10 text-purple-600 border-purple-500/30';
-      case 'pending': return 'bg-amber-500/10 text-amber-600 border-amber-500/30';
+      case 'traveling': return 'bg-info/10 text-info border-info/30';
+      case 'confirmed': return 'bg-primary/10 text-primary border-purple-500/30';
+      case 'pending': return 'bg-warning/10 text-warning border-warning/30';
     }
   };
 
@@ -54,7 +54,7 @@ export function VIPGuestTracker(_props: VIPGuestTrackerProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Crown className="h-4 w-4 text-amber-500" />
+            <Crown className="h-4 w-4 text-warning" />
             VIP Guests
           </CardTitle>
           <Button size="sm" variant="outline" className="h-8 gap-1">
@@ -72,8 +72,8 @@ export function VIPGuestTracker(_props: VIPGuestTrackerProps) {
                 className="p-3 rounded-lg border border-border/50 bg-background/50 hover:bg-accent/30 transition-colors"
               >
                 <div className="flex items-start gap-3">
-                  <Avatar className="h-10 w-10 border-2 border-amber-500/30">
-                    <AvatarFallback className="bg-amber-500/10 text-amber-600 text-sm font-medium">
+                  <Avatar className="h-10 w-10 border-2 border-warning/30">
+                    <AvatarFallback className="bg-warning/10 text-warning text-sm font-medium">
                       {getInitials(guest.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -89,7 +89,7 @@ export function VIPGuestTracker(_props: VIPGuestTrackerProps) {
                       {guest.title} @ {guest.company}
                     </p>
                     {guest.notes && (
-                      <p className="text-xs text-blue-500 mt-1 truncate">
+                      <p className="text-xs text-info mt-1 truncate">
                         📌 {guest.notes}
                       </p>
                     )}

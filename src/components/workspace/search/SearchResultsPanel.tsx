@@ -128,9 +128,9 @@ function ResultItem({
       case 'task':
         return <CheckSquare className="h-4 w-4 text-primary" />;
       case 'message':
-        return <MessageSquare className="h-4 w-4 text-blue-500" />;
+        return <MessageSquare className="h-4 w-4 text-info" />;
       case 'member':
-        return <User className="h-4 w-4 text-green-500" />;
+        return <User className="h-4 w-4 text-success" />;
       default:
         return null;
     }
@@ -139,13 +139,13 @@ function ResultItem({
   const getStatusColor = (status?: string) => {
     switch (status?.toUpperCase()) {
       case 'DONE':
-        return 'text-green-600 bg-green-100';
+        return 'text-success bg-success/20';
       case 'IN_PROGRESS':
-        return 'text-blue-600 bg-blue-100';
+        return 'text-info bg-info/20';
       case 'BLOCKED':
-        return 'text-red-600 bg-red-100';
+        return 'text-destructive bg-destructive/20';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-muted-foreground bg-muted';
     }
   };
 

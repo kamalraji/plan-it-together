@@ -71,13 +71,13 @@ export function TaskDetailView({
       case TaskStatus.NOT_STARTED:
         return 'bg-muted text-foreground';
       case TaskStatus.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case TaskStatus.REVIEW_REQUIRED:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case TaskStatus.COMPLETED:
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case TaskStatus.BLOCKED:
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/20 text-red-800';
       default:
         return 'bg-muted text-foreground';
     }
@@ -88,11 +88,11 @@ export function TaskDetailView({
       case TaskPriority.LOW:
         return 'bg-muted text-foreground';
       case TaskPriority.MEDIUM:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case TaskPriority.HIGH:
         return 'bg-orange-100 text-orange-800';
       case TaskPriority.URGENT:
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/20 text-red-800';
       default:
         return 'bg-muted text-foreground';
     }
@@ -105,11 +105,11 @@ export function TaskDetailView({
       case TaskCategory.MARKETING:
         return 'bg-pink-100 text-pink-800';
       case TaskCategory.LOGISTICS:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case TaskCategory.TECHNICAL:
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case TaskCategory.REGISTRATION:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case TaskCategory.POST_EVENT:
         return 'bg-muted text-foreground';
       default:
@@ -206,7 +206,7 @@ export function TaskDetailView({
                     {task.category.replace('_', ' ')}
                   </span>
                   {isOverdue(task) && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-destructive/20 text-red-800">
                       Overdue
                     </span>
                   )}
@@ -231,14 +231,14 @@ export function TaskDetailView({
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === tab.id
-                      ? 'border-indigo-500 text-indigo-600'
+                      ? 'border-primary text-primary'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                     }`}
                 >
                   <span className="flex items-center space-x-2">
                     <span>{tab.name}</span>
                     {tab.count !== undefined && (
-                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'
+                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.id ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
                         }`}>
                         {tab.count}
                       </span>
@@ -269,8 +269,8 @@ export function TaskDetailView({
                     {task.assignee ? (
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-8 w-8">
-                          <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center">
-                            <span className="text-sm font-medium text-white">
+                          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary-foreground">
                               {task.assignee.user.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
@@ -293,7 +293,7 @@ export function TaskDetailView({
                   <div>
                     <h4 className="text-sm font-medium text-foreground mb-2">Due Date</h4>
                     {task.dueDate ? (
-                      <p className={`text-sm ${isOverdue(task) ? 'text-red-600 font-medium' : 'text-foreground'}`}>
+                      <p className={`text-sm ${isOverdue(task) ? 'text-destructive font-medium' : 'text-foreground'}`}>
                         {formatDate(task.dueDate)}
                       </p>
                     ) : (
@@ -368,7 +368,7 @@ export function TaskDetailView({
                     <div className="flex items-center space-x-3">
                       <div className="flex-1 bg-muted rounded-full h-2">
                         <div
-                          className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
                           style={{ width: `${task.progress}%` }}
                         ></div>
                       </div>

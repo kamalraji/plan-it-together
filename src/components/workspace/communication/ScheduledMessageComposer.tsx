@@ -233,7 +233,7 @@ function ScheduledMessageCard({ message, onCancel, onDelete }: ScheduledMessageC
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <Megaphone className="h-4 w-4 text-amber-500" />
+            <Megaphone className="h-4 w-4 text-warning" />
             <span className="text-xs text-muted-foreground">
               {format(scheduledFor, 'MMM d, yyyy')} at {format(scheduledFor, 'h:mm a')}
             </span>

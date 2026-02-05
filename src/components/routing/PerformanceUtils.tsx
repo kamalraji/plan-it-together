@@ -287,7 +287,7 @@ export const PaginationControls: React.FC<{
                   onClick={() => onPageChange(page)}
                   className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                     page === currentPage
-                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                      ? 'z-10 bg-primary/10 border-primary text-primary'
                       : 'bg-card border-input text-muted-foreground hover:bg-muted/50'
                   }`}
                 >
@@ -373,13 +373,13 @@ export const PerformanceMetrics: React.FC = () => {
     <div className="fixed bottom-4 right-4 z-50">
       <button
         onClick={() => setShowMetrics(!showMetrics)}
-        className="bg-foreground/80 text-white px-3 py-2 rounded-md text-xs hover:bg-muted-foreground/50"
+        className="bg-foreground/80 text-primary-foreground px-3 py-2 rounded-md text-xs hover:bg-muted-foreground/50"
       >
         Perf
       </button>
       
       {showMetrics && (
-        <div className="absolute bottom-full right-0 mb-2 bg-foreground/80 text-white p-3 rounded-md text-xs min-w-[200px]">
+        <div className="absolute bottom-full right-0 mb-2 bg-foreground/80 text-primary-foreground p-3 rounded-md text-xs min-w-[200px]">
           <div className="space-y-1">
             <div>Load Time: {metrics.loadTime.toFixed(2)}ms</div>
             <div>Memory: {(metrics.memoryUsage * 100).toFixed(1)}%</div>

@@ -58,11 +58,11 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
   const getSeverityBadge = (severity: Incident['severity']) => {
     switch (severity) {
       case 'critical':
-        return <Badge className="bg-red-600 text-white border-red-700">Critical</Badge>;
+        return <Badge className="bg-destructive text-primary-foreground border-red-700">Critical</Badge>;
       case 'high':
         return <Badge className="bg-orange-500/20 text-orange-600 border-orange-500/30">High</Badge>;
       case 'medium':
-        return <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30">Medium</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-warning/30">Medium</Badge>;
       default:
         return <Badge className="bg-muted text-muted-foreground">Low</Badge>;
     }
@@ -75,9 +75,9 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
       case 'closed':
         return <Badge className="bg-muted text-muted-foreground">Closed</Badge>;
       case 'investigating':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">Investigating</Badge>;
+        return <Badge className="bg-info/20 text-info border-info/30">Investigating</Badge>;
       default:
-        return <Badge className="bg-red-500/20 text-red-600 border-red-500/30">Open</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive border-destructive/30">Open</Badge>;
     }
   };
 
@@ -142,14 +142,14 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-500/20 rounded-full">
-                <AlertCircle className="h-6 w-6 text-red-500" />
+              <div className="p-3 bg-destructive/20 rounded-full">
+                <AlertCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-red-500">{openIncidents.length}</div>
+                <div className="text-3xl font-bold text-destructive">{openIncidents.length}</div>
                 <p className="text-sm text-muted-foreground">Open Incidents</p>
               </div>
             </div>
@@ -200,7 +200,7 @@ export function IncidentReportTab({ workspace }: IncidentReportTabProps) {
                       <div
                         key={incident.id}
                         className={`p-4 rounded-lg transition-colors ${
-                          incident.severity === 'critical' ? 'bg-red-500/10 border border-red-500/30' : 'bg-muted/30 hover:bg-muted/50'
+                          incident.severity === 'critical' ? 'bg-destructive/10 border border-destructive/30' : 'bg-muted/30 hover:bg-muted/50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-4 mb-3">

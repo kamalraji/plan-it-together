@@ -291,7 +291,7 @@ export const CommunicationPage: React.FC = () => {
                       type="checkbox"
                       checked={showUnreadOnly}
                       onChange={(e) => setShowUnreadOnly(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                      className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                     />
                     <span className="ml-2 text-sm text-foreground">Show unread only</span>
                   </label>
@@ -309,7 +309,7 @@ export const CommunicationPage: React.FC = () => {
                           onClick={() => setSelectedCategory(category.id)}
                           className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${
                             selectedCategory === category.id
-                              ? 'bg-indigo-100 text-indigo-700'
+                              ? 'bg-primary/20 text-primary'
                               : 'text-muted-foreground hover:bg-muted'
                           }`}
                         >
@@ -413,7 +413,7 @@ export const CommunicationPage: React.FC = () => {
                           type="checkbox"
                           checked={value}
                           onChange={(e) => handlePreferenceChange('emailNotifications', key, e.target.checked)}
-                          className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                          className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                         />
                       </label>
                     ))}
@@ -436,7 +436,7 @@ export const CommunicationPage: React.FC = () => {
                           value={option.value}
                           checked={preferences.frequency === option.value}
                           onChange={(e) => setPreferences(prev => ({ ...prev, frequency: e.target.value as any }))}
-                          className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                          className="mt-1 h-4 w-4 text-primary focus-visible:ring-ring border-input"
                         />
                         <div className="ml-3">
                           <span className="text-sm font-medium text-foreground">{option.label}</span>
@@ -456,7 +456,7 @@ export const CommunicationPage: React.FC = () => {
                         type="checkbox"
                         checked={preferences.quietHours.enabled}
                         onChange={(e) => handlePreferenceChange('quietHours', 'enabled', e.target.checked)}
-                        className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                        className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                       />
                       <span className="ml-2 text-sm text-foreground">Enable quiet hours</span>
                     </label>
@@ -523,16 +523,16 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'email': return 'bg-blue-100 text-blue-800';
-      case 'notification': return 'bg-yellow-100 text-yellow-800';
-      case 'announcement': return 'bg-green-100 text-green-800';
+      case 'email': return 'bg-info/20 text-blue-800';
+      case 'notification': return 'bg-warning/20 text-yellow-800';
+      case 'announcement': return 'bg-success/20 text-success';
       case 'reminder': return 'bg-orange-100 text-orange-800';
       default: return 'bg-muted text-foreground';
     }
   };
 
   return (
-    <div className={`p-6 hover:bg-muted/50 transition-colors ${!message.read ? 'bg-blue-50' : ''}`}>
+    <div className={`p-6 hover:bg-muted/50 transition-colors ${!message.read ? 'bg-info/10' : ''}`}>
       <div className="flex items-start space-x-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
@@ -591,7 +591,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
             {/* Unread Indicator */}
             {!message.read && (
               <div className="flex-shrink-0 ml-4">
-                <div className="h-3 w-3 bg-indigo-600 rounded-full"></div>
+                <div className="h-3 w-3 bg-primary rounded-full"></div>
               </div>
             )}
           </div>

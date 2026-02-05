@@ -444,7 +444,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               key={category.value}
               className={`relative rounded-lg border p-4 cursor-pointer hover:bg-muted/50 ${
                 formData.serviceCategories.includes(category.value)
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-info bg-info/10'
                   : 'border-input'
               }`}
               onClick={() => handleServiceCategoryToggle(category.value)}
@@ -455,7 +455,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                     type="checkbox"
                     checked={formData.serviceCategories.includes(category.value)}
                     onChange={() => handleServiceCategoryToggle(category.value)}
-                    className="focus-visible:ring-ring h-4 w-4 text-blue-600 border-input rounded"
+                    className="focus-visible:ring-ring h-4 w-4 text-info border-input rounded"
                   />
                 </div>
                 <div className="ml-3">
@@ -523,7 +523,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             </div>
             <p className="text-xs text-muted-foreground">PDF, PNG, JPG up to 10MB</p>
             {formData.businessLicense && (
-              <p className="text-sm text-green-600">✓ Document uploaded</p>
+              <p className="text-sm text-success">✓ Document uploaded</p>
             )}
           </div>
         </div>
@@ -568,7 +568,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             </div>
             <p className="text-xs text-muted-foreground">PDF, PNG, JPG up to 10MB</p>
             {formData.insuranceCertificate && (
-              <p className="text-sm text-green-600">✓ Document uploaded</p>
+              <p className="text-sm text-success">✓ Document uploaded</p>
             )}
           </div>
         </div>
@@ -665,7 +665,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 <button
                   type="button"
                   onClick={() => removePortfolioItem(item.id)}
-                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-destructive text-primary-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -698,14 +698,14 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                   <div
                     className={`relative flex h-8 w-8 items-center justify-center rounded-full ${
                       step.id < currentStep
-                        ? 'bg-blue-600'
+                        ? 'bg-primary'
                         : step.id === currentStep
-                        ? 'border-2 border-blue-600 bg-card'
+                        ? 'border-2 border-primary bg-card'
                         : 'border-2 border-input bg-card'
                     }`}
                   >
                     {step.id < currentStep ? (
-                      <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <svg className="h-5 w-5 text-primary-foreground" viewBox="0 0 20 20" fill="currentColor">
                         <path
                           fillRule="evenodd"
                           d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -715,7 +715,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                     ) : (
                       <span
                         className={`text-sm font-medium ${
-                          step.id === currentStep ? 'text-blue-600' : 'text-muted-foreground'
+                          step.id === currentStep ? 'text-info' : 'text-muted-foreground'
                         }`}
                       >
                         {step.id}
@@ -727,7 +727,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 {stepIdx !== steps.length - 1 && (
                   <div
                     className={`absolute top-4 left-4 -ml-px mt-0.5 h-full w-0.5 ${
-                      step.id < currentStep ? 'bg-blue-600' : 'bg-muted'
+                      step.id < currentStep ? 'bg-primary' : 'bg-muted'
                     }`}
                   />
                 )}
@@ -749,7 +749,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="mb-6 bg-destructive/10 border border-red-200 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">

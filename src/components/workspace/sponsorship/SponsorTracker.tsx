@@ -25,12 +25,12 @@ const tierColors: Record<SponsorTier, string> = {
 
 const statusColors: Record<SponsorStatus, string> = {
   prospect: 'bg-muted text-muted-foreground',
-  contacted: 'bg-blue-500/10 text-blue-500',
-  negotiating: 'bg-amber-500/10 text-amber-500',
+  contacted: 'bg-info/10 text-info',
+  negotiating: 'bg-warning/10 text-warning',
   confirmed: 'bg-emerald-500/10 text-emerald-500',
   active: 'bg-emerald-500/10 text-emerald-500',
   completed: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-red-500/10 text-red-500',
+  cancelled: 'bg-destructive/10 text-destructive',
 };
 
 export function SponsorTracker({ workspaceId }: SponsorTrackerProps) {

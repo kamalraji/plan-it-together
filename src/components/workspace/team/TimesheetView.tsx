@@ -29,8 +29,8 @@ export function TimesheetView({ workspaceId }: TimesheetViewProps) {
 
   const statusColors: Record<string, string> = {
     draft: 'bg-muted text-muted-foreground',
-    submitted: 'bg-blue-500/20 text-blue-600',
-    approved: 'bg-green-500/20 text-green-600',
+    submitted: 'bg-info/20 text-info',
+    approved: 'bg-success/20 text-success',
     rejected: 'bg-destructive/20 text-destructive',
   };
 

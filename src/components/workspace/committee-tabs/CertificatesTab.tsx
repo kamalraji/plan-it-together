@@ -239,8 +239,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <LayoutTemplate className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <LayoutTemplate className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{templates.length}</p>
@@ -265,8 +265,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.pending ?? 0}</p>
@@ -278,8 +278,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Send className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Send className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.distributed ?? 0}</p>
@@ -418,8 +418,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
               <div className="p-4 rounded-lg border space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-500/10">
-                      <Award className="h-5 w-5 text-blue-500" />
+                    <div className="p-2 rounded-lg bg-info/10">
+                      <Award className="h-5 w-5 text-info" />
                     </div>
                     <div>
                       <h4 className="font-medium">Completion Certificate</h4>
@@ -446,8 +446,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
               <div className="p-4 rounded-lg border space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-500/10">
-                      <Award className="h-5 w-5 text-amber-500" />
+                    <div className="p-2 rounded-lg bg-warning/10">
+                      <Award className="h-5 w-5 text-warning" />
                     </div>
                     <div>
                       <h4 className="font-medium">Merit Certificate</h4>
@@ -474,8 +474,8 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
               <div className="p-4 rounded-lg border space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-purple-500/10">
-                      <Award className="h-5 w-5 text-purple-500" />
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Award className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <h4 className="font-medium">Appreciation Certificate</h4>
@@ -681,7 +681,7 @@ export function CertificatesTab({ workspace }: CertificatesTabProps) {
                                 Sent
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="text-amber-500 border-amber-500/30">
+                              <Badge variant="outline" className="text-warning border-warning/30">
                                 <Clock className="h-3 w-3 mr-1" />
                                 Pending
                               </Badge>

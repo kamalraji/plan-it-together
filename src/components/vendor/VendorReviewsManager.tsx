@@ -135,7 +135,7 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600 flex items-center justify-center gap-1">
+            <div className="text-2xl font-bold text-warning flex items-center justify-center gap-1">
               <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
               {stats.averageRating}
             </div>
@@ -144,13 +144,13 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
         </Card>
         <Card className={stats.pending > 0 ? 'border-yellow-200' : ''}>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-sm text-muted-foreground">Awaiting Response</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.responded}</div>
+            <div className="text-2xl font-bold text-success">{stats.responded}</div>
             <div className="text-sm text-muted-foreground">Responded</div>
           </CardContent>
         </Card>
@@ -200,7 +200,7 @@ const VendorReviewsManager: React.FC<VendorReviewsManagerProps> = ({ vendorId })
                   <div className="flex items-center gap-2">
                     {renderStars(review.rating)}
                     {review.is_verified_booking && (
-                      <Badge variant="outline" className="text-green-600 border-green-200">
+                      <Badge variant="outline" className="text-success border-green-200">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         Verified
                       </Badge>

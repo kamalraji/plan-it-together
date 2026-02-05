@@ -102,13 +102,13 @@ export function TaskCalendarView({
   const getPriorityColor = (priority?: string) => {
     switch (priority?.toLowerCase()) {
       case 'critical':
-        return 'bg-red-500';
+        return 'bg-destructive';
       case 'high':
         return 'bg-orange-500';
       case 'medium':
-        return 'bg-yellow-500';
+        return 'bg-warning';
       default:
-        return 'bg-blue-500';
+        return 'bg-info';
     }
   };
 
@@ -197,7 +197,7 @@ export function TaskCalendarView({
                     {dayTasks.slice(0, 3).map(task => (
                       <div
                         key={task.id}
-                        className={`text-[10px] px-1 py-0.5 rounded truncate cursor-pointer ${getPriorityColor(task.priority)} text-white`}
+                        className={`text-[10px] px-1 py-0.5 rounded truncate cursor-pointer ${getPriorityColor(task.priority)} text-primary-foreground`}
                         onClick={(e) => {
                           e.stopPropagation();
                           onTaskClick?.(task);
@@ -226,7 +226,7 @@ export function TaskCalendarView({
         {/* Legend */}
         <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-red-500" />
+            <div className="w-3 h-3 rounded bg-destructive" />
             <span>Critical</span>
           </div>
           <div className="flex items-center gap-1">
@@ -234,11 +234,11 @@ export function TaskCalendarView({
             <span>High</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded bg-warning" />
             <span>Medium</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-blue-500" />
+            <div className="w-3 h-3 rounded bg-info" />
             <span>Low</span>
           </div>
         </div>

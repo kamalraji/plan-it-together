@@ -165,7 +165,7 @@ export const RegistrationMobileCard: React.FC<RegistrationMobileCardProps> = ({
                     disabled={isUpdating}
                     className="flex-1 min-h-[44px]"
                   >
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-success" />
                     Approve
                   </Button>
                 )}
@@ -198,13 +198,13 @@ export const RegistrationMobileCard: React.FC<RegistrationMobileCardProps> = ({
                   <DropdownMenuContent align="end">
                     {registration.status === 'WAITLISTED' && (
                       <DropdownMenuItem onClick={() => onStatusChange('CONFIRMED')}>
-                        <UserCheck className="h-4 w-4 mr-2 text-purple-600" />
+                        <UserCheck className="h-4 w-4 mr-2 text-primary" />
                         Move to Confirmed
                       </DropdownMenuItem>
                     )}
                     {registration.status === 'PENDING' && (
                       <DropdownMenuItem onClick={() => onStatusChange('WAITLISTED')}>
-                        <Users className="h-4 w-4 mr-2 text-blue-600" />
+                        <Users className="h-4 w-4 mr-2 text-info" />
                         Add to Waitlist
                       </DropdownMenuItem>
                     )}

@@ -6,8 +6,8 @@ import { Camera, Image, Video, FileAudio, Download, Eye, Upload } from 'lucide-r
 import { useMediaAssets } from '@/hooks/useContentDepartmentData';
 
 const categoryConfig = {
-  photo: { icon: Image, label: 'Photos', color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-  video: { icon: Video, label: 'Videos', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  photo: { icon: Image, label: 'Photos', color: 'text-primary', bgColor: 'bg-primary/10' },
+  video: { icon: Video, label: 'Videos', color: 'text-info', bgColor: 'bg-info/10' },
   audio: { icon: FileAudio, label: 'Audio', color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
 };
 
@@ -54,8 +54,8 @@ export function MediaAssetsConnected({ workspaceId, onUpload }: MediaAssetsConne
       <Card className="bg-card border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-purple-500/10">
-              <Camera className="h-4 w-4 text-purple-500" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <Camera className="h-4 w-4 text-primary" />
             </div>
             Media Assets
           </CardTitle>
@@ -77,8 +77,8 @@ export function MediaAssetsConnected({ workspaceId, onUpload }: MediaAssetsConne
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-purple-500/10">
-              <Camera className="h-4 w-4 text-purple-500" />
+            <div className="p-1.5 rounded-lg bg-primary/10">
+              <Camera className="h-4 w-4 text-primary" />
             </div>
             Media Assets
           </CardTitle>

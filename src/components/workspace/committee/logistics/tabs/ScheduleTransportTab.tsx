@@ -122,7 +122,7 @@ export function ScheduleTransportTab({ workspaceId }: ScheduleTransportTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Bus className="h-8 w-8 text-blue-500" />
+              <Bus className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.inProgress}</p>
                 <p className="text-sm text-muted-foreground">In Progress</p>
@@ -133,7 +133,7 @@ export function ScheduleTransportTab({ workspaceId }: ScheduleTransportTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.completed}</p>
                 <p className="text-sm text-muted-foreground">Completed</p>
@@ -144,7 +144,7 @@ export function ScheduleTransportTab({ workspaceId }: ScheduleTransportTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Truck className="h-8 w-8 text-purple-500" />
+              <Truck className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{stats.total}</p>
                 <p className="text-sm text-muted-foreground">Total Routes</p>

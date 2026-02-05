@@ -248,14 +248,14 @@ export const RolesDiagramPage: React.FC = () => {
             </p>
           </div>
 
-          <Card className="shadow-soft border-coral/20 bg-black/90 text-muted-foreground">
+          <Card className="shadow-soft border-coral/20 bg-foreground/90 text-muted-foreground">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Mermaid source (kept in sync with <code className="font-mono text-xs">docs/role-model-diagram.md</code>)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="max-h-[480px] overflow-auto rounded-md bg-black/80 p-4 text-xs sm:text-sm text-muted-foreground">
+              <pre className="max-h-[480px] overflow-auto rounded-md bg-foreground/80 p-4 text-xs sm:text-sm text-muted-foreground">
                 <code className="language-mermaid whitespace-pre">{mermaidDiagram}</code>
               </pre>
             </CardContent>

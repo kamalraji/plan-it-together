@@ -27,9 +27,9 @@ const recentFindings = [
 
 const getSeverityBadge = (severity: string) => {
   switch (severity) {
-    case 'high': return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">High</Badge>;
-    case 'medium': return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">Medium</Badge>;
-    case 'low': return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Low</Badge>;
+    case 'high': return <Badge className="bg-destructive/10 text-destructive border-destructive/20">High</Badge>;
+    case 'medium': return <Badge className="bg-warning/10 text-warning border-warning/20">Medium</Badge>;
+    case 'low': return <Badge className="bg-info/10 text-info border-info/20">Low</Badge>;
     default: return null;
   }
 };
@@ -68,9 +68,9 @@ export function SecurityAuditTab({ workspaceId: _workspaceId }: SecurityAuditTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-8 w-8 text-amber-500" />
+              <AlertTriangle className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">{totalIssues}</p>
+                <p className="text-2xl font-bold text-warning">{totalIssues}</p>
                 <p className="text-sm text-muted-foreground">Total Issues</p>
               </div>
             </div>
@@ -79,9 +79,9 @@ export function SecurityAuditTab({ workspaceId: _workspaceId }: SecurityAuditTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <ShieldAlert className="h-8 w-8 text-red-500" />
+              <ShieldAlert className="h-8 w-8 text-destructive" />
               <div>
-                <p className="text-2xl font-bold text-red-500">{openFindings}</p>
+                <p className="text-2xl font-bold text-destructive">{openFindings}</p>
                 <p className="text-sm text-muted-foreground">Open Findings</p>
               </div>
             </div>
@@ -115,8 +115,8 @@ export function SecurityAuditTab({ workspaceId: _workspaceId }: SecurityAuditTab
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     {item.status === 'passed' && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
-                    {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-amber-500" />}
-                    {item.status === 'critical' && <ShieldAlert className="h-4 w-4 text-red-500" />}
+                    {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-warning" />}
+                    {item.status === 'critical' && <ShieldAlert className="h-4 w-4 text-destructive" />}
                     <p className="font-medium">{item.category}</p>
                   </div>
                   <div className="flex items-center gap-4">

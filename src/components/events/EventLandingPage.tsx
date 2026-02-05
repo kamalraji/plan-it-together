@@ -356,7 +356,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 <button
                   onClick={() => setShowRegistrationModal(true)}
                   disabled={registrationMutation.isPending}
-                  className="bg-card text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors disabled:opacity-50"
+                  className="bg-card text-primary px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {registrationMutation.isPending
                     ? 'Registering...'
@@ -365,7 +365,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               ) : (
                 <button
                   onClick={() => navigate('/register')}
-                  className="bg-card text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors"
+                  className="bg-card text-primary px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors"
                 >
                   Sign Up to Register
                 </button>
@@ -625,8 +625,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Status:</span>
-                    <span className={`font-medium capitalize ${event.status === 'PUBLISHED' ? 'text-green-600' :
-                        event.status === 'DRAFT' ? 'text-yellow-600' : 'text-muted-foreground'
+                    <span className={`font-medium capitalize ${event.status === 'PUBLISHED' ? 'text-success' :
+                        event.status === 'DRAFT' ? 'text-warning' : 'text-muted-foreground'
                       }`}>
                       {event.status.toLowerCase()}
                     </span>
@@ -661,15 +661,15 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                         </div>
                       </div>
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                          <div className="h-3 w-3 bg-indigo-600 rounded-full"></div>
+                        <div className="h-8 w-8 bg-primary/20 rounded-full flex items-center justify-center">
+                          <div className="h-3 w-3 bg-primary rounded-full"></div>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
                           <h3 className="text-lg font-medium text-foreground">{item.title}</h3>
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-blue-100 text-blue-800' :
-                              item.type === 'break' ? 'bg-green-100 text-green-800' :
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-info/20 text-blue-800' :
+                              item.type === 'break' ? 'bg-success/20 text-success' :
                                 item.type === 'networking' ? 'bg-purple-100 text-purple-800' :
                                   'bg-muted text-foreground'
                             }`}>
@@ -727,16 +727,16 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                     .map((prize: PrizeInfo, index: number) => (
                       <div key={prize.id || index} className="border border-border rounded-lg p-6">
                         <div className="text-center">
-                          <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${prize.position === 1 ? 'bg-yellow-100 text-yellow-600' :
+                          <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${prize.position === 1 ? 'bg-warning/20 text-warning' :
                               prize.position === 2 ? 'bg-muted text-muted-foreground' :
                                 prize.position === 3 ? 'bg-orange-100 text-orange-600' :
-                                  'bg-blue-100 text-blue-600'
+                                  'bg-info/20 text-info'
                             }`}>
                             <span className="text-lg font-bold">#{prize.position}</span>
                           </div>
                           <h3 className="text-lg font-semibold text-foreground mb-2">{prize.title}</h3>
                           {prize.value && (
-                            <p className="text-2xl font-bold text-indigo-600 mb-3">{prize.value}</p>
+                            <p className="text-2xl font-bold text-primary mb-3">{prize.value}</p>
                           )}
                           <p className="text-muted-foreground text-sm">{prize.description}</p>
                           {prize.category && (
@@ -774,9 +774,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
                     return (
                       <div key={tier}>
-                        <h3 className={`text-xl font-semibold mb-4 ${tier === 'title' ? 'text-purple-600' :
+                        <h3 className={`text-xl font-semibold mb-4 ${tier === 'title' ? 'text-primary' :
                             tier === 'platinum' ? 'text-muted-foreground' :
-                              tier === 'gold' ? 'text-yellow-600' :
+                              tier === 'gold' ? 'text-warning' :
                                 tier === 'silver' ? 'text-muted-foreground' :
                                   'text-orange-600'
                           }`}>
@@ -851,7 +851,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
       {/* Registration Modal */}
       {showRegistrationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-foreground bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-card rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Confirm Registration</h3>
             <p className="text-muted-foreground mb-6">

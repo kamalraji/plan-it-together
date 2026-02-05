@@ -60,13 +60,13 @@ export function TravelLogistics({ workspace }: TravelLogisticsProps) {
 
   const getStatusIcon = (status: string) => {
     if (status === 'confirmed') return <CheckCircle2 className="h-3 w-3 text-emerald-500" />;
-    if (status === 'pending') return <Clock className="h-3 w-3 text-amber-500" />;
+    if (status === 'pending') return <Clock className="h-3 w-3 text-warning" />;
     return <span className="text-xs text-muted-foreground">—</span>;
   };
 
   const getStatusBg = (status: string) => {
     if (status === 'confirmed') return 'bg-emerald-500/10';
-    if (status === 'pending') return 'bg-amber-500/10';
+    if (status === 'pending') return 'bg-warning/10';
     return 'bg-muted/30';
   };
 

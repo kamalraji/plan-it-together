@@ -66,7 +66,7 @@ export function PreferencesStep({
           animate={{ scale: 1 }}
           className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-coral to-teal mb-4"
         >
-          <Sparkles className="h-6 w-6 text-white" />
+          <Sparkles className="h-6 w-6 text-primary-foreground" />
         </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}

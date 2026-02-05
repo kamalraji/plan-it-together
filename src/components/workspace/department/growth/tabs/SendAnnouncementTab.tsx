@@ -18,10 +18,10 @@ interface SendAnnouncementTabProps {
 }
 
 const typeConfig: Record<string, { color: string; icon: React.ElementType }> = {
-  general: { color: 'bg-blue-500/20 text-blue-600', icon: MessageSquare },
-  urgent: { color: 'bg-red-500/20 text-red-600', icon: Bell },
-  reminder: { color: 'bg-amber-500/20 text-amber-600', icon: Clock },
-  update: { color: 'bg-green-500/20 text-green-600', icon: CheckCircle2 },
+  general: { color: 'bg-info/20 text-info', icon: MessageSquare },
+  urgent: { color: 'bg-destructive/20 text-destructive', icon: Bell },
+  reminder: { color: 'bg-warning/20 text-warning', icon: Clock },
+  update: { color: 'bg-success/20 text-success', icon: CheckCircle2 },
 };
 
 const audienceOptions = [

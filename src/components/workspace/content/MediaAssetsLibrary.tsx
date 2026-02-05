@@ -39,9 +39,9 @@ export function MediaAssetsLibrary({ workspaceId }: MediaAssetsLibraryProps) {
   };
 
   const getTypeColor = (type: string) => {
-    if (type === 'image' || type === 'photo') return 'bg-purple-500/10 text-purple-500';
-    if (type === 'video') return 'bg-red-500/10 text-red-500';
-    return 'bg-blue-500/10 text-blue-500';
+    if (type === 'image' || type === 'photo') return 'bg-primary/10 text-primary';
+    if (type === 'video') return 'bg-destructive/10 text-destructive';
+    return 'bg-info/10 text-info';
   };
 
   const filteredAssets = assets.filter((asset) => {

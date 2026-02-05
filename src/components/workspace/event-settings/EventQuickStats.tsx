@@ -58,7 +58,7 @@ const StatCard: React.FC<StatCardProps> = ({
           {trend && (
             <div className={cn(
               "flex items-center gap-1 mt-1 text-xs font-medium",
-              trend.isPositive ? "text-green-600" : "text-red-500"
+              trend.isPositive ? "text-success" : "text-destructive"
             )}>
               <TrendingUp className={cn("h-3 w-3", !trend.isPositive && "rotate-180")} />
               <span>{trend.value}% {trend.label}</span>
@@ -222,8 +222,8 @@ export const EventQuickStats: React.FC<EventQuickStatsProps> = ({ eventId }) => 
           title="Attendance"
           value={`${stats.attendance.rate}%`}
           subtitle={`${stats.attendance.checkedIn} checked in`}
-          icon={<UserCheck className="h-5 w-5 text-green-600" />}
-          iconBg="bg-green-500/10"
+          icon={<UserCheck className="h-5 w-5 text-success" />}
+          iconBg="bg-success/10"
         />
 
         {/* Tickets Sold */}
@@ -231,8 +231,8 @@ export const EventQuickStats: React.FC<EventQuickStatsProps> = ({ eventId }) => 
           title="Tickets Sold"
           value={stats.tickets.sold}
           subtitle={`Across ${stats.tickets.tiersCount} tier${stats.tickets.tiersCount !== 1 ? 's' : ''}`}
-          icon={<Ticket className="h-5 w-5 text-blue-600" />}
-          iconBg="bg-blue-500/10"
+          icon={<Ticket className="h-5 w-5 text-info" />}
+          iconBg="bg-info/10"
           progress={stats.tickets.totalCapacity > 0 ? {
             value: stats.tickets.sold,
             max: stats.tickets.totalCapacity

@@ -45,7 +45,7 @@ export function MaterialsCollectionTab({ workspaceId }: MaterialsCollectionTabPr
 
   const getStatusIcon = (status: { submitted: boolean | null; approved: boolean | null }) => {
     if (status.approved) return <CheckCircle className="h-4 w-4 text-emerald-500" />;
-    if (status.submitted) return <AlertCircle className="h-4 w-4 text-amber-500" />;
+    if (status.submitted) return <AlertCircle className="h-4 w-4 text-warning" />;
     return <Clock className="h-4 w-4 text-muted-foreground" />;
   };
 

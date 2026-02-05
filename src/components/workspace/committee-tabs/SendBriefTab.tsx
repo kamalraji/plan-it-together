@@ -88,7 +88,7 @@ export function SendBriefTab({ workspace }: SendBriefTabProps) {
       case 'sent':
         return { className: 'border-emerald-500/30 text-emerald-600', label: 'Sent' };
       case 'scheduled':
-        return { className: 'border-amber-500/30 text-amber-600', label: 'Scheduled' };
+        return { className: 'border-warning/30 text-warning', label: 'Scheduled' };
       case 'draft':
       default:
         return { className: 'border-slate-500/30 text-muted-foreground', label: 'Draft' };
@@ -100,7 +100,7 @@ export function SendBriefTab({ workspace }: SendBriefTabProps) {
       case 'sent':
         return <CheckCircle className="h-4 w-4 text-emerald-500" />;
       case 'scheduled':
-        return <Clock className="h-4 w-4 text-amber-500" />;
+        return <Clock className="h-4 w-4 text-warning" />;
       default:
         return <FileText className="h-4 w-4 text-muted-foreground" />;
     }
@@ -155,7 +155,7 @@ export function SendBriefTab({ workspace }: SendBriefTabProps) {
             {isLoading ? (
               <Skeleton className="h-8 w-12" />
             ) : (
-              <div className="text-2xl font-bold text-amber-600">{stats.scheduled}</div>
+              <div className="text-2xl font-bold text-warning">{stats.scheduled}</div>
             )}
             <div className="text-xs text-muted-foreground">Scheduled</div>
           </CardContent>
@@ -297,7 +297,7 @@ export function SendBriefTab({ workspace }: SendBriefTabProps) {
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
                       brief.status === 'sent' ? 'bg-emerald-500/10' :
-                      brief.status === 'scheduled' ? 'bg-amber-500/10' :
+                      brief.status === 'scheduled' ? 'bg-warning/10' :
                       'bg-slate-500/10'
                     }`}>
                       {getStatusIcon(brief.status)}

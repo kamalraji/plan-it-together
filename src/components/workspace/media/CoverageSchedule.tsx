@@ -31,9 +31,9 @@ export function CoverageSchedule({ workspaceId }: CoverageScheduleProps) {
   const getPriorityColor = (priority: CoverageScheduleType['priority']) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-destructive/20 text-red-800 border-red-200';
       case 'medium':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-warning/20 text-amber-800 border-amber-200';
       case 'low':
         return 'bg-muted text-foreground border-border';
     }

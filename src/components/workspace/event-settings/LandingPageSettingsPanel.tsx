@@ -136,8 +136,8 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Eye className="h-5 w-5 text-blue-500" />
+                <div className="p-2 bg-info/10 rounded-lg">
+                  <Eye className="h-5 w-5 text-info" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{pageViews?.toLocaleString() || 0}</p>
@@ -150,8 +150,8 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-500/10 rounded-lg">
-                  <FileEdit className="h-5 w-5 text-green-500" />
+                <div className="p-2 bg-success/10 rounded-lg">
+                  <FileEdit className="h-5 w-5 text-success" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{pageStats?.totalSections || 0}</p>
@@ -164,8 +164,8 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <Clock className="h-5 w-5 text-purple-500" />
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Clock className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">
@@ -279,13 +279,13 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-500/10 rounded-lg">
-                  <Edit3 className="h-6 w-6 text-green-500" />
+                <div className="p-3 bg-success/10 rounded-lg">
+                  <Edit3 className="h-6 w-6 text-success" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-medium">Page Builder Access</p>
-                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                    <Badge className="bg-success/10 text-success border-success/20">
                       Assigned
                     </Badge>
                   </div>
@@ -307,8 +307,8 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <BarChart3 className="h-5 w-5 text-blue-500" />
+                <div className="p-2 bg-info/10 rounded-lg">
+                  <BarChart3 className="h-5 w-5 text-info" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{pageViews?.toLocaleString() || 0}</p>
@@ -321,8 +321,8 @@ export const LandingPageSettingsPanel: React.FC<LandingPageSettingsPanelProps> =
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <Clock className="h-5 w-5 text-purple-500" />
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Clock className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">

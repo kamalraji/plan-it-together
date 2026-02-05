@@ -62,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
 
         {/* Sponsored/Featured Badge */}
         {Math.random() > 0.7 && (
-          <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] px-1.5 py-0.5">
+          <Badge className="absolute top-2 left-2 bg-warning text-primary-foreground text-[10px] px-1.5 py-0.5">
             <Zap className="w-3 h-3 mr-0.5" />
             Deal
           </Badge>
@@ -79,7 +79,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
           >
             {service.vendor?.business_name}
           </Link>
-          {isVerified && <BadgeCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
+          {isVerified && <BadgeCheck className="w-3.5 h-3.5 text-info shrink-0" />}
         </div>
 
         {/* Service Name */}
@@ -91,7 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
         <div className="flex items-center gap-1.5 mb-2">
           {reviewCount > 0 ? (
             <>
-              <div className="flex items-center gap-0.5 bg-emerald-600 text-white text-xs px-1.5 py-0.5 rounded">
+              <div className="flex items-center gap-0.5 bg-emerald-600 text-primary-foreground text-xs px-1.5 py-0.5 rounded">
                 <span className="font-medium">{rating.toFixed(1)}</span>
                 <Star className="w-3 h-3 fill-current" />
               </div>
@@ -101,7 +101,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
             <span className="text-xs text-muted-foreground">No reviews yet</span>
           )}
           {isVerified && (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-200 text-blue-600 ml-auto">
+            <Badge variant="outline" className="text-[10px] px-1 py-0 border-blue-200 text-info ml-auto">
               Assured
             </Badge>
           )}

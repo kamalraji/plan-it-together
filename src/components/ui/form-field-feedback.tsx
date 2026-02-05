@@ -118,7 +118,7 @@ export function FormFieldFeedback({
           isOverLimit 
             ? 'text-destructive font-medium' 
             : showCharWarning 
-              ? 'text-amber-500' 
+              ? 'text-warning' 
               : 'text-muted-foreground'
         )}>
           {charCount.current} / {charCount.max} characters
@@ -148,13 +148,13 @@ export function ValidationBadge({ state, size = 'sm', className }: ValidationBad
         <Loader2 className={cn(sizeClasses, 'animate-spin text-muted-foreground')} />
       )}
       {state === 'valid' && (
-        <CheckCircle2 className={cn(sizeClasses, 'text-green-500')} />
+        <CheckCircle2 className={cn(sizeClasses, 'text-success')} />
       )}
       {state === 'invalid' && (
         <AlertCircle className={cn(sizeClasses, 'text-destructive')} />
       )}
       {state === 'warning' && (
-        <AlertTriangle className={cn(sizeClasses, 'text-amber-500')} />
+        <AlertTriangle className={cn(sizeClasses, 'text-warning')} />
       )}
     </div>
   );
@@ -187,14 +187,14 @@ export function SectionValidationSummary({
     <div className={cn(
       'flex items-center gap-3 px-3 py-2 rounded-lg border transition-colors',
       allValid 
-        ? 'border-green-500/30 bg-green-500/5' 
+        ? 'border-success/30 bg-success/5' 
         : hasErrors 
           ? 'border-destructive/30 bg-destructive/5'
           : 'border-border bg-muted/30',
       className
     )}>
       {allValid ? (
-        <CheckCircle2 className="h-4 w-4 text-green-500" />
+        <CheckCircle2 className="h-4 w-4 text-success" />
       ) : hasErrors ? (
         <AlertCircle className="h-4 w-4 text-destructive" />
       ) : (

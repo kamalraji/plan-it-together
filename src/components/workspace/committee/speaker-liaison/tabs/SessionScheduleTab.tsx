@@ -28,10 +28,10 @@ export function SessionScheduleTab({ workspaceId }: SessionScheduleTabProps) {
 
   const getTypeColor = (type: string | null) => {
     const colors: Record<string, string> = {
-      keynote: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-      workshop: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+      keynote: 'bg-primary/10 text-primary border-purple-500/20',
+      workshop: 'bg-info/10 text-info border-info/20',
       panel: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-      breakout: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      breakout: 'bg-warning/10 text-warning border-warning/20',
       fireside: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
     };
     return colors[type || 'breakout'] || 'bg-muted text-muted-foreground';

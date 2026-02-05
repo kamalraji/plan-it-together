@@ -72,8 +72,8 @@ export function FinancialSummaryCards({ workspaceId }: FinancialSummaryCardsProp
       value: formatCurrency(stats.pending),
       subtitle: `${stats.pendingCount} expense${stats.pendingCount !== 1 ? 's' : ''} awaiting approval`,
       icon: Receipt,
-      iconBg: 'bg-amber-500/10',
-      iconColor: 'text-amber-600',
+      iconBg: 'bg-warning/10',
+      iconColor: 'text-warning',
       alert: stats.pendingCount > 5,
     },
   ];
@@ -107,7 +107,7 @@ export function FinancialSummaryCards({ workspaceId }: FinancialSummaryCardsProp
                 <card.icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
               {card.alert && (
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <AlertTriangle className="w-4 h-4 text-warning" />
               )}
               {card.trend !== undefined && (
                 <div className={`flex items-center gap-0.5 text-xs font-medium ${

@@ -270,11 +270,11 @@ export default function GenerateBackgrounds() {
                 <>
                   <Progress value={getProgressPercent(idCardResults)} />
                   <div className="flex gap-4 text-sm">
-                    <span className="flex items-center gap-1 text-green-600">
+                    <span className="flex items-center gap-1 text-success">
                       <CheckCircle2 className="h-4 w-4" />
                       {getSuccessCount(idCardResults)} success
                     </span>
-                    <span className="flex items-center gap-1 text-red-600">
+                    <span className="flex items-center gap-1 text-destructive">
                       <XCircle className="h-4 w-4" />
                       {getErrorCount(idCardResults)} failed
                     </span>
@@ -294,10 +294,10 @@ export default function GenerateBackgrounds() {
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />
                           )}
                           {result.status === 'success' && (
-                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                            <CheckCircle2 className="h-3 w-3 text-success" />
                           )}
                           {result.status === 'error' && (
-                            <XCircle className="h-3 w-3 text-red-600" />
+                            <XCircle className="h-3 w-3 text-destructive" />
                           )}
                           <span className="truncate">{result.theme}/{result.style}</span>
                         </div>
@@ -343,11 +343,11 @@ export default function GenerateBackgrounds() {
                 <>
                   <Progress value={getProgressPercent(certificateResults)} />
                   <div className="flex gap-4 text-sm">
-                    <span className="flex items-center gap-1 text-green-600">
+                    <span className="flex items-center gap-1 text-success">
                       <CheckCircle2 className="h-4 w-4" />
                       {getSuccessCount(certificateResults)} success
                     </span>
-                    <span className="flex items-center gap-1 text-red-600">
+                    <span className="flex items-center gap-1 text-destructive">
                       <XCircle className="h-4 w-4" />
                       {getErrorCount(certificateResults)} failed
                     </span>
@@ -367,10 +367,10 @@ export default function GenerateBackgrounds() {
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />
                           )}
                           {result.status === 'success' && (
-                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                            <CheckCircle2 className="h-3 w-3 text-success" />
                           )}
                           {result.status === 'error' && (
-                            <XCircle className="h-3 w-3 text-red-600" />
+                            <XCircle className="h-3 w-3 text-destructive" />
                           )}
                           <span className="truncate">{result.theme}/{result.style}</span>
                         </div>

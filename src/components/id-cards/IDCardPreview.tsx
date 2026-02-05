@@ -103,11 +103,11 @@ export function IDCardPreview({ template, sampleData }: IDCardPreviewProps) {
                 }}
               >
                 {el.type === 'qr' ? (
-                  <div className="w-full h-full bg-white p-1 rounded flex items-center justify-center">
-                    <QrCode className="w-full h-full text-gray-800" />
+                  <div className="w-full h-full bg-background p-1 rounded flex items-center justify-center">
+                    <QrCode className="w-full h-full text-foreground" />
                   </div>
                 ) : el.type === 'placeholder' && el.content === '{photo}' ? (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded">
+                  <div className="w-full h-full bg-muted flex items-center justify-center rounded">
                     {sampleData.photoUrl ? (
                       <img 
                         src={sampleData.photoUrl} 
@@ -115,7 +115,7 @@ export function IDCardPreview({ template, sampleData }: IDCardPreviewProps) {
                         className="w-full h-full object-cover rounded"
                       />
                     ) : (
-                      <Image className="w-6 h-6 text-gray-400" />
+                      <Image className="w-6 h-6 text-muted-foreground" />
                     )}
                   </div>
                 ) : (

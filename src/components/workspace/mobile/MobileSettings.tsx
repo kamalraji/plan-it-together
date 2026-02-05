@@ -94,21 +94,21 @@ export function MobileSettings() {
     }
     
     if (permission === 'denied') {
-      return { icon: XCircleIcon, text: 'Blocked', color: 'text-red-600' };
+      return { icon: XCircleIcon, text: 'Blocked', color: 'text-destructive' };
     }
     
     if (isEnabled()) {
-      return { icon: CheckCircleIcon, text: 'Enabled', color: 'text-green-600' };
+      return { icon: CheckCircleIcon, text: 'Enabled', color: 'text-success' };
     }
     
-    return { icon: ExclamationTriangleIcon, text: 'Disabled', color: 'text-yellow-600' };
+    return { icon: ExclamationTriangleIcon, text: 'Disabled', color: 'text-warning' };
   };
 
   const getOfflineStatus = () => {
     if (isOnline) {
-      return { icon: CheckCircleIcon, text: 'Online', color: 'text-green-600' };
+      return { icon: CheckCircleIcon, text: 'Online', color: 'text-success' };
     }
-    return { icon: ExclamationTriangleIcon, text: 'Offline', color: 'text-yellow-600' };
+    return { icon: ExclamationTriangleIcon, text: 'Offline', color: 'text-warning' };
   };
 
   const notificationStatus = getNotificationStatus();
@@ -173,7 +173,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ workspace_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Workspace activity</span>
                 </label>
@@ -185,7 +185,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ event_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Events</span>
                 </label>
@@ -197,7 +197,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ marketplace_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Marketplace</span>
                 </label>
@@ -209,7 +209,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ organization_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Organization updates</span>
                 </label>
@@ -221,7 +221,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ system_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">System alerts</span>
                 </label>
@@ -233,7 +233,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ sound_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Play sound for important alerts</span>
                 </label>
@@ -245,7 +245,7 @@ export function MobileSettings() {
                     onChange={(e) =>
                       updatePreferences?.({ vibration_enabled: e.target.checked })
                     }
-                    className="rounded border-input text-indigo-600 focus-visible:ring-ring"
+                    className="rounded border-input text-primary focus-visible:ring-ring"
                   />
                   <span className="ml-2 text-sm text-foreground">Vibrate on critical alerts</span>
                 </label>
@@ -254,11 +254,11 @@ export function MobileSettings() {
           )}
 
           {permission === 'denied' && (
-            <div className="p-3 bg-yellow-50 rounded-md">
+            <div className="p-3 bg-warning/10 rounded-md">
               <div className="flex">
                 <InformationCircleIcon className="w-5 h-5 text-yellow-400" />
                 <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
+                  <p className="text-sm text-warning">
                     Notifications are blocked. To enable them, go to your browser settings and allow notifications for this site.
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export function MobileSettings() {
                   </p>
                   <div className="w-full bg-muted rounded-full h-2 mt-2">
                     <div
-                      className="bg-indigo-600 h-2 rounded-full"
+                      className="bg-primary h-2 rounded-full"
                       style={{
                         width: `${Math.min((storageUsage.used / storageUsage.quota) * 100, 100)}%`
                       }}
@@ -369,12 +369,12 @@ export function MobileSettings() {
       </div>
 
       {/* Offline Features Info */}
-      <div className="bg-blue-50 rounded-lg p-4">
+      <div className="bg-info/10 rounded-lg p-4">
         <div className="flex">
           <InformationCircleIcon className="w-5 h-5 text-blue-400 flex-shrink-0" />
           <div className="ml-3">
             <h4 className="text-sm font-medium text-blue-900">Offline Features</h4>
-            <div className="mt-2 text-sm text-blue-700">
+            <div className="mt-2 text-sm text-info">
               <ul className="list-disc list-inside space-y-1">
                 <li>View cached workspace data</li>
                 <li>Update task status (syncs when online)</li>

@@ -66,9 +66,9 @@ export function NetworkStatusTab({ workspaceId: _workspaceId }: NetworkStatusTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Wifi className="h-8 w-8 text-amber-500" />
+              <Wifi className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">{degradedDevices}</p>
+                <p className="text-2xl font-bold text-warning">{degradedDevices}</p>
                 <p className="text-sm text-muted-foreground">Degraded</p>
               </div>
             </div>
@@ -77,9 +77,9 @@ export function NetworkStatusTab({ workspaceId: _workspaceId }: NetworkStatusTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <ArrowUpDown className="h-8 w-8 text-blue-500" />
+              <ArrowUpDown className="h-8 w-8 text-info" />
               <div>
-                <p className="text-2xl font-bold text-blue-500">67%</p>
+                <p className="text-2xl font-bold text-info">67%</p>
                 <p className="text-sm text-muted-foreground">Bandwidth Used</p>
               </div>
             </div>
@@ -134,7 +134,7 @@ export function NetworkStatusTab({ workspaceId: _workspaceId }: NetworkStatusTab
             {networkDevices.map((device) => (
               <div key={device.name} className="flex items-center justify-between p-3 rounded-lg border bg-card">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${device.status === 'online' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${device.status === 'online' ? 'bg-emerald-500' : 'bg-warning'}`} />
                   <div>
                     <p className="font-medium text-sm">{device.name}</p>
                     <p className="text-xs text-muted-foreground">{device.ip}</p>

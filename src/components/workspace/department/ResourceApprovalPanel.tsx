@@ -38,8 +38,8 @@ export function ResourceApprovalPanel({ workspaceId }: ResourceApprovalPanelProp
   };
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-500/20 text-yellow-600',
-    approved: 'bg-green-500/20 text-green-600',
+    pending: 'bg-warning/20 text-warning',
+    approved: 'bg-success/20 text-success',
     rejected: 'bg-destructive/20 text-destructive',
     returned: 'bg-muted text-muted-foreground',
   };
@@ -69,7 +69,7 @@ export function ResourceApprovalPanel({ workspaceId }: ResourceApprovalPanelProp
           <h3 className="text-base sm:text-lg font-semibold text-foreground">Resource Requests</h3>
         </div>
         {pendingRequests.length > 0 && (
-          <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-600">
+          <Badge variant="secondary" className="bg-warning/20 text-warning">
             {pendingRequests.length} pending
           </Badge>
         )}
@@ -86,13 +86,13 @@ export function ResourceApprovalPanel({ workspaceId }: ResourceApprovalPanelProp
                 key={request.id} 
                 className={cn(
                   "border border-border rounded-lg overflow-hidden transition-all",
-                  isPending && "border-yellow-500/30"
+                  isPending && "border-warning/30"
                 )}
               >
                 <div 
                   className={cn(
                     "flex items-center justify-between p-3 cursor-pointer",
-                    isPending ? "bg-yellow-500/5" : "bg-muted/30"
+                    isPending ? "bg-warning/5" : "bg-muted/30"
                   )}
                   onClick={() => isPending && setExpandedId(isExpanded ? null : request.id)}
                 >

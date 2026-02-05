@@ -119,8 +119,8 @@ export function ResourceApprovalList({ requests, isLoading, workspaceId }: Resou
           return (
             <div key={request.id} className="border border-border rounded-lg overflow-hidden">
               <button onClick={() => setExpandedId(isExpanded ? null : request.id)} className="w-full p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors text-left">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <Package className="h-4 w-4 text-blue-600" />
+                <div className="p-2 rounded-lg bg-info/10">
+                  <Package className="h-4 w-4 text-info" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

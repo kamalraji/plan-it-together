@@ -18,16 +18,16 @@ interface ContentPipelineOverviewProps {
 
 const statusConfig = {
   draft: { icon: Edit3, label: 'Draft', color: 'text-muted-foreground', bgColor: 'bg-muted' },
-  review: { icon: Eye, label: 'In Review', color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  in_review: { icon: Eye, label: 'In Review', color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
+  review: { icon: Eye, label: 'In Review', color: 'text-warning', bgColor: 'bg-warning/10' },
+  in_review: { icon: Eye, label: 'In Review', color: 'text-warning', bgColor: 'bg-warning/10' },
   approved: { icon: CheckCircle, label: 'Approved', color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  published: { icon: Send, label: 'Published', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  published: { icon: Send, label: 'Published', color: 'text-info', bgColor: 'bg-info/10' },
 };
 
 const priorityConfig = {
   low: 'bg-slate-500/10 text-muted-foreground',
-  medium: 'bg-amber-500/10 text-amber-500',
-  high: 'bg-red-500/10 text-red-500',
+  medium: 'bg-warning/10 text-warning',
+  high: 'bg-destructive/10 text-destructive',
 };
 
 export function ContentPipelineOverview({ workspaceId }: ContentPipelineOverviewProps) {
@@ -48,8 +48,8 @@ export function ContentPipelineOverview({ workspaceId }: ContentPipelineOverview
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-blue-500/10">
-              <FileText className="h-4 w-4 text-blue-500" />
+            <div className="p-1.5 rounded-lg bg-info/10">
+              <FileText className="h-4 w-4 text-info" />
             </div>
             Content Pipeline
           </CardTitle>

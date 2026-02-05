@@ -31,8 +31,8 @@ const getTypeIcon = (type: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'in-use': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">In Use</Badge>;
-    case 'available': return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Available</Badge>;
-    case 'maintenance': return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">Maintenance</Badge>;
+    case 'available': return <Badge className="bg-info/10 text-info border-info/20">Available</Badge>;
+    case 'maintenance': return <Badge className="bg-warning/10 text-warning border-warning/20">Maintenance</Badge>;
     default: return null;
   }
 };
@@ -82,9 +82,9 @@ export function EquipmentReportTab({ workspaceId: _workspaceId }: EquipmentRepor
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Package className="h-8 w-8 text-blue-500" />
+              <Package className="h-8 w-8 text-info" />
               <div>
-                <p className="text-2xl font-bold text-blue-500">{available}</p>
+                <p className="text-2xl font-bold text-info">{available}</p>
                 <p className="text-sm text-muted-foreground">Available</p>
               </div>
             </div>
@@ -93,9 +93,9 @@ export function EquipmentReportTab({ workspaceId: _workspaceId }: EquipmentRepor
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Wrench className="h-8 w-8 text-amber-500" />
+              <Wrench className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">{maintenance}</p>
+                <p className="text-2xl font-bold text-warning">{maintenance}</p>
                 <p className="text-sm text-muted-foreground">Maintenance</p>
               </div>
             </div>

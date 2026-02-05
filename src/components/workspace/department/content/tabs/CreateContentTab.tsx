@@ -35,15 +35,15 @@ const CONTENT_TYPES: { value: ContentItemType; label: string }[] = [
 
 const PRIORITY_OPTIONS: { value: ContentItemPriority; label: string; color: string }[] = [
   { value: 'low', label: 'Low', color: 'text-muted-foreground' },
-  { value: 'medium', label: 'Medium', color: 'text-amber-500' },
-  { value: 'high', label: 'High', color: 'text-red-500' },
+  { value: 'medium', label: 'Medium', color: 'text-warning' },
+  { value: 'high', label: 'High', color: 'text-destructive' },
 ];
 
 const STATUS_OPTIONS: { value: ContentItemStatus; label: string; icon: React.ReactNode; color: string }[] = [
   { value: 'draft', label: 'Draft', icon: <Edit2 className="h-3 w-3" />, color: 'bg-muted-foreground/30/10 text-muted-foreground border-gray-500/30' },
-  { value: 'review', label: 'In Review', icon: <Clock className="h-3 w-3" />, color: 'bg-amber-500/10 text-amber-600 border-amber-500/30' },
-  { value: 'approved', label: 'Approved', icon: <FileCheck className="h-3 w-3" />, color: 'bg-blue-500/10 text-blue-600 border-blue-500/30' },
-  { value: 'published', label: 'Published', icon: <CheckCircle className="h-3 w-3" />, color: 'bg-green-500/10 text-green-600 border-green-500/30' },
+  { value: 'review', label: 'In Review', icon: <Clock className="h-3 w-3" />, color: 'bg-warning/10 text-warning border-warning/30' },
+  { value: 'approved', label: 'Approved', icon: <FileCheck className="h-3 w-3" />, color: 'bg-info/10 text-info border-info/30' },
+  { value: 'published', label: 'Published', icon: <CheckCircle className="h-3 w-3" />, color: 'bg-success/10 text-success border-success/30' },
 ];
 
 export function CreateContentTab({ workspace }: CreateContentTabProps) {
@@ -164,19 +164,19 @@ export function CreateContentTab({ workspace }: CreateContentTabProps) {
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('review')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.review}</div>
+            <div className="text-2xl font-bold text-warning">{stats.review}</div>
             <p className="text-xs text-muted-foreground">In Review</p>
           </CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('approved')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.approved}</div>
+            <div className="text-2xl font-bold text-info">{stats.approved}</div>
             <p className="text-xs text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('published')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.published}</div>
+            <div className="text-2xl font-bold text-success">{stats.published}</div>
             <p className="text-xs text-muted-foreground">Published</p>
           </CardContent>
         </Card>
@@ -187,7 +187,7 @@ export function CreateContentTab({ workspace }: CreateContentTabProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-info" />
               Create Content
             </CardTitle>
             <CardDescription>Add and manage content items for your department</CardDescription>
@@ -335,7 +335,7 @@ export function CreateContentTab({ workspace }: CreateContentTabProps) {
                     <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                       {item.due_date && (
                         <span className={cn(
-                          new Date(item.due_date) < new Date() && item.status !== 'published' && 'text-red-500'
+                          new Date(item.due_date) < new Date() && item.status !== 'published' && 'text-destructive'
                         )}>
                           Due: {format(new Date(item.due_date), 'MMM d, yyyy')}
                         </span>

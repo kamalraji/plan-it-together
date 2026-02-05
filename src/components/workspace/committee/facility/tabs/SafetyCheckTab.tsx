@@ -80,7 +80,7 @@ export function SafetyCheckTab({ workspaceId }: SafetyCheckTabProps) {
                 <p className="text-sm text-muted-foreground">Pending</p>
                 <p className="text-2xl font-bold">{totalCount - completedCount}</p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-amber-500" />
+              <AlertTriangle className="h-8 w-8 text-warning" />
             </div>
           </CardContent>
         </Card>
@@ -102,7 +102,7 @@ export function SafetyCheckTab({ workspaceId }: SafetyCheckTabProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-red-500" />
+            <Shield className="h-5 w-5 text-destructive" />
             Safety Checklist
           </CardTitle>
           <div className="flex gap-2">
@@ -160,7 +160,7 @@ export function SafetyCheckTab({ workspaceId }: SafetyCheckTabProps) {
           {/* Empty State */}
           {totalCount === 0 && !isAdding && (
             <div className="text-center py-12">
-              <AlertTriangle className="h-12 w-12 mx-auto text-amber-500 mb-4" />
+              <AlertTriangle className="h-12 w-12 mx-auto text-warning mb-4" />
               <h3 className="text-lg font-medium mb-2">No safety items</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Load default safety items or add custom ones.

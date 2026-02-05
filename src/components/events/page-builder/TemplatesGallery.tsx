@@ -33,7 +33,7 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
             className={cn(
               'px-2.5 py-1 text-xs rounded-md transition-colors',
               activeCategory === cat.id
-                ? 'bg-[var(--gjs-accent)] text-white'
+                ? 'bg-[var(--gjs-accent)] text-primary-foreground'
                 : 'bg-[var(--gjs-bg-tertiary)] text-[var(--gjs-text-muted)] hover:text-[var(--gjs-text-primary)]'
             )}
           >
@@ -84,15 +84,15 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
                 )}
 
                 {/* Category badge */}
-                <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/50 backdrop-blur-sm">
+                <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-foreground/50 backdrop-blur-sm">
                   <Icon className="w-3 h-3 text-primary" />
-                  <span className="text-[10px] font-medium text-white">{template.category}</span>
+                  <span className="text-[10px] font-medium text-primary-foreground">{template.category}</span>
                 </div>
 
                 {/* Info overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <h4 className="font-medium text-white text-sm mb-0.5">{template.name}</h4>
-                  <p className="text-[11px] text-white/70 line-clamp-1">{template.description}</p>
+                  <h4 className="font-medium text-primary-foreground text-sm mb-0.5">{template.name}</h4>
+                  <p className="text-[11px] text-primary-foreground/70 line-clamp-1">{template.description}</p>
                 </div>
               </div>
             </motion.button>

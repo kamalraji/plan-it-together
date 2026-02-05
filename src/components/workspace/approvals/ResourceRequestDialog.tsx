@@ -146,7 +146,7 @@ export function ResourceRequestDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-blue-600" />
+              <Package className="h-5 w-5 text-info" />
               Request Resources
             </DialogTitle>
             <DialogDescription>

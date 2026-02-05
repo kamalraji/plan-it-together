@@ -89,7 +89,7 @@ export function AddVenueTab({ workspaceId }: AddVenueTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-blue-500" />
+              <CheckCircle className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.confirmed}</p>
                 <p className="text-sm text-muted-foreground">Confirmed</p>
@@ -100,7 +100,7 @@ export function AddVenueTab({ workspaceId }: AddVenueTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Building className="h-8 w-8 text-amber-500" />
+              <Building className="h-8 w-8 text-warning" />
               <div>
                 <p className="text-2xl font-bold">{stats.setupComplete}</p>
                 <p className="text-sm text-muted-foreground">Setup Complete</p>
@@ -111,7 +111,7 @@ export function AddVenueTab({ workspaceId }: AddVenueTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.ready}</p>
                 <p className="text-sm text-muted-foreground">Ready</p>

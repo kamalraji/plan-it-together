@@ -89,9 +89,9 @@ function StepIndicator({ step, size }: StepIndicatorProps) {
   const getStatusStyles = () => {
     switch (step.status) {
       case 'approved':
-        return 'bg-green-500/10 text-green-500 border-green-500/30';
+        return 'bg-success/10 text-success border-success/30';
       case 'rejected':
-        return 'bg-red-500/10 text-red-500 border-red-500/30';
+        return 'bg-destructive/10 text-destructive border-destructive/30';
       case 'skipped':
         return 'bg-muted text-muted-foreground border-muted-foreground/30';
       case 'pending':

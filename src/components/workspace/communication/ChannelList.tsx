@@ -141,7 +141,7 @@ export function ChannelList({
                 id="isPrivate"
                 checked={newChannelData.isPrivate}
                 onChange={(e) => setNewChannelData({ ...newChannelData, isPrivate: e.target.checked })}
-                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
               />
               <label htmlFor="isPrivate" className="ml-2 text-sm text-foreground">
                 Private channel (invite-only)
@@ -186,7 +186,7 @@ export function ChannelList({
                     onClick={() => onChannelSelect(channel)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                       selectedChannel?.id === channel.id
-                        ? 'bg-indigo-100 text-indigo-700 border-l-4 border-indigo-500'
+                        ? 'bg-primary/20 text-primary border-l-4 border-primary'
                         : 'text-foreground hover:bg-muted'
                     }`}
                   >

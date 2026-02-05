@@ -24,16 +24,16 @@ export function IndustryTemplatePreview({ template, onClose, onImport }: Industr
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
-      case 'CRITICAL': return 'bg-red-100 text-red-800';
+      case 'CRITICAL': return 'bg-destructive/20 text-red-800';
       case 'HIGH': return 'bg-orange-100 text-orange-800';
-      case 'MEDIUM': return 'bg-blue-100 text-blue-800';
-      case 'LOW': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'MEDIUM': return 'bg-info/20 text-blue-800';
+      case 'LOW': return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground';
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-foreground/50 flex items-center justify-center p-4">
       <div className="bg-card rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-border">
@@ -46,7 +46,7 @@ export function IndustryTemplatePreview({ template, onClose, onImport }: Industr
                   {INDUSTRY_CONFIG[template.industry].label}
                 </Badge>
                 <Badge variant="outline">{template.eventType}</Badge>
-                <div className="flex items-center gap-1 text-amber-500">
+                <div className="flex items-center gap-1 text-warning">
                   <Star className="h-4 w-4 fill-current" />
                   <span className="text-sm font-medium">{template.metadata.rating}</span>
                 </div>

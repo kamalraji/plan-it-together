@@ -44,10 +44,10 @@ const activityColors: Record<string, string> = {
   task_completed: 'text-emerald-500',
   budget_approved: 'text-emerald-500',
   resource_approved: 'text-emerald-500',
-  member_joined: 'text-blue-500',
+  member_joined: 'text-info',
   budget_rejected: 'text-destructive',
   resource_rejected: 'text-destructive',
-  member_left: 'text-amber-500',
+  member_left: 'text-warning',
   default: 'text-muted-foreground',
 };
 

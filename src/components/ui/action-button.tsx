@@ -93,7 +93,7 @@ export const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProp
         case "success":
           return (
             <>
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success" />
               <span>{successText || children}</span>
             </>
           );
@@ -121,7 +121,7 @@ export const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProp
         disabled={disabled || isLoading}
         className={cn(
           "relative transition-all",
-          currentState === "success" && "ring-2 ring-green-500/20",
+          currentState === "success" && "ring-2 ring-success/20",
           currentState === "error" && "ring-2 ring-destructive/20",
           className
         )}

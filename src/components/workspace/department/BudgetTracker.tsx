@@ -90,7 +90,7 @@ export function BudgetTracker({
           </div>
           <Progress 
             value={Math.min(usagePercent, 100)} 
-            className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : isNearLimit ? '[&>div]:bg-amber-500' : ''}`}
+            className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : isNearLimit ? '[&>div]:bg-warning' : ''}`}
           />
         </div>
 

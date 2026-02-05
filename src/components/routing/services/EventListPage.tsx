@@ -333,7 +333,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
               )}
 
               {selectedTemplate && (
-                <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4">
+                <div className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/50 px-4">
                   <div className="max-w-lg w-full bg-card rounded-lg shadow-lg p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>

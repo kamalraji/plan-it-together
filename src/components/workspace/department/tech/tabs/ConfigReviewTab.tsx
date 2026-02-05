@@ -24,8 +24,8 @@ const changeHistory = [
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'reviewed': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Reviewed</Badge>;
-    case 'pending': return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">Pending Review</Badge>;
-    case 'outdated': return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Outdated</Badge>;
+    case 'pending': return <Badge className="bg-warning/10 text-warning border-warning/20">Pending Review</Badge>;
+    case 'outdated': return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Outdated</Badge>;
     default: return null;
   }
 };
@@ -64,9 +64,9 @@ export function ConfigReviewTab({ workspaceId: _workspaceId }: ConfigReviewTabPr
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-amber-500" />
+              <Clock className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">{pendingReviews}</p>
+                <p className="text-2xl font-bold text-warning">{pendingReviews}</p>
                 <p className="text-sm text-muted-foreground">Pending Review</p>
               </div>
             </div>
@@ -86,9 +86,9 @@ export function ConfigReviewTab({ workspaceId: _workspaceId }: ConfigReviewTabPr
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
+              <AlertTriangle className="h-8 w-8 text-destructive" />
               <div>
-                <p className="text-2xl font-bold text-red-500">{outdatedConfigs}</p>
+                <p className="text-2xl font-bold text-destructive">{outdatedConfigs}</p>
                 <p className="text-sm text-muted-foreground">Outdated</p>
               </div>
             </div>

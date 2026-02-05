@@ -82,7 +82,7 @@ export function TaskApprovalDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-500" />
+            <Clock className="h-5 w-5 text-warning" />
             Review Approval Request
           </DialogTitle>
           <DialogDescription>
@@ -141,16 +141,16 @@ export function TaskApprovalDialog({
                       <div
                         className={cn(
                           'rounded-full p-1.5 border-2',
-                          decision?.decision === 'APPROVED' && 'bg-green-100 border-green-500',
-                          decision?.decision === 'REJECTED' && 'bg-red-100 border-red-500',
-                          isCurrent && !decision && 'bg-amber-100 border-amber-500',
+                          decision?.decision === 'APPROVED' && 'bg-success/20 border-success',
+                          decision?.decision === 'REJECTED' && 'bg-destructive/20 border-destructive',
+                          isCurrent && !decision && 'bg-warning/20 border-warning',
                           !isCurrent && !decision && 'bg-muted border-muted-foreground/30'
                         )}
                       >
                         {decision?.decision === 'APPROVED' ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                         ) : decision?.decision === 'REJECTED' ? (
-                          <XCircle className="h-4 w-4 text-red-600" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                         ) : (
                           <span className="h-4 w-4 flex items-center justify-center text-xs font-medium">
                             {level.level}
@@ -179,11 +179,11 @@ export function TaskApprovalDialog({
                       className="text-sm p-2 rounded-md bg-muted/50 flex items-start gap-2"
                     >
                       {d.decision === 'APPROVED' ? (
-                        <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                        <CheckCircle className="h-4 w-4 text-success mt-0.5" />
                       ) : d.decision === 'REJECTED' ? (
-                        <XCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                        <XCircle className="h-4 w-4 text-destructive mt-0.5" />
                       ) : (
-                        <ArrowRight className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <ArrowRight className="h-4 w-4 text-info mt-0.5" />
                       )}
                       <div className="flex-1">
                         <p className="font-medium">
@@ -207,7 +207,7 @@ export function TaskApprovalDialog({
             {/* Self Approval Warning */}
             {showSelfApprovalWarning && (
               <div className="flex items-start gap-2 p-3 rounded-md bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
-                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
                     Self-approval not allowed

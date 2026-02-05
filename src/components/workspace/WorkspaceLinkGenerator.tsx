@@ -201,7 +201,7 @@ export function WorkspaceLinkGenerator({
             onClick={() => handleCopy('generated', generatedUrl)}
           >
             {copiedId === 'generated' ? (
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success" />
             ) : (
               <ClipboardCopy className="h-4 w-4" />
             )}

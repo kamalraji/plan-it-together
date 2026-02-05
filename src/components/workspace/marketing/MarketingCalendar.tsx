@@ -19,10 +19,10 @@ interface MarketingCalendarProps {
 
 const typeColors: Record<MarketingEvent['type'], string> = {
   campaign: 'bg-pink-500',
-  content: 'bg-blue-500',
+  content: 'bg-info',
   email: 'bg-emerald-500',
-  social: 'bg-purple-500',
-  deadline: 'bg-red-500',
+  social: 'bg-primary',
+  deadline: 'bg-destructive',
   task: 'bg-orange-500',
 };
 
@@ -95,7 +95,7 @@ export function MarketingCalendar({ workspaceId }: MarketingCalendarProps) {
     <Card className="border-border/50">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-indigo-600" />
+          <Calendar className="h-5 w-5 text-primary" />
           <CardTitle className="text-lg font-semibold">Marketing Calendar</CardTitle>
           {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
@@ -129,7 +129,7 @@ export function MarketingCalendar({ workspaceId }: MarketingCalendarProps) {
             <span className="text-muted-foreground">Campaign</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <div className="w-3 h-3 rounded-full bg-info" />
             <span className="text-muted-foreground">Content</span>
           </div>
           <div className="flex items-center gap-1">
@@ -137,11 +137,11 @@ export function MarketingCalendar({ workspaceId }: MarketingCalendarProps) {
             <span className="text-muted-foreground">Email</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-purple-500" />
+            <div className="w-3 h-3 rounded-full bg-primary" />
             <span className="text-muted-foreground">Social</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-destructive" />
             <span className="text-muted-foreground">Deadline</span>
           </div>
           <div className="flex items-center gap-1">
@@ -191,7 +191,7 @@ export function MarketingCalendar({ workspaceId }: MarketingCalendarProps) {
                   {dayEvents.slice(0, 2).map((event) => (
                     <div
                       key={event.id}
-                      className={`text-[10px] px-1 py-0.5 rounded truncate text-white ${typeColors[event.type]}`}
+                      className={`text-[10px] px-1 py-0.5 rounded truncate text-primary-foreground ${typeColors[event.type]}`}
                       title={event.title}
                     >
                       {event.title}

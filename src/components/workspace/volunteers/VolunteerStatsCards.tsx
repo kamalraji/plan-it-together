@@ -111,15 +111,15 @@ export function VolunteerStatsCards({ workspaceId }: VolunteerStatsCardsProps) {
       value: hoursThisWeek,
       subtext: `${totalShifts} shifts scheduled`,
       icon: Clock,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Check-In Rate',
       value: `${checkInRate}%`,
       subtext: `${todayStats?.checkedIn || 0}/${todayStats?.total || 0} today`,
       icon: UserCheck,
-      color: 'text-violet-600',
+      color: 'text-primary',
       bgColor: 'bg-violet-50',
     },
     {
@@ -127,8 +127,8 @@ export function VolunteerStatsCards({ workspaceId }: VolunteerStatsCardsProps) {
       value: openSlots,
       subtext: `${totalAssigned}/${totalRequired} filled`,
       icon: openSlots > 5 ? AlertCircle : CalendarClock,
-      color: openSlots > 5 ? 'text-amber-600' : 'text-cyan-600',
-      bgColor: openSlots > 5 ? 'bg-amber-50' : 'bg-cyan-50',
+      color: openSlots > 5 ? 'text-warning' : 'text-cyan-600',
+      bgColor: openSlots > 5 ? 'bg-warning/10' : 'bg-cyan-50',
     },
   ];
 

@@ -228,7 +228,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
     <button
       onClick={() => onSelect(service.id)}
       className={`w-full flex items-center space-x-3 px-3 py-2 text-sm rounded-md text-left hover:bg-muted/50 transition-colors group ${
-        isActive ? 'bg-indigo-50 text-indigo-700' : 'text-foreground'
+        isActive ? 'bg-primary/10 text-primary' : 'text-foreground'
       }`}
     >
       <div className="flex-1 min-w-0">
@@ -241,7 +241,7 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
         aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
       >
         {isFavorite ? (
-          <StarIconSolid className="h-4 w-4 text-yellow-500" />
+          <StarIconSolid className="h-4 w-4 text-warning" />
         ) : (
           <StarIcon className="h-4 w-4 text-muted-foreground hover:text-yellow-500" />
         )}

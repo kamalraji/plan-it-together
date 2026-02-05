@@ -26,8 +26,8 @@ interface ScheduledItem {
 
 const typeConfig = {
   announcement: { icon: Megaphone, color: 'text-pink-500', bgColor: 'bg-pink-500/10', label: 'Announcement' },
-  email: { icon: Mail, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Email Campaign' },
-  'press-release': { icon: Newspaper, color: 'text-purple-500', bgColor: 'bg-purple-500/10', label: 'Press Release' },
+  email: { icon: Mail, color: 'text-info', bgColor: 'bg-info/10', label: 'Email Campaign' },
+  'press-release': { icon: Newspaper, color: 'text-primary', bgColor: 'bg-primary/10', label: 'Press Release' },
   broadcast: { icon: Radio, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', label: 'Broadcast' },
 };
 
@@ -219,8 +219,8 @@ export function ScheduleUpdateTab({ workspaceId }: ScheduleUpdateTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Send className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Send className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{weekCount}</p>
@@ -232,8 +232,8 @@ export function ScheduleUpdateTab({ workspaceId }: ScheduleUpdateTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <RefreshCw className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <RefreshCw className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{filteredItems.length}</p>

@@ -34,7 +34,7 @@ export function PlatformManager({ workspaceId }: PlatformManagerProps) {
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-emerald-500" />;
-    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-red-500" />;
+    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
     return <Minus className="h-3 w-3 text-muted-foreground" />;
   };
 
@@ -116,7 +116,7 @@ export function PlatformManager({ workspaceId }: PlatformManagerProps) {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${platform.color || 'bg-muted'} flex items-center justify-center text-white text-lg`}>
+                <div className={`w-10 h-10 rounded-xl ${platform.color || 'bg-muted'} flex items-center justify-center text-primary-foreground text-lg`}>
                   {platform.icon}
                 </div>
                 <div>

@@ -18,18 +18,18 @@ interface SetGoalsTabProps {
 }
 
 const categoryConfig: Record<string, { color: string; label: string }> = {
-  reach: { color: 'bg-blue-500/20 text-blue-600', label: 'Reach' },
-  engagement: { color: 'bg-purple-500/20 text-purple-600', label: 'Engagement' },
-  revenue: { color: 'bg-green-500/20 text-green-600', label: 'Revenue' },
-  audience: { color: 'bg-amber-500/20 text-amber-600', label: 'Audience' },
+  reach: { color: 'bg-info/20 text-info', label: 'Reach' },
+  engagement: { color: 'bg-primary/20 text-primary', label: 'Engagement' },
+  revenue: { color: 'bg-success/20 text-success', label: 'Revenue' },
+  audience: { color: 'bg-warning/20 text-warning', label: 'Audience' },
   conversion: { color: 'bg-pink-500/20 text-pink-600', label: 'Conversion' },
   brand: { color: 'bg-cyan-500/20 text-cyan-600', label: 'Brand' },
 };
 
 const statusConfig: Record<string, { color: string; label: string }> = {
-  active: { color: 'bg-blue-500/20 text-blue-600', label: 'Active' },
-  achieved: { color: 'bg-green-500/20 text-green-600', label: 'Achieved' },
-  missed: { color: 'bg-red-500/20 text-red-600', label: 'Missed' },
+  active: { color: 'bg-info/20 text-info', label: 'Active' },
+  achieved: { color: 'bg-success/20 text-success', label: 'Achieved' },
+  missed: { color: 'bg-destructive/20 text-destructive', label: 'Missed' },
   cancelled: { color: 'bg-muted-foreground/30/20 text-muted-foreground', label: 'Cancelled' },
 };
 
@@ -254,7 +254,7 @@ export function SetGoalsTab({ workspace }: SetGoalsTabProps) {
           {filteredGoals.map((goal) => {
             const progress = goal.target_value > 0 ? Math.min((goal.current_value / goal.target_value) * 100, 100) : 0;
             const TrendIcon = trendIcons[goal.trend] || Minus;
-            const trendColor = goal.trend === 'up' ? 'text-green-500' : goal.trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
+            const trendColor = goal.trend === 'up' ? 'text-success' : goal.trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
             
             return (
               <Card key={goal.id}>

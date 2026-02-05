@@ -150,7 +150,7 @@ export const ResourceDetailPage: React.FC<ResourceDetailPageProps> = ({
           <div className="px-4 sm:px-6 lg:px-8 py-6">
             <div className="bg-card shadow rounded-lg p-8">
               <div className="text-center">
-                <div className="text-red-600 text-lg font-medium mb-2">
+                <div className="text-destructive text-lg font-medium mb-2">
                   Failed to load {resourceType}
                 </div>
                 <p className="text-muted-foreground mb-4">{error}</p>
@@ -200,7 +200,7 @@ export const ResourceDetailPage: React.FC<ResourceDetailPageProps> = ({
                 >
                   {action.icon && (
                     <action.icon className={`mr-3 h-4 w-4 ${
-                      action.variant === 'danger' ? 'text-red-500' : 'text-muted-foreground'
+                      action.variant === 'danger' ? 'text-destructive' : 'text-muted-foreground'
                     }`} />
                   )}
                   {action.label}
@@ -308,7 +308,7 @@ export const ActivityTab: React.FC<{ resourceType: string }> = ({
                 <div className="relative flex space-x-3">
                   <div>
                     <span className="h-8 w-8 rounded-full bg-muted-foreground/20 flex items-center justify-center ring-8 ring-background">
-                      <PencilIcon className="h-4 w-4 text-white" />
+                      <PencilIcon className="h-4 w-4 text-primary-foreground" />
                     </span>
                   </div>
                   <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">

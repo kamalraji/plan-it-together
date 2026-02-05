@@ -62,8 +62,8 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
   const getRoleColor = (role: string) => {
     if (role === WorkspaceRole.WORKSPACE_OWNER) return 'bg-purple-100 text-purple-800';
     if (role.endsWith('_MANAGER')) return 'bg-violet-100 text-violet-800';
-    if (role.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
-    if (role.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
+    if (role.endsWith('_LEAD')) return 'bg-info/20 text-blue-800';
+    if (role.endsWith('_COORDINATOR')) return 'bg-primary/20 text-indigo-800';
     return 'bg-muted text-foreground';
   };
 
@@ -119,11 +119,11 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
             <div className="text-xs text-muted-foreground">Total</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{activeMembers}</div>
+            <div className="text-2xl font-bold text-success">{activeMembers}</div>
             <div className="text-xs text-muted-foreground">Active</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">{pendingMembers}</div>
+            <div className="text-2xl font-bold text-warning">{pendingMembers}</div>
             <div className="text-xs text-muted-foreground">Pending</div>
           </div>
         </div>
@@ -143,8 +143,8 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
                     className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md min-h-[56px]"
                   >
                     {/* Avatar */}
-                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <span className="text-indigo-600 font-medium text-xs">
+                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-medium text-xs">
                         {getInitials(member.user_profiles?.name || 'Unknown')}
                       </span>
                     </div>
@@ -156,9 +156,9 @@ export function MobileTeamOverview({ workspace, onViewTeam }: MobileTeamOverview
                           {member.user_profiles?.name || 'Unknown User'}
                         </p>
                         {member.status === 'ACTIVE' ? (
-                          <CheckCircleIcon className="w-3 h-3 text-green-500 flex-shrink-0" />
+                          <CheckCircleIcon className="w-3 h-3 text-success flex-shrink-0" />
                         ) : (
-                          <ClockIcon className="w-3 h-3 text-yellow-500 flex-shrink-0" />
+                          <ClockIcon className="w-3 h-3 text-warning flex-shrink-0" />
                         )}
                       </div>
                       <div className="flex items-center space-x-2">

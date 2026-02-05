@@ -113,7 +113,7 @@ const ParticipantRow: React.FC<ParticipantRowProps> = ({
         </Avatar>
         
         {participant.isHost && (
-          <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-0.5">
+          <div className="absolute -top-1 -right-1 bg-warning rounded-full p-0.5">
             <Crown className="h-2.5 w-2.5 text-amber-950" />
           </div>
         )}

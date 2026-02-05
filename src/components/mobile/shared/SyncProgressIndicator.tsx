@@ -28,7 +28,7 @@ export const SyncProgressIndicator: React.FC<SyncProgressIndicatorProps> = ({
       case 'syncing':
         return <RefreshCw className="h-4 w-4 animate-spin text-primary" />;
       case 'success':
-        return <Check className="h-4 w-4 text-green-500" />;
+        return <Check className="h-4 w-4 text-success" />;
       case 'error':
         return <AlertTriangle className="h-4 w-4 text-destructive" />;
       case 'offline':
@@ -58,7 +58,7 @@ export const SyncProgressIndicator: React.FC<SyncProgressIndicatorProps> = ({
       case 'syncing':
         return 'text-primary';
       case 'success':
-        return 'text-green-600';
+        return 'text-success';
       case 'error':
         return 'text-destructive';
       case 'offline':

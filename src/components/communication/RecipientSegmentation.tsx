@@ -95,7 +95,7 @@ export function RecipientSegmentation({
                   type="checkbox"
                   checked={segmentCriteria.roles?.includes(option.value) || false}
                   onChange={(e) => handleRoleChange(option.value, e.target.checked)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                  className="mt-1 h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                 />
                 <div className="flex-1">
                   <div className="text-sm font-medium text-foreground">{option.label}</div>
@@ -116,7 +116,7 @@ export function RecipientSegmentation({
                   type="checkbox"
                   checked={segmentCriteria.registrationStatus?.includes(option.value) || false}
                   onChange={(e) => handleRegistrationStatusChange(option.value, e.target.checked)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                  className="mt-1 h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                 />
                 <div className="flex-1">
                   <div className="text-sm font-medium text-foreground">{option.label}</div>
@@ -138,7 +138,7 @@ export function RecipientSegmentation({
                   name="attendanceStatus"
                   checked={segmentCriteria.attendanceStatus === option.value}
                   onChange={() => handleAttendanceStatusChange(option.value)}
-                  className="mt-1 h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                  className="mt-1 h-4 w-4 text-primary focus-visible:ring-ring border-input"
                 />
                 <div className="flex-1">
                   <div className="text-sm font-medium text-foreground">{option.label}</div>
@@ -166,14 +166,14 @@ export function RecipientSegmentation({
 
           {isLoading ? (
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
               <span>Loading recipients...</span>
             </div>
           ) : recipientPreview ? (
             <div>
               <div className="flex items-center space-x-2 mb-3">
                 <div className="flex items-center space-x-1">
-                  <span className="text-2xl font-bold text-indigo-600">{recipientPreview.count}</span>
+                  <span className="text-2xl font-bold text-primary">{recipientPreview.count}</span>
                   <span className="text-sm text-muted-foreground">
                     recipient{recipientPreview.count !== 1 ? 's' : ''} selected
                   </span>

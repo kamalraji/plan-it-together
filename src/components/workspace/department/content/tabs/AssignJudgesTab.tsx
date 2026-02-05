@@ -165,19 +165,19 @@ export function AssignJudgesTab({ workspace }: AssignJudgesTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats?.totalSubmissions || 0}</div>
+            <div className="text-2xl font-bold text-info">{stats?.totalSubmissions || 0}</div>
             <p className="text-xs text-muted-foreground">Submissions</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats?.pendingAssignments || 0}</div>
+            <div className="text-2xl font-bold text-warning">{stats?.pendingAssignments || 0}</div>
             <p className="text-xs text-muted-foreground">Pending Evaluations</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats?.evaluatedSubmissions || 0}</div>
+            <div className="text-2xl font-bold text-success">{stats?.evaluatedSubmissions || 0}</div>
             <p className="text-xs text-muted-foreground">Evaluated</p>
           </CardContent>
         </Card>
@@ -187,7 +187,7 @@ export function AssignJudgesTab({ workspace }: AssignJudgesTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Gavel className="h-5 w-5 text-amber-500" />
+            <Gavel className="h-5 w-5 text-warning" />
             Assign Judges
           </CardTitle>
           <CardDescription>Select submissions and assign them to a judge</CardDescription>
@@ -235,7 +235,7 @@ export function AssignJudgesTab({ workspace }: AssignJudgesTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-500" />
+            <FileText className="h-5 w-5 text-info" />
             Submissions
           </CardTitle>
           <CardDescription>Click to select submissions for bulk assignment</CardDescription>

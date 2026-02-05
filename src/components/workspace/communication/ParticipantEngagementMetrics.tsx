@@ -63,9 +63,9 @@ const StatCard = ({
 }) => {
   const colorClasses = {
     primary: 'text-primary bg-primary/10',
-    green: 'text-green-600 bg-green-500/10',
-    amber: 'text-amber-600 bg-amber-500/10',
-    blue: 'text-blue-600 bg-blue-500/10',
+    green: 'text-success bg-success/10',
+    amber: 'text-warning bg-warning/10',
+    blue: 'text-info bg-info/10',
   };
 
   return (
@@ -85,8 +85,8 @@ const StatCard = ({
         </div>
         {trend !== undefined && (
           <div className="flex items-center gap-1 mt-3">
-            <TrendingUp className={`h-3.5 w-3.5 ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`} />
-            <span className={`text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <TrendingUp className={`h-3.5 w-3.5 ${trend >= 0 ? 'text-success' : 'text-destructive'}`} />
+            <span className={`text-sm ${trend >= 0 ? 'text-success' : 'text-destructive'}`}>
               {trend >= 0 ? '+' : ''}{trend}%
             </span>
             <span className="text-xs text-muted-foreground">vs last week</span>

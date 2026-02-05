@@ -103,19 +103,19 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{pendingRequests.length}</div>
+            <div className="text-2xl font-bold text-warning">{pendingRequests.length}</div>
             <p className="text-xs text-muted-foreground">Pending Budget Requests</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{pendingExpenses.length}</div>
+            <div className="text-2xl font-bold text-warning">{pendingExpenses.length}</div>
             <p className="text-xs text-muted-foreground">Pending Expenses</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-success">
               {requests.filter(r => r.status === 'approved').length}
             </div>
             <p className="text-xs text-muted-foreground">Approved Requests</p>
@@ -123,7 +123,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-destructive">
               {requests.filter(r => r.status === 'rejected').length}
             </div>
             <p className="text-xs text-muted-foreground">Rejected Requests</p>
@@ -135,7 +135,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-amber-500" />
+            <DollarSign className="h-5 w-5 text-warning" />
             Pending Budget Requests
           </CardTitle>
           <CardDescription>Budget requests from sub-workspaces awaiting your approval</CardDescription>
@@ -143,7 +143,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
         <CardContent>
           {pendingRequests.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500/50" />
+              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-success/50" />
               <p>No pending budget requests</p>
               <p className="text-sm">All caught up!</p>
             </div>
@@ -152,14 +152,14 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
               {pendingRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-amber-500/5 border-amber-500/20"
+                  className="flex items-center justify-between p-4 rounded-lg border bg-warning/5 border-warning/20"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
                         ₹{request.requested_amount.toLocaleString()}
                       </span>
-                      <Badge variant="outline" className="bg-amber-500/10 text-amber-600">
+                      <Badge variant="outline" className="bg-warning/10 text-warning">
                         <Clock className="h-3 w-3 mr-1" />
                         Pending
                       </Badge>
@@ -200,7 +200,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <AlertCircle className="h-5 w-5 text-warning" />
             Pending Expenses
           </CardTitle>
           <CardDescription>Expense records awaiting approval</CardDescription>
@@ -208,7 +208,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
         <CardContent>
           {pendingExpenses.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500/50" />
+              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-success/50" />
               <p>No pending expenses</p>
             </div>
           ) : (
@@ -216,7 +216,7 @@ export function ApproveRequestTab({ workspace }: ApproveRequestTabProps) {
               {pendingExpenses.map((expense) => (
                 <div
                   key={expense.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-amber-500/5 border-amber-500/20"
+                  className="flex items-center justify-between p-4 rounded-lg border bg-warning/5 border-warning/20"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">

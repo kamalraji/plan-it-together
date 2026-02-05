@@ -51,8 +51,8 @@ const calculateTrustScore = (metrics: TrustMetrics): number => {
 
 const getTrustLevel = (score: number): { label: string; color: string; bgColor: string } => {
   if (score >= 90) return { label: 'Exceptional', color: 'text-emerald-600', bgColor: 'bg-emerald-500' };
-  if (score >= 75) return { label: 'Excellent', color: 'text-blue-600', bgColor: 'bg-blue-500' };
-  if (score >= 60) return { label: 'Good', color: 'text-amber-600', bgColor: 'bg-amber-500' };
+  if (score >= 75) return { label: 'Excellent', color: 'text-info', bgColor: 'bg-info' };
+  if (score >= 60) return { label: 'Good', color: 'text-warning', bgColor: 'bg-warning' };
   if (score >= 40) return { label: 'Fair', color: 'text-orange-600', bgColor: 'bg-orange-500' };
   return { label: 'New', color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/20' };
 };
@@ -120,7 +120,7 @@ export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <Star className="w-4 h-4 text-warning fill-amber-500" />
                 </TooltipTrigger>
                 <TooltipContent>Top Rated ({metrics.avgRating.toFixed(1)})</TooltipContent>
               </Tooltip>
@@ -131,7 +131,7 @@ export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Zap className="w-4 h-4 text-blue-500" />
+                  <Zap className="w-4 h-4 text-info" />
                 </TooltipTrigger>
                 <TooltipContent>Fast Response</TooltipContent>
               </Tooltip>
@@ -142,7 +142,7 @@ export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <MessageCircle className="w-4 h-4 text-violet-500" />
+                  <MessageCircle className="w-4 h-4 text-primary" />
                 </TooltipTrigger>
                 <TooltipContent>{metrics.reviewCount} Reviews</TooltipContent>
               </Tooltip>
@@ -206,14 +206,14 @@ export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-sm">
-          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+          <Star className="w-4 h-4 text-warning fill-amber-500" />
           <span className="text-foreground">
             {metrics.avgRating > 0 ? `${metrics.avgRating.toFixed(1)} Rating` : 'No ratings'}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm">
-          <MessageCircle className="w-4 h-4 text-violet-500" />
+          <MessageCircle className="w-4 h-4 text-primary" />
           <span className="text-foreground">
             {metrics.reviewCount} Review{metrics.reviewCount !== 1 ? 's' : ''}
           </span>
@@ -222,8 +222,8 @@ export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({
         <div className="flex items-center gap-2 text-sm">
           <Clock className={cn(
             'w-4 h-4',
-            metrics.responseTime === 'fast' ? 'text-blue-500' : 
-            metrics.responseTime === 'moderate' ? 'text-amber-500' : 'text-muted-foreground'
+            metrics.responseTime === 'fast' ? 'text-info' : 
+            metrics.responseTime === 'moderate' ? 'text-warning' : 'text-muted-foreground'
           )} />
           <span className="text-foreground capitalize">
             {metrics.responseTime || 'Unknown'} response

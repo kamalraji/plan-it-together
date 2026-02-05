@@ -16,16 +16,16 @@ interface SponsorCommunicationsProps {
 }
 
 const typeConfig = {
-  email: { icon: Mail, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  email: { icon: Mail, color: 'text-info', bgColor: 'bg-info/10' },
   call: { icon: Phone, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  meeting: { icon: Calendar, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+  meeting: { icon: Calendar, color: 'text-primary', bgColor: 'bg-primary/10' },
   other: { icon: MessageSquare, color: 'text-muted-foreground', bgColor: 'bg-muted/50' },
 };
 
 const statusColors = {
-  sent: 'text-blue-500 bg-blue-500/10',
+  sent: 'text-info bg-info/10',
   received: 'text-emerald-500 bg-emerald-500/10',
-  scheduled: 'text-amber-500 bg-amber-500/10',
+  scheduled: 'text-warning bg-warning/10',
   completed: 'text-muted-foreground bg-muted/50',
 };
 

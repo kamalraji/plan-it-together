@@ -27,7 +27,7 @@ export function MaterialsTracker({ workspace }: MaterialsTrackerProps) {
 
   const getStatusIcon = (status: { submitted: boolean | null; approved: boolean | null }) => {
     if (status.approved) return <FileCheck className="h-3 w-3 text-emerald-500" />;
-    if (status.submitted) return <AlertCircle className="h-3 w-3 text-amber-500" />;
+    if (status.submitted) return <AlertCircle className="h-3 w-3 text-warning" />;
     return <AlertCircle className="h-3 w-3 text-muted-foreground" />;
   };
 
@@ -177,7 +177,7 @@ export function MaterialsTracker({ workspace }: MaterialsTrackerProps) {
                 <span>Approved</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <div className="w-2 h-2 rounded-full bg-warning" />
                 <span>Pending Review</span>
               </div>
               <div className="flex items-center gap-1">

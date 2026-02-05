@@ -24,9 +24,9 @@ function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
                 {change >= 0 ? (
                   <TrendingUp className="h-3 w-3 text-emerald-500" />
                 ) : (
-                  <TrendingDown className="h-3 w-3 text-red-500" />
+                  <TrendingDown className="h-3 w-3 text-destructive" />
                 )}
-                <span className={`text-xs font-medium ${change >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <span className={`text-xs font-medium ${change >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
                   {change >= 0 ? '+' : ''}{change}%
                 </span>
                 <span className="text-xs text-muted-foreground">vs last month</span>
@@ -34,7 +34,7 @@ function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
             )}
           </div>
           <div className={`p-3 rounded-xl ${color}`}>
-            <Icon className="h-5 w-5 text-white" />
+            <Icon className="h-5 w-5 text-primary-foreground" />
           </div>
         </div>
       </CardContent>
@@ -61,7 +61,7 @@ export function GrowthStatsCards({ workspaceId }: GrowthStatsCardsProps) {
       value: formatValue(data?.totalReach ?? 0),
       change: 18,
       icon: Megaphone,
-      color: 'bg-blue-500',
+      color: 'bg-info',
     },
     {
       title: 'Audience Growth',
@@ -75,14 +75,14 @@ export function GrowthStatsCards({ workspaceId }: GrowthStatsCardsProps) {
       value: formatValue(data?.sponsorshipRevenue ?? 0, '$'),
       change: 15,
       icon: Handshake,
-      color: 'bg-amber-500',
+      color: 'bg-warning',
     },
     {
       title: 'Engagement Rate',
       value: `${data?.engagementRate ?? 0}%`,
       change: 12,
       icon: Target,
-      color: 'bg-violet-500',
+      color: 'bg-primary',
     },
   ];
 

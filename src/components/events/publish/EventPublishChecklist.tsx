@@ -26,22 +26,22 @@ export function EventPublishChecklist({
   const getStatusIcon = (status: ChecklistItem['status']) => {
     switch (status) {
       case 'pass':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-success" />;
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-5 w-5 text-warning" />;
       case 'fail':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
     }
   };
 
   const getStatusBg = (status: ChecklistItem['status']) => {
     switch (status) {
       case 'pass':
-        return 'bg-green-500/10 border-green-500/20';
+        return 'bg-success/10 border-success/20';
       case 'warning':
-        return 'bg-yellow-500/10 border-yellow-500/20';
+        return 'bg-warning/10 border-warning/20';
       case 'fail':
-        return 'bg-red-500/10 border-red-500/20';
+        return 'bg-destructive/10 border-destructive/20';
     }
   };
 
@@ -93,14 +93,14 @@ export function EventPublishChecklist({
       <div className={cn(
         'rounded-lg border p-4',
         failCount === 0 
-          ? 'bg-green-500/10 border-green-500/20' 
-          : 'bg-yellow-500/10 border-yellow-500/20'
+          ? 'bg-success/10 border-success/20' 
+          : 'bg-warning/10 border-warning/20'
       )}>
         <div className="flex items-center gap-3">
           {failCount === 0 ? (
-            <CheckCircle className="h-6 w-6 text-green-500" />
+            <CheckCircle className="h-6 w-6 text-success" />
           ) : (
-            <AlertCircle className="h-6 w-6 text-yellow-500" />
+            <AlertCircle className="h-6 w-6 text-warning" />
           )}
           <div>
             <p className={cn(

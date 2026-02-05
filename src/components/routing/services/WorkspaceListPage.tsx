@@ -160,11 +160,11 @@ export const WorkspaceListPage: React.FC = () => {
   const getStatusColor = (status: WorkspaceStatus) => {
     switch (status) {
       case WorkspaceStatus.ACTIVE:
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case WorkspaceStatus.PROVISIONING:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case WorkspaceStatus.DISSOLVED:
         return 'bg-muted text-foreground';
       default:
@@ -404,7 +404,7 @@ export const WorkspaceListPage: React.FC = () => {
         <div className="bg-card rounded-lg border border-border overflow-hidden">
           {isLoading ? (
             <div className="py-12 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
           ) : !hasAnyWorkspaces ? (
             <EmptyState
@@ -433,7 +433,7 @@ export const WorkspaceListPage: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       <input
                         type="checkbox"
-                        className="rounded border-input text-blue-600 focus-visible:ring-ring"
+                        className="rounded border-input text-info focus-visible:ring-ring"
                         onChange={(e) => {
                           if (e.target.checked) {
                             setSelectedWorkspaces(filteredWorkspaces.map((w) => w.id));
@@ -466,7 +466,7 @@ export const WorkspaceListPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
-                          className="rounded border-input text-blue-600 focus-visible:ring-ring"
+                          className="rounded border-input text-info focus-visible:ring-ring"
                           checked={selectedWorkspaces.includes(workspace.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -503,9 +503,9 @@ export const WorkspaceListPage: React.FC = () => {
 
         {/* Bulk Actions */}
         {selectedWorkspaces.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+          <div className="bg-info/10 border border-blue-200 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-blue-700">
+              <span className="text-sm text-info">
                 {selectedWorkspaces.length} workspace{selectedWorkspaces.length !== 1 ? 's' : ''} selected
               </span>
               <div className="flex space-x-2">

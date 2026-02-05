@@ -24,7 +24,7 @@ const quickActions: QuickAction[] = [
     label: 'Create Content',
     description: 'Start a new content item',
     icon: Plus,
-    color: 'text-blue-500',
+    color: 'text-info',
     bgColor: 'bg-blue-500/10 hover:bg-blue-500/20',
   },
   {
@@ -32,7 +32,7 @@ const quickActions: QuickAction[] = [
     label: 'Assign Judges',
     description: 'Distribute submissions',
     icon: Gavel,
-    color: 'text-amber-500',
+    color: 'text-warning',
     bgColor: 'bg-amber-500/10 hover:bg-amber-500/20',
   },
   {
@@ -40,7 +40,7 @@ const quickActions: QuickAction[] = [
     label: 'Enter Score',
     description: 'Score a submission',
     icon: Star,
-    color: 'text-yellow-500',
+    color: 'text-warning',
     bgColor: 'bg-yellow-500/10 hover:bg-yellow-500/20',
   },
   {
@@ -48,7 +48,7 @@ const quickActions: QuickAction[] = [
     label: 'Upload Media',
     description: 'Add photos or videos',
     icon: Upload,
-    color: 'text-purple-500',
+    color: 'text-primary',
     bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
   },
   {

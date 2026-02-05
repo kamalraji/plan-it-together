@@ -55,9 +55,9 @@ export function FacilityCheckTab({ workspace }: FacilityCheckTabProps) {
       case 'pass':
         return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
       case 'fail':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
       default:
         return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
@@ -68,9 +68,9 @@ export function FacilityCheckTab({ workspace }: FacilityCheckTabProps) {
       case 'pass':
         return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30">Pass</Badge>;
       case 'fail':
-        return <Badge className="bg-red-500/20 text-red-600 border-red-500/30">Fail</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive border-destructive/30">Fail</Badge>;
       case 'warning':
-        return <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30">Warning</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-warning/30">Warning</Badge>;
       default:
         return <Badge className="bg-muted text-muted-foreground">Pending</Badge>;
     }
@@ -147,27 +147,27 @@ export function FacilityCheckTab({ workspace }: FacilityCheckTabProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500/10 border-amber-500/20">
+        <Card className="bg-warning/10 border-warning/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-amber-500/20 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-amber-500" />
+              <div className="p-3 bg-warning/20 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-warning" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-amber-500">{warningCount}</div>
+                <div className="text-3xl font-bold text-warning">{warningCount}</div>
                 <p className="text-sm text-muted-foreground">Warnings</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-500/20 rounded-full">
-                <XCircle className="h-6 w-6 text-red-500" />
+              <div className="p-3 bg-destructive/20 rounded-full">
+                <XCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-red-500">{failedCount}</div>
+                <div className="text-3xl font-bold text-destructive">{failedCount}</div>
                 <p className="text-sm text-muted-foreground">Failed</p>
               </div>
             </div>

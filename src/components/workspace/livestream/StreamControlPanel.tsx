@@ -123,7 +123,7 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
             >
               <Radio className={cn(
                 "h-5 w-5",
-                stream.stream_status === 'live' ? 'text-red-500' : 'text-muted-foreground'
+                stream.stream_status === 'live' ? 'text-destructive' : 'text-muted-foreground'
               )} />
             </motion.div>
             <div>
@@ -138,8 +138,8 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
                   variant="outline" 
                   className={cn(
                     "mt-1 font-semibold capitalize",
-                    stream.stream_status === 'scheduled' && 'bg-blue-500/10 text-blue-500 border-blue-500/30',
-                    stream.stream_status === 'preparing' && 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
+                    stream.stream_status === 'scheduled' && 'bg-info/10 text-info border-info/30',
+                    stream.stream_status === 'preparing' && 'bg-warning/10 text-warning border-warning/30',
                     stream.stream_status === 'ended' && 'bg-muted text-muted-foreground',
                     stream.stream_status === 'error' && 'bg-destructive/10 text-destructive border-destructive/30'
                   )}
@@ -215,7 +215,7 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
                 transition={{ delay: 0.3 }}
                 className="text-center p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/5 border border-green-500/20"
               >
-                <div className="flex items-center justify-center gap-2 text-green-500 mb-1">
+                <div className="flex items-center justify-center gap-2 text-success mb-1">
                   <Activity className="h-4 w-4" />
                   <span className="text-2xl font-bold">Stable</span>
                 </div>
@@ -233,14 +233,14 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
             className="grid grid-cols-2 gap-3"
           >
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-              <Zap className="h-4 w-4 text-yellow-500" />
+              <Zap className="h-4 w-4 text-warning" />
               <div>
                 <p className="text-sm font-semibold">{analytics.peakViewers}</p>
                 <p className="text-xs text-muted-foreground">Peak viewers</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-              <BarChart3 className="h-4 w-4 text-blue-500" />
+              <BarChart3 className="h-4 w-4 text-info" />
               <div>
                 <p className="text-sm font-semibold">{Math.round(analytics.averageWatchTime / 60)}m</p>
                 <p className="text-xs text-muted-foreground">Avg watch time</p>
@@ -290,8 +290,8 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
             animate={{ opacity: 1 }}
             className="p-5 rounded-2xl bg-gradient-to-br from-blue-500/15 via-blue-500/5 to-transparent border border-blue-500/20"
           >
-            <div className="flex items-center gap-3 text-blue-500 mb-2">
-              <div className="p-2 rounded-xl bg-blue-500/20">
+            <div className="flex items-center gap-3 text-info mb-2">
+              <div className="p-2 rounded-xl bg-info/20">
                 <Clock className="h-5 w-5" />
               </div>
               <span className="font-semibold">Scheduled for</span>
@@ -312,7 +312,7 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
           </div>
           <Badge 
             variant={stream.chat_enabled ? "default" : "secondary"}
-            className={stream.chat_enabled ? "bg-green-500/20 text-green-600 border-green-500/30" : ""}
+            className={stream.chat_enabled ? "bg-success/20 text-success border-success/30" : ""}
           >
             {stream.chat_enabled ? 'Enabled' : 'Disabled'}
           </Badge>
@@ -374,8 +374,8 @@ export function StreamControlPanel({ stream, workspaceId, onSettingsClick }: Str
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-green-600 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-green-500/20">
+                <p className="font-semibold text-success flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-success/20">
                     <BarChart3 className="h-4 w-4" />
                   </div>
                   Recording Available

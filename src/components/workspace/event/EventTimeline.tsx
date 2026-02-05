@@ -14,8 +14,8 @@ export function EventTimeline({ workspaceId }: EventTimelineProps) {
   const getTypeIcon = (type: TimelineEvent['type']) => {
     switch (type) {
       case 'completed': return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-      case 'current': return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
-      case 'milestone': return <Flag className="h-4 w-4 text-purple-500" />;
+      case 'current': return <Clock className="h-4 w-4 text-info animate-pulse" />;
+      case 'milestone': return <Flag className="h-4 w-4 text-primary" />;
       case 'alert': return <AlertCircle className="h-4 w-4 text-destructive" />;
     }
   };
@@ -23,8 +23,8 @@ export function EventTimeline({ workspaceId }: EventTimelineProps) {
   const getTypeBadge = (type: TimelineEvent['type']) => {
     switch (type) {
       case 'completed': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
-      case 'current': return 'bg-blue-500/10 text-blue-600 border-blue-500/30';
-      case 'milestone': return 'bg-purple-500/10 text-purple-600 border-purple-500/30';
+      case 'current': return 'bg-info/10 text-info border-info/30';
+      case 'milestone': return 'bg-primary/10 text-primary border-purple-500/30';
       case 'alert': return 'bg-destructive/10 text-destructive border-destructive/30';
     }
   };
@@ -34,7 +34,7 @@ export function EventTimeline({ workspaceId }: EventTimelineProps) {
       <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Clock className="h-4 w-4 text-blue-500" />
+            <Clock className="h-4 w-4 text-info" />
             Event Timeline
           </CardTitle>
         </CardHeader>
@@ -61,7 +61,7 @@ export function EventTimeline({ workspaceId }: EventTimelineProps) {
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Clock className="h-4 w-4 text-blue-500" />
+          <Clock className="h-4 w-4 text-info" />
           Event Timeline
           {timelineEvents.length > 0 && (
             <Badge variant="secondary" className="ml-2 text-xs">

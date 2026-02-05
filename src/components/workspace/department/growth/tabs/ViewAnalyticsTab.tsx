@@ -65,13 +65,13 @@ export function ViewAnalyticsTab({ workspace }: ViewAnalyticsTabProps) {
                 <p className="text-sm text-muted-foreground">Total Impressions</p>
                 <p className="text-2xl font-bold">{analytics.totalImpressions.toLocaleString()}</p>
               </div>
-              <div className="p-3 rounded-full bg-blue-500/10">
-                <Eye className="h-5 w-5 text-blue-500" />
+              <div className="p-3 rounded-full bg-info/10">
+                <Eye className="h-5 w-5 text-info" />
               </div>
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">12.5%</span>
+              <TrendingUp className="h-4 w-4 text-success" />
+              <span className="text-success">12.5%</span>
               <span className="text-muted-foreground">vs last period</span>
             </div>
           </CardContent>
@@ -84,13 +84,13 @@ export function ViewAnalyticsTab({ workspace }: ViewAnalyticsTabProps) {
                 <p className="text-sm text-muted-foreground">Click-Through Rate</p>
                 <p className="text-2xl font-bold">{analytics.ctr}%</p>
               </div>
-              <div className="p-3 rounded-full bg-purple-500/10">
-                <MousePointer className="h-5 w-5 text-purple-500" />
+              <div className="p-3 rounded-full bg-primary/10">
+                <MousePointer className="h-5 w-5 text-primary" />
               </div>
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">0.3%</span>
+              <TrendingUp className="h-4 w-4 text-success" />
+              <span className="text-success">0.3%</span>
               <span className="text-muted-foreground">improvement</span>
             </div>
           </CardContent>
@@ -103,13 +103,13 @@ export function ViewAnalyticsTab({ workspace }: ViewAnalyticsTabProps) {
                 <p className="text-sm text-muted-foreground">Total Conversions</p>
                 <p className="text-2xl font-bold">{analytics.totalConversions.toLocaleString()}</p>
               </div>
-              <div className="p-3 rounded-full bg-green-500/10">
-                <Target className="h-5 w-5 text-green-500" />
+              <div className="p-3 rounded-full bg-success/10">
+                <Target className="h-5 w-5 text-success" />
               </div>
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <span className="text-green-500">8.2%</span>
+              <TrendingUp className="h-4 w-4 text-success" />
+              <span className="text-success">8.2%</span>
               <span className="text-muted-foreground">conversion rate</span>
             </div>
           </CardContent>
@@ -122,8 +122,8 @@ export function ViewAnalyticsTab({ workspace }: ViewAnalyticsTabProps) {
                 <p className="text-sm text-muted-foreground">Sponsor Revenue</p>
                 <p className="text-2xl font-bold">${analytics.sponsorRevenue.toLocaleString()}</p>
               </div>
-              <div className="p-3 rounded-full bg-amber-500/10">
-                <DollarSign className="h-5 w-5 text-amber-500" />
+              <div className="p-3 rounded-full bg-warning/10">
+                <DollarSign className="h-5 w-5 text-warning" />
               </div>
             </div>
             <div className="flex items-center gap-1 mt-2 text-sm">

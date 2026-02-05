@@ -96,7 +96,7 @@ export function TrackShipmentTab({ workspaceId }: TrackShipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Truck className="h-8 w-8 text-blue-500" />
+              <Truck className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.inTransit}</p>
                 <p className="text-sm text-muted-foreground">In Transit</p>
@@ -107,7 +107,7 @@ export function TrackShipmentTab({ workspaceId }: TrackShipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.delivered}</p>
                 <p className="text-sm text-muted-foreground">Delivered</p>

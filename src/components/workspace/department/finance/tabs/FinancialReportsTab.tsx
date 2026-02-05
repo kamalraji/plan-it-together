@@ -26,8 +26,8 @@ export function FinancialReportsTab({ workspaceId }: FinancialReportsTabProps) {
       name: 'Budget Summary',
       description: 'Overview of budget allocation vs spending',
       icon: BarChart3,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       id: 'expense-report',
@@ -42,16 +42,16 @@ export function FinancialReportsTab({ workspaceId }: FinancialReportsTabProps) {
       name: 'Category Breakdown',
       description: 'Spending analysis by category',
       icon: FileSpreadsheet,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       id: 'monthly-summary',
       name: 'Monthly Summary',
       description: 'Month-by-month financial overview',
       icon: Calendar,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
   ];
 
@@ -73,8 +73,8 @@ export function FinancialReportsTab({ workspaceId }: FinancialReportsTabProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-indigo-500/10">
-          <FileSpreadsheet className="w-6 h-6 text-indigo-600" />
+        <div className="p-2.5 rounded-xl bg-primary/10">
+          <FileSpreadsheet className="w-6 h-6 text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Financial Reports</h1>

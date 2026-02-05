@@ -69,7 +69,7 @@ export function PageBuilderStatusCard({ workspaceId, eventId, className }: PageB
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-foreground">Page Builder</p>
-              <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">
+              <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/20">
                 Assigned
               </Badge>
             </div>

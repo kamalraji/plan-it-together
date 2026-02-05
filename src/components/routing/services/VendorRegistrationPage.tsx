@@ -1146,7 +1146,7 @@ export const VendorRegistrationPage: React.FC = () => {
           {vendor.verification_status === 'PENDING' && (
             <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
               <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <Clock className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Application Under Review</p>
                   <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
@@ -1161,7 +1161,7 @@ export const VendorRegistrationPage: React.FC = () => {
           {vendor.verification_status === 'REJECTED' && vendor.rejection_reason && (
             <div className="mt-4 p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
               <div className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <XCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-red-800 dark:text-red-200">Application Rejected</p>
                   <p className="text-sm text-red-700 dark:text-red-300 mt-1">

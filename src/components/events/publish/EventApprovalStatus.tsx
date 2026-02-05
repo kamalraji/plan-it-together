@@ -51,24 +51,24 @@ export function EventApprovalStatus({
       case 'pending':
         return {
           icon: Clock,
-          color: 'text-yellow-500',
-          bg: 'bg-yellow-500/10',
+          color: 'text-warning',
+          bg: 'bg-warning/10',
           label: 'Pending Review',
           description: 'Your publish request is awaiting review by workspace managers.',
         };
       case 'approved':
         return {
           icon: CheckCircle,
-          color: 'text-green-500',
-          bg: 'bg-green-500/10',
+          color: 'text-success',
+          bg: 'bg-success/10',
           label: 'Approved',
           description: 'Your event has been approved and published!',
         };
       case 'rejected':
         return {
           icon: XCircle,
-          color: 'text-red-500',
-          bg: 'bg-red-500/10',
+          color: 'text-destructive',
+          bg: 'bg-destructive/10',
           label: 'Rejected',
           description: 'Your publish request was not approved. Please review the feedback and try again.',
         };
@@ -138,9 +138,9 @@ export function EventApprovalStatus({
 
           {/* Review Notes (if rejected) */}
           {request.status === 'rejected' && request.reviewNotes && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
+            <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-red-700 dark:text-red-400">
                     Reviewer Feedback

@@ -10,8 +10,8 @@ export function ExpenseManagementTab({ workspaceId }: ExpenseManagementTabProps)
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-blue-500/10">
-          <Receipt className="w-6 h-6 text-blue-600" />
+        <div className="p-2.5 rounded-xl bg-info/10">
+          <Receipt className="w-6 h-6 text-info" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Expense Management</h1>

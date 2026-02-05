@@ -32,11 +32,11 @@ export function WorkspaceTemplateSelector({
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
       case 'SIMPLE':
-        return 'bg-green-500/10 text-green-600 border-green-500/20';
+        return 'bg-success/10 text-success border-success/20';
       case 'MODERATE':
-        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'COMPLEX':
-        return 'bg-red-500/10 text-red-600 border-red-500/20';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -45,9 +45,9 @@ export function WorkspaceTemplateSelector({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'social':
-        return 'bg-blue-500/10 text-blue-600';
+        return 'bg-info/10 text-info';
       case 'business':
-        return 'bg-purple-500/10 text-purple-600';
+        return 'bg-primary/10 text-primary';
       case 'education':
         return 'bg-emerald-500/10 text-emerald-600';
       case 'competition':
@@ -311,10 +311,10 @@ export function WorkspaceTemplateSelector({
                     className={cn(
                       "text-[10px] px-1.5 py-0 flex-shrink-0",
                       task.priority === 'HIGH'
-                        ? 'bg-red-500/10 text-red-600 border-red-500/20'
+                        ? 'bg-destructive/10 text-destructive border-destructive/20'
                         : task.priority === 'MEDIUM'
-                        ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
-                        : 'bg-green-500/10 text-green-600 border-green-500/20'
+                        ? 'bg-warning/10 text-warning border-warning/20'
+                        : 'bg-success/10 text-success border-success/20'
                     )}
                   >
                     {task.priority}

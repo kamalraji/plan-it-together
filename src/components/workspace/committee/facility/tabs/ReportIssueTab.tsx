@@ -79,13 +79,13 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
   const getSeverityConfig = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return { label: 'Critical', className: 'bg-red-500 text-white' };
+        return { label: 'Critical', className: 'bg-destructive text-primary-foreground' };
       case 'high':
-        return { label: 'High', className: 'bg-orange-500 text-white' };
+        return { label: 'High', className: 'bg-orange-500 text-primary-foreground' };
       case 'medium':
-        return { label: 'Medium', className: 'bg-amber-500 text-white' };
+        return { label: 'Medium', className: 'bg-warning text-primary-foreground' };
       case 'low':
-        return { label: 'Low', className: 'bg-blue-500 text-white' };
+        return { label: 'Low', className: 'bg-info text-primary-foreground' };
       default:
         return { label: severity, className: 'bg-muted' };
     }
@@ -154,14 +154,14 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
         </Card>
 
         {criticalCount > 0 && (
-          <Card className="border-red-500/50">
+          <Card className="border-destructive/50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Critical</p>
-                  <p className="text-2xl font-bold text-red-500">{criticalCount}</p>
+                  <p className="text-2xl font-bold text-destructive">{criticalCount}</p>
                 </div>
-                <AlertTriangle className="h-8 w-8 text-red-500" />
+                <AlertTriangle className="h-8 w-8 text-destructive" />
               </div>
             </CardContent>
           </Card>
@@ -171,7 +171,7 @@ export function ReportIssueTab({ workspaceId }: ReportIssueTabProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
+          <AlertTriangle className="h-5 w-5 text-warning" />
           Facility Issues
         </h2>
         <div className="flex gap-2">

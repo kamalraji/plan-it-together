@@ -34,20 +34,20 @@ interface CommitteeStatus {
 const COMMITTEE_CONFIG = {
   content: {
     icon: FileText,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/20',
+    color: 'text-info',
+    bgColor: 'bg-info/10',
+    borderColor: 'border-info/20',
   },
   judge: {
     icon: Gavel,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-    borderColor: 'border-amber-500/20',
+    color: 'text-warning',
+    bgColor: 'bg-warning/10',
+    borderColor: 'border-warning/20',
   },
   media: {
     icon: Camera,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10',
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
     borderColor: 'border-purple-500/20',
   },
   speaker: {
@@ -143,8 +143,8 @@ export function ContentCommitteeHub({ workspaceId, committees: propCommittees = 
   const getStatusBadge = (status: CommitteeStatus['status']) => {
     const config = {
       'on-track': { label: 'On Track', className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
-      'at-risk': { label: 'At Risk', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
-      'behind': { label: 'Behind', className: 'bg-red-500/10 text-red-500 border-red-500/20' },
+      'at-risk': { label: 'At Risk', className: 'bg-warning/10 text-warning border-warning/20' },
+      'behind': { label: 'Behind', className: 'bg-destructive/10 text-destructive border-destructive/20' },
     };
     return config[status];
   };

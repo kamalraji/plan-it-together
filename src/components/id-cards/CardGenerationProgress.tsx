@@ -26,7 +26,7 @@ export function CardGenerationProgress({
   const getStatusIcon = () => {
     switch (progress.status) {
       case 'complete':
-        return <CheckCircle2 className="h-12 w-12 text-green-500" />;
+        return <CheckCircle2 className="h-12 w-12 text-success" />;
       case 'error':
         return <AlertCircle className="h-12 w-12 text-destructive" />;
       default:

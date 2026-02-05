@@ -118,7 +118,7 @@ export const OrganizerOnboardingChecklist: React.FC = () => {
             <li key={item.id} className="flex items-start gap-3">
               <div className="mt-0.5">
                 {item.completed ? (
-                  <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                  <CheckCircleIcon className="h-5 w-5 text-success" />
                 ) : (
                   <XCircleIcon className="h-5 w-5 text-muted-foreground" />
                 )}

@@ -19,9 +19,9 @@ interface PresenceAvatarProps {
 }
 
 const statusColors = {
-  online: 'bg-green-500',
-  away: 'bg-yellow-500',
-  busy: 'bg-red-500',
+  online: 'bg-success',
+  away: 'bg-warning',
+  busy: 'bg-destructive',
   offline: 'bg-gray-400',
 };
 

@@ -81,9 +81,9 @@ export function CertificatesSettingsPanel({
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'COMPLETION':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case 'MERIT':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case 'APPRECIATION':
         return 'bg-purple-100 text-purple-800';
       default:

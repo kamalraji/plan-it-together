@@ -55,7 +55,7 @@ export function MarketingQuickActions() {
     <Card className="border-border/50">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-amber-500" />
+          <Zap className="h-5 w-5 text-warning" />
           <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
         </div>
       </CardHeader>

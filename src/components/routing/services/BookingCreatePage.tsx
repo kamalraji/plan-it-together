@@ -184,7 +184,7 @@ export const BookingCreatePage: React.FC = () => {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <Card>
           <CardContent className="py-12 text-center space-y-4">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            <CheckCircle className="h-16 w-16 text-success mx-auto" />
             <h2 className="text-2xl font-bold">Booking Submitted!</h2>
             <p className="text-muted-foreground">
               Your booking request for <strong>{service.name}</strong> has been submitted. 

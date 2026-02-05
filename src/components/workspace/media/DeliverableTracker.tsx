@@ -79,13 +79,13 @@ export function DeliverableTracker({ workspaceId }: DeliverableTrackerProps) {
   const getStatusConfig = (status: MediaDeliverable['status']) => {
     switch (status) {
       case 'completed':
-        return { icon: CheckCircle, color: 'bg-green-100 text-green-800', label: 'Completed' };
+        return { icon: CheckCircle, color: 'bg-success/20 text-success', label: 'Completed' };
       case 'in_progress':
-        return { icon: Clock, color: 'bg-blue-100 text-blue-800', label: 'In Progress' };
+        return { icon: Clock, color: 'bg-info/20 text-blue-800', label: 'In Progress' };
       case 'pending':
         return { icon: Clock, color: 'bg-muted text-foreground', label: 'Pending' };
       case 'overdue':
-        return { icon: AlertCircle, color: 'bg-red-100 text-red-800', label: 'Overdue' };
+        return { icon: AlertCircle, color: 'bg-destructive/20 text-red-800', label: 'Overdue' };
     }
   };
 

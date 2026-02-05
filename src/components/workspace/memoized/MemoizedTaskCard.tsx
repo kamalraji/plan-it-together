@@ -24,18 +24,18 @@ interface TaskCardProps {
 }
 
 const priorityConfig = {
-  URGENT: { color: 'text-red-500', bg: 'bg-red-500/10', label: 'Urgent' },
+  URGENT: { color: 'text-destructive', bg: 'bg-destructive/10', label: 'Urgent' },
   HIGH: { color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'High' },
-  MEDIUM: { color: 'text-yellow-500', bg: 'bg-yellow-500/10', label: 'Medium' },
-  LOW: { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Low' },
+  MEDIUM: { color: 'text-warning', bg: 'bg-warning/10', label: 'Medium' },
+  LOW: { color: 'text-info', bg: 'bg-info/10', label: 'Low' },
 } as const;
 
 const statusConfig = {
   TODO: { color: 'text-muted-foreground', bg: 'bg-muted', label: 'To Do' },
-  IN_PROGRESS: { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'In Progress' },
-  IN_REVIEW: { color: 'text-purple-500', bg: 'bg-purple-500/10', label: 'In Review' },
-  COMPLETED: { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Completed' },
-  BLOCKED: { color: 'text-red-500', bg: 'bg-red-500/10', label: 'Blocked' },
+  IN_PROGRESS: { color: 'text-info', bg: 'bg-info/10', label: 'In Progress' },
+  IN_REVIEW: { color: 'text-primary', bg: 'bg-primary/10', label: 'In Review' },
+  COMPLETED: { color: 'text-success', bg: 'bg-success/10', label: 'Completed' },
+  BLOCKED: { color: 'text-destructive', bg: 'bg-destructive/10', label: 'Blocked' },
 } as const;
 
 function TaskCardComponent({
@@ -59,7 +59,7 @@ function TaskCardComponent({
     <Card
       className={cn(
         'p-3 cursor-pointer transition-all hover:shadow-md hover:border-primary/30',
-        isOverdue && 'border-red-500/50',
+        isOverdue && 'border-destructive/50',
         className
       )}
       onClick={onClick}
@@ -99,7 +99,7 @@ function TaskCardComponent({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
             {dueDate && (
-              <div className={cn('flex items-center gap-1', isOverdue && 'text-red-500', isDueToday && 'text-orange-500')}>
+              <div className={cn('flex items-center gap-1', isOverdue && 'text-destructive', isDueToday && 'text-orange-500')}>
                 <Calendar className="h-3 w-3" />
                 <span>{format(new Date(dueDate), 'MMM d')}</span>
               </div>

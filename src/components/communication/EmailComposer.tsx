@@ -201,7 +201,7 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
                 placeholder="Enter email subject"
               />
               {errors.subject && (
-                <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.subject.message}</p>
               )}
             </div>
 
@@ -216,17 +216,17 @@ export function EmailComposer({ eventId }: EmailComposerProps) {
                 placeholder="Enter your message here..."
               />
               {errors.body && (
-                <p className="mt-1 text-sm text-red-600">{errors.body.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.body.message}</p>
               )}
               
               {selectedTemplate && selectedTemplate.variables.length > 0 && (
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="mt-2 p-3 bg-info/10 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-800 font-medium mb-1">Available Variables:</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedTemplate.variables.map((variable) => (
                       <span
                         key={variable}
-                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-info/20 text-blue-800"
                       >
                         {`{{${variable}}}`}
                       </span>

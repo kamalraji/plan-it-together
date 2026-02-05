@@ -13,11 +13,11 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
       case 'SIMPLE':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'MODERATE':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case 'COMPLEX':
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/20 text-red-800';
       default:
         return 'bg-muted text-foreground';
     }
@@ -65,11 +65,11 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
   //   switch (priority.toLowerCase()) {
   //     case 'high':
   //     case 'urgent':
-  //       return 'bg-red-100 text-red-800';
+  //       return 'bg-destructive/20 text-red-800';
   //     case 'medium':
-  //       return 'bg-yellow-100 text-yellow-800';
+  //       return 'bg-warning/20 text-yellow-800';
   //     case 'low':
-  //       return 'bg-green-100 text-green-800';
+  //       return 'bg-success/20 text-success';
   //     default:
   //       return 'bg-muted text-foreground';
   //   }
@@ -127,7 +127,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? 'border-indigo-500 text-indigo-600'
+                    ? 'border-primary text-primary'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >
@@ -166,7 +166,7 @@ export function WorkspaceTemplatePreview({ template, onClose, onUseTemplate }: W
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-info/10 rounded-lg p-4">
                 <h4 className="font-medium text-foreground mb-2">Usage Statistics</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>

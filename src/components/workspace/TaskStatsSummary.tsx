@@ -42,14 +42,14 @@ export function TaskStatsSummary({ tasks, className }: TaskStatsSummaryProps) {
       value: stats.inProgress,
       icon: Clock,
       color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-500/10',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Overdue',
       value: stats.overdue,
       icon: AlertTriangle,
       color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-500/10',
+      bgColor: 'bg-destructive/10',
       highlight: stats.overdue > 0,
     },
   ];
@@ -63,13 +63,13 @@ export function TaskStatsSummary({ tasks, className }: TaskStatsSummaryProps) {
             className={cn(
               "rounded-xl border border-border p-4 transition-all",
               stat.bgColor,
-              stat.highlight && "ring-1 ring-red-500/30"
+              stat.highlight && "ring-1 ring-destructive/30"
             )}
           >
             <div className="flex items-center justify-between mb-2">
               <stat.icon className={cn("h-5 w-5", stat.color)} />
               {stat.highlight && (
-                <span className="text-[10px] font-medium uppercase tracking-wider text-red-500">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-destructive">
                   Attention
                 </span>
               )}
@@ -102,7 +102,7 @@ export function TaskStatsSummary({ tasks, className }: TaskStatsSummaryProps) {
         <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
           <span>{stats.completed} of {stats.total} tasks completed</span>
           {stats.urgent > 0 && (
-            <span className="text-red-500 font-medium">
+            <span className="text-destructive font-medium">
               {stats.urgent} urgent pending
             </span>
           )}

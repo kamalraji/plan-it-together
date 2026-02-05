@@ -95,8 +95,8 @@ export const WorkloadForecast: React.FC<WorkloadForecastProps> = ({
 
   const getStatusColor = (utilization: number) => {
     if (utilization > 100) return 'bg-destructive';
-    if (utilization > 80) return 'bg-yellow-500';
-    if (utilization > 50) return 'bg-green-500';
+    if (utilization > 80) return 'bg-warning';
+    if (utilization > 50) return 'bg-success';
     return 'bg-muted';
   };
 
@@ -131,7 +131,7 @@ export const WorkloadForecast: React.FC<WorkloadForecastProps> = ({
             <p
               className={cn(
                 'text-lg font-bold',
-                metrics.avgUtilization > 80 ? 'text-yellow-500' : 'text-green-500'
+                metrics.avgUtilization > 80 ? 'text-warning' : 'text-success'
               )}
             >
               {metrics.avgUtilization}%
@@ -189,7 +189,7 @@ export const WorkloadForecast: React.FC<WorkloadForecastProps> = ({
         {clusters.length > 0 && (
           <div>
             <p className="text-sm font-medium mb-2 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
               Peak Days Requiring Attention
             </p>
             <div className="space-y-2">
@@ -226,7 +226,7 @@ export const WorkloadForecast: React.FC<WorkloadForecastProps> = ({
                     <span
                       className={cn(
                         'text-sm font-medium',
-                        day.isOverloaded ? 'text-destructive' : 'text-yellow-500'
+                        day.isOverloaded ? 'text-destructive' : 'text-warning'
                       )}
                     >
                       {Math.round(day.capacityUtilization)}%
@@ -240,7 +240,7 @@ export const WorkloadForecast: React.FC<WorkloadForecastProps> = ({
 
         {clusters.length === 0 && (
           <div className="text-center py-6 text-muted-foreground">
-            <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-green-500" />
+            <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-success" />
             <p className="text-sm">Workload looks balanced!</p>
             <p className="text-xs">No capacity issues detected in the next {forecastDays} days</p>
           </div>

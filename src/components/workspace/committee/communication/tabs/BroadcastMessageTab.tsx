@@ -29,16 +29,16 @@ interface BroadcastMessageTabProps {
 
 const statusConfig = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  scheduled: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Scheduled' },
-  sending: { icon: Radio, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Sending' },
+  scheduled: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Scheduled' },
+  sending: { icon: Radio, color: 'text-info', bgColor: 'bg-info/10', label: 'Sending' },
   sent: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Sent' },
 };
 
 const messageTypeConfig = {
-  general: { icon: MessageSquare, color: 'text-blue-500', label: 'General' },
-  urgent: { icon: AlertTriangle, color: 'text-red-500', label: 'Urgent' },
-  reminder: { icon: Bell, color: 'text-amber-500', label: 'Reminder' },
-  update: { icon: Radio, color: 'text-purple-500', label: 'Update' },
+  general: { icon: MessageSquare, color: 'text-info', label: 'General' },
+  urgent: { icon: AlertTriangle, color: 'text-destructive', label: 'Urgent' },
+  reminder: { icon: Bell, color: 'text-warning', label: 'Reminder' },
+  update: { icon: Radio, color: 'text-primary', label: 'Update' },
 };
 
 const channelOptions = [
@@ -305,8 +305,8 @@ export function BroadcastMessageTab({ workspaceId }: BroadcastMessageTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
@@ -320,8 +320,8 @@ export function BroadcastMessageTab({ workspaceId }: BroadcastMessageTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div>
                 <p className="text-2xl font-bold">

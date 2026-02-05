@@ -403,7 +403,7 @@ export function OrganizerDashboard() {
                             <span className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
                               {startDate.toLocaleDateString('en-US', { month: 'short' })}
                             </span>
-                            <span className={`block text-xl font-bold ${isLive ? 'text-red-500' : 'text-primary'}`}>
+                            <span className={`block text-xl font-bold ${isLive ? 'text-destructive' : 'text-primary'}`}>
                               {startDate.getDate()}
                             </span>
                           </div>

@@ -49,11 +49,11 @@ export function TemplatePreviewModal({
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
       case 'SIMPLE':
-        return 'bg-green-500/10 text-green-600 border-green-500/20';
+        return 'bg-success/10 text-success border-success/20';
       case 'MODERATE':
-        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'COMPLEX':
-        return 'bg-red-500/10 text-red-600 border-red-500/20';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -62,11 +62,11 @@ export function TemplatePreviewModal({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'HIGH':
-        return 'bg-red-500/10 text-red-600 border-red-500/20';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       case 'MEDIUM':
-        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'LOW':
-        return 'bg-green-500/10 text-green-600 border-green-500/20';
+        return 'bg-success/10 text-success border-success/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -117,14 +117,14 @@ export function TemplatePreviewModal({
         <div className="grid grid-cols-5 gap-2 py-4 border-y border-border">
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <FolderIcon className="h-4 w-4 text-blue-500" />
+              <FolderIcon className="h-4 w-4 text-info" />
             </div>
             <div className="text-lg font-semibold text-foreground">{departmentCount}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Departments</div>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <UsersIcon className="h-4 w-4 text-amber-500" />
+              <UsersIcon className="h-4 w-4 text-warning" />
             </div>
             <div className="text-lg font-semibold text-foreground">{committeeCount}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Committees</div>
@@ -138,7 +138,7 @@ export function TemplatePreviewModal({
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-1">
-              <CalendarDaysIcon className="h-4 w-4 text-purple-500" />
+              <CalendarDaysIcon className="h-4 w-4 text-primary" />
             </div>
             <div className="text-lg font-semibold text-foreground">{milestoneCount}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Milestones</div>
@@ -180,12 +180,12 @@ export function TemplatePreviewModal({
                 {template.structure.departments.map((dept) => (
                   <div key={dept.id} className="ml-4 space-y-1">
                     {/* Department */}
-                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/20">
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-500 flex-shrink-0" />
-                      <ChevronRightIcon className="h-3 w-3 text-blue-500" />
-                      <FolderIcon className="h-4 w-4 text-blue-500" />
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-info/5 border border-info/20">
+                      <div className="w-2.5 h-2.5 rounded-full bg-info flex-shrink-0" />
+                      <ChevronRightIcon className="h-3 w-3 text-info" />
+                      <FolderIcon className="h-4 w-4 text-info" />
                       <span className="text-sm font-medium text-foreground">{dept.name}</span>
-                      <Badge variant="outline" className="ml-auto text-[10px] bg-blue-500/10 text-blue-600 border-blue-500/20">
+                      <Badge variant="outline" className="ml-auto text-[10px] bg-info/10 text-info border-info/20">
                         L2 DEPT
                       </Badge>
                     </div>
@@ -194,12 +194,12 @@ export function TemplatePreviewModal({
                     {dept.committees.map((committeeId) => {
                       const committee = COMMITTEE_DEFINITIONS[committeeId];
                       return (
-                        <div key={committeeId} className="ml-6 flex items-center gap-2 p-2 rounded-lg bg-amber-500/5 border border-amber-500/20">
-                          <div className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
-                          <ChevronRightIcon className="h-3 w-3 text-amber-500" />
-                          <UsersIcon className="h-4 w-4 text-amber-500" />
+                        <div key={committeeId} className="ml-6 flex items-center gap-2 p-2 rounded-lg bg-warning/5 border border-warning/20">
+                          <div className="w-2 h-2 rounded-full bg-warning flex-shrink-0" />
+                          <ChevronRightIcon className="h-3 w-3 text-warning" />
+                          <UsersIcon className="h-4 w-4 text-warning" />
                           <span className="text-sm text-foreground">{committee?.name || committeeId}</span>
-                          <Badge variant="outline" className="ml-auto text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/20">
+                          <Badge variant="outline" className="ml-auto text-[10px] bg-warning/10 text-warning border-warning/20">
                             L3 COMM
                           </Badge>
                         </div>
@@ -281,7 +281,7 @@ export function TemplatePreviewModal({
                           milestone.daysFromEventStart === 0
                             ? 'bg-primary text-primary-foreground'
                             : milestone.daysFromEventStart < 0
-                            ? 'bg-blue-500/20 text-blue-600 border-2 border-blue-500'
+                            ? 'bg-info/20 text-info border-2 border-info'
                             : 'bg-emerald-500/20 text-emerald-600 border-2 border-emerald-500'
                         )}>
                           <CalendarDaysIcon className="h-3 w-3" />
@@ -295,7 +295,7 @@ export function TemplatePreviewModal({
                               milestone.daysFromEventStart === 0
                                 ? 'bg-primary/10 text-primary border-primary/20'
                                 : milestone.daysFromEventStart < 0
-                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                                ? 'bg-info/10 text-info border-info/20'
                                 : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                             )}>
                               {milestone.daysFromEventStart === 0
@@ -328,8 +328,8 @@ export function TemplatePreviewModal({
                       <div className={cn(
                         'w-10 h-10 rounded-full flex items-center justify-center',
                         role.level === 'MANAGER' ? 'bg-primary/10 text-primary' :
-                        role.level === 'LEAD' ? 'bg-blue-500/10 text-blue-600' :
-                        role.level === 'COORDINATOR' ? 'bg-amber-500/10 text-amber-600' :
+                        role.level === 'LEAD' ? 'bg-info/10 text-info' :
+                        role.level === 'COORDINATOR' ? 'bg-warning/10 text-warning' :
                         'bg-muted text-muted-foreground'
                       )}>
                         <UsersIcon className="h-5 w-5" />

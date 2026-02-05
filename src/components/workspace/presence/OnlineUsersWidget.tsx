@@ -55,25 +55,25 @@ export function OnlineUsersWidget({
     )}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-green-500/10">
-            <Users className="h-4 w-4 text-green-600" />
+          <div className="p-2 rounded-lg bg-success/10">
+            <Users className="h-4 w-4 text-success" />
           </div>
           <h3 className="text-sm font-semibold text-foreground">Active Now</h3>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="w-2 h-2 rounded-full bg-success" />
             {onlineUsers.length}
           </span>
           {awayUsers.length > 0 && (
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-yellow-500" />
+              <span className="w-2 h-2 rounded-full bg-warning" />
               {awayUsers.length}
             </span>
           )}
           {busyUsers.length > 0 && (
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="w-2 h-2 rounded-full bg-destructive" />
               {busyUsers.length}
             </span>
           )}

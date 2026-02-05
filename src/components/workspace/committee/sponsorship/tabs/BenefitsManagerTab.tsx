@@ -39,7 +39,7 @@ interface BenefitsManagerTabProps {
 
 const tiers = [
   { id: 'platinum', label: 'Platinum', icon: Crown, color: 'text-muted-foreground', bgColor: 'bg-muted' },
-  { id: 'gold', label: 'Gold', icon: Medal, color: 'text-amber-600', bgColor: 'bg-amber-100' },
+  { id: 'gold', label: 'Gold', icon: Medal, color: 'text-warning', bgColor: 'bg-warning/20' },
   { id: 'silver', label: 'Silver', icon: Award, color: 'text-muted-foreground', bgColor: 'bg-muted' },
   { id: 'bronze', label: 'Bronze', icon: Star, color: 'text-orange-600', bgColor: 'bg-orange-100' },
 ];

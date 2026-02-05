@@ -140,7 +140,7 @@ export function LiveStreamDashboard({ workspaceId, eventId }: LiveStreamDashboar
           <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500/5 to-card">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <Calendar className="h-4 w-4 text-blue-500" />
+                <Calendar className="h-4 w-4 text-info" />
                 <span className="text-sm font-medium">Upcoming</span>
               </div>
               <div className="text-3xl font-bold">{upcomingStreams.length}</div>
@@ -181,7 +181,7 @@ export function LiveStreamDashboard({ workspaceId, eventId }: LiveStreamDashboar
                   whileHover={{ scale: 1.05, rotate: 2 }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 >
-                  <Video className="h-10 w-10 text-red-500" />
+                  <Video className="h-10 w-10 text-destructive" />
                 </motion.div>
                 <h3 className="font-bold text-xl mb-2">No Active Streams</h3>
                 <p className="text-muted-foreground text-center mb-6 max-w-sm">
@@ -208,7 +208,7 @@ export function LiveStreamDashboard({ workspaceId, eventId }: LiveStreamDashboar
                   <Clock className="h-4 w-4" />
                   Upcoming
                   {upcomingStreams.length > 0 && (
-                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-blue-500/20 text-blue-600">
+                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-info/20 text-info">
                       {upcomingStreams.length}
                     </Badge>
                   )}
@@ -360,14 +360,14 @@ function StreamListItem({ stream, isSelected, onSelect, index }: StreamListItemP
         return <LiveIndicator size="sm" variant="badge" />;
       case 'scheduled':
         return (
-          <Badge variant="outline" className="gap-1.5 bg-blue-500/10 text-blue-600 border-blue-500/30">
+          <Badge variant="outline" className="gap-1.5 bg-info/10 text-info border-info/30">
             <Clock className="h-3 w-3" />
             Scheduled
           </Badge>
         );
       case 'preparing':
         return (
-          <Badge variant="outline" className="gap-1 bg-yellow-500/10 text-yellow-600 border-yellow-500/30">
+          <Badge variant="outline" className="gap-1 bg-warning/10 text-warning border-warning/30">
             Preparing
           </Badge>
         );

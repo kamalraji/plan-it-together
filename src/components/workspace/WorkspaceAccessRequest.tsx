@@ -50,7 +50,7 @@ export function WorkspaceAccessRequest({
   if (isSubmitted) {
     return (
       <div className="bg-card border border-border rounded-lg p-6 text-center">
-        <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
+        <CheckCircleIcon className="h-12 w-12 text-success mx-auto mb-4" />
         <h3 className="text-lg font-medium text-foreground mb-2">Request Submitted</h3>
         <p className="text-sm text-muted-foreground">
           Your request to join "{workspaceName}" has been sent to the workspace owner. 
@@ -85,7 +85,7 @@ export function WorkspaceAccessRequest({
         <button
           type="submit"
           disabled={requestMutation.isPending}
-          className="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 disabled:opacity-50"
+          className="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50"
         >
           {requestMutation.isPending ? (
             <>

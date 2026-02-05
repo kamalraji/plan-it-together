@@ -46,7 +46,7 @@ export function CommunicationInterface({ eventId: propEventId }: CommunicationIn
                   onClick={() => setActiveTab(tab.key as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                     activeTab === tab.key
-                      ? 'border-indigo-500 text-indigo-600'
+                      ? 'border-primary text-primary'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >

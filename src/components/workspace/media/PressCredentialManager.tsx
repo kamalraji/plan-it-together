@@ -23,18 +23,18 @@ export function PressCredentialManager({ workspaceId }: PressCredentialManagerPr
   const getStatusConfig = (status: PressCredential['status']) => {
     switch (status) {
       case 'approved':
-        return { icon: CheckCircle, color: 'bg-green-100 text-green-800', label: 'Approved' };
+        return { icon: CheckCircle, color: 'bg-success/20 text-success', label: 'Approved' };
       case 'pending':
-        return { icon: Clock, color: 'bg-amber-100 text-amber-800', label: 'Pending' };
+        return { icon: Clock, color: 'bg-warning/20 text-amber-800', label: 'Pending' };
       case 'rejected':
-        return { icon: XCircle, color: 'bg-red-100 text-red-800', label: 'Rejected' };
+        return { icon: XCircle, color: 'bg-destructive/20 text-red-800', label: 'Rejected' };
     }
   };
 
   const getTypeColor = (type: PressCredential['credential_type']) => {
     switch (type) {
       case 'print':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case 'broadcast':
         return 'bg-purple-100 text-purple-800';
       case 'online':
@@ -80,7 +80,7 @@ export function PressCredentialManager({ workspaceId }: PressCredentialManagerPr
           <Users className="h-5 w-5 text-primary" />
           Press Credentials
           {pendingCount > 0 && (
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+            <Badge variant="secondary" className="bg-warning/20 text-amber-800">
               {pendingCount} pending
             </Badge>
           )}
@@ -133,7 +133,7 @@ export function PressCredentialManager({ workspaceId }: PressCredentialManagerPr
                       <Button 
                         size="sm" 
                         variant="ghost" 
-                        className="h-7 text-green-600"
+                        className="h-7 text-success"
                         onClick={() => handleApprove(credential.id)}
                         disabled={updateCredentialStatus.isPending}
                       >
@@ -142,7 +142,7 @@ export function PressCredentialManager({ workspaceId }: PressCredentialManagerPr
                       <Button 
                         size="sm" 
                         variant="ghost" 
-                        className="h-7 text-red-600"
+                        className="h-7 text-destructive"
                         onClick={() => handleReject(credential.id)}
                         disabled={updateCredentialStatus.isPending}
                       >

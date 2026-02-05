@@ -64,17 +64,17 @@ interface ScheduledBroadcastsManagerProps {
 }
 
 const statusConfig = {
-  scheduled: { icon: Clock, color: 'bg-blue-500/10 text-blue-600', label: 'Scheduled' },
-  sending: { icon: Send, color: 'bg-amber-500/10 text-amber-600', label: 'Sending' },
-  sent: { icon: CheckCircle2, color: 'bg-green-500/10 text-green-600', label: 'Sent' },
-  failed: { icon: AlertCircle, color: 'bg-red-500/10 text-red-600', label: 'Failed' },
-  cancelled: { icon: Pause, color: 'bg-gray-500/10 text-gray-600', label: 'Cancelled' },
+  scheduled: { icon: Clock, color: 'bg-info/10 text-info', label: 'Scheduled' },
+  sending: { icon: Send, color: 'bg-warning/10 text-warning', label: 'Sending' },
+  sent: { icon: CheckCircle2, color: 'bg-success/10 text-success', label: 'Sent' },
+  failed: { icon: AlertCircle, color: 'bg-destructive/10 text-destructive', label: 'Failed' },
+  cancelled: { icon: Pause, color: 'bg-gray-500/10 text-muted-foreground', label: 'Cancelled' },
 };
 
 const priorityConfig = {
   normal: { icon: Bell, color: 'text-muted-foreground' },
-  important: { icon: AlertTriangle, color: 'text-amber-500' },
-  urgent: { icon: Zap, color: 'text-red-500' },
+  important: { icon: AlertTriangle, color: 'text-warning' },
+  urgent: { icon: Zap, color: 'text-destructive' },
 };
 
 export function ScheduledBroadcastsManager({ workspaceId }: ScheduledBroadcastsManagerProps) {

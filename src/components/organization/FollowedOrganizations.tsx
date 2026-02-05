@@ -166,7 +166,7 @@ function FollowedOrganizationCard({
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-muted-foreground"></div>
             ) : (
               <>
-                <HeartSolidIcon className="h-4 w-4 text-red-500 mr-2" />
+                <HeartSolidIcon className="h-4 w-4 text-destructive mr-2" />
                 Following
               </>
             )}

@@ -467,14 +467,14 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
           <div className="flex">
             <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <p className="mt-1 text-sm text-red-700">{error}</p>
+              <p className="mt-1 text-sm text-destructive">{error}</p>
             </div>
           </div>
         </div>
@@ -489,7 +489,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
               key={template.id}
               className={`relative rounded-lg border p-4 cursor-pointer hover:bg-muted/50 ${
                 selectedTemplate.id === template.id
-                  ? 'border-indigo-500 ring-2 ring-indigo-500'
+                  ? 'border-primary ring-2 ring-primary'
                   : 'border-input'
               }`}
               onClick={() => handleTemplateChange(template)}
@@ -512,7 +512,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
               </div>
               {selectedTemplate.id === template.id && (
                 <div className="absolute top-2 right-2">
-                  <svg className="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -574,7 +574,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 value="PDF"
                 checked={reportOptions.format === 'PDF'}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, format: e.target.value as 'PDF' | 'CSV' }))}
-                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input"
+                className="focus-visible:ring-ring h-4 w-4 text-primary border-input"
               />
               <span className="ml-2 text-sm text-foreground">PDF (Formatted Report)</span>
             </label>
@@ -585,7 +585,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 value="CSV"
                 checked={reportOptions.format === 'CSV'}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, format: e.target.value as 'PDF' | 'CSV' }))}
-                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input"
+                className="focus-visible:ring-ring h-4 w-4 text-primary border-input"
               />
               <span className="ml-2 text-sm text-foreground">CSV (Data Export)</span>
             </label>
@@ -602,7 +602,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                   type="checkbox"
                   checked={reportOptions.includeSections.includes(section)}
                   onChange={() => handleSectionToggle(section)}
-                  className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
+                  className="focus-visible:ring-ring h-4 w-4 text-primary border-input rounded"
                 />
                 <span className="ml-2 text-sm text-foreground">{getSectionDisplayName(section)}</span>
               </label>
@@ -619,7 +619,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 type="checkbox"
                 checked={reportOptions.includeCharts}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, includeCharts: e.target.checked }))}
-                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
+                className="focus-visible:ring-ring h-4 w-4 text-primary border-input rounded"
               />
               <span className="ml-2 text-sm text-foreground">Include Charts and Visualizations</span>
             </label>
@@ -628,7 +628,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 type="checkbox"
                 checked={reportOptions.includeRawData}
                 onChange={(e) => setReportOptions(prev => ({ ...prev, includeRawData: e.target.checked }))}
-                className="focus-visible:ring-ring h-4 w-4 text-indigo-600 border-input rounded"
+                className="focus-visible:ring-ring h-4 w-4 text-primary border-input rounded"
               />
               <span className="ml-2 text-sm text-foreground">Include Raw Data Tables</span>
             </label>
@@ -637,7 +637,7 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
 
         {/* Generation Progress */}
         {isGenerating && (
-          <div className="mb-6 bg-indigo-50 border border-indigo-200 rounded-md p-4">
+          <div className="mb-6 bg-primary/10 border border-indigo-200 rounded-md p-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -650,11 +650,11 @@ export function WorkspaceReportExport({ workspace, teamMembers }: WorkspaceRepor
                 </p>
                 <div className="mt-2 w-full bg-indigo-200 rounded-full h-2">
                   <div 
-                    className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-primary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${generationProgress}%` }}
                   ></div>
                 </div>
-                <p className="mt-1 text-xs text-indigo-600">{generationProgress}% complete</p>
+                <p className="mt-1 text-xs text-primary">{generationProgress}% complete</p>
               </div>
             </div>
           </div>

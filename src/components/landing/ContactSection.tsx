@@ -123,7 +123,7 @@ export const ContactSection = forwardRef<HTMLElement, ContactSectionProps>(
               >
                 {supportEmail}
                 {copied ? (
-                  <Check className="w-4 h-4 text-green-500" />
+                  <Check className="w-4 h-4 text-success" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -186,7 +186,7 @@ export const ContactSection = forwardRef<HTMLElement, ContactSectionProps>(
 
               {formSubmitted ? (
                 <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/20 text-success mb-4">
                     <Check className="w-8 h-8" />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Message Sent!</h4>

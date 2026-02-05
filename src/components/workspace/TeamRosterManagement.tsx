@@ -374,8 +374,8 @@ export function TeamRosterManagement({
                   <div className="col-span-4">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <UserIcon className="h-4 w-4 text-indigo-600" />
+                        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <UserIcon className="h-4 w-4 text-primary" />
                         </div>
                       </div>
                       <div>
@@ -445,7 +445,7 @@ export function TeamRosterManagement({
                     <div className="flex items-center">
                       <div className="w-full bg-muted rounded-full h-2">
                         <div
-                          className="bg-indigo-600 h-2 rounded-full"
+                          className="bg-primary h-2 rounded-full"
                           style={{ width: `${activity.contributionScore}%` }}
                         ></div>
                       </div>
@@ -518,8 +518,8 @@ export function TeamRosterManagement({
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <UserIcon className="h-6 w-6 text-indigo-600" />
+                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <UserIcon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-foreground">{selectedMember.user.name}</h4>

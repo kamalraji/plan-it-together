@@ -12,9 +12,9 @@ interface DeliverableTrackerProps {
 
 const statusConfig = {
   pending: { icon: CircleDashed, color: 'text-muted-foreground', bgColor: 'bg-muted/50', label: 'Pending' },
-  in_progress: { icon: Clock, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'In Progress' },
+  in_progress: { icon: Clock, color: 'text-info', bgColor: 'bg-info/10', label: 'In Progress' },
   completed: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Completed' },
-  overdue: { icon: AlertTriangle, color: 'text-red-500', bgColor: 'bg-red-500/10', label: 'Overdue' },
+  overdue: { icon: AlertTriangle, color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'Overdue' },
 };
 
 export function DeliverableTracker({ workspaceId }: DeliverableTrackerProps) {

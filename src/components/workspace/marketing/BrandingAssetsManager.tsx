@@ -19,10 +19,10 @@ const typeIcons: Record<BrandingAsset['asset_type'], typeof FileImage> = {
 
 const typeColors: Record<BrandingAsset['asset_type'], string> = {
   logo: 'bg-pink-100 text-pink-700',
-  banner: 'bg-blue-100 text-blue-700',
+  banner: 'bg-info/20 text-info',
   template: 'bg-emerald-100 text-emerald-700',
   video: 'bg-purple-100 text-purple-700',
-  guideline: 'bg-amber-100 text-amber-700',
+  guideline: 'bg-warning/20 text-amber-700',
   other: 'bg-muted text-foreground',
 };
 
@@ -50,7 +50,7 @@ export function BrandingAssetsManager({ workspaceId }: BrandingAssetsManagerProp
     <Card className="border-border/50">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <div className="flex items-center gap-2">
-          <Palette className="h-5 w-5 text-purple-600" />
+          <Palette className="h-5 w-5 text-primary" />
           <CardTitle className="text-lg font-semibold">Branding Assets</CardTitle>
         </div>
         <Button size="sm" variant="outline" className="gap-1">

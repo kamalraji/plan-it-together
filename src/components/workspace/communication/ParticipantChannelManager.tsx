@@ -24,9 +24,9 @@ interface ParticipantChannelManagerProps {
 }
 
 const typeColors: Record<string, string> = {
-  announcement: 'bg-amber-500/10 text-amber-600',
+  announcement: 'bg-warning/10 text-warning',
   general: 'bg-primary/10 text-primary',
-  private: 'bg-purple-500/10 text-purple-600',
+  private: 'bg-primary/10 text-primary',
   task: 'bg-emerald-500/10 text-emerald-600',
 };
 
@@ -216,7 +216,7 @@ function ChannelConfigCard({
               {channel.participant_count || 0} participants
             </span>
             {!canWrite && (
-              <span className="flex items-center gap-1 text-amber-600">
+              <span className="flex items-center gap-1 text-warning">
                 <Lock className="h-3 w-3" />
                 Read-only
               </span>

@@ -16,17 +16,17 @@ interface PerformanceReviewTabProps {
 
 const getRankIcon = (rank: number) => {
   switch (rank) {
-    case 1: return <Trophy className="h-5 w-5 text-yellow-500" />;
+    case 1: return <Trophy className="h-5 w-5 text-warning" />;
     case 2: return <Medal className="h-5 w-5 text-muted-foreground" />;
-    case 3: return <Medal className="h-5 w-5 text-amber-600" />;
+    case 3: return <Medal className="h-5 w-5 text-warning" />;
     default: return <span className="text-sm font-bold text-muted-foreground">#{rank}</span>;
   }
 };
 
 const getAttendanceBadgeColor = (rate: number) => {
   if (rate >= 95) return 'border-emerald-500/30 text-emerald-600';
-  if (rate >= 80) return 'border-amber-500/30 text-amber-600';
-  return 'border-red-500/30 text-red-600';
+  if (rate >= 80) return 'border-warning/30 text-warning';
+  return 'border-destructive/30 text-destructive';
 };
 
 export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
@@ -56,7 +56,7 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Award className="h-6 w-6 text-yellow-500" />
+            <Award className="h-6 w-6 text-warning" />
             Performance Review
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -79,7 +79,7 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.totalHours}</div>
+            <div className="text-2xl font-bold text-warning">{stats.totalHours}</div>
             <div className="text-xs text-muted-foreground">Total Hours Logged</div>
           </CardContent>
         </Card>
@@ -91,13 +91,13 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.totalKudos}</div>
+            <div className="text-2xl font-bold text-primary">{stats.totalKudos}</div>
             <div className="text-xs text-muted-foreground">Kudos Given</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.activeVolunteers}</div>
+            <div className="text-2xl font-bold text-info">{stats.activeVolunteers}</div>
             <div className="text-xs text-muted-foreground">Active Volunteers</div>
           </CardContent>
         </Card>
@@ -141,28 +141,28 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
 
                     {/* 1st Place */}
                     <div className="flex flex-col items-center -mb-4">
-                      <Avatar className="h-20 w-20 border-4 border-yellow-500">
-                        <AvatarFallback className="bg-yellow-500/20 text-yellow-600">
+                      <Avatar className="h-20 w-20 border-4 border-warning">
+                        <AvatarFallback className="bg-warning/20 text-warning">
                           {performanceData[0]?.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
-                      <Trophy className="h-8 w-8 text-yellow-500 mt-2" />
+                      <Trophy className="h-8 w-8 text-warning mt-2" />
                       <p className="font-semibold mt-1">{performanceData[0]?.name}</p>
                       <p className="text-xs text-muted-foreground">{performanceData[0]?.hoursLogged}h</p>
-                      <div className="h-28 w-24 bg-yellow-500/20 rounded-t-lg mt-2" />
+                      <div className="h-28 w-24 bg-warning/20 rounded-t-lg mt-2" />
                     </div>
 
                     {/* 3rd Place */}
                     <div className="flex flex-col items-center">
                       <Avatar className="h-14 w-14 border-4 border-amber-600">
-                        <AvatarFallback className="bg-amber-600/20 text-amber-600">
+                        <AvatarFallback className="bg-warning/20 text-warning">
                           {performanceData[2]?.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
-                      <Medal className="h-5 w-5 text-amber-600 mt-2" />
+                      <Medal className="h-5 w-5 text-warning mt-2" />
                       <p className="font-medium text-sm mt-1">{performanceData[2]?.name}</p>
                       <p className="text-xs text-muted-foreground">{performanceData[2]?.hoursLogged}h</p>
-                      <div className="h-14 w-20 bg-amber-600/20 rounded-t-lg mt-2" />
+                      <div className="h-14 w-20 bg-warning/20 rounded-t-lg mt-2" />
                     </div>
                   </div>
                 </div>
@@ -202,7 +202,7 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
                         {[...Array(5)].map((_, i) => (
                           <Star 
                             key={i} 
-                            className={`h-4 w-4 ${i < Math.floor(volunteer.rating) ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground/30'}`}
+                            className={`h-4 w-4 ${i < Math.floor(volunteer.rating) ? 'text-warning fill-yellow-500' : 'text-muted-foreground/30'}`}
                           />
                         ))}
                       </div>
@@ -253,7 +253,7 @@ export function PerformanceReviewTab({ workspace }: PerformanceReviewTabProps) {
                           <div>
                             <p className="text-muted-foreground text-xs mb-1">Kudos</p>
                             <p className="font-medium flex items-center gap-1">
-                              <ThumbsUp className="h-3.5 w-3.5 text-purple-500" />
+                              <ThumbsUp className="h-3.5 w-3.5 text-primary" />
                               {volunteer.kudosReceived}
                             </p>
                           </div>

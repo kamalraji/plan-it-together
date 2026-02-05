@@ -63,9 +63,9 @@ interface CreateChecklistDialogProps {
 }
 
 const phaseOptions = [
-  { value: 'pre_event', label: 'Pre-Event', icon: ClipboardList, color: 'text-blue-500' },
-  { value: 'during_event', label: 'During Event', icon: Clock, color: 'text-amber-500' },
-  { value: 'post_event', label: 'Post-Event', icon: CheckCircle, color: 'text-green-500' },
+  { value: 'pre_event', label: 'Pre-Event', icon: ClipboardList, color: 'text-info' },
+  { value: 'during_event', label: 'During Event', icon: Clock, color: 'text-warning' },
+  { value: 'post_event', label: 'Post-Event', icon: CheckCircle, color: 'text-success' },
 ];
 
 export function CreateChecklistDialog({ 

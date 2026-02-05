@@ -15,8 +15,8 @@ export function InvoiceManagementTab({ workspaceId }: InvoiceManagementTabProps)
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-purple-500/10">
-          <FileText className="w-6 h-6 text-purple-600" />
+        <div className="p-2.5 rounded-xl bg-primary/10">
+          <FileText className="w-6 h-6 text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Invoice Management</h1>
@@ -32,8 +32,8 @@ export function InvoiceManagementTab({ workspaceId }: InvoiceManagementTabProps)
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-amber-500/10">
-                  <Clock className="w-4 h-4 text-amber-600" />
+                <div className="p-2 rounded-lg bg-warning/10">
+                  <Clock className="w-4 h-4 text-warning" />
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Outstanding</p>
@@ -75,8 +75,8 @@ export function InvoiceManagementTab({ workspaceId }: InvoiceManagementTabProps)
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <FileText className="w-4 h-4 text-blue-600" />
+                <div className="p-2 rounded-lg bg-info/10">
+                  <FileText className="w-4 h-4 text-info" />
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Pending</p>

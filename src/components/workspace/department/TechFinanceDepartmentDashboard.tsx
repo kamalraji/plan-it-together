@@ -56,8 +56,8 @@ export function TechFinanceDepartmentDashboard({
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-green-500/20">
             <div className="relative">
-              <Server className="h-5 w-5 text-blue-500 absolute -top-1 -left-1" />
-              <DollarSign className="h-5 w-5 text-green-500" />
+              <Server className="h-5 w-5 text-info absolute -top-1 -left-1" />
+              <DollarSign className="h-5 w-5 text-success" />
             </div>
           </div>
           <div className="flex-1">
@@ -80,7 +80,7 @@ export function TechFinanceDepartmentDashboard({
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
               {pendingRequests.length > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-warning/20 text-warning rounded-full">
                   {pendingRequests.length} pending requests
                 </span>
               )}

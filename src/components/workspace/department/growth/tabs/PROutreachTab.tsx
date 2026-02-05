@@ -17,16 +17,16 @@ interface PROutreachTabProps {
 }
 
 const contactTypeConfig: Record<string, { color: string; label: string }> = {
-  journalist: { color: 'bg-blue-500/20 text-blue-600', label: 'Journalist' },
-  blogger: { color: 'bg-purple-500/20 text-purple-600', label: 'Blogger' },
-  editor: { color: 'bg-green-500/20 text-green-600', label: 'Editor' },
-  producer: { color: 'bg-amber-500/20 text-amber-600', label: 'Producer' },
+  journalist: { color: 'bg-info/20 text-info', label: 'Journalist' },
+  blogger: { color: 'bg-primary/20 text-primary', label: 'Blogger' },
+  editor: { color: 'bg-success/20 text-success', label: 'Editor' },
+  producer: { color: 'bg-warning/20 text-warning', label: 'Producer' },
   podcaster: { color: 'bg-pink-500/20 text-pink-600', label: 'Podcaster' },
 };
 
 const priorityConfig: Record<string, { color: string; icon: React.ElementType }> = {
-  high: { color: 'bg-red-500/20 text-red-600', icon: Star },
-  medium: { color: 'bg-amber-500/20 text-amber-600', icon: Star },
+  high: { color: 'bg-destructive/20 text-destructive', icon: Star },
+  medium: { color: 'bg-warning/20 text-warning', icon: Star },
   low: { color: 'bg-muted-foreground/30/20 text-muted-foreground', icon: Star },
 };
 
@@ -241,13 +241,13 @@ export function PROutreachTab({ workspace }: PROutreachTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-red-500">{highPriorityContacts.length}</p>
+            <p className="text-3xl font-bold text-destructive">{highPriorityContacts.length}</p>
             <p className="text-sm text-muted-foreground">High Priority</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-amber-500">
+            <p className="text-3xl font-bold text-warning">
               {contacts?.filter(c => c.status === 'unresponsive').length || 0}
             </p>
             <p className="text-sm text-muted-foreground">Unresponsive</p>
@@ -255,7 +255,7 @@ export function PROutreachTab({ workspace }: PROutreachTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-green-500">
+            <p className="text-3xl font-bold text-success">
               {contacts?.filter(c => c.last_contacted_at).length || 0}
             </p>
             <p className="text-sm text-muted-foreground">Contacted</p>
@@ -308,7 +308,7 @@ export function PROutreachTab({ workspace }: PROutreachTabProps) {
           {/* High Priority Section */}
           {highPriorityContacts.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-red-600 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-destructive flex items-center gap-2">
                 <Star className="h-4 w-4" />
                 High Priority Contacts
               </h3>
@@ -412,7 +412,7 @@ function ContactCard({
         )}
 
         {contact.status === 'unresponsive' && (
-          <Badge className="bg-amber-500/20 text-amber-600">
+          <Badge className="bg-warning/20 text-warning">
             <AlertCircle className="h-3 w-3 mr-1" />
             Unresponsive
           </Badge>

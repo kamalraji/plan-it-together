@@ -14,23 +14,23 @@ const statusConfig = {
   pending: {
     label: 'Pending',
     icon: Clock,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-    borderColor: 'border-amber-500/30',
+    color: 'text-warning',
+    bgColor: 'bg-warning/10',
+    borderColor: 'border-warning/30',
   },
   in_progress: {
     label: 'In Progress',
     icon: Clock,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30',
+    color: 'text-info',
+    bgColor: 'bg-info/10',
+    borderColor: 'border-info/30',
   },
   completed: {
     label: 'Completed',
     icon: CheckCircle2,
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
+    borderColor: 'border-success/30',
   },
   overdue: {
     label: 'Overdue',
@@ -88,7 +88,7 @@ export function DelegatedChecklistBadge({
                 className={cn(
                   'text-[10px] px-1.5 py-0 gap-1 cursor-help',
                   isOverdue && 'text-destructive border-destructive/30 bg-destructive/5',
-                  isDueToday && !isOverdue && 'text-amber-600 border-amber-500/30 bg-amber-500/5',
+                  isDueToday && !isOverdue && 'text-warning border-warning/30 bg-warning/5',
                   !isOverdue && !isDueToday && 'text-muted-foreground'
                 )}
               >

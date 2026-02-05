@@ -81,21 +81,21 @@ export function AttendeeList({ workspaceId }: AttendeeListProps) {
     switch (attendee.status) {
       case 'CONFIRMED':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">
+          <Badge className="bg-info/10 text-info border-info/20">
             <CheckCircle2 className="w-3 h-3 mr-1" aria-hidden="true" />
             Confirmed
           </Badge>
         );
       case 'PENDING':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <Badge className="bg-warning/10 text-warning border-warning/20">
             <Clock className="w-3 h-3 mr-1" aria-hidden="true" />
             Pending
           </Badge>
         );
       case 'WAITLISTED':
         return (
-          <Badge className="bg-violet-500/10 text-violet-600 border-violet-500/20">
+          <Badge className="bg-primary/10 text-primary border-violet-500/20">
             <Clock className="w-3 h-3 mr-1" aria-hidden="true" />
             Waitlisted
           </Badge>

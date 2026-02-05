@@ -18,9 +18,9 @@ interface ScheduleContentSocialTabProps {
 const PLATFORMS = [
   { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500' },
   { id: 'twitter', label: 'Twitter/X', icon: Twitter, color: 'text-sky-500' },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-600' },
-  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500' },
-  { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-red-500' },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-info' },
+  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-info' },
+  { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-destructive' },
 ];
 
 const POST_TYPES = [
@@ -34,9 +34,9 @@ const POST_TYPES = [
 
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-muted-foreground/30/20 text-muted-foreground',
-  scheduled: 'bg-blue-500/20 text-blue-600',
+  scheduled: 'bg-info/20 text-info',
   published: 'bg-emerald-500/20 text-emerald-600',
-  failed: 'bg-red-500/20 text-red-600',
+  failed: 'bg-destructive/20 text-destructive',
 };
 
 export function ScheduleContentSocialTab({ workspaceId }: ScheduleContentSocialTabProps) {

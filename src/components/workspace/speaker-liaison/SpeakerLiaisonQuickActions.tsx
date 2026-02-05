@@ -29,7 +29,7 @@ export function SpeakerLiaisonQuickActions({
       label: 'Add Speaker',
       description: 'Register new speaker',
       icon: UserPlus,
-      color: 'text-purple-500',
+      color: 'text-primary',
       bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
       onClick: onAddSpeaker,
     },
@@ -37,7 +37,7 @@ export function SpeakerLiaisonQuickActions({
       label: 'Send Reminder',
       description: 'Email pending speakers',
       icon: Mail,
-      color: 'text-blue-500',
+      color: 'text-info',
       bgColor: 'bg-blue-500/10 hover:bg-blue-500/20',
       onClick: onSendReminder,
     },
@@ -62,7 +62,7 @@ export function SpeakerLiaisonQuickActions({
   const shortcuts = [
     { label: 'Book Travel', icon: Plane, color: 'text-sky-500' },
     { label: 'Send Message', icon: MessageSquare, color: 'text-pink-500' },
-    { label: 'A/V Checklist', icon: ClipboardList, color: 'text-amber-500' },
+    { label: 'A/V Checklist', icon: ClipboardList, color: 'text-warning' },
   ];
 
   return (

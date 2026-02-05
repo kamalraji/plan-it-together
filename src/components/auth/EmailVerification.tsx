@@ -53,7 +53,7 @@ export function EmailVerification() {
           )}
 
           {status === 'success' && (
-            <div className="rounded-md bg-green-50 p-4">
+            <div className="rounded-md bg-success/10 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
@@ -70,10 +70,10 @@ export function EmailVerification() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
+                  <h3 className="text-sm font-medium text-success">
                     Email Verified Successfully!
                   </h3>
-                  <div className="mt-2 text-sm text-green-700">
+                  <div className="mt-2 text-sm text-success">
                     <p>{message}</p>
                   </div>
                   <div className="mt-4">
@@ -90,7 +90,7 @@ export function EmailVerification() {
           )}
 
           {status === 'error' && (
-            <div className="rounded-md bg-red-50 p-4">
+            <div className="rounded-md bg-destructive/10 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
@@ -110,7 +110,7 @@ export function EmailVerification() {
                   <h3 className="text-sm font-medium text-red-800">
                     Verification Failed
                   </h3>
-                  <div className="mt-2 text-sm text-red-700">
+                  <div className="mt-2 text-sm text-destructive">
                     <p>{message}</p>
                   </div>
                   <div className="mt-4 space-x-4">

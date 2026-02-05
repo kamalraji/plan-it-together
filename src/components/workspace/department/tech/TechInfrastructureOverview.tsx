@@ -46,21 +46,21 @@ export function TechInfrastructureOverview() {
     switch (status) {
       case 'operational':
         return (
-          <Badge variant="outline" className="text-green-600 border-green-600/30 bg-green-500/10">
+          <Badge variant="outline" className="text-success border-success/30 bg-success/10">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Operational
           </Badge>
         );
       case 'maintenance':
         return (
-          <Badge variant="outline" className="text-yellow-600 border-yellow-600/30 bg-yellow-500/10">
+          <Badge variant="outline" className="text-warning border-yellow-600/30 bg-warning/10">
             <AlertCircle className="h-3 w-3 mr-1" />
             Maintenance
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="text-red-600 border-red-600/30 bg-red-500/10">
+          <Badge variant="outline" className="text-destructive border-destructive/30 bg-destructive/10">
             <AlertCircle className="h-3 w-3 mr-1" />
             Down
           </Badge>

@@ -16,7 +16,7 @@ export function SocialMediaSummary() {
   const platforms: PlatformStat[] = [
     { platform: 'Instagram', icon: '📷', followers: 28500, growth: 12, engagement: 7.2, postsThisWeek: 12, color: 'bg-pink-500' },
     { platform: 'Twitter/X', icon: '𝕏', followers: 12450, growth: 8, engagement: 4.8, postsThisWeek: 18, color: 'bg-sky-500' },
-    { platform: 'LinkedIn', icon: '💼', followers: 8200, growth: 5, engagement: 3.1, postsThisWeek: 6, color: 'bg-blue-600' },
+    { platform: 'LinkedIn', icon: '💼', followers: 8200, growth: 5, engagement: 3.1, postsThisWeek: 6, color: 'bg-primary' },
     { platform: 'TikTok', icon: '🎵', followers: 5400, growth: 24, engagement: 9.5, postsThisWeek: 4, color: 'bg-foreground/80' },
   ];
 
@@ -55,7 +55,7 @@ export function SocialMediaSummary() {
         <div className="space-y-3">
           {platforms.map((platform) => (
             <div key={platform.platform} className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${platform.color} flex items-center justify-center text-white text-sm`}>
+              <div className={`w-8 h-8 rounded-lg ${platform.color} flex items-center justify-center text-primary-foreground text-sm`}>
                 {platform.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -65,9 +65,9 @@ export function SocialMediaSummary() {
                     {platform.growth >= 0 ? (
                       <TrendingUp className="h-3 w-3 text-emerald-500" />
                     ) : (
-                      <TrendingDown className="h-3 w-3 text-red-500" />
+                      <TrendingDown className="h-3 w-3 text-destructive" />
                     )}
-                    <span className={`text-xs font-medium ${platform.growth >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                    <span className={`text-xs font-medium ${platform.growth >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
                       +{platform.growth}%
                     </span>
                   </div>

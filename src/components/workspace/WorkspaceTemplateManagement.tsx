@@ -111,7 +111,7 @@ export function WorkspaceTemplateManagement({
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -122,7 +122,7 @@ export function WorkspaceTemplateManagement({
             <p className="text-sm text-red-800">{error}</p>
             <button 
               onClick={() => setError(null)}
-              className="text-sm text-red-600 underline mt-1"
+              className="text-sm text-destructive underline mt-1"
             >
               Dismiss
             </button>
@@ -141,7 +141,7 @@ export function WorkspaceTemplateManagement({
             onClick={() => setCurrentMode('library')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               currentMode === 'library'
-                ? 'border-indigo-500 text-indigo-600'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
             }`}
           >
@@ -152,7 +152,7 @@ export function WorkspaceTemplateManagement({
               onClick={() => setCurrentMode('create')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 currentMode === 'create'
-                  ? 'border-indigo-500 text-indigo-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
@@ -237,7 +237,7 @@ export function WorkspaceTemplateManagement({
       {loading && (
         <div className="fixed inset-0 bg-muted-foreground/40 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-card rounded-lg p-6 flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             <span className="text-foreground">Applying template...</span>
           </div>
         </div>

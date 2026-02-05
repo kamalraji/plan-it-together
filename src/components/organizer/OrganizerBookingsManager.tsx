@@ -476,7 +476,7 @@ const OrganizerBookingsManager: React.FC = () => {
               {selectedBooking.status === 'QUOTE_SENT' && (
                 <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                   <div className="flex items-start gap-3">
-                    <DollarSign className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                    <DollarSign className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-purple-800 dark:text-purple-300">Quote Received</p>
                       <p className="text-sm text-purple-700 dark:text-purple-400">

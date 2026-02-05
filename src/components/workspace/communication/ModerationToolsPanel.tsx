@@ -67,11 +67,11 @@ interface ModerationRecord {
 }
 
 const ACTION_CONFIGS: Record<ModerationAction, { icon: React.ReactNode; label: string; color: string }> = {
-  mute: { icon: <VolumeX className="h-4 w-4" />, label: 'Mute', color: 'text-amber-500' },
+  mute: { icon: <VolumeX className="h-4 w-4" />, label: 'Mute', color: 'text-warning' },
   timeout: { icon: <Clock className="h-4 w-4" />, label: 'Timeout', color: 'text-orange-500' },
-  ban: { icon: <Ban className="h-4 w-4" />, label: 'Ban', color: 'text-red-500' },
-  warn: { icon: <AlertTriangle className="h-4 w-4" />, label: 'Warning', color: 'text-yellow-500' },
-  restrict: { icon: <UserX className="h-4 w-4" />, label: 'Restrict', color: 'text-purple-500' },
+  ban: { icon: <Ban className="h-4 w-4" />, label: 'Ban', color: 'text-destructive' },
+  warn: { icon: <AlertTriangle className="h-4 w-4" />, label: 'Warning', color: 'text-warning' },
+  restrict: { icon: <UserX className="h-4 w-4" />, label: 'Restrict', color: 'text-primary' },
 };
 
 const DURATION_OPTIONS = [

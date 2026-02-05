@@ -268,7 +268,7 @@ const MetricWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         {change && (
           <div className={`flex items-center text-sm ${
-            changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+            changeType === 'increase' ? 'text-success' : 'text-destructive'
           }`}>
             <ArrowTrendingUpIcon className={`h-4 w-4 mr-1 ${
               changeType === 'decrease' ? 'rotate-180' : ''

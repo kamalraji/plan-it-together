@@ -86,7 +86,7 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
             {isMobileMenuOpen && (
               <div className="lg:hidden fixed inset-0 z-50 flex">
                 <div
-                  className="fixed inset-0 bg-black/60"
+                  className="fixed inset-0 bg-foreground/60"
                   onClick={toggleMobileMenu}
                 />
                 <div className="relative flex-1 flex flex-col max-w-xs w-full bg-card">

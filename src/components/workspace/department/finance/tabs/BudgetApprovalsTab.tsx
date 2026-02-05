@@ -61,8 +61,8 @@ export function BudgetApprovalsTab({ workspaceId }: BudgetApprovalsTabProps) {
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="w-5 h-5 text-amber-600" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="w-5 h-5 text-warning" />
               </div>
               <div>
                 <CardTitle className="text-lg">Pending Expenses</CardTitle>

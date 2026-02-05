@@ -262,7 +262,7 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                   {widget.type === 'metric' && (
                     <div>
                       <div className="text-lg font-bold">123</div>
-                      <div className="text-xs text-green-600">+5%</div>
+                      <div className="text-xs text-success">+5%</div>
                     </div>
                   )}
                   {widget.type === 'chart' && (
@@ -296,16 +296,16 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
                   )}
                   {widget.type === 'status' && (
                     <div className="flex items-center justify-center space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-success rounded-full"></div>
                       <span className="text-xs">Healthy</span>
                     </div>
                   )}
                   {widget.type === 'quickAction' && (
                     <div className="space-y-1">
-                      <button className="w-full text-xs bg-indigo-100 text-indigo-700 py-1 rounded">
+                      <button className="w-full text-xs bg-primary/20 text-primary py-1 rounded">
                         Action 1
                       </button>
-                      <button className="w-full text-xs bg-indigo-100 text-indigo-700 py-1 rounded">
+                      <button className="w-full text-xs bg-primary/20 text-primary py-1 rounded">
                         Action 2
                       </button>
                     </div>
@@ -366,9 +366,9 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
       )}
 
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-info/10 border border-blue-200 rounded-lg p-4">
         <h4 className="text-sm font-medium text-blue-800 mb-2">Customization Tips</h4>
-        <ul className="text-sm text-blue-700 space-y-1">
+        <ul className="text-sm text-info space-y-1">
           <li>• Drag widgets to reorder them</li>
           <li>• Use the dropdown to change widget sizes</li>
           <li>• Click the × button to remove widgets</li>

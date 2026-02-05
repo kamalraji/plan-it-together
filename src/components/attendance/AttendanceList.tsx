@@ -269,7 +269,7 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
                     <div className="ml-4 flex items-center space-x-2">
                       {record.attended ? (
                         <svg
-                          className="h-5 w-5 text-green-500"
+                          className="h-5 w-5 text-success"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"

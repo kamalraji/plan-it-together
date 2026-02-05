@@ -84,7 +84,7 @@ export function ViewerCounter({
   if (variant === 'minimal') {
     return (
       <div className={cn("flex items-center gap-1.5", className)}>
-        <Eye className={cn(config.icon, "text-red-500")} />
+        <Eye className={cn(config.icon, "text-destructive")} />
         <AnimatePresence mode="popLayout">
           <motion.span
             key={displayCount}
@@ -105,10 +105,10 @@ export function ViewerCounter({
       <div className={cn(
         "flex flex-col items-center p-4 rounded-2xl",
         "bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent",
-        "border border-red-500/20",
+        "border border-destructive/20",
         className
       )}>
-        <div className="flex items-center gap-2 text-red-500 mb-1">
+        <div className="flex items-center gap-2 text-destructive mb-1">
           <Eye className={config.icon} />
           <AnimatePresence mode="popLayout">
             <motion.span
@@ -133,7 +133,7 @@ export function ViewerCounter({
             className={cn(
               "flex items-center gap-1 mt-2",
               config.label,
-              trend === 'up' ? 'text-green-500' : 'text-red-400'
+              trend === 'up' ? 'text-success' : 'text-red-400'
             )}
           >
             {trend === 'up' ? (
@@ -154,7 +154,7 @@ export function ViewerCounter({
         className={cn(
           "relative overflow-hidden rounded-2xl p-6",
           "bg-gradient-to-br from-red-500/15 via-orange-500/10 to-yellow-500/5",
-          "border border-red-500/30 shadow-xl shadow-red-500/10",
+          "border border-destructive/30 shadow-xl shadow-red-500/10",
           className
         )}
         initial={{ opacity: 0, scale: 0.95 }}
@@ -170,8 +170,8 @@ export function ViewerCounter({
         <div className="relative flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 rounded-xl bg-red-500/20">
-                <Users className="h-5 w-5 text-red-500" />
+              <div className="p-2 rounded-xl bg-destructive/20">
+                <Users className="h-5 w-5 text-destructive" />
               </div>
               <span className="text-sm text-muted-foreground font-medium">
                 Live Viewers
@@ -196,7 +196,7 @@ export function ViewerCounter({
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium",
                 trend === 'up' 
-                  ? 'bg-green-500/20 text-green-500' 
+                  ? 'bg-success/20 text-success' 
                   : 'bg-red-400/20 text-red-400'
               )}
             >
@@ -217,10 +217,10 @@ export function ViewerCounter({
   return (
     <div className={cn(
       "inline-flex items-center gap-2 px-3 py-1.5 rounded-full",
-      "bg-red-500/10 border border-red-500/20",
+      "bg-destructive/10 border border-destructive/20",
       className
     )}>
-      <Eye className={cn(config.icon, "text-red-500")} />
+      <Eye className={cn(config.icon, "text-destructive")} />
       <AnimatePresence mode="popLayout">
         <motion.span
           key={displayCount}

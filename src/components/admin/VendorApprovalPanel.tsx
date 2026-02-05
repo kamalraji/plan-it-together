@@ -283,7 +283,7 @@ export const VendorApprovalPanel: React.FC = () => {
           <TabsTrigger value="PENDING" className="gap-2">
             <Clock className="w-4 h-4" />
             Pending
-            <Badge variant="secondary" className="ml-1 bg-amber-100 text-amber-800">{statusCounts.PENDING || 0}</Badge>
+            <Badge variant="secondary" className="ml-1 bg-warning/20 text-amber-800">{statusCounts.PENDING || 0}</Badge>
           </TabsTrigger>
           <TabsTrigger value="VERIFIED" className="gap-2">
             <CheckCircle2 className="w-4 h-4" />

@@ -47,12 +47,12 @@ const PLATFORM_ICONS: Record<string, React.ComponentType<{ className?: string }>
 
 const PLATFORM_COLORS: Record<string, string> = {
   twitter: 'bg-sky-500',
-  linkedin: 'bg-blue-600',
-  facebook: 'bg-blue-500',
+  linkedin: 'bg-primary',
+  facebook: 'bg-info',
   instagram: 'bg-gradient-to-r from-purple-500 to-pink-500',
   blog: 'bg-emerald-500',
   website: 'bg-slate-500',
-  email: 'bg-amber-500',
+  email: 'bg-warning',
 };
 
 export function ContentCalendarTab({ workspaceId }: ContentCalendarTabProps) {
@@ -184,7 +184,7 @@ export function ContentCalendarTab({ workspaceId }: ContentCalendarTabProps) {
                             <div
                               key={item.id}
                               className={cn(
-                                'text-xs px-1.5 py-0.5 rounded truncate text-white flex items-center gap-1',
+                                'text-xs px-1.5 py-0.5 rounded truncate text-primary-foreground flex items-center gap-1',
                                 PLATFORM_COLORS[item.platform] || 'bg-slate-500'
                               )}
                               title={item.title}
@@ -234,7 +234,7 @@ export function ContentCalendarTab({ workspaceId }: ContentCalendarTabProps) {
                     <CardContent className="p-3">
                       <div className="flex items-start gap-2">
                         <div className={cn(
-                          'p-1.5 rounded text-white',
+                          'p-1.5 rounded text-primary-foreground',
                           PLATFORM_COLORS[item.platform] || 'bg-slate-500'
                         )}>
                           {getPlatformIcon(item.platform)}
@@ -270,7 +270,7 @@ export function ContentCalendarTab({ workspaceId }: ContentCalendarTabProps) {
               const Icon = PLATFORM_ICONS[platform] || Globe;
               return (
                 <div key={platform} className="flex items-center gap-2">
-                  <div className={cn('p-1 rounded text-white', color)}>
+                  <div className={cn('p-1 rounded text-primary-foreground', color)}>
                     <Icon className="h-3 w-3" />
                   </div>
                   <span className="text-sm capitalize">{platform}</span>

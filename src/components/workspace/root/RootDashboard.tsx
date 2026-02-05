@@ -126,11 +126,11 @@ export function RootDashboard({
                       <p className="text-xs text-muted-foreground">Members</p>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-green-600">{dept.tasksCompleted}</p>
+                      <p className="text-sm font-semibold text-success">{dept.tasksCompleted}</p>
                       <p className="text-xs text-muted-foreground">Done</p>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-blue-600">{dept.tasksInProgress}</p>
+                      <p className="text-sm font-semibold text-info">{dept.tasksInProgress}</p>
                       <p className="text-xs text-muted-foreground">Active</p>
                     </div>
                   </div>
@@ -209,8 +209,8 @@ export function RootDashboard({
                 {upcomingMilestones.map((milestone) => (
                   <div key={milestone.id} className="flex items-start gap-3">
                     <div className={`w-2 h-2 rounded-full mt-1.5 ${
-                      milestone.status === 'overdue' ? 'bg-red-500' :
-                      milestone.status === 'in_progress' ? 'bg-blue-500' :
+                      milestone.status === 'overdue' ? 'bg-destructive' :
+                      milestone.status === 'in_progress' ? 'bg-info' :
                       'bg-muted-foreground'
                     }`} />
                     <div className="flex-1 min-w-0">

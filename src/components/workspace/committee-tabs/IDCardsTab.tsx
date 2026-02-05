@@ -51,10 +51,10 @@ interface IDCardTemplate {
 }
 
 const cardTypeColors: Record<string, string> = {
-  attendee: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
-  vip: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
+  attendee: 'bg-info/10 text-info border-info/30',
+  vip: 'bg-warning/10 text-warning border-warning/30',
   staff: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-  speaker: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
+  speaker: 'bg-primary/10 text-primary border-purple-500/30',
   volunteer: 'bg-pink-500/10 text-pink-600 border-pink-500/30',
 };
 
@@ -309,7 +309,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CreditCard className="h-6 w-6 text-indigo-500" />
+            <CreditCard className="h-6 w-6 text-primary" />
             ID Cards & Badges
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -327,8 +327,8 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
         <Card className="border-border/50 bg-card/50">
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <FileText className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <FileText className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{templates?.length || 0}</p>
@@ -355,8 +355,8 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
         <Card className="border-border/50 bg-card/50">
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <CheckCircle className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <CheckCircle className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.checkedIn}</p>
@@ -369,8 +369,8 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
         <Card className="border-border/50 bg-card/50">
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Clock className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Clock className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.notCheckedIn}</p>
@@ -700,15 +700,15 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${
                           job.status === 'completed' ? 'bg-emerald-500/10' :
-                          job.status === 'failed' ? 'bg-red-500/10' :
-                          'bg-amber-500/10'
+                          job.status === 'failed' ? 'bg-destructive/10' :
+                          'bg-warning/10'
                         }`}>
                           {job.status === 'completed' ? (
                             <CheckCircle className="h-4 w-4 text-emerald-500" />
                           ) : job.status === 'failed' ? (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
+                            <AlertCircle className="h-4 w-4 text-destructive" />
                           ) : (
-                            <RefreshCw className="h-4 w-4 text-amber-500 animate-spin" />
+                            <RefreshCw className="h-4 w-4 text-warning animate-spin" />
                           )}
                         </div>
                         <div>

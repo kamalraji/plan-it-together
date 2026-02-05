@@ -151,14 +151,14 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
           {/* Check-in Status */}
           {isCheckedIn ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-success/10 border border-green-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-2">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-success mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-green-800 text-sm sm:text-base font-medium">Checked In</span>
+                <span className="text-success text-sm sm:text-base font-medium">Checked In</span>
               </div>
-              <p className="text-xs sm:text-sm text-green-700">
+              <p className="text-xs sm:text-sm text-success">
                 {latestCheckIn && (
                   <>
                     Check-in time: {new Date(latestCheckIn.checkInTime).toLocaleString()}
@@ -169,14 +169,14 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
               </p>
             </div>
           ) : (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-info/10 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex items-center justify-center mb-1.5 sm:mb-2">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-info mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-blue-800 text-sm sm:text-base font-medium">Ready for Check-in</span>
               </div>
-              <p className="text-xs sm:text-sm text-blue-700">
+              <p className="text-xs sm:text-sm text-info">
                 Present this QR code to volunteers at the event entrance.
               </p>
             </div>
@@ -217,10 +217,10 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
               <span
                 className={`inline-flex px-2 py-0.5 text-[11px] sm:text-xs font-semibold rounded-full ${
                   registration.status === 'CONFIRMED'
-                    ? 'bg-green-100 text-green-800'
+                    ? 'bg-success/20 text-success'
                     : registration.status === 'WAITLISTED'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-blue-100 text-blue-800'
+                    ? 'bg-warning/20 text-yellow-800'
+                    : 'bg-info/20 text-blue-800'
                 }`}
               >
                 {registration.status}
@@ -236,25 +236,25 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
           </h4>
           <div className="space-y-2 text-xs sm:text-sm text-muted-foreground">
             <div className="flex items-start">
-              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 text-indigo-600 rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
+              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-primary/20 text-primary rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
                 1
               </span>
               <span>Save this personal QR code from your profile to your phone or take a screenshot.</span>
             </div>
             <div className="flex items-start">
-              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 text-indigo-600 rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
+              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-primary/20 text-primary rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
                 2
               </span>
               <span>Arrive at the event venue at the scheduled time.</span>
             </div>
             <div className="flex items-start">
-              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 text-indigo-600 rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
+              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-primary/20 text-primary rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
                 3
               </span>
               <span>Show your QR code to volunteers at the check-in desk for any event you&apos;re registered for.</span>
             </div>
             <div className="flex items-start">
-              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 text-indigo-600 rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
+              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-primary/20 text-primary rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
                 4
               </span>
               <span>Wait for the green confirmation after scanning.</span>
@@ -299,7 +299,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
       {/* Error Display */}
       {downloadError && (
-        <div className="mt-3 bg-red-50 border border-red-200 rounded-md p-2.5">
+        <div className="mt-3 bg-destructive/10 border border-red-200 rounded-md p-2.5">
           <p className="text-xs sm:text-sm text-red-800 text-center">{downloadError}</p>
         </div>
       )}

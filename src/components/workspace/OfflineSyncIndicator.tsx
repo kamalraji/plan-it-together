@@ -40,7 +40,7 @@ export function OfflineSyncIndicator({ compact = false }: OfflineSyncIndicatorPr
               size="icon"
               className={cn(
                 "h-8 w-8",
-                !isOnline && "text-amber-500",
+                !isOnline && "text-warning",
                 errors.length > 0 && "text-destructive"
               )}
               onClick={isOnline ? syncNow : undefined}
@@ -58,7 +58,7 @@ export function OfflineSyncIndicator({ compact = false }: OfflineSyncIndicatorPr
                 <WifiOff className="h-4 w-4" />
               )}
               {pendingCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-amber-500 text-[10px] text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-warning text-[10px] text-primary-foreground flex items-center justify-center">
                   {pendingCount}
                 </span>
               )}
@@ -87,7 +87,7 @@ export function OfflineSyncIndicator({ compact = false }: OfflineSyncIndicatorPr
         {isOnline ? (
           <Wifi className="h-4 w-4 text-emerald-500" />
         ) : (
-          <WifiOff className="h-4 w-4 text-amber-500" />
+          <WifiOff className="h-4 w-4 text-warning" />
         )}
         <span className="text-sm font-medium">
           {isOnline ? 'Online' : 'Offline'}

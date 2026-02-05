@@ -45,8 +45,8 @@ const integrationConfigs = {
   google_calendar: {
     name: 'Google Calendar',
     icon: Calendar,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
+    color: 'text-info',
+    bgColor: 'bg-info/10',
     description: 'Sync task deadlines with Google Calendar',
   },
   github: {
@@ -63,8 +63,8 @@ const integrationConfigs = {
         <path d="M11.571 11.513H0l5.786-5.714 5.785 5.714zm5.714-5.714L11.57 0 5.785 5.786l5.714 5.714 5.786-5.701zm-5.714 17.2l5.714-5.713-5.714-5.714L5.857 17.286l5.714 5.713z" />
       </svg>
     ),
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-600/10',
+    color: 'text-info',
+    bgColor: 'bg-primary/10',
     description: 'Sync with Jira issues and projects',
   },
   zapier: {
@@ -227,12 +227,12 @@ export function IntegrationsHub({ workspaceId }: IntegrationsHubProps) {
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">Status:</span>
                     {integration.sync_status === 'success' ? (
-                      <Badge variant="outline" className="gap-1 text-green-600 border-green-200">
+                      <Badge variant="outline" className="gap-1 text-success border-green-200">
                         <CheckCircle className="h-3 w-3" />
                         Connected
                       </Badge>
                     ) : integration.sync_status === 'error' ? (
-                      <Badge variant="outline" className="gap-1 text-red-600 border-red-200">
+                      <Badge variant="outline" className="gap-1 text-destructive border-red-200">
                         <XCircle className="h-3 w-3" />
                         Error
                       </Badge>

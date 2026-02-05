@@ -45,16 +45,16 @@ interface UpdateMenuTabProps {
 }
 
 const MEAL_TYPES = [
-  { value: 'breakfast', label: 'Breakfast', color: 'bg-amber-500' },
+  { value: 'breakfast', label: 'Breakfast', color: 'bg-warning' },
   { value: 'lunch', label: 'Lunch', color: 'bg-orange-500' },
   { value: 'dinner', label: 'Dinner', color: 'bg-rose-500' },
-  { value: 'snack', label: 'Snack', color: 'bg-purple-500' },
+  { value: 'snack', label: 'Snack', color: 'bg-primary' },
 ];
 
 const STATUS_CONFIG = {
   draft: { label: 'Draft', color: 'bg-muted text-muted-foreground', icon: Clock },
-  confirmed: { label: 'Confirmed', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: Check },
-  prepared: { label: 'Prepared', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: ChefHat },
+  confirmed: { label: 'Confirmed', color: 'bg-info/10 text-info border-info/20', icon: Check },
+  prepared: { label: 'Prepared', color: 'bg-success/10 text-success border-success/20', icon: ChefHat },
 };
 
 const ALLERGEN_OPTIONS = [
@@ -269,7 +269,7 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
                       onCheckedChange={(v) => setFormData({ ...formData, is_vegetarian: v })}
                     />
                     <span className="text-sm flex items-center gap-1">
-                      <Leaf className="h-4 w-4 text-green-500" />
+                      <Leaf className="h-4 w-4 text-success" />
                       Vegetarian
                     </span>
                   </div>
@@ -289,7 +289,7 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
                       onCheckedChange={(v) => setFormData({ ...formData, is_gluten_free: v })}
                     />
                     <span className="text-sm flex items-center gap-1">
-                      <Wheat className="h-4 w-4 text-amber-500" />
+                      <Wheat className="h-4 w-4 text-warning" />
                       Gluten-Free
                     </span>
                   </div>
@@ -336,13 +336,13 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.confirmed}</div>
+            <div className="text-2xl font-bold text-info">{stats.confirmed}</div>
             <div className="text-xs text-muted-foreground">Confirmed</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.vegetarian}</div>
+            <div className="text-2xl font-bold text-success">{stats.vegetarian}</div>
             <div className="text-xs text-muted-foreground">Vegetarian</div>
           </CardContent>
         </Card>
@@ -354,13 +354,13 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.glutenFree}</div>
+            <div className="text-2xl font-bold text-warning">{stats.glutenFree}</div>
             <div className="text-xs text-muted-foreground">Gluten-Free</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-purple-600">{vendors.filter(v => v.status === 'confirmed').length}</div>
+            <div className="text-2xl font-bold text-primary">{vendors.filter(v => v.status === 'confirmed').length}</div>
             <div className="text-xs text-muted-foreground">Active Vendors</div>
           </CardContent>
         </Card>
@@ -428,7 +428,7 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
 
                 <div className="flex flex-wrap gap-1">
                   {item.is_vegetarian && (
-                    <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600">
+                    <Badge variant="outline" className="text-xs bg-success/10 text-success">
                       <Leaf className="h-3 w-3 mr-1" />
                       Vegetarian
                     </Badge>
@@ -440,7 +440,7 @@ export function UpdateMenuTab({ workspaceId }: UpdateMenuTabProps) {
                     </Badge>
                   )}
                   {item.is_gluten_free && (
-                    <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600">
+                    <Badge variant="outline" className="text-xs bg-warning/10 text-warning">
                       <Wheat className="h-3 w-3 mr-1" />
                       GF
                     </Badge>

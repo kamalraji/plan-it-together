@@ -114,13 +114,13 @@ export function TaskGanttChart({
                     )}
                   >
                     {task.metadata?.isMilestone ? (
-                      <Diamond className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                      <Diamond className="h-3.5 w-3.5 text-warning shrink-0" />
                     ) : (
                       <div className={cn(
                         "h-2 w-2 rounded-full shrink-0",
                         task.status === TaskStatus.COMPLETED ? "bg-emerald-500" :
-                        task.status === TaskStatus.IN_PROGRESS ? "bg-blue-500" :
-                        task.status === TaskStatus.BLOCKED ? "bg-red-500" :
+                        task.status === TaskStatus.IN_PROGRESS ? "bg-info" :
+                        task.status === TaskStatus.BLOCKED ? "bg-destructive" :
                         "bg-slate-400"
                       )} />
                     )}
@@ -163,10 +163,10 @@ export function TaskGanttChart({
               {/* Today Line */}
               {todayPosition > 0 && todayPosition < timelineWidth && (
                 <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20"
+                  className="absolute top-0 bottom-0 w-0.5 bg-destructive z-20"
                   style={{ left: todayPosition }}
                 >
-                  <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-destructive rounded-full" />
                 </div>
               )}
 
@@ -254,7 +254,7 @@ export function TaskGanttChart({
       {/* Legend */}
       <div className="flex items-center gap-4 px-4 py-2 border-t border-border bg-muted/30 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 bg-blue-500 rounded-sm" />
+          <div className="w-3 h-3 bg-info rounded-sm" />
           <span>In Progress</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -266,11 +266,11 @@ export function TaskGanttChart({
           <span>Not Started</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Diamond className="h-3 w-3 text-amber-500" />
+          <Diamond className="h-3 w-3 text-warning" />
           <span>Milestone</span>
         </div>
         <div className="flex items-center gap-1.5 ml-auto">
-          <div className="w-6 h-0.5 bg-red-500" />
+          <div className="w-6 h-0.5 bg-destructive" />
           <span>Today</span>
         </div>
       </div>

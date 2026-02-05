@@ -132,15 +132,15 @@ export const OrganizationAnalyticsPage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Growth Rate</span>
-                <span className="text-sm font-medium text-green-600">+12.5%</span>
+                <span className="text-sm font-medium text-success">+12.5%</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Engagement Score</span>
-                <span className="text-sm font-medium text-blue-600">8.4/10</span>
+                <span className="text-sm font-medium text-info">8.4/10</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Event Success Rate</span>
-                <span className="text-sm font-medium text-purple-600">94%</span>
+                <span className="text-sm font-medium text-primary">94%</span>
               </div>
             </div>
           </div>
@@ -185,16 +185,16 @@ export const OrganizationAnalyticsPage: React.FC = () => {
         </div>
 
         {/* Analytics Tips */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
+        <div className="mt-8 bg-info/10 rounded-lg p-6">
           <h3 className="text-lg font-medium text-blue-900 mb-2">Analytics Insights</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <h4 className="font-medium text-blue-900 mb-1">Growth Tracking</h4>
-              <p className="text-blue-700">Monitor follower growth and engagement trends to understand your organization's reach and impact.</p>
+              <p className="text-info">Monitor follower growth and engagement trends to understand your organization's reach and impact.</p>
             </div>
             <div>
               <h4 className="font-medium text-blue-900 mb-1">Event Performance</h4>
-              <p className="text-blue-700">Track event attendance and engagement to optimize future event planning and marketing strategies.</p>
+              <p className="text-info">Track event attendance and engagement to optimize future event planning and marketing strategies.</p>
             </div>
           </div>
         </div>

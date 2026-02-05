@@ -250,7 +250,7 @@ export function VolunteerTrainingTracker({ workspaceId }: VolunteerTrainingTrack
           </div>
           <Progress value={progress} className="h-2" />
           {requiredCompleted < requiredCount && (
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-warning">
               {requiredCount - requiredCompleted} required module(s) remaining
             </p>
           )}

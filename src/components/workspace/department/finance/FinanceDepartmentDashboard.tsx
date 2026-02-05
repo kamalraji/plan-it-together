@@ -51,13 +51,13 @@ export function FinanceDepartmentDashboard({
       {/* Finance Department Header */}
       <div className="bg-gradient-to-br from-green-500/10 via-card to-emerald-500/5 rounded-xl border border-border shadow-sm p-4 sm:p-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-green-500/20">
-            <DollarSign className="h-6 w-6 text-green-500" />
+          <div className="p-3 rounded-xl bg-success/20">
+            <DollarSign className="h-6 w-6 text-success" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-lg font-semibold text-foreground">{workspace.name}</h2>
-              <span className="px-2 py-0.5 text-xs font-medium bg-green-500/20 text-green-600 rounded-full">
+              <span className="px-2 py-0.5 text-xs font-medium bg-success/20 text-success rounded-full">
                 Finance Department
               </span>
             </div>
@@ -74,7 +74,7 @@ export function FinanceDepartmentDashboard({
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
               {pendingRequests.length > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-warning/20 text-warning rounded-full">
                   {pendingRequests.length} pending requests
                 </span>
               )}

@@ -41,7 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // Validation states
             validationState === 'idle' && "border-border hover:border-primary/50 hover:shadow-soft focus-visible:ring-primary focus-visible:border-primary",
             validationState === 'validating' && "border-muted-foreground/50 focus-visible:ring-muted-foreground",
-            validationState === 'valid' && "border-green-500 focus-visible:ring-green-500 focus-visible:border-green-500 pr-10",
+            validationState === 'valid' && "border-success focus-visible:ring-success focus-visible:border-success pr-10",
             validationState === 'invalid' && "border-destructive focus-visible:ring-destructive focus-visible:border-destructive pr-10",
             // Character count padding
             showCharCount && "pr-16",
@@ -59,7 +59,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         {validationState === 'valid' && !showCharCount && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CheckCircle2 className="h-4 w-4 text-success" />
           </div>
         )}
         {validationState === 'invalid' && !showCharCount && (
@@ -72,7 +72,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {showCharCount && maxLength && (
           <div className={cn(
             "absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium transition-colors",
-            isOverLimit ? "text-destructive" : charCount > maxLength * 0.9 ? "text-amber-500" : "text-muted-foreground"
+            isOverLimit ? "text-destructive" : charCount > maxLength * 0.9 ? "text-warning" : "text-muted-foreground"
           )}>
             {charCount}/{maxLength}
           </div>

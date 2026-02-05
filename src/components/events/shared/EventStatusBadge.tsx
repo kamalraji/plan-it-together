@@ -24,7 +24,7 @@ export function EventStatusBadge({ status, className }: EventStatusBadgeProps) {
     <Badge 
       variant={config.variant} 
       className={cn(
-        status === 'ONGOING' && 'animate-pulse bg-green-500 text-white',
+        status === 'ONGOING' && 'animate-pulse bg-success text-primary-foreground',
         className
       )}
       aria-label={`Event status: ${config.label}`}

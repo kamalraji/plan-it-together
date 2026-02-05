@@ -153,9 +153,9 @@ export function SettingsCompletionProgress({
               className={cn(
                 'flex items-center justify-between p-3 rounded-lg border transition-colors',
                 isComplete 
-                  ? 'bg-green-500/5 border-green-500/20' 
+                  ? 'bg-success/5 border-success/20' 
                   : isRequired 
-                    ? 'bg-red-500/5 border-red-500/20' 
+                    ? 'bg-destructive/5 border-destructive/20' 
                     : 'bg-muted/30 border-border'
               )}
             >
@@ -163,9 +163,9 @@ export function SettingsCompletionProgress({
                 <div className={cn(
                   'p-2 rounded-lg',
                   isComplete 
-                    ? 'bg-green-500/10' 
+                    ? 'bg-success/10' 
                     : isRequired 
-                      ? 'bg-red-500/10' 
+                      ? 'bg-destructive/10' 
                       : 'bg-muted'
                 )}>
                   <Icon className={cn(
@@ -193,12 +193,12 @@ export function SettingsCompletionProgress({
               </div>
               <div className="flex items-center gap-2">
                 {isComplete ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 ) : (
                   <>
                     <XCircle className={cn(
                       'h-5 w-5',
-                      isRequired ? 'text-red-500' : 'text-muted-foreground'
+                      isRequired ? 'text-destructive' : 'text-muted-foreground'
                     )} />
                     {onNavigateToSetting && (
                       <Button

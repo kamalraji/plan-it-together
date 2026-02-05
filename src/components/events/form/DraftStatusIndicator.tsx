@@ -33,9 +33,9 @@ export function DraftStatusIndicator({
       case 'syncing':
         return <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />;
       case 'synced':
-        return <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-success" />;
       case 'error':
-        return <AlertCircle className="h-3.5 w-3.5 text-amber-500" />;
+        return <AlertCircle className="h-3.5 w-3.5 text-warning" />;
       default:
         return lastSaved ? (
           <Cloud className="h-3.5 w-3.5 text-primary" />

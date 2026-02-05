@@ -156,20 +156,20 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
     switch (status) {
       case 'PENDING':
       case 'VENDOR_REVIEWING':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case 'QUOTE_SENT':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case 'QUOTE_ACCEPTED':
       case 'CONFIRMED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'IN_PROGRESS':
         return 'bg-purple-100 text-purple-800';
       case 'COMPLETED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'CANCELLED':
         return 'bg-muted text-foreground';
       case 'DISPUTED':
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/20 text-red-800';
       default:
         return 'bg-muted text-foreground';
     }
@@ -191,18 +191,18 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
             <h3 className="text-sm font-medium text-red-800">Error loading bookings</h3>
-            <div className="mt-2 text-sm text-red-700">
+            <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
@@ -245,14 +245,14 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
               onClick={() => setActiveTab(tab.id as any)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-info text-info'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
               {tab.name}
               {tab.count > 0 && (
                 <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                  activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-muted text-muted-foreground'
+                  activeTab === tab.id ? 'bg-info/20 text-info' : 'bg-muted text-muted-foreground'
                 }`}>
                   {tab.count}
                 </span>
@@ -298,7 +298,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                       key={booking.id}
                       onClick={() => setSelectedBooking(booking)}
                       className={`p-4 border rounded-lg cursor-pointer hover:bg-muted/50 ${
-                        selectedBooking?.id === booking.id ? 'border-blue-500 bg-blue-50' : 'border-border'
+                        selectedBooking?.id === booking.id ? 'border-info bg-info/10' : 'border-border'
                       }`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -389,7 +389,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                     </button>
                     <button
                       onClick={() => updateBookingStatus(selectedBooking.id, 'CANCELLED')}
-                      className="px-4 py-2 bg-muted-foreground/40 text-white text-sm font-medium rounded-md hover:bg-muted-foreground/50"
+                      className="px-4 py-2 bg-muted-foreground/40 text-primary-foreground text-sm font-medium rounded-md hover:bg-muted-foreground/50"
                     >
                       Decline
                     </button>
@@ -471,7 +471,7 @@ const VendorBookingManagement: React.FC<VendorBookingManagementProps> = ({ vendo
                         <div
                           className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                             message.senderType === 'VENDOR'
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-primary text-primary-foreground'
                               : 'bg-muted text-foreground'
                           }`}
                         >

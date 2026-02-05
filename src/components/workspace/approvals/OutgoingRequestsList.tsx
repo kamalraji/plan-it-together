@@ -26,18 +26,18 @@ export function OutgoingRequestsList({ requests, isLoading }: OutgoingRequestsLi
       case 'budget':
         return 'bg-emerald-500/10 text-emerald-600';
       case 'resource':
-        return 'bg-blue-500/10 text-blue-600';
+        return 'bg-info/10 text-info';
     }
   };
 
   const getStatusBadge = (status: OutgoingRequest['status']) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Pending</Badge>;
+        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Pending</Badge>;
       case 'approved':
         return <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Approved</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">Rejected</Badge>;
+        return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">Rejected</Badge>;
     }
   };
 

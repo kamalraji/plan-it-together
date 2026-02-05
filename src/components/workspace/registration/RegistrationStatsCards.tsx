@@ -77,8 +77,8 @@ export function RegistrationStatsCards({ workspaceId }: RegistrationStatsCardsPr
       value: safeStats.pending.toLocaleString(),
       subtitle: 'Awaiting review',
       icon: Clock,
-      iconBg: 'bg-amber-500/10',
-      iconColor: 'text-amber-600',
+      iconBg: 'bg-warning/10',
+      iconColor: 'text-warning',
       alert: safeStats.pending > 100,
     },
     {
@@ -86,8 +86,8 @@ export function RegistrationStatsCards({ workspaceId }: RegistrationStatsCardsPr
       value: safeStats.waitlisted.toLocaleString(),
       subtitle: `${safeStats.cancelled} cancelled`,
       icon: Ticket,
-      iconBg: 'bg-violet-500/10',
-      iconColor: 'text-violet-600',
+      iconBg: 'bg-primary/10',
+      iconColor: 'text-primary',
     },
   ];
 
@@ -104,7 +104,7 @@ export function RegistrationStatsCards({ workspaceId }: RegistrationStatsCardsPr
                 <card.icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
               {card.alert && (
-                <AlertTriangle className="w-4 h-4 text-amber-500" aria-label="Alert: high pending count" />
+                <AlertTriangle className="w-4 h-4 text-warning" aria-label="Alert: high pending count" />
               )}
               {card.trend !== undefined && (
                 <div 

@@ -27,8 +27,8 @@ interface UpdateScheduleTabProps {
 // Session types (available for future use/enhancement)
 // const SESSION_TYPES = [
 //   { value: 'keynote', label: 'Keynote', color: 'bg-purple-100 text-purple-800' },
-//   { value: 'session', label: 'Session', color: 'bg-blue-100 text-blue-800' },
-//   { value: 'break', label: 'Break', color: 'bg-amber-100 text-amber-800' },
+//   { value: 'session', label: 'Session', color: 'bg-info/20 text-blue-800' },
+//   { value: 'break', label: 'Break', color: 'bg-warning/20 text-amber-800' },
 //   { value: 'networking', label: 'Networking', color: 'bg-emerald-100 text-emerald-800' },
 // ];
 

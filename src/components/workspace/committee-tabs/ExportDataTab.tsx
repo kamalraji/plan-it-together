@@ -179,7 +179,7 @@ export function ExportDataTab({ workspace }: ExportDataTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5 text-purple-500" />
+            <Download className="h-5 w-5 text-primary" />
             Export Financial Data
           </CardTitle>
           <CardDescription>
@@ -281,7 +281,7 @@ export function ExportDataTab({ workspace }: ExportDataTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-blue-500" />
+            <Database className="h-5 w-5 text-info" />
             Available Data
           </CardTitle>
           <CardDescription>Summary of data that can be exported</CardDescription>

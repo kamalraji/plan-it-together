@@ -109,7 +109,7 @@ export function ReviewContentTab({ workspaceId }: ReviewContentTabProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5 text-purple-500" />
+              <Eye className="h-5 w-5 text-primary" />
               Review Content Queue
             </CardTitle>
             <Badge variant="outline" className="text-lg px-3 py-1">

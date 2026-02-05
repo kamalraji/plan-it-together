@@ -99,7 +99,7 @@ export function EngagementTracker({ workspaceId }: EngagementTrackerProps) {
                   <span className="font-medium text-sm">{metric.platform}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-medium ${metric.trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                  <span className={`text-xs font-medium ${metric.trend >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
                     {metric.trend >= 0 ? '+' : ''}{metric.trend}%
                   </span>
                   <Badge variant="secondary" className="text-xs">
@@ -109,11 +109,11 @@ export function EngagementTracker({ workspaceId }: EngagementTrackerProps) {
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <div className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
-                  <Heart className="h-3.5 w-3.5 text-red-500" />
+                  <Heart className="h-3.5 w-3.5 text-destructive" />
                   <span className="text-xs font-medium">{formatNumber(metric.likes)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
-                  <MessageCircle className="h-3.5 w-3.5 text-blue-500" />
+                  <MessageCircle className="h-3.5 w-3.5 text-info" />
                   <span className="text-xs font-medium">{formatNumber(metric.comments)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
@@ -121,7 +121,7 @@ export function EngagementTracker({ workspaceId }: EngagementTrackerProps) {
                   <span className="text-xs font-medium">{formatNumber(metric.shares)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
-                  <Bookmark className="h-3.5 w-3.5 text-amber-500" />
+                  <Bookmark className="h-3.5 w-3.5 text-warning" />
                   <span className="text-xs font-medium">{formatNumber(metric.saves)}</span>
                 </div>
               </div>

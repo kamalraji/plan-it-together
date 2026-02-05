@@ -477,7 +477,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             {/* Scanning overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-48 h-48 border-2 border-background border-dashed rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
+                <span className="text-primary-foreground text-sm font-medium">
                   Position QR code here
                 </span>
               </div>
@@ -586,7 +586,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                   <button
                     type="button"
                     onClick={handlePrintBadge}
-                    className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-foreground/90 text-white hover:bg-foreground/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+                    className="mt-2 inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-foreground/90 text-primary-foreground hover:bg-foreground/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                   >
                     Print Badge
                   </button>

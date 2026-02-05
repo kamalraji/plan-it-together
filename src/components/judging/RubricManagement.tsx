@@ -148,14 +148,14 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+        <div className="mb-4 p-4 bg-destructive/10 border border-red-200 rounded-md">
           <p className="text-red-800">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-green-800">{success}</p>
+        <div className="mb-4 p-4 bg-success/10 border border-green-200 rounded-md">
+          <p className="text-success">{success}</p>
         </div>
       )}
 
@@ -252,7 +252,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
           </button>
 
           <div className="text-right">
-            <div className={`text-sm mb-2 ${getTotalWeight() === 100 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-sm mb-2 ${getTotalWeight() === 100 ? 'text-success' : 'text-destructive'}`}>
               Total Weight: {getTotalWeight()}% {getTotalWeight() === 100 ? '✓' : '(must equal 100%)'}
             </div>
             <button

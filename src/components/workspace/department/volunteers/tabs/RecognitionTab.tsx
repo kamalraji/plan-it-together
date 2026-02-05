@@ -21,20 +21,20 @@ export function RecognitionTab({ workspace }: RecognitionTabProps) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'star': return <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />;
-      case 'kudos': return <ThumbsUp className="h-4 w-4 text-blue-500" />;
-      case 'award': return <Trophy className="h-4 w-4 text-amber-500" />;
-      case 'milestone': return <Medal className="h-4 w-4 text-purple-500" />;
+      case 'star': return <Star className="h-4 w-4 text-warning fill-yellow-500" />;
+      case 'kudos': return <ThumbsUp className="h-4 w-4 text-info" />;
+      case 'award': return <Trophy className="h-4 w-4 text-warning" />;
+      case 'milestone': return <Medal className="h-4 w-4 text-primary" />;
       default: return <Heart className="h-4 w-4 text-rose-500" />;
     }
   };
 
   const getTypeBg = (type: string) => {
     switch (type) {
-      case 'star': return 'bg-yellow-500/10';
-      case 'kudos': return 'bg-blue-500/10';
-      case 'award': return 'bg-amber-500/10';
-      case 'milestone': return 'bg-purple-500/10';
+      case 'star': return 'bg-warning/10';
+      case 'kudos': return 'bg-info/10';
+      case 'award': return 'bg-warning/10';
+      case 'milestone': return 'bg-primary/10';
       default: return 'bg-rose-500/10';
     }
   };
@@ -76,19 +76,19 @@ export function RecognitionTab({ workspace }: RecognitionTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.stars}</div>
+            <div className="text-2xl font-bold text-warning">{stats.stars}</div>
             <div className="text-xs text-muted-foreground">Star Awards</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.kudos}</div>
+            <div className="text-2xl font-bold text-info">{stats.kudos}</div>
             <div className="text-xs text-muted-foreground">Kudos Given</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.milestones}</div>
+            <div className="text-2xl font-bold text-primary">{stats.milestones}</div>
             <div className="text-xs text-muted-foreground">Milestones</div>
           </CardContent>
         </Card>
@@ -167,11 +167,11 @@ export function RecognitionTab({ workspace }: RecognitionTabProps) {
                     <div className="flex items-center gap-4">
                       <div className="w-8 flex justify-center">
                         {index === 0 ? (
-                          <Trophy className="h-6 w-6 text-yellow-500" />
+                          <Trophy className="h-6 w-6 text-warning" />
                         ) : index === 1 ? (
                           <Medal className="h-6 w-6 text-muted-foreground" />
                         ) : (
-                          <Medal className="h-6 w-6 text-amber-600" />
+                          <Medal className="h-6 w-6 text-warning" />
                         )}
                       </div>
                       <Avatar className="h-10 w-10">
@@ -187,7 +187,7 @@ export function RecognitionTab({ workspace }: RecognitionTabProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <ThumbsUp className="h-4 w-4 text-blue-500" />
+                      <ThumbsUp className="h-4 w-4 text-info" />
                       <span className="font-bold">{performer.kudosCount}</span>
                     </div>
                   </div>

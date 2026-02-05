@@ -197,11 +197,11 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
   const getInvitationStatusBadge = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><ClockIcon className="w-3 h-3 mr-1" />Pending</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/20 text-yellow-800"><ClockIcon className="w-3 h-3 mr-1" />Pending</span>;
       case 'ACCEPTED':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircleIcon className="w-3 h-3 mr-1" />Accepted</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success"><CheckCircleIcon className="w-3 h-3 mr-1" />Accepted</span>;
       case 'EXPIRED':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><ExclamationTriangleIcon className="w-3 h-3 mr-1" />Expired</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-destructive/20 text-red-800"><ExclamationTriangleIcon className="w-3 h-3 mr-1" />Expired</span>;
       default:
         return null;
     }
@@ -241,7 +241,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                   <textarea id="message" rows={3} value={singleInvitation.customMessage} onChange={(e) => setSingleInvitation({ ...singleInvitation, customMessage: e.target.value })} className="mt-1 block w-full border-border bg-background text-foreground rounded-md shadow-sm focus:ring-primary focus:border-primary" placeholder="Add a personal message..." />
                 </div>
                 <div className="flex justify-end">
-                  <button type="submit" disabled={singleInviteMutation.isPending} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 disabled:opacity-50">
+                  <button type="submit" disabled={singleInviteMutation.isPending} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50">
                     {singleInviteMutation.isPending ? <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> : <PaperAirplaneIcon className="w-4 h-4 mr-2" />}
                     Send Invitation
                   </button>
@@ -284,7 +284,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                   <EyeIcon className="w-4 h-4 mr-2" />{showPreview ? 'Hide' : 'Show'} Preview
                 </button>
               </div>
-              {errors.length > 0 && <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md"><h4 className="text-sm font-medium text-red-800 mb-2">Errors found:</h4><ul className="text-sm text-red-600 space-y-1">{errors.map((error, index) => <li key={index}>• {error}</li>)}</ul></div>}
+              {errors.length > 0 && <div className="mb-4 p-4 bg-destructive/10 border border-red-200 rounded-md"><h4 className="text-sm font-medium text-red-800 mb-2">Errors found:</h4><ul className="text-sm text-destructive space-y-1">{errors.map((error, index) => <li key={index}>• {error}</li>)}</ul></div>}
               {showPreview && (
                 <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                   {bulkInvitations.map((invitation, index) => (
@@ -307,7 +307,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                 </div>
                 <div className="flex justify-end space-x-3">
                   <button onClick={() => { setBulkInvitations([]); setCsvFile(null); setShowPreview(false); }} className="px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50">Clear All</button>
-                  <button onClick={handleBulkInvite} disabled={bulkInviteMutation.isPending || bulkInvitations.length === 0} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 disabled:opacity-50">
+                  <button onClick={handleBulkInvite} disabled={bulkInviteMutation.isPending || bulkInvitations.length === 0} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50">
                     {bulkInviteMutation.isPending ? <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> : <PaperAirplaneIcon className="w-4 h-4 mr-2" />}
                     Send {bulkInvitations.length} Invitations
                   </button>
@@ -327,7 +327,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
                     <span className="font-medium text-foreground">{invitation.email}</span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{getWorkspaceRoleLabel(invitation.role)}</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info/20 text-blue-800">{getWorkspaceRoleLabel(invitation.role)}</span>
                     {getInvitationStatusBadge(invitation.status)}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">Invited by {invitation.invitedBy.name} on {new Date(invitation.invitedAt).toLocaleDateString()}</p>

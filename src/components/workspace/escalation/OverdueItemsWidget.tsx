@@ -37,21 +37,21 @@ export function OverdueItemsWidget({
     switch (status) {
       case 'on_track':
         return (
-          <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+          <Badge className="bg-success/10 text-success border-success/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             On Track
           </Badge>
         );
       case 'at_risk':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+          <Badge className="bg-warning/10 text-warning border-warning/20">
             <AlertCircle className="h-3 w-3 mr-1" />
             At Risk
           </Badge>
         );
       case 'breached':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/20">
+          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
             <XCircle className="h-3 w-3 mr-1" />
             Breached
           </Badge>
@@ -73,11 +73,11 @@ export function OverdueItemsWidget({
     switch (priority.toLowerCase()) {
       case 'critical':
       case 'urgent':
-        return 'text-red-600';
+        return 'text-destructive';
       case 'high':
         return 'text-orange-600';
       case 'medium':
-        return 'text-yellow-600';
+        return 'text-warning';
       default:
         return 'text-muted-foreground';
     }
@@ -101,7 +101,7 @@ export function OverdueItemsWidget({
         {/* Compact header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <AlertTriangle className="h-4 w-4 text-warning" />
             <span className="font-medium text-sm">Overdue Items</span>
             {stats.totalOverdue > 0 && (
               <Badge variant="destructive" className="text-xs">
@@ -150,15 +150,15 @@ export function OverdueItemsWidget({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/10">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <div className="p-2 rounded-lg bg-warning/10">
+              <AlertTriangle className="h-5 w-5 text-warning" />
             </div>
             <div>
               <CardTitle className="text-lg">Overdue Items</CardTitle>
               <CardDescription>
                 {stats.totalOverdue} items need attention
                 {stats.needingEscalation > 0 && (
-                  <span className="text-amber-600"> • {stats.needingEscalation} ready for escalation</span>
+                  <span className="text-warning"> • {stats.needingEscalation} ready for escalation</span>
                 )}
               </CardDescription>
             </div>
@@ -195,7 +195,7 @@ export function OverdueItemsWidget({
       <CardContent>
         {overdueItems.length === 0 ? (
           <div className="text-center py-8">
-            <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-3" />
+            <CheckCircle2 className="h-10 w-10 text-success mx-auto mb-3" />
             <p className="text-muted-foreground">All caught up!</p>
             <p className="text-sm text-muted-foreground mt-1">
               No overdue items requiring attention
@@ -234,7 +234,7 @@ export function OverdueItemsWidget({
                             {item.priority} priority
                           </span>
                           <span>•</span>
-                          <span className="text-red-600 font-medium">
+                          <span className="text-destructive font-medium">
                             {formatOverdueTime(item.overdueByHours)} overdue
                           </span>
                           {item.assigneeName && (

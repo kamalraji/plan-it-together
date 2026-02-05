@@ -92,11 +92,11 @@ export function LeaderboardPreview({ workspaceId, eventId }: LeaderboardPreviewP
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-500" />;
+        return <Trophy className="h-5 w-5 text-warning" />;
       case 2:
         return <Medal className="h-5 w-5 text-muted-foreground" />;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <Award className="h-5 w-5 text-warning" />;
       default:
         return <span className="w-5 h-5 flex items-center justify-center text-sm font-bold text-muted-foreground">{rank}</span>;
     }

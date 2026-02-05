@@ -42,8 +42,8 @@ export const DelegatedSettingsAlert: React.FC<DelegatedSettingsAlertProps> = ({
   const workspaces = Object.values(groupedByWorkspace);
 
   return (
-    <Alert variant="destructive" className="border-yellow-500/50 bg-yellow-500/10">
-      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+    <Alert variant="destructive" className="border-warning/50 bg-warning/10">
+      <AlertTriangle className="h-4 w-4 text-warning" />
       <AlertTitle className="text-yellow-700 dark:text-yellow-400">
         Delegated Settings Incomplete
       </AlertTitle>

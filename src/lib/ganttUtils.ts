@@ -245,17 +245,17 @@ export function getDaysFromStart(date: Date, timelineStart: Date): number {
 
 // Priority colors for Gantt bars
 export const GANTT_PRIORITY_COLORS = {
-  URGENT: 'bg-red-500',
+  URGENT: 'bg-destructive',
   HIGH: 'bg-orange-500',
-  MEDIUM: 'bg-blue-500',
-  LOW: 'bg-green-500',
+  MEDIUM: 'bg-info',
+  LOW: 'bg-success',
 };
 
 // Status colors for Gantt bars
 export const GANTT_STATUS_COLORS = {
   NOT_STARTED: 'bg-slate-400',
-  IN_PROGRESS: 'bg-blue-500',
-  REVIEW_REQUIRED: 'bg-amber-500',
+  IN_PROGRESS: 'bg-info',
+  REVIEW_REQUIRED: 'bg-warning',
   COMPLETED: 'bg-emerald-500',
-  BLOCKED: 'bg-red-500',
+  BLOCKED: 'bg-destructive',
 };

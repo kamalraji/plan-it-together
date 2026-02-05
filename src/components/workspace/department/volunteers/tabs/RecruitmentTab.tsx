@@ -67,7 +67,7 @@ export function RecruitmentTab({ workspace }: RecruitmentTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-xs text-muted-foreground">Pending Review</div>
           </CardContent>
         </Card>
@@ -85,7 +85,7 @@ export function RecruitmentTab({ workspace }: RecruitmentTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.acceptanceRate}%</div>
+            <div className="text-2xl font-bold text-info">{stats.acceptanceRate}%</div>
             <div className="text-xs text-muted-foreground">Acceptance Rate</div>
           </CardContent>
         </Card>
@@ -189,7 +189,7 @@ export function RecruitmentTab({ workspace }: RecruitmentTabProps) {
                               className={
                                 application.status === 'approved' 
                                   ? 'border-emerald-500/30 text-emerald-600' 
-                                  : 'border-red-500/30 text-red-600'
+                                  : 'border-destructive/30 text-destructive'
                               }
                             >
                               {application.status === 'approved' ? 'Approved' : 'Rejected'}

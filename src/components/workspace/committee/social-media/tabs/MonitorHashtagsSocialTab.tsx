@@ -25,8 +25,8 @@ const CATEGORIES = [
 
 const TREND_ICONS = {
   trending: { icon: TrendingUp, color: 'text-emerald-500' },
-  stable: { icon: Minus, color: 'text-amber-500' },
-  declining: { icon: TrendingDown, color: 'text-red-500' },
+  stable: { icon: Minus, color: 'text-warning' },
+  declining: { icon: TrendingDown, color: 'text-destructive' },
 };
 
 export function MonitorHashtagsSocialTab({ workspaceId }: MonitorHashtagsSocialTabProps) {
@@ -198,7 +198,7 @@ export function MonitorHashtagsSocialTab({ workspaceId }: MonitorHashtagsSocialT
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <Star className="h-4 w-4 text-amber-500" />
+                <Star className="h-4 w-4 text-warning" />
                 Primary Hashtags
               </CardTitle>
               <Button variant="outline" size="sm" onClick={copyAllHashtags} className="gap-2">
@@ -242,7 +242,7 @@ export function MonitorHashtagsSocialTab({ workspaceId }: MonitorHashtagsSocialT
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">
+            <div className="text-2xl font-bold text-warning">
               {primaryHashtags.length}
             </div>
             <p className="text-sm text-muted-foreground">Primary Tags</p>
@@ -311,7 +311,7 @@ export function MonitorHashtagsSocialTab({ workspaceId }: MonitorHashtagsSocialT
                   <TableRow key={hashtag.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {hashtag.is_primary && <Star className="h-3.5 w-3.5 text-amber-500" />}
+                        {hashtag.is_primary && <Star className="h-3.5 w-3.5 text-warning" />}
                         <span className="font-medium">#{hashtag.tag}</span>
                       </div>
                     </TableCell>
@@ -337,7 +337,7 @@ export function MonitorHashtagsSocialTab({ workspaceId }: MonitorHashtagsSocialT
                           onClick={() => handleTogglePrimary(hashtag)}
                           title={hashtag.is_primary ? 'Remove from primary' : 'Add to primary'}
                         >
-                          <Star className={`h-3.5 w-3.5 ${hashtag.is_primary ? 'fill-amber-500 text-amber-500' : ''}`} />
+                          <Star className={`h-3.5 w-3.5 ${hashtag.is_primary ? 'fill-amber-500 text-warning' : ''}`} />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => copyHashtag(hashtag.tag)}>
                           <Copy className="h-3.5 w-3.5" />

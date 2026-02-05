@@ -133,10 +133,10 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
 
   const getStatusBadge = (status: string) => {
     const config = {
-      'pending': { class: 'bg-amber-500/10 text-amber-600 border-amber-500/20', label: 'Pending' },
+      'pending': { class: 'bg-warning/10 text-warning border-warning/20', label: 'Pending' },
       'checked-in': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Checked In' },
       'late': { class: 'bg-orange-500/10 text-orange-600 border-orange-500/20', label: 'Late' },
-      'no-show': { class: 'bg-red-500/10 text-red-600 border-red-500/20', label: 'No Show' },
+      'no-show': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'No Show' },
     };
     const { class: className, label } = config[status as keyof typeof config] || config.pending;
     return <Badge variant="outline" className={className}>{label}</Badge>;
@@ -175,8 +175,8 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Users className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Users className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{volunteers.length}</p>
@@ -201,8 +201,8 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{pendingCount}</p>
@@ -287,7 +287,7 @@ export function VolunteerCheckInTab({ workspaceId }: VolunteerCheckInTabProps) {
                     'flex items-center justify-between p-4 rounded-lg border transition-colors',
                     volunteer.status === 'checked-in' && 'bg-emerald-50/50 border-emerald-200',
                     volunteer.status === 'pending' && 'hover:bg-muted/50',
-                    volunteer.status === 'no-show' && 'bg-red-50/50 border-red-200'
+                    volunteer.status === 'no-show' && 'bg-destructive/10/50 border-red-200'
                   )}
                 >
                   <div className="flex items-center gap-4">

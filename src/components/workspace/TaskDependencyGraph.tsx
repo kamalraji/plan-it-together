@@ -60,15 +60,15 @@ export function TaskDependencyGraph({
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.COMPLETED:
-        return { bg: 'fill-green-100', border: 'stroke-green-500', text: 'text-green-700' };
+        return { bg: 'fill-green-100', border: 'stroke-green-500', text: 'text-success' };
       case TaskStatus.IN_PROGRESS:
-        return { bg: 'fill-blue-100', border: 'stroke-blue-500', text: 'text-blue-700' };
+        return { bg: 'fill-blue-100', border: 'stroke-blue-500', text: 'text-info' };
       case TaskStatus.BLOCKED:
-        return { bg: 'fill-red-100', border: 'stroke-red-500', text: 'text-red-700' };
+        return { bg: 'fill-red-100', border: 'stroke-red-500', text: 'text-destructive' };
       case TaskStatus.REVIEW_REQUIRED:
         return { bg: 'fill-amber-100', border: 'stroke-amber-500', text: 'text-amber-700' };
       default:
-        return { bg: 'fill-gray-100', border: 'stroke-gray-400', text: 'text-gray-700' };
+        return { bg: 'fill-gray-100', border: 'stroke-gray-400', text: 'text-foreground' };
     }
   };
 
@@ -217,15 +217,15 @@ export function TaskDependencyGraph({
       {/* Legend */}
       <div className="absolute bottom-3 left-3 z-10 flex flex-wrap gap-2 bg-background/80 backdrop-blur-sm rounded-lg border border-border p-2 text-xs">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
+          <div className="w-3 h-3 rounded-full bg-success" />
           <span>Completed</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-blue-500" />
+          <div className="w-3 h-3 rounded-full bg-info" />
           <span>In Progress</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-red-500" />
+          <div className="w-3 h-3 rounded-full bg-destructive" />
           <span>Blocked</span>
         </div>
         <div className="flex items-center gap-1">

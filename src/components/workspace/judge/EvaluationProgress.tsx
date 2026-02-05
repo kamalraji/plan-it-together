@@ -145,9 +145,9 @@ export function EvaluationProgress({ workspaceId, eventId }: EvaluationProgressP
   const getPhaseStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600';
+        return 'text-success';
       case 'in_progress':
-        return 'text-blue-600';
+        return 'text-info';
       case 'upcoming':
         return 'text-muted-foreground';
       default:
@@ -212,11 +212,11 @@ export function EvaluationProgress({ workspaceId, eventId }: EvaluationProgressP
           
           <div className="relative h-4 rounded-full bg-muted overflow-hidden">
             <div 
-              className="absolute h-full bg-green-500 transition-all"
+              className="absolute h-full bg-success transition-all"
               style={{ width: `${evaluatedPercent}%` }}
             />
             <div 
-              className="absolute h-full bg-blue-500 transition-all"
+              className="absolute h-full bg-info transition-all"
               style={{ left: `${evaluatedPercent}%`, width: `${inProgressPercent}%` }}
             />
           </div>
@@ -224,11 +224,11 @@ export function EvaluationProgress({ workspaceId, eventId }: EvaluationProgressP
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="w-2 h-2 rounded-full bg-success" />
                 Evaluated ({progressData.evaluated})
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-info" />
                 In Progress ({progressData.inProgress})
               </span>
               <span className="flex items-center gap-1">
@@ -265,10 +265,10 @@ export function EvaluationProgress({ workspaceId, eventId }: EvaluationProgressP
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {phase.status === 'completed' ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className="h-4 w-4 text-success" />
                   ) : (
                     <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs ${
-                      phase.status === 'in_progress' ? 'border-blue-600 text-blue-600' : 'border-muted-foreground'
+                      phase.status === 'in_progress' ? 'border-primary text-info' : 'border-muted-foreground'
                     }`}>
                       {index + 1}
                     </span>

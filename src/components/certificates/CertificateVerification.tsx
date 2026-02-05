@@ -47,9 +47,9 @@ const typeConfig = {
   MERIT: { 
     label: 'Certificate of Merit', 
     gradient: 'from-amber-500 to-orange-500',
-    bg: 'bg-amber-500/10',
+    bg: 'bg-warning/10',
     text: 'text-amber-600 dark:text-amber-400',
-    border: 'border-amber-500/20'
+    border: 'border-warning/20'
   },
   COMPLETION: { 
     label: 'Certificate of Completion', 
@@ -61,9 +61,9 @@ const typeConfig = {
   APPRECIATION: { 
     label: 'Certificate of Appreciation', 
     gradient: 'from-blue-500 to-indigo-500',
-    bg: 'bg-blue-500/10',
+    bg: 'bg-info/10',
     text: 'text-blue-600 dark:text-blue-400',
-    border: 'border-blue-500/20'
+    border: 'border-info/20'
   },
 };
 
@@ -263,12 +263,12 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                 {/* Success Banner */}
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-6 text-white">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center">
                       <CheckCircle2 className="w-8 h-8" />
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold mb-1">Certificate Verified</h2>
-                      <p className="text-white/80">This certificate is authentic and valid</p>
+                      <p className="text-primary-foreground/80">This certificate is authentic and valid</p>
                     </div>
                   </div>
                 </div>
@@ -391,12 +391,12 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                 {/* Error Banner */}
                 <div className="bg-gradient-to-r from-red-500 to-rose-500 p-6 text-white">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center">
                       <XCircle className="w-8 h-8" />
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold mb-1">Verification Failed</h2>
-                      <p className="text-white/80">
+                      <p className="text-primary-foreground/80">
                         {verificationResult.error || 'This certificate could not be verified'}
                       </p>
                     </div>

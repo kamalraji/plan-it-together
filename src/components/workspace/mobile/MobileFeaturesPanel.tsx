@@ -165,11 +165,11 @@ export function MobileFeaturesPanel({
   const getLocationStatusIcon = () => {
     switch (locationStatus) {
       case 'requesting':
-        return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>;
+        return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>;
       case 'success':
-        return <CheckCircleIcon className="w-4 h-4 text-green-600" />;
+        return <CheckCircleIcon className="w-4 h-4 text-success" />;
       case 'error':
-        return <ExclamationTriangleIcon className="w-4 h-4 text-red-600" />;
+        return <ExclamationTriangleIcon className="w-4 h-4 text-destructive" />;
       default:
         return <MapPinIcon className="w-4 h-4 text-muted-foreground" />;
     }
@@ -178,7 +178,7 @@ export function MobileFeaturesPanel({
   return (
     <div className="bg-card rounded-lg shadow-sm p-4 space-y-4">
       <div className="flex items-center space-x-2">
-        <InformationCircleIcon className="w-5 h-5 text-blue-600" />
+        <InformationCircleIcon className="w-5 h-5 text-info" />
         <h3 className="text-sm font-medium text-foreground">Mobile Features</h3>
       </div>
 
@@ -199,19 +199,19 @@ export function MobileFeaturesPanel({
         </div>
 
         {currentLocation && (
-          <div className="p-2 bg-green-50 rounded-md">
-            <p className="text-xs text-green-700">
+          <div className="p-2 bg-success/10 rounded-md">
+            <p className="text-xs text-success">
               <strong>Location:</strong> {formatLocation(currentLocation)}
             </p>
-            <p className="text-xs text-green-600">
+            <p className="text-xs text-success">
               Accuracy: ±{Math.round(currentLocation.accuracy)}m
             </p>
           </div>
         )}
 
         {locationStatus === 'error' && (
-          <div className="p-2 bg-red-50 rounded-md">
-            <p className="text-xs text-red-700">
+          <div className="p-2 bg-destructive/10 rounded-md">
+            <p className="text-xs text-destructive">
               Failed to get location. Please check permissions and try again.
             </p>
           </div>
@@ -241,7 +241,7 @@ export function MobileFeaturesPanel({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <MicrophoneIcon className={`w-4 h-4 ${isRecording ? 'text-red-600' : 'text-muted-foreground'}`} />
+            <MicrophoneIcon className={`w-4 h-4 ${isRecording ? 'text-destructive' : 'text-muted-foreground'}`} />
             <span className="text-sm text-foreground">Voice Recording</span>
           </div>
           <button
@@ -252,7 +252,7 @@ export function MobileFeaturesPanel({
             onMouseLeave={stopVoiceRecording}
             className={`px-3 py-1 rounded-md text-xs font-medium ${
               isRecording 
-                ? 'bg-red-100 text-red-700' 
+                ? 'bg-destructive/20 text-destructive' 
                 : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
             }`}
           >
@@ -261,10 +261,10 @@ export function MobileFeaturesPanel({
         </div>
 
         {isRecording && (
-          <div className="p-2 bg-red-50 rounded-md">
+          <div className="p-2 bg-destructive/10 rounded-md">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-red-700 font-medium">
+              <div className="w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
+              <span className="text-xs text-destructive font-medium">
                 Recording: {formatRecordingTime(recordingTime)}
               </span>
             </div>
@@ -281,7 +281,7 @@ export function MobileFeaturesPanel({
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${
-              'geolocation' in navigator ? 'bg-green-500' : 'bg-red-500'
+              'geolocation' in navigator ? 'bg-success' : 'bg-destructive'
             }`}></div>
             <span className="text-xs text-muted-foreground">
               Location Services: {'geolocation' in navigator ? 'Available' : 'Not Available'}
@@ -290,7 +290,7 @@ export function MobileFeaturesPanel({
           
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${
-              'mediaDevices' in navigator ? 'bg-green-500' : 'bg-red-500'
+              'mediaDevices' in navigator ? 'bg-success' : 'bg-destructive'
             }`}></div>
             <span className="text-xs text-muted-foreground">
               Camera/Microphone: {'mediaDevices' in navigator ? 'Available' : 'Not Available'}

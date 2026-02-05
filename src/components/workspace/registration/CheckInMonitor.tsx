@@ -86,14 +86,14 @@ export function CheckInMonitor({ workspaceId: _workspaceId }: CheckInMonitorProp
             <p className="text-xs text-muted-foreground mt-1">Last hour</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/40 text-center">
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-blue-600">
+            <div className="flex items-center justify-center gap-1 text-lg font-bold text-info">
               <Zap className="w-4 h-4" />
               {checkInStats.avgCheckInTime}s
             </div>
             <p className="text-xs text-muted-foreground mt-1">Avg time</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/40 text-center">
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-violet-600">
+            <div className="flex items-center justify-center gap-1 text-lg font-bold text-primary">
               <Clock className="w-4 h-4" />
               {checkInStats.peakHour}
             </div>

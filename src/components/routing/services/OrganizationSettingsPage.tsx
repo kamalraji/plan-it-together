@@ -342,7 +342,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-info text-info'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >
@@ -371,7 +371,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.name}</p>
                       )}
                     </div>
                     <div>
@@ -389,7 +389,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         <option value="NON_PROFIT">Non-Profit</option>
                       </select>
                       {errors.category && (
-                        <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.category}</p>
                       )}
                     </div>
                   </div>
@@ -404,7 +404,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                       className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                     />
                     {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                      <p className="mt-1 text-sm text-destructive">{errors.description}</p>
                     )}
                   </div>
 
@@ -421,7 +421,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.website && (
-                        <p className="mt-1 text-sm text-red-600">{errors.website}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.website}</p>
                       )}
                     </div>
                     <div>
@@ -436,7 +436,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.email}</p>
                       )}
                     </div>
                   </div>
@@ -453,7 +453,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.phone && (
-                        <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.phone}</p>
                       )}
                     </div>
                     <div>
@@ -467,7 +467,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.city && (
-                        <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.city}</p>
                       )}
                     </div>
                     <div>
@@ -491,7 +491,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         />
                       </div>
                       {(errors.state || errors.country) && (
-                        <p className="mt-1 text-sm text-red-600">
+                        <p className="mt-1 text-sm text-destructive">
                           {errors.state || errors.country}
                         </p>
                       )}
@@ -520,7 +520,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                       <input
                         type="checkbox"
                         defaultChecked={organization.settings.allowFollowers}
-                        className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                        className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                         readOnly
                       />
                     </div>
@@ -532,7 +532,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                       <input
                         type="checkbox"
                         defaultChecked={organization.settings.memberCanCreateEvents}
-                        className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                        className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                         readOnly
                       />
                     </div>
@@ -544,7 +544,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                       <input
                         type="checkbox"
                         defaultChecked={organization.settings.emailNotifications}
-                        className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                        className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                         readOnly
                       />
                     </div>
@@ -635,7 +635,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.logo_url && (
-                        <p className="mt-1 text-sm text-red-600">{errors.logo_url}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.logo_url}</p>
                       )}
                     </div>
                     <div>
@@ -650,7 +650,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                       />
                       {errors.banner_url && (
-                        <p className="mt-1 text-sm text-red-600">{errors.banner_url}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.banner_url}</p>
                       )}
                     </div>
                   </div>
@@ -683,7 +683,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         />
                       </div>
                       {errors.primary_color && (
-                        <p className="mt-1 text-sm text-red-600">{errors.primary_color}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.primary_color}</p>
                       )}
                     </div>
                     <div>
@@ -709,7 +709,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         />
                       </div>
                       {errors.secondary_color && (
-                        <p className="mt-1 text-sm text-red-600">{errors.secondary_color}</p>
+                        <p className="mt-1 text-sm text-destructive">{errors.secondary_color}</p>
                       )}
                     </div>
                   </div>
@@ -732,7 +732,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                           className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                         />
                         {errors.seo_title && (
-                          <p className="mt-1 text-sm text-red-600">{errors.seo_title}</p>
+                          <p className="mt-1 text-sm text-destructive">{errors.seo_title}</p>
                         )}
                       </div>
                       <div>
@@ -748,7 +748,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                           className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                         />
                         {errors.seo_description && (
-                          <p className="mt-1 text-sm text-red-600">{errors.seo_description}</p>
+                          <p className="mt-1 text-sm text-destructive">{errors.seo_description}</p>
                         )}
                       </div>
                       <div>
@@ -764,7 +764,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                           className="w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                         />
                         {errors.seo_image_url && (
-                          <p className="mt-1 text-sm text-red-600">{errors.seo_image_url}</p>
+                          <p className="mt-1 text-sm text-destructive">{errors.seo_image_url}</p>
                         )}
                       </div>
                     </div>
@@ -782,7 +782,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                         <p className="text-xs text-muted-foreground mb-1 truncate">
                           {(organization.website || window.location.origin) + `/org/${organization.slug}`}
                         </p>
-                        <p className="text-sm font-medium text-blue-700 mb-1 truncate">
+                        <p className="text-sm font-medium text-info mb-1 truncate">
                           {(seoTitle || organization.seo_title || organization.name) || 'Organization title'}
                         </p>
                         <p className="text-xs text-foreground line-clamp-2">
@@ -872,7 +872,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                     <input
                       type="checkbox"
                       defaultChecked={organization.settings.requireApprovalForEvents}
-                      className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                      className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                       readOnly
                     />
                   </div>

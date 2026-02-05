@@ -118,7 +118,7 @@ export function WidgetLibrary({ onAddWidget }: WidgetLibraryProps) {
         {/* Popular Widgets */}
         <div className="mb-6">
           <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-            <Star className="h-4 w-4 text-yellow-500" />
+            <Star className="h-4 w-4 text-warning" />
             Popular Widgets
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -173,7 +173,7 @@ function WidgetCard({
       case 'communication':
         return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -186,7 +186,7 @@ function WidgetCard({
         <div className="flex items-center gap-2">
           <h4 className="font-medium text-sm">{widget.title}</h4>
           {widget.isPopular && (
-            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+            <Star className="h-3 w-3 text-warning fill-yellow-500" />
           )}
         </div>
         <p className="text-xs text-muted-foreground line-clamp-2">

@@ -193,7 +193,7 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <Truck className="h-4 w-4 text-blue-500" />
+                <Truck className="h-4 w-4 text-info" />
                 <span className="text-sm font-medium">Shipments</span>
               </div>
               <p className="text-2xl font-bold">{stats.shipments.total}</p>
@@ -203,7 +203,7 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <Package className="h-4 w-4 text-amber-500" />
+                <Package className="h-4 w-4 text-warning" />
                 <span className="text-sm font-medium">Equipment</span>
               </div>
               <p className="text-2xl font-bold">{stats.equipment.total}</p>
@@ -213,7 +213,7 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <Truck className="h-4 w-4 text-green-500" />
+                <Truck className="h-4 w-4 text-success" />
                 <span className="text-sm font-medium">Transports</span>
               </div>
               <p className="text-2xl font-bold">{stats.transports.total}</p>
@@ -223,7 +223,7 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <MapPin className="h-4 w-4 text-purple-500" />
+                <MapPin className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">Venues</span>
               </div>
               <p className="text-2xl font-bold">{stats.venues.total}</p>
@@ -233,7 +233,7 @@ export function GenerateReportTab({ workspaceId }: GenerateReportTabProps) {
             </div>
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <AlertTriangle className="h-4 w-4 text-destructive" />
                 <span className="text-sm font-medium">Issues</span>
               </div>
               <p className="text-2xl font-bold">{stats.issues.total}</p>

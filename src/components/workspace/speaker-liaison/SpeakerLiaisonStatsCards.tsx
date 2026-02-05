@@ -19,8 +19,8 @@ export function SpeakerLiaisonStatsCards({
       label: 'Total Speakers',
       value: totalSpeakers,
       icon: Mic,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Confirmed',
@@ -33,15 +33,15 @@ export function SpeakerLiaisonStatsCards({
       label: 'Sessions',
       value: sessionsScheduled,
       icon: Calendar,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Pending Items',
       value: pendingRequirements,
       icon: Clock,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
   ];
 

@@ -72,7 +72,7 @@ export function PageBuilderTab({ workspace }: PageBuilderTabProps) {
               </p>
             </div>
           </div>
-          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+          <Badge variant="outline" className="bg-success/10 text-success border-success/20">
             Assigned
           </Badge>
         </div>
@@ -94,10 +94,10 @@ export function PageBuilderTab({ workspace }: PageBuilderTabProps) {
         </div>
 
         {/* Info Box */}
-        <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-6">
-          <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+        <div className="flex items-start gap-3 p-4 bg-info/10 border border-info/20 rounded-lg mb-6">
+          <AlertCircle className="h-5 w-5 text-info mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-blue-600 mb-1">Collaborative Editing</p>
+            <p className="font-medium text-info mb-1">Collaborative Editing</p>
             <p className="text-muted-foreground">
               All changes made in the page builder are tracked with your workspace attribution. 
               Other team members can see who made changes and when.

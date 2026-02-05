@@ -28,15 +28,15 @@ interface TeamMemberRowProps {
 }
 
 const roleConfig = {
-  LEAD: { color: 'text-purple-500', bg: 'bg-purple-500/10', label: 'Lead' },
-  CO_LEAD: { color: 'text-indigo-500', bg: 'bg-indigo-500/10', label: 'Co-Lead' },
-  MEMBER: { color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Member' },
+  LEAD: { color: 'text-primary', bg: 'bg-primary/10', label: 'Lead' },
+  CO_LEAD: { color: 'text-primary', bg: 'bg-primary/10', label: 'Co-Lead' },
+  MEMBER: { color: 'text-info', bg: 'bg-info/10', label: 'Member' },
   VIEWER: { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Viewer' },
 } as const;
 
 const statusConfig = {
-  ACTIVE: { color: 'text-green-500', bg: 'bg-green-500/10', label: 'Active' },
-  INVITED: { color: 'text-yellow-500', bg: 'bg-yellow-500/10', label: 'Invited' },
+  ACTIVE: { color: 'text-success', bg: 'bg-success/10', label: 'Active' },
+  INVITED: { color: 'text-warning', bg: 'bg-warning/10', label: 'Invited' },
   INACTIVE: { color: 'text-muted-foreground', bg: 'bg-muted', label: 'Inactive' },
 } as const;
 

@@ -174,14 +174,14 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!rubric) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+      <div className="bg-warning/10 border border-yellow-200 rounded-md p-4">
         <p className="text-yellow-800">No rubric has been created for this event yet.</p>
       </div>
     );
@@ -189,7 +189,7 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
 
   if (submissions.length === 0) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+      <div className="bg-info/10 border border-blue-200 rounded-md p-4">
         <p className="text-blue-800">No submissions have been assigned to you for judging.</p>
       </div>
     );
@@ -282,21 +282,21 @@ const JudgeScoring: React.FC<JudgeScoringProps> = ({ eventId, judgeId }) => {
               </h3>
               <div className="text-right">
                 <div className="text-sm text-muted-foreground">Total Score</div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-info">
                   {calculateTotalScore().toFixed(1)}%
                 </div>
               </div>
             </div>
 
             {error && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="mb-4 p-4 bg-destructive/10 border border-red-200 rounded-md">
                 <p className="text-red-800">{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
-                <p className="text-green-800">{success}</p>
+              <div className="mb-4 p-4 bg-success/10 border border-green-200 rounded-md">
+                <p className="text-success">{success}</p>
               </div>
             )}
 

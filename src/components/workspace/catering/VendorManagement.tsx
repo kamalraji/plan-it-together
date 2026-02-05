@@ -51,14 +51,14 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
   const vendorTypeConfig = {
     caterer: { label: 'Caterer', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
     bakery: { label: 'Bakery', color: 'text-pink-500', bgColor: 'bg-pink-500/10' },
-    beverage: { label: 'Beverage', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-    specialty: { label: 'Specialty', color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+    beverage: { label: 'Beverage', color: 'text-info', bgColor: 'bg-info/10' },
+    specialty: { label: 'Specialty', color: 'text-primary', bgColor: 'bg-primary/10' },
   };
 
   const statusConfig = {
-    confirmed: { label: 'Confirmed', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
-    pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-    contacted: { label: 'Contacted', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
+    confirmed: { label: 'Confirmed', color: 'bg-success/10 text-success border-success/20' },
+    pending: { label: 'Pending', color: 'bg-warning/10 text-warning border-warning/20' },
+    contacted: { label: 'Contacted', color: 'bg-info/10 text-info border-info/20' },
   };
 
   const handleSubmit = async () => {
@@ -285,7 +285,7 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
                       <Badge variant="secondary" className="text-xs">{typeConfig.label}</Badge>
                       {Number(vendor.rating) > 0 && (
                         <span className="flex items-center text-xs text-muted-foreground">
-                          <Star className="h-3 w-3 text-amber-500 mr-1" />
+                          <Star className="h-3 w-3 text-warning mr-1" />
                           {vendor.rating}
                         </span>
                       )}
@@ -298,7 +298,7 @@ export function VendorManagement({ workspaceId }: VendorManagementProps) {
                 <div className="flex gap-1">
                   {vendor.status !== 'confirmed' && (
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => confirmVendor(vendor.id)}>
-                      <Check className="h-4 w-4 text-green-500" />
+                      <Check className="h-4 w-4 text-success" />
                     </Button>
                   )}
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(vendor)}>

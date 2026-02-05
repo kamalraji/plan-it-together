@@ -114,7 +114,7 @@ export function ScoringRubricManager({ workspaceId }: ScoringRubricManagerProps)
                   aria-label={rubric.isActive ? 'Deactivate rubric' : 'Activate rubric'}
                 >
                   {rubric.isActive ? (
-                    <ToggleRight className="h-4 w-4 text-green-600" />
+                    <ToggleRight className="h-4 w-4 text-success" />
                   ) : (
                     <ToggleLeft className="h-4 w-4 text-muted-foreground" />
                   )}

@@ -75,13 +75,13 @@ export function EquipmentManager({ workspaceId }: EquipmentManagerProps) {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'available':
-        return { label: 'Available', variant: 'default' as const, icon: CheckCircle, color: 'text-green-600' };
+        return { label: 'Available', variant: 'default' as const, icon: CheckCircle, color: 'text-success' };
       case 'in_use':
-        return { label: 'In Use', variant: 'secondary' as const, icon: Clock, color: 'text-blue-600' };
+        return { label: 'In Use', variant: 'secondary' as const, icon: Clock, color: 'text-info' };
       case 'maintenance':
-        return { label: 'Maintenance', variant: 'destructive' as const, icon: AlertTriangle, color: 'text-amber-600' };
+        return { label: 'Maintenance', variant: 'destructive' as const, icon: AlertTriangle, color: 'text-warning' };
       case 'reserved':
-        return { label: 'Reserved', variant: 'outline' as const, icon: Clock, color: 'text-purple-600' };
+        return { label: 'Reserved', variant: 'outline' as const, icon: Clock, color: 'text-primary' };
       default:
         return { label: status, variant: 'secondary' as const, icon: Package, color: 'text-muted-foreground' };
     }

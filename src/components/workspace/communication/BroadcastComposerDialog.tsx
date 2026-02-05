@@ -221,14 +221,14 @@ export function BroadcastComposerDialog({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="important" id="important" />
                   <Label htmlFor="important" className="cursor-pointer flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3 text-amber-500" />
+                    <AlertTriangle className="h-3 w-3 text-warning" />
                     Important
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="urgent" id="urgent" />
                   <Label htmlFor="urgent" className="cursor-pointer flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-red-500" />
+                    <Zap className="h-3 w-3 text-destructive" />
                     Urgent
                   </Label>
                 </div>

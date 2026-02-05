@@ -45,9 +45,9 @@ interface OrganizationListRow {
 }
 
 const categoryColors: Record<string, string> = {
-  COMPANY: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-  COLLEGE: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-  INDUSTRY: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  COMPANY: 'bg-info/10 text-info border-info/20',
+  COLLEGE: 'bg-primary/10 text-primary border-purple-500/20',
+  INDUSTRY: 'bg-warning/10 text-warning border-warning/20',
   NON_PROFIT: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
 };
 
@@ -56,7 +56,7 @@ const VerificationIcon = ({ status }: { status: string }) => {
     return <BadgeCheck className="h-4 w-4 text-emerald-500" />;
   }
   if (status === 'PENDING') {
-    return <Clock className="h-4 w-4 text-amber-500" />;
+    return <Clock className="h-4 w-4 text-warning" />;
   }
   return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
 };

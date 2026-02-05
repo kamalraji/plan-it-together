@@ -291,7 +291,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
         <div className="bg-card shadow rounded-lg">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
               <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
             </div>
           ) : viewType === 'table' ? (
@@ -305,7 +305,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                           type="checkbox"
                           checked={selectedItems.size === paginatedData.length && paginatedData.length > 0}
                           onChange={handleSelectAll}
-                          className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                          className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                         />
                       </th>
                     )}
@@ -348,7 +348,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                             checked={selectedItems.has(item.id)}
                             onChange={() => handleSelectItem(item.id)}
                             onClick={(e) => e.stopPropagation()}
-                            className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                            className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                           />
                         </td>
                       )}
@@ -434,7 +434,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                           key={page}
                           onClick={() => setCurrentPage(page)}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === currentPage
-                              ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                              ? 'z-10 bg-primary/10 border-primary text-primary'
                               : 'bg-card border-input text-muted-foreground hover:bg-muted/50'
                             }`}
                         >

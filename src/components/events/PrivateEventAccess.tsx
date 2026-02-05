@@ -176,7 +176,7 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
         {/* Access Control (Requirements 24.2, 24.3) */}
         <div className="border-t pt-6">
           <div className="text-center mb-6">
-            <div className="text-yellow-500 text-4xl mb-3">🔒</div>
+            <div className="text-warning text-4xl mb-3">🔒</div>
             <h2 className="text-lg font-semibold text-foreground mb-2">Private Event</h2>
             <p className="text-muted-foreground text-sm">
               This is a private event. You need an invitation to access it.
@@ -221,12 +221,12 @@ export function PrivateEventAccess({ eventId: propEventId }: PrivateEventAccessP
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="mt-4 p-3 bg-destructive/10 border border-red-200 rounded-md">
               <div className="flex items-center">
                 <div className="text-red-400 text-lg mr-2">❌</div>
                 <div>
                   <h3 className="text-sm font-medium text-red-800">Access Denied</h3>
-                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                  <p className="text-sm text-destructive mt-1">{error}</p>
                 </div>
               </div>
             </div>

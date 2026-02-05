@@ -149,7 +149,7 @@ export const AnalyticsPage: React.FC = () => {
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-green-500">{stat.trend}</span>
+                  <span className="text-success">{stat.trend}</span>
                   {stat.description}
                 </p>
               </CardContent>
@@ -271,7 +271,7 @@ export const AnalyticsPage: React.FC = () => {
                 <CardContent>
                   <div className="text-2xl font-bold">4m 32s</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500">+12%</span> from last week
+                    <span className="text-success">+12%</span> from last week
                   </p>
                 </CardContent>
               </Card>
@@ -284,7 +284,7 @@ export const AnalyticsPage: React.FC = () => {
                 <CardContent>
                   <div className="text-2xl font-bold">2,456</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500">+8%</span> from last week
+                    <span className="text-success">+8%</span> from last week
                   </p>
                 </CardContent>
               </Card>
@@ -297,7 +297,7 @@ export const AnalyticsPage: React.FC = () => {
                 <CardContent>
                   <div className="text-2xl font-bold">3.2%</div>
                   <p className="text-xs text-muted-foreground">
-                    <span className="text-green-500">+0.4%</span> from last week
+                    <span className="text-success">+0.4%</span> from last week
                   </p>
                 </CardContent>
               </Card>

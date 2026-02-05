@@ -35,11 +35,11 @@ interface CommitteeSummaryData {
 }
 
 const typeConfig = {
-  marketing: { icon: Megaphone, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  marketing: { icon: Megaphone, color: 'text-info', bgColor: 'bg-info/10' },
   'social-media': { icon: Share2, color: 'text-pink-500', bgColor: 'bg-pink-500/10' },
-  sponsorship: { icon: Handshake, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
+  sponsorship: { icon: Handshake, color: 'text-warning', bgColor: 'bg-warning/10' },
   communication: { icon: MessageSquare, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  other: { icon: LayoutGrid, color: 'text-violet-500', bgColor: 'bg-violet-500/10' },
+  other: { icon: LayoutGrid, color: 'text-primary', bgColor: 'bg-primary/10' },
 };
 
 function getCommitteeType(name: string): CommitteeSummaryData['type'] {

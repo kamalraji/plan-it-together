@@ -38,9 +38,9 @@ const typeIcons = {
 };
 
 const typeColors = {
-  announcement: 'text-amber-500 bg-amber-500/10',
+  announcement: 'text-warning bg-warning/10',
   general: 'text-primary bg-primary/10',
-  private: 'text-purple-500 bg-purple-500/10',
+  private: 'text-primary bg-primary/10',
   task: 'text-emerald-500 bg-emerald-500/10',
 };
 

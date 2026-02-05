@@ -46,9 +46,9 @@ interface ContentPipelineTabProps {
 
 const PIPELINE_STAGES = [
   { id: 'draft', label: 'Draft', icon: Edit2, color: 'bg-slate-500' },
-  { id: 'review', label: 'In Review', icon: Eye, color: 'bg-purple-500' },
+  { id: 'review', label: 'In Review', icon: Eye, color: 'bg-primary' },
   { id: 'approved', label: 'Approved', icon: CheckCircle, color: 'bg-emerald-500' },
-  { id: 'scheduled', label: 'Scheduled', icon: Clock, color: 'bg-blue-500' },
+  { id: 'scheduled', label: 'Scheduled', icon: Clock, color: 'bg-info' },
   { id: 'published', label: 'Published', icon: Upload, color: 'bg-cyan-500' },
 ];
 
@@ -174,7 +174,7 @@ export function ContentPipelineTab({ workspaceId }: ContentPipelineTabProps) {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={cn('p-1.5 rounded text-white', stage.color)}>
+                      <div className={cn('p-1.5 rounded text-primary-foreground', stage.color)}>
                         <StageIcon className="h-4 w-4" />
                       </div>
                       {stage.label}
@@ -234,7 +234,7 @@ export function ContentPipelineTab({ workspaceId }: ContentPipelineTabProps) {
               return (
                 <React.Fragment key={stage.id}>
                   <div className="flex items-center gap-2">
-                    <div className={cn('p-2 rounded text-white', stage.color)}>
+                    <div className={cn('p-2 rounded text-primary-foreground', stage.color)}>
                       <StageIcon className="h-5 w-5" />
                     </div>
                     <div>

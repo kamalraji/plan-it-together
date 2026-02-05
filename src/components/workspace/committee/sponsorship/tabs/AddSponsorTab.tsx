@@ -36,16 +36,16 @@ interface AddSponsorTabProps {
 
 const tierColors: Record<string, string> = {
   platinum: 'bg-muted text-foreground border-input',
-  gold: 'bg-amber-100 text-amber-800 border-amber-300',
+  gold: 'bg-warning/20 text-amber-800 border-amber-300',
   silver: 'bg-muted text-foreground border-input',
   bronze: 'bg-orange-100 text-orange-800 border-orange-300',
 };
 
 const paymentStatusColors: Record<string, string> = {
   paid: 'bg-emerald-500/10 text-emerald-600',
-  pending: 'bg-amber-500/10 text-amber-600',
-  partial: 'bg-blue-500/10 text-blue-600',
-  overdue: 'bg-red-500/10 text-red-600',
+  pending: 'bg-warning/10 text-warning',
+  partial: 'bg-info/10 text-info',
+  overdue: 'bg-destructive/10 text-destructive',
 };
 
 export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
@@ -285,8 +285,8 @@ export function AddSponsorTab({ workspace }: AddSponsorTabProps) {
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-blue-500/10">
-                <Building2 className="h-5 w-5 text-blue-500" />
+              <div className="p-2.5 rounded-lg bg-info/10">
+                <Building2 className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{sponsors.length}</p>

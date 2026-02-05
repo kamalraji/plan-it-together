@@ -77,13 +77,13 @@ export function ContentCalendar() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        return 'bg-info/10 text-info border-info/20';
       case 'draft':
-        return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'published':
         return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
       case 'failed':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return '';
     }

@@ -50,7 +50,7 @@ export const UsernameInput: React.FC<UsernameInputProps> = ({
     }
     
     if (isAvailable === true) {
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      return <CheckCircle2 className="h-4 w-4 text-success" />;
     }
     
     if (isAvailable === false) {
@@ -81,7 +81,7 @@ export const UsernameInput: React.FC<UsernameInputProps> = ({
           className={cn(
             "pl-9 pr-10",
             displayError && "border-destructive focus-visible:ring-destructive",
-            isAvailable === true && !isCurrentUsername && "border-green-500 focus-visible:ring-green-500"
+            isAvailable === true && !isCurrentUsername && "border-success focus-visible:ring-success"
           )}
           placeholder="your_username"
           maxLength={30}
@@ -102,7 +102,7 @@ export const UsernameInput: React.FC<UsernameInputProps> = ({
         </p>
         <span className={cn(
           "text-xs tabular-nums",
-          value.length > 25 ? "text-amber-500" : "text-muted-foreground",
+          value.length > 25 ? "text-warning" : "text-muted-foreground",
           value.length >= 30 && "text-destructive"
         )}>
           {value.length}/30
@@ -125,7 +125,7 @@ export const UsernameInput: React.FC<UsernameInputProps> = ({
             </p>
           )}
           {!isChecking && isAvailable === true && (
-            <p className="text-xs text-green-600">
+            <p className="text-xs text-success">
               ✓ Username is available
             </p>
           )}

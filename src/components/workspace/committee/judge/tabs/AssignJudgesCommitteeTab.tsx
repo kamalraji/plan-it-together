@@ -48,10 +48,10 @@ const JUDGE_CATEGORIES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  invited: 'bg-yellow-500/10 text-yellow-500',
-  confirmed: 'bg-green-500/10 text-green-500',
-  declined: 'bg-red-500/10 text-red-500',
-  active: 'bg-blue-500/10 text-blue-500',
+  invited: 'bg-warning/10 text-warning',
+  confirmed: 'bg-success/10 text-success',
+  declined: 'bg-destructive/10 text-destructive',
+  active: 'bg-info/10 text-info',
 };
 
 export function AssignJudgesCommitteeTab({ workspaceId }: AssignJudgesCommitteeTabProps) {
@@ -498,9 +498,9 @@ export function AssignJudgesCommitteeTab({ workspaceId }: AssignJudgesCommitteeT
                                 onClick={() => deleteAssignment.mutate(assignment.id)}
                               >
                                 {assignment.status === 'completed' ? (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                  <CheckCircle2 className="h-5 w-5 text-success" />
                                 ) : (
-                                  <Clock className="h-5 w-5 text-yellow-500" />
+                                  <Clock className="h-5 w-5 text-warning" />
                                 )}
                               </Button>
                             ) : (

@@ -68,7 +68,7 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 text-amber-500" />
+            <GraduationCap className="h-6 w-6 text-warning" />
             Training Status
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -91,7 +91,7 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{overallProgress}%</div>
+            <div className="text-2xl font-bold text-warning">{overallProgress}%</div>
             <div className="text-xs text-muted-foreground">Overall Progress</div>
           </CardContent>
         </Card>
@@ -103,13 +103,13 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{inProgressCount}</div>
+            <div className="text-2xl font-bold text-info">{inProgressCount}</div>
             <div className="text-xs text-muted-foreground">In Progress</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-red-500/10 to-red-600/5 border-red-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">{notStartedCount}</div>
+            <div className="text-2xl font-bold text-destructive">{notStartedCount}</div>
             <div className="text-xs text-muted-foreground">Not Started</div>
           </CardContent>
         </Card>
@@ -147,7 +147,7 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">{module.name}</span>
                       {module.is_required && (
-                        <Badge variant="outline" className="text-xs border-red-500/30 text-red-600">
+                        <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">
                           Required
                         </Badge>
                       )}
@@ -225,7 +225,7 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
-                        <AvatarFallback className="text-xs bg-amber-500/10 text-amber-600">
+                        <AvatarFallback className="text-xs bg-warning/10 text-warning">
                           {volunteer.volunteerName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
@@ -250,8 +250,8 @@ export function TrainingStatusTab({ workspace }: TrainingStatusTabProps) {
                         variant="outline"
                         className={
                           status === 'completed' ? 'border-emerald-500/30 text-emerald-600' :
-                          status === 'in_progress' ? 'border-blue-500/30 text-blue-600' :
-                          'border-red-500/30 text-red-600'
+                          status === 'in_progress' ? 'border-info/30 text-info' :
+                          'border-destructive/30 text-destructive'
                         }
                       >
                         {status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}

@@ -131,9 +131,9 @@ const AdminRolesDiagramPage: React.FC = () => {
                     {Object.values(perms).map((perm, i) => (
                       <td key={i} className="text-center p-2">
                         <span className={
-                          perm === '✓' ? 'text-green-600' :
-                          perm === 'Own' ? 'text-blue-600' :
-                          perm === 'R' ? 'text-yellow-600' :
+                          perm === '✓' ? 'text-success' :
+                          perm === 'Own' ? 'text-info' :
+                          perm === 'R' ? 'text-warning' :
                           perm === '-' ? 'text-muted-foreground' :
                           'text-foreground'
                         }>
@@ -146,9 +146,9 @@ const AdminRolesDiagramPage: React.FC = () => {
               </tbody>
             </table>
             <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
-              <span><span className="text-green-600 font-semibold">✓</span> = Full CRUD</span>
-              <span><span className="text-blue-600 font-semibold">Own</span> = Own records only</span>
-              <span><span className="text-yellow-600 font-semibold">R</span> = Read only</span>
+              <span><span className="text-success font-semibold">✓</span> = Full CRUD</span>
+              <span><span className="text-info font-semibold">Own</span> = Own records only</span>
+              <span><span className="text-warning font-semibold">R</span> = Read only</span>
               <span><span className="text-muted-foreground font-semibold">-</span> = No access</span>
               <span><span className="font-semibold">*</span> = Via org membership</span>
             </div>

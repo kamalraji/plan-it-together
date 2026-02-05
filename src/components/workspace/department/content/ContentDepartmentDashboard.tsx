@@ -90,7 +90,7 @@ export function ContentDepartmentDashboard({
       <div className="bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-emerald-500/10 rounded-xl border border-border shadow-sm p-4 sm:p-6">
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
-            <FileText className="h-6 w-6 text-white" />
+            <FileText className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
@@ -112,7 +112,7 @@ export function ContentDepartmentDashboard({
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
               {pendingRequests.length > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-warning/20 text-warning rounded-full">
                   {pendingRequests.length} pending requests
                 </span>
               )}

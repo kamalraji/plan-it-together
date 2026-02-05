@@ -51,8 +51,8 @@ export function ContentCalendar({ workspaceId }: ContentCalendarProps) {
     const colors: Record<string, string> = {
       twitter: 'bg-sky-500',
       instagram: 'bg-pink-500',
-      linkedin: 'bg-blue-600',
-      facebook: 'bg-indigo-500',
+      linkedin: 'bg-primary',
+      facebook: 'bg-primary',
       blog: 'bg-emerald-500',
       general: 'bg-muted-foreground',
     };

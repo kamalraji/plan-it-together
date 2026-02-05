@@ -201,10 +201,10 @@ export function WorkspaceRoleAnalytics({ workspace }: WorkspaceRoleAnalyticsProp
                           <div
                             className={`h-2 rounded-full ${
                               completionRate >= 80
-                                ? 'bg-green-500'
+                                ? 'bg-success'
                                 : completionRate >= 50
-                                ? 'bg-amber-500'
-                                : 'bg-red-500'
+                                ? 'bg-warning'
+                                : 'bg-destructive'
                             }`}
                             style={{ width: `${completionRate}%` }}
                           />

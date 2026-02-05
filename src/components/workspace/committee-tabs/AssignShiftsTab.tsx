@@ -70,7 +70,7 @@ export function AssignShiftsTab({ workspace }: AssignShiftsTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-info">
               {shifts?.reduce((acc, s) => acc + (s.requiredVolunteers || 0), 0) || 0}
             </div>
             <div className="text-xs text-muted-foreground">Volunteers Needed</div>
@@ -78,7 +78,7 @@ export function AssignShiftsTab({ workspace }: AssignShiftsTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-amber-600">{pastShifts.length}</div>
+            <div className="text-2xl font-bold text-warning">{pastShifts.length}</div>
             <div className="text-xs text-muted-foreground">Completed</div>
           </CardContent>
         </Card>

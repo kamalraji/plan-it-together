@@ -526,7 +526,7 @@ export function AIDesignDialog({
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-500" />
+            <Sparkles className="h-5 w-5 text-primary" />
             AI Design Generator
           </DialogTitle>
           <DialogDescription>

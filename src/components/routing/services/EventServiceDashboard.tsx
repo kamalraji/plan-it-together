@@ -55,7 +55,7 @@ export const EventServiceDashboard: React.FC = () => {
         return { 
           bg: 'bg-amber-500/10 dark:bg-amber-500/20', 
           text: 'text-amber-600 dark:text-amber-400',
-          dot: 'bg-amber-500',
+          dot: 'bg-warning',
           pulse: false 
         };
       case 'ONGOING':
@@ -115,7 +115,7 @@ export const EventServiceDashboard: React.FC = () => {
           {[
             { label: 'Total Events', value: totalEvents, icon: Calendar, color: 'text-primary' },
             { label: 'Published', value: publishedEvents, icon: TrendingUp, color: 'text-emerald-500' },
-            { label: 'Drafts', value: draftEvents, icon: Clock, color: 'text-amber-500' },
+            { label: 'Drafts', value: draftEvents, icon: Clock, color: 'text-warning' },
             { label: 'Registrations', value: totalRegistrations, icon: Users, color: 'text-sky-500' },
           ].map((stat, i) => (
             <div 

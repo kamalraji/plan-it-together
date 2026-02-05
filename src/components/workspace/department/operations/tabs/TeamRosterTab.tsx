@@ -24,11 +24,11 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'OWNER':
-        return <Badge className="bg-purple-500/20 text-purple-600 border-purple-500/30">Owner</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-purple-500/30">Owner</Badge>;
       case 'MANAGER':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">Manager</Badge>;
+        return <Badge className="bg-info/20 text-info border-info/30">Manager</Badge>;
       case 'LEAD':
-        return <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30">Lead</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-warning/30">Lead</Badge>;
       case 'MEMBER':
         return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30">Member</Badge>;
       default:
@@ -98,8 +98,8 @@ export function TeamRosterTab({ workspace }: TeamRosterTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/20 rounded-full">
-                <User className="h-6 w-6 text-blue-500" />
+              <div className="p-3 bg-info/20 rounded-full">
+                <User className="h-6 w-6 text-info" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-foreground">

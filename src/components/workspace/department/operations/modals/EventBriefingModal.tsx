@@ -37,11 +37,11 @@ export function EventBriefingModal({ open, onOpenChange }: EventBriefingModalPro
   const getStatusBadge = (status: ScheduleItem['status']) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="secondary" className="bg-green-500/10 text-green-600">Completed</Badge>;
+        return <Badge variant="secondary" className="bg-success/10 text-success">Completed</Badge>;
       case 'in-progress':
-        return <Badge variant="secondary" className="bg-amber-500/10 text-amber-600">In Progress</Badge>;
+        return <Badge variant="secondary" className="bg-warning/10 text-warning">In Progress</Badge>;
       case 'upcoming':
-        return <Badge variant="secondary" className="bg-blue-500/10 text-blue-600">Upcoming</Badge>;
+        return <Badge variant="secondary" className="bg-info/10 text-info">Upcoming</Badge>;
     }
   };
 
@@ -50,7 +50,7 @@ export function EventBriefingModal({ open, onOpenChange }: EventBriefingModalPro
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-blue-500" />
+            <CalendarDays className="h-5 w-5 text-info" />
             Event Briefing - Day-of Schedule
           </DialogTitle>
         </DialogHeader>
@@ -85,12 +85,12 @@ export function EventBriefingModal({ open, onOpenChange }: EventBriefingModalPro
               <div
                 key={index}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
-                  item.status === 'in-progress' ? 'border-amber-500/50 bg-amber-500/5' : 'border-border'
+                  item.status === 'in-progress' ? 'border-warning/50 bg-warning/5' : 'border-border'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   {item.status === 'completed' ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <CheckCircle2 className="h-5 w-5 text-success" />
                   ) : (
                     <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
                   )}

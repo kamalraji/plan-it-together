@@ -43,17 +43,17 @@ interface CheckInventoryTabProps {
 }
 
 const CATEGORIES = [
-  { value: 'food', label: 'Food', color: 'text-green-500', bgColor: 'bg-green-500/10' },
-  { value: 'beverage', label: 'Beverage', color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { value: 'equipment', label: 'Equipment', color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+  { value: 'food', label: 'Food', color: 'text-success', bgColor: 'bg-success/10' },
+  { value: 'beverage', label: 'Beverage', color: 'text-info', bgColor: 'bg-info/10' },
+  { value: 'equipment', label: 'Equipment', color: 'text-primary', bgColor: 'bg-primary/10' },
   { value: 'supplies', label: 'Supplies', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
 ];
 
 const STATUS_CONFIG = {
-  adequate: { label: 'Adequate', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: Check },
-  low: { label: 'Low Stock', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: TrendingDown },
-  critical: { label: 'Critical', color: 'bg-red-500/10 text-red-600 border-red-500/20', icon: AlertTriangle },
-  ordered: { label: 'Ordered', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: RefreshCw },
+  adequate: { label: 'Adequate', color: 'bg-success/10 text-success border-success/20', icon: Check },
+  low: { label: 'Low Stock', color: 'bg-warning/10 text-warning border-warning/20', icon: TrendingDown },
+  critical: { label: 'Critical', color: 'bg-destructive/10 text-destructive border-destructive/20', icon: AlertTriangle },
+  ordered: { label: 'Ordered', color: 'bg-info/10 text-info border-info/20', icon: RefreshCw },
 };
 
 export function CheckInventoryTab({ workspaceId }: CheckInventoryTabProps) {
@@ -173,7 +173,7 @@ export function CheckInventoryTab({ workspaceId }: CheckInventoryTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Package className="h-6 w-6 text-amber-500" />
+            <Package className="h-6 w-6 text-warning" />
             Check Inventory
           </h2>
           <p className="text-muted-foreground">Manage and track inventory levels</p>
@@ -277,27 +277,27 @@ export function CheckInventoryTab({ workspaceId }: CheckInventoryTabProps) {
             <div className="text-xs text-muted-foreground">Total Items</div>
           </CardContent>
         </Card>
-        <Card className="border-green-500/20">
+        <Card className="border-success/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.adequate}</div>
+            <div className="text-2xl font-bold text-success">{stats.adequate}</div>
             <div className="text-xs text-muted-foreground">Adequate</div>
           </CardContent>
         </Card>
-        <Card className="border-amber-500/20">
+        <Card className="border-warning/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.low}</div>
+            <div className="text-2xl font-bold text-warning">{stats.low}</div>
             <div className="text-xs text-muted-foreground">Low Stock</div>
           </CardContent>
         </Card>
-        <Card className="border-red-500/20">
+        <Card className="border-destructive/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">{stats.critical}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.critical}</div>
             <div className="text-xs text-muted-foreground">Critical</div>
           </CardContent>
         </Card>
-        <Card className="border-blue-500/20">
+        <Card className="border-info/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.ordered}</div>
+            <div className="text-2xl font-bold text-info">{stats.ordered}</div>
             <div className="text-xs text-muted-foreground">Ordered</div>
           </CardContent>
         </Card>
@@ -305,9 +305,9 @@ export function CheckInventoryTab({ workspaceId }: CheckInventoryTabProps) {
 
       {/* Low Stock Alerts */}
       {alertItems.length > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
+        <Card className="border-warning/30 bg-warning/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2 text-amber-600">
+            <CardTitle className="text-base flex items-center gap-2 text-warning">
               <AlertTriangle className="h-4 w-4" />
               Low Stock Alerts ({alertItems.length})
             </CardTitle>

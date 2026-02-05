@@ -22,9 +22,9 @@ export function UpdateCredentialsTab({ workspaceId: _workspaceId }: UpdateCreden
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "valid": return <Badge className="bg-green-500/10 text-green-600 text-xs">Valid</Badge>;
-      case "expiring": return <Badge className="bg-yellow-500/10 text-yellow-600 text-xs">Expiring Soon</Badge>;
-      case "expired": return <Badge className="bg-red-500/10 text-red-600 text-xs">Expired</Badge>;
+      case "valid": return <Badge className="bg-success/10 text-success text-xs">Valid</Badge>;
+      case "expiring": return <Badge className="bg-warning/10 text-warning text-xs">Expiring Soon</Badge>;
+      case "expired": return <Badge className="bg-destructive/10 text-destructive text-xs">Expired</Badge>;
       default: return null;
     }
   };
@@ -47,21 +47,21 @@ export function UpdateCredentialsTab({ workspaceId: _workspaceId }: UpdateCreden
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Card className="border-green-500/20 bg-green-500/5">
+        <Card className="border-success/20 bg-success/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-green-600">{validCount}</div>
+            <div className="text-xl font-bold text-success">{validCount}</div>
             <p className="text-xs text-muted-foreground">Valid</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-yellow-600">{expiringCount}</div>
+            <div className="text-xl font-bold text-warning">{expiringCount}</div>
             <p className="text-xs text-muted-foreground">Expiring</p>
           </CardContent>
         </Card>
-        <Card className="border-red-500/20 bg-red-500/5">
+        <Card className="border-destructive/20 bg-destructive/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-red-600">{expiredCount}</div>
+            <div className="text-xl font-bold text-destructive">{expiredCount}</div>
             <p className="text-xs text-muted-foreground">Expired</p>
           </CardContent>
         </Card>
@@ -92,7 +92,7 @@ export function UpdateCredentialsTab({ workspaceId: _workspaceId }: UpdateCreden
                       Rotated {cred.lastRotated}
                     </span>
                     {cred.status !== "valid" && (
-                      <span className="text-xs text-yellow-600 flex items-center gap-1">
+                      <span className="text-xs text-warning flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3" />
                         Expires in {cred.expiresIn}
                       </span>

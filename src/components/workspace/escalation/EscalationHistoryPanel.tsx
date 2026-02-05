@@ -61,11 +61,11 @@ export function EscalationHistoryPanel({ workspaceId, maxItems = 20 }: Escalatio
   const getSLABadge = (status: string | null) => {
     switch (status) {
       case 'met':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-500/20">SLA Met</Badge>;
+        return <Badge className="bg-success/10 text-success border-success/20">SLA Met</Badge>;
       case 'breached':
-        return <Badge className="bg-red-500/10 text-red-600 border-red-500/20">SLA Breached</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/20">SLA Breached</Badge>;
       case 'at_risk':
-        return <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">At Risk</Badge>;
+        return <Badge className="bg-warning/10 text-warning border-warning/20">At Risk</Badge>;
       default:
         return <Badge variant="secondary">Pending</Badge>;
     }
@@ -100,8 +100,8 @@ export function EscalationHistoryPanel({ workspaceId, maxItems = 20 }: Escalatio
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-500/10">
-            <History className="h-5 w-5 text-blue-500" />
+          <div className="p-2 rounded-lg bg-info/10">
+            <History className="h-5 w-5 text-info" />
           </div>
           <div>
             <CardTitle className="text-lg">Escalation History</CardTitle>
@@ -132,8 +132,8 @@ export function EscalationHistoryPanel({ workspaceId, maxItems = 20 }: Escalatio
                   {/* Timeline dot */}
                   <div className={`absolute -left-2 top-0 w-4 h-4 rounded-full border-2 ${
                     item.resolvedAt 
-                      ? 'bg-green-500 border-green-500' 
-                      : 'bg-yellow-500 border-yellow-500'
+                      ? 'bg-success border-success' 
+                      : 'bg-warning border-warning'
                   }`} />
 
                   <div className="bg-muted/30 rounded-lg p-4">
@@ -168,8 +168,8 @@ export function EscalationHistoryPanel({ workspaceId, maxItems = 20 }: Escalatio
                     {item.resolvedAt ? (
                       <div className="mt-3 pt-3 border-t border-border">
                         <div className="flex items-center gap-2 text-sm">
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          <span className="text-green-600 font-medium">Resolved</span>
+                          <CheckCircle2 className="h-4 w-4 text-success" />
+                          <span className="text-success font-medium">Resolved</span>
                           <span className="text-muted-foreground">
                             {format(new Date(item.resolvedAt), 'MMM d, yyyy h:mm a')}
                           </span>
@@ -183,8 +183,8 @@ export function EscalationHistoryPanel({ workspaceId, maxItems = 20 }: Escalatio
                     ) : (
                       <div className="mt-3 pt-3 border-t border-border">
                         <div className="flex items-center gap-2 text-sm">
-                          <Clock className="h-4 w-4 text-yellow-500" />
-                          <span className="text-yellow-600 font-medium">Pending resolution</span>
+                          <Clock className="h-4 w-4 text-warning" />
+                          <span className="text-warning font-medium">Pending resolution</span>
                         </div>
                       </div>
                     )}

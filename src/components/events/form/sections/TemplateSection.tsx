@@ -90,11 +90,11 @@ export const TemplateSection: React.FC<TemplateSectionProps> = ({
   const getComplexityColor = (complexity: string | null) => {
     switch (complexity) {
       case 'SIMPLE':
-        return 'bg-green-500/10 text-green-600 border-green-500/20';
+        return 'bg-success/10 text-success border-success/20';
       case 'MODERATE':
-        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'COMPLEX':
-        return 'bg-red-500/10 text-red-600 border-red-500/20';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -214,7 +214,7 @@ export const TemplateSection: React.FC<TemplateSectionProps> = ({
                       </div>
 
                       {template.effectiveness && template.effectiveness > 0 && (
-                        <div className="flex items-center gap-1 text-xs text-yellow-600">
+                        <div className="flex items-center gap-1 text-xs text-warning">
                           <Star className="h-3 w-3 fill-current" />
                           <span>{template.effectiveness.toFixed(1)}</span>
                         </div>

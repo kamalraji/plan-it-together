@@ -304,10 +304,10 @@ export function IDCardDesigner({
                     }}
                   >
                     {el.type === 'qr' ? (
-                      <QrCode className="w-full h-full text-gray-800" />
+                      <QrCode className="w-full h-full text-foreground" />
                     ) : el.type === 'placeholder' && el.content === '{photo}' ? (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded">
-                        <Image className="w-6 h-6 text-gray-400" />
+                      <div className="w-full h-full bg-muted flex items-center justify-center rounded">
+                        <Image className="w-6 h-6 text-muted-foreground" />
                       </div>
                     ) : (
                       <span className="truncate">

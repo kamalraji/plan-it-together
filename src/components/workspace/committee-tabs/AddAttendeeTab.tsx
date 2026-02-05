@@ -557,11 +557,11 @@ export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
                   <div className="space-y-2">
                     <Label>Promo Code (Optional)</Label>
                     {appliedPromoCode ? (
-                      <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-md">
+                      <div className="flex items-center justify-between p-3 bg-success/10 border border-success/30 rounded-md">
                         <div className="flex items-center gap-2">
-                          <Tag className="w-4 h-4 text-green-600" />
-                          <span className="font-medium text-green-700">{appliedPromoCode.code}</span>
-                          <Badge variant="secondary" className="bg-green-500/20 text-green-700">
+                          <Tag className="w-4 h-4 text-success" />
+                          <span className="font-medium text-success">{appliedPromoCode.code}</span>
+                          <Badge variant="secondary" className="bg-success/20 text-success">
                             {formatDiscount(appliedPromoCode)}
                           </Badge>
                         </div>
@@ -612,7 +612,7 @@ export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
                         <span>₹{subtotal}</span>
                       </div>
                       {appliedPromoCode && discountAmount > 0 && (
-                        <div className="flex justify-between text-sm text-green-600">
+                        <div className="flex justify-between text-sm text-success">
                           <span>Discount ({appliedPromoCode.code})</span>
                           <span>-₹{discountAmount.toFixed(2)}</span>
                         </div>
@@ -915,7 +915,7 @@ export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
                   ) : (
                     <Badge 
                       variant={ticket.available > 20 ? 'outline' : 'secondary'} 
-                      className={ticket.available < 10 ? 'bg-amber-500/10 text-amber-600' : ''}
+                      className={ticket.available < 10 ? 'bg-warning/10 text-warning' : ''}
                     >
                       {ticket.available} left
                     </Badge>
@@ -930,7 +930,7 @@ export function AddAttendeeTab({ workspace }: AddAttendeeTabProps) {
             <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                   Recently Added
                 </CardTitle>
               </CardHeader>

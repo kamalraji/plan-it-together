@@ -179,17 +179,17 @@ export const DECISION_INFO: Record<ApprovalDecision, { label: string; icon: stri
   APPROVED: {
     label: 'Approved',
     icon: 'CheckCircle',
-    color: 'text-green-600',
+    color: 'text-success',
   },
   REJECTED: {
     label: 'Rejected',
     icon: 'XCircle',
-    color: 'text-red-600',
+    color: 'text-destructive',
   },
   DELEGATED: {
     label: 'Delegated',
     icon: 'ArrowRight',
-    color: 'text-blue-600',
+    color: 'text-info',
   },
 };
 
@@ -200,17 +200,17 @@ export const REQUEST_STATUS_INFO: Record<ApprovalRequestStatus, { label: string;
   PENDING: {
     label: 'Pending Approval',
     icon: 'Clock',
-    color: 'text-amber-600',
+    color: 'text-warning',
   },
   APPROVED: {
     label: 'Approved',
     icon: 'CheckCircle',
-    color: 'text-green-600',
+    color: 'text-success',
   },
   REJECTED: {
     label: 'Rejected',
     icon: 'XCircle',
-    color: 'text-red-600',
+    color: 'text-destructive',
   },
   EXPIRED: {
     label: 'Expired',

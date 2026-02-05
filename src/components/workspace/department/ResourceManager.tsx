@@ -159,7 +159,7 @@ export function ResourceManager({ workspaceId }: ResourceManagerProps) {
 
         {/* Alert for low availability */}
         {lowAvailability > 0 && (
-          <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-warning/10 border border-warning/20">
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <p className="text-sm text-amber-700 dark:text-amber-300">
               {lowAvailability} resource{lowAvailability > 1 ? 's' : ''} fully allocated
@@ -217,7 +217,7 @@ export function ResourceManager({ workspaceId }: ResourceManagerProps) {
                           <div 
                             className={`h-full rounded-full transition-all ${
                               utilizationPercent >= 100 ? 'bg-destructive' : 
-                              utilizationPercent >= 75 ? 'bg-amber-500' : 'bg-primary'
+                              utilizationPercent >= 75 ? 'bg-warning' : 'bg-primary'
                             }`}
                             style={{ width: `${Math.min(utilizationPercent, 100)}%` }}
                           />

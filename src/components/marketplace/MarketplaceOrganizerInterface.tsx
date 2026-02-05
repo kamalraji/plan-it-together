@@ -43,7 +43,7 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
                 onClick={() => setCurrentTab('integrated')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   currentTab === 'integrated'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-info text-info'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >
@@ -61,7 +61,7 @@ const MarketplaceOrganizerInterface: React.FC<MarketplaceOrganizerInterfaceProps
                 onClick={() => setCurrentTab(tab.id as any)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   currentTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-info text-info'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                 }`}
               >

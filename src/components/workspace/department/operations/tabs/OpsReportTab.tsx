@@ -94,7 +94,7 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Facility Checks</span>
-              <Building2 className="h-4 w-4 text-purple-500" />
+              <Building2 className="h-4 w-4 text-primary" />
             </div>
             <div className="text-2xl font-bold text-foreground">{facilityCheckPercent}%</div>
             <Progress value={facilityCheckPercent} className="h-2 mt-2" />
@@ -119,7 +119,7 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Incidents</span>
-              <AlertCircle className="h-4 w-4 text-red-500" />
+              <AlertCircle className="h-4 w-4 text-destructive" />
             </div>
             <div className="text-2xl font-bold text-foreground">{stats.incidentsOpen}</div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -135,7 +135,7 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Truck className="h-5 w-5 text-blue-500" />
+              <Truck className="h-5 w-5 text-info" />
               Logistics Summary
             </CardTitle>
           </CardHeader>
@@ -145,13 +145,13 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
                 <span className="text-sm text-foreground">Delivered</span>
                 <Badge className="bg-emerald-500/20 text-emerald-600">{stats.logisticsDelivered}</Badge>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-info/10">
                 <span className="text-sm text-foreground">In Transit</span>
-                <Badge className="bg-blue-500/20 text-blue-600">{stats.logisticsInTransit}</Badge>
+                <Badge className="bg-info/20 text-info">{stats.logisticsInTransit}</Badge>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/10">
                 <span className="text-sm text-foreground">Delayed</span>
-                <Badge className="bg-red-500/20 text-red-600">{stats.logisticsDelayed}</Badge>
+                <Badge className="bg-destructive/20 text-destructive">{stats.logisticsDelayed}</Badge>
               </div>
             </div>
           </CardContent>
@@ -161,15 +161,15 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+              <AlertCircle className="h-5 w-5 text-destructive" />
               Incident Summary
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/10">
                 <span className="text-sm text-foreground">Open Incidents</span>
-                <Badge className="bg-red-500/20 text-red-600">{stats.incidentsOpen}</Badge>
+                <Badge className="bg-destructive/20 text-destructive">{stats.incidentsOpen}</Badge>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10">
                 <span className="text-sm text-foreground">Critical</span>
@@ -188,7 +188,7 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-purple-500" />
+            <Building2 className="h-5 w-5 text-primary" />
             Facility Status Overview
           </CardTitle>
         </CardHeader>
@@ -199,14 +199,14 @@ export function OpsReportTab({ workspace }: OpsReportTabProps) {
               <div className="text-2xl font-bold text-emerald-500">{stats.facilityPassed}</div>
               <p className="text-sm text-muted-foreground">Passed</p>
             </div>
-            <div className="text-center p-4 rounded-lg bg-amber-500/10">
-              <AlertCircle className="h-8 w-8 mx-auto text-amber-500 mb-2" />
-              <div className="text-2xl font-bold text-amber-500">{stats.facilityWarnings}</div>
+            <div className="text-center p-4 rounded-lg bg-warning/10">
+              <AlertCircle className="h-8 w-8 mx-auto text-warning mb-2" />
+              <div className="text-2xl font-bold text-warning">{stats.facilityWarnings}</div>
               <p className="text-sm text-muted-foreground">Warnings</p>
             </div>
-            <div className="text-center p-4 rounded-lg bg-red-500/10">
-              <AlertCircle className="h-8 w-8 mx-auto text-red-500 mb-2" />
-              <div className="text-2xl font-bold text-red-500">{stats.facilityFailed}</div>
+            <div className="text-center p-4 rounded-lg bg-destructive/10">
+              <AlertCircle className="h-8 w-8 mx-auto text-destructive mb-2" />
+              <div className="text-2xl font-bold text-destructive">{stats.facilityFailed}</div>
               <p className="text-sm text-muted-foreground">Failed</p>
             </div>
           </div>

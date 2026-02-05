@@ -63,50 +63,50 @@ type ListType = 'events' | 'organizations';
 
 const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; color: string }> = {
   // Original categories
-  [EventCategory.HACKATHON]: { icon: Code, label: 'Hackathon', color: 'bg-violet-500/10 text-violet-600 border-violet-500/20' },
-  [EventCategory.BOOTCAMP]: { icon: GraduationCap, label: 'Bootcamp', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
-  [EventCategory.WORKSHOP]: { icon: Presentation, label: 'Workshop', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  [EventCategory.HACKATHON]: { icon: Code, label: 'Hackathon', color: 'bg-primary/10 text-primary border-violet-500/20' },
+  [EventCategory.BOOTCAMP]: { icon: GraduationCap, label: 'Bootcamp', color: 'bg-info/10 text-info border-info/20' },
+  [EventCategory.WORKSHOP]: { icon: Presentation, label: 'Workshop', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.CONFERENCE]: { icon: Mic, label: 'Conference', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
   [EventCategory.MEETUP]: { icon: Users, label: 'Meetup', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
   [EventCategory.STARTUP_PITCH]: { icon: Briefcase, label: 'Startup Pitch', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
   [EventCategory.HIRING_CHALLENGE]: { icon: Trophy, label: 'Hiring Challenge', color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20' },
   [EventCategory.WEBINAR]: { icon: Video, label: 'Webinar', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
-  [EventCategory.COMPETITION]: { icon: Award, label: 'Competition', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' },
+  [EventCategory.COMPETITION]: { icon: Award, label: 'Competition', color: 'bg-primary/10 text-primary border-primary/20' },
   [EventCategory.OTHER]: { icon: LayoutGrid, label: 'Other', color: 'bg-muted-foreground/30/10 text-muted-foreground border-gray-500/20' },
   // College/University
   [EventCategory.SEMINAR]: { icon: BookOpen, label: 'Seminar', color: 'bg-teal-500/10 text-teal-600 border-teal-500/20' },
-  [EventCategory.SYMPOSIUM]: { icon: Landmark, label: 'Symposium', color: 'bg-purple-500/10 text-purple-600 border-purple-500/20' },
+  [EventCategory.SYMPOSIUM]: { icon: Landmark, label: 'Symposium', color: 'bg-primary/10 text-primary border-purple-500/20' },
   [EventCategory.CULTURAL_FEST]: { icon: PartyPopper, label: 'Cultural Fest', color: 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20' },
-  [EventCategory.SPORTS_EVENT]: { icon: Dumbbell, label: 'Sports Event', color: 'bg-red-500/10 text-red-600 border-red-500/20' },
+  [EventCategory.SPORTS_EVENT]: { icon: Dumbbell, label: 'Sports Event', color: 'bg-destructive/10 text-destructive border-destructive/20' },
   [EventCategory.ORIENTATION]: { icon: UserCheck, label: 'Orientation', color: 'bg-sky-500/10 text-sky-600 border-sky-500/20' },
   [EventCategory.ALUMNI_MEET]: { icon: UsersRound, label: 'Alumni Meet', color: 'bg-lime-500/10 text-lime-600 border-lime-500/20' },
-  [EventCategory.CAREER_FAIR]: { icon: School, label: 'Career Fair', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
+  [EventCategory.CAREER_FAIR]: { icon: School, label: 'Career Fair', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.LECTURE]: { icon: MessageSquare, label: 'Lecture', color: 'bg-slate-500/10 text-muted-foreground border-slate-500/20' },
-  [EventCategory.QUIZ]: { icon: ShieldQuestion, label: 'Quiz', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  [EventCategory.QUIZ]: { icon: ShieldQuestion, label: 'Quiz', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.DEBATE]: { icon: Megaphone, label: 'Debate', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
   // Company
-  [EventCategory.PRODUCT_LAUNCH]: { icon: Package, label: 'Product Launch', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
+  [EventCategory.PRODUCT_LAUNCH]: { icon: Package, label: 'Product Launch', color: 'bg-info/10 text-info border-info/20' },
   [EventCategory.TOWN_HALL]: { icon: Building, label: 'Town Hall', color: 'bg-stone-500/10 text-stone-600 border-stone-500/20' },
-  [EventCategory.TEAM_BUILDING]: { icon: Handshake, label: 'Team Building', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
-  [EventCategory.TRAINING]: { icon: GraduationCap, label: 'Training', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' },
-  [EventCategory.AWARDS_CEREMONY]: { icon: Medal, label: 'Awards Ceremony', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
+  [EventCategory.TEAM_BUILDING]: { icon: Handshake, label: 'Team Building', color: 'bg-success/10 text-success border-success/20' },
+  [EventCategory.TRAINING]: { icon: GraduationCap, label: 'Training', color: 'bg-primary/10 text-primary border-primary/20' },
+  [EventCategory.AWARDS_CEREMONY]: { icon: Medal, label: 'Awards Ceremony', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.OFFSITE]: { icon: Plane, label: 'Offsite', color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20' },
-  [EventCategory.NETWORKING]: { icon: Network, label: 'Networking', color: 'bg-violet-500/10 text-violet-600 border-violet-500/20' },
+  [EventCategory.NETWORKING]: { icon: Network, label: 'Networking', color: 'bg-primary/10 text-primary border-violet-500/20' },
   // Industry
   [EventCategory.TRADE_SHOW]: { icon: Store, label: 'Trade Show', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
   [EventCategory.EXPO]: { icon: Building2, label: 'Expo', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
-  [EventCategory.SUMMIT]: { icon: Mountain, label: 'Summit', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
-  [EventCategory.PANEL_DISCUSSION]: { icon: PanelTop, label: 'Panel Discussion', color: 'bg-purple-500/10 text-purple-600 border-purple-500/20' },
+  [EventCategory.SUMMIT]: { icon: Mountain, label: 'Summit', color: 'bg-info/10 text-info border-info/20' },
+  [EventCategory.PANEL_DISCUSSION]: { icon: PanelTop, label: 'Panel Discussion', color: 'bg-primary/10 text-primary border-purple-500/20' },
   [EventCategory.DEMO_DAY]: { icon: Rocket, label: 'Demo Day', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
   // Non-Profit
   [EventCategory.FUNDRAISER]: { icon: Heart, label: 'Fundraiser', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
   [EventCategory.GALA]: { icon: Gift, label: 'Gala', color: 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20' },
-  [EventCategory.CHARITY_EVENT]: { icon: HandHeart, label: 'Charity Event', color: 'bg-red-500/10 text-red-600 border-red-500/20' },
-  [EventCategory.VOLUNTEER_DRIVE]: { icon: Hand, label: 'Volunteer Drive', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
+  [EventCategory.CHARITY_EVENT]: { icon: HandHeart, label: 'Charity Event', color: 'bg-destructive/10 text-destructive border-destructive/20' },
+  [EventCategory.VOLUNTEER_DRIVE]: { icon: Hand, label: 'Volunteer Drive', color: 'bg-success/10 text-success border-success/20' },
   [EventCategory.AWARENESS_CAMPAIGN]: { icon: Leaf, label: 'Awareness Campaign', color: 'bg-teal-500/10 text-teal-600 border-teal-500/20' },
   // General
-  [EventCategory.CONCERT]: { icon: Music, label: 'Concert', color: 'bg-violet-500/10 text-violet-600 border-violet-500/20' },
-  [EventCategory.EXHIBITION]: { icon: ImageIcon, label: 'Exhibition', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  [EventCategory.CONCERT]: { icon: Music, label: 'Concert', color: 'bg-primary/10 text-primary border-violet-500/20' },
+  [EventCategory.EXHIBITION]: { icon: ImageIcon, label: 'Exhibition', color: 'bg-warning/10 text-warning border-warning/20' },
   [EventCategory.FESTIVAL]: { icon: Tent, label: 'Festival', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
   [EventCategory.SOCIAL_GATHERING]: { icon: Coffee, label: 'Social Gathering', color: 'bg-stone-500/10 text-stone-600 border-stone-500/20' },
 };
@@ -610,10 +610,10 @@ export function ParticipantEventsPage() {
                             <span className="block text-xs font-medium text-muted-foreground uppercase">
                               {startDate.weekday}
                             </span>
-                            <span className={`block text-2xl sm:text-3xl font-bold ${isLive ? 'text-red-500' : 'text-primary'}`}>
+                            <span className={`block text-2xl sm:text-3xl font-bold ${isLive ? 'text-destructive' : 'text-primary'}`}>
                               {startDate.day}
                             </span>
-                            <span className={`block text-xs font-semibold uppercase ${isLive ? 'text-red-500/80' : 'text-primary/80'}`}>
+                            <span className={`block text-xs font-semibold uppercase ${isLive ? 'text-destructive/80' : 'text-primary/80'}`}>
                               {startDate.month}
                             </span>
                           </div>
@@ -656,7 +656,7 @@ export function ParticipantEventsPage() {
                       <div className="flex items-center justify-between mt-5 pt-4 border-t border-border/50">
                         <Badge 
                           variant={statusConfig.variant}
-                          className={`${isLive ? 'animate-pulse bg-red-500/10 text-red-600 border-red-500/30' : ''}`}
+                          className={`${isLive ? 'animate-pulse bg-destructive/10 text-destructive border-destructive/30' : ''}`}
                         >
                           <span className="flex items-center gap-1">
                             {statusConfig.icon}

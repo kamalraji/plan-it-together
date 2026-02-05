@@ -38,17 +38,17 @@ interface TrackDeliverablesTabProps {
 }
 
 const statusConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string; label: string }> = {
-  pending: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Pending' },
-  in_progress: { icon: Clock, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'In Progress' },
+  pending: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Pending' },
+  in_progress: { icon: Clock, color: 'text-info', bgColor: 'bg-info/10', label: 'In Progress' },
   completed: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Completed' },
-  overdue: { icon: AlertTriangle, color: 'text-red-500', bgColor: 'bg-red-500/10', label: 'Overdue' },
+  overdue: { icon: AlertTriangle, color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'Overdue' },
 };
 
 const priorityColors: Record<string, string> = {
   low: 'bg-muted text-foreground',
-  medium: 'bg-blue-100 text-blue-700',
+  medium: 'bg-info/20 text-info',
   high: 'bg-orange-100 text-orange-700',
-  critical: 'bg-red-100 text-red-700',
+  critical: 'bg-destructive/20 text-destructive',
 };
 
 const categoryLabels: Record<string, string> = {
@@ -401,7 +401,7 @@ export function TrackDeliverablesTab({ workspace }: TrackDeliverablesTabProps) {
                       className={cn(
                         "flex items-center justify-between p-4 rounded-lg border transition-colors",
                         deliverable.isOverdue 
-                          ? "border-red-500/30 bg-red-500/5" 
+                          ? "border-destructive/30 bg-destructive/5" 
                           : "border-border/50 hover:bg-muted/30"
                       )}
                     >
@@ -427,7 +427,7 @@ export function TrackDeliverablesTab({ workspace }: TrackDeliverablesTabProps) {
                         <div className="text-right">
                           <p className={cn(
                             "text-sm font-medium",
-                            deliverable.isOverdue ? "text-red-600" : "text-muted-foreground"
+                            deliverable.isOverdue ? "text-destructive" : "text-muted-foreground"
                           )}>
                             {getDueDateLabel(deliverable.due_date)}
                           </p>

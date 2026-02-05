@@ -101,15 +101,15 @@ export const ContributeToPublishCard: React.FC<ContributeToPublishCardProps> = (
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pass': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'fail': return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'pass': return <CheckCircle className="h-4 w-4 text-success" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      case 'fail': return <XCircle className="h-4 w-4 text-destructive" />;
       default: return <AlertTriangle className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   return (
-    <Card className="border-blue-500/20 bg-blue-500/5">
+    <Card className="border-info/20 bg-info/5">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -136,9 +136,9 @@ export const ContributeToPublishCard: React.FC<ContributeToPublishCardProps> = (
               key={key}
               className={cn(
                 'flex items-center gap-3 p-2.5 rounded-lg',
-                status === 'pass' && 'bg-green-500/10',
-                status === 'warning' && 'bg-yellow-500/10',
-                status === 'fail' && 'bg-red-500/10',
+                status === 'pass' && 'bg-success/10',
+                status === 'warning' && 'bg-warning/10',
+                status === 'fail' && 'bg-destructive/10',
               )}
             >
               <Icon className="h-4 w-4 text-muted-foreground" />

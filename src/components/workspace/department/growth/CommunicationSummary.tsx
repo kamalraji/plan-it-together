@@ -67,7 +67,7 @@ export function CommunicationSummary() {
         );
       case 'scheduled':
         return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-xs flex items-center gap-1">
+          <Badge className="bg-info/10 text-info border-info/20 text-xs flex items-center gap-1">
             <Clock className="h-3 w-3" />
             Scheduled
           </Badge>

@@ -126,7 +126,7 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
       </div>
 
       {/* Scanner Area */}
-      <div className="relative aspect-square max-h-[400px] bg-black">
+      <div className="relative aspect-square max-h-[400px] bg-foreground">
         {isStarting && !error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/90 z-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4" />
@@ -160,7 +160,7 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
             {/* Scan overlay */}
             <div className="absolute inset-0 pointer-events-none">
               {/* Semi-transparent overlay */}
-              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 bg-foreground/40" />
               {/* Clear scanning area */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56">
                 <div className="absolute inset-0 bg-transparent" style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.4)' }} />

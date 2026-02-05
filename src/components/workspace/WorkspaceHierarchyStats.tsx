@@ -164,14 +164,14 @@ export function WorkspaceHierarchyStats({
           bg: 'bg-blue-50 dark:bg-blue-900/20',
           border: 'border-blue-200 dark:border-blue-800',
           text: 'text-blue-600 dark:text-blue-400',
-          progress: 'bg-blue-500',
+          progress: 'bg-info',
         };
       case 3:
         return {
           bg: 'bg-amber-50 dark:bg-amber-900/20',
           border: 'border-amber-200 dark:border-amber-800',
           text: 'text-amber-600 dark:text-amber-400',
-          progress: 'bg-amber-500',
+          progress: 'bg-warning',
         };
       case 4:
         return {
@@ -280,16 +280,16 @@ export function WorkspaceHierarchyStats({
               {stat.taskStats.total > 0 && (
                 <div className="flex items-center gap-3 mt-2 text-[10px]">
                   <div className="flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    <CheckCircle2 className="h-3 w-3 text-success" />
                     <span>{stat.taskStats.completed} done</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-blue-500" />
+                    <Clock className="h-3 w-3 text-info" />
                     <span>{stat.taskStats.inProgress} in progress</span>
                   </div>
                   {stat.taskStats.blocked > 0 && (
                     <div className="flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3 text-red-500" />
+                      <AlertCircle className="h-3 w-3 text-destructive" />
                       <span>{stat.taskStats.blocked} blocked</span>
                     </div>
                   )}

@@ -24,25 +24,25 @@ import { format, isToday, isPast, isTomorrow } from 'date-fns';
 
 const PRIORITY_CONFIG = {
   HIGH: { label: 'High', color: 'bg-destructive/10 text-destructive border-destructive/20' },
-  MEDIUM: { label: 'Medium', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+  MEDIUM: { label: 'Medium', color: 'bg-warning/10 text-warning border-warning/20' },
   LOW: { label: 'Low', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   TODO: { label: 'To Do', color: 'bg-muted text-muted-foreground' },
   NOT_STARTED: { label: 'Not Started', color: 'bg-muted text-muted-foreground' },
-  IN_PROGRESS: { label: 'In Progress', color: 'bg-blue-500/10 text-blue-600' },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500/10 text-blue-600' },
+  IN_PROGRESS: { label: 'In Progress', color: 'bg-info/10 text-info' },
+  in_progress: { label: 'In Progress', color: 'bg-info/10 text-info' },
   DONE: { label: 'Done', color: 'bg-emerald-500/10 text-emerald-600' },
   completed: { label: 'Completed', color: 'bg-emerald-500/10 text-emerald-600' },
-  pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600' },
-  accepted: { label: 'Accepted', color: 'bg-blue-500/10 text-blue-600' },
+  pending: { label: 'Pending', color: 'bg-warning/10 text-warning' },
+  accepted: { label: 'Accepted', color: 'bg-info/10 text-info' },
 };
 
 const WORKSPACE_TYPE_COLORS: Record<string, string> = {
   ROOT: 'bg-primary/10 text-primary border-primary/20',
-  DEPARTMENT: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-  COMMITTEE: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  DEPARTMENT: 'bg-info/10 text-info border-info/20',
+  COMMITTEE: 'bg-warning/10 text-warning border-warning/20',
   TEAM: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
 };
 
@@ -53,10 +53,10 @@ function AssignmentCard({ assignment }: { assignment: MyAssignment }) {
     const date = new Date(dueDate);
     
     if (isToday(date)) {
-      return { text: 'Today', className: 'text-amber-600 bg-amber-500/10' };
+      return { text: 'Today', className: 'text-warning bg-warning/10' };
     }
     if (isTomorrow(date)) {
-      return { text: 'Tomorrow', className: 'text-blue-600 bg-blue-500/10' };
+      return { text: 'Tomorrow', className: 'text-info bg-info/10' };
     }
     if (isPast(date) && assignment.status !== 'DONE' && assignment.status !== 'completed') {
       return { text: `Overdue (${format(date, 'MMM d')})`, className: 'text-destructive bg-destructive/10' };
@@ -79,12 +79,12 @@ function AssignmentCard({ assignment }: { assignment: MyAssignment }) {
       <div className="flex items-start gap-3">
         <div className={cn(
           "p-2 rounded-lg flex-shrink-0",
-          assignment.type === 'task' ? 'bg-primary/10' : 'bg-amber-500/10'
+          assignment.type === 'task' ? 'bg-primary/10' : 'bg-warning/10'
         )}>
           {assignment.type === 'task' ? (
             <ClipboardList className="h-4 w-4 text-primary" />
           ) : (
-            <ListChecks className="h-4 w-4 text-amber-600" />
+            <ListChecks className="h-4 w-4 text-warning" />
           )}
         </div>
 

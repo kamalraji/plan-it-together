@@ -48,10 +48,10 @@ interface AdminAuditLog {
 }
 
 const severityConfig = {
-  low: { color: 'bg-blue-500/10 text-blue-700 border-blue-500/30', icon: Activity },
-  medium: { color: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/30', icon: AlertTriangle },
+  low: { color: 'bg-info/10 text-info border-info/30', icon: Activity },
+  medium: { color: 'bg-warning/10 text-warning border-warning/30', icon: AlertTriangle },
   high: { color: 'bg-orange-500/10 text-orange-700 border-orange-500/30', icon: AlertTriangle },
-  critical: { color: 'bg-red-500/10 text-red-700 border-red-500/30', icon: Ban },
+  critical: { color: 'bg-destructive/10 text-destructive border-destructive/30', icon: Ban },
 };
 
 export const SecurityAuditDashboard: React.FC = () => {
@@ -224,16 +224,16 @@ export const SecurityAuditDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-destructive/30 bg-destructive/5">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Critical/High</p>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-2xl font-bold text-destructive">
                   {stats.critical + stats.high}
                 </p>
               </div>
-              <Ban className="h-8 w-8 text-red-500/50" />
+              <Ban className="h-8 w-8 text-destructive/50" />
             </div>
           </CardContent>
         </Card>

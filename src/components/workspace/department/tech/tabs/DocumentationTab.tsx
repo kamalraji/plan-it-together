@@ -19,10 +19,10 @@ const documents = [
 ];
 
 const categories = [
-  { name: 'Infrastructure', count: 12, color: 'bg-blue-500' },
-  { name: 'Security', count: 8, color: 'bg-red-500' },
+  { name: 'Infrastructure', count: 12, color: 'bg-info' },
+  { name: 'Security', count: 8, color: 'bg-destructive' },
   { name: 'Operations', count: 15, color: 'bg-emerald-500' },
-  { name: 'HR/IT', count: 6, color: 'bg-purple-500' },
+  { name: 'HR/IT', count: 6, color: 'bg-primary' },
 ];
 
 export function DocumentationTab({ workspaceId: _workspaceId }: DocumentationTabProps) {
@@ -90,9 +90,9 @@ export function DocumentationTab({ workspaceId: _workspaceId }: DocumentationTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-amber-500" />
+              <Clock className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">3</p>
+                <p className="text-2xl font-bold text-warning">3</p>
                 <p className="text-sm text-muted-foreground">Updated This Week</p>
               </div>
             </div>
@@ -101,9 +101,9 @@ export function DocumentationTab({ workspaceId: _workspaceId }: DocumentationTab
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <FolderOpen className="h-8 w-8 text-blue-500" />
+              <FolderOpen className="h-8 w-8 text-info" />
               <div>
-                <p className="text-2xl font-bold text-blue-500">{categories.length}</p>
+                <p className="text-2xl font-bold text-info">{categories.length}</p>
                 <p className="text-sm text-muted-foreground">Categories</p>
               </div>
             </div>

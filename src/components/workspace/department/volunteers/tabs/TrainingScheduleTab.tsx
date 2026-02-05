@@ -20,17 +20,17 @@ export function TrainingScheduleTab({ workspace }: TrainingScheduleTabProps) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'virtual': return <Video className="h-4 w-4 text-blue-500" />;
+      case 'virtual': return <Video className="h-4 w-4 text-info" />;
       case 'in-person': return <MapPin className="h-4 w-4 text-emerald-500" />;
-      default: return <BookOpen className="h-4 w-4 text-purple-500" />;
+      default: return <BookOpen className="h-4 w-4 text-primary" />;
     }
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'virtual': return 'border-blue-500/30 text-blue-600';
+      case 'virtual': return 'border-info/30 text-info';
       case 'in-person': return 'border-emerald-500/30 text-emerald-600';
-      default: return 'border-purple-500/30 text-purple-600';
+      default: return 'border-purple-500/30 text-primary';
     }
   };
 
@@ -83,7 +83,7 @@ export function TrainingScheduleTab({ workspace }: TrainingScheduleTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.upcomingSessions}</div>
+            <div className="text-2xl font-bold text-info">{stats.upcomingSessions}</div>
             <div className="text-xs text-muted-foreground">Upcoming</div>
           </CardContent>
         </Card>
@@ -95,7 +95,7 @@ export function TrainingScheduleTab({ workspace }: TrainingScheduleTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.completedSessions}</div>
+            <div className="text-2xl font-bold text-primary">{stats.completedSessions}</div>
             <div className="text-xs text-muted-foreground">Completed</div>
           </CardContent>
         </Card>
@@ -140,7 +140,7 @@ export function TrainingScheduleTab({ workspace }: TrainingScheduleTabProps) {
         <Card className="border-purple-500/30">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+              <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
               In Progress
             </CardTitle>
           </CardHeader>

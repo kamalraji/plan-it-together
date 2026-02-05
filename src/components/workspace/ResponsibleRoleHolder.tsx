@@ -44,11 +44,11 @@ export function ResponsibleRoleHolder({
   const getLevelBgColor = (lvl: WorkspaceHierarchyLevel): string => {
     switch (lvl) {
       case WorkspaceHierarchyLevel.OWNER:
-        return 'bg-amber-500/10';
+        return 'bg-warning/10';
       case WorkspaceHierarchyLevel.MANAGER:
-        return 'bg-violet-500/10';
+        return 'bg-primary/10';
       case WorkspaceHierarchyLevel.LEAD:
-        return 'bg-blue-500/10';
+        return 'bg-info/10';
       case WorkspaceHierarchyLevel.COORDINATOR:
         return 'bg-emerald-500/10';
     }

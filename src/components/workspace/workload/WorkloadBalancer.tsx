@@ -36,9 +36,9 @@ export const WorkloadBalancer: React.FC<WorkloadBalancerProps> = ({
 
   const getStatusColor = (utilization: number) => {
     if (utilization > 100) return 'text-destructive';
-    if (utilization > 80) return 'text-yellow-500';
+    if (utilization > 80) return 'text-warning';
     if (utilization < 50) return 'text-muted-foreground';
-    return 'text-green-500';
+    return 'text-success';
   };
 
   const getStatusBadge = (utilization: number) => {
@@ -52,7 +52,7 @@ export const WorkloadBalancer: React.FC<WorkloadBalancerProps> = ({
     }
     if (utilization > 80) {
       return (
-        <Badge variant="secondary" className="text-xs bg-yellow-500/10 text-yellow-600">
+        <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
           At Capacity
         </Badge>
       );
@@ -151,7 +151,7 @@ export const WorkloadBalancer: React.FC<WorkloadBalancerProps> = ({
                   className={cn(
                     'h-2',
                     utilization > 100 && '[&>div]:bg-destructive',
-                    utilization > 80 && utilization <= 100 && '[&>div]:bg-yellow-500'
+                    utilization > 80 && utilization <= 100 && '[&>div]:bg-warning'
                   )}
                 />
               </div>

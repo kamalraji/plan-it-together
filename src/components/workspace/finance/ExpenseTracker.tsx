@@ -63,7 +63,7 @@ export function ExpenseTracker({ workspaceId, showApprovalActions = false }: Exp
         );
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <Badge className="bg-warning/10 text-warning border-warning/20">
             <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>

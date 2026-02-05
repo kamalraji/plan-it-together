@@ -63,8 +63,8 @@ export function InterestSelector({
   };
 
   const selectedColorClasses = {
-    coral: 'bg-coral text-white border-coral',
-    teal: 'bg-teal text-white border-teal',
+    coral: 'bg-coral text-primary-foreground border-coral',
+    teal: 'bg-teal text-primary-foreground border-teal',
     sunny: 'bg-sunny text-foreground border-sunny',
   };
 
@@ -76,7 +76,7 @@ export function InterestSelector({
         </span>
         <span className={cn(
           'font-medium',
-          selectedInterests.length >= maxSelections ? 'text-amber-500' : 'text-muted-foreground'
+          selectedInterests.length >= maxSelections ? 'text-warning' : 'text-muted-foreground'
         )}>
           {selectedInterests.length} / {maxSelections}
         </span>

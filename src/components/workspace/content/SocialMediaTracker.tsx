@@ -45,7 +45,7 @@ export function SocialMediaTracker() {
       engagement: 3.5,
       trend: 'stable',
       postsThisWeek: 5,
-      color: 'bg-blue-600',
+      color: 'bg-primary',
     },
     {
       id: 'facebook',
@@ -55,13 +55,13 @@ export function SocialMediaTracker() {
       engagement: 2.1,
       trend: 'down',
       postsThisWeek: 6,
-      color: 'bg-indigo-500',
+      color: 'bg-primary',
     },
   ];
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-emerald-500" />;
-    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-red-500" />;
+    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-destructive" />;
     return <Minus className="h-3 w-3 text-muted-foreground" />;
   };
 
@@ -89,7 +89,7 @@ export function SocialMediaTracker() {
           <div key={platform.id} className="p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-lg ${platform.color} flex items-center justify-center text-white text-sm`}>
+                <div className={`w-8 h-8 rounded-lg ${platform.color} flex items-center justify-center text-primary-foreground text-sm`}>
                   {platform.icon}
                 </div>
                 <div>

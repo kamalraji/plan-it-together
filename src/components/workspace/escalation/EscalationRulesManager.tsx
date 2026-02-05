@@ -201,8 +201,8 @@ export function EscalationRulesManager({ workspaceId }: EscalationRulesManagerPr
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/10">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <div className="p-2 rounded-lg bg-warning/10">
+              <AlertTriangle className="h-5 w-5 text-warning" />
             </div>
             <div>
               <CardTitle className="text-lg">Escalation Rules</CardTitle>

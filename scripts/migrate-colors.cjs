@@ -1,14 +1,14 @@
- #!/usr/bin/env node
- 
- /**
-  * Color Migration Script
-  * Safely migrates hardcoded Tailwind colors to semantic design tokens
-  * 
-  * Usage:
-  *   node scripts/migrate-colors.js --dry-run    # Preview changes (default)
-  *   node scripts/migrate-colors.js --apply      # Apply changes
-  *   node scripts/migrate-colors.js --report     # Generate report only
-  */
+#!/usr/bin/env node
+
+/**
+ * Color Migration Script
+ * Safely migrates hardcoded Tailwind colors to semantic design tokens
+ * 
+ * Usage:
+ *   node scripts/migrate-colors.js --dry-run    # Preview changes (default)
+ *   node scripts/migrate-colors.js --apply      # Apply changes
+ *   node scripts/migrate-colors.js --report     # Generate report only
+ */
  
  const fs = require('fs');
  const path = require('path');

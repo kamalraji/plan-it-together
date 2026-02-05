@@ -275,8 +275,8 @@ export function ImageUploader({
                       alt={bg.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="text-white text-center">
+                    <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="text-primary-foreground text-center">
                         <Image className="h-6 w-6 mx-auto mb-1" />
                         <p className="text-xs font-medium">{bg.name}</p>
                       </div>

@@ -17,7 +17,7 @@ interface AnnouncementManagerProps {
 
 const statusConfig: Record<AnnouncementStatus, { icon: typeof Edit; color: string; bgColor: string; label: string }> = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  scheduled: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Scheduled' },
+  scheduled: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Scheduled' },
   published: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Published' },
   archived: { icon: CheckCircle2, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Archived' },
 };
@@ -116,7 +116,7 @@ function AnnouncementRow({ announcement }: { announcement: Announcement }) {
             )}
           </div>
           {announcement.scheduledFor && (
-            <p className="text-xs text-amber-500 mt-1">
+            <p className="text-xs text-warning mt-1">
               Scheduled: {new Date(announcement.scheduledFor).toLocaleDateString()}
             </p>
           )}

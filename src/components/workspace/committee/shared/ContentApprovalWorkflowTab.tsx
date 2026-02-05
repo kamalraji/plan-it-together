@@ -15,19 +15,19 @@ interface ContentApprovalWorkflowTabProps {
 }
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  submitted: { label: 'Submitted', color: 'bg-blue-500', icon: Send },
-  content_review: { label: 'Content Review', color: 'bg-amber-500', icon: Users },
-  design_review: { label: 'Design Review', color: 'bg-purple-500', icon: FileText },
+  submitted: { label: 'Submitted', color: 'bg-info', icon: Send },
+  content_review: { label: 'Content Review', color: 'bg-warning', icon: Users },
+  design_review: { label: 'Design Review', color: 'bg-primary', icon: FileText },
   final_approval: { label: 'Final Approval', color: 'bg-cyan-500', icon: CheckCircle },
-  approved: { label: 'Approved', color: 'bg-green-500', icon: CheckCircle },
-  rejected: { label: 'Rejected', color: 'bg-red-500', icon: XCircle },
+  approved: { label: 'Approved', color: 'bg-success', icon: CheckCircle },
+  rejected: { label: 'Rejected', color: 'bg-destructive', icon: XCircle },
 };
 
 const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
   low: { label: 'Low', color: 'bg-slate-500' },
-  medium: { label: 'Medium', color: 'bg-blue-500' },
-  high: { label: 'High', color: 'bg-amber-500' },
-  urgent: { label: 'Urgent', color: 'bg-red-500' },
+  medium: { label: 'Medium', color: 'bg-info' },
+  high: { label: 'High', color: 'bg-warning' },
+  urgent: { label: 'Urgent', color: 'bg-destructive' },
 };
 
 export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkflowTabProps) {
@@ -63,32 +63,32 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div><p className="text-sm text-muted-foreground">Pending Review</p><p className="text-2xl font-bold text-blue-600">{pendingCount || 0}</p></div>
-              <Clock className="h-8 w-8 text-blue-500/50" />
+              <div><p className="text-sm text-muted-foreground">Pending Review</p><p className="text-2xl font-bold text-info">{pendingCount || 0}</p></div>
+              <Clock className="h-8 w-8 text-info/50" />
             </div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div><p className="text-sm text-muted-foreground">In Review</p><p className="text-2xl font-bold text-amber-600">{approvals?.filter((a: ContentApproval) => a.current_stage === 'content_review').length || 0}</p></div>
-              <Users className="h-8 w-8 text-amber-500/50" />
+              <div><p className="text-sm text-muted-foreground">In Review</p><p className="text-2xl font-bold text-warning">{approvals?.filter((a: ContentApproval) => a.current_stage === 'content_review').length || 0}</p></div>
+              <Users className="h-8 w-8 text-warning/50" />
             </div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div><p className="text-sm text-muted-foreground">Approved</p><p className="text-2xl font-bold text-green-600">{approvals?.filter((a: ContentApproval) => a.current_stage === 'approved').length || 0}</p></div>
-              <CheckCircle className="h-8 w-8 text-green-500/50" />
+              <div><p className="text-sm text-muted-foreground">Approved</p><p className="text-2xl font-bold text-success">{approvals?.filter((a: ContentApproval) => a.current_stage === 'approved').length || 0}</p></div>
+              <CheckCircle className="h-8 w-8 text-success/50" />
             </div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-red-500/10 to-red-600/5 border-red-500/20">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div><p className="text-sm text-muted-foreground">Rejected</p><p className="text-2xl font-bold text-red-600">{approvals?.filter((a: ContentApproval) => a.current_stage === 'rejected').length || 0}</p></div>
-              <XCircle className="h-8 w-8 text-red-500/50" />
+              <div><p className="text-sm text-muted-foreground">Rejected</p><p className="text-2xl font-bold text-destructive">{approvals?.filter((a: ContentApproval) => a.current_stage === 'rejected').length || 0}</p></div>
+              <XCircle className="h-8 w-8 text-destructive/50" />
             </div>
           </CardContent>
         </Card>
@@ -104,7 +104,7 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
               return (
                 <React.Fragment key={key}>
                   <div className="flex flex-col items-center gap-2">
-                    <div className={cn('w-12 h-12 rounded-full flex items-center justify-center', config.color, 'text-white')}><Icon className="h-6 w-6" /></div>
+                    <div className={cn('w-12 h-12 rounded-full flex items-center justify-center', config.color, 'text-primary-foreground')}><Icon className="h-6 w-6" /></div>
                     <span className="text-xs font-medium text-center max-w-[80px]">{config.label}</span>
                     <Badge variant="secondary" className="text-xs">{count}</Badge>
                   </div>
@@ -148,7 +148,7 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
                             <h4 className="font-medium truncate">{approval.title}</h4>
-                            <Badge variant="outline" className={cn('text-xs', priorityConfig.color, 'text-white border-0')}>{priorityConfig.label}</Badge>
+                            <Badge variant="outline" className={cn('text-xs', priorityConfig.color, 'text-primary-foreground border-0')}>{priorityConfig.label}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{approval.description || 'No description'}</p>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -157,11 +157,11 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className={cn('text-xs', stageConfig.color, 'text-white border-0')}><StageIcon className="h-3 w-3 mr-1" />{stageConfig.label}</Badge>
+                          <Badge className={cn('text-xs', stageConfig.color, 'text-primary-foreground border-0')}><StageIcon className="h-3 w-3 mr-1" />{stageConfig.label}</Badge>
                           {approval.current_stage !== 'approved' && approval.current_stage !== 'rejected' && (
                             <div className="flex items-center gap-1">
-                              <Button size="sm" variant="outline" className="h-7 text-xs text-green-600" onClick={() => openReviewDialog(approval, 'approve')}><CheckCircle className="h-3 w-3 mr-1" />Approve</Button>
-                              <Button size="sm" variant="outline" className="h-7 text-xs text-red-600" onClick={() => openReviewDialog(approval, 'reject')}><XCircle className="h-3 w-3 mr-1" />Reject</Button>
+                              <Button size="sm" variant="outline" className="h-7 text-xs text-success" onClick={() => openReviewDialog(approval, 'approve')}><CheckCircle className="h-3 w-3 mr-1" />Approve</Button>
+                              <Button size="sm" variant="outline" className="h-7 text-xs text-destructive" onClick={() => openReviewDialog(approval, 'reject')}><XCircle className="h-3 w-3 mr-1" />Reject</Button>
                             </div>
                           )}
                         </div>
@@ -177,7 +177,7 @@ export function ContentApprovalWorkflowTab({ workspaceId }: ContentApprovalWorkf
 
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle className="flex items-center gap-2">{reviewAction === 'approve' ? <><CheckCircle className="h-5 w-5 text-green-500" />Approve Content</> : <><XCircle className="h-5 w-5 text-red-500" />Reject Content</>}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="flex items-center gap-2">{reviewAction === 'approve' ? <><CheckCircle className="h-5 w-5 text-success" />Approve Content</> : <><XCircle className="h-5 w-5 text-destructive" />Reject Content</>}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             {selectedApproval && (<div className="p-3 rounded-lg bg-muted"><p className="font-medium">{selectedApproval.title}</p><p className="text-sm text-muted-foreground">{selectedApproval.description}</p></div>)}
             <div><label className="text-sm font-medium mb-2 block">Review Notes</label><Textarea placeholder="Add your review notes..." value={reviewNotes} onChange={(e) => setReviewNotes(e.target.value)} rows={4} /></div>

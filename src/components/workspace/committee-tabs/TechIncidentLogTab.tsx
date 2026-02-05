@@ -26,17 +26,17 @@ const INCIDENT_TYPES = [
 ];
 
 const SEVERITY_CONFIG = {
-  critical: { color: 'bg-red-500/20 text-red-600 border-red-500/30', icon: '🔴' },
+  critical: { color: 'bg-destructive/20 text-destructive border-destructive/30', icon: '🔴' },
   high: { color: 'bg-orange-500/20 text-orange-600 border-orange-500/30', icon: '🟠' },
-  medium: { color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30', icon: '🟡' },
-  low: { color: 'bg-green-500/20 text-green-600 border-green-500/30', icon: '🟢' },
+  medium: { color: 'bg-warning/20 text-warning border-warning/30', icon: '🟡' },
+  low: { color: 'bg-success/20 text-success border-success/30', icon: '🟢' },
 };
 
 const STATUS_CONFIG = {
-  open: { color: 'bg-red-500/20 text-red-600', label: 'Open' },
-  investigating: { color: 'bg-yellow-500/20 text-yellow-600', label: 'Investigating' },
-  resolved: { color: 'bg-blue-500/20 text-blue-600', label: 'Resolved' },
-  closed: { color: 'bg-green-500/20 text-green-600', label: 'Closed' },
+  open: { color: 'bg-destructive/20 text-destructive', label: 'Open' },
+  investigating: { color: 'bg-warning/20 text-warning', label: 'Investigating' },
+  resolved: { color: 'bg-info/20 text-info', label: 'Resolved' },
+  closed: { color: 'bg-success/20 text-success', label: 'Closed' },
 };
 
 export function TechIncidentLogTab({ workspaceId }: TechIncidentLogTabProps) {
@@ -213,9 +213,9 @@ export function TechIncidentLogTab({ workspaceId }: TechIncidentLogTabProps) {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-red-600">{stats.open}</p>
+            <p className="text-2xl font-bold text-destructive">{stats.open}</p>
             <p className="text-xs text-muted-foreground">Open</p>
           </CardContent>
         </Card>
@@ -225,21 +225,21 @@ export function TechIncidentLogTab({ workspaceId }: TechIncidentLogTabProps) {
             <p className="text-xs text-muted-foreground">Critical</p>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-500/10 border-yellow-500/20">
+        <Card className="bg-warning/10 border-warning/20">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-yellow-600">{stats.needsRCA}</p>
+            <p className="text-2xl font-bold text-warning">{stats.needsRCA}</p>
             <p className="text-xs text-muted-foreground">Needs RCA</p>
           </CardContent>
         </Card>
-        <Card className="bg-blue-500/10 border-blue-500/20">
+        <Card className="bg-info/10 border-info/20">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-blue-600">{stats.pendingReview}</p>
+            <p className="text-2xl font-bold text-info">{stats.pendingReview}</p>
             <p className="text-xs text-muted-foreground">Pending Review</p>
           </CardContent>
         </Card>
-        <Card className="bg-purple-500/10 border-purple-500/20">
+        <Card className="bg-primary/10 border-purple-500/20">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-purple-600">{stats.avgResolutionTime}m</p>
+            <p className="text-2xl font-bold text-primary">{stats.avgResolutionTime}m</p>
             <p className="text-xs text-muted-foreground">Avg Resolution</p>
           </CardContent>
         </Card>
@@ -292,7 +292,7 @@ export function TechIncidentLogTab({ workspaceId }: TechIncidentLogTabProps) {
                         {STATUS_CONFIG[incident.status].label}
                       </Badge>
                       {incident.isRecurring && (
-                        <Badge variant="outline" className="bg-purple-500/20 text-purple-600">
+                        <Badge variant="outline" className="bg-primary/20 text-primary">
                           <RefreshCw className="h-3 w-3 mr-1" /> Recurring
                         </Badge>
                       )}
@@ -318,20 +318,20 @@ export function TechIncidentLogTab({ workspaceId }: TechIncidentLogTabProps) {
                     {/* Status indicators */}
                     <div className="flex items-center gap-2 mt-2">
                       {incident.rootCause ? (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-600 text-xs">
+                        <Badge variant="outline" className="bg-success/10 text-success text-xs">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> RCA Complete
                         </Badge>
                       ) : (incident.status === 'resolved' || incident.status === 'closed') && (
-                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 text-xs">
+                        <Badge variant="outline" className="bg-warning/10 text-warning text-xs">
                           <FileText className="h-3 w-3 mr-1" /> RCA Needed
                         </Badge>
                       )}
                       {incident.reviewedAt ? (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-600 text-xs">
+                        <Badge variant="outline" className="bg-success/10 text-success text-xs">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Reviewed
                         </Badge>
                       ) : incident.status === 'resolved' && (
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-600 text-xs">
+                        <Badge variant="outline" className="bg-info/10 text-info text-xs">
                           Pending Review
                         </Badge>
                       )}

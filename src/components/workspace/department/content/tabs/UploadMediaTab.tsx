@@ -199,7 +199,7 @@ export function UploadMediaTab({ workspace }: UploadMediaTabProps) {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setTypeFilter('photo')}>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Image className="h-5 w-5 text-blue-500" />
+              <Image className="h-5 w-5 text-info" />
               <span className="text-2xl font-bold">{stats.photos}</span>
             </div>
             <p className="text-xs text-muted-foreground">Photos</p>
@@ -208,7 +208,7 @@ export function UploadMediaTab({ workspace }: UploadMediaTabProps) {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setTypeFilter('video')}>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Video className="h-5 w-5 text-purple-500" />
+              <Video className="h-5 w-5 text-primary" />
               <span className="text-2xl font-bold">{stats.videos}</span>
             </div>
             <p className="text-xs text-muted-foreground">Videos</p>
@@ -217,7 +217,7 @@ export function UploadMediaTab({ workspace }: UploadMediaTabProps) {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setTypeFilter('audio')}>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Music className="h-5 w-5 text-green-500" />
+              <Music className="h-5 w-5 text-success" />
               <span className="text-2xl font-bold">{stats.audio}</span>
             </div>
             <p className="text-xs text-muted-foreground">Audio</p>
@@ -230,7 +230,7 @@ export function UploadMediaTab({ workspace }: UploadMediaTabProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5 text-purple-500" />
+              <Upload className="h-5 w-5 text-primary" />
               Upload Media
             </CardTitle>
             <CardDescription>Add photos, videos, and audio to your media library</CardDescription>

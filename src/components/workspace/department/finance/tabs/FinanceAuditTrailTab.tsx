@@ -101,7 +101,7 @@ export function FinanceAuditTrailTab({ workspaceId }: FinanceAuditTrailTabProps)
         );
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <Badge className="bg-warning/10 text-warning border-warning/20">
             <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
@@ -121,11 +121,11 @@ export function FinanceAuditTrailTab({ workspaceId }: FinanceAuditTrailTabProps)
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'expense':
-        return <Receipt className="w-4 h-4 text-blue-500" />;
+        return <Receipt className="w-4 h-4 text-info" />;
       case 'budget_request':
         return <DollarSign className="w-4 h-4 text-emerald-500" />;
       case 'budget_change':
-        return <FileText className="w-4 h-4 text-purple-500" />;
+        return <FileText className="w-4 h-4 text-primary" />;
       default:
         return <History className="w-4 h-4 text-muted-foreground" />;
     }
@@ -149,8 +149,8 @@ export function FinanceAuditTrailTab({ workspaceId }: FinanceAuditTrailTabProps)
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-indigo-500/10">
-          <History className="w-6 h-6 text-indigo-600" />
+        <div className="p-2.5 rounded-xl bg-primary/10">
+          <History className="w-6 h-6 text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Finance Audit Trail</h1>

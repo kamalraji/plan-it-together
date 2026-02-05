@@ -82,7 +82,7 @@ export function OpsReportModal({ open, onOpenChange }: OpsReportModalProps) {
               {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
-          <Badge variant="outline" className="text-green-600 border-green-600">
+          <Badge variant="outline" className="text-success border-success">
             <Clock className="h-3 w-3 mr-1" />
             Live Data
           </Badge>
@@ -123,8 +123,8 @@ export function OpsReportModal({ open, onOpenChange }: OpsReportModalProps) {
                 </div>
 
                 <div className="p-4 rounded-lg border border-border flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  <div className="h-10 w-10 rounded-full bg-warning/10 flex items-center justify-center">
+                    <AlertTriangle className="h-5 w-5 text-warning" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{metrics.incidentsResolved}/{metrics.incidentsResolved + metrics.incidentsOpen}</p>
@@ -142,16 +142,16 @@ export function OpsReportModal({ open, onOpenChange }: OpsReportModalProps) {
                   <div
                     key={index}
                     className={`flex items-center gap-3 p-3 rounded-lg ${
-                      highlight.type === 'success' ? 'bg-green-500/5' :
-                      highlight.type === 'warning' ? 'bg-amber-500/5' : 'bg-blue-500/5'
+                      highlight.type === 'success' ? 'bg-success/5' :
+                      highlight.type === 'warning' ? 'bg-warning/5' : 'bg-info/5'
                     }`}
                   >
                     {highlight.type === 'success' ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
                     ) : highlight.type === 'warning' ? (
-                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                      <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
                     ) : (
-                      <TrendingUp className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                      <TrendingUp className="h-4 w-4 text-info flex-shrink-0" />
                     )}
                     <span className="text-sm">{highlight.message}</span>
                   </div>
@@ -164,15 +164,15 @@ export function OpsReportModal({ open, onOpenChange }: OpsReportModalProps) {
               <h4 className="text-sm font-semibold mb-3">Performance Summary</h4>
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-lg font-bold text-green-600">98%</p>
+                  <p className="text-lg font-bold text-success">98%</p>
                   <p className="text-xs text-muted-foreground">On-time Rate</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-lg font-bold text-blue-600">4.8/5</p>
+                  <p className="text-lg font-bold text-info">4.8/5</p>
                   <p className="text-xs text-muted-foreground">Team Rating</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-lg font-bold text-purple-600">15min</p>
+                  <p className="text-lg font-bold text-primary">15min</p>
                   <p className="text-xs text-muted-foreground">Avg Response</p>
                 </div>
               </div>

@@ -114,11 +114,11 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
   ];
 
   const statusColors = {
-    submitted: 'bg-blue-100 text-blue-800',
-    under_review: 'bg-yellow-100 text-yellow-800',
+    submitted: 'bg-info/20 text-blue-800',
+    under_review: 'bg-warning/20 text-yellow-800',
     planned: 'bg-purple-100 text-purple-800',
-    implemented: 'bg-green-100 text-green-800',
-    declined: 'bg-red-100 text-red-800'
+    implemented: 'bg-success/20 text-success',
+    declined: 'bg-destructive/20 text-red-800'
   };
 
   React.useEffect(() => {
@@ -208,7 +208,7 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
   if (submitted) {
     return (
       <div className="bg-card rounded-lg border border-border p-8 text-center">
-        <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+        <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-foreground mb-2">Thank You for Your Feedback!</h2>
         <p className="text-muted-foreground mb-6">
           We appreciate you taking the time to share your thoughts. 

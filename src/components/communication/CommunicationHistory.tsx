@@ -103,9 +103,9 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      SENT: { color: 'bg-green-100 text-green-800', label: 'Sent' },
-      FAILED: { color: 'bg-red-100 text-red-800', label: 'Failed' },
-      PARTIAL: { color: 'bg-yellow-100 text-yellow-800', label: 'Partial' },
+      SENT: { color: 'bg-success/20 text-success', label: 'Sent' },
+      FAILED: { color: 'bg-destructive/20 text-red-800', label: 'Failed' },
+      PARTIAL: { color: 'bg-warning/20 text-yellow-800', label: 'Partial' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.FAILED;
@@ -124,7 +124,7 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
           <h2 className="text-xl font-semibold text-foreground mb-4">Communication History</h2>
         </div>
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
           <span>Loading communication history...</span>
         </div>
       </div>
@@ -186,7 +186,7 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
                 key={log.id}
                 className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                   selectedLog?.id === log.id
-                    ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                    ? 'border-primary bg-primary/10 shadow-md'
                     : 'border-border hover:border-input hover:shadow-sm'
                 }`}
                 onClick={() => setSelectedLog(log)}
@@ -210,7 +210,7 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
 
                 {selectedLog?.id === log.id && (
                   <div className="mt-2 pt-2 border-t border-indigo-200">
-                    <span className="text-xs text-indigo-600 font-medium">
+                    <span className="text-xs text-primary font-medium">
                       Click to view details →
                     </span>
                   </div>
@@ -228,7 +228,7 @@ export function CommunicationHistory({ eventId }: CommunicationHistoryProps) {
             <div className="bg-card border border-border rounded-lg p-6">
               {detailLoading ? (
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                   <span>Loading details...</span>
                 </div>
               ) : detailedLog ? (

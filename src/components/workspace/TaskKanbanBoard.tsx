@@ -36,28 +36,28 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
     status: TaskStatus.IN_PROGRESS,
     title: 'In Progress',
     color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-50',
+    bgColor: 'bg-info/10',
     darkBgColor: 'dark:bg-blue-950/30'
   },
   {
     status: TaskStatus.REVIEW_REQUIRED,
     title: 'Review',
     color: 'text-yellow-600 dark:text-yellow-400',
-    bgColor: 'bg-yellow-50',
+    bgColor: 'bg-warning/10',
     darkBgColor: 'dark:bg-yellow-950/30'
   },
   {
     status: TaskStatus.BLOCKED,
     title: 'Blocked',
     color: 'text-red-600 dark:text-red-400',
-    bgColor: 'bg-red-50',
+    bgColor: 'bg-destructive/10',
     darkBgColor: 'dark:bg-red-950/30'
   },
   {
     status: TaskStatus.COMPLETED,
     title: 'Completed',
     color: 'text-green-600 dark:text-green-400',
-    bgColor: 'bg-green-50',
+    bgColor: 'bg-success/10',
     darkBgColor: 'dark:bg-green-950/30'
   }
 ];
@@ -306,11 +306,11 @@ export function TaskKanbanBoard({
       case TaskCategory.MARKETING:
         return 'bg-pink-100 text-pink-800';
       case TaskCategory.LOGISTICS:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case TaskCategory.TECHNICAL:
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case TaskCategory.REGISTRATION:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case TaskCategory.POST_EVENT:
         return 'bg-muted text-foreground';
       default:

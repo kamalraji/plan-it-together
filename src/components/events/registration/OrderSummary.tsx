@@ -79,11 +79,11 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         {/* Promo code badge */}
         {promoCode && discountAmount > 0 && (
           <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-950/30 rounded-lg">
-            <Tag className="h-4 w-4 text-green-600" />
+            <Tag className="h-4 w-4 text-success" />
             <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
               {promoCode}
             </Badge>
-            <CheckCircle2 className="h-4 w-4 text-green-600 ml-auto" />
+            <CheckCircle2 className="h-4 w-4 text-success ml-auto" />
           </div>
         )}
 
@@ -95,7 +95,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
           </div>
           
           {discountAmount > 0 && (
-            <div className="flex justify-between text-sm text-green-600">
+            <div className="flex justify-between text-sm text-success">
               <span>Discount</span>
               <span>-{formatPrice(discountAmount)}</span>
             </div>

@@ -97,7 +97,7 @@ export function ExportListTab({ workspace }: ExportListTabProps) {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Download className="w-6 h-6 text-purple-500" />
+          <Download className="w-6 h-6 text-primary" />
           Export Attendee List
         </h2>
         <p className="text-muted-foreground mt-1">Download registration data in various formats</p>
@@ -271,14 +271,14 @@ export function ExportListTab({ workspace }: ExportListTabProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-amber-500" />
+                      <Clock className="w-4 h-4 text-warning" />
                       <span>Pending</span>
                     </div>
                     <span className="text-sm">{stats.pending.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm">
-                      <XCircle className="w-4 h-4 text-red-500" />
+                      <XCircle className="w-4 h-4 text-destructive" />
                       <span>Cancelled</span>
                     </div>
                     <span className="text-sm">{stats.cancelled.toLocaleString()}</span>

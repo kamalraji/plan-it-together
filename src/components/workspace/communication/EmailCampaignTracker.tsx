@@ -11,11 +11,11 @@ interface EmailCampaignTrackerProps {
 
 const statusColors: Record<EmailCampaignStatus, string> = {
   draft: 'text-muted-foreground bg-muted',
-  scheduled: 'text-amber-500 bg-amber-500/10',
-  sending: 'text-blue-500 bg-blue-500/10',
-  sent: 'text-blue-500 bg-blue-500/10',
+  scheduled: 'text-warning bg-warning/10',
+  sending: 'text-info bg-info/10',
+  sent: 'text-info bg-info/10',
   completed: 'text-emerald-500 bg-emerald-500/10',
-  failed: 'text-red-500 bg-red-500/10',
+  failed: 'text-destructive bg-destructive/10',
 };
 
 export function EmailCampaignTracker({ workspaceId }: EmailCampaignTrackerProps) {
@@ -129,7 +129,7 @@ function EmailCampaignRow({ campaign }: { campaign: EmailCampaign }) {
         {hasSent ? (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Eye className="h-3.5 w-3.5 text-blue-500" />
+              <Eye className="h-3.5 w-3.5 text-info" />
               <Progress value={openRate} className="h-1.5 flex-1" />
               <span className="text-xs text-muted-foreground w-10">{openRate}%</span>
             </div>
@@ -140,7 +140,7 @@ function EmailCampaignRow({ campaign }: { campaign: EmailCampaign }) {
             </div>
           </div>
         ) : campaign.scheduledFor ? (
-          <p className="text-xs text-amber-500">
+          <p className="text-xs text-warning">
             Scheduled: {new Date(campaign.scheduledFor).toLocaleDateString()}
           </p>
         ) : (

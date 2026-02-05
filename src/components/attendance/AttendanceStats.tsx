@@ -87,23 +87,23 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({
       label: 'Total Registered',
       value: stats?.totalRegistrations ?? 0,
       icon: Users,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Checked In',
       value: stats?.attendedCount ?? 0,
       icon: UserCheck,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
       highlight: true,
     },
     {
       label: 'Pending',
       value: stats?.notAttendedCount ?? 0,
       icon: UserX,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Check-in Rate',
@@ -167,7 +167,7 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({
                 animate={{ opacity: 0, scale: 2 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6 }}
-                className="absolute inset-0 bg-green-500/20 rounded-xl pointer-events-none"
+                className="absolute inset-0 bg-success/20 rounded-xl pointer-events-none"
               />
             </AnimatePresence>
           )}

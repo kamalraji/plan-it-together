@@ -21,8 +21,8 @@ export function SponsorshipStatsCards({ workspaceId }: SponsorshipStatsCardsProp
       label: 'Active Sponsors',
       value: data?.totalSponsors?.toString() ?? '0',
       icon: Users,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Total Revenue',
@@ -35,15 +35,15 @@ export function SponsorshipStatsCards({ workspaceId }: SponsorshipStatsCardsProp
       label: 'Pending Proposals',
       value: data?.pendingProposals?.toString() ?? '0',
       icon: FileText,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Deliverables Due',
       value: data?.deliverablesDue?.toString() ?? '0',
       icon: Clock,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ];
 

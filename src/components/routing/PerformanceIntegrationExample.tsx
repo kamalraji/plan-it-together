@@ -99,9 +99,9 @@ export const PerformanceIntegrationExample: React.FC = () => {
       label: 'Status',
       render: (value: string) => (
         <span className={`px-2 py-1 text-xs rounded-full ${
-          value === 'active' ? 'bg-green-100 text-green-800' :
-          value === 'inactive' ? 'bg-red-100 text-red-800' :
-          'bg-yellow-100 text-yellow-800'
+          value === 'active' ? 'bg-success/20 text-success' :
+          value === 'inactive' ? 'bg-destructive/20 text-red-800' :
+          'bg-warning/20 text-yellow-800'
         }`}>
           {value}
         </span>
@@ -206,9 +206,9 @@ export const PerformanceIntegrationExample: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <div className={`px-2 py-1 text-xs rounded-full ${
-                      item.status === 'active' ? 'bg-green-100 text-green-800' :
-                      item.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      item.status === 'active' ? 'bg-success/20 text-success' :
+                      item.status === 'inactive' ? 'bg-destructive/20 text-red-800' :
+                      'bg-warning/20 text-yellow-800'
                     }`}>
                       {item.status}
                     </div>
@@ -295,7 +295,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
                   onClick={() => setActiveTab(tab.key as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.key
-                      ? 'border-indigo-500 text-indigo-600'
+                      ? 'border-primary text-primary'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >

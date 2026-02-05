@@ -165,7 +165,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
     switch (status) {
       case 'VERIFIED':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success">
             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -174,7 +174,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
         );
       case 'PENDING':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/20 text-yellow-800">
             Pending Verification
           </span>
         );
@@ -186,11 +186,11 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'COLLEGE':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info/20 text-blue-800';
       case 'COMPANY':
         return 'bg-purple-100 text-purple-800';
       case 'INDUSTRY':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'NON_PROFIT':
         return 'bg-orange-100 text-orange-800';
       default:
@@ -245,7 +245,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
           backgroundPosition: 'center'
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div className="absolute inset-0 bg-foreground bg-opacity-40"></div>
       </div>
 
       {/* Organization Info */}
@@ -346,7 +346,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                   onClick={() => setActiveTab('upcoming')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'upcoming'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-info text-info'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >
@@ -356,7 +356,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                   onClick={() => setActiveTab('past')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'past'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-info text-info'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                   }`}
                 >

@@ -42,26 +42,26 @@ export function FacilityCheckModal({ open, onOpenChange }: FacilityCheckModalPro
   const getStatusIcon = (status: FacilityItem['status']) => {
     switch (status) {
       case 'pass':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
       case 'fail':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
       case 'pending':
-        return <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />;
+        return <RefreshCw className="h-5 w-5 text-info animate-spin" />;
     }
   };
 
   const getStatusBadge = (status: FacilityItem['status']) => {
     switch (status) {
       case 'pass':
-        return <Badge className="bg-green-500/10 text-green-600">Pass</Badge>;
+        return <Badge className="bg-success/10 text-success">Pass</Badge>;
       case 'fail':
-        return <Badge className="bg-red-500/10 text-red-600">Fail</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive">Fail</Badge>;
       case 'warning':
-        return <Badge className="bg-amber-500/10 text-amber-600">Warning</Badge>;
+        return <Badge className="bg-warning/10 text-warning">Warning</Badge>;
       case 'pending':
-        return <Badge className="bg-blue-500/10 text-blue-600">Pending</Badge>;
+        return <Badge className="bg-info/10 text-info">Pending</Badge>;
     }
   };
 
@@ -95,22 +95,22 @@ export function FacilityCheckModal({ open, onOpenChange }: FacilityCheckModalPro
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-purple-500" />
+            <Building2 className="h-5 w-5 text-primary" />
             Facility Check - Safety & Setup Status
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-3 gap-4 py-4">
-          <div className="p-3 rounded-lg bg-green-500/10 text-center">
-            <p className="text-2xl font-bold text-green-600">{passCount}</p>
+          <div className="p-3 rounded-lg bg-success/10 text-center">
+            <p className="text-2xl font-bold text-success">{passCount}</p>
             <p className="text-xs text-muted-foreground">Passed</p>
           </div>
-          <div className="p-3 rounded-lg bg-amber-500/10 text-center">
-            <p className="text-2xl font-bold text-amber-600">{warningCount}</p>
+          <div className="p-3 rounded-lg bg-warning/10 text-center">
+            <p className="text-2xl font-bold text-warning">{warningCount}</p>
             <p className="text-xs text-muted-foreground">Warnings</p>
           </div>
-          <div className="p-3 rounded-lg bg-red-500/10 text-center">
-            <p className="text-2xl font-bold text-red-600">{failCount}</p>
+          <div className="p-3 rounded-lg bg-destructive/10 text-center">
+            <p className="text-2xl font-bold text-destructive">{failCount}</p>
             <p className="text-xs text-muted-foreground">Failed</p>
           </div>
         </div>

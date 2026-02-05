@@ -31,8 +31,8 @@ interface DraftPressReleaseTabProps {
 
 const statusConfig = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  review: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'In Review' },
-  approved: { icon: CheckCircle2, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Approved' },
+  review: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'In Review' },
+  approved: { icon: CheckCircle2, color: 'text-info', bgColor: 'bg-info/10', label: 'Approved' },
   distributed: { icon: Send, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Distributed' },
 };
 
@@ -294,8 +294,8 @@ export function DraftPressReleaseTab({ workspaceId }: DraftPressReleaseTabProps)
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
@@ -309,8 +309,8 @@ export function DraftPressReleaseTab({ workspaceId }: DraftPressReleaseTabProps)
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <CheckCircle2 className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <CheckCircle2 className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">
@@ -387,7 +387,7 @@ export function DraftPressReleaseTab({ workspaceId }: DraftPressReleaseTabProps)
                                 <span>by {release.author_name}</span>
                               )}
                               {release.embargo_date && (
-                                <span className="flex items-center gap-1 text-amber-500">
+                                <span className="flex items-center gap-1 text-warning">
                                   <AlertCircle className="h-3 w-3" />
                                   Embargo: {format(new Date(release.embargo_date), 'MMM d, yyyy')}
                                 </span>

@@ -68,8 +68,8 @@ export function GrowthGoalsTracker() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'reach': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'engagement': return 'bg-violet-500/10 text-violet-500 border-violet-500/20';
+      case 'reach': return 'bg-info/10 text-info border-info/20';
+      case 'engagement': return 'bg-primary/10 text-primary border-violet-500/20';
       case 'revenue': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
       case 'audience': return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
       default: return '';

@@ -97,7 +97,7 @@ export function WorkspaceRoleSelect({
         <SelectValue placeholder="Select a role">
           <span className="flex items-center gap-2">
             {primaryRole?.value === value && (
-              <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+              <Star className="h-3 w-3 text-warning fill-amber-500" />
             )}
             {recommendedRoles.some(r => r.value === value) && (
               <Sparkles className="h-3 w-3 text-primary" />
@@ -120,7 +120,7 @@ export function WorkspaceRoleSelect({
                 className="flex items-center gap-2"
               >
                 <span className="flex items-center gap-2">
-                  <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                  <Star className="h-3 w-3 text-warning fill-amber-500" />
                   {primaryRole.label}
                   {primaryRole.description && (
                     <span className="text-xs text-muted-foreground ml-1">

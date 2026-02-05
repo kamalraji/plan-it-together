@@ -178,7 +178,7 @@ export function GanttTaskRow({
                 "absolute flex items-center justify-center cursor-pointer transition-transform",
                 isSelected && "ring-2 ring-primary ring-offset-2",
                 isDragging && "scale-110 z-30",
-                isDependencySource && "ring-2 ring-blue-500"
+                isDependencySource && "ring-2 ring-primary"
               )}
               style={{
                 left: position.left - 12,
@@ -197,7 +197,7 @@ export function GanttTaskRow({
               onMouseDown={(e) => handleMouseDown(e, 'move')}
               onDoubleClick={onDependencyStart}
             >
-              <Diamond className="h-5 w-5 text-amber-500 fill-amber-500" />
+              <Diamond className="h-5 w-5 text-warning fill-amber-500" />
             </div>
           </TooltipTrigger>
           <TooltipContent>
@@ -223,7 +223,7 @@ export function GanttTaskRow({
               statusOpacity,
               isSelected && "ring-2 ring-primary ring-offset-1",
               isDragging && "shadow-lg z-30",
-              isDependencySource && "ring-2 ring-blue-500"
+              isDependencySource && "ring-2 ring-primary"
             )}
             style={{
               left: position.left,
@@ -247,12 +247,12 @@ export function GanttTaskRow({
               className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize opacity-0 group-hover:opacity-100 flex items-center justify-center"
               onMouseDown={(e) => handleMouseDown(e, 'resize-left')}
             >
-              <GripVertical className="h-3 w-3 text-white/70" />
+              <GripVertical className="h-3 w-3 text-primary-foreground/70" />
             </div>
 
             {/* Progress bar */}
             <div
-              className="absolute left-0 top-0 bottom-0 bg-white/20 rounded-l-md"
+              className="absolute left-0 top-0 bottom-0 bg-background/20 rounded-l-md"
               style={{ width: `${progressWidth}%` }}
             />
 
@@ -261,7 +261,7 @@ export function GanttTaskRow({
               className="flex-1 px-2 flex items-center gap-1.5 min-w-0"
               onMouseDown={(e) => handleMouseDown(e, 'move')}
             >
-              <span className="text-xs font-medium text-white truncate">
+              <span className="text-xs font-medium text-primary-foreground truncate">
                 {task.title}
               </span>
             </div>
@@ -271,7 +271,7 @@ export function GanttTaskRow({
               className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize opacity-0 group-hover:opacity-100 flex items-center justify-center"
               onMouseDown={(e) => handleMouseDown(e, 'resize-right')}
             >
-              <GripVertical className="h-3 w-3 text-white/70" />
+              <GripVertical className="h-3 w-3 text-primary-foreground/70" />
             </div>
           </div>
         </TooltipTrigger>
@@ -285,7 +285,7 @@ export function GanttTaskRow({
             )}
             <div className="flex items-center gap-2 text-xs">
               <span className={cn(
-                "px-1.5 py-0.5 rounded text-white",
+                "px-1.5 py-0.5 rounded text-primary-foreground",
                 priorityColor.split(' ')[0]
               )}>
                 {task.priority}

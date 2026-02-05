@@ -18,11 +18,11 @@ interface EquipmentCheckoutTabProps {
 }
 
 const CONDITION_OPTIONS = [
-  { value: 'excellent', label: 'Excellent', color: 'bg-green-500/20 text-green-600' },
-  { value: 'good', label: 'Good', color: 'bg-blue-500/20 text-blue-600' },
-  { value: 'fair', label: 'Fair', color: 'bg-yellow-500/20 text-yellow-600' },
+  { value: 'excellent', label: 'Excellent', color: 'bg-success/20 text-success' },
+  { value: 'good', label: 'Good', color: 'bg-info/20 text-info' },
+  { value: 'fair', label: 'Fair', color: 'bg-warning/20 text-warning' },
   { value: 'poor', label: 'Poor', color: 'bg-orange-500/20 text-orange-600' },
-  { value: 'damaged', label: 'Damaged', color: 'bg-red-500/20 text-red-600' },
+  { value: 'damaged', label: 'Damaged', color: 'bg-destructive/20 text-destructive' },
 ];
 
 export function EquipmentCheckoutTab({ workspaceId, eventId }: EquipmentCheckoutTabProps) {
@@ -203,15 +203,15 @@ export function EquipmentCheckoutTab({ workspaceId, eventId }: EquipmentCheckout
             <p className="text-xs text-muted-foreground">Active Checkouts</p>
           </CardContent>
         </Card>
-        <Card className={overdueCount > 0 ? 'border-red-500/30 bg-red-500/5' : ''}>
+        <Card className={overdueCount > 0 ? 'border-destructive/30 bg-destructive/5' : ''}>
           <CardContent className="p-4 text-center">
-            <p className={`text-2xl font-bold ${overdueCount > 0 ? 'text-red-600' : 'text-muted-foreground'}`}>{overdueCount}</p>
+            <p className={`text-2xl font-bold ${overdueCount > 0 ? 'text-destructive' : 'text-muted-foreground'}`}>{overdueCount}</p>
             <p className="text-xs text-muted-foreground">Overdue</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">{returnedCheckouts.length}</p>
+            <p className="text-2xl font-bold text-success">{returnedCheckouts.length}</p>
             <p className="text-xs text-muted-foreground">Returned Today</p>
           </CardContent>
         </Card>
@@ -219,9 +219,9 @@ export function EquipmentCheckoutTab({ workspaceId, eventId }: EquipmentCheckout
 
       {/* Overdue Items */}
       {overdueCheckouts.length > 0 && (
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-destructive/30 bg-destructive/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 text-red-600">
+            <CardTitle className="text-base flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-4 w-4" /> Overdue Items
             </CardTitle>
           </CardHeader>
@@ -229,13 +229,13 @@ export function EquipmentCheckoutTab({ workspaceId, eventId }: EquipmentCheckout
             {overdueCheckouts.map(checkout => (
               <div key={checkout.id} className="flex items-center justify-between p-3 bg-background rounded-lg border">
                 <div className="flex items-center gap-3">
-                  <Package className="h-5 w-5 text-red-600" />
+                  <Package className="h-5 w-5 text-destructive" />
                   <div>
                     <p className="font-medium">{checkout.equipmentName}</p>
                     <p className="text-sm text-muted-foreground">
                       To: {checkout.borrowedByCommittee || checkout.borrowedByName}
                     </p>
-                    <p className="text-xs text-red-600">{getOverdueText(checkout)}</p>
+                    <p className="text-xs text-destructive">{getOverdueText(checkout)}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">

@@ -45,9 +45,9 @@ const ROOM_TYPES = [
 
 const ROOM_STATUSES = [
   { value: 'pending', label: 'Pending', icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted' },
-  { value: 'setup_in_progress', label: 'Setup In Progress', icon: PlayCircle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { value: 'setup_in_progress', label: 'Setup In Progress', icon: PlayCircle, color: 'text-warning', bg: 'bg-warning/10' },
   { value: 'ready', label: 'Ready', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-  { value: 'in_use', label: 'In Use', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+  { value: 'in_use', label: 'In Use', icon: Users, color: 'text-info', bg: 'bg-info/10' },
 ];
 
 export function RoomStatusTab({ workspaceId }: RoomStatusTabProps) {
@@ -122,9 +122,9 @@ export function RoomStatusTab({ workspaceId }: RoomStatusTabProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">In Use</p>
-                <p className="text-2xl font-bold text-blue-500">{inUseCount}</p>
+                <p className="text-2xl font-bold text-info">{inUseCount}</p>
               </div>
-              <Users className="h-6 w-6 text-blue-500" />
+              <Users className="h-6 w-6 text-info" />
             </div>
           </CardContent>
         </Card>
@@ -134,9 +134,9 @@ export function RoomStatusTab({ workspaceId }: RoomStatusTabProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Setting Up</p>
-                <p className="text-2xl font-bold text-amber-500">{setupCount}</p>
+                <p className="text-2xl font-bold text-warning">{setupCount}</p>
               </div>
-              <PlayCircle className="h-6 w-6 text-amber-500" />
+              <PlayCircle className="h-6 w-6 text-warning" />
             </div>
           </CardContent>
         </Card>
@@ -169,7 +169,7 @@ export function RoomStatusTab({ workspaceId }: RoomStatusTabProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <DoorOpen className="h-5 w-5 text-blue-500" />
+          <DoorOpen className="h-5 w-5 text-info" />
           Room Manager
         </h2>
         <Button onClick={() => setIsAdding(!isAdding)}>

@@ -28,7 +28,7 @@ export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
             : data.totalReach.toString()
         : '0',
       icon: Users,
-      color: 'text-blue-600',
+      color: 'text-info',
       bgColor: 'bg-blue-50 dark:bg-blue-500/10',
     },
     {
@@ -48,7 +48,7 @@ export function MarketingStatsCards({ workspaceId }: MarketingStatsCardsProps) {
           : 0
       }`,
       icon: DollarSign,
-      color: 'text-amber-600',
+      color: 'text-warning',
       bgColor: 'bg-amber-50 dark:bg-amber-500/10',
     },
   ];

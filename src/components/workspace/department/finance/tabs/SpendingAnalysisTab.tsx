@@ -52,8 +52,8 @@ export function SpendingAnalysisTab({ workspaceId }: SpendingAnalysisTabProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-amber-500/10">
-          <PieChart className="w-6 h-6 text-amber-600" />
+        <div className="p-2.5 rounded-xl bg-warning/10">
+          <PieChart className="w-6 h-6 text-warning" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Spending Analysis</h1>
@@ -78,7 +78,7 @@ export function SpendingAnalysisTab({ workspaceId }: SpendingAnalysisTabProps) {
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <ArrowUpRight className="h-4 w-4 text-blue-600" />
+              <ArrowUpRight className="h-4 w-4 text-info" />
               <span className="text-sm text-muted-foreground">Top Category</span>
             </div>
             <p className="text-2xl font-bold">{topCategory?.name || 'N/A'}</p>

@@ -161,8 +161,8 @@ export const ExampleResourceListPage: React.FC = () => {
       filterable: true,
       render: (value: string) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          value === 'Active' ? 'bg-green-100 text-green-800' :
-          value === 'Published' ? 'bg-blue-100 text-blue-800' :
+          value === 'Active' ? 'bg-success/20 text-success' :
+          value === 'Published' ? 'bg-info/20 text-blue-800' :
           'bg-muted text-foreground'
         }`}>
           {value}

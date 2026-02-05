@@ -126,7 +126,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
               >
                 <X className="h-5 w-5" />
               </Button>
-              <span className="text-sm font-medium text-white">Preview</span>
+              <span className="text-sm font-medium text-primary-foreground">Preview</span>
             </div>
 
             {/* Center: Device selector */}
@@ -145,7 +145,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
                           className={cn(
                             'h-8 w-8',
                             device === d
-                              ? 'bg-neutral-600 text-white'
+                              ? 'bg-neutral-600 text-primary-foreground'
                               : 'text-neutral-400 hover:text-white hover:bg-neutral-600/50'
                           )}
                         >
@@ -264,7 +264,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
               {/* Iframe container */}
               <div
                 className={cn(
-                  'relative bg-white overflow-hidden',
+                  'relative bg-background overflow-hidden',
                   device === 'desktop' ? 'rounded-lg shadow-2xl' : 'rounded-[1.5rem]'
                 )}
                 style={{

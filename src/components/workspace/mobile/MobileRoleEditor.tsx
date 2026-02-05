@@ -37,7 +37,7 @@ const ROLE_OPTIONS = [
     value: WorkspaceRole.CONTENT_MANAGER, 
     label: 'Content Manager', 
     description: 'Manage content and media',
-    color: 'bg-blue-100 text-blue-800 border-blue-200'
+    color: 'bg-info/20 text-blue-800 border-blue-200'
   },
   { 
     value: WorkspaceRole.TECH_FINANCE_MANAGER, 
@@ -55,7 +55,7 @@ const ROLE_OPTIONS = [
     value: WorkspaceRole.EVENT_COORDINATOR, 
     label: 'Event Coordinator', 
     description: 'Coordinate event logistics',
-    color: 'bg-indigo-100 text-indigo-800 border-indigo-200'
+    color: 'bg-primary/20 text-indigo-800 border-indigo-200'
   },
   { 
     value: WorkspaceRole.MARKETING_LEAD, 
@@ -152,7 +152,7 @@ export function MobileRoleEditor({
         {/* Content */}
         <div className="p-4 space-y-3 pb-8">
           {isOwnerRole && (
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="p-3 bg-warning/10 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-800">
                 Owner role cannot be changed. Transfer ownership from workspace settings.
               </p>

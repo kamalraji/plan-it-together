@@ -65,13 +65,13 @@ export function EventStatsCards({ workspaceId, eventId }: EventStatsCardsProps) 
         <Card key={stat.label} className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <stat.icon className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <stat.icon className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
-                <p className="text-xs text-blue-500">{stat.change}</p>
+                <p className="text-xs text-info">{stat.change}</p>
               </div>
             </div>
           </CardContent>

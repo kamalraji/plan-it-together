@@ -32,11 +32,11 @@ const PROCEDURE_CATEGORIES = [
 ];
 
 const STATUS_CONFIG = {
-  ready: { color: 'bg-green-500/20 text-green-600', label: 'Ready' },
-  deployed: { color: 'bg-blue-500/20 text-blue-600', label: 'Deployed' },
-  in_use: { color: 'bg-purple-500/20 text-purple-600', label: 'In Use' },
-  maintenance: { color: 'bg-yellow-500/20 text-yellow-600', label: 'Maintenance' },
-  unavailable: { color: 'bg-gray-500/20 text-gray-600', label: 'Unavailable' },
+  ready: { color: 'bg-success/20 text-success', label: 'Ready' },
+  deployed: { color: 'bg-info/20 text-info', label: 'Deployed' },
+  in_use: { color: 'bg-primary/20 text-primary', label: 'In Use' },
+  maintenance: { color: 'bg-warning/20 text-warning', label: 'Maintenance' },
+  unavailable: { color: 'bg-gray-500/20 text-muted-foreground', label: 'Unavailable' },
 };
 
 export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTabProps) {
@@ -293,13 +293,13 @@ export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTab
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">{stats.backupReady}</p>
+            <p className="text-2xl font-bold text-success">{stats.backupReady}</p>
             <p className="text-xs text-muted-foreground">Backup Ready</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-blue-600">{stats.backupDeployed}</p>
+            <p className="text-2xl font-bold text-info">{stats.backupDeployed}</p>
             <p className="text-xs text-muted-foreground">Deployed</p>
           </CardContent>
         </Card>
@@ -311,9 +311,9 @@ export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTab
             <p className="text-xs text-muted-foreground">Verified Procedures</p>
           </CardContent>
         </Card>
-        <Card className={stats.needsTest > 0 ? 'border-yellow-500/30 bg-yellow-500/5' : ''}>
+        <Card className={stats.needsTest > 0 ? 'border-warning/30 bg-warning/5' : ''}>
           <CardContent className="p-4 text-center">
-            <p className={`text-2xl font-bold ${stats.needsTest > 0 ? 'text-yellow-600' : 'text-muted-foreground'}`}>
+            <p className={`text-2xl font-bold ${stats.needsTest > 0 ? 'text-warning' : 'text-muted-foreground'}`}>
               {stats.needsTest}
             </p>
             <p className="text-xs text-muted-foreground">Needs Testing</p>
@@ -346,9 +346,9 @@ export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTab
                         {backup.testResult && (
                           <Badge 
                             variant="outline" 
-                            className={backup.testResult === 'passed' ? 'bg-green-500/10 text-green-600' : 
-                                       backup.testResult === 'failed' ? 'bg-red-500/10 text-red-600' : 
-                                       'bg-yellow-500/10 text-yellow-600'}
+                            className={backup.testResult === 'passed' ? 'bg-success/10 text-success' : 
+                                       backup.testResult === 'failed' ? 'bg-destructive/10 text-destructive' : 
+                                       'bg-warning/10 text-warning'}
                           >
                             {backup.testResult}
                           </Badge>
@@ -363,7 +363,7 @@ export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTab
                         </p>
                       )}
                       {backup.status === 'deployed' && backup.deployedFor && (
-                        <p className="text-xs text-blue-600">Replacing: {backup.deployedFor}</p>
+                        <p className="text-xs text-info">Replacing: {backup.deployedFor}</p>
                       )}
                     </div>
                   </div>
@@ -446,11 +446,11 @@ export function ContingencyChecklistTab({ workspaceId }: ContingencyChecklistTab
                                     </Badge>
                                   )}
                                   {procedure.isVerified ? (
-                                    <Badge className="bg-green-500/20 text-green-600">
+                                    <Badge className="bg-success/20 text-success">
                                       <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                                     </Badge>
                                   ) : (
-                                    <Badge variant="outline" className="text-yellow-600">Not Verified</Badge>
+                                    <Badge variant="outline" className="text-warning">Not Verified</Badge>
                                   )}
                                 </div>
                                 <p className="text-sm text-muted-foreground">{procedure.triggerCondition}</p>

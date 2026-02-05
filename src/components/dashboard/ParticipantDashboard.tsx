@@ -541,8 +541,8 @@ export function ParticipantDashboard() {
                       <span
                         className={`px-2 py-0.5 rounded-full ${
                           registration.status === 'CONFIRMED'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-success/20 text-success'
+                            : 'bg-warning/20 text-yellow-800'
                         }`}
                       >
                         {registration.status}

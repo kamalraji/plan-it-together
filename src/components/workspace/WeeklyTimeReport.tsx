@@ -111,8 +111,8 @@ export function WeeklyTimeReport({ workspaceId }: WeeklyTimeReportProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <Clock className="h-5 w-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <Clock className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{data?.billableHours.toFixed(1) || 0}</p>
@@ -125,8 +125,8 @@ export function WeeklyTimeReport({ workspaceId }: WeeklyTimeReportProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Users className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Users className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{data?.byUser.length || 0}</p>
@@ -139,8 +139,8 @@ export function WeeklyTimeReport({ workspaceId }: WeeklyTimeReportProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <FolderKanban className="h-5 w-5 text-purple-600" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <FolderKanban className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{data?.byTask.length || 0}</p>

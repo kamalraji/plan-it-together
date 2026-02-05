@@ -100,7 +100,7 @@ export function WaitlistManager({ workspaceId }: WaitlistManagerProps) {
     }
     if (priority === 'vip') {
       return (
-        <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px]">
+        <Badge className="bg-primary/10 text-primary border-purple-500/20 text-[10px]">
           VIP
         </Badge>
       );
@@ -113,8 +113,8 @@ export function WaitlistManager({ workspaceId }: WaitlistManagerProps) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-violet-500/10">
-              <ListOrdered className="w-5 h-5 text-violet-600" aria-hidden="true" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <ListOrdered className="w-5 h-5 text-primary" aria-hidden="true" />
             </div>
             <div>
               <CardTitle className="text-lg">Waitlist Manager</CardTitle>

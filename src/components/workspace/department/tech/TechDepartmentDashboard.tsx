@@ -51,13 +51,13 @@ export function TechDepartmentDashboard({
       {/* Tech Department Header */}
       <div className="bg-gradient-to-br from-blue-500/10 via-card to-purple-500/5 rounded-xl border border-border shadow-sm p-4 sm:p-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-blue-500/20">
-            <Server className="h-6 w-6 text-blue-500" />
+          <div className="p-3 rounded-xl bg-info/20">
+            <Server className="h-6 w-6 text-info" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-lg font-semibold text-foreground">{workspace.name}</h2>
-              <span className="px-2 py-0.5 text-xs font-medium bg-blue-500/20 text-blue-600 rounded-full">
+              <span className="px-2 py-0.5 text-xs font-medium bg-info/20 text-info rounded-full">
                 Tech Department
               </span>
             </div>
@@ -74,7 +74,7 @@ export function TechDepartmentDashboard({
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
               {pendingRequests.length > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-warning/20 text-warning rounded-full">
                   {pendingRequests.length} pending requests
                 </span>
               )}

@@ -177,7 +177,7 @@ export function AssignVolunteersModal({
                         className={
                           shift.assignedVolunteers >= shift.requiredVolunteers
                             ? 'bg-emerald-500/10 text-emerald-600'
-                            : 'bg-amber-500/10 text-amber-600'
+                            : 'bg-warning/10 text-warning'
                         }
                       >
                         {shift.assignedVolunteers}/{shift.requiredVolunteers}

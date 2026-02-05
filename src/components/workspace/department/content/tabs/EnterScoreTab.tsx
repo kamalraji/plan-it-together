@@ -181,13 +181,13 @@ export function EnterScoreTab({ workspace }: EnterScoreTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{scoredIds.length}</div>
+            <div className="text-2xl font-bold text-success">{scoredIds.length}</div>
             <p className="text-xs text-muted-foreground">Scored</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">
+            <div className="text-2xl font-bold text-warning">
               {(mySubmissions?.length || 0) - scoredIds.length}
             </div>
             <p className="text-xs text-muted-foreground">Pending</p>
@@ -195,7 +195,7 @@ export function EnterScoreTab({ workspace }: EnterScoreTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats?.averageScore || 0}</div>
+            <div className="text-2xl font-bold text-info">{stats?.averageScore || 0}</div>
             <p className="text-xs text-muted-foreground">Avg Score</p>
           </CardContent>
         </Card>
@@ -205,7 +205,7 @@ export function EnterScoreTab({ workspace }: EnterScoreTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-500" />
+            <Star className="h-5 w-5 text-warning" />
             Enter Score
           </CardTitle>
           <CardDescription>Select a submission to score</CardDescription>
@@ -225,9 +225,9 @@ export function EnterScoreTab({ workspace }: EnterScoreTabProps) {
                       <SelectItem key={submission.id} value={submission.id}>
                         <div className="flex items-center gap-2">
                           {isScored ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-4 w-4 text-success" />
                           ) : (
-                            <Clock className="h-4 w-4 text-amber-500" />
+                            <Clock className="h-4 w-4 text-warning" />
                           )}
                           {submission.team_name}
                           {isScored && <span className="text-xs text-muted-foreground">(scored)</span>}

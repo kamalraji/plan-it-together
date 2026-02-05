@@ -90,7 +90,7 @@ export function ViewWaitlistTab({ workspace }: ViewWaitlistTabProps) {
   const getPriorityBadge = (priority: WaitlistEntry['priority']) => {
     switch (priority) {
       case 'vip':
-        return <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20">VIP</Badge>;
+        return <Badge className="bg-primary/10 text-primary border-purple-500/20">VIP</Badge>;
       case 'high':
         return <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20">Priority</Badge>;
       default:
@@ -173,9 +173,9 @@ export function ViewWaitlistTab({ workspace }: ViewWaitlistTabProps) {
             <p className="text-sm text-muted-foreground">Priority Entries</p>
           </CardContent>
         </Card>
-        <Card className="border-blue-500/20 bg-blue-500/5">
+        <Card className="border-info/20 bg-info/5">
           <CardContent className="pt-4 text-center">
-            <p className="text-3xl font-bold text-blue-600">{stats.avgWaitDays}</p>
+            <p className="text-3xl font-bold text-info">{stats.avgWaitDays}</p>
             <p className="text-sm text-muted-foreground">Avg Days Waiting</p>
           </CardContent>
         </Card>
@@ -370,7 +370,7 @@ export function ViewWaitlistTab({ workspace }: ViewWaitlistTabProps) {
                   <div key={ticket.tierId} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
                     <span className="text-sm">{ticket.tierName}</span>
                     <div className="flex items-center gap-2">
-                      <Badge className={ticket.available > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}>
+                      <Badge className={ticket.available > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-destructive/10 text-destructive'}>
                         {ticket.available} spots
                       </Badge>
                     </div>

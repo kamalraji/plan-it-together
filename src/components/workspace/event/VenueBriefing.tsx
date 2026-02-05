@@ -37,7 +37,7 @@ export function VenueBriefing(_props: VenueBriefingProps) {
   const getStatusStyle = (status: VenueZone['status']) => {
     switch (status) {
       case 'ready': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
-      case 'in-progress': return 'bg-blue-500/10 text-blue-600 border-blue-500/30';
+      case 'in-progress': return 'bg-info/10 text-info border-info/30';
       case 'issue': return 'bg-destructive/10 text-destructive border-destructive/30';
     }
   };
@@ -87,7 +87,7 @@ export function VenueBriefing(_props: VenueBriefingProps) {
               </div>
 
               {zone.notes && (
-                <p className={`text-xs ${zone.status === 'issue' ? 'text-destructive' : 'text-blue-500'}`}>
+                <p className={`text-xs ${zone.status === 'issue' ? 'text-destructive' : 'text-info'}`}>
                   📌 {zone.notes}
                 </p>
               )}

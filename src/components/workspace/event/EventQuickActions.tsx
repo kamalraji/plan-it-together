@@ -28,7 +28,7 @@ export function EventQuickActions(_props: EventQuickActionsProps) {
     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Zap className="h-4 w-4 text-amber-500" />
+          <Zap className="h-4 w-4 text-warning" />
           Quick Actions
         </CardTitle>
       </CardHeader>

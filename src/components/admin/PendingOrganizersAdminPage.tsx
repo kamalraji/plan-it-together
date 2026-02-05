@@ -99,7 +99,7 @@ export const PendingOrganizersAdminPage: React.FC = () => {
           </Button>
         </div>
 
-        <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-soft border-coral/20 bg-background/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-xl">Organizer Candidates</CardTitle>
           </CardHeader>
@@ -113,7 +113,7 @@ export const PendingOrganizersAdminPage: React.FC = () => {
                 No pending organizer signups found.
               </div>
             ) : (
-              <div className="rounded-xl border border-border bg-white/60 overflow-hidden">
+              <div className="rounded-xl border border-border bg-background/60 overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -100,11 +100,11 @@ export const TeamCapacityChart: React.FC<TeamCapacityChartProps> = ({
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mt-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-green-500" />
+            <div className="w-3 h-3 rounded bg-success" />
             <span>Healthy (30-80%)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded bg-warning" />
             <span>At Capacity (80-100%)</span>
           </div>
           <div className="flex items-center gap-2">

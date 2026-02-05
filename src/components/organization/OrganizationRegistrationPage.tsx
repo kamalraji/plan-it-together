@@ -110,7 +110,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
           </button>
         </div>
         {errors.form && (
-          <div className="mb-4 rounded-md bg-red-50 border border-red-100 px-3 py-2 text-xs text-red-700">
+          <div className="mb-4 rounded-md bg-destructive/10 border border-red-100 px-3 py-2 text-xs text-destructive">
             {errors.form}
           </div>
         )}
@@ -130,7 +130,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-lg border-input shadow-sm focus:border-coral focus:ring-coral"
               />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1" htmlFor="slug">
@@ -152,7 +152,7 @@ export const OrganizationRegistrationPage: React.FC = () => {
                 />
               </div>
               <p className="mt-1 text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
-              {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
+              {errors.slug && <p className="mt-1 text-xs text-destructive">{errors.slug}</p>}
             </div>
           </div>
 

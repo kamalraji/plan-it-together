@@ -310,7 +310,7 @@ function WidgetPreview({ type, config: _config }: { type: WidgetType; config: Re
     'task-progress': (
       <div className="h-20 flex items-center justify-center bg-muted/30 rounded-lg">
         <div className="text-center">
-          <div className="text-3xl font-bold text-green-500">75%</div>
+          <div className="text-3xl font-bold text-success">75%</div>
           <div className="text-xs text-muted-foreground">Complete</div>
         </div>
       </div>

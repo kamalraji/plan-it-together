@@ -71,10 +71,10 @@ export function FinanceCommitteeConnectionsPanel({ workspaceId, eventId, orgSlug
 
   const getCommitteeColor = (name: string) => {
     const lower = name.toLowerCase();
-    if (lower.includes('finance')) return 'text-green-500 bg-green-500/10';
-    if (lower.includes('registration')) return 'text-blue-500 bg-blue-500/10';
+    if (lower.includes('finance')) return 'text-success bg-success/10';
+    if (lower.includes('registration')) return 'text-info bg-info/10';
     if (lower.includes('expense')) return 'text-orange-500 bg-orange-500/10';
-    return 'text-purple-500 bg-purple-500/10';
+    return 'text-primary bg-primary/10';
   };
 
   const handleCommitteeClick = (committeeId: string) => {

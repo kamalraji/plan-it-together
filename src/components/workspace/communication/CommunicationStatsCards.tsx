@@ -19,8 +19,8 @@ export function CommunicationStatsCards({
       label: 'Announcements',
       value: totalAnnouncements,
       icon: Megaphone,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Emails Sent',
@@ -33,15 +33,15 @@ export function CommunicationStatsCards({
       label: 'Open Rate',
       value: `${openRate}%`,
       icon: BarChart3,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Pending Approvals',
       value: pendingApprovals,
       icon: Clock,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
   ];
 

@@ -290,7 +290,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
               
               {/* Overlay controls */}
               <div className={cn(
-                'absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 transition-opacity',
+                'absolute inset-0 bg-foreground/60 flex flex-col items-center justify-center gap-2 transition-opacity',
                 disabled ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
               )}>
                 <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export const EventImageGallery: React.FC<EventImageGalleryProps> = ({
 
               {/* Drag handle */}
               {!disabled && (
-                <div className="absolute top-2 left-2 p-1 rounded bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 left-2 p-1 rounded bg-foreground/50 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                   <GripVertical className="h-4 w-4" />
                 </div>
               )}

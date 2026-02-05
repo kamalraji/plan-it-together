@@ -453,11 +453,11 @@ const MetricCard: React.FC<{
           {trend !== undefined && (
             <div className="flex items-center mt-2 text-xs">
               {trend >= 0 ? (
-                <ArrowUpRight className="h-3 w-3 text-green-500 mr-1" />
+                <ArrowUpRight className="h-3 w-3 text-success mr-1" />
               ) : (
-                <ArrowDownRight className="h-3 w-3 text-red-500 mr-1" />
+                <ArrowDownRight className="h-3 w-3 text-destructive mr-1" />
               )}
-              <span className={trend >= 0 ? 'text-green-500' : 'text-red-500'}>
+              <span className={trend >= 0 ? 'text-success' : 'text-destructive'}>
                 {Math.abs(trend)}%
               </span>
               {trendLabel && (

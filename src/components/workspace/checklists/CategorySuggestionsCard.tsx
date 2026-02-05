@@ -30,9 +30,9 @@ export function CategorySuggestionsCard({
   };
 
   const phaseColors = {
-    pre_event: 'bg-blue-500/10 text-blue-600',
-    during_event: 'bg-amber-500/10 text-amber-600',
-    post_event: 'bg-green-500/10 text-green-600',
+    pre_event: 'bg-info/10 text-info',
+    during_event: 'bg-warning/10 text-warning',
+    post_event: 'bg-success/10 text-success',
   };
 
   const handleAdd = (template: ChecklistTemplate) => {
@@ -49,11 +49,11 @@ export function CategorySuggestionsCard({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <div className="rounded-xl border border-amber-500/20 bg-amber-500/5">
+      <div className="rounded-xl border border-warning/20 bg-warning/5">
         <CollapsibleTrigger asChild>
           <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-amber-500/10 transition-colors rounded-t-xl">
             <div className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-amber-500" />
+              <Lightbulb className="h-5 w-5 text-warning" />
               <div>
                 <h3 className="text-sm font-medium text-foreground">
                   Suggested for {formatCategory(eventCategory)} Events

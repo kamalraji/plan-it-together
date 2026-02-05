@@ -156,7 +156,7 @@ export const OrganizationServiceDashboard: React.FC = () => {
               icon: Users,
               path: getOrgPath('/team'),
               gradient: 'from-blue-500/10 to-cyan-500/10',
-              iconBg: 'bg-blue-500/10 text-blue-600'
+              iconBg: 'bg-info/10 text-info'
             },
             {
               title: 'Organization Settings',
@@ -164,7 +164,7 @@ export const OrganizationServiceDashboard: React.FC = () => {
               icon: Settings,
               path: getOrgPath('/settings'),
               gradient: 'from-purple-500/10 to-pink-500/10',
-              iconBg: 'bg-purple-500/10 text-purple-600'
+              iconBg: 'bg-primary/10 text-primary'
             },
             {
               title: 'Analytics & Insights',

@@ -75,14 +75,14 @@ export function InfluencerTracker({ workspaceId: _workspaceId }: InfluencerTrack
         );
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-xs flex items-center gap-1">
+          <Badge className="bg-warning/10 text-warning border-warning/20 text-xs flex items-center gap-1">
             <Clock className="h-3 w-3" />
             Pending
           </Badge>
         );
       case 'declined':
         return (
-          <Badge className="bg-red-500/10 text-red-500 border-red-500/20 text-xs flex items-center gap-1">
+          <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-xs flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             Declined
           </Badge>

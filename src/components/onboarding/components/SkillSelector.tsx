@@ -108,7 +108,7 @@ export function SkillSelector({
           {selectedSkills.length} / {maxSkills} skills
         </span>
         {selectedSkills.length >= maxSkills && (
-          <span className="text-amber-500 font-medium">Maximum reached</span>
+          <span className="text-warning font-medium">Maximum reached</span>
         )}
       </div>
 

@@ -124,7 +124,7 @@ export function ViewAnalyticsMarketingTab({ workspaceId }: ViewAnalyticsMarketin
           value={analytics?.totalReach.toLocaleString() || '0'}
           icon={Eye}
           trend={12.5}
-          color="text-blue-500"
+          color="text-info"
         />
         <KPICard
           title="Total Clicks"
@@ -138,14 +138,14 @@ export function ViewAnalyticsMarketingTab({ workspaceId }: ViewAnalyticsMarketin
           value={analytics?.totalConversions.toLocaleString() || '0'}
           icon={Target}
           trend={-2.1}
-          color="text-purple-500"
+          color="text-primary"
         />
         <KPICard
           title="Total Spent"
           value={`$${(analytics?.totalSpent || 0).toLocaleString()}`}
           icon={DollarSign}
           trend={5.7}
-          color="text-amber-500"
+          color="text-warning"
           subtitle={`of $${(analytics?.totalBudget || 0).toLocaleString()} budget`}
         />
       </div>
@@ -171,7 +171,7 @@ export function ViewAnalyticsMarketingTab({ workspaceId }: ViewAnalyticsMarketin
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-3xl font-bold text-purple-500">
+              <p className="text-3xl font-bold text-primary">
                 ${analytics && analytics.totalConversions > 0 
                   ? (analytics.totalSpent / analytics.totalConversions).toFixed(2) 
                   : '0'}
@@ -302,8 +302,8 @@ export function ViewAnalyticsMarketingTab({ workspaceId }: ViewAnalyticsMarketin
                           <Badge className={cn(
                             'text-xs',
                             campaign.status === 'active' && 'bg-emerald-500/20 text-emerald-600',
-                            campaign.status === 'paused' && 'bg-amber-500/20 text-amber-600',
-                            campaign.status === 'completed' && 'bg-blue-500/20 text-blue-600',
+                            campaign.status === 'paused' && 'bg-warning/20 text-warning',
+                            campaign.status === 'completed' && 'bg-info/20 text-info',
                             campaign.status === 'draft' && 'bg-muted text-muted-foreground',
                           )}>
                             {campaign.status}
@@ -376,7 +376,7 @@ function KPICard({
         </div>
         <div className={cn(
           'flex items-center gap-1 text-xs mt-3',
-          isPositive ? 'text-emerald-500' : 'text-red-500'
+          isPositive ? 'text-emerald-500' : 'text-destructive'
         )}>
           {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
           <span>{Math.abs(trend)}% vs last period</span>

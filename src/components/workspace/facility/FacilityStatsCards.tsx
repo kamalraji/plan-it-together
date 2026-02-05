@@ -47,7 +47,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       subValue: `${roomsReady} ready`,
       icon: Building,
       color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-500/10',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Setup Complete',
@@ -55,7 +55,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       subValue: `of ${venueCount}`,
       icon: DoorOpen,
       color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-500/10',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'Safety Checks',
@@ -63,7 +63,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       subValue: `of ${safetyChecks}`,
       icon: Shield,
       color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-500/10',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'Maintenance',
@@ -71,7 +71,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       subValue: `${pendingMaintenance} pending`,
       icon: Wrench,
       color: 'text-amber-600 dark:text-amber-400',
-      bgColor: 'bg-amber-500/10',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Completed',
@@ -87,7 +87,7 @@ export function FacilityStatsCards({ workspaceId }: FacilityStatsCardsProps) {
       subValue: 'need attention',
       icon: AlertTriangle,
       color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-500/10',
+      bgColor: 'bg-destructive/10',
     },
   ];
 

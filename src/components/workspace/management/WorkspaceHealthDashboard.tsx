@@ -99,7 +99,7 @@ export function WorkspaceHealthDashboard({ stats, workspaces }: WorkspaceHealthD
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Needs Attention
           </CardTitle>
-          <AlertTriangle className={`h-4 w-4 ${needsAttention.length > 0 ? 'text-amber-500' : 'text-muted-foreground'}`} />
+          <AlertTriangle className={`h-4 w-4 ${needsAttention.length > 0 ? 'text-warning' : 'text-muted-foreground'}`} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{needsAttention.length}</div>

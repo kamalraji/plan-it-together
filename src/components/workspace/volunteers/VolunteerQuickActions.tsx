@@ -186,7 +186,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       label: 'Event Check-In',
       description: checkInAvailable ? 'Open check-in scanner' : 'No event linked',
       icon: ScanLine,
-      color: 'text-green-500',
+      color: 'text-success',
       onClick: handleOpenCheckIn,
       disabled: !checkInAvailable,
       external: true,
@@ -196,7 +196,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       label: 'Send Brief',
       description: 'Send briefing to all volunteers',
       icon: Send,
-      color: 'text-blue-500',
+      color: 'text-info',
       onClick: handleSendBrief,
     },
     {
@@ -212,7 +212,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       label: 'Export Roster',
       description: 'Download volunteer list',
       icon: Download,
-      color: 'text-purple-500',
+      color: 'text-primary',
       onClick: handleExportRoster,
     },
     {
@@ -220,7 +220,7 @@ export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: Volunte
       label: 'Send Reminder',
       description: 'Remind upcoming shifts',
       icon: MessageSquare,
-      color: 'text-amber-500',
+      color: 'text-warning',
       onClick: handleSendReminder,
     },
     {

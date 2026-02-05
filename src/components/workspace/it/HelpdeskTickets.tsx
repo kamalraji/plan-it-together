@@ -244,19 +244,19 @@ export function HelpdeskTickets({ workspaceId, eventId }: HelpdeskTicketsProps) 
       <CardContent>
         {/* Stats Summary */}
         <div className="grid grid-cols-4 gap-2 mb-4">
-          <div className="p-2 rounded-lg bg-blue-500/10 text-center">
+          <div className="p-2 rounded-lg bg-info/10 text-center">
             <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{stats.new}</div>
             <div className="text-xs text-muted-foreground">New</div>
           </div>
-          <div className="p-2 rounded-lg bg-amber-500/10 text-center">
+          <div className="p-2 rounded-lg bg-warning/10 text-center">
             <div className="text-lg font-bold text-amber-600 dark:text-amber-400">{stats.inProgress}</div>
             <div className="text-xs text-muted-foreground">In Progress</div>
           </div>
-          <div className="p-2 rounded-lg bg-red-500/10 text-center">
+          <div className="p-2 rounded-lg bg-destructive/10 text-center">
             <div className="text-lg font-bold text-red-600 dark:text-red-400">{stats.escalated}</div>
             <div className="text-xs text-muted-foreground">Escalated</div>
           </div>
-          <div className="p-2 rounded-lg bg-green-500/10 text-center">
+          <div className="p-2 rounded-lg bg-success/10 text-center">
             <div className="text-lg font-bold text-green-600 dark:text-green-400">{stats.resolved}</div>
             <div className="text-xs text-muted-foreground">Resolved</div>
           </div>

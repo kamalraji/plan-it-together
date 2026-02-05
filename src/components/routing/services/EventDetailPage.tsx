@@ -96,9 +96,9 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   }
   const getModeBadge = (mode: EventMode) => {
     const modeConfig = {
-      [EventMode.ONLINE]: { color: 'bg-blue-100 text-blue-800', label: 'Online', icon: GlobeAltIcon },
+      [EventMode.ONLINE]: { color: 'bg-info/20 text-blue-800', label: 'Online', icon: GlobeAltIcon },
       [EventMode.OFFLINE]: { color: 'bg-purple-100 text-purple-800', label: 'Offline', icon: MapPinIcon },
-      [EventMode.HYBRID]: { color: 'bg-indigo-100 text-indigo-800', label: 'Hybrid', icon: CalendarIcon },
+      [EventMode.HYBRID]: { color: 'bg-primary/20 text-indigo-800', label: 'Hybrid', icon: CalendarIcon },
     };
 
     const config = modeConfig[mode];

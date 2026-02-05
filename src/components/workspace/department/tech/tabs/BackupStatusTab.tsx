@@ -25,8 +25,8 @@ const storageLocations = [
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'completed': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Completed</Badge>;
-    case 'running': return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Running</Badge>;
-    case 'failed': return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Failed</Badge>;
+    case 'running': return <Badge className="bg-info/10 text-info border-info/20">Running</Badge>;
+    case 'failed': return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Failed</Badge>;
     default: return null;
   }
 };
@@ -82,9 +82,9 @@ export function BackupStatusTab({ workspaceId: _workspaceId }: BackupStatusTabPr
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
+              <AlertTriangle className="h-8 w-8 text-destructive" />
               <div>
-                <p className="text-2xl font-bold text-red-500">{failedJobs}</p>
+                <p className="text-2xl font-bold text-destructive">{failedJobs}</p>
                 <p className="text-sm text-muted-foreground">Failed</p>
               </div>
             </div>
@@ -93,9 +93,9 @@ export function BackupStatusTab({ workspaceId: _workspaceId }: BackupStatusTabPr
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <HardDrive className="h-8 w-8 text-blue-500" />
+              <HardDrive className="h-8 w-8 text-info" />
               <div>
-                <p className="text-2xl font-bold text-blue-500">{totalSize}</p>
+                <p className="text-2xl font-bold text-info">{totalSize}</p>
                 <p className="text-sm text-muted-foreground">Total Backed Up</p>
               </div>
             </div>

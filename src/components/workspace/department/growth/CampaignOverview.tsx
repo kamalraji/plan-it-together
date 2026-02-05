@@ -82,9 +82,9 @@ export function CampaignOverview() {
       case 'active':
         return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-xs">Active</Badge>;
       case 'paused':
-        return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-xs">Paused</Badge>;
+        return <Badge className="bg-warning/10 text-warning border-warning/20 text-xs">Paused</Badge>;
       case 'scheduled':
-        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-xs">Scheduled</Badge>;
+        return <Badge className="bg-info/10 text-info border-info/20 text-xs">Scheduled</Badge>;
       case 'completed':
         return <Badge variant="secondary" className="text-xs">Completed</Badge>;
       default:

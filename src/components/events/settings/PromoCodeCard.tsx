@@ -78,7 +78,7 @@ export const PromoCodeCard: React.FC<PromoCodeCardProps> = ({
 
             {/* Discount */}
             <div className="text-right shrink-0">
-              <p className="font-bold text-lg text-green-600">
+              <p className="font-bold text-lg text-success">
                 {formatDiscount(promoCode)}
               </p>
               <p className="text-xs text-muted-foreground">{getUsageText()}</p>

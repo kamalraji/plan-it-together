@@ -18,7 +18,7 @@ export function EmailTemplates({
       <div className="bg-card border border-border rounded-lg p-6">
         <h3 className="text-lg font-medium text-foreground mb-4">Email Templates</h3>
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
           <span>Loading templates...</span>
         </div>
       </div>
@@ -53,7 +53,7 @@ export function EmailTemplates({
             key={template.id}
             className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
               selectedTemplate?.id === template.id
-                ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                ? 'border-primary bg-primary/10 shadow-md'
                 : 'border-border hover:border-input hover:shadow-sm'
             }`}
             onClick={() => onTemplateSelect(template)}
@@ -62,8 +62,8 @@ export function EmailTemplates({
               <h4 className="font-medium text-foreground">{template.name}</h4>
               {selectedTemplate?.id === template.id && (
                 <div className="flex-shrink-0">
-                  <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
@@ -112,7 +112,7 @@ export function EmailTemplates({
                 type="button"
                 className={`w-full text-sm font-medium py-1 px-2 rounded transition-colors ${
                   selectedTemplate?.id === template.id
-                    ? 'text-indigo-700 bg-indigo-100'
+                    ? 'text-primary bg-primary/20'
                     : 'text-foreground hover:text-indigo-600'
                 }`}
               >
@@ -124,10 +124,10 @@ export function EmailTemplates({
       </div>
 
       {selectedTemplate && (
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <div className="mt-4 p-4 bg-info/10 border border-blue-200 rounded-md">
           <div className="flex items-start space-x-2">
             <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-info mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
             </div>
@@ -135,7 +135,7 @@ export function EmailTemplates({
               <p className="text-sm font-medium text-blue-800">
                 Template "{selectedTemplate.name}" applied
               </p>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="text-sm text-info mt-1">
                 The subject and body fields have been populated with the template content. 
                 You can modify them as needed before sending.
               </p>

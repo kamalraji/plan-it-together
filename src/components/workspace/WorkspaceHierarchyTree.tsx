@@ -560,11 +560,11 @@ export function WorkspaceHierarchyTree({
               <span className="text-muted-foreground">L1 Root</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <div className="w-2 h-2 rounded-full bg-info" />
               <span className="text-muted-foreground">L2 Department</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <div className="w-2 h-2 rounded-full bg-warning" />
               <span className="text-muted-foreground">L3 Committee</span>
             </div>
             <div className="flex items-center gap-1">
@@ -575,11 +575,11 @@ export function WorkspaceHierarchyTree({
           <div className="flex flex-wrap gap-3 text-[10px]">
             <span className="text-muted-foreground font-medium">Roles:</span>
             <div className="flex items-center gap-1">
-              <Shield className="h-2.5 w-2.5 text-purple-500" />
+              <Shield className="h-2.5 w-2.5 text-primary" />
               <span className="text-muted-foreground">Owner</span>
             </div>
             <div className="flex items-center gap-1">
-              <Shield className="h-2.5 w-2.5 text-indigo-500" />
+              <Shield className="h-2.5 w-2.5 text-primary" />
               <span className="text-muted-foreground">Manager</span>
             </div>
             <div className="flex items-center gap-1">

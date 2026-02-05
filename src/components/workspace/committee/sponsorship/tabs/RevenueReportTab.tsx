@@ -31,9 +31,9 @@ const tierColors: Record<string, string> = {
 
 const paymentStatusColors: Record<string, { color: string; bgColor: string; label: string }> = {
   paid: { color: 'text-emerald-600', bgColor: 'bg-emerald-500/10', label: 'Paid' },
-  pending: { color: 'text-amber-600', bgColor: 'bg-amber-500/10', label: 'Pending' },
-  partial: { color: 'text-blue-600', bgColor: 'bg-blue-500/10', label: 'Partial' },
-  overdue: { color: 'text-red-600', bgColor: 'bg-red-500/10', label: 'Overdue' },
+  pending: { color: 'text-warning', bgColor: 'bg-warning/10', label: 'Pending' },
+  partial: { color: 'text-info', bgColor: 'bg-info/10', label: 'Partial' },
+  overdue: { color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'Overdue' },
 };
 
 export function RevenueReportTab({ workspace }: RevenueReportTabProps) {
@@ -117,8 +117,8 @@ export function RevenueReportTab({ workspace }: RevenueReportTabProps) {
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-blue-500/10">
-                <CheckCircle2 className="h-5 w-5 text-blue-500" />
+              <div className="p-2.5 rounded-lg bg-info/10">
+                <CheckCircle2 className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">${(totalCollected + partialCollected).toLocaleString()}</p>
@@ -130,8 +130,8 @@ export function RevenueReportTab({ workspace }: RevenueReportTabProps) {
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2.5 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">${totalPending.toLocaleString()}</p>
@@ -143,8 +143,8 @@ export function RevenueReportTab({ workspace }: RevenueReportTabProps) {
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-purple-500/10">
-                <TrendingUp className="h-5 w-5 text-purple-500" />
+              <div className="p-2.5 rounded-lg bg-primary/10">
+                <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{collectionRate}%</p>

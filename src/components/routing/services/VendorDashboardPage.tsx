@@ -106,23 +106,23 @@ export const VendorDashboardPage: React.FC<VendorDashboardPageProps> = ({ defaul
         </div>
 
         {/* Help Section */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
+        <div className="mt-8 bg-info/10 rounded-lg p-6">
           <h3 className="text-lg font-medium text-blue-900 mb-2">Vendor Resources</h3>
-          <p className="text-blue-700 mb-4">
+          <p className="text-info mb-4">
             Maximize your success on the marketplace with these resources and best practices.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <h4 className="font-medium text-blue-900 mb-1">📈 Performance Tips</h4>
-              <p className="text-blue-700">Maintain high ratings by responding quickly and delivering quality service.</p>
+              <p className="text-info">Maintain high ratings by responding quickly and delivering quality service.</p>
             </div>
             <div>
               <h4 className="font-medium text-blue-900 mb-1">📸 Service Listings</h4>
-              <p className="text-blue-700">Use high-quality photos and detailed descriptions to attract more bookings.</p>
+              <p className="text-info">Use high-quality photos and detailed descriptions to attract more bookings.</p>
             </div>
             <div>
               <h4 className="font-medium text-blue-900 mb-1">💬 Communication</h4>
-              <p className="text-blue-700">Stay responsive to booking requests and maintain professional communication.</p>
+              <p className="text-info">Stay responsive to booking requests and maintain professional communication.</p>
             </div>
           </div>
         </div>

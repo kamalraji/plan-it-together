@@ -247,8 +247,8 @@ export function ChannelModerationTools({ workspaceId, channelId }: ChannelModera
         <Card>
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-500/10 rounded-lg">
-                <VolumeX className="h-4 w-4 text-amber-600" />
+              <div className="p-2 bg-warning/10 rounded-lg">
+                <VolumeX className="h-4 w-4 text-warning" />
               </div>
               <div>
                 <p className="text-lg font-semibold">
@@ -375,7 +375,7 @@ export function ChannelModerationTools({ workspaceId, channelId }: ChannelModera
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <VolumeX className="h-5 w-5 text-amber-600" />
+              <VolumeX className="h-5 w-5 text-warning" />
               Mute Member
             </AlertDialogTitle>
             <AlertDialogDescription>

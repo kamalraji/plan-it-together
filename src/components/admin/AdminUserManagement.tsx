@@ -314,7 +314,7 @@ export const AdminUserManagement: React.FC = () => {
                                 {user.roles.length > 1 ? (
                                   <SimpleDropdownItem
                                     onClick={() => openSuspendDialog(user)}
-                                    className="text-amber-600"
+                                    className="text-warning"
                                   >
                                     <UserX className="h-4 w-4 mr-2" />
                                     Suspend User
@@ -400,7 +400,7 @@ export const AdminUserManagement: React.FC = () => {
       <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-amber-600">
+            <DialogTitle className="flex items-center gap-2 text-warning">
               <UserX className="h-5 w-5" />
               Suspend User
             </DialogTitle>

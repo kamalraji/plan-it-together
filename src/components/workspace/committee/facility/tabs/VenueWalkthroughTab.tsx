@@ -67,13 +67,13 @@ export function VenueWalkthroughTab({ workspaceId }: VenueWalkthroughTabProps) {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'scheduled':
-        return { label: 'Scheduled', variant: 'outline' as const, icon: Clock, color: 'text-blue-500' };
+        return { label: 'Scheduled', variant: 'outline' as const, icon: Clock, color: 'text-info' };
       case 'in_progress':
-        return { label: 'In Progress', variant: 'default' as const, icon: Play, color: 'text-amber-500' };
+        return { label: 'In Progress', variant: 'default' as const, icon: Play, color: 'text-warning' };
       case 'completed':
         return { label: 'Completed', variant: 'secondary' as const, icon: CheckCircle, color: 'text-emerald-500' };
       case 'cancelled':
-        return { label: 'Cancelled', variant: 'destructive' as const, icon: AlertCircle, color: 'text-red-500' };
+        return { label: 'Cancelled', variant: 'destructive' as const, icon: AlertCircle, color: 'text-destructive' };
       default:
         return { label: status, variant: 'outline' as const, icon: Clock, color: 'text-muted-foreground' };
     }

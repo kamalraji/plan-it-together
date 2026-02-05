@@ -10,10 +10,10 @@ interface ProposalPipelineProps {
 
 const stages = [
   { key: 'draft', label: 'Draft', icon: FileText, color: 'text-muted-foreground', bgColor: 'bg-muted/50' },
-  { key: 'sent', label: 'Sent', icon: Send, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { key: 'negotiation', label: 'Negotiation', icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
+  { key: 'sent', label: 'Sent', icon: Send, color: 'text-info', bgColor: 'bg-info/10' },
+  { key: 'negotiation', label: 'Negotiation', icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10' },
   { key: 'closed-won', label: 'Won', icon: CheckCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  { key: 'closed-lost', label: 'Lost', icon: XCircle, color: 'text-red-500', bgColor: 'bg-red-500/10' },
+  { key: 'closed-lost', label: 'Lost', icon: XCircle, color: 'text-destructive', bgColor: 'bg-destructive/10' },
 ];
 
 export function ProposalPipeline({ workspaceId }: ProposalPipelineProps) {

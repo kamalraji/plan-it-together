@@ -168,9 +168,9 @@ export function EventPublishApprovalList({ workspaceId }: EventPublishApprovalLi
                     </div>
                     <Progress value={stats.percentage} className="h-1.5" />
                     <div className="flex gap-3 text-xs">
-                      <span className="text-green-600">{stats.pass} pass</span>
-                      {stats.warning > 0 && <span className="text-yellow-600">{stats.warning} warning</span>}
-                      {stats.fail > 0 && <span className="text-red-600">{stats.fail} fail</span>}
+                      <span className="text-success">{stats.pass} pass</span>
+                      {stats.warning > 0 && <span className="text-warning">{stats.warning} warning</span>}
+                      {stats.fail > 0 && <span className="text-destructive">{stats.fail} fail</span>}
                     </div>
                   </div>
                 )}
@@ -237,12 +237,12 @@ export function EventPublishApprovalList({ workspaceId }: EventPublishApprovalLi
             <DialogTitle className="flex items-center gap-2">
               {actionType === 'approve' ? (
                 <>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                   Approve Publish Request
                 </>
               ) : (
                 <>
-                  <XCircle className="h-5 w-5 text-red-500" />
+                  <XCircle className="h-5 w-5 text-destructive" />
                   Reject Publish Request
                 </>
               )}
@@ -256,8 +256,8 @@ export function EventPublishApprovalList({ workspaceId }: EventPublishApprovalLi
 
           <div className="space-y-4 py-4">
             {actionType === 'reject' && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/10 border border-warning/20">
+                <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
                 <p className="text-sm text-muted-foreground">
                   Please provide feedback to help the requester understand why this was rejected.
                 </p>
@@ -360,14 +360,14 @@ export function EventPublishApprovalList({ workspaceId }: EventPublishApprovalLi
                                   key={index}
                                   className={cn(
                                     'flex items-center gap-2 p-2 rounded-lg text-sm',
-                                    item.status === 'pass' && 'bg-green-500/10',
-                                    item.status === 'warning' && 'bg-yellow-500/10',
-                                    item.status === 'fail' && 'bg-red-500/10',
+                                    item.status === 'pass' && 'bg-success/10',
+                                    item.status === 'warning' && 'bg-warning/10',
+                                    item.status === 'fail' && 'bg-destructive/10',
                                   )}
                                 >
-                                  {item.status === 'pass' && <CheckCircle className="h-4 w-4 text-green-500" />}
-                                  {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
-                                  {item.status === 'fail' && <XCircle className="h-4 w-4 text-red-500" />}
+                                  {item.status === 'pass' && <CheckCircle className="h-4 w-4 text-success" />}
+                                  {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-warning" />}
+                                  {item.status === 'fail' && <XCircle className="h-4 w-4 text-destructive" />}
                                   <span className="flex-1">{item.label}</span>
                                   {item.required && (
                                     <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
@@ -391,16 +391,16 @@ export function EventPublishApprovalList({ workspaceId }: EventPublishApprovalLi
                                     key={index}
                                     className={cn(
                                       'flex items-center gap-2 p-2 rounded-lg text-sm',
-                                      item.status === 'pass' && 'bg-green-500/10',
-                                      item.status === 'warning' && 'bg-yellow-500/10',
-                                      item.status === 'fail' && 'bg-red-500/10',
+                                      item.status === 'pass' && 'bg-success/10',
+                                      item.status === 'warning' && 'bg-warning/10',
+                                      item.status === 'fail' && 'bg-destructive/10',
                                     )}
                                   >
                                     <Icon className={cn(
                                       'h-4 w-4',
-                                      item.status === 'pass' && 'text-green-500',
-                                      item.status === 'warning' && 'text-yellow-500',
-                                      item.status === 'fail' && 'text-red-500',
+                                      item.status === 'pass' && 'text-success',
+                                      item.status === 'warning' && 'text-warning',
+                                      item.status === 'fail' && 'text-destructive',
                                     )} />
                                     <div className="flex-1">
                                       <span>{item.label}</span>

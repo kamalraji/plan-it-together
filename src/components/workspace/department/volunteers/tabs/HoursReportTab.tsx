@@ -94,7 +94,7 @@ export function HoursReportTab({ workspace }: HoursReportTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.totalShifts}</div>
+            <div className="text-2xl font-bold text-info">{stats.totalShifts}</div>
             <div className="text-xs text-muted-foreground">Shifts Completed</div>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ export function HoursReportTab({ workspace }: HoursReportTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.activeVolunteers}</div>
+            <div className="text-2xl font-bold text-primary">{stats.activeVolunteers}</div>
             <div className="text-xs text-muted-foreground">Active Volunteers</div>
           </CardContent>
         </Card>

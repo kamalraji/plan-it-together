@@ -214,7 +214,7 @@ export function AutomationRulesPanel({ workspaceId, userRole = null }: Automatio
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       'h-2 w-2 rounded-full',
-                      log.success ? 'bg-green-500' : 'bg-red-500'
+                      log.success ? 'bg-success' : 'bg-destructive'
                     )} />
                     <div>
                       <p className="text-sm font-medium">{log.actionTaken}</p>

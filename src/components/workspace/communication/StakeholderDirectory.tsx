@@ -41,16 +41,16 @@ interface StakeholderDirectoryProps {
 }
 
 const categoryConfig: Record<StakeholderCategory, { color: string; bgColor: string; label: string }> = {
-  vip: { color: 'text-purple-500', bgColor: 'bg-purple-500/10', label: 'VIP' },
-  media: { color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Media' },
-  sponsor: { color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Sponsor' },
+  vip: { color: 'text-primary', bgColor: 'bg-primary/10', label: 'VIP' },
+  media: { color: 'text-info', bgColor: 'bg-info/10', label: 'Media' },
+  sponsor: { color: 'text-warning', bgColor: 'bg-warning/10', label: 'Sponsor' },
   partner: { color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Partner' },
-  government: { color: 'text-red-500', bgColor: 'bg-red-500/10', label: 'Gov' },
+  government: { color: 'text-destructive', bgColor: 'bg-destructive/10', label: 'Gov' },
 };
 
 const priorityColors: Record<StakeholderPriority, string> = {
-  high: 'text-red-500',
-  medium: 'text-amber-500',
+  high: 'text-destructive',
+  medium: 'text-warning',
   low: 'text-muted-foreground',
 };
 

@@ -28,8 +28,8 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
   const getStatusBadge = (status: string) => {
     const styles = {
       filled: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-      partial: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-      critical: 'bg-red-500/10 text-red-600 border-red-500/20',
+      partial: 'bg-warning/10 text-warning border-warning/20',
+      critical: 'bg-destructive/10 text-destructive border-destructive/20',
     };
     const labels = {
       filled: 'Filled',
@@ -86,8 +86,8 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
               fillPercentage >= 90 
                 ? 'bg-emerald-500/10 text-emerald-600' 
                 : fillPercentage >= 70 
-                  ? 'bg-amber-500/10 text-amber-600'
-                  : 'bg-red-500/10 text-red-600'
+                  ? 'bg-warning/10 text-warning'
+                  : 'bg-destructive/10 text-destructive'
             )}
           >
             {fillPercentage}%
@@ -105,8 +105,8 @@ export function VolunteerShiftScheduler({ workspaceId }: VolunteerShiftScheduler
                 className={cn(
                   'flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/30 cursor-pointer',
                   status === 'filled' && 'border-emerald-500/20 bg-emerald-500/5',
-                  status === 'partial' && 'border-amber-500/20 bg-amber-500/5',
-                  status === 'critical' && 'border-red-500/20 bg-red-500/5'
+                  status === 'partial' && 'border-warning/20 bg-warning/5',
+                  status === 'critical' && 'border-destructive/20 bg-destructive/5'
                 )}
               >
                 <div className="space-y-1">

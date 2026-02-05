@@ -46,11 +46,11 @@ export function RecordExpenseTab({ workspace }: RecordExpenseTabProps) {
   const getStatusBadge = (status: WorkspaceExpense['status']) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
+        return <Badge variant="outline" className="bg-success/10 text-success border-success/30"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
+        return <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
     }
   };
 
@@ -74,19 +74,19 @@ export function RecordExpenseTab({ workspace }: RecordExpenseTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">₹{stats.pending.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-warning">₹{stats.pending.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">{stats.pendingCount} Pending</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">₹{stats.approved.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-success">₹{stats.approved.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">₹{stats.rejected.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-destructive">₹{stats.rejected.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Rejected</p>
           </CardContent>
         </Card>
@@ -97,7 +97,7 @@ export function RecordExpenseTab({ workspace }: RecordExpenseTabProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-green-500" />
+              <Receipt className="h-5 w-5 text-success" />
               Record Expense
             </CardTitle>
             <CardDescription>Track expenses for your committee</CardDescription>

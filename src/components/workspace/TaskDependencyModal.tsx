@@ -59,7 +59,7 @@ export function TaskDependencyModal({
           
           {stats.criticalPathLength > 0 && (
             <div className="flex items-center gap-2">
-              <Route className="h-4 w-4 text-amber-500" />
+              <Route className="h-4 w-4 text-warning" />
               <span className="text-sm text-muted-foreground">
                 Critical path: {stats.criticalPathLength} tasks
               </span>

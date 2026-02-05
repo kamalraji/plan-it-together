@@ -86,11 +86,11 @@ export function SubmissionsList({
   const getStatusBadge = (status: FormSubmission['status']) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">Pending</Badge>;
+        return <Badge variant="outline" className="bg-warning/20 text-warning border-yellow-300">Pending</Badge>;
       case 'reviewed':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">Reviewed</Badge>;
+        return <Badge variant="outline" className="bg-info/20 text-info border-blue-300">Reviewed</Badge>;
       case 'processed':
-        return <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">Processed</Badge>;
+        return <Badge variant="outline" className="bg-success/20 text-success border-green-300">Processed</Badge>;
     }
   };
 

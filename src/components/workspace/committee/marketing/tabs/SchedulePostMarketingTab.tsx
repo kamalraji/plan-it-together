@@ -37,15 +37,15 @@ interface SchedulePostMarketingTabProps {
 const platformOptions = [
   { id: 'twitter', label: 'Twitter/X', icon: Twitter, color: 'text-sky-500', maxChars: 280 },
   { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', maxChars: 2200 },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-600', maxChars: 3000 },
-  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', maxChars: 63206 },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-info', maxChars: 3000 },
+  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-info', maxChars: 63206 },
 ];
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
-  scheduled: 'bg-amber-500/20 text-amber-600',
+  scheduled: 'bg-warning/20 text-warning',
   published: 'bg-emerald-500/20 text-emerald-600',
-  failed: 'bg-red-500/20 text-red-600',
+  failed: 'bg-destructive/20 text-destructive',
 };
 
 export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingTabProps) {
@@ -219,7 +219,7 @@ export function SchedulePostMarketingTab({ workspaceId }: SchedulePostMarketingT
                 <Label>Content</Label>
                 <span className={cn(
                   'text-xs',
-                  content.length > getCharLimit() ? 'text-red-500' : 'text-muted-foreground'
+                  content.length > getCharLimit() ? 'text-destructive' : 'text-muted-foreground'
                 )}>
                   {content.length} / {getCharLimit()}
                 </span>

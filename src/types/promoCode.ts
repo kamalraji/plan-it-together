@@ -56,10 +56,10 @@ export function getPromoCodeStatus(code: PromoCode): PromoCodeStatus {
 
 export function getPromoCodeStatusColor(status: PromoCodeStatus): string {
   switch (status) {
-    case 'active': return 'text-green-600 bg-green-100';
-    case 'upcoming': return 'text-yellow-600 bg-yellow-100';
+    case 'active': return 'text-success bg-success/20';
+    case 'upcoming': return 'text-warning bg-warning/20';
     case 'expired': return 'text-muted-foreground bg-muted';
-    case 'exhausted': return 'text-red-600 bg-red-100';
+    case 'exhausted': return 'text-destructive bg-destructive/20';
     case 'inactive': return 'text-muted-foreground bg-muted';
   }
 }

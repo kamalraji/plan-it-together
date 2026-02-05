@@ -184,7 +184,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
         {/* Notification Badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1">
+          <span className="absolute -top-1 -right-1 bg-destructive text-primary-foreground text-xs rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -194,7 +194,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       {isOpen && isMobile && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/50 sm:hidden"
+            className="fixed inset-0 z-40 bg-foreground/50 sm:hidden"
             onClick={() => setIsOpen(false)}
           />
           <div
@@ -418,17 +418,17 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   const getTypeIcon = () => {
     switch (notification.type) {
       case 'success':
-        return <CheckIcon className="h-5 w-5 text-green-500" />;
+        return <CheckIcon className="h-5 w-5 text-success" />;
       case 'warning':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5 text-warning" />;
       case 'error':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />;
       case 'task':
-        return <ClockIcon className="h-5 w-5 text-blue-500" />;
+        return <ClockIcon className="h-5 w-5 text-info" />;
       case 'event':
-        return <CalendarIcon className="h-5 w-5 text-indigo-500" />;
+        return <CalendarIcon className="h-5 w-5 text-primary" />;
       case 'marketplace':
-        return <ShoppingBagIcon className="h-5 w-5 text-purple-500" />;
+        return <ShoppingBagIcon className="h-5 w-5 text-primary" />;
       case 'system':
         return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:

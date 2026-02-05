@@ -33,7 +33,7 @@ export function LiveIndicator({
           animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         />
-        <span className="relative inline-flex rounded-full h-full w-full bg-red-500" />
+        <span className="relative inline-flex rounded-full h-full w-full bg-destructive" />
       </span>
     );
   }
@@ -45,7 +45,7 @@ export function LiveIndicator({
         animate={{ scale: 1, opacity: 1 }}
         className={cn(
           "inline-flex items-center rounded-full font-bold",
-          "bg-red-500 text-white shadow-lg shadow-red-500/30",
+          "bg-destructive text-primary-foreground shadow-lg shadow-red-500/30",
           config.padding,
           config.gap,
           className
@@ -53,11 +53,11 @@ export function LiveIndicator({
       >
         <span className={cn("relative flex", config.dot)}>
           <motion.span
-            className="absolute inline-flex h-full w-full rounded-full bg-white"
+            className="absolute inline-flex h-full w-full rounded-full bg-background"
             animate={{ scale: [1, 1.5, 1], opacity: [0.75, 0, 0.75] }}
             transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
           />
-          <span className="relative inline-flex rounded-full h-full w-full bg-white" />
+          <span className="relative inline-flex rounded-full h-full w-full bg-background" />
         </span>
         {showText && <span className={config.text}>LIVE</span>}
       </motion.div>
@@ -72,7 +72,7 @@ export function LiveIndicator({
       className={cn(
         "inline-flex items-center rounded-full font-bold",
         "bg-gradient-to-r from-red-500 to-red-600 text-white",
-        "shadow-xl shadow-red-500/40 ring-2 ring-red-500/20",
+        "shadow-xl shadow-red-500/40 ring-2 ring-destructive/20",
         "backdrop-blur-sm",
         config.padding,
         config.gap,
@@ -81,7 +81,7 @@ export function LiveIndicator({
     >
       <span className={cn("relative flex", config.dot)}>
         <motion.span
-          className="absolute inline-flex h-full w-full rounded-full bg-white/80"
+          className="absolute inline-flex h-full w-full rounded-full bg-background/80"
           animate={{ 
             scale: [1, 2, 1], 
             opacity: [0.8, 0, 0.8] 
@@ -92,7 +92,7 @@ export function LiveIndicator({
             ease: "easeOut" 
           }}
         />
-        <span className="relative inline-flex rounded-full h-full w-full bg-white" />
+        <span className="relative inline-flex rounded-full h-full w-full bg-background" />
       </span>
       {showText && (
         <motion.span 

@@ -25,7 +25,7 @@ export function MealSchedule({ workspaceId }: MealScheduleProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
+            <Clock className="h-5 w-5 text-info" />
             Meal Schedule
           </CardTitle>
         </CardHeader>
@@ -41,7 +41,7 @@ export function MealSchedule({ workspaceId }: MealScheduleProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
+            <Clock className="h-5 w-5 text-info" />
             Meal Schedule
           </CardTitle>
         </CardHeader>
@@ -59,7 +59,7 @@ export function MealSchedule({ workspaceId }: MealScheduleProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
+            <Clock className="h-5 w-5 text-info" />
             Meal Schedule
           </CardTitle>
           <Badge variant="secondary" className="text-xs">

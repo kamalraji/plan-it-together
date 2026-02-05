@@ -75,10 +75,10 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
   const getStatusBadge = (status: string) => {
     const config = {
       'pending': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Pending', icon: Clock },
-      'in_transit': { class: 'bg-blue-500/10 text-blue-600 border-blue-500/20', label: 'In Transit', icon: Truck },
-      'out_for_delivery': { class: 'bg-purple-500/10 text-purple-600 border-purple-500/20', label: 'Out for Delivery', icon: Package },
+      'in_transit': { class: 'bg-info/10 text-info border-info/20', label: 'In Transit', icon: Truck },
+      'out_for_delivery': { class: 'bg-primary/10 text-primary border-purple-500/20', label: 'Out for Delivery', icon: Package },
       'delivered': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Delivered', icon: CheckCircle2 },
-      'delayed': { class: 'bg-red-500/10 text-red-600 border-red-500/20', label: 'Delayed', icon: AlertTriangle },
+      'delayed': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Delayed', icon: AlertTriangle },
     };
     const { class: className, label, icon: Icon } = config[status as keyof typeof config] || config.pending;
     return (
@@ -92,9 +92,9 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
   const getPriorityBadge = (priority: string) => {
     const config = {
       'low': { class: 'bg-muted text-muted-foreground', label: 'Low' },
-      'normal': { class: 'bg-blue-100 text-blue-600', label: 'Normal' },
-      'high': { class: 'bg-amber-100 text-amber-600', label: 'High' },
-      'urgent': { class: 'bg-red-100 text-red-600', label: 'Urgent' },
+      'normal': { class: 'bg-info/20 text-info', label: 'Normal' },
+      'high': { class: 'bg-warning/20 text-warning', label: 'High' },
+      'urgent': { class: 'bg-destructive/20 text-destructive', label: 'Urgent' },
     };
     const { class: className, label } = config[priority as keyof typeof config] || config.normal;
     return <Badge className={className}>{label}</Badge>;
@@ -245,13 +245,13 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
 
       {/* Delayed Alert */}
       {delayedCount > 0 && (
-        <Card className="border-red-200 bg-red-50/50">
+        <Card className="border-red-200 bg-destructive/10/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <AlertTriangle className="h-5 w-5 text-destructive" />
               <div>
                 <p className="font-medium text-red-800">Shipment Delays</p>
-                <p className="text-sm text-red-700">
+                <p className="text-sm text-destructive">
                   {delayedCount} shipment(s) are delayed. Please follow up with carriers.
                 </p>
               </div>
@@ -278,8 +278,8 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Truck className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Truck className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{inTransitCount}</p>
@@ -304,8 +304,8 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{delayedCount}</p>
@@ -321,7 +321,7 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
         <CardHeader className="pb-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-green-500" />
+              <Truck className="h-5 w-5 text-success" />
               All Shipments
             </CardTitle>
             <div className="flex items-center gap-2 w-full md:w-auto">
@@ -366,7 +366,7 @@ export function LogisticsShipmentsTab({ workspaceId }: LogisticsShipmentsTabProp
                   key={shipment.id}
                   className={cn(
                     'p-4 rounded-lg border transition-colors hover:bg-muted/30',
-                    shipment.status === 'delayed' && 'bg-red-50/50 border-red-200',
+                    shipment.status === 'delayed' && 'bg-destructive/10/50 border-red-200',
                     shipment.status === 'delivered' && 'bg-emerald-50/30 border-emerald-200'
                   )}
                 >

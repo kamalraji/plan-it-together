@@ -220,7 +220,7 @@ export function DepartmentDashboard({
                 <span>{workspace.teamMembers?.length || 0} Members</span>
               </div>
               {pendingRequests.length > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-yellow-500/20 text-yellow-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-warning/20 text-warning rounded-full">
                   {pendingRequests.length} pending requests
                 </span>
               )}

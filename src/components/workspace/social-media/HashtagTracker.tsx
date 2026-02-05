@@ -63,7 +63,7 @@ export function HashtagTracker({ workspaceId }: HashtagTrackerProps) {
       case 'trending':
         return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-xs">Trending</Badge>;
       case 'declining':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20 text-xs">Declining</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-xs">Declining</Badge>;
       default:
         return <Badge variant="outline" className="text-xs">Stable</Badge>;
     }

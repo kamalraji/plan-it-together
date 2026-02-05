@@ -78,7 +78,7 @@ export function ViewCommitteesTab({ workspace }: ViewCommitteesTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{totalMembers}</div>
+            <div className="text-2xl font-bold text-info">{totalMembers}</div>
             <div className="text-xs text-muted-foreground">Total Members</div>
           </CardContent>
         </Card>

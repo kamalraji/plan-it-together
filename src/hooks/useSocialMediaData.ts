@@ -235,10 +235,10 @@ export function useUpdateAudienceDemographics() {
 export const DEFAULT_PLATFORMS: Omit<SocialMediaAccount, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>[] = [
   { platform: 'twitter', name: 'Twitter/X', icon: '𝕏', handle: '@eventname', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 21, color: 'bg-sky-500', connected: false, last_synced_at: null },
   { platform: 'instagram', name: 'Instagram', icon: '📷', handle: '@eventname', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 14, color: 'bg-pink-500', connected: false, last_synced_at: null },
-  { platform: 'linkedin', name: 'LinkedIn', icon: '💼', handle: 'Event Name', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 7, color: 'bg-blue-600', connected: false, last_synced_at: null },
-  { platform: 'facebook', name: 'Facebook', icon: '📘', handle: 'Event Name Page', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 10, color: 'bg-indigo-500', connected: false, last_synced_at: null },
+  { platform: 'linkedin', name: 'LinkedIn', icon: '💼', handle: 'Event Name', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 7, color: 'bg-primary', connected: false, last_synced_at: null },
+  { platform: 'facebook', name: 'Facebook', icon: '📘', handle: 'Event Name Page', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 10, color: 'bg-primary', connected: false, last_synced_at: null },
   { platform: 'tiktok', name: 'TikTok', icon: '🎵', handle: '@eventname', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 7, color: 'bg-foreground/80', connected: false, last_synced_at: null },
-  { platform: 'youtube', name: 'YouTube', icon: '▶️', handle: 'Event Name Channel', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 3, color: 'bg-red-600', connected: false, last_synced_at: null },
+  { platform: 'youtube', name: 'YouTube', icon: '▶️', handle: 'Event Name Channel', followers: 0, engagement_rate: 0, trend: 'stable', posts_this_week: 0, posts_goal: 3, color: 'bg-destructive', connected: false, last_synced_at: null },
 ];
 
 export const DEFAULT_HASHTAGS: Omit<Hashtag, 'id' | 'workspace_id' | 'created_at' | 'updated_at'>[] = [
@@ -249,10 +249,10 @@ export const DEFAULT_HASHTAGS: Omit<Hashtag, 'id' | 'workspace_id' | 'created_at
 export const DEFAULT_DEMOGRAPHICS = {
   age: [
     { demographic_type: 'age' as const, label: '18-24', value: 18, color: 'bg-pink-500', sort_order: 0 },
-    { demographic_type: 'age' as const, label: '25-34', value: 42, color: 'bg-blue-500', sort_order: 1 },
+    { demographic_type: 'age' as const, label: '25-34', value: 42, color: 'bg-info', sort_order: 1 },
     { demographic_type: 'age' as const, label: '35-44', value: 28, color: 'bg-emerald-500', sort_order: 2 },
-    { demographic_type: 'age' as const, label: '45-54', value: 8, color: 'bg-amber-500', sort_order: 3 },
-    { demographic_type: 'age' as const, label: '55+', value: 4, color: 'bg-purple-500', sort_order: 4 },
+    { demographic_type: 'age' as const, label: '45-54', value: 8, color: 'bg-warning', sort_order: 3 },
+    { demographic_type: 'age' as const, label: '55+', value: 4, color: 'bg-primary', sort_order: 4 },
   ],
   location: [
     { demographic_type: 'location' as const, label: 'Chennai', value: 35, color: null, sort_order: 0 },

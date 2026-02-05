@@ -25,9 +25,9 @@ interface DelegationProgressDashboardProps {
 
 const statusConfig: Record<DelegationStatus, { label: string; icon: React.ElementType; color: string }> = {
   pending: { label: 'Pending', icon: Clock, color: 'text-muted-foreground' },
-  in_progress: { label: 'In Progress', icon: Timer, color: 'text-blue-500' },
-  completed: { label: 'Completed', icon: CheckCircle, color: 'text-green-500' },
-  overdue: { label: 'Overdue', icon: AlertTriangle, color: 'text-red-500' },
+  in_progress: { label: 'In Progress', icon: Timer, color: 'text-info' },
+  completed: { label: 'Completed', icon: CheckCircle, color: 'text-success' },
+  overdue: { label: 'Overdue', icon: AlertTriangle, color: 'text-destructive' },
 };
 
 function DelegationCard({ delegation }: { delegation: DelegatedChecklistWithProgress }) {
@@ -68,7 +68,7 @@ function DelegationCard({ delegation }: { delegation: DelegatedChecklistWithProg
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{delegation.completedItems} of {delegation.totalItems} items</span>
                 {delegation.due_date && (
-                  <span className={cn(delegation.isOverdue && "text-red-500 font-medium")}>
+                  <span className={cn(delegation.isOverdue && "text-destructive font-medium")}>
                     Due: {format(parseISO(delegation.due_date), 'MMM d')}
                     {delegation.isOverdue && ` (${delegation.daysOverdue}d overdue)`}
                   </span>
@@ -212,7 +212,7 @@ export function DelegationProgressDashboard({ workspaceId }: DelegationProgressD
           label="In Progress"
           value={stats.inProgress}
           icon={Timer}
-          color="text-blue-500"
+          color="text-info"
           onClick={() => setStatusFilter('in_progress')}
           active={statusFilter === 'in_progress'}
         />
@@ -220,7 +220,7 @@ export function DelegationProgressDashboard({ workspaceId }: DelegationProgressD
           label="Completed"
           value={stats.completed}
           icon={CheckCircle}
-          color="text-green-500"
+          color="text-success"
           onClick={() => setStatusFilter('completed')}
           active={statusFilter === 'completed'}
         />
@@ -228,7 +228,7 @@ export function DelegationProgressDashboard({ workspaceId }: DelegationProgressD
           label="Overdue"
           value={stats.overdue}
           icon={AlertTriangle}
-          color="text-red-500"
+          color="text-destructive"
           onClick={() => setStatusFilter('overdue')}
           active={statusFilter === 'overdue'}
         />

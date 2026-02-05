@@ -180,10 +180,10 @@ export const RegistrationManagementTab: React.FC<RegistrationManagementTabProps>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard label="Total" value={stats?.total ?? 0} />
-        <StatCard label="Confirmed" value={stats?.confirmed ?? 0} color="text-green-600" />
-        <StatCard label="Pending" value={stats?.pending ?? 0} color="text-yellow-600" />
-        <StatCard label="Waitlisted" value={stats?.waitlisted ?? 0} color="text-blue-600" />
-        <StatCard label="Checked In" value={stats?.checkedIn ?? 0} color="text-purple-600" />
+        <StatCard label="Confirmed" value={stats?.confirmed ?? 0} color="text-success" />
+        <StatCard label="Pending" value={stats?.pending ?? 0} color="text-warning" />
+        <StatCard label="Waitlisted" value={stats?.waitlisted ?? 0} color="text-info" />
+        <StatCard label="Checked In" value={stats?.checkedIn ?? 0} color="text-primary" />
         <StatCard 
           label="Revenue" 
           value={`$${(stats?.totalRevenue ?? 0).toLocaleString()}`} 
@@ -521,13 +521,13 @@ const RegistrationRow: React.FC<{
             <DropdownMenuContent align="end">
               {registration.status !== 'CONFIRMED' && (
                 <DropdownMenuItem onClick={() => onStatusChange('CONFIRMED')}>
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                  <CheckCircle className="h-4 w-4 mr-2 text-success" />
                   Approve
                 </DropdownMenuItem>
               )}
               {registration.status === 'WAITLISTED' && (
                 <DropdownMenuItem onClick={() => onStatusChange('CONFIRMED')}>
-                  <UserCheck className="h-4 w-4 mr-2 text-purple-600" />
+                  <UserCheck className="h-4 w-4 mr-2 text-primary" />
                   Move to Confirmed
                 </DropdownMenuItem>
               )}

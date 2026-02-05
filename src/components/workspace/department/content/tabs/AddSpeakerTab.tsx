@@ -21,9 +21,9 @@ interface AddSpeakerTabProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Pending', icon: Clock, color: 'bg-amber-500/10 text-amber-600 border-amber-500/30' },
-  { value: 'confirmed', label: 'Confirmed', icon: CheckCircle, color: 'bg-green-500/10 text-green-600 border-green-500/30' },
-  { value: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'bg-red-500/10 text-red-600 border-red-500/30' },
+  { value: 'pending', label: 'Pending', icon: Clock, color: 'bg-warning/10 text-warning border-warning/30' },
+  { value: 'confirmed', label: 'Confirmed', icon: CheckCircle, color: 'bg-success/10 text-success border-success/30' },
+  { value: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'bg-destructive/10 text-destructive border-destructive/30' },
 ];
 
 export function AddSpeakerTab({ workspace }: AddSpeakerTabProps) {
@@ -240,19 +240,19 @@ export function AddSpeakerTab({ workspace }: AddSpeakerTabProps) {
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('pending')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <p className="text-xs text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('confirmed')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
+            <div className="text-2xl font-bold text-success">{stats.confirmed}</div>
             <p className="text-xs text-muted-foreground">Confirmed</p>
           </CardContent>
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('cancelled')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">{stats.cancelled}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.cancelled}</div>
             <p className="text-xs text-muted-foreground">Cancelled</p>
           </CardContent>
         </Card>
@@ -499,10 +499,10 @@ export function AddSpeakerTab({ workspace }: AddSpeakerTabProps) {
 
                     <div className="flex gap-2 mt-2">
                       {speaker.travel_arranged && (
-                        <Badge variant="outline" className="text-xs bg-green-500/10">✓ Travel</Badge>
+                        <Badge variant="outline" className="text-xs bg-success/10">✓ Travel</Badge>
                       )}
                       {speaker.accommodation_arranged && (
-                        <Badge variant="outline" className="text-xs bg-green-500/10">✓ Accommodation</Badge>
+                        <Badge variant="outline" className="text-xs bg-success/10">✓ Accommodation</Badge>
                       )}
                     </div>
                   </div>

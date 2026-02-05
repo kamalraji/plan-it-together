@@ -20,7 +20,7 @@ interface BudgetRequestFormProps {
 }
 
 const statusConfig = {
-  pending: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'Pending' },
+  pending: { icon: Clock, color: 'text-warning', bg: 'bg-warning/10', label: 'Pending' },
   approved: { icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10', label: 'Approved' },
   rejected: { icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10', label: 'Rejected' },
 };

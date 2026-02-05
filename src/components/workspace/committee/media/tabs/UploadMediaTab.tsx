@@ -114,8 +114,8 @@ export function UploadMediaTab({ workspaceId }: UploadMediaTabProps) {
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) return <Image className="h-4 w-4 text-blue-500" />;
-    if (file.type.startsWith('video/')) return <Video className="h-4 w-4 text-purple-500" />;
+    if (file.type.startsWith('image/')) return <Image className="h-4 w-4 text-info" />;
+    if (file.type.startsWith('video/')) return <Video className="h-4 w-4 text-primary" />;
     return <File className="h-4 w-4 text-muted-foreground" />;
   };
 
@@ -182,7 +182,7 @@ export function UploadMediaTab({ workspaceId }: UploadMediaTabProps) {
                     </div>
                     {uploadProgress[file.name] !== undefined ? (
                       uploadProgress[file.name] === 100 ? (
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-success" />
                       ) : uploadProgress[file.name] === -1 ? (
                         <X className="h-4 w-4 text-destructive" />
                       ) : (
@@ -324,9 +324,9 @@ export function UploadMediaTab({ workspaceId }: UploadMediaTabProps) {
                       className="flex items-center gap-2 p-2 bg-muted/30 rounded text-sm"
                     >
                       {asset.type === 'image' ? (
-                        <Image className="h-4 w-4 text-blue-500 shrink-0" />
+                        <Image className="h-4 w-4 text-info shrink-0" />
                       ) : asset.type === 'video' ? (
-                        <Video className="h-4 w-4 text-purple-500 shrink-0" />
+                        <Video className="h-4 w-4 text-primary shrink-0" />
                       ) : (
                         <File className="h-4 w-4 text-muted-foreground shrink-0" />
                       )}

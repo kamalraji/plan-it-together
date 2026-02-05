@@ -48,7 +48,7 @@ function getErrorInfo(error: Error, isOnline: boolean) {
       title: 'Too Many Requests',
       message: 'Please wait a moment before trying again.',
       icon: Clock,
-      iconColor: 'text-amber-500',
+      iconColor: 'text-warning',
       bgColor: 'bg-amber-50 dark:bg-amber-950/20',
       borderColor: 'border-amber-200 dark:border-amber-800',
     };
@@ -59,7 +59,7 @@ function getErrorInfo(error: Error, isOnline: boolean) {
       title: 'Server Error',
       message: 'Our servers are experiencing issues. Please try again later.',
       icon: AlertTriangle,
-      iconColor: 'text-red-500',
+      iconColor: 'text-destructive',
       bgColor: 'bg-red-50 dark:bg-red-950/20',
       borderColor: 'border-red-200 dark:border-red-800',
     };
@@ -274,8 +274,8 @@ export function OfflineBanner() {
     <div className={cn(
       'fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium transition-colors',
       isOnline
-        ? 'bg-green-500 text-white'
-        : 'bg-orange-500 text-white',
+        ? 'bg-success text-primary-foreground'
+        : 'bg-orange-500 text-primary-foreground',
     )}>
       <div className="flex items-center justify-center gap-2">
         {isOnline ? (

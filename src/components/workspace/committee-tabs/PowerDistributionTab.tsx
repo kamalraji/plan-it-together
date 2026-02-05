@@ -28,13 +28,13 @@ const ZONE_TYPES = [
 ];
 
 const STATUS_CONFIG = {
-  active: { color: 'bg-green-500/20 text-green-600', label: 'Active' },
-  inactive: { color: 'bg-gray-500/20 text-gray-600', label: 'Inactive' },
-  overloaded: { color: 'bg-red-500/20 text-red-600', label: 'Overloaded' },
-  tripped: { color: 'bg-red-500/20 text-red-600', label: 'Tripped' },
-  fault: { color: 'bg-red-500/20 text-red-600', label: 'Fault' },
-  maintenance: { color: 'bg-yellow-500/20 text-yellow-600', label: 'Maintenance' },
-  reserved: { color: 'bg-blue-500/20 text-blue-600', label: 'Reserved' },
+  active: { color: 'bg-success/20 text-success', label: 'Active' },
+  inactive: { color: 'bg-gray-500/20 text-muted-foreground', label: 'Inactive' },
+  overloaded: { color: 'bg-destructive/20 text-destructive', label: 'Overloaded' },
+  tripped: { color: 'bg-destructive/20 text-destructive', label: 'Tripped' },
+  fault: { color: 'bg-destructive/20 text-destructive', label: 'Fault' },
+  maintenance: { color: 'bg-warning/20 text-warning', label: 'Maintenance' },
+  reserved: { color: 'bg-info/20 text-info', label: 'Reserved' },
 };
 
 export function PowerDistributionTab({ workspaceId }: PowerDistributionTabProps) {
@@ -104,10 +104,10 @@ export function PowerDistributionTab({ workspaceId }: PowerDistributionTabProps)
   };
 
   const getLoadColor = (percentage: number) => {
-    if (percentage >= 100) return 'bg-red-500';
+    if (percentage >= 100) return 'bg-destructive';
     if (percentage >= 80) return 'bg-orange-500';
-    if (percentage >= 60) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (percentage >= 60) return 'bg-warning';
+    return 'bg-success';
   };
 
   const trippedCircuits = circuits.filter(c => c.status === 'tripped' || c.status === 'overloaded');
@@ -201,13 +201,13 @@ export function PowerDistributionTab({ workspaceId }: PowerDistributionTabProps)
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">{stats.activeCircuits}</p>
+            <p className="text-2xl font-bold text-success">{stats.activeCircuits}</p>
             <p className="text-xs text-muted-foreground">Active Circuits</p>
           </CardContent>
         </Card>
-        <Card className={stats.trippedCircuits > 0 ? 'border-red-500/30 bg-red-500/5' : ''}>
+        <Card className={stats.trippedCircuits > 0 ? 'border-destructive/30 bg-destructive/5' : ''}>
           <CardContent className="p-4 text-center">
-            <p className={`text-2xl font-bold ${stats.trippedCircuits > 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+            <p className={`text-2xl font-bold ${stats.trippedCircuits > 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
               {stats.trippedCircuits}
             </p>
             <p className="text-xs text-muted-foreground">Tripped</p>
@@ -231,9 +231,9 @@ export function PowerDistributionTab({ workspaceId }: PowerDistributionTabProps)
 
       {/* Alerts */}
       {trippedCircuits.length > 0 && (
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-destructive/30 bg-destructive/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 text-red-600">
+            <CardTitle className="text-base flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-4 w-4" /> Alerts
             </CardTitle>
           </CardHeader>
@@ -279,7 +279,7 @@ export function PowerDistributionTab({ workspaceId }: PowerDistributionTabProps)
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                          <Zap className="h-5 w-5 text-yellow-500" />
+                          <Zap className="h-5 w-5 text-warning" />
                           <div>
                             <CardTitle className="text-base">{zone.name}</CardTitle>
                             <p className="text-sm text-muted-foreground">

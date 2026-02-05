@@ -86,11 +86,11 @@ export function CateringUpdateModal({ open, onOpenChange }: CateringUpdateModalP
   const getStatusBadge = (status: MealSchedule['status']) => {
     switch (status) {
       case 'served':
-        return <Badge className="bg-green-500/10 text-green-600">Served</Badge>;
+        return <Badge className="bg-success/10 text-success">Served</Badge>;
       case 'preparing':
-        return <Badge className="bg-amber-500/10 text-amber-600">Preparing</Badge>;
+        return <Badge className="bg-warning/10 text-warning">Preparing</Badge>;
       case 'scheduled':
-        return <Badge className="bg-blue-500/10 text-blue-600">Scheduled</Badge>;
+        return <Badge className="bg-info/10 text-info">Scheduled</Badge>;
     }
   };
 
@@ -99,7 +99,7 @@ export function CateringUpdateModal({ open, onOpenChange }: CateringUpdateModalP
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UtensilsCrossed className="h-5 w-5 text-amber-500" />
+            <UtensilsCrossed className="h-5 w-5 text-warning" />
             Catering Update - Meal Schedules
           </DialogTitle>
         </DialogHeader>
@@ -150,8 +150,8 @@ export function CateringUpdateModal({ open, onOpenChange }: CateringUpdateModalP
                 {dietaryReqs.map((req, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-border">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Leaf className="h-5 w-5 text-green-500" />
+                      <div className="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center">
+                        <Leaf className="h-5 w-5 text-success" />
                       </div>
                       <div>
                         <p className="font-medium">{req.type}</p>
@@ -163,8 +163,8 @@ export function CateringUpdateModal({ open, onOpenChange }: CateringUpdateModalP
                     </Badge>
                   </div>
                 ))}
-                <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <div className="flex items-center gap-2 text-amber-600">
+                <div className="p-4 rounded-lg bg-warning/10 border border-warning/30">
+                  <div className="flex items-center gap-2 text-warning">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="text-sm font-medium">Reminder: Confirm final dietary counts 2 hours before each meal</span>
                   </div>

@@ -297,9 +297,9 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-green-100 text-green-800';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'advanced': return 'bg-red-100 text-red-800';
+      case 'beginner': return 'bg-success/20 text-success';
+      case 'intermediate': return 'bg-warning/20 text-yellow-800';
+      case 'advanced': return 'bg-destructive/20 text-red-800';
       default: return 'bg-muted text-foreground';
     }
   };
@@ -312,7 +312,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
     const isLastStep = currentStep === activeTutorial.steps.length - 1;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-foreground bg-opacity-50 z-50 flex items-center justify-center">
         <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
@@ -334,7 +334,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
           <div className="px-4 py-2">
             <div className="w-full bg-muted rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / activeTutorial.steps.length) * 100}%` }}
               />
             </div>
@@ -346,9 +346,9 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
             <p className="text-muted-foreground text-sm mb-4">{step.content}</p>
             
             {step.hints && step.hints.length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div className="bg-info/10 border border-blue-200 rounded-lg p-3 mb-4">
                 <p className="text-sm text-blue-800 font-medium mb-1">💡 Hints:</p>
-                <ul className="text-sm text-blue-700 space-y-1">
+                <ul className="text-sm text-info space-y-1">
                   {step.hints.map((hint, index) => (
                     <li key={index}>• {hint}</li>
                   ))}
@@ -449,7 +449,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
                         </div>
                         <div className="w-full bg-muted rounded-full h-1">
                           <div
-                            className="bg-blue-600 h-1 rounded-full"
+                            className="bg-primary h-1 rounded-full"
                             style={{ width: `${((tutorialProgress.currentStep + 1) / tutorial.steps.length) * 100}%` }}
                           />
                         </div>
@@ -491,7 +491,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
                           {tutorial.difficulty}
                         </span>
                         {tutorialProgress?.completed && (
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <CheckCircle className="w-4 h-4 text-success" />
                         )}
                       </div>
                       <p className="text-muted-foreground text-sm mb-3">{tutorial.description}</p>
@@ -519,7 +519,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
                           </div>
                           <div className="w-full bg-muted rounded-full h-1">
                             <div
-                              className="bg-blue-600 h-1 rounded-full"
+                              className="bg-primary h-1 rounded-full"
                               style={{ width: `${((tutorialProgress.currentStep + 1) / tutorial.steps.length) * 100}%` }}
                             />
                           </div>

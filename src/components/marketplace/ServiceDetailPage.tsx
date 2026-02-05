@@ -212,7 +212,7 @@ export const ServiceDetailPage: React.FC = () => {
                         <span>{service.location}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <StarIcon className="h-4 w-4 text-yellow-500" />
+                        <StarIcon className="h-4 w-4 text-warning" />
                         <span>{service.rating.toFixed(1)} ({service.review_count} reviews)</span>
                       </div>
                     </div>
@@ -238,13 +238,13 @@ export const ServiceDetailPage: React.FC = () => {
                     {service.inclusions && service.inclusions.length > 0 && (
                       <div>
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
-                          <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                          <CheckCircleIcon className="h-5 w-5 text-success" />
                           Included
                         </h4>
                         <ul className="space-y-2">
                           {service.inclusions.map((item: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <CheckCircleIcon className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                              <CheckCircleIcon className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                               <span>{item}</span>
                             </li>
                           ))}
@@ -255,13 +255,13 @@ export const ServiceDetailPage: React.FC = () => {
                     {service.exclusions && service.exclusions.length > 0 && (
                       <div className="mt-6">
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
-                          <XCircleIcon className="h-5 w-5 text-red-500" />
+                          <XCircleIcon className="h-5 w-5 text-destructive" />
                           Not Included
                         </h4>
                         <ul className="space-y-2">
                           {service.exclusions.map((item: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <XCircleIcon className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                              <XCircleIcon className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
                               <span>{item}</span>
                             </li>
                           ))}
@@ -296,7 +296,7 @@ export const ServiceDetailPage: React.FC = () => {
                   <CardTitle className="flex items-center gap-2">
                     About the Vendor
                     {service.vendor.verification_status === 'VERIFIED' && (
-                      <ShieldCheckIcon className="h-5 w-5 text-green-500" />
+                      <ShieldCheckIcon className="h-5 w-5 text-success" />
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -321,7 +321,7 @@ export const ServiceDetailPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Rating</span>
                       <div className="flex items-center gap-1">
-                        <StarIcon className="h-4 w-4 text-yellow-500" />
+                        <StarIcon className="h-4 w-4 text-warning" />
                         <span className="font-semibold">{service.vendor.rating.toFixed(1)}</span>
                       </div>
                     </div>

@@ -86,7 +86,7 @@ const DefaultErrorFallback: React.FC<{
   return (
     <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4 p-8">
       <div className="text-center">
-        <div className="text-5xl mb-4 font-bold text-red-500">!</div>
+        <div className="text-5xl mb-4 font-bold text-destructive">!</div>
         <h2 className="text-xl font-semibold text-foreground mb-2">
           Something went wrong
         </h2>
@@ -113,7 +113,7 @@ const DefaultErrorFallback: React.FC<{
         
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-muted-foreground/40 text-white rounded-md hover:bg-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="px-4 py-2 bg-muted-foreground/40 text-primary-foreground rounded-md hover:bg-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Reload Page
         </button>
@@ -370,7 +370,7 @@ const useIntersectionObserver = (options: IntersectionObserverInit = {}) => {
 // Slow network fallback component
 export const SlowNetworkFallback: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     <div className="text-center">
       <p className="text-muted-foreground mb-2">Taking longer than usual...</p>
       <p className="text-sm text-muted-foreground">

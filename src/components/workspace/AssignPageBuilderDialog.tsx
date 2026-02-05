@@ -143,10 +143,10 @@ export function AssignPageBuilderDialog({
 
           {/* Existing Assignment Warning */}
           {existingAssignment && (
-            <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
+            <div className="flex items-start gap-2 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-warning mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-amber-600">Already Assigned</p>
+                <p className="font-medium text-warning">Already Assigned</p>
                 <p className="text-muted-foreground">
                   This page type is currently assigned to <strong>{existingAssignment.workspaceName}</strong>.
                   Assigning to a new workspace will revoke the existing assignment.

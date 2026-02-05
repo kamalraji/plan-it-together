@@ -27,11 +27,11 @@ interface SpecialRequest {
 
 // Map requirement types to display config
 const requirementConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }> = {
-  'vegetarian': { icon: Leaf, color: 'text-green-500', bgColor: 'bg-green-500/10' },
+  'vegetarian': { icon: Leaf, color: 'text-success', bgColor: 'bg-success/10' },
   'vegan': { icon: Leaf, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
-  'gluten-free': { icon: Wheat, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  'lactose-free': { icon: Milk, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  'nut-allergy': { icon: Nut, color: 'text-red-500', bgColor: 'bg-red-500/10' },
+  'gluten-free': { icon: Wheat, color: 'text-warning', bgColor: 'bg-warning/10' },
+  'lactose-free': { icon: Milk, color: 'text-info', bgColor: 'bg-info/10' },
+  'nut-allergy': { icon: Nut, color: 'text-destructive', bgColor: 'bg-destructive/10' },
   'seafood-allergy': { icon: Fish, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10' },
 };
 
@@ -111,7 +111,7 @@ export function DietaryRequirementsTracker({ workspaceId, eventId }: DietaryRequ
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <AlertTriangle className="h-5 w-5 text-warning" />
             Dietary Requirements
           </CardTitle>
         </CardHeader>
@@ -128,7 +128,7 @@ export function DietaryRequirementsTracker({ workspaceId, eventId }: DietaryRequ
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <AlertTriangle className="h-5 w-5 text-warning" />
             Dietary Requirements
           </CardTitle>
         </CardHeader>
@@ -146,7 +146,7 @@ export function DietaryRequirementsTracker({ workspaceId, eventId }: DietaryRequ
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
+          <AlertTriangle className="h-5 w-5 text-warning" />
           Dietary Requirements
         </CardTitle>
       </CardHeader>

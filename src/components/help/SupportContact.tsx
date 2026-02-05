@@ -125,10 +125,10 @@ export const SupportContact: React.FC<SupportContactProps> = ({
   ];
 
   const priorities = [
-    { value: 'low', label: 'Low', color: 'text-green-600' },
-    { value: 'medium', label: 'Medium', color: 'text-yellow-600' },
+    { value: 'low', label: 'Low', color: 'text-success' },
+    { value: 'medium', label: 'Medium', color: 'text-warning' },
     { value: 'high', label: 'High', color: 'text-orange-600' },
-    { value: 'urgent', label: 'Urgent', color: 'text-red-600' }
+    { value: 'urgent', label: 'Urgent', color: 'text-destructive' }
   ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,9 +186,9 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
-      case 'resolved': return 'bg-green-100 text-green-800';
+      case 'open': return 'bg-info/20 text-blue-800';
+      case 'in_progress': return 'bg-warning/20 text-yellow-800';
+      case 'resolved': return 'bg-success/20 text-success';
       case 'closed': return 'bg-muted text-foreground';
       default: return 'bg-muted text-foreground';
     }
@@ -206,7 +206,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
   if (submitted) {
     return (
       <div className="bg-card rounded-lg border border-border p-8 text-center">
-        <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+        <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-foreground mb-2">Ticket Submitted Successfully!</h2>
         <p className="text-muted-foreground mb-6">
           We've received your support request and will get back to you soon. 
@@ -396,7 +396,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
                 className="border border-border rounded-lg p-4 hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-center mb-3">
-                  <Icon className="w-6 h-6 text-blue-600 mr-3" />
+                  <Icon className="w-6 h-6 text-info mr-3" />
                   <h3 className="font-medium text-foreground">{method.name}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">{method.description}</p>
@@ -420,12 +420,12 @@ export const SupportContact: React.FC<SupportContactProps> = ({
       </div>
 
       {/* Emergency Contact */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-lg p-4">
         <div className="flex items-start">
-          <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-destructive mr-3 mt-0.5" />
           <div>
             <h3 className="font-medium text-red-900 mb-1">Emergency Support</h3>
-            <p className="text-sm text-red-700 mb-2">
+            <p className="text-sm text-destructive mb-2">
               For critical issues affecting live events or system outages, contact our emergency line:
             </p>
             <a

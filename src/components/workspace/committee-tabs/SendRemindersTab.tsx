@@ -117,7 +117,7 @@ export function SendRemindersTab({ workspace }: SendRemindersTabProps) {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Mail className="w-6 h-6 text-amber-500" />
+          <Mail className="w-6 h-6 text-warning" />
           Send Reminders
         </h2>
         <p className="text-muted-foreground mt-1">Send email or SMS reminders to your attendees</p>
@@ -387,11 +387,11 @@ export function SendRemindersTab({ workspace }: SendRemindersTabProps) {
                         {item.status === 'sent' ? (
                           <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5" />
                         ) : item.status === 'scheduled' ? (
-                          <Clock className="w-5 h-5 text-amber-500 mt-0.5" />
+                          <Clock className="w-5 h-5 text-warning mt-0.5" />
                         ) : item.status === 'sending' ? (
-                          <Loader2 className="w-5 h-5 text-blue-500 mt-0.5 animate-spin" />
+                          <Loader2 className="w-5 h-5 text-info mt-0.5 animate-spin" />
                         ) : (
-                          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+                          <AlertCircle className="w-5 h-5 text-destructive mt-0.5" />
                         )}
                         <div>
                           <p className="font-medium">{item.subject || item.name}</p>

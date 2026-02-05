@@ -94,11 +94,11 @@ export function MaintenanceRequests({ workspaceId }: MaintenanceRequestsProps) {
   const getPriorityConfig = (priority: string) => {
     switch (priority) {
       case 'high':
-        return { label: 'High', color: 'bg-red-500/10 text-red-600' };
+        return { label: 'High', color: 'bg-destructive/10 text-destructive' };
       case 'medium':
-        return { label: 'Medium', color: 'bg-amber-500/10 text-amber-600' };
+        return { label: 'Medium', color: 'bg-warning/10 text-warning' };
       case 'low':
-        return { label: 'Low', color: 'bg-green-500/10 text-green-600' };
+        return { label: 'Low', color: 'bg-success/10 text-success' };
       default:
         return { label: priority, color: 'bg-muted text-muted-foreground' };
     }

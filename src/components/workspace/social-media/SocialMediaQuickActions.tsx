@@ -26,15 +26,15 @@ export function SocialMediaQuickActions() {
       label: 'Create Post',
       description: 'Draft a new social media post',
       icon: PenSquare,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Schedule Content',
       description: 'Plan posts for future dates',
       icon: Calendar,
-      color: 'text-violet-500',
-      bgColor: 'bg-violet-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       label: 'View Analytics',
@@ -47,8 +47,8 @@ export function SocialMediaQuickActions() {
       label: 'Manage Influencers',
       description: 'Track partner collaborations',
       icon: Users,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       label: 'Upload Media',
@@ -61,8 +61,8 @@ export function SocialMediaQuickActions() {
       label: 'Create Reel/Video',
       description: 'Start a new video project',
       icon: Video,
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
     },
     {
       label: 'Hashtag Research',
@@ -75,8 +75,8 @@ export function SocialMediaQuickActions() {
       label: 'Respond to Comments',
       description: 'Engage with audience',
       icon: MessageSquare,
-      color: 'text-indigo-500',
-      bgColor: 'bg-indigo-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ];
 

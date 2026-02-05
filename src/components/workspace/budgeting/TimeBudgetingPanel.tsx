@@ -28,9 +28,9 @@ interface TimeBudget {
 
 
 const categoryColors: Record<string, string> = {
-  development: 'bg-blue-500',
-  design: 'bg-purple-500',
-  meetings: 'bg-amber-500',
+  development: 'bg-info',
+  design: 'bg-primary',
+  meetings: 'bg-warning',
   admin: 'bg-gray-500',
   planning: 'bg-emerald-500',
   review: 'bg-pink-500',
@@ -79,8 +79,8 @@ export function TimeBudgetingPanel({
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Clock className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Clock className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.totalAllocated}h</p>
@@ -107,8 +107,8 @@ export function TimeBudgetingPanel({
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <AlertTriangle className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.overBudget}</p>
@@ -215,7 +215,7 @@ export function TimeBudgetingPanel({
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isOverBudget ? 'text-red-500' : 'text-muted-foreground'
+                          isOverBudget ? 'text-destructive' : 'text-muted-foreground'
                         )}
                       >
                         {budget.used_hours}h / {budget.allocated_hours}h
@@ -223,10 +223,10 @@ export function TimeBudgetingPanel({
                     </div>
                     <Progress
                       value={Math.min(percentage, 100)}
-                      className={cn('h-2', isOverBudget && '[&>div]:bg-red-500')}
+                      className={cn('h-2', isOverBudget && '[&>div]:bg-destructive')}
                     />
                     {isOverBudget && (
-                      <p className="text-xs text-red-500 flex items-center gap-1">
+                      <p className="text-xs text-destructive flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3" />
                         {(percentage - 100).toFixed(0)}% over budget
                       </p>

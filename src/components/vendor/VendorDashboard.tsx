@@ -195,8 +195,8 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Package className="h-5 w-5 text-blue-600" />
+              <div className="h-10 w-10 rounded-lg bg-info/20 flex items-center justify-center">
+                <Package className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Active Services</p>
@@ -211,8 +211,8 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                <Star className="h-5 w-5 text-yellow-600" />
+              <div className="h-10 w-10 rounded-lg bg-warning/20 flex items-center justify-center">
+                <Star className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Average Rating</p>
@@ -227,8 +227,8 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-green-600" />
+              <div className="h-10 w-10 rounded-lg bg-success/20 flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Reviews</p>
@@ -244,7 +244,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <CalendarCheck className="h-5 w-5 text-purple-600" />
+                <CalendarCheck className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pending Bookings</p>
@@ -317,12 +317,12 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
 
       {/* Status Alert */}
       {vendor.verification_status === 'PENDING' && (
-        <Card className="border-yellow-200 bg-yellow-50">
+        <Card className="border-yellow-200 bg-warning/10">
           <CardContent className="p-4 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <AlertCircle className="h-5 w-5 text-warning" />
             <div>
               <p className="font-medium text-yellow-800">Verification Pending</p>
-              <p className="text-sm text-yellow-700">
+              <p className="text-sm text-warning">
                 Your vendor profile is under review. You'll be notified once it's approved.
               </p>
             </div>
@@ -331,12 +331,12 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
       )}
 
       {vendor.verification_status === 'VERIFIED' && (
-        <Card className="border-green-200 bg-green-50">
+        <Card className="border-green-200 bg-success/10">
           <CardContent className="p-4 flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-success" />
             <div>
-              <p className="font-medium text-green-800">Verified Vendor</p>
-              <p className="text-sm text-green-700">
+              <p className="font-medium text-success">Verified Vendor</p>
+              <p className="text-sm text-success">
                 Your profile is verified and visible to customers in the marketplace.
               </p>
             </div>

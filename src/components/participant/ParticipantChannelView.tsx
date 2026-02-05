@@ -118,7 +118,7 @@ export function ParticipantChannelView({ eventId, onBack }: ParticipantChannelVi
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${
                   channel.type === 'announcement' 
-                    ? 'bg-amber-500/10 text-amber-600' 
+                    ? 'bg-warning/10 text-warning' 
                     : 'bg-primary/10 text-primary'
                 }`}>
                   {typeIcons[channel.type] || <Hash className="h-4 w-4" />}
@@ -210,7 +210,7 @@ function ChannelMessageView({ channel, onBack }: ChannelMessageViewProps) {
           </Button>
           <div className={`p-2 rounded-lg ${
             channel.type === 'announcement' 
-              ? 'bg-amber-500/10 text-amber-600' 
+              ? 'bg-warning/10 text-warning' 
               : 'bg-primary/10 text-primary'
           }`}>
             {typeIcons[channel.type] || <Hash className="h-4 w-4" />}

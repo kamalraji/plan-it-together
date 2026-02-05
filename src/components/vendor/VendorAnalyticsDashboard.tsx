@@ -152,18 +152,18 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
             <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
-            <div className="mt-2 text-sm text-red-700">
+            <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
@@ -187,8 +187,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 bg-info rounded-md flex items-center justify-center">
+                <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                   <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                 </svg>
@@ -206,8 +206,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 bg-success rounded-md flex items-center justify-center">
+                <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -224,8 +224,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -242,8 +242,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <div className="bg-card p-6 rounded-lg shadow">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-8 h-8 bg-warning rounded-md flex items-center justify-center">
+                <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                 </svg>
@@ -263,7 +263,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Conversion Rate</h3>
-          <div className="text-3xl font-bold text-blue-600">
+          <div className="text-3xl font-bold text-info">
             {performanceMetrics?.conversionRate.toFixed(1)}%
           </div>
           <p className="text-sm text-muted-foreground mt-2">Views to Inquiries</p>
@@ -271,7 +271,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
 
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Booking Rate</h3>
-          <div className="text-3xl font-bold text-green-600">
+          <div className="text-3xl font-bold text-success">
             {performanceMetrics?.inquiryToBookingRate.toFixed(1)}%
           </div>
           <p className="text-sm text-muted-foreground mt-2">Inquiries to Bookings</p>
@@ -280,7 +280,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Average Rating</h3>
           <div className="flex items-center">
-            <div className="text-3xl font-bold text-yellow-600">
+            <div className="text-3xl font-bold text-warning">
               {performanceMetrics?.averageRating.toFixed(1)}
             </div>
             <div className="ml-2 flex">
@@ -375,16 +375,16 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Response Time</h3>
-          <div className="text-3xl font-bold text-blue-600">
+          <div className="text-3xl font-bold text-info">
             {performanceMetrics?.averageResponseTime}h
           </div>
           <div className="mt-2">
             <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
               (performanceMetrics?.averageResponseTime || 0) <= 12 
-                ? 'bg-green-100 text-green-800' 
+                ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.averageResponseTime || 0) <= 24
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
+                ? 'bg-warning/20 text-yellow-800'
+                : 'bg-destructive/20 text-red-800'
             }`}>
               {(performanceMetrics?.averageResponseTime || 0) <= 12 ? 'Excellent' : 
                (performanceMetrics?.averageResponseTime || 0) <= 24 ? 'Good' : 'Needs Improvement'}
@@ -394,16 +394,16 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
 
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Completion Rate</h3>
-          <div className="text-3xl font-bold text-green-600">
+          <div className="text-3xl font-bold text-success">
             {performanceMetrics?.completionRate.toFixed(1)}%
           </div>
           <div className="mt-2">
             <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
               (performanceMetrics?.completionRate || 0) >= 95 
-                ? 'bg-green-100 text-green-800' 
+                ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.completionRate || 0) >= 85
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
+                ? 'bg-warning/20 text-yellow-800'
+                : 'bg-destructive/20 text-red-800'
             }`}>
               {(performanceMetrics?.completionRate || 0) >= 95 ? 'Excellent' : 
                (performanceMetrics?.completionRate || 0) >= 85 ? 'Good' : 'Needs Improvement'}
@@ -413,16 +413,16 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
 
         <div className="bg-card p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-foreground mb-4">Repeat Customer Rate</h3>
-          <div className="text-3xl font-bold text-purple-600">
+          <div className="text-3xl font-bold text-primary">
             {performanceMetrics?.repeatCustomerRate.toFixed(1)}%
           </div>
           <div className="mt-2">
             <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
               (performanceMetrics?.repeatCustomerRate || 0) >= 30 
-                ? 'bg-green-100 text-green-800' 
+                ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.repeatCustomerRate || 0) >= 15
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
+                ? 'bg-warning/20 text-yellow-800'
+                : 'bg-destructive/20 text-red-800'
             }`}>
               {(performanceMetrics?.repeatCustomerRate || 0) >= 30 ? 'Excellent' : 
                (performanceMetrics?.repeatCustomerRate || 0) >= 15 ? 'Good' : 'Needs Improvement'}
@@ -450,7 +450,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
         <h3 className="text-lg font-medium text-foreground mb-4">Competitive Positioning</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-info">
               #{insights?.competitivePositioning.marketRank}
             </div>
             <div className="text-sm text-muted-foreground">Market Rank</div>
@@ -461,9 +461,9 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           
           <div className="text-center">
             <div className={`text-2xl font-bold ${
-              insights?.competitivePositioning.pricePosition === 'ABOVE_MARKET' ? 'text-red-600' :
-              insights?.competitivePositioning.pricePosition === 'BELOW_MARKET' ? 'text-green-600' :
-              'text-yellow-600'
+              insights?.competitivePositioning.pricePosition === 'ABOVE_MARKET' ? 'text-destructive' :
+              insights?.competitivePositioning.pricePosition === 'BELOW_MARKET' ? 'text-success' :
+              'text-warning'
             }`}>
               {insights?.competitivePositioning.pricePosition.replace('_', ' ')}
             </div>
@@ -472,9 +472,9 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           
           <div className="text-center">
             <div className={`text-2xl font-bold ${
-              insights?.competitivePositioning.ratingPosition === 'ABOVE_AVERAGE' ? 'text-green-600' :
-              insights?.competitivePositioning.ratingPosition === 'BELOW_AVERAGE' ? 'text-red-600' :
-              'text-yellow-600'
+              insights?.competitivePositioning.ratingPosition === 'ABOVE_AVERAGE' ? 'text-success' :
+              insights?.competitivePositioning.ratingPosition === 'BELOW_AVERAGE' ? 'text-destructive' :
+              'text-warning'
             }`}>
               {insights?.competitivePositioning.ratingPosition.replace('_', ' ')}
             </div>
@@ -482,7 +482,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-primary">
               ${performanceMetrics?.averageOrderValue.toLocaleString()}
             </div>
             <div className="text-sm text-muted-foreground">Avg Order Value</div>
@@ -505,7 +505,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   <h4 className="font-medium text-foreground">{rec.serviceName}</h4>
                   <div className="text-right">
                     <div className="text-sm text-muted-foreground">Current: ${rec.currentPrice}</div>
-                    <div className="text-sm font-medium text-green-600">
+                    <div className="text-sm font-medium text-success">
                       Recommended: ${rec.recommendedPrice}
                     </div>
                   </div>
@@ -526,9 +526,9 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mr-3 ${
-                    suggestion.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
-                    suggestion.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
+                    suggestion.priority === 'HIGH' ? 'bg-destructive/20 text-red-800' :
+                    suggestion.priority === 'MEDIUM' ? 'bg-warning/20 text-yellow-800' :
+                    'bg-success/20 text-success'
                   }`}>
                     {suggestion.priority}
                   </span>
@@ -583,8 +583,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      forecast.growthRate > 0 ? 'bg-green-100 text-green-800' : 
-                      forecast.growthRate < 0 ? 'bg-red-100 text-red-800' :
+                      forecast.growthRate > 0 ? 'bg-success/20 text-success' : 
+                      forecast.growthRate < 0 ? 'bg-destructive/20 text-red-800' :
                       'bg-muted text-foreground'
                     }`}>
                       {forecast.growthRate > 0 ? '+' : ''}{forecast.growthRate.toFixed(1)}%
@@ -636,8 +636,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                 <div className="flex items-center">
                   <span className="text-sm text-muted-foreground mr-2">Relevance:</span>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    trend.relevanceScore >= 80 ? 'bg-green-100 text-green-800' :
-                    trend.relevanceScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                    trend.relevanceScore >= 80 ? 'bg-success/20 text-success' :
+                    trend.relevanceScore >= 60 ? 'bg-warning/20 text-yellow-800' :
                     'bg-muted text-foreground'
                   }`}>
                     {trend.relevanceScore}%
@@ -646,7 +646,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               </div>
               <p className="text-sm text-muted-foreground mb-2">{trend.description}</p>
               {trend.actionable && (
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-info/20 text-blue-800">
                   Actionable
                 </span>
               )}
@@ -680,7 +680,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               onClick={() => setActiveTab(tab.id as any)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-info text-info'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >

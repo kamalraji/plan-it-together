@@ -56,13 +56,13 @@ export function LogisticsStatusTab({ workspace }: LogisticsStatusTabProps) {
       case 'delivered':
         return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Delivered</Badge>;
       case 'in_transit':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30"><Truck className="h-3 w-3 mr-1" />In Transit</Badge>;
+        return <Badge className="bg-info/20 text-info border-info/30"><Truck className="h-3 w-3 mr-1" />In Transit</Badge>;
       case 'delayed':
-        return <Badge className="bg-red-500/20 text-red-600 border-red-500/30"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive border-destructive/30"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
       case 'cancelled':
         return <Badge className="bg-muted text-muted-foreground">Cancelled</Badge>;
       default:
-        return <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-warning/30"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
     }
   };
 
@@ -84,7 +84,7 @@ export function LogisticsStatusTab({ workspace }: LogisticsStatusTabProps) {
       case 'delivered':
         return 'bg-emerald-500';
       case 'delayed':
-        return 'bg-red-500';
+        return 'bg-destructive';
       default:
         return 'bg-primary';
     }
@@ -156,27 +156,27 @@ export function LogisticsStatusTab({ workspace }: LogisticsStatusTabProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-blue-500/10 border-blue-500/20">
+        <Card className="bg-info/10 border-info/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/20 rounded-full">
-                <Truck className="h-6 w-6 text-blue-500" />
+              <div className="p-3 bg-info/20 rounded-full">
+                <Truck className="h-6 w-6 text-info" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-500">{inTransitCount}</div>
+                <div className="text-3xl font-bold text-info">{inTransitCount}</div>
                 <p className="text-sm text-muted-foreground">In Transit</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-500/20 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-500" />
+              <div className="p-3 bg-destructive/20 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-red-500">{delayedCount}</div>
+                <div className="text-3xl font-bold text-destructive">{delayedCount}</div>
                 <p className="text-sm text-muted-foreground">Delayed</p>
               </div>
             </div>

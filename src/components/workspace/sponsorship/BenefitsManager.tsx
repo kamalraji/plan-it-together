@@ -10,7 +10,7 @@ interface BenefitsManagerProps {
 
 const tiers = [
   { key: 'platinum', label: 'Platinum', color: 'bg-slate-600' },
-  { key: 'gold', label: 'Gold', color: 'bg-amber-500' },
+  { key: 'gold', label: 'Gold', color: 'bg-warning' },
   { key: 'silver', label: 'Silver', color: 'bg-muted-foreground/30' },
   { key: 'bronze', label: 'Bronze', color: 'bg-orange-500' },
 ];
@@ -56,7 +56,7 @@ export function BenefitsManager({ workspaceId }: BenefitsManagerProps) {
                 {tiers.map((tier) => (
                   <div
                     key={tier.key}
-                    className={`w-16 text-center text-xs font-medium text-white py-1 px-2 rounded ${tier.color}`}
+                    className={`w-16 text-center text-xs font-medium text-primary-foreground py-1 px-2 rounded ${tier.color}`}
                   >
                     {tier.label}
                   </div>

@@ -85,7 +85,7 @@ export function AddEquipmentTab({ workspaceId }: AddEquipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div>
                 <p className="text-2xl font-bold">{stats.available}</p>
                 <p className="text-sm text-muted-foreground">Available</p>
@@ -96,7 +96,7 @@ export function AddEquipmentTab({ workspaceId }: AddEquipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Package className="h-8 w-8 text-blue-500" />
+              <Package className="h-8 w-8 text-info" />
               <div>
                 <p className="text-2xl font-bold">{stats.inUse}</p>
                 <p className="text-sm text-muted-foreground">In Use</p>
@@ -107,7 +107,7 @@ export function AddEquipmentTab({ workspaceId }: AddEquipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Wrench className="h-8 w-8 text-amber-500" />
+              <Wrench className="h-8 w-8 text-warning" />
               <div>
                 <p className="text-2xl font-bold">{stats.maintenance}</p>
                 <p className="text-sm text-muted-foreground">Maintenance</p>
@@ -118,7 +118,7 @@ export function AddEquipmentTab({ workspaceId }: AddEquipmentTabProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Box className="h-8 w-8 text-purple-500" />
+              <Box className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{stats.reserved}</p>
                 <p className="text-sm text-muted-foreground">Reserved</p>

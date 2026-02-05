@@ -124,7 +124,7 @@ export function FullVolunteerRoster({ workspaceId, onAddVolunteer }: FullVolunte
       case 'ACTIVE':
         return <CheckCircle className="h-4 w-4 text-emerald-500" />;
       case 'PENDING':
-        return <Clock className="h-4 w-4 text-amber-500" />;
+        return <Clock className="h-4 w-4 text-warning" />;
       case 'INACTIVE':
         return <XCircle className="h-4 w-4 text-muted-foreground" />;
       default:
@@ -135,7 +135,7 @@ export function FullVolunteerRoster({ workspaceId, onAddVolunteer }: FullVolunte
   const getStatusBadge = (status: string) => {
     const styles = {
       ACTIVE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-      PENDING: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      PENDING: 'bg-warning/10 text-warning border-warning/20',
       INACTIVE: 'bg-muted text-muted-foreground border-border',
     };
     return (

@@ -140,9 +140,9 @@ export function MessageComposer({
                 type="checkbox"
                 checked={isPriority}
                 onChange={(e) => setIsPriority(e.target.checked)}
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-input rounded"
+                className="h-4 w-4 text-destructive focus:ring-destructive border-input rounded"
               />
-              <span className={isPriority ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+              <span className={isPriority ? 'text-destructive font-medium' : 'text-muted-foreground'}>
                 🚨 Priority
               </span>
             </label>
@@ -177,7 +177,7 @@ export function MessageComposer({
       <p className="text-xs text-muted-foreground">
         Press Enter to send, Shift+Enter for new line
         {isPriority && (
-          <span className="text-red-500 font-medium ml-2">
+          <span className="text-destructive font-medium ml-2">
             • Priority message will notify all members immediately
           </span>
         )}

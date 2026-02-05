@@ -51,10 +51,10 @@ export function MenuPlanner({ workspaceId }: MenuPlannerProps) {
   });
 
   const mealTypeConfig = {
-    breakfast: { icon: Coffee, label: 'Breakfast', color: 'text-amber-500' },
+    breakfast: { icon: Coffee, label: 'Breakfast', color: 'text-warning' },
     lunch: { icon: Sun, label: 'Lunch', color: 'text-orange-500' },
-    dinner: { icon: Moon, label: 'Dinner', color: 'text-indigo-500' },
-    snack: { icon: Utensils, label: 'Snack', color: 'text-green-500' },
+    dinner: { icon: Moon, label: 'Dinner', color: 'text-primary' },
+    snack: { icon: Utensils, label: 'Snack', color: 'text-success' },
   };
 
   const handleSubmit = async () => {
@@ -279,23 +279,23 @@ export function MenuPlanner({ workspaceId }: MenuPlannerProps) {
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                         <div className="flex flex-wrap gap-1 mt-2">
                           {item.is_vegetarian && (
-                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
+                            <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
                               <Leaf className="h-3 w-3 mr-1" />
                               Vegetarian
                             </Badge>
                           )}
                           {item.is_vegan && (
-                            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
+                            <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
                               Vegan
                             </Badge>
                           )}
                           {item.is_gluten_free && (
-                            <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20">
+                            <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">
                               GF
                             </Badge>
                           )}
                           {item.allergens.length > 0 && (
-                            <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 border-red-500/20">
+                            <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/20">
                               <AlertTriangle className="h-3 w-3 mr-1" />
                               {item.allergens.join(', ')}
                             </Badge>
@@ -307,7 +307,7 @@ export function MenuPlanner({ workspaceId }: MenuPlannerProps) {
                     <div className="flex gap-1">
                       {item.status === 'draft' && (
                         <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => confirmItem(item.id)}>
-                          <Check className="h-4 w-4 text-green-500" />
+                          <Check className="h-4 w-4 text-success" />
                         </Button>
                       )}
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(item)}>

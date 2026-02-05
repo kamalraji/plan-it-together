@@ -16,9 +16,9 @@ interface PostNowSocialTabProps {
 const PLATFORMS = [
   { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', bgColor: 'bg-pink-500/10', charLimit: 2200 },
   { id: 'twitter', label: 'Twitter/X', icon: Twitter, color: 'text-sky-500', bgColor: 'bg-sky-500/10', charLimit: 280 },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-600', bgColor: 'bg-blue-600/10', charLimit: 3000 },
-  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', bgColor: 'bg-blue-500/10', charLimit: 63206 },
-  { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-red-500', bgColor: 'bg-red-500/10', charLimit: 5000 },
+  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-info', bgColor: 'bg-primary/10', charLimit: 3000 },
+  { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-info', bgColor: 'bg-info/10', charLimit: 63206 },
+  { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-destructive', bgColor: 'bg-destructive/10', charLimit: 5000 },
 ];
 
 const POST_TYPES = [
@@ -67,7 +67,7 @@ export function PostNowSocialTab({ workspaceId }: PostNowSocialTabProps) {
     if (remaining < 0) {
       return { status: 'over', remaining, color: 'text-destructive' };
     } else if (remaining < 50) {
-      return { status: 'warning', remaining, color: 'text-amber-500' };
+      return { status: 'warning', remaining, color: 'text-warning' };
     }
     return { status: 'ok', remaining, color: 'text-muted-foreground' };
   };

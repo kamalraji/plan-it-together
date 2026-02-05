@@ -76,11 +76,11 @@ function ActivityMetadata({ activityType, metadata }: { activityType: ActivityTy
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = { TODO: 'bg-gray-100 text-gray-700', IN_PROGRESS: 'bg-blue-100 text-blue-700', COMPLETED: 'bg-green-100 text-green-700', BLOCKED: 'bg-red-100 text-red-700', ON_HOLD: 'bg-yellow-100 text-yellow-700' };
+  const colors: Record<string, string> = { TODO: 'bg-muted text-foreground', IN_PROGRESS: 'bg-info/20 text-info', COMPLETED: 'bg-success/20 text-success', BLOCKED: 'bg-destructive/20 text-destructive', ON_HOLD: 'bg-warning/20 text-warning' };
   return <span className={cn('px-2 py-0.5 rounded-full', colors[status] || 'bg-muted')}>{status?.replace(/_/g, ' ')}</span>;
 }
 
 function PriorityBadge({ priority }: { priority: string }) {
-  const colors: Record<string, string> = { LOW: 'bg-slate-100 text-slate-700', MEDIUM: 'bg-blue-100 text-blue-700', HIGH: 'bg-orange-100 text-orange-700', CRITICAL: 'bg-red-100 text-red-700' };
+  const colors: Record<string, string> = { LOW: 'bg-muted text-foreground', MEDIUM: 'bg-info/20 text-info', HIGH: 'bg-orange-100 text-orange-700', CRITICAL: 'bg-destructive/20 text-destructive' };
   return <span className={cn('px-2 py-0.5 rounded-full', colors[priority] || 'bg-muted')}>{priority}</span>;
 }

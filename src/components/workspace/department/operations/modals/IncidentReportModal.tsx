@@ -46,11 +46,11 @@ export function IncidentReportModal({ open, onOpenChange, workspaceId }: Inciden
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <Badge className="bg-red-500 text-white">Critical</Badge>;
+        return <Badge className="bg-destructive text-primary-foreground">Critical</Badge>;
       case 'high':
         return <Badge className="bg-orange-500/10 text-orange-600">High</Badge>;
       case 'medium':
-        return <Badge className="bg-amber-500/10 text-amber-600">Medium</Badge>;
+        return <Badge className="bg-warning/10 text-warning">Medium</Badge>;
       case 'low':
         return <Badge className="bg-muted-foreground/30/10 text-muted-foreground">Low</Badge>;
       default:
@@ -61,11 +61,11 @@ export function IncidentReportModal({ open, onOpenChange, workspaceId }: Inciden
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge variant="outline" className="text-red-600 border-red-600">Open</Badge>;
+        return <Badge variant="outline" className="text-destructive border-destructive">Open</Badge>;
       case 'investigating':
-        return <Badge variant="outline" className="text-amber-600 border-amber-600">Investigating</Badge>;
+        return <Badge variant="outline" className="text-warning border-amber-600">Investigating</Badge>;
       case 'resolved':
-        return <Badge variant="outline" className="text-green-600 border-green-600">Resolved</Badge>;
+        return <Badge variant="outline" className="text-success border-success">Resolved</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -98,7 +98,7 @@ export function IncidentReportModal({ open, onOpenChange, workspaceId }: Inciden
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500" />
+            <AlertCircle className="h-5 w-5 text-destructive" />
             Incident Report - Log Issues & Alerts
           </DialogTitle>
         </DialogHeader>

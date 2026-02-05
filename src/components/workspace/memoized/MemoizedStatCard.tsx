@@ -30,9 +30,9 @@ function StatCardComponent({
   className,
 }: StatCardProps) {
   const trendColor = trend?.direction === 'up' 
-    ? 'text-green-500' 
+    ? 'text-success' 
     : trend?.direction === 'down' 
-    ? 'text-red-500' 
+    ? 'text-destructive' 
     : 'text-muted-foreground';
 
   return (

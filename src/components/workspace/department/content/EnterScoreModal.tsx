@@ -177,7 +177,7 @@ export function EnterScoreModal({ open, onOpenChange, eventId }: EnterScoreModal
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-500" />
+            <Star className="h-5 w-5 text-warning" />
             Enter Score
           </DialogTitle>
         </DialogHeader>

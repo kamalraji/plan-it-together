@@ -60,13 +60,13 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   switch (type) {
     case 'message':
-      return 'text-blue-500 bg-blue-500/10';
+      return 'text-info bg-info/10';
     case 'mention':
-      return 'text-amber-500 bg-amber-500/10';
+      return 'text-warning bg-warning/10';
     case 'task':
       return 'text-emerald-500 bg-emerald-500/10';
     case 'event':
-      return 'text-purple-500 bg-purple-500/10';
+      return 'text-primary bg-primary/10';
     default:
       return 'text-muted-foreground bg-muted';
   }

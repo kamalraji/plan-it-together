@@ -136,8 +136,8 @@ export function InvoiceManager({ workspaceId }: InvoiceManagerProps) {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <FileText className="w-5 h-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <FileText className="w-5 h-5 text-info" />
               </div>
               <div>
                 <CardTitle className="text-lg">Invoice Manager</CardTitle>

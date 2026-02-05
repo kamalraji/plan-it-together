@@ -45,14 +45,14 @@ interface DietaryReportTabProps {
 }
 
 const REQUIREMENT_TYPES = [
-  { value: 'vegetarian', label: 'Vegetarian', icon: Leaf, color: 'text-green-500', bgColor: 'bg-green-500/10' },
+  { value: 'vegetarian', label: 'Vegetarian', icon: Leaf, color: 'text-success', bgColor: 'bg-success/10' },
   { value: 'vegan', label: 'Vegan', icon: Leaf, color: 'text-emerald-600', bgColor: 'bg-emerald-500/10' },
-  { value: 'gluten_free', label: 'Gluten-Free', icon: Wheat, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
-  { value: 'lactose_free', label: 'Lactose-Free', icon: AlertCircle, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { value: 'nut_allergy', label: 'Nut Allergy', icon: AlertCircle, color: 'text-red-500', bgColor: 'bg-red-500/10' },
+  { value: 'gluten_free', label: 'Gluten-Free', icon: Wheat, color: 'text-warning', bgColor: 'bg-warning/10' },
+  { value: 'lactose_free', label: 'Lactose-Free', icon: AlertCircle, color: 'text-info', bgColor: 'bg-info/10' },
+  { value: 'nut_allergy', label: 'Nut Allergy', icon: AlertCircle, color: 'text-destructive', bgColor: 'bg-destructive/10' },
   { value: 'seafood_allergy', label: 'Seafood Allergy', icon: AlertCircle, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
   { value: 'halal', label: 'Halal', icon: Check, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
-  { value: 'kosher', label: 'Kosher', icon: Check, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+  { value: 'kosher', label: 'Kosher', icon: Check, color: 'text-primary', bgColor: 'bg-primary/10' },
   { value: 'other', label: 'Other', icon: FileText, color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10' },
 ];
 
@@ -230,7 +230,7 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Leaf className="h-5 w-5 text-green-500" />
+              <Leaf className="h-5 w-5 text-success" />
               <div>
                 <div className="text-2xl font-bold">{menuCoverage.vegetarian}</div>
                 <div className="text-xs text-muted-foreground">Vegetarian Menu Items</div>
@@ -252,7 +252,7 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <Wheat className="h-5 w-5 text-amber-500" />
+              <Wheat className="h-5 w-5 text-warning" />
               <div>
                 <div className="text-2xl font-bold">{menuCoverage.gluten_free}</div>
                 <div className="text-xs text-muted-foreground">Gluten-Free Items</div>
@@ -264,9 +264,9 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
 
       {/* Coverage Gaps Alert */}
       {coverageGaps.length > 0 && (
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-destructive/30 bg-destructive/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2 text-red-600">
+            <CardTitle className="text-base flex items-center gap-2 text-destructive">
               <AlertCircle className="h-4 w-4" />
               Menu Coverage Gaps
             </CardTitle>
@@ -279,7 +279,7 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
               {coverageGaps.map(gap => {
                 const config = REQUIREMENT_TYPES.find(r => r.value === gap.requirement_type);
                 return (
-                  <Badge key={gap.id} variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+                  <Badge key={gap.id} variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
                     {config?.label || gap.requirement_type}: {gap.count} attendees
                   </Badge>
                 );
@@ -351,15 +351,15 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+            <div className="p-4 rounded-lg bg-success/10 border border-success/20">
               <div className="flex items-center gap-2 mb-2">
-                <Leaf className="h-5 w-5 text-green-500" />
+                <Leaf className="h-5 w-5 text-success" />
                 <span className="font-medium">Vegetarian</span>
               </div>
               <div className="text-2xl font-bold">{menuCoverage.vegetarian}</div>
               <p className="text-xs text-muted-foreground">menu items available</p>
               {menuCoverage.vegetarian === 0 && requirements.some(r => r.requirement_type === 'vegetarian') && (
-                <Badge variant="outline" className="mt-2 bg-red-500/10 text-red-600 border-red-500/20">
+                <Badge variant="outline" className="mt-2 bg-destructive/10 text-destructive border-destructive/20">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   No coverage
                 </Badge>
@@ -373,21 +373,21 @@ export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps
               <div className="text-2xl font-bold">{menuCoverage.vegan}</div>
               <p className="text-xs text-muted-foreground">menu items available</p>
               {menuCoverage.vegan === 0 && requirements.some(r => r.requirement_type === 'vegan') && (
-                <Badge variant="outline" className="mt-2 bg-red-500/10 text-red-600 border-red-500/20">
+                <Badge variant="outline" className="mt-2 bg-destructive/10 text-destructive border-destructive/20">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   No coverage
                 </Badge>
               )}
             </div>
-            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="p-4 rounded-lg bg-warning/10 border border-warning/20">
               <div className="flex items-center gap-2 mb-2">
-                <Wheat className="h-5 w-5 text-amber-500" />
+                <Wheat className="h-5 w-5 text-warning" />
                 <span className="font-medium">Gluten-Free</span>
               </div>
               <div className="text-2xl font-bold">{menuCoverage.gluten_free}</div>
               <p className="text-xs text-muted-foreground">menu items available</p>
               {menuCoverage.gluten_free === 0 && requirements.some(r => r.requirement_type === 'gluten_free') && (
-                <Badge variant="outline" className="mt-2 bg-red-500/10 text-red-600 border-red-500/20">
+                <Badge variant="outline" className="mt-2 bg-destructive/10 text-destructive border-destructive/20">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   No coverage
                 </Badge>

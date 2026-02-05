@@ -57,17 +57,17 @@ export const REACTION_EMOJIS = ['👍', '👎', '❤️', '🎉', '😄', '😕'
 export type ReactionEmoji = typeof REACTION_EMOJIS[number];
 
 export const ACTIVITY_TYPE_CONFIG: Record<ActivityType, { icon: string; color: string; label: string }> = {
-  created: { icon: 'Plus', color: 'text-green-500', label: 'Created task' },
-  status_changed: { icon: 'RefreshCw', color: 'text-blue-500', label: 'Changed status' },
+  created: { icon: 'Plus', color: 'text-success', label: 'Created task' },
+  status_changed: { icon: 'RefreshCw', color: 'text-info', label: 'Changed status' },
   priority_changed: { icon: 'Flag', color: 'text-orange-500', label: 'Changed priority' },
-  assigned: { icon: 'UserPlus', color: 'text-purple-500', label: 'Assigned' },
-  unassigned: { icon: 'UserMinus', color: 'text-gray-500', label: 'Unassigned' },
-  due_date_changed: { icon: 'Calendar', color: 'text-indigo-500', label: 'Changed due date' },
+  assigned: { icon: 'UserPlus', color: 'text-primary', label: 'Assigned' },
+  unassigned: { icon: 'UserMinus', color: 'text-muted-foreground', label: 'Unassigned' },
+  due_date_changed: { icon: 'Calendar', color: 'text-primary', label: 'Changed due date' },
   progress_updated: { icon: 'TrendingUp', color: 'text-cyan-500', label: 'Updated progress' },
   comment_added: { icon: 'MessageSquare', color: 'text-blue-400', label: 'Added comment' },
   file_uploaded: { icon: 'Upload', color: 'text-teal-500', label: 'Uploaded file' },
-  dependency_added: { icon: 'Link', color: 'text-amber-500', label: 'Added dependency' },
+  dependency_added: { icon: 'Link', color: 'text-warning', label: 'Added dependency' },
   dependency_removed: { icon: 'Unlink', color: 'text-red-400', label: 'Removed dependency' },
-  title_changed: { icon: 'Edit', color: 'text-yellow-500', label: 'Changed title' },
-  description_changed: { icon: 'FileText', color: 'text-slate-500', label: 'Changed description' },
+  title_changed: { icon: 'Edit', color: 'text-warning', label: 'Changed title' },
+  description_changed: { icon: 'FileText', color: 'text-muted-foreground', label: 'Changed description' },
 };

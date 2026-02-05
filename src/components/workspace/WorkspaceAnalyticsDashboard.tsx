@@ -395,19 +395,19 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
 
   const getHealthColor = (health: string) => {
     switch (health) {
-      case 'EXCELLENT': return 'text-green-600 bg-green-100';
-      case 'GOOD': return 'text-blue-600 bg-blue-100';
-      case 'WARNING': return 'text-yellow-600 bg-yellow-100';
-      case 'CRITICAL': return 'text-red-600 bg-red-100';
+      case 'EXCELLENT': return 'text-success bg-success/20';
+      case 'GOOD': return 'text-info bg-info/20';
+      case 'WARNING': return 'text-warning bg-warning/20';
+      case 'CRITICAL': return 'text-destructive bg-destructive/20';
       default: return 'text-muted-foreground bg-muted';
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'LOW': return 'text-green-600 bg-green-100';
-      case 'MEDIUM': return 'text-yellow-600 bg-yellow-100';
-      case 'HIGH': return 'text-red-600 bg-red-100';
+      case 'LOW': return 'text-success bg-success/20';
+      case 'MEDIUM': return 'text-warning bg-warning/20';
+      case 'HIGH': return 'text-destructive bg-destructive/20';
       default: return 'text-muted-foreground bg-muted';
     }
   };
@@ -415,21 +415,21 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
           <div className="ml-3">
             <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
-            <p className="mt-1 text-sm text-red-700">{error}</p>
+            <p className="mt-1 text-sm text-destructive">{error}</p>
             <button
               onClick={() => fetchAnalytics()}
               className="mt-2 text-sm text-red-800 underline hover:text-red-900"
@@ -532,7 +532,7 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
             <div className="space-y-2">
               {analytics.healthIndicators.bottlenecks.map((bottleneck, index) => (
                 <div key={index} className="flex items-start space-x-3 p-3 bg-muted/50 rounded-md">
-                  <svg className="h-5 w-5 text-yellow-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5 text-warning mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   <div className="flex-1">
@@ -557,8 +557,8 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
             <h4 className="text-sm font-medium text-foreground mb-2">Recommendations</h4>
             <div className="space-y-2">
               {analytics.healthIndicators.recommendations.map((rec, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-md">
-                  <svg className="h-5 w-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={index} className="flex items-start space-x-3 p-3 bg-info/10 rounded-md">
+                  <svg className="h-5 w-5 text-info mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p className="text-sm text-foreground">{rec.message}</p>
@@ -675,23 +675,23 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
                 <p className="text-sm text-muted-foreground">
                   {member.completedTasks} of {member.assignedTasks} tasks completed
                   {member.overdueTasks > 0 && (
-                    <span className="text-red-600 ml-2">• {member.overdueTasks} overdue</span>
+                    <span className="text-destructive ml-2">• {member.overdueTasks} overdue</span>
                   )}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="w-32 bg-muted rounded-full h-2">
                   <div
-                    className="bg-indigo-600 h-2 rounded-full"
+                    className="bg-primary h-2 rounded-full"
                     style={{ width: `${(member.completedTasks / member.assignedTasks) * 100}%` }}
                   ></div>
                 </div>
                 <span className="text-sm font-medium text-foreground w-12 text-right">
                   {((member.completedTasks / member.assignedTasks) * 100).toFixed(0)}%
                 </span>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${member.workloadScore > 80 ? 'text-red-600 bg-red-100' :
-                    member.workloadScore > 60 ? 'text-yellow-600 bg-yellow-100' :
-                      'text-green-600 bg-green-100'
+                <div className={`px-2 py-1 rounded text-xs font-medium ${member.workloadScore > 80 ? 'text-destructive bg-destructive/20' :
+                    member.workloadScore > 60 ? 'text-warning bg-warning/20' :
+                      'text-success bg-success/20'
                   }`}>
                   Load: {member.workloadScore}%
                 </div>
@@ -712,10 +712,10 @@ export function WorkspaceAnalyticsDashboard({ workspace, roleScope: _roleScope }
                 <p className="text-sm text-muted-foreground">Assigned to {deadline.assigneeName}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${deadline.priority === 'URGENT' ? 'text-red-600 bg-red-100' :
+                <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${deadline.priority === 'URGENT' ? 'text-destructive bg-destructive/20' :
                     deadline.priority === 'HIGH' ? 'text-orange-600 bg-orange-100' :
-                      deadline.priority === 'MEDIUM' ? 'text-yellow-600 bg-yellow-100' :
-                        'text-green-600 bg-green-100'
+                      deadline.priority === 'MEDIUM' ? 'text-warning bg-warning/20' :
+                        'text-success bg-success/20'
                   }`}>
                   {deadline.priority}
                 </span>

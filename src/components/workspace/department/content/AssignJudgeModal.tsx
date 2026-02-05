@@ -156,7 +156,7 @@ export function AssignJudgeModal({ open, onOpenChange, eventId }: AssignJudgeMod
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Gavel className="h-5 w-5 text-amber-500" />
+            <Gavel className="h-5 w-5 text-warning" />
             Assign Judge to Submissions
           </DialogTitle>
         </DialogHeader>

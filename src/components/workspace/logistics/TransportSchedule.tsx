@@ -78,13 +78,13 @@ export function TransportSchedule({ workspaceId }: TransportScheduleProps) {
   const getTypeConfig = (type: TransportType) => {
     switch (type) {
       case 'shuttle':
-        return { label: 'Shuttle', color: 'bg-blue-500/10 text-blue-600', icon: Bus };
+        return { label: 'Shuttle', color: 'bg-info/10 text-info', icon: Bus };
       case 'vip':
-        return { label: 'VIP', color: 'bg-purple-500/10 text-purple-600', icon: Users };
+        return { label: 'VIP', color: 'bg-primary/10 text-primary', icon: Users };
       case 'equipment':
-        return { label: 'Equipment', color: 'bg-amber-500/10 text-amber-600', icon: Bus };
+        return { label: 'Equipment', color: 'bg-warning/10 text-warning', icon: Bus };
       case 'staff':
-        return { label: 'Staff', color: 'bg-green-500/10 text-green-600', icon: Users };
+        return { label: 'Staff', color: 'bg-success/10 text-success', icon: Users };
     }
   };
 

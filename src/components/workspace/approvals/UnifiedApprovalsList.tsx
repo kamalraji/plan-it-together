@@ -33,11 +33,11 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
       case 'budget':
         return 'bg-emerald-500/10 text-emerald-600';
       case 'resource':
-        return 'bg-blue-500/10 text-blue-600';
+        return 'bg-info/10 text-info';
       case 'access':
-        return 'bg-amber-500/10 text-amber-600';
+        return 'bg-warning/10 text-warning';
       case 'event-publish':
-        return 'bg-purple-500/10 text-purple-600';
+        return 'bg-primary/10 text-primary';
       default:
         return 'bg-muted text-muted-foreground';
     }

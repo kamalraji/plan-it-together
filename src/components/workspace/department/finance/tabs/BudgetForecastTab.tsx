@@ -39,7 +39,7 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
 
   const getHealthStatus = (percent: number) => {
     if (percent < 60) return { label: 'Healthy', color: 'text-emerald-600', bgColor: 'bg-emerald-500/10' };
-    if (percent < 80) return { label: 'Moderate', color: 'text-amber-600', bgColor: 'bg-amber-500/10' };
+    if (percent < 80) return { label: 'Moderate', color: 'text-warning', bgColor: 'bg-warning/10' };
     if (percent < 100) return { label: 'High Usage', color: 'text-orange-600', bgColor: 'bg-orange-500/10' };
     return { label: 'Over Budget', color: 'text-destructive', bgColor: 'bg-destructive/10' };
   };
@@ -158,8 +158,8 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
               </div>
             )}
             {utilizationPercent >= 50 && utilizationPercent < 80 && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
-                <Calendar className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-warning/5 border border-warning/20">
+                <Calendar className="h-5 w-5 text-warning mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Monitor spending closely</p>
                   <p className="text-xs text-muted-foreground">
@@ -180,8 +180,8 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
               </div>
             )}
             {stats.pendingCount > 5 && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
-                <Calendar className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-info/5 border border-info/20">
+                <Calendar className="h-5 w-5 text-info mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Pending approvals queue</p>
                   <p className="text-xs text-muted-foreground">

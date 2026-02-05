@@ -194,9 +194,9 @@ export const SEOValidator: React.FC<SEOValidatorProps> = ({ html, meta }) => {
             className={cn(
               'text-xs font-medium',
               score >= 80
-                ? 'text-green-500'
+                ? 'text-success'
                 : score >= 60
-                ? 'text-amber-500'
+                ? 'text-warning'
                 : 'text-destructive'
             )}
           >
@@ -215,9 +215,9 @@ export const SEOValidator: React.FC<SEOValidatorProps> = ({ html, meta }) => {
               className={cn(
                 'h-2',
                 score >= 80
-                  ? '[&>div]:bg-green-500'
+                  ? '[&>div]:bg-success'
                   : score >= 60
-                  ? '[&>div]:bg-amber-500'
+                  ? '[&>div]:bg-warning'
                   : '[&>div]:bg-destructive'
               )}
             />
@@ -249,8 +249,8 @@ const IssueItem: React.FC<{ issue: SEOIssue }> = ({ issue }) => {
   };
   const colors = {
     error: 'text-destructive',
-    warning: 'text-amber-500',
-    success: 'text-green-500',
+    warning: 'text-warning',
+    success: 'text-success',
   };
 
   const Icon = icons[issue.type];

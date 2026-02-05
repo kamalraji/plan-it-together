@@ -108,7 +108,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 value="ALL_MEMBERS"
                 checked={targetType === 'ALL_MEMBERS'}
                 onChange={(e) => setTargetType(e.target.value as any)}
-                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                className="h-4 w-4 text-primary focus-visible:ring-ring border-input"
               />
               <span className="ml-2 text-sm text-foreground">
                 All team members ({workspace?.teamMembers?.length || 0} members)
@@ -121,7 +121,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 value="ROLE_SPECIFIC"
                 checked={targetType === 'ROLE_SPECIFIC'}
                 onChange={(e) => setTargetType(e.target.value as any)}
-                className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                className="h-4 w-4 text-primary focus-visible:ring-ring border-input"
               />
               <span className="ml-2 text-sm text-foreground">
                 Specific roles
@@ -147,7 +147,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                     key={role.value}
                     className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
                       selectedRoles.includes(role.value)
-                        ? 'border-indigo-500 bg-indigo-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-input hover:border-input'
                     }`}
                   >
@@ -155,7 +155,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                       type="checkbox"
                       checked={selectedRoles.includes(role.value)}
                       onChange={() => handleRoleToggle(role.value)}
-                      className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+                      className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
                     />
                     <div className="ml-3 flex-1">
                       <span className="text-sm font-medium text-foreground">
@@ -238,9 +238,9 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
                 type="checkbox"
                 checked={isPriority}
                 onChange={(e) => setIsPriority(e.target.checked)}
-                className="h-4 w-4 text-red-600 focus:ring-red-500 border-input rounded"
+                className="h-4 w-4 text-destructive focus:ring-destructive border-input rounded"
               />
-              <span className={`text-sm ${isPriority ? 'text-red-600 font-medium' : 'text-muted-foreground'}`}>
+              <span className={`text-sm ${isPriority ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
                 Priority broadcast (immediate notifications)
               </span>
             </label>
@@ -262,7 +262,7 @@ export function BroadcastComposer({ workspace, onSendBroadcast, isSending }: Bro
               </p>
             </div>
             {isPriority && (
-              <div className="text-red-600 text-sm font-medium">
+              <div className="text-destructive text-sm font-medium">
                 🚨 Priority Message
               </div>
             )}

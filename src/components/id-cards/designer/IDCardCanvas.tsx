@@ -343,7 +343,7 @@ export const IDCardCanvas = forwardRef<IDCardCanvasRef, IDCardCanvasProps>(
         className="flex-1 flex items-center justify-center bg-muted/30 overflow-hidden w-full h-full"
       >
         <div 
-          className="shadow-2xl border border-border rounded-lg overflow-hidden bg-white"
+          className="shadow-2xl border border-border rounded-lg overflow-hidden bg-background"
           style={{ 
             transform: `scale(${scale})`, 
             transformOrigin: 'center',

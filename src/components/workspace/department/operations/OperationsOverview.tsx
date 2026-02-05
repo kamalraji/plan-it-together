@@ -96,10 +96,10 @@ export function OperationsOverview({ workspaceId }: OperationsOverviewProps) {
 
   const getTypeColor = (type: CommitteeStatus['type']) => {
     switch (type) {
-      case 'event': return 'text-blue-500 bg-blue-500/10';
-      case 'logistics': return 'text-green-500 bg-green-500/10';
-      case 'catering': return 'text-amber-500 bg-amber-500/10';
-      case 'facility': return 'text-purple-500 bg-purple-500/10';
+      case 'event': return 'text-info bg-info/10';
+      case 'logistics': return 'text-success bg-success/10';
+      case 'catering': return 'text-warning bg-warning/10';
+      case 'facility': return 'text-primary bg-primary/10';
       default: return 'text-muted-foreground bg-muted-foreground/30/10';
     }
   };
@@ -108,21 +108,21 @@ export function OperationsOverview({ workspaceId }: OperationsOverviewProps) {
     switch (status) {
       case 'on-track':
         return (
-          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+          <Badge variant="outline" className="bg-success/10 text-success border-success/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             On Track
           </Badge>
         );
       case 'at-risk':
         return (
-          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
             <Clock className="h-3 w-3 mr-1" />
             At Risk
           </Badge>
         );
       case 'delayed':
         return (
-          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Delayed
           </Badge>
@@ -179,7 +179,7 @@ export function OperationsOverview({ workspaceId }: OperationsOverviewProps) {
               <p className="text-lg font-bold text-foreground">{overallProgress}%</p>
             </div>
             {atRiskCount > 0 && (
-              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                 {atRiskCount} at risk
               </Badge>
             )}
@@ -220,7 +220,7 @@ export function OperationsOverview({ workspaceId }: OperationsOverviewProps) {
                 </span>
               </div>
               {committee.tasksCritical > 0 && (
-                <p className="text-xs text-yellow-600 mt-2 flex items-center gap-1">
+                <p className="text-xs text-warning mt-2 flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" />
                   {committee.tasksCritical} critical task{committee.tasksCritical > 1 ? 's' : ''} pending
                 </p>

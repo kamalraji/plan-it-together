@@ -91,7 +91,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             className={cn(
               'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
               activeTab === tab
-                ? 'bg-[var(--gjs-accent)] text-white'
+                ? 'bg-[var(--gjs-accent)] text-primary-foreground'
                 : 'text-[var(--gjs-text-muted)] hover:text-[var(--gjs-text-primary)]'
             )}
           >
@@ -244,7 +244,7 @@ const DraggableLayerItem: React.FC<DraggableLayerItemProps> = ({
         className={cn(
           'flex items-center gap-1 rounded-md py-1 text-xs transition-colors relative',
           selected
-            ? 'bg-[var(--gjs-accent)] text-white'
+            ? 'bg-[var(--gjs-accent)] text-primary-foreground'
             : 'text-[var(--gjs-text-primary)] hover:bg-[var(--gjs-bg-hover)]',
           !layer.visible && 'opacity-50'
         )}
@@ -279,7 +279,7 @@ const DraggableLayerItem: React.FC<DraggableLayerItemProps> = ({
         {/* Icon */}
         <Icon className={cn(
           'h-3.5 w-3.5 shrink-0',
-          selected ? 'text-white' : 'text-[var(--gjs-accent)]'
+          selected ? 'text-primary-foreground' : 'text-[var(--gjs-accent)]'
         )} />
 
         {/* Label */}
@@ -353,7 +353,7 @@ const AssetsPanel: React.FC<AssetsPanelProps> = ({
           className={cn(
             'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
             activeSection === 'templates'
-              ? 'bg-[var(--gjs-accent)] text-white'
+              ? 'bg-[var(--gjs-accent)] text-primary-foreground'
               : 'text-[var(--gjs-text-muted)] hover:text-[var(--gjs-text-primary)]'
           )}
         >
@@ -364,7 +364,7 @@ const AssetsPanel: React.FC<AssetsPanelProps> = ({
           className={cn(
             'flex-1 py-1.5 text-xs font-medium rounded-md transition-colors',
             activeSection === 'blocks'
-              ? 'bg-[var(--gjs-accent)] text-white'
+              ? 'bg-[var(--gjs-accent)] text-primary-foreground'
               : 'text-[var(--gjs-text-muted)] hover:text-[var(--gjs-text-primary)]'
           )}
         >

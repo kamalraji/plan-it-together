@@ -134,7 +134,7 @@ export function AccessApprovalList({ requests, isLoading, workspaceId }: AccessA
               <button onClick={() => setExpandedId(isExpanded ? null : request.id)} className="w-full p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors text-left">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={request.avatarUrl || undefined} />
-                  <AvatarFallback className="bg-amber-500/10 text-amber-600 text-xs">{getInitials(request.userName)}</AvatarFallback>
+                  <AvatarFallback className="bg-warning/10 text-warning text-xs">{getInitials(request.userName)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

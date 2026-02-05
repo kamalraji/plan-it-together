@@ -73,8 +73,8 @@ export function BlogArticleTracker({ workspaceId }: BlogArticleTrackerProps) {
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
       draft: { color: 'bg-muted text-muted-foreground', icon: <Edit className="h-3 w-3" />, label: 'Draft' },
-      review: { color: 'bg-amber-500/10 text-amber-600', icon: <Eye className="h-3 w-3" />, label: 'In Review' },
-      scheduled: { color: 'bg-blue-500/10 text-blue-600', icon: <Clock className="h-3 w-3" />, label: 'Scheduled' },
+      review: { color: 'bg-warning/10 text-warning', icon: <Eye className="h-3 w-3" />, label: 'In Review' },
+      scheduled: { color: 'bg-info/10 text-info', icon: <Clock className="h-3 w-3" />, label: 'Scheduled' },
       published: { color: 'bg-emerald-500/10 text-emerald-600', icon: <CheckCircle2 className="h-3 w-3" />, label: 'Published' },
     };
     return configs[status] || configs.draft;

@@ -17,16 +17,16 @@ interface ManagePartnersTabProps {
 
 const partnerTypeConfig: Record<string, { color: string; label: string }> = {
   influencer: { color: 'bg-pink-500/20 text-pink-600', label: 'Influencer' },
-  media: { color: 'bg-blue-500/20 text-blue-600', label: 'Media Partner' },
-  affiliate: { color: 'bg-green-500/20 text-green-600', label: 'Affiliate' },
-  strategic: { color: 'bg-purple-500/20 text-purple-600', label: 'Strategic' },
-  community: { color: 'bg-amber-500/20 text-amber-600', label: 'Community' },
+  media: { color: 'bg-info/20 text-info', label: 'Media Partner' },
+  affiliate: { color: 'bg-success/20 text-success', label: 'Affiliate' },
+  strategic: { color: 'bg-primary/20 text-primary', label: 'Strategic' },
+  community: { color: 'bg-warning/20 text-warning', label: 'Community' },
 };
 
 const statusConfig: Record<string, { color: string }> = {
-  active: { color: 'bg-green-500/20 text-green-600' },
-  pending: { color: 'bg-amber-500/20 text-amber-600' },
-  completed: { color: 'bg-blue-500/20 text-blue-600' },
+  active: { color: 'bg-success/20 text-success' },
+  pending: { color: 'bg-warning/20 text-warning' },
+  completed: { color: 'bg-info/20 text-info' },
   cancelled: { color: 'bg-muted-foreground/30/20 text-muted-foreground' },
 };
 

@@ -80,13 +80,13 @@ export function TestEquipmentTab({ workspaceId }: TestEquipmentTabProps) {
       case 'passed':
         return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20"><CheckCircle className="h-3 w-3 mr-1" />Passed</Badge>;
       case 'failed':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/20"><XCircle className="h-3 w-3 mr-1" />Failed</Badge>;
       case 'pending':
-        return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20"><AlertTriangle className="h-3 w-3 mr-1" />Pending</Badge>;
+        return <Badge className="bg-warning/10 text-warning border-warning/20"><AlertTriangle className="h-3 w-3 mr-1" />Pending</Badge>;
       case 'testing':
-        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20"><RotateCcw className="h-3 w-3 mr-1 animate-spin" />Testing</Badge>;
+        return <Badge className="bg-info/10 text-info border-info/20"><RotateCcw className="h-3 w-3 mr-1 animate-spin" />Testing</Badge>;
       case 'maintenance':
-        return <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20"><Wrench className="h-3 w-3 mr-1" />Maintenance</Badge>;
+        return <Badge className="bg-primary/10 text-primary border-purple-500/20"><Wrench className="h-3 w-3 mr-1" />Maintenance</Badge>;
     }
   };
 
@@ -301,21 +301,21 @@ export function TestEquipmentTab({ workspaceId }: TestEquipmentTabProps) {
             <div className="text-xs text-muted-foreground">Passed</div>
           </CardContent>
         </Card>
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-500">{stats.failed}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.failed}</div>
             <div className="text-xs text-muted-foreground">Failed</div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500/10 border-amber-500/20">
+        <Card className="bg-warning/10 border-warning/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-500">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <div className="text-xs text-muted-foreground">Pending</div>
           </CardContent>
         </Card>
-        <Card className="bg-blue-500/10 border-blue-500/20">
+        <Card className="bg-info/10 border-info/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-500">{stats.testing}</div>
+            <div className="text-2xl font-bold text-info">{stats.testing}</div>
             <div className="text-xs text-muted-foreground">Testing</div>
           </CardContent>
         </Card>
@@ -508,12 +508,12 @@ export function TestEquipmentTab({ workspaceId }: TestEquipmentTabProps) {
                           </Badge>
                         )}
                         {test.result === 'warning' && (
-                          <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">
+                          <Badge className="bg-warning/10 text-warning border-warning/20">
                             <AlertTriangle className="h-3 w-3 mr-1" />Warning
                           </Badge>
                         )}
                         {test.result === 'failed' && (
-                          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
+                          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
                             <XCircle className="h-3 w-3 mr-1" />Failed
                           </Badge>
                         )}

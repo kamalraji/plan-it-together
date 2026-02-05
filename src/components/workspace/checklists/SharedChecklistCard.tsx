@@ -43,9 +43,9 @@ export function SharedChecklistCard({ checklist, currentWorkspaceId, onToggleIte
   const isOwner = checklist.workspace_id === currentWorkspaceId;
 
   const phaseColors = {
-    pre_event: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-    during_event: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-    post_event: 'bg-green-500/10 text-green-600 border-green-500/20',
+    pre_event: 'bg-info/10 text-info border-info/20',
+    during_event: 'bg-warning/10 text-warning border-warning/20',
+    post_event: 'bg-success/10 text-success border-success/20',
   };
 
   const phaseLabels = {

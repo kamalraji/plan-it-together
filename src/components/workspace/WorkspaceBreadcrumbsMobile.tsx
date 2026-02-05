@@ -51,13 +51,13 @@ const LEVEL_CONFIG = {
     icon: Briefcase,
     label: 'Dept',
     colors: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    dotColor: 'bg-blue-500',
+    dotColor: 'bg-info',
   },
   COMMITTEE: {
     icon: Users,
     label: 'Committee',
     colors: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-    dotColor: 'bg-amber-500',
+    dotColor: 'bg-warning',
   },
   TEAM: {
     icon: UsersRound,

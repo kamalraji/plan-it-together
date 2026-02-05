@@ -56,7 +56,7 @@ function AssignableAvatar({
             </Avatar>
             {justAssigned && (
               <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                <Check className="h-3 w-3 text-white" />
+                <Check className="h-3 w-3 text-primary-foreground" />
               </div>
             )}
           </div>

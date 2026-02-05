@@ -116,11 +116,11 @@ export function WorkspaceTemplateLibrary({
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
       case 'SIMPLE':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/20 text-success';
       case 'MODERATE':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/20 text-yellow-800';
       case 'COMPLEX':
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/20 text-red-800';
       default:
         return 'bg-muted text-foreground';
     }
@@ -166,14 +166,14 @@ export function WorkspaceTemplateLibrary({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">

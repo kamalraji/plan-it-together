@@ -222,7 +222,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
               onClick={() => setActiveTab(tab.key as any)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.key
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-info text-info'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
               }`}
             >
@@ -248,7 +248,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
 
             {criteriaLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-muted-foreground mt-2">Loading criteria...</p>
               </div>
             ) : (
@@ -332,7 +332,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                               requiresAttendance: e.target.checked
                             }
                           })}
-                          className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                          className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                         />
                         <label htmlFor={`attendance-${index}`} className="ml-2 block text-sm text-foreground">
                           Requires Attendance
@@ -363,7 +363,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                                   }
                                 });
                               }}
-                              className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                              className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                             />
                             <span className="ml-2 text-sm text-foreground">{role}</span>
                           </label>
@@ -405,7 +405,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
 
             {certificatesLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-muted-foreground mt-2">Loading certificates...</p>
               </div>
             ) : certificates && certificates.length > 0 ? (
@@ -474,7 +474,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                               type="checkbox"
                               checked={selectedCertificates.includes(certificate.id)}
                               onChange={() => toggleCertificateSelection(certificate.id)}
-                              className="h-4 w-4 text-blue-600 focus-visible:ring-ring border-input rounded"
+                              className="h-4 w-4 text-info focus-visible:ring-ring border-input rounded"
                             />
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -489,9 +489,9 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.type === 'MERIT' ? 'bg-yellow-100 text-yellow-800' :
-                              certificate.type === 'COMPLETION' ? 'bg-green-100 text-green-800' :
-                              'bg-blue-100 text-blue-800'
+                              certificate.type === 'MERIT' ? 'bg-warning/20 text-yellow-800' :
+                              certificate.type === 'COMPLETION' ? 'bg-success/20 text-success' :
+                              'bg-info/20 text-blue-800'
                             }`}>
                               {certificate.type}
                             </span>
@@ -507,7 +507,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.distributedAt ? 'bg-green-100 text-green-800' : 'bg-muted text-foreground'
+                              certificate.distributedAt ? 'bg-success/20 text-success' : 'bg-muted text-foreground'
                             }`}>
                               {certificate.distributedAt ? 'Distributed' : 'Pending'}
                             </span>
@@ -564,13 +564,13 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
               <div>
                 {/* Distribution Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="bg-info/10 rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-blue-900 mb-2">Total Certificates</h3>
-                    <p className="text-3xl font-bold text-blue-600">{certificates.length}</p>
+                    <p className="text-3xl font-bold text-info">{certificates.length}</p>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-success/10 rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-green-900 mb-2">Distributed</h3>
-                    <p className="text-3xl font-bold text-green-600">
+                    <p className="text-3xl font-bold text-success">
                       {certificates.filter(cert => cert.distributedAt).length}
                     </p>
                   </div>
@@ -619,9 +619,9 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.type === 'MERIT' ? 'bg-yellow-100 text-yellow-800' :
-                              certificate.type === 'COMPLETION' ? 'bg-green-100 text-green-800' :
-                              'bg-blue-100 text-blue-800'
+                              certificate.type === 'MERIT' ? 'bg-warning/20 text-yellow-800' :
+                              certificate.type === 'COMPLETION' ? 'bg-success/20 text-success' :
+                              'bg-info/20 text-blue-800'
                             }`}>
                               {certificate.type}
                             </span>
@@ -631,7 +631,7 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              certificate.distributedAt ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                              certificate.distributedAt ? 'bg-success/20 text-success' : 'bg-warning/20 text-yellow-800'
                             }`}>
                               {certificate.distributedAt ? 'Distributed' : 'Pending Distribution'}
                             </span>
@@ -660,25 +660,25 @@ export function CertificateManagement({ eventId }: CertificateManagementProps) {
 
       {/* Success/Error Messages */}
       {storeCriteriaMutation.isSuccess && (
-        <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="fixed bottom-4 right-4 bg-success/20 border border-green-400 text-success px-4 py-3 rounded">
           Certificate criteria saved successfully!
         </div>
       )}
 
       {batchGenerateMutation.isSuccess && (
-        <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="fixed bottom-4 right-4 bg-success/20 border border-green-400 text-success px-4 py-3 rounded">
           Certificates generated successfully!
         </div>
       )}
 
       {distributeMutation.isSuccess && distributeMutation.data && (
-        <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <div className="fixed bottom-4 right-4 bg-success/20 border border-green-400 text-success px-4 py-3 rounded">
           Distribution completed: {distributeMutation.data.successful} successful, {distributeMutation.data.failed} failed
         </div>
       )}
 
       {(storeCriteriaMutation.isError || batchGenerateMutation.isError || distributeMutation.isError) && (
-        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="fixed bottom-4 right-4 bg-destructive/20 border border-red-400 text-destructive px-4 py-3 rounded">
           An error occurred. Please try again.
         </div>
       )}

@@ -19,8 +19,8 @@ const systems = [
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'healthy': return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-    case 'warning': return <AlertTriangle className="h-4 w-4 text-amber-500" />;
-    case 'critical': return <XCircle className="h-4 w-4 text-red-500" />;
+    case 'warning': return <AlertTriangle className="h-4 w-4 text-warning" />;
+    case 'critical': return <XCircle className="h-4 w-4 text-destructive" />;
     default: return null;
   }
 };
@@ -28,8 +28,8 @@ const getStatusIcon = (status: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'healthy': return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Healthy</Badge>;
-    case 'warning': return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">Warning</Badge>;
-    case 'critical': return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Critical</Badge>;
+    case 'warning': return <Badge className="bg-warning/10 text-warning border-warning/20">Warning</Badge>;
+    case 'critical': return <Badge className="bg-destructive/10 text-destructive border-destructive/20">Critical</Badge>;
     default: return null;
   }
 };
@@ -65,23 +65,23 @@ export function SystemHealthCheckTab({ workspaceId: _workspaceId }: SystemHealth
             </div>
           </CardContent>
         </Card>
-        <Card className="border-amber-500/20 bg-amber-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-8 w-8 text-amber-500" />
+              <AlertTriangle className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-2xl font-bold text-amber-500">{warningSystems}</p>
+                <p className="text-2xl font-bold text-warning">{warningSystems}</p>
                 <p className="text-sm text-muted-foreground">Warnings</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-red-500/20 bg-red-500/5">
+        <Card className="border-destructive/20 bg-destructive/5">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <XCircle className="h-8 w-8 text-red-500" />
+              <XCircle className="h-8 w-8 text-destructive" />
               <div>
-                <p className="text-2xl font-bold text-red-500">{criticalSystems}</p>
+                <p className="text-2xl font-bold text-destructive">{criticalSystems}</p>
                 <p className="text-sm text-muted-foreground">Critical Issues</p>
               </div>
             </div>

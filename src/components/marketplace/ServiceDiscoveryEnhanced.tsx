@@ -300,7 +300,7 @@ export const ServiceDiscoveryEnhanced: React.FC = () => {
                           <span>{service.location}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <StarIcon className="h-4 w-4 text-yellow-500" />
+                          <StarIcon className="h-4 w-4 text-warning" />
                           <span className="font-semibold">{service.rating?.toFixed(1) || '0.0'}</span>
                           <span className="text-muted-foreground">({service.review_count || 0})</span>
                         </div>
@@ -310,7 +310,7 @@ export const ServiceDiscoveryEnhanced: React.FC = () => {
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span>{service.vendors.business_name}</span>
                           {service.vendors.verification_status === 'VERIFIED' && (
-                            <ShieldCheckIcon className="h-4 w-4 text-green-500" />
+                            <ShieldCheckIcon className="h-4 w-4 text-success" />
                           )}
                         </div>
                       )}

@@ -21,7 +21,7 @@ export function AdPerformancePanel({ workspaceId }: AdPerformancePanelProps) {
         );
       case 'down':
         return (
-          <Badge className="bg-red-100 text-red-700 border-red-200">
+          <Badge className="bg-destructive/20 text-destructive border-red-200">
             <TrendingDown className="h-3 w-3 mr-1" />
             Down
           </Badge>
@@ -56,7 +56,7 @@ export function AdPerformancePanel({ workspaceId }: AdPerformancePanelProps) {
     <Card className="border-border/50">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <div className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <BarChart3 className="h-5 w-5 text-info" />
           <CardTitle className="text-lg font-semibold">Ad Performance by Channel</CardTitle>
         </div>
         <div className="flex items-center gap-4 text-sm">

@@ -79,8 +79,8 @@ export function YouTubeChannelCard({
         <div className="h-2 bg-gradient-to-r from-red-500/50 to-red-700/50" />
         <CardContent className="p-6">
           <div className="flex flex-col items-center text-center py-4">
-            <div className="p-4 rounded-full bg-red-500/10 mb-4">
-              <Youtube className="h-8 w-8 text-red-500" />
+            <div className="p-4 rounded-full bg-destructive/10 mb-4">
+              <Youtube className="h-8 w-8 text-destructive" />
             </div>
             <h3 className="font-semibold text-lg mb-1">Connect YouTube Channel</h3>
             <p className="text-sm text-muted-foreground mb-4 max-w-xs">
@@ -115,12 +115,12 @@ export function YouTubeChannelCard({
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Youtube className="h-5 w-5 text-red-500" />
+              <Youtube className="h-5 w-5 text-destructive" />
               <CardTitle className="text-base">YouTube Channel</CardTitle>
             </div>
             <Badge 
               variant={channel.is_active ? "default" : "secondary"}
-              className={channel.is_active ? "bg-green-500/20 text-green-600 border-green-500/30" : ""}
+              className={channel.is_active ? "bg-success/20 text-success border-success/30" : ""}
             >
               {channel.is_active ? (
                 <>
@@ -140,11 +140,11 @@ export function YouTubeChannelCard({
               <img 
                 src={channel.channel_thumbnail} 
                 alt={channel.channel_name}
-                className="w-14 h-14 rounded-full ring-2 ring-red-500/20"
+                className="w-14 h-14 rounded-full ring-2 ring-destructive/20"
               />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center">
-                <Youtube className="h-6 w-6 text-red-500" />
+              <div className="w-14 h-14 rounded-full bg-destructive/20 flex items-center justify-center">
+                <Youtube className="h-6 w-6 text-destructive" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -168,18 +168,18 @@ export function YouTubeChannelCard({
           {/* Status Indicators */}
           <div className="flex flex-wrap gap-2">
             {channel.is_live_enabled ? (
-              <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
+              <Badge variant="outline" className="bg-success/10 text-success border-success/30">
                 <Wifi className="h-3 w-3 mr-1" />
                 Live Streaming Enabled
               </Badge>
             ) : (
-              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
                 <AlertCircle className="h-3 w-3 mr-1" />
                 Live Streaming Disabled
               </Badge>
             )}
             {isTokenExpiring && (
-              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30">
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
                 <AlertCircle className="h-3 w-3 mr-1" />
                 Token Expiring Soon
               </Badge>
@@ -188,8 +188,8 @@ export function YouTubeChannelCard({
 
           {/* Token Expiry Warning */}
           {isTokenExpiring && (
-            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-              <p className="text-sm text-yellow-600">
+            <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
+              <p className="text-sm text-warning">
                 Your connection expires on {format(new Date(channel.expires_at), 'MMM d, yyyy')}. 
                 Please refresh your connection to continue streaming.
               </p>

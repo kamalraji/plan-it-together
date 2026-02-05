@@ -89,13 +89,13 @@ export function CalendarDayDetail({
           </Card>
           <Card className="bg-muted/50">
             <CardContent className="p-3 text-center">
-              <p className="text-2xl font-bold text-green-600">{completedTasks.length}</p>
+              <p className="text-2xl font-bold text-success">{completedTasks.length}</p>
               <p className="text-xs text-muted-foreground">Done</p>
             </CardContent>
           </Card>
           <Card className="bg-muted/50">
             <CardContent className="p-3 text-center">
-              <p className={`text-2xl font-bold ${overdueTasks.length > 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+              <p className={`text-2xl font-bold ${overdueTasks.length > 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
                 {overdueTasks.length}
               </p>
               <p className="text-xs text-muted-foreground">Overdue</p>
@@ -119,7 +119,7 @@ export function CalendarDayDetail({
                   onClick={() => onTaskClick?.(task)}
                 >
                   <CheckSquare className={`h-5 w-5 mt-0.5 shrink-0 ${
-                    task.status === 'DONE' ? 'text-green-600' : 'text-muted-foreground'
+                    task.status === 'DONE' ? 'text-success' : 'text-muted-foreground'
                   }`} />
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium ${task.status === 'DONE' ? 'line-through text-muted-foreground' : ''}`}>

@@ -379,22 +379,22 @@ export function getDepartmentColor(departmentId: string): {
 } {
   const colors: Record<string, { bg: string; text: string; border: string; icon: string }> = {
     operations: { 
-      bg: 'bg-blue-500/10', 
+      bg: 'bg-info/10', 
       text: 'text-blue-600 dark:text-blue-400', 
-      border: 'border-blue-500/20',
-      icon: 'text-blue-500',
+      border: 'border-info/20',
+      icon: 'text-info',
     },
     growth: { 
-      bg: 'bg-green-500/10', 
+      bg: 'bg-success/10', 
       text: 'text-green-600 dark:text-green-400', 
-      border: 'border-green-500/20',
-      icon: 'text-green-500',
+      border: 'border-success/20',
+      icon: 'text-success',
     },
     content: { 
-      bg: 'bg-purple-500/10', 
+      bg: 'bg-primary/10', 
       text: 'text-purple-600 dark:text-purple-400', 
       border: 'border-purple-500/20',
-      icon: 'text-purple-500',
+      icon: 'text-primary',
     },
     tech_finance: { 
       bg: 'bg-orange-500/10', 

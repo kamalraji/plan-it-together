@@ -51,9 +51,9 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
   }
 
   const stats = [
-    { title: 'Total Events', value: events?.length || 0, icon: CalendarIcon, color: 'text-blue-600' },
-    { title: 'Total Participants', value: analytics?.totalRegistrations || 0, icon: UsersIcon, color: 'text-green-600' },
-    { title: 'Active Events', value: events?.filter((e: any) => e.status === 'PUBLISHED').length || 0, icon: TrophyIcon, color: 'text-purple-600' },
+    { title: 'Total Events', value: events?.length || 0, icon: CalendarIcon, color: 'text-info' },
+    { title: 'Total Participants', value: analytics?.totalRegistrations || 0, icon: UsersIcon, color: 'text-success' },
+    { title: 'Active Events', value: events?.filter((e: any) => e.status === 'PUBLISHED').length || 0, icon: TrophyIcon, color: 'text-primary' },
     { title: 'Completed', value: events?.filter((e: any) => e.status === 'COMPLETED').length || 0, icon: CheckCircleIcon, color: 'text-orange-600' },
   ];
 
@@ -146,13 +146,13 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                 <div className="bg-card rounded-lg border border-border p-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-warning/20 text-amber-700 flex items-center justify-center text-sm font-semibold">
                         DR
                       </div>
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-muted-foreground">Draft Events</p>
-                      <p className="text-2xl font-bold text-amber-500">{eventMetrics.draftEvents}</p>
+                      <p className="text-2xl font-bold text-warning">{eventMetrics.draftEvents}</p>
                     </div>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-muted-foreground">Upcoming Events</p>
-                      <p className="text-2xl font-bold text-violet-500">{eventMetrics.upcomingEvents}</p>
+                      <p className="text-2xl font-bold text-primary">{eventMetrics.upcomingEvents}</p>
                     </div>
                   </div>
                 </div>
@@ -305,28 +305,28 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                 <div className="p-4 rounded-lg border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-foreground">Event Growth</h4>
-                    <span className="text-sm text-green-600 font-medium">+12%</span>
+                    <span className="text-sm text-success font-medium">+12%</span>
                   </div>
                   <p className="text-sm text-muted-foreground">Events created compared to last period</p>
                 </div>
                 <div className="p-4 rounded-lg border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-foreground">Registration Rate</h4>
-                    <span className="text-sm text-green-600 font-medium">+8%</span>
+                    <span className="text-sm text-success font-medium">+8%</span>
                   </div>
                   <p className="text-sm text-muted-foreground">Registrations per event average</p>
                 </div>
                 <div className="p-4 rounded-lg border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-foreground">Team Growth</h4>
-                    <span className="text-sm text-green-600 font-medium">+5%</span>
+                    <span className="text-sm text-success font-medium">+5%</span>
                   </div>
                   <p className="text-sm text-muted-foreground">New team members this period</p>
                 </div>
                 <div className="p-4 rounded-lg border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-foreground">Engagement Score</h4>
-                    <span className="text-sm text-amber-600 font-medium">+2%</span>
+                    <span className="text-sm text-warning font-medium">+2%</span>
                   </div>
                   <p className="text-sm text-muted-foreground">Overall engagement metrics</p>
                 </div>

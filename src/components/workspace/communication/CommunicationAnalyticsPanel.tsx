@@ -174,8 +174,8 @@ export function CommunicationAnalyticsPanel({
         <Card className="border-border/50 bg-gradient-to-br from-blue-500/5 to-transparent">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-blue-500/10">
-                <Megaphone className="h-5 w-5 text-blue-500" />
+              <div className="p-2.5 rounded-xl bg-info/10">
+                <Megaphone className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{analytics?.broadcastStats.total || 0}</p>
@@ -188,8 +188,8 @@ export function CommunicationAnalyticsPanel({
         <Card className="border-border/50 bg-gradient-to-br from-amber-500/5 to-transparent">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500/10">
-                <Eye className="h-5 w-5 text-amber-500" />
+              <div className="p-2.5 rounded-xl bg-warning/10">
+                <Eye className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{analytics?.broadcastStats.readRate || 0}%</p>

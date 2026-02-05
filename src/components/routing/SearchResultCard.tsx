@@ -40,9 +40,9 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
   const getTypeColor = (type: string) => {
     const colors = {
-      event: 'text-blue-600 bg-blue-50 border-blue-200',
-      workspace: 'text-green-600 bg-green-50 border-green-200',
-      organization: 'text-purple-600 bg-purple-50 border-purple-200',
+      event: 'text-info bg-info/10 border-blue-200',
+      workspace: 'text-success bg-success/10 border-green-200',
+      organization: 'text-primary bg-purple-50 border-purple-200',
       marketplace: 'text-orange-600 bg-orange-50 border-orange-200',
       user: 'text-muted-foreground bg-muted/50 border-border',
       service: 'text-orange-600 bg-orange-50 border-orange-200',
@@ -52,11 +52,11 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
   const getStatusColor = (status: string) => {
     const colors = {
-      active: 'text-green-700 bg-green-100',
-      upcoming: 'text-blue-700 bg-blue-100',
+      active: 'text-success bg-success/20',
+      upcoming: 'text-info bg-info/20',
       completed: 'text-foreground bg-muted',
-      draft: 'text-yellow-700 bg-yellow-100',
-      cancelled: 'text-red-700 bg-red-100',
+      draft: 'text-warning bg-warning/20',
+      cancelled: 'text-destructive bg-destructive/20',
     };
     return colors[status as keyof typeof colors] || 'text-foreground bg-muted';
   };
@@ -132,7 +132,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.verified) {
           items.push(
-            <div key="verified" className="flex items-center space-x-1 text-green-600">
+            <div key="verified" className="flex items-center space-x-1 text-success">
               <CheckBadgeIcon className="h-3 w-3" />
               <span>Verified</span>
             </div>
@@ -143,7 +143,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       case 'marketplace':
         if (metadata.rating) {
           items.push(
-            <div key="rating" className="flex items-center space-x-1 text-yellow-600">
+            <div key="rating" className="flex items-center space-x-1 text-warning">
               <StarIcon className="h-3 w-3 fill-current" />
               <span>{metadata.rating}</span>
             </div>
@@ -183,7 +183,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
         }
         if (metadata.verified) {
           items.push(
-            <div key="verified" className="flex items-center space-x-1 text-green-600">
+            <div key="verified" className="flex items-center space-x-1 text-success">
               <CheckBadgeIcon className="h-3 w-3" />
               <span>Verified</span>
             </div>

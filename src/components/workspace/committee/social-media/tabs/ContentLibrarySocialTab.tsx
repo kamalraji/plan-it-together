@@ -95,13 +95,13 @@ export function ContentLibrarySocialTab({ workspaceId }: ContentLibrarySocialTab
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-500">{stats.images}</div>
+            <div className="text-2xl font-bold text-info">{stats.images}</div>
             <p className="text-sm text-muted-foreground">Images</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-purple-500">{stats.videos}</div>
+            <div className="text-2xl font-bold text-primary">{stats.videos}</div>
             <p className="text-sm text-muted-foreground">Videos</p>
           </CardContent>
         </Card>
@@ -216,7 +216,7 @@ export function ContentLibrarySocialTab({ workspaceId }: ContentLibrarySocialTab
                       {asset.type}
                     </Badge>
                   </div>
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <Button variant="secondary" size="sm">
                       <Eye className="h-4 w-4" />
                     </Button>

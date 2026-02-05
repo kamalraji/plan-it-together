@@ -82,22 +82,22 @@ export const OrgMarketplacePage: React.FC = () => {
       label: 'Total Views', 
       value: totalImpressions, 
       icon: Eye, 
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-100',
+      color: 'text-info',
+      bgColor: 'bg-info/20',
     },
     { 
       label: 'Total Clicks', 
       value: totalClicks, 
       icon: MousePointerClick, 
-      color: 'text-purple-500',
+      color: 'text-primary',
       bgColor: 'bg-purple-100',
     },
     { 
       label: 'Featured', 
       value: featuredProducts, 
       icon: Star, 
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-100',
+      color: 'text-warning',
+      bgColor: 'bg-warning/20',
     },
   ];
 

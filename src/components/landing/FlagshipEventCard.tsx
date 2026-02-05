@@ -50,9 +50,9 @@ function getEventStatus(event: FlagshipEvent): EventStatus {
 }
 
 const modeConfig = {
-  ONLINE: { icon: Globe, label: "Virtual", className: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+  ONLINE: { icon: Globe, label: "Virtual", className: "bg-info/10 text-info border-info/20" },
   OFFLINE: { icon: MapPin, label: "In-Person", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  HYBRID: { icon: Users, label: "Hybrid", className: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
+  HYBRID: { icon: Users, label: "Hybrid", className: "bg-primary/10 text-primary border-purple-500/20" },
 };
 
 const statusConfig: Record<EventStatus, { icon: typeof Clock; label: string; className: string }> = {
@@ -111,7 +111,7 @@ export const FlagshipEventCard = forwardRef<HTMLDivElement, { event: FlagshipEve
         
         {/* Badges overlay */}
         <div className="absolute top-3 left-3 flex gap-2">
-          <Badge variant="outline" className="bg-emerald-500/90 text-white border-0 text-xs font-medium">
+          <Badge variant="outline" className="bg-emerald-500/90 text-primary-foreground border-0 text-xs font-medium">
             Free
           </Badge>
           <Badge variant="outline" className={`${modeConfig[event.mode].className} text-xs font-medium`}>

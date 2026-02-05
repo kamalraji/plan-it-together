@@ -63,11 +63,11 @@ export function UpdateRunsheetTab({ workspaceId, eventId }: UpdateRunsheetTabPro
       case 'completed':
         return <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20"><CheckCircle className="h-3 w-3 mr-1" />Done</Badge>;
       case 'live':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20 animate-pulse"><Play className="h-3 w-3 mr-1" />Live</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-destructive/20 animate-pulse"><Play className="h-3 w-3 mr-1" />Live</Badge>;
       case 'upcoming':
-        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20"><Clock className="h-3 w-3 mr-1" />Upcoming</Badge>;
+        return <Badge className="bg-info/10 text-info border-info/20"><Clock className="h-3 w-3 mr-1" />Upcoming</Badge>;
       case 'delayed':
-        return <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
+        return <Badge className="bg-warning/10 text-warning border-warning/20"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
       case 'skipped':
         return <Badge className="bg-muted text-muted-foreground"><SkipForward className="h-3 w-3 mr-1" />Skipped</Badge>;
     }
@@ -75,11 +75,11 @@ export function UpdateRunsheetTab({ workspaceId, eventId }: UpdateRunsheetTabPro
 
   const getCueTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
-      audio: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+      audio: 'bg-primary/10 text-primary border-purple-500/20',
       visual: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
-      lighting: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      lighting: 'bg-warning/10 text-warning border-warning/20',
       stage: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
-      general: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+      general: 'bg-gray-500/10 text-muted-foreground border-gray-500/20',
     };
     return <Badge variant="outline" className={colors[type] || colors.general}>{type}</Badge>;
   };
@@ -263,15 +263,15 @@ export function UpdateRunsheetTab({ workspaceId, eventId }: UpdateRunsheetTabPro
             <div className="text-xs text-muted-foreground">Completed</div>
           </CardContent>
         </Card>
-        <Card className="bg-red-500/10 border-red-500/20">
+        <Card className="bg-destructive/10 border-destructive/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-500">{stats.live}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.live}</div>
             <div className="text-xs text-muted-foreground">Live Now</div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500/10 border-amber-500/20">
+        <Card className="bg-warning/10 border-warning/20">
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-amber-500">{stats.delayed}</div>
+            <div className="text-2xl font-bold text-warning">{stats.delayed}</div>
             <div className="text-xs text-muted-foreground">Delayed</div>
           </CardContent>
         </Card>
@@ -298,13 +298,13 @@ export function UpdateRunsheetTab({ workspaceId, eventId }: UpdateRunsheetTabPro
                   key={cue.id}
                   className={`flex items-start gap-4 p-3 rounded-lg border transition-colors ${
                     cue.status === 'live' 
-                      ? 'bg-red-500/5 border-red-500/30' 
+                      ? 'bg-destructive/5 border-destructive/30' 
                       : cue.status === 'completed'
                       ? 'bg-muted/30 opacity-60'
                       : cue.status === 'skipped'
                       ? 'bg-muted/20 opacity-40'
                       : cue.status === 'delayed'
-                      ? 'bg-amber-500/5 border-amber-500/30'
+                      ? 'bg-warning/5 border-warning/30'
                       : 'bg-card hover:bg-muted/30'
                   }`}
                 >

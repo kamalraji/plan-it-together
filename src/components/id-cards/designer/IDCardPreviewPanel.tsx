@@ -143,7 +143,7 @@ export function IDCardPreviewPanel({
             </SheetHeader>
 
             <div className="flex-1 flex items-center justify-center overflow-auto">
-              <div className="shadow-xl border border-border rounded-lg overflow-hidden bg-white relative">
+              <div className="shadow-xl border border-border rounded-lg overflow-hidden bg-background relative">
                 {isRendering && (
                   <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10">
                     <RefreshCw className="h-6 w-6 animate-spin text-primary" />

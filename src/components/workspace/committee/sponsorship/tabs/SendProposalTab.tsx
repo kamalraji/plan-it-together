@@ -40,16 +40,16 @@ interface SendProposalTabProps {
 
 const stages = [
   { id: 'lead', label: 'Lead', icon: Building2, color: 'bg-muted-foreground/30' },
-  { id: 'contacted', label: 'Contacted', icon: Send, color: 'bg-blue-500' },
-  { id: 'proposal_sent', label: 'Proposal Sent', icon: ArrowRight, color: 'bg-purple-500' },
-  { id: 'negotiation', label: 'Negotiation', icon: Clock, color: 'bg-amber-500' },
+  { id: 'contacted', label: 'Contacted', icon: Send, color: 'bg-info' },
+  { id: 'proposal_sent', label: 'Proposal Sent', icon: ArrowRight, color: 'bg-primary' },
+  { id: 'negotiation', label: 'Negotiation', icon: Clock, color: 'bg-warning' },
   { id: 'closed_won', label: 'Won', icon: CheckCircle2, color: 'bg-emerald-500' },
-  { id: 'closed_lost', label: 'Lost', icon: XCircle, color: 'bg-red-500' },
+  { id: 'closed_lost', label: 'Lost', icon: XCircle, color: 'bg-destructive' },
 ];
 
 const tierColors: Record<string, string> = {
   platinum: 'bg-muted text-foreground',
-  gold: 'bg-amber-100 text-amber-800',
+  gold: 'bg-warning/20 text-amber-800',
   silver: 'bg-muted text-foreground',
   bronze: 'bg-orange-100 text-orange-800',
 };
@@ -302,7 +302,7 @@ export function SendProposalTab({ workspace }: SendProposalTabProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={cn('p-1.5 rounded', stage.color)}>
-                        <StageIcon className="h-3.5 w-3.5 text-white" />
+                        <StageIcon className="h-3.5 w-3.5 text-primary-foreground" />
                       </div>
                       <CardTitle className="text-sm font-medium">{stage.label}</CardTitle>
                       <Badge variant="secondary" className="text-xs">
@@ -377,7 +377,7 @@ export function SendProposalTab({ workspace }: SendProposalTabProps) {
                               </span>
                             </div>
                             {proposal.next_follow_up_date && (
-                              <div className="flex items-center gap-2 text-xs text-amber-600 mt-1">
+                              <div className="flex items-center gap-2 text-xs text-warning mt-1">
                                 <CalendarDays className="h-3 w-3" />
                                 <span>Follow-up: {format(new Date(proposal.next_follow_up_date), 'MMM d')}</span>
                               </div>
@@ -409,15 +409,15 @@ export function SendProposalTab({ workspace }: SendProposalTabProps) {
             </p>
           </CardContent>
         </Card>
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-destructive/30 bg-destructive/5">
           <CardHeader className="py-3">
             <div className="flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-500" />
+              <XCircle className="h-4 w-4 text-destructive" />
               <CardTitle className="text-sm">Lost ({getProposalsByStage('closed_lost').length})</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-destructive">
               ${getStageValue('closed_lost').toLocaleString()}
             </p>
           </CardContent>

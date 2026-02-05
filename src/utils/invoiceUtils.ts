@@ -88,9 +88,9 @@ export function getInvoiceStatusConfig(status: string) {
       };
     case 'sent':
       return {
-        bgClass: 'bg-blue-500/10',
-        textClass: 'text-blue-600',
-        borderClass: 'border-blue-500/20',
+        bgClass: 'bg-info/10',
+        textClass: 'text-info',
+        borderClass: 'border-info/20',
         label: 'Sent',
       };
     case 'draft':

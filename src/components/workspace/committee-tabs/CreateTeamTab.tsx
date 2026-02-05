@@ -106,7 +106,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Users className="h-6 w-6 text-blue-500" />
+            <Users className="h-6 w-6 text-info" />
             Create Team
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -126,7 +126,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{childTeams?.length || 0}</div>
+            <div className="text-2xl font-bold text-info">{childTeams?.length || 0}</div>
             <div className="text-xs text-muted-foreground">Total Teams</div>
           </CardContent>
         </Card>
@@ -140,7 +140,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-primary">
               {childTeams?.length ? Math.round(Object.values(teamMemberCounts || {}).reduce((a, b) => a + b, 0) / childTeams.length) : 0}
             </div>
             <div className="text-xs text-muted-foreground">Avg Team Size</div>
@@ -150,10 +150,10 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
 
       {/* Create Form */}
       {showCreateForm && (
-        <Card className="border-blue-500/30">
+        <Card className="border-info/30">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Folder className="h-5 w-5 text-blue-500" />
+              <Folder className="h-5 w-5 text-info" />
               Create New Team
             </CardTitle>
             <CardDescription>
@@ -207,7 +207,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-info" />
             </div>
           ) : !childTeams || childTeams.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -223,8 +223,8 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
                   className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-500/10">
-                      <Folder className="h-4 w-4 text-blue-500" />
+                    <div className="p-2 rounded-lg bg-info/10">
+                      <Folder className="h-4 w-4 text-info" />
                     </div>
                     <div>
                       <h4 className="font-medium text-foreground">{team.name}</h4>
@@ -235,7 +235,7 @@ export function CreateTeamTab({ workspace }: CreateTeamTabProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-green-500/30 text-green-600">
+                    <Badge variant="outline" className="text-xs border-success/30 text-success">
                       {team.workspace_type}
                     </Badge>
                     <Button size="icon" variant="ghost" className="h-8 w-8">

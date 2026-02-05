@@ -52,9 +52,9 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
       case 'completed':
         return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Completed</Badge>;
       case 'in_progress':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30"><PlayCircle className="h-3 w-3 mr-1" />In Progress</Badge>;
+        return <Badge className="bg-info/20 text-info border-info/30"><PlayCircle className="h-3 w-3 mr-1" />In Progress</Badge>;
       case 'delayed':
-        return <Badge className="bg-red-500/20 text-red-600 border-red-500/30"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive border-destructive/30"><AlertTriangle className="h-3 w-3 mr-1" />Delayed</Badge>;
       default:
         return <Badge className="bg-muted text-muted-foreground"><Clock3 className="h-3 w-3 mr-1" />Upcoming</Badge>;
     }
@@ -127,7 +127,7 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-500">{totalCount - completedCount}</div>
+              <div className="text-3xl font-bold text-info">{totalCount - completedCount}</div>
               <p className="text-sm text-muted-foreground">Remaining</p>
             </div>
           </CardContent>
@@ -156,7 +156,7 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
 
                     {/* Timeline connector */}
                     <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full ${item.status === 'completed' ? 'bg-emerald-500' : item.status === 'in_progress' ? 'bg-blue-500' : 'bg-muted-foreground'}`} />
+                      <div className={`w-3 h-3 rounded-full ${item.status === 'completed' ? 'bg-emerald-500' : item.status === 'in_progress' ? 'bg-info' : 'bg-muted-foreground'}`} />
                       {index < briefings.length - 1 && <div className="w-0.5 flex-1 bg-border mt-1" />}
                     </div>
 

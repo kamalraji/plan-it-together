@@ -27,10 +27,10 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
   // Determine overall health status
   const getHealthStatus = () => {
-    if (overdueRate > 20) return { status: 'critical', color: 'text-red-600', bgColor: 'bg-red-50' };
-    if (overdueRate > 10 || completionRate < 50) return { status: 'warning', color: 'text-yellow-600', bgColor: 'bg-yellow-50' };
-    if (completionRate > 80) return { status: 'excellent', color: 'text-green-600', bgColor: 'bg-green-50' };
-    return { status: 'good', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+    if (overdueRate > 20) return { status: 'critical', color: 'text-destructive', bgColor: 'bg-destructive/10' };
+    if (overdueRate > 10 || completionRate < 50) return { status: 'warning', color: 'text-warning', bgColor: 'bg-warning/10' };
+    if (completionRate > 80) return { status: 'excellent', color: 'text-success', bgColor: 'bg-success/10' };
+    return { status: 'good', color: 'text-info', bgColor: 'bg-info/10' };
   };
 
   const healthStatus = getHealthStatus();
@@ -38,9 +38,9 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
   const getWorkspaceStatusInfo = () => {
     switch (workspace.status) {
       case WorkspaceStatus.ACTIVE:
-        return { text: 'Active & Collaborative', color: 'text-green-600' };
+        return { text: 'Active & Collaborative', color: 'text-success' };
       case WorkspaceStatus.PROVISIONING:
-        return { text: 'Setting Up', color: 'text-yellow-600' };
+        return { text: 'Setting Up', color: 'text-warning' };
       case WorkspaceStatus.WINDING_DOWN:
         return { text: 'Wrapping Up', color: 'text-orange-600' };
       case WorkspaceStatus.DISSOLVED:
@@ -57,25 +57,25 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
       label: 'Task Completion',
       value: `${completionRate}%`,
       trend: completionRate > 70 ? 'up' : completionRate < 30 ? 'down' : 'stable',
-      color: completionRate > 70 ? 'text-green-600' : completionRate < 30 ? 'text-red-600' : 'text-yellow-600'
+      color: completionRate > 70 ? 'text-success' : completionRate < 30 ? 'text-destructive' : 'text-warning'
     },
     {
       label: 'Team Members',
       value: teamSize.toString(),
       trend: 'stable',
-      color: 'text-blue-600'
+      color: 'text-info'
     },
     {
       label: 'Active Channels',
       value: activeChannels.toString(),
       trend: 'stable',
-      color: 'text-purple-600'
+      color: 'text-primary'
     },
     {
       label: 'Overdue Tasks',
       value: taskSummary.overdue.toString(),
       trend: taskSummary.overdue > 0 ? 'down' : 'stable',
-      color: taskSummary.overdue > 0 ? 'text-red-600' : 'text-green-600'
+      color: taskSummary.overdue > 0 ? 'text-destructive' : 'text-success'
     }
   ];
 
@@ -83,13 +83,13 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
     switch (trend) {
       case 'up':
         return (
-          <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
           </svg>
         );
       case 'down':
         return (
-          <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7l-9.2 9.2M7 7v10h10" />
           </svg>
         );
@@ -163,8 +163,8 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all duration-300 ${completionRate > 70 ? 'bg-green-500' :
-                          completionRate > 40 ? 'bg-yellow-500' : 'bg-red-500'
+                      className={`h-2 rounded-full transition-all duration-300 ${completionRate > 70 ? 'bg-success' :
+                          completionRate > 40 ? 'bg-warning' : 'bg-destructive'
                         }`}
                       style={{ width: `${completionRate}%` }}
                     ></div>
@@ -173,15 +173,15 @@ export function WorkspaceHealthMetrics({ workspace }: WorkspaceHealthMetricsProp
 
                 {/* Overdue Alert */}
                 {taskSummary.overdue > 0 && (
-                  <div className="flex items-center space-x-2 p-3 bg-red-50 rounded-lg">
-                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center space-x-2 p-3 bg-destructive/10 rounded-lg">
+                    <svg className="w-5 h-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                     <div>
                       <p className="text-sm font-medium text-red-800">
                         {taskSummary.overdue} overdue task{taskSummary.overdue !== 1 ? 's' : ''}
                       </p>
-                      <p className="text-xs text-red-600">Requires immediate attention</p>
+                      <p className="text-xs text-destructive">Requires immediate attention</p>
                     </div>
                   </div>
                 )}

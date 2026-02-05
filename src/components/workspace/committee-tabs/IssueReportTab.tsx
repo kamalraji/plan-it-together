@@ -60,10 +60,10 @@ interface IssueReportTabProps {
 }
 
 const priorityConfig: Record<IssuePriority, { label: string; color: string; icon: React.ReactNode }> = {
-  critical: { label: 'Critical', color: 'bg-red-500 text-white', icon: <AlertCircle className="h-3 w-3" /> },
-  high: { label: 'High', color: 'bg-orange-500 text-white', icon: <AlertTriangle className="h-3 w-3" /> },
-  medium: { label: 'Medium', color: 'bg-yellow-500 text-white', icon: <Clock className="h-3 w-3" /> },
-  low: { label: 'Low', color: 'bg-blue-500 text-white', icon: <HelpCircle className="h-3 w-3" /> },
+  critical: { label: 'Critical', color: 'bg-destructive text-primary-foreground', icon: <AlertCircle className="h-3 w-3" /> },
+  high: { label: 'High', color: 'bg-orange-500 text-primary-foreground', icon: <AlertTriangle className="h-3 w-3" /> },
+  medium: { label: 'Medium', color: 'bg-warning text-primary-foreground', icon: <Clock className="h-3 w-3" /> },
+  low: { label: 'Low', color: 'bg-info text-primary-foreground', icon: <HelpCircle className="h-3 w-3" /> },
 };
 
 const categoryConfig: Record<IssueCategory, { label: string; icon: React.ReactNode }> = {
@@ -273,19 +273,19 @@ export function IssueReportTab({ workspaceId, eventId }: IssueReportTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.open}</div>
+            <div className="text-2xl font-bold text-info">{stats.open}</div>
             <p className="text-xs text-muted-foreground">Open</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.inProgress}</div>
+            <div className="text-2xl font-bold text-warning">{stats.inProgress}</div>
             <p className="text-xs text-muted-foreground">In Progress</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+            <div className="text-2xl font-bold text-success">{stats.resolved}</div>
             <p className="text-xs text-muted-foreground">Resolved</p>
           </CardContent>
         </Card>
@@ -297,7 +297,7 @@ export function IssueReportTab({ workspaceId, eventId }: IssueReportTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">{stats.critical}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.critical}</div>
             <p className="text-xs text-muted-foreground">Critical</p>
           </CardContent>
         </Card>
@@ -444,7 +444,7 @@ function IssueCard({
   const status = statusConfig[issue.status];
 
   return (
-    <Card className={issue.priority === 'critical' && issue.status === 'open' ? 'border-red-500 border-2' : ''}>
+    <Card className={issue.priority === 'critical' && issue.status === 'open' ? 'border-destructive border-2' : ''}>
       <CardContent className="py-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">

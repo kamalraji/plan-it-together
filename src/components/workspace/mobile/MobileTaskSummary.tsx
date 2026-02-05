@@ -64,22 +64,22 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
       label: 'Completed',
       value: completedTasks,
       icon: CheckCircleIcon,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'In Progress',
       value: inProgressTasks,
       icon: ClockIcon,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Overdue',
       value: overdueTasks,
       icon: ExclamationCircleIcon,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
     },
     {
       label: 'Blocked',
@@ -115,7 +115,7 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
         </div>
         <div className="w-full bg-muted rounded-full h-2">
           <div
-            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+            className="bg-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${completionRate}%` }}
           ></div>
         </div>
@@ -167,16 +167,16 @@ export function MobileTaskSummary({ workspace, onViewTasks }: MobileTaskSummaryP
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
                       {task.due_date && (
-                        <p className={`text-xs ${isOverdue ? 'text-red-600' : 'text-muted-foreground'}`}>
+                        <p className={`text-xs ${isOverdue ? 'text-destructive' : 'text-muted-foreground'}`}>
                           Due: {new Date(task.due_date).toLocaleDateString()}
                         </p>
                       )}
                     </div>
                     <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${
                       task.priority === 'HIGH' 
-                        ? 'bg-red-100 text-red-800'
+                        ? 'bg-destructive/20 text-red-800'
                         : task.priority === 'MEDIUM'
-                        ? 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-warning/20 text-yellow-800'
                         : 'bg-muted text-foreground'
                     }`}>
                       {task.priority}

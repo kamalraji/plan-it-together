@@ -21,7 +21,7 @@ interface PlatformConfig { id: string; name: string; icon: React.FC; color: stri
 
 const PLATFORMS: PlatformConfig[] = [
   { id: 'twitter', name: 'Twitter / X', icon: TwitterIcon, color: 'text-sky-500', bgColor: 'bg-sky-500/10', fields: [{ key: 'api_key', label: 'API Key', type: 'password' }, { key: 'api_secret', label: 'API Secret', type: 'password' }, { key: 'access_token', label: 'Access Token', type: 'password' }] },
-  { id: 'linkedin', name: 'LinkedIn', icon: LinkedinIcon, color: 'text-blue-600', bgColor: 'bg-blue-600/10', fields: [{ key: 'client_id', label: 'Client ID', type: 'text' }, { key: 'client_secret', label: 'Client Secret', type: 'password' }, { key: 'access_token', label: 'Access Token', type: 'password' }] },
+  { id: 'linkedin', name: 'LinkedIn', icon: LinkedinIcon, color: 'text-info', bgColor: 'bg-primary/10', fields: [{ key: 'client_id', label: 'Client ID', type: 'text' }, { key: 'client_secret', label: 'Client Secret', type: 'password' }, { key: 'access_token', label: 'Access Token', type: 'password' }] },
   { id: 'instagram', name: 'Instagram', icon: InstagramIcon, color: 'text-pink-500', bgColor: 'bg-pink-500/10', fields: [{ key: 'app_id', label: 'App ID', type: 'text' }, { key: 'app_secret', label: 'App Secret', type: 'password' }, { key: 'access_token', label: 'Access Token', type: 'password' }] },
 ];
 
@@ -53,11 +53,11 @@ export function SocialApiCredentialsTab({ workspaceId }: SocialApiCredentialsTab
           const creds = getCredentialsForPlatform(platform.id);
           const isConnected = creds?.is_active;
           return (
-            <Card key={platform.id} className={cn('transition-all hover:shadow-md', isConnected && 'ring-2 ring-green-500/30')}>
+            <Card key={platform.id} className={cn('transition-all hover:shadow-md', isConnected && 'ring-2 ring-success/30')}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className={cn('p-3 rounded-xl', platform.bgColor)}><Icon /></div>
-                  <Badge variant="outline" className={cn('text-xs', isConnected ? 'bg-green-500/10 text-green-600' : 'bg-muted')}>{isConnected ? <><CheckCircle className="h-3 w-3 mr-1" />Connected</> : <><XCircle className="h-3 w-3 mr-1" />Not Connected</>}</Badge>
+                  <Badge variant="outline" className={cn('text-xs', isConnected ? 'bg-success/10 text-success' : 'bg-muted')}>{isConnected ? <><CheckCircle className="h-3 w-3 mr-1" />Connected</> : <><XCircle className="h-3 w-3 mr-1" />Not Connected</>}</Badge>
                 </div>
                 <CardTitle className="text-lg">{platform.name}</CardTitle>
                 <CardDescription className="text-xs">{isConnected ? 'Connected' : 'Configure to enable posting'}</CardDescription>
@@ -67,7 +67,7 @@ export function SocialApiCredentialsTab({ workspaceId }: SocialApiCredentialsTab
           );
         })}
       </div>
-      <Card><CardHeader><CardTitle className="flex items-center gap-2"><Link2 className="h-5 w-5 text-primary" />Integration Status</CardTitle></CardHeader><CardContent><div className="space-y-2">{PLATFORMS.map((p) => { const c = getCredentialsForPlatform(p.id); const Icon = p.icon; return (<div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50"><div className="flex items-center gap-3"><Icon /><span className="font-medium text-sm">{p.name}</span></div><div className={cn('w-2 h-2 rounded-full', c?.is_active ? 'bg-green-500' : 'bg-muted-foreground')} /></div>); })}</div></CardContent></Card>
+      <Card><CardHeader><CardTitle className="flex items-center gap-2"><Link2 className="h-5 w-5 text-primary" />Integration Status</CardTitle></CardHeader><CardContent><div className="space-y-2">{PLATFORMS.map((p) => { const c = getCredentialsForPlatform(p.id); const Icon = p.icon; return (<div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50"><div className="flex items-center gap-3"><Icon /><span className="font-medium text-sm">{p.name}</span></div><div className={cn('w-2 h-2 rounded-full', c?.is_active ? 'bg-success' : 'bg-muted-foreground')} /></div>); })}</div></CardContent></Card>
       <Dialog open={!!editingPlatform} onOpenChange={() => setEditingPlatform(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle className="flex items-center gap-2">{editingPlatform && <>Configure {editingPlatform.name}</>}</DialogTitle><DialogDescription>Enter API credentials to enable automated posting.</DialogDescription></DialogHeader>

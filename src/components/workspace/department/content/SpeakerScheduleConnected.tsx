@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 
 const statusConfig = {
   confirmed: { label: 'Confirmed', icon: CheckCircle, className: 'bg-emerald-500/10 text-emerald-500' },
-  pending: { label: 'Pending', icon: AlertCircle, className: 'bg-amber-500/10 text-amber-500' },
-  cancelled: { label: 'Cancelled', icon: AlertCircle, className: 'bg-red-500/10 text-red-500' },
+  pending: { label: 'Pending', icon: AlertCircle, className: 'bg-warning/10 text-warning' },
+  cancelled: { label: 'Cancelled', icon: AlertCircle, className: 'bg-destructive/10 text-destructive' },
 };
 
 interface SpeakerScheduleConnectedProps {

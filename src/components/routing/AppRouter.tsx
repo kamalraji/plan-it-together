@@ -256,7 +256,7 @@ export const ConsoleDashboard = () => {
         )}
 
         {error && (
-          <div className="mb-8 max-w-2xl mx-auto rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-8 max-w-2xl mx-auto rounded-xl border border-red-200 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             Unable to load live metrics right now. Data cards below may be empty.
           </div>
         )}
@@ -295,7 +295,7 @@ export const ConsoleDashboard = () => {
               } else {
                 navigate('/dashboard/eventmanagement');
               }
-            }} className="w-full bg-gradient-to-r from-coral to-coral-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+            }} className="w-full bg-gradient-to-r from-coral to-coral-light text-primary-foreground font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Events
             </button>
           </div>
@@ -325,7 +325,7 @@ export const ConsoleDashboard = () => {
               } else {
                 navigate('/dashboard/workspaces');
               }
-            }} className="w-full bg-gradient-to-r from-teal to-teal-light text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
+            }} className="w-full bg-gradient-to-r from-teal to-teal-light text-primary-foreground font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105">
               Go to Workspaces
             </button>
           </div>
@@ -356,7 +356,7 @@ export const ConsoleDashboard = () => {
             </div>
             <button
               onClick={() => navigate('/marketplace')}
-              className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
+              className="w-full bg-gradient-to-r from-sunny to-sunny/80 text-primary-foreground font-semibold py-3 px-6 rounded-xl hover:shadow-soft transition-all duration-200 hover:scale-105"
             >
               Go to Marketplace
             </button>
@@ -368,19 +368,19 @@ export const ConsoleDashboard = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <button 
               onClick={() => navigate('/dashboard/eventmanagement/create')}
-              className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+              className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Create Event
             </button>
             <button 
               onClick={() => navigate('/dashboard/workspaces')}
-              className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+              className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Join Workspace
             </button>
             <button
               onClick={() => navigate('/marketplace')}
-              className="bg-card/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+              className="bg-card/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Browse Services
             </button>

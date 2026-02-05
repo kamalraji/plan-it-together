@@ -43,8 +43,8 @@ export function JudgingOverviewConnected({ eventId, onAssignJudge, onEnterScore 
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-amber-500/10">
-              <Gavel className="h-4 w-4 text-amber-500" />
+            <div className="p-1.5 rounded-lg bg-warning/10">
+              <Gavel className="h-4 w-4 text-warning" />
             </div>
             Judging Overview
           </CardTitle>
@@ -87,7 +87,7 @@ export function JudgingOverviewConnected({ eventId, onAssignJudge, onEnterScore 
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-lg bg-accent/50 border border-border">
                 <div className="flex items-center gap-2 mb-1">
-                  <Users className="h-4 w-4 text-blue-500" />
+                  <Users className="h-4 w-4 text-info" />
                   <span className="text-xs text-muted-foreground">Active Judges</span>
                 </div>
                 <p className="text-lg font-semibold text-foreground">
@@ -107,7 +107,7 @@ export function JudgingOverviewConnected({ eventId, onAssignJudge, onEnterScore 
 
               <div className="p-3 rounded-lg bg-accent/50 border border-border">
                 <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="h-4 w-4 text-purple-500" />
+                  <TrendingUp className="h-4 w-4 text-primary" />
                   <span className="text-xs text-muted-foreground">Avg Score</span>
                 </div>
                 <p className="text-lg font-semibold text-foreground">
@@ -117,7 +117,7 @@ export function JudgingOverviewConnected({ eventId, onAssignJudge, onEnterScore 
 
               <div className="p-3 rounded-lg bg-accent/50 border border-border">
                 <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-amber-500" />
+                  <Clock className="h-4 w-4 text-warning" />
                   <span className="text-xs text-muted-foreground">Pending</span>
                 </div>
                 <p className="text-lg font-semibold text-foreground">

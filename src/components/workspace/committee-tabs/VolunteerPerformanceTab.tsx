@@ -170,12 +170,12 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
 
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <TrendingUp className="h-4 w-4 text-emerald-500" />;
-    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-red-500" />;
+    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-destructive" />;
     return <span className="h-4 w-4 text-muted-foreground">—</span>;
   };
 
   const getMedalColor = (index: number) => {
-    if (index === 0) return 'text-amber-500';
+    if (index === 0) return 'text-warning';
     if (index === 1) return 'text-muted-foreground';
     if (index === 2) return 'text-amber-700';
     return 'text-muted-foreground';
@@ -248,8 +248,8 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Calendar className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Calendar className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{summary?.avgPunctuality || 0}%</p>
@@ -261,8 +261,8 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/20">
-                <Trophy className="h-5 w-5 text-amber-600" />
+              <div className="p-2 rounded-lg bg-warning/20">
+                <Trophy className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-lg font-bold truncate">{summary?.topPerformer?.name || 'N/A'}</p>
@@ -278,7 +278,7 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <Medal className="h-5 w-5 text-amber-500" />
+              <Medal className="h-5 w-5 text-warning" />
               Volunteer Leaderboard
             </CardTitle>
             <Select value={sortBy} onValueChange={setSortBy}>
@@ -331,7 +331,7 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
                         <span>{volunteer.shiftsCompleted}/{volunteer.shiftsAssigned} shifts</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-amber-500" />
+                          <Star className="h-3 w-3 text-warning" />
                           {volunteer.rating}
                         </span>
                       </div>
@@ -355,8 +355,8 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
                         variant="outline"
                         className={cn(
                           volunteer.attendanceRate >= 90 && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-                          volunteer.attendanceRate >= 70 && volunteer.attendanceRate < 90 && 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-                          volunteer.attendanceRate < 70 && 'bg-red-500/10 text-red-600 border-red-500/20'
+                          volunteer.attendanceRate >= 70 && volunteer.attendanceRate < 90 && 'bg-warning/10 text-warning border-warning/20',
+                          volunteer.attendanceRate < 70 && 'bg-destructive/10 text-destructive border-destructive/20'
                         )}
                       >
                         {volunteer.attendanceRate >= 90 ? 'Excellent' : volunteer.attendanceRate >= 70 ? 'Good' : 'Needs Attention'}

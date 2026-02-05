@@ -155,7 +155,7 @@ export function TechCheckTab({ workspaceId, eventId }: TechCheckTabProps) {
               <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
                 <CheckCircle className="h-3 w-3 mr-1" />{stats.completedItems} Complete
               </Badge>
-              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">
+              <Badge className="bg-warning/10 text-warning border-warning/20">
                 <Clock className="h-3 w-3 mr-1" />{stats.totalItems - stats.completedItems} Remaining
               </Badge>
             </div>

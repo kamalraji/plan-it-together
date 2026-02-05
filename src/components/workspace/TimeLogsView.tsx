@@ -50,9 +50,9 @@ export function TimeLogsView({ workspaceId, userId, isManager = false }: TimeLog
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft': return 'bg-muted text-muted-foreground';
-      case 'submitted': return 'bg-blue-100 text-blue-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
+      case 'submitted': return 'bg-info/20 text-blue-800';
+      case 'approved': return 'bg-success/20 text-success';
+      case 'rejected': return 'bg-destructive/20 text-red-800';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -181,7 +181,7 @@ export function TimeLogsView({ workspaceId, userId, isManager = false }: TimeLog
                                   className="h-8 w-8"
                                   onClick={() => handleSaveEdit(entry)}
                                 >
-                                  <Check className="h-4 w-4 text-green-600" />
+                                  <Check className="h-4 w-4 text-success" />
                                 </Button>
                                 <Button
                                   variant="ghost"

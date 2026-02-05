@@ -56,10 +56,10 @@ export function getTierSaleStatus(tier: TicketTier): TierSaleStatus {
 
 export function getTierStatusColor(status: TierSaleStatus): string {
   switch (status) {
-    case 'on_sale': return 'text-green-600 bg-green-100';
-    case 'upcoming': return 'text-yellow-600 bg-yellow-100';
+    case 'on_sale': return 'text-success bg-success/20';
+    case 'upcoming': return 'text-warning bg-warning/20';
     case 'ended': return 'text-muted-foreground bg-muted';
-    case 'sold_out': return 'text-red-600 bg-red-100';
+    case 'sold_out': return 'text-destructive bg-destructive/20';
     case 'inactive': return 'text-muted-foreground bg-muted';
   }
 }

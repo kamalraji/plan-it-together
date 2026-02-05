@@ -66,8 +66,8 @@ export const PublishDialog: React.FC<PublishDialogProps> = ({
 
         {published ? (
           <div className="py-8 flex flex-col items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-              <Check className="h-6 w-6 text-green-600" />
+            <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center">
+              <Check className="h-6 w-6 text-success" />
             </div>
             <div className="text-center">
               <p className="font-medium text-foreground">Published successfully!</p>

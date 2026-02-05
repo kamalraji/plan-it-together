@@ -69,7 +69,7 @@ export function IDCardToolbar({
               size="sm"
               onClick={onOpenAIDialog}
             >
-              <Sparkles className="h-4 w-4 text-purple-600" />
+              <Sparkles className="h-4 w-4 text-primary" />
               AI Design Generator
             </Button>
           </div>

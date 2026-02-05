@@ -26,9 +26,9 @@ const tierConfig: Record<string, { color: string; minValue: number }> = {
 
 const statusConfig: Record<string, { color: string; icon: React.ElementType }> = {
   prospect: { color: 'bg-muted text-muted-foreground', icon: Clock },
-  negotiating: { color: 'bg-blue-500/20 text-blue-600', icon: FileText },
-  confirmed: { color: 'bg-green-500/20 text-green-600', icon: CheckCircle2 },
-  declined: { color: 'bg-red-500/20 text-red-600', icon: Clock },
+  negotiating: { color: 'bg-info/20 text-info', icon: FileText },
+  confirmed: { color: 'bg-success/20 text-success', icon: CheckCircle2 },
+  declined: { color: 'bg-destructive/20 text-destructive', icon: Clock },
   churned: { color: 'bg-muted-foreground/30/20 text-muted-foreground', icon: Clock },
 };
 

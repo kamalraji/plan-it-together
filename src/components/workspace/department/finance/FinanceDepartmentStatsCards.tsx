@@ -64,16 +64,16 @@ export function FinanceDepartmentStatsCards({ workspaceId }: FinanceDepartmentSt
       value: formatCurrency(totalBudget),
       subtext: `${utilizationRate}% utilized`,
       icon: DollarSign,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       label: 'Expenses',
       value: formatCurrency(expenseStats.total),
       subtext: `${expenseStats.pending > 0 ? formatCurrency(expenseStats.pending) + ' pending' : 'All processed'}`,
       icon: Receipt,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       label: 'Invoices Outstanding',
@@ -82,8 +82,8 @@ export function FinanceDepartmentStatsCards({ workspaceId }: FinanceDepartmentSt
         ? `${invoiceStats.overdueCount} overdue`
         : `${invoiceStats.sentCount} awaiting payment`,
       icon: FileText,
-      color: invoiceStats.overdueCount > 0 ? 'text-amber-500' : 'text-purple-500',
-      bgColor: invoiceStats.overdueCount > 0 ? 'bg-amber-500/10' : 'bg-purple-500/10',
+      color: invoiceStats.overdueCount > 0 ? 'text-warning' : 'text-primary',
+      bgColor: invoiceStats.overdueCount > 0 ? 'bg-warning/10' : 'bg-primary/10',
     },
     {
       label: 'Remaining',
@@ -92,8 +92,8 @@ export function FinanceDepartmentStatsCards({ workspaceId }: FinanceDepartmentSt
         ? `${pendingRequests.length} pending requests`
         : 'Available funds',
       icon: remainingBudget > 0 ? TrendingUp : AlertTriangle,
-      color: remainingBudget > 0 ? 'text-emerald-500' : 'text-red-500',
-      bgColor: remainingBudget > 0 ? 'bg-emerald-500/10' : 'bg-red-500/10',
+      color: remainingBudget > 0 ? 'text-emerald-500' : 'text-destructive',
+      bgColor: remainingBudget > 0 ? 'bg-emerald-500/10' : 'bg-destructive/10',
     },
   ];
 

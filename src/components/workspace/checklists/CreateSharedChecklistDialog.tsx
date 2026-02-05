@@ -80,19 +80,19 @@ const PHASE_CONFIG = {
     label: 'Pre-Event',
     icon: ClipboardList,
     color: 'bg-blue-500/10 text-blue-600 border-blue-500/30 hover:bg-blue-500/20',
-    activeColor: 'bg-blue-500 text-white border-blue-600',
+    activeColor: 'bg-info text-primary-foreground border-primary',
   },
   during_event: {
     label: 'During Event',
     icon: Clock,
     color: 'bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20',
-    activeColor: 'bg-amber-500 text-white border-amber-600',
+    activeColor: 'bg-warning text-primary-foreground border-amber-600',
   },
   post_event: {
     label: 'Post-Event',
     icon: CheckCircle2,
     color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20',
-    activeColor: 'bg-emerald-500 text-white border-emerald-600',
+    activeColor: 'bg-emerald-500 text-primary-foreground border-emerald-600',
   },
 };
 
@@ -100,22 +100,22 @@ const PRIORITY_CONFIG = {
   low: {
     label: 'Low',
     color: 'bg-slate-500/10 text-slate-600 border-slate-500/30 hover:bg-slate-500/20',
-    activeColor: 'bg-slate-500 text-white border-slate-600',
+    activeColor: 'bg-slate-500 text-primary-foreground border-slate-600',
   },
   medium: {
     label: 'Medium',
     color: 'bg-blue-500/10 text-blue-600 border-blue-500/30 hover:bg-blue-500/20',
-    activeColor: 'bg-blue-500 text-white border-blue-600',
+    activeColor: 'bg-info text-primary-foreground border-primary',
   },
   high: {
     label: 'High',
     color: 'bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20',
-    activeColor: 'bg-amber-500 text-white border-amber-600',
+    activeColor: 'bg-warning text-primary-foreground border-amber-600',
   },
   urgent: {
     label: 'Urgent',
     color: 'bg-red-500/10 text-red-600 border-red-500/30 hover:bg-red-500/20',
-    activeColor: 'bg-red-500 text-white border-red-600',
+    activeColor: 'bg-destructive text-primary-foreground border-destructive',
   },
 };
 

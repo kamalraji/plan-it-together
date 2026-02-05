@@ -132,7 +132,7 @@ export function SafetyChecklist({ workspaceId }: SafetyChecklistProps) {
         {/* Progress Bar */}
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-green-500 transition-all duration-300"
+            className="h-full bg-success transition-all duration-300"
             style={{ width: `${completionPercent}%` }}
           />
         </div>

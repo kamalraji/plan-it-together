@@ -225,7 +225,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                       {filter.type === 'toggle' && (
                         <button
                           onClick={() => filter.onChange(!filter.value)}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus-visible:ring-ring focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-muted'
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus-visible:ring-ring focus:ring-offset-2 ${filter.value ? 'bg-primary' : 'bg-muted'
                             }`}
                         >
                           <span

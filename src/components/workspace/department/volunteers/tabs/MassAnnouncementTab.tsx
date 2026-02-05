@@ -99,7 +99,7 @@ export function MassAnnouncementTab({ workspace }: MassAnnouncementTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.totalRecipients}</div>
+            <div className="text-2xl font-bold text-info">{stats.totalRecipients}</div>
             <div className="text-xs text-muted-foreground">Recipients Reached</div>
           </CardContent>
         </Card>

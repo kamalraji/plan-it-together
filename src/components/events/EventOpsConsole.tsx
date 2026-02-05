@@ -65,9 +65,9 @@ export const EventOpsConsole: React.FC = () => {
     return (
       <div className="p-6">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
             <h2 className="text-sm font-semibold text-red-800 mb-1">Missing event context</h2>
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-destructive">
               The Event-Day Ops console needs a valid event id in the URL.
             </p>
           </div>
@@ -113,11 +113,11 @@ export const EventOpsConsole: React.FC = () => {
             </div>
             <div className="bg-card rounded-lg border border-border p-4">
               <p className="text-sm font-medium text-muted-foreground mb-1">Checked-in</p>
-              <p className="text-2xl font-semibold text-green-600">{attendedCount}</p>
+              <p className="text-2xl font-semibold text-success">{attendedCount}</p>
             </div>
             <div className="bg-card rounded-lg border border-border p-4">
               <p className="text-sm font-medium text-muted-foreground mb-1">Attendance rate</p>
-              <p className="text-2xl font-semibold text-indigo-600">
+              <p className="text-2xl font-semibold text-primary">
                 {checkInRate.toFixed(1)}%
               </p>
             </div>

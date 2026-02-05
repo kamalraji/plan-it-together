@@ -17,7 +17,7 @@ export function EventScheduleManager({ eventId }: EventScheduleManagerProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
-      case 'in-progress': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
+      case 'in-progress': return 'bg-info/10 text-info border-info/20';
       case 'cancelled': return 'bg-destructive/10 text-destructive border-destructive/20';
       case 'upcoming':
       default: return 'bg-muted text-muted-foreground border-border';
@@ -26,10 +26,10 @@ export function EventScheduleManager({ eventId }: EventScheduleManagerProps) {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'keynote': return 'bg-purple-500/10 text-purple-600';
-      case 'break': return 'bg-amber-500/10 text-amber-600';
+      case 'keynote': return 'bg-primary/10 text-primary';
+      case 'break': return 'bg-warning/10 text-warning';
       case 'networking': return 'bg-pink-500/10 text-pink-600';
-      default: return 'bg-blue-500/10 text-blue-600';
+      default: return 'bg-info/10 text-info';
     }
   };
 
@@ -66,7 +66,7 @@ export function EventScheduleManager({ eventId }: EventScheduleManagerProps) {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <Clock className="h-4 w-4 text-blue-500" />
+              <Clock className="h-4 w-4 text-info" />
               Event Schedule
             </CardTitle>
           </div>
@@ -89,7 +89,7 @@ export function EventScheduleManager({ eventId }: EventScheduleManagerProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Clock className="h-4 w-4 text-blue-500" />
+            <Clock className="h-4 w-4 text-info" />
             Event Schedule
             {sessions.length > 0 && (
               <Badge variant="secondary" className="ml-2 text-xs">
@@ -146,7 +146,7 @@ export function EventScheduleManager({ eventId }: EventScheduleManagerProps) {
                             {sessionType}
                           </Badge>
                           {session.status === 'in-progress' && (
-                            <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/30 animate-pulse">
+                            <Badge variant="outline" className="text-xs bg-info/10 text-info border-info/30 animate-pulse">
                               Live
                             </Badge>
                           )}

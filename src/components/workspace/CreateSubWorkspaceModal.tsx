@@ -433,36 +433,36 @@ export function CreateSubWorkspaceModal({
                               deptAlreadyCreated 
                                 ? "opacity-50 cursor-not-allowed" 
                                 : "hover:bg-accent/30",
-                              isDeptSelected && !deptAlreadyCreated && "bg-blue-500/10"
+                              isDeptSelected && !deptAlreadyCreated && "bg-info/10"
                             )}
                           >
                             {deptAlreadyCreated ? (
-                              <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                              <CheckCircle className="h-4 w-4 text-success shrink-0" />
                             ) : (
                               <div className={cn(
                                 "flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors",
                                 "border-[1.5px]",
                                 isDeptSelected 
-                                  ? "border-blue-500 bg-blue-500" 
+                                  ? "border-info bg-info" 
                                   : "border-muted-foreground/40"
                               )}>
-                                {isDeptSelected && <Check className="h-2.5 w-2.5 text-white" />}
+                                {isDeptSelected && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
                               </div>
                             )}
-                            <Building2 className={cn("h-3.5 w-3.5", deptAlreadyCreated ? "text-green-500" : "text-blue-500")} />
+                            <Building2 className={cn("h-3.5 w-3.5", deptAlreadyCreated ? "text-success" : "text-info")} />
                             <span className={cn("text-xs font-medium flex-1", deptAlreadyCreated ? "text-muted-foreground" : "text-foreground")}>
                               {dept.name}
                             </span>
                             {deptAlreadyCreated ? (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-600">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success/20 text-success">
                                 Created
                               </span>
                             ) : selectedCommCount > 0 ? (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
                                 {selectedCommCount} comm
                               </span>
                             ) : createdCommCount > 0 ? (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                                 {createdCommCount}/{committees.length}
                               </span>
                             ) : null}
@@ -505,28 +505,28 @@ export function CreateSubWorkspaceModal({
                                     commAlreadyCreated 
                                       ? "opacity-50 cursor-not-allowed"
                                       : "hover:bg-accent/30",
-                                    isCommSelected && !commAlreadyCreated && "bg-amber-500/10"
+                                    isCommSelected && !commAlreadyCreated && "bg-warning/10"
                                   )}
                                 >
                                   {commAlreadyCreated ? (
-                                    <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                                    <CheckCircle className="h-3.5 w-3.5 text-success shrink-0" />
                                   ) : (
                                     <div className={cn(
                                       "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded transition-colors",
                                       "border-[1.5px]",
                                       isCommSelected 
-                                        ? "border-amber-500 bg-amber-500" 
+                                        ? "border-warning bg-warning" 
                                         : "border-muted-foreground/40"
                                     )}>
-                                      {isCommSelected && <Check className="h-2 w-2 text-white" />}
+                                      {isCommSelected && <Check className="h-2 w-2 text-primary-foreground" />}
                                     </div>
                                   )}
-                                  <Users className={cn("h-3 w-3", commAlreadyCreated ? "text-green-500" : "text-amber-500")} />
+                                  <Users className={cn("h-3 w-3", commAlreadyCreated ? "text-success" : "text-warning")} />
                                   <span className={cn("text-[11px] flex-1", commAlreadyCreated ? "text-muted-foreground" : "text-foreground")}>
                                     {comm.name}
                                   </span>
                                   {commAlreadyCreated && (
-                                    <span className="text-[9px] px-1 py-0.5 rounded bg-green-500/20 text-green-600">
+                                    <span className="text-[9px] px-1 py-0.5 rounded bg-success/20 text-success">
                                       Created
                                     </span>
                                   )}
@@ -576,8 +576,8 @@ export function CreateSubWorkspaceModal({
                         className={cn(
                           "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
                           item.type === 'department'
-                            ? "bg-blue-500/10 text-blue-600"
-                            : "bg-amber-500/10 text-amber-600"
+                            ? "bg-info/10 text-info"
+                            : "bg-warning/10 text-warning"
                         )}
                       >
                         {item.type === 'department' ? <Building2 className="h-2.5 w-2.5" /> : <Users className="h-2.5 w-2.5" />}
@@ -596,9 +596,9 @@ export function CreateSubWorkspaceModal({
               {/* Actions */}
               <div className="flex items-center gap-2 px-4 pb-4 pt-2 border-t border-border/30">
                 <div className="flex-1 text-[10px] text-muted-foreground">
-                  {selectedDepts.length > 0 && <span className="text-blue-500">{selectedDepts.length} dept</span>}
+                  {selectedDepts.length > 0 && <span className="text-info">{selectedDepts.length} dept</span>}
                   {selectedDepts.length > 0 && selectedComms.length > 0 && <span> • </span>}
-                  {selectedComms.length > 0 && <span className="text-amber-500">{selectedComms.length} comm</span>}
+                  {selectedComms.length > 0 && <span className="text-warning">{selectedComms.length} comm</span>}
                 </div>
                 <Button
                   type="button"
@@ -647,15 +647,15 @@ export function CreateSubWorkspaceModal({
                       <div className={cn(
                         "flex items-center gap-2 p-2 rounded-md border-l-2",
                         dept.isNew 
-                          ? "bg-blue-500/5 border-blue-500" 
-                          : "bg-green-500/5 border-green-500"
+                          ? "bg-info/5 border-info" 
+                          : "bg-success/5 border-success"
                       )}>
-                        <Building2 className={cn("h-3.5 w-3.5", dept.isNew ? "text-blue-500" : "text-green-500")} />
+                        <Building2 className={cn("h-3.5 w-3.5", dept.isNew ? "text-info" : "text-success")} />
                         <span className="text-xs font-medium text-foreground flex-1">{dept.deptName}</span>
                         {dept.isNew ? (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600">New • L2</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-info/20 text-info">New • L2</span>
                         ) : (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-600">Exists • L2</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-success/20 text-success">Exists • L2</span>
                         )}
                       </div>
 
@@ -663,11 +663,11 @@ export function CreateSubWorkspaceModal({
                       {dept.committees.map((comm, idx) => (
                         <div 
                           key={`${dept.deptId}-${idx}`} 
-                          className="ml-4 flex items-center gap-2 p-2 rounded-md bg-amber-500/5 border-l-2 border-amber-500"
+                          className="ml-4 flex items-center gap-2 p-2 rounded-md bg-warning/5 border-l-2 border-warning"
                         >
-                          <Users className="h-3 w-3 text-amber-500" />
+                          <Users className="h-3 w-3 text-warning" />
                           <span className="text-[11px] text-foreground flex-1">{comm.name}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600">New • L3</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">New • L3</span>
                         </div>
                       ))}
                     </div>

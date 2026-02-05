@@ -107,14 +107,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
     switch (status) {
       case 'ACTIVE':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success">
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Active
           </span>
         );
       case 'PENDING':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warning/20 text-yellow-800">
             <ClockIcon className="w-3 h-3 mr-1" />
             Pending
           </span>
@@ -139,7 +139,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       [WorkspaceRole.CONTENT_MANAGER]: 'bg-violet-100 text-violet-800',
       [WorkspaceRole.TECH_FINANCE_MANAGER]: 'bg-violet-100 text-violet-800',
       [WorkspaceRole.VOLUNTEERS_MANAGER]: 'bg-violet-100 text-violet-800',
-      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-indigo-100 text-indigo-800',
+      [WorkspaceRole.EVENT_COORDINATOR]: 'bg-primary/20 text-indigo-800',
       [WorkspaceRole.MARKETING_LEAD]: 'bg-pink-100 text-pink-800',
     };
 
@@ -165,8 +165,8 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
     const getColor = (r: string): string => {
       if (roleColors[r]) return roleColors[r];
       if (r.endsWith('_MANAGER')) return 'bg-violet-100 text-violet-800';
-      if (r.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
-      if (r.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
+      if (r.endsWith('_LEAD')) return 'bg-info/20 text-blue-800';
+      if (r.endsWith('_COORDINATOR')) return 'bg-primary/20 text-indigo-800';
       return 'bg-muted text-foreground';
     };
 
@@ -311,8 +311,8 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
             >
               <div className="flex items-center space-x-3">
                 {/* Avatar */}
-                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-indigo-600 font-medium text-sm">
+                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-primary font-medium text-sm">
                     {getInitials(member.user_profiles?.name || 'Unknown')}
                   </span>
                 </div>

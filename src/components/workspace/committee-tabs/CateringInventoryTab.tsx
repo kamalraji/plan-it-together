@@ -152,8 +152,8 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
   const getStatusBadge = (status: string) => {
     const config = {
       'sufficient': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Sufficient' },
-      'low': { class: 'bg-amber-500/10 text-amber-600 border-amber-500/20', label: 'Low Stock' },
-      'critical': { class: 'bg-red-500/10 text-red-600 border-red-500/20', label: 'Critical' },
+      'low': { class: 'bg-warning/10 text-warning border-warning/20', label: 'Low Stock' },
+      'critical': { class: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Critical' },
       'out': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Out of Stock' },
     };
     const { class: className, label } = config[status as keyof typeof config] || config.sufficient;
@@ -162,8 +162,8 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
 
   const getStockColor = (status: string) => {
     if (status === 'sufficient') return 'bg-emerald-500';
-    if (status === 'low') return 'bg-amber-500';
-    return 'bg-red-500';
+    if (status === 'low') return 'bg-warning';
+    return 'bg-destructive';
   };
 
   if (isLoading) {
@@ -274,10 +274,10 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
 
       {/* Alerts */}
       {(criticalCount > 0 || lowCount > 0) && (
-        <Card className="border-amber-200 bg-amber-50/50">
+        <Card className="border-amber-200 bg-warning/10/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <AlertTriangle className="h-5 w-5 text-warning" />
               <div>
                 <p className="font-medium text-amber-800">Inventory Alerts</p>
                 <p className="text-sm text-amber-700">
@@ -295,8 +295,8 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Package className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Package className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{inventory.length}</p>
@@ -321,8 +321,8 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <TrendingDown className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <TrendingDown className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{lowCount}</p>
@@ -334,8 +334,8 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{criticalCount}</p>
@@ -396,9 +396,9 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
                   key={item.id}
                   className={cn(
                     'flex items-center justify-between p-4 rounded-lg border transition-colors',
-                    item.status === 'critical' && 'bg-red-50/50 border-red-200',
+                    item.status === 'critical' && 'bg-destructive/10/50 border-red-200',
                     item.status === 'out' && 'bg-muted/50/50 border-border',
-                    item.status === 'low' && 'bg-amber-50/50 border-amber-200'
+                    item.status === 'low' && 'bg-warning/10/50 border-amber-200'
                   )}
                 >
                   <div className="flex items-center gap-4 flex-1">

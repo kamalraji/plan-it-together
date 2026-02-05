@@ -32,7 +32,7 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
       return <Leaf className="h-4 w-4 text-emerald-500" />;
     }
     if (lowerType.includes('gluten')) {
-      return <Wheat className="h-4 w-4 text-amber-500" />;
+      return <Wheat className="h-4 w-4 text-warning" />;
     }
     return <AlertCircle className="h-4 w-4 text-orange-500" />;
   };
@@ -61,8 +61,8 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-amber-500/20 rounded-full">
-                <UtensilsCrossed className="h-6 w-6 text-amber-500" />
+              <div className="p-3 bg-warning/20 rounded-full">
+                <UtensilsCrossed className="h-6 w-6 text-warning" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-foreground">{meals?.length || 0}</div>
@@ -74,8 +74,8 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-500/20 rounded-full">
-                <Users className="h-6 w-6 text-blue-500" />
+              <div className="p-3 bg-info/20 rounded-full">
+                <Users className="h-6 w-6 text-info" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-foreground">{totalGuests}</div>
@@ -243,13 +243,13 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
                             </Badge>
                           )}
                           {item.is_vegan && (
-                            <Badge className="bg-green-500/20 text-green-600 border-green-500/30 text-xs">
+                            <Badge className="bg-success/20 text-success border-success/30 text-xs">
                               <Leaf className="h-3 w-3 mr-1" />
                               Vegan
                             </Badge>
                           )}
                           {item.is_gluten_free && (
-                            <Badge className="bg-amber-500/20 text-amber-600 border-amber-500/30 text-xs">
+                            <Badge className="bg-warning/20 text-warning border-warning/30 text-xs">
                               <Wheat className="h-3 w-3 mr-1" />
                               Gluten-Free
                             </Badge>

@@ -278,12 +278,12 @@ export const DashboardDataLab: React.FC = () => {
         </header>
 
         {formError && (
-          <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
+          <div className="rounded-md bg-destructive/10 border border-red-200 px-4 py-3 text-sm text-red-800">
             {formError}
           </div>
         )}
         {formSuccess && (
-          <div className="rounded-md bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+          <div className="rounded-md bg-success/10 border border-green-200 px-4 py-3 text-sm text-success">
             {formSuccess}
           </div>
         )}
@@ -323,7 +323,7 @@ export const DashboardDataLab: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-md bg-coral px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-coral-light focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md bg-coral px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-coral-light focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2"
             >
               Add workspace
             </button>
@@ -398,7 +398,7 @@ export const DashboardDataLab: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className="inline-flex items-center justify-center rounded-md bg-teal px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-light focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md bg-teal px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-teal-light focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
               >
                 Add service
               </button>
@@ -483,7 +483,7 @@ export const DashboardDataLab: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-md bg-sunny px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sunny/80 focus:outline-none focus:ring-2 focus:ring-sunny focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md bg-sunny px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-sunny/80 focus:outline-none focus:ring-2 focus:ring-sunny focus:ring-offset-2"
             >
               Add booking
             </button>

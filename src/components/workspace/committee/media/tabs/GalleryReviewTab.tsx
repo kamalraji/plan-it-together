@@ -113,11 +113,11 @@ export function GalleryReviewTab({ workspaceId }: GalleryReviewTabProps) {
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-500/10 text-green-600 border-green-200">Approved</Badge>;
+        return <Badge className="bg-success/10 text-success border-green-200">Approved</Badge>;
       case 'rejected':
-        return <Badge className="bg-red-500/10 text-red-600 border-red-200">Rejected</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive border-red-200">Rejected</Badge>;
       case 'revision_requested':
-        return <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-200">Revision</Badge>;
+        return <Badge className="bg-warning/10 text-warning border-yellow-200">Revision</Badge>;
       default:
         return <Badge variant="outline">Pending</Badge>;
     }
@@ -157,19 +157,19 @@ export function GalleryReviewTab({ workspaceId }: GalleryReviewTabProps) {
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             <p className="text-sm text-muted-foreground">Pending Review</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-2xl font-bold text-success">{stats.approved}</div>
             <p className="text-sm text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
             <p className="text-sm text-muted-foreground">Rejected</p>
           </CardContent>
         </Card>
@@ -191,7 +191,7 @@ export function GalleryReviewTab({ workspaceId }: GalleryReviewTabProps) {
               <Button 
                 size="sm" 
                 variant="outline" 
-                className="text-green-600"
+                className="text-success"
                 onClick={() => handleBulkAction('approved')}
               >
                 <Check className="h-4 w-4 mr-1" />
@@ -200,7 +200,7 @@ export function GalleryReviewTab({ workspaceId }: GalleryReviewTabProps) {
               <Button 
                 size="sm" 
                 variant="outline" 
-                className="text-red-600"
+                className="text-destructive"
                 onClick={() => handleBulkAction('rejected')}
               >
                 <X className="h-4 w-4 mr-1" />
@@ -346,10 +346,10 @@ export function GalleryReviewTab({ workspaceId }: GalleryReviewTabProps) {
                 </div>
                 {getStatusBadge(asset.review?.status)}
                 <div className="flex gap-1">
-                  <Button size="sm" variant="ghost" className="text-green-600" onClick={(e) => { e.stopPropagation(); handleReview(asset.id, 'approved'); }}>
+                  <Button size="sm" variant="ghost" className="text-success" onClick={(e) => { e.stopPropagation(); handleReview(asset.id, 'approved'); }}>
                     <Check className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" className="text-red-600" onClick={(e) => { e.stopPropagation(); handleReview(asset.id, 'rejected'); }}>
+                  <Button size="sm" variant="ghost" className="text-destructive" onClick={(e) => { e.stopPropagation(); handleReview(asset.id, 'rejected'); }}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>

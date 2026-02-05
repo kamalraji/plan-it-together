@@ -148,7 +148,7 @@ export function AssignReviewerTab({ workspaceId }: AssignReviewerTabProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-amber-500" />
+              <UserPlus className="h-5 w-5 text-warning" />
               Assign Reviewers
             </CardTitle>
             <div className="flex gap-2">
@@ -245,7 +245,7 @@ export function AssignReviewerTab({ workspaceId }: AssignReviewerTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-blue-500" />
+            <Users className="h-5 w-5 text-info" />
             Reviewer Workload
           </CardTitle>
         </CardHeader>

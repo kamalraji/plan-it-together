@@ -22,25 +22,25 @@ const statusConfig: Record<StreamStatus, {
 }> = {
   live: {
     gradient: 'from-red-500/20 via-red-500/10 to-transparent',
-    borderColor: 'border-red-500/40',
+    borderColor: 'border-destructive/40',
     icon: Radio,
-    iconColor: 'text-red-500',
+    iconColor: 'text-destructive',
     label: 'Broadcasting',
     description: 'Your stream is live and viewers can watch',
   },
   scheduled: {
     gradient: 'from-blue-500/20 via-blue-500/10 to-transparent',
-    borderColor: 'border-blue-500/40',
+    borderColor: 'border-info/40',
     icon: Clock,
-    iconColor: 'text-blue-500',
+    iconColor: 'text-info',
     label: 'Scheduled',
     description: 'Stream is scheduled for a future time',
   },
   preparing: {
     gradient: 'from-yellow-500/20 via-yellow-500/10 to-transparent',
-    borderColor: 'border-yellow-500/40',
+    borderColor: 'border-warning/40',
     icon: Pause,
-    iconColor: 'text-yellow-500',
+    iconColor: 'text-warning',
     label: 'Preparing',
     description: 'Getting ready to go live',
   },
@@ -85,7 +85,7 @@ export function StreamStatusBanner({
       {/* Animated pulse for live status */}
       {status === 'live' && (
         <motion.div
-          className="absolute inset-0 bg-red-500/5"
+          className="absolute inset-0 bg-destructive/5"
           animate={{ opacity: [0.3, 0.1, 0.3] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -95,7 +95,7 @@ export function StreamStatusBanner({
         <div className="flex items-center gap-4">
           <div className={cn(
             "p-2.5 rounded-xl",
-            status === 'live' ? 'bg-red-500/20' : 'bg-muted'
+            status === 'live' ? 'bg-destructive/20' : 'bg-muted'
           )}>
             <Icon className={cn("h-5 w-5", config.iconColor)} />
           </div>
@@ -110,8 +110,8 @@ export function StreamStatusBanner({
               ) : (
                 <span className={cn(
                   "text-sm font-medium px-2 py-0.5 rounded-md",
-                  status === 'scheduled' && 'bg-blue-500/20 text-blue-500',
-                  status === 'preparing' && 'bg-yellow-500/20 text-yellow-500',
+                  status === 'scheduled' && 'bg-info/20 text-info',
+                  status === 'preparing' && 'bg-warning/20 text-warning',
                   status === 'ended' && 'bg-muted text-muted-foreground',
                   status === 'error' && 'bg-destructive/20 text-destructive'
                 )}>

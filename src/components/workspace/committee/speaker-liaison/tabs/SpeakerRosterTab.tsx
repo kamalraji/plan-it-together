@@ -45,7 +45,7 @@ export function SpeakerRosterTab({ workspaceId }: SpeakerRosterTabProps) {
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; icon: React.ElementType }> = {
       confirmed: { color: 'bg-emerald-500/10 text-emerald-600', icon: CheckCircle },
-      pending: { color: 'bg-amber-500/10 text-amber-600', icon: Clock },
+      pending: { color: 'bg-warning/10 text-warning', icon: Clock },
       cancelled: { color: 'bg-destructive/10 text-destructive', icon: XCircle },
     };
     const { color, icon: Icon } = config[status] || config.pending;
@@ -177,7 +177,7 @@ export function SpeakerRosterTab({ workspaceId }: SpeakerRosterTabProps) {
                         Mark Confirmed
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleStatusChange(speaker, 'pending')}>
-                        <Clock className="h-4 w-4 mr-2 text-amber-500" />
+                        <Clock className="h-4 w-4 mr-2 text-warning" />
                         Mark Pending
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleStatusChange(speaker, 'cancelled')}>

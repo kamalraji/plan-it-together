@@ -140,7 +140,7 @@ export const JoinOrganizationPage: React.FC = () => {
                                 Joined
                               </span>
                             ) : isPending ? (
-                              <span className="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-500">
+                              <span className="inline-flex items-center rounded-full bg-warning/10 px-3 py-1 text-xs font-medium text-warning">
                                 Pending approval
                               </span>
                             ) : (

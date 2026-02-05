@@ -18,7 +18,7 @@ interface SendAnnouncementTabProps {
 
 const statusConfig = {
   draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Draft' },
-  scheduled: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Scheduled' },
+  scheduled: { icon: Clock, color: 'text-warning', bgColor: 'bg-warning/10', label: 'Scheduled' },
   published: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Published' },
 };
 
@@ -270,8 +270,8 @@ export function SendAnnouncementTab({ workspaceId }: SendAnnouncementTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">

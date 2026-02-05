@@ -162,7 +162,7 @@ export function WorkspaceTemplateRating({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -217,7 +217,7 @@ export function WorkspaceTemplateRating({
                   name="eventSuccess"
                   checked={ratingData.eventSuccess === true}
                   onChange={() => handleRatingChange('eventSuccess', true)}
-                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input"
                 />
                 <span className="ml-2 text-sm text-foreground">Event was successful</span>
               </label>
@@ -227,7 +227,7 @@ export function WorkspaceTemplateRating({
                   name="eventSuccess"
                   checked={ratingData.eventSuccess === false}
                   onChange={() => handleRatingChange('eventSuccess', false)}
-                  className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input"
+                  className="h-4 w-4 text-primary focus-visible:ring-ring border-input"
                 />
                 <span className="ml-2 text-sm text-foreground">Event had challenges</span>
               </label>
@@ -241,7 +241,7 @@ export function WorkspaceTemplateRating({
               type="checkbox"
               checked={ratingData.wouldRecommend}
               onChange={(e) => handleRatingChange('wouldRecommend', e.target.checked)}
-              className="h-4 w-4 text-indigo-600 focus-visible:ring-ring border-input rounded"
+              className="h-4 w-4 text-primary focus-visible:ring-ring border-input rounded"
             />
             <label htmlFor="wouldRecommend" className="ml-2 block text-sm text-foreground">
               I would recommend this template to others

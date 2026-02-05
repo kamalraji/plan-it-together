@@ -94,15 +94,15 @@ export function BasicProfileStep({ data, onSubmit, onBack }: BasicProfileStepPro
         <div className="relative group">
           <Avatar className="h-24 w-24 border-4 border-primary/20">
             <AvatarImage src={previewAvatar || undefined} />
-            <AvatarFallback className="bg-gradient-to-br from-coral to-teal text-white text-2xl">
+            <AvatarFallback className="bg-gradient-to-br from-coral to-teal text-primary-foreground text-2xl">
               {form.watch('fullName')?.charAt(0)?.toUpperCase() || <User className="h-10 w-10" />}
             </AvatarFallback>
           </Avatar>
           <button
             type="button"
-            className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <Upload className="h-6 w-6 text-white" />
+            <Upload className="h-6 w-6 text-primary-foreground" />
           </button>
         </div>
       </div>

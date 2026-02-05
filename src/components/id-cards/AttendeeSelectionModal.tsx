@@ -171,7 +171,7 @@ export function AttendeeSelectionModal({
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate">{attendee.full_name}</span>
                         {attendee.checked_in && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
                         )}
                       </div>
                       <div className="text-sm text-muted-foreground truncate">

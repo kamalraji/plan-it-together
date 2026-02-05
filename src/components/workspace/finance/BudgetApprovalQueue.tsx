@@ -87,8 +87,8 @@ export function BudgetApprovalQueue({ workspaceId }: BudgetApprovalQueueProps) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-violet-500/10">
-              <Wallet className="w-5 h-5 text-violet-600" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Wallet className="w-5 h-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-lg">Budget Approval Queue</CardTitle>

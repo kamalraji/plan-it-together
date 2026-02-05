@@ -139,17 +139,17 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
     <Card id="performance-overview">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-amber-500" />
+          <Trophy className="h-5 w-5 text-warning" />
           <CardTitle className="text-lg">Volunteer Performance</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <Clock className="h-4 w-4 text-blue-600 mx-auto mb-1" />
+          <div className="text-center p-3 bg-info/10 rounded-lg">
+            <Clock className="h-4 w-4 text-info mx-auto mb-1" />
             <p className="text-lg font-bold text-blue-900">{totals.hours}</p>
-            <p className="text-xs text-blue-600">Hours Logged</p>
+            <p className="text-xs text-info">Hours Logged</p>
           </div>
           <div className="text-center p-3 bg-emerald-50 rounded-lg">
             <UserCheck className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
@@ -157,9 +157,9 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
             <p className="text-xs text-emerald-600">Attendance</p>
           </div>
           <div className="text-center p-3 bg-violet-50 rounded-lg">
-            <TrendingUp className="h-4 w-4 text-violet-600 mx-auto mb-1" />
+            <TrendingUp className="h-4 w-4 text-primary mx-auto mb-1" />
             <p className="text-lg font-bold text-violet-900">{totals.reliability}%</p>
-            <p className="text-xs text-violet-600">Reliability</p>
+            <p className="text-xs text-primary">Reliability</p>
           </div>
         </div>
 
@@ -182,7 +182,7 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
                   className="flex items-center gap-3 p-2 rounded-lg bg-muted/30"
                 >
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    index === 0 ? 'bg-amber-100 text-amber-700' :
+                    index === 0 ? 'bg-warning/20 text-amber-700' :
                     index === 1 ? 'bg-muted text-foreground' :
                     index === 2 ? 'bg-orange-100 text-orange-700' :
                     'bg-muted text-muted-foreground'

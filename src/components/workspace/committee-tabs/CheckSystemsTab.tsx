@@ -19,9 +19,9 @@ export function CheckSystemsTab({ workspaceId: _workspaceId }: CheckSystemsTabPr
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "healthy": return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "warning": return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case "critical": return <XCircle className="h-4 w-4 text-red-500" />;
+      case "healthy": return <CheckCircle className="h-4 w-4 text-success" />;
+      case "warning": return <AlertTriangle className="h-4 w-4 text-warning" />;
+      case "critical": return <XCircle className="h-4 w-4 text-destructive" />;
       default: return null;
     }
   };
@@ -37,9 +37,9 @@ export function CheckSystemsTab({ workspaceId: _workspaceId }: CheckSystemsTabPr
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "healthy": return <Badge className="bg-green-500/10 text-green-600 text-xs">Healthy</Badge>;
-      case "warning": return <Badge className="bg-yellow-500/10 text-yellow-600 text-xs">Warning</Badge>;
-      case "critical": return <Badge className="bg-red-500/10 text-red-600 text-xs">Critical</Badge>;
+      case "healthy": return <Badge className="bg-success/10 text-success text-xs">Healthy</Badge>;
+      case "warning": return <Badge className="bg-warning/10 text-warning text-xs">Warning</Badge>;
+      case "critical": return <Badge className="bg-destructive/10 text-destructive text-xs">Critical</Badge>;
       default: return null;
     }
   };
@@ -62,21 +62,21 @@ export function CheckSystemsTab({ workspaceId: _workspaceId }: CheckSystemsTabPr
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Card className="border-green-500/20 bg-green-500/5">
+        <Card className="border-success/20 bg-success/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-green-600">{healthyCount}</div>
+            <div className="text-xl font-bold text-success">{healthyCount}</div>
             <p className="text-xs text-muted-foreground">Healthy</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="border-warning/20 bg-warning/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-yellow-600">{warningCount}</div>
+            <div className="text-xl font-bold text-warning">{warningCount}</div>
             <p className="text-xs text-muted-foreground">Warning</p>
           </CardContent>
         </Card>
-        <Card className="border-red-500/20 bg-red-500/5">
+        <Card className="border-destructive/20 bg-destructive/5">
           <CardContent className="p-3 text-center">
-            <div className="text-xl font-bold text-red-600">{criticalCount}</div>
+            <div className="text-xl font-bold text-destructive">{criticalCount}</div>
             <p className="text-xs text-muted-foreground">Critical</p>
           </CardContent>
         </Card>

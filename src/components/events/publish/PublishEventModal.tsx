@@ -137,8 +137,8 @@ export function PublishEventModal({
           {/* Approval Options (if required) */}
           {requiresApproval && checklist.canPublish && !confirmStep && (
             <div className="space-y-4 pt-4 border-t border-border">
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/10 border border-warning/20">
+                <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-yellow-700 dark:text-yellow-400">
                     Approval Required
@@ -182,9 +182,9 @@ export function PublishEventModal({
 
           {/* Acknowledgment Step for Issues */}
           {!requiresApproval && checklist.requiresAcknowledgment && !acknowledgedIssues && (
-            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+            <div className="p-4 rounded-lg bg-warning/10 border border-warning/20">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="font-medium text-yellow-700 dark:text-yellow-400">
                     {checklist.failCount > 0 
@@ -201,9 +201,9 @@ export function PublishEventModal({
 
           {/* Acknowledged confirmation */}
           {!requiresApproval && acknowledgedIssues && !confirmStep && (
-            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+            <div className="p-4 rounded-lg bg-success/10 border border-success/20">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="font-medium text-green-700 dark:text-green-400">
                     Issues acknowledged

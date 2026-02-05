@@ -74,13 +74,13 @@ export const EventOverviewPanel: React.FC<EventOverviewPanelProps> = ({
       return { label: 'Ended', color: 'bg-muted text-muted-foreground' };
     }
     if (isPast(startDate) && isFuture(endDate)) {
-      return { label: 'In Progress', color: 'bg-green-500/20 text-green-700' };
+      return { label: 'In Progress', color: 'bg-success/20 text-success' };
     }
     const daysUntil = differenceInDays(startDate, now);
     if (daysUntil <= 7) {
-      return { label: `${daysUntil} days away`, color: 'bg-amber-500/20 text-amber-700' };
+      return { label: `${daysUntil} days away`, color: 'bg-warning/20 text-amber-700' };
     }
-    return { label: `${daysUntil} days away`, color: 'bg-blue-500/20 text-blue-700' };
+    return { label: `${daysUntil} days away`, color: 'bg-info/20 text-info' };
   };
 
   const timeStatus = getEventTimeStatus();
@@ -195,14 +195,14 @@ export const EventOverviewPanel: React.FC<EventOverviewPanelProps> = ({
                   key={item.id}
                   className={cn(
                     'flex items-center gap-2 p-2 rounded-lg text-sm',
-                    item.status === 'pass' && 'bg-green-500/10',
-                    item.status === 'warning' && 'bg-yellow-500/10',
-                    item.status === 'fail' && 'bg-red-500/10',
+                    item.status === 'pass' && 'bg-success/10',
+                    item.status === 'warning' && 'bg-warning/10',
+                    item.status === 'fail' && 'bg-destructive/10',
                   )}
                 >
-                  {item.status === 'pass' && <CheckCircle className="h-4 w-4 text-green-500" />}
-                  {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
-                  {item.status === 'fail' && <XCircle className="h-4 w-4 text-red-500" />}
+                  {item.status === 'pass' && <CheckCircle className="h-4 w-4 text-success" />}
+                  {item.status === 'warning' && <AlertTriangle className="h-4 w-4 text-warning" />}
+                  {item.status === 'fail' && <XCircle className="h-4 w-4 text-destructive" />}
                   <span className="truncate">{item.label}</span>
                 </div>
               ))}
@@ -210,14 +210,14 @@ export const EventOverviewPanel: React.FC<EventOverviewPanelProps> = ({
 
             {/* Issues to Address */}
             {checklist.failCount > 0 && (
-              <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <div className="p-3 rounded-lg bg-warning/10 border border-warning/20">
                 <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400 mb-2">
                   Issues to address before publishing:
                 </p>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   {checklist.items.filter(i => i.status === 'fail').map((item) => (
                     <li key={item.id} className="flex items-center gap-2">
-                      <AlertTriangle className="h-3 w-3 text-yellow-500" />
+                      <AlertTriangle className="h-3 w-3 text-warning" />
                       {item.label}
                     </li>
                   ))}

@@ -32,14 +32,14 @@ interface ViewScoresTabProps {
 }
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
-  pending: <Clock className="h-4 w-4 text-yellow-500" />,
-  in_progress: <TrendingUp className="h-4 w-4 text-blue-500" />,
-  judged: <CheckCircle2 className="h-4 w-4 text-green-500" />,
-  finalist: <Star className="h-4 w-4 text-amber-500" />,
-  winner: <Trophy className="h-4 w-4 text-yellow-500" />,
+  pending: <Clock className="h-4 w-4 text-warning" />,
+  in_progress: <TrendingUp className="h-4 w-4 text-info" />,
+  judged: <CheckCircle2 className="h-4 w-4 text-success" />,
+  finalist: <Star className="h-4 w-4 text-warning" />,
+  winner: <Trophy className="h-4 w-4 text-warning" />,
 };
 
-const MEDAL_COLORS = ['text-yellow-500', 'text-muted-foreground', 'text-amber-600'];
+const MEDAL_COLORS = ['text-warning', 'text-muted-foreground', 'text-warning'];
 
 export function ViewScoresTab({ workspaceId }: ViewScoresTabProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -238,7 +238,7 @@ export function ViewScoresTab({ workspaceId }: ViewScoresTabProps) {
                                     {entry.project_name}
                                   </span>
                                   {hasDiscrepancy && (
-                                    <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                                    <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
                                   )}
                                 </div>
                                 <div className="text-sm text-muted-foreground flex items-center gap-2">
@@ -343,10 +343,10 @@ export function ViewScoresTab({ workspaceId }: ViewScoresTabProps) {
                             )}
 
                             {hasDiscrepancy && (
-                              <div className="mt-3 p-3 bg-amber-500/10 rounded-lg flex items-start gap-2">
-                                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
+                              <div className="mt-3 p-3 bg-warning/10 rounded-lg flex items-start gap-2">
+                                <AlertTriangle className="h-4 w-4 text-warning mt-0.5" />
                                 <div className="text-sm">
-                                  <span className="font-medium text-amber-500">Score Discrepancy Detected</span>
+                                  <span className="font-medium text-warning">Score Discrepancy Detected</span>
                                   <p className="text-muted-foreground">
                                     Judge scores differ by more than 20 points. Consider reviewing or adding another judge.
                                   </p>

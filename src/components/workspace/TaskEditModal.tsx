@@ -56,16 +56,16 @@ interface TaskEditModalProps {
 
 const PRIORITY_CONFIG = {
   [TaskPriority.LOW]: { label: 'Low', color: 'bg-emerald-500/10 text-emerald-600' },
-  [TaskPriority.MEDIUM]: { label: 'Medium', color: 'bg-amber-500/10 text-amber-600' },
+  [TaskPriority.MEDIUM]: { label: 'Medium', color: 'bg-warning/10 text-warning' },
   [TaskPriority.HIGH]: { label: 'High', color: 'bg-rose-500/10 text-rose-600' },
-  [TaskPriority.URGENT]: { label: 'Urgent', color: 'bg-red-500/10 text-red-600' },
+  [TaskPriority.URGENT]: { label: 'Urgent', color: 'bg-destructive/10 text-destructive' },
 };
 
 const STATUS_CONFIG = {
   [TaskStatus.NOT_STARTED]: { label: 'Not Started', color: 'bg-muted text-muted-foreground' },
-  [TaskStatus.IN_PROGRESS]: { label: 'In Progress', color: 'bg-blue-500/10 text-blue-600' },
+  [TaskStatus.IN_PROGRESS]: { label: 'In Progress', color: 'bg-info/10 text-info' },
   [TaskStatus.BLOCKED]: { label: 'Blocked', color: 'bg-orange-500/10 text-orange-600' },
-  [TaskStatus.COMPLETED]: { label: 'Completed', color: 'bg-green-500/10 text-green-600' },
+  [TaskStatus.COMPLETED]: { label: 'Completed', color: 'bg-success/10 text-success' },
 };
 
 export function TaskEditModal({

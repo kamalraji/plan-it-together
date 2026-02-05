@@ -32,8 +32,8 @@ import { cn } from '@/lib/utils';
 
 const WORKSPACE_TYPE_COLORS: Record<string, string> = {
   ROOT: 'bg-primary/10 text-primary border-primary/20',
-  DEPARTMENT: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-  COMMITTEE: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  DEPARTMENT: 'bg-info/10 text-info border-info/20',
+  COMMITTEE: 'bg-warning/10 text-warning border-warning/20',
   TEAM: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
 };
 

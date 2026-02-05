@@ -95,7 +95,7 @@ export function FormRenderer({ form, onSubmit, isPreview = false }: FormRenderer
       <Card className="max-w-2xl mx-auto">
         <CardContent className="py-12">
           <div className="text-center">
-            <CheckCircle2 className="h-16 w-16 mx-auto text-green-500 mb-4" />
+            <CheckCircle2 className="h-16 w-16 mx-auto text-success mb-4" />
             <h2 className="text-2xl font-bold mb-2">Thank You!</h2>
             <p className="text-muted-foreground mb-6">
               Your submission has been received successfully.
