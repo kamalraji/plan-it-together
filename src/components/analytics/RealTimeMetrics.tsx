@@ -100,11 +100,11 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           setTimeout(connectWebSocket, 3000);
         };
 
-        ws.onerror = (_err) => {
+        ws.onerror = () => {
           setError('Connection error');
           setIsConnected(false);
         };
-      } catch (_err) {
+      } catch {
         setError('Failed to establish real-time connection');
       }
     };

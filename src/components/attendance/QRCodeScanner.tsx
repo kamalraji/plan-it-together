@@ -293,7 +293,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       );
 
       controlsRef.current = controls;
-    } catch (_error) {
+  } catch {
       setIsScanning(false);
       setScanMode('manual');
     }
@@ -370,7 +370,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
           formResponses.TrackName ||
           undefined;
       }
-    } catch (_error) {
+} catch {
       // Loading badge metadata failed silently
     }
 

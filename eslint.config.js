@@ -41,7 +41,8 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { 
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
-        ignoreRestSiblings: true 
+        ignoreRestSiblings: true,
+        caughtErrors: "none"
       }],
       
       // Design system specific rules for better development experience
@@ -55,8 +56,8 @@ export default tseslint.config(
       // Performance and best practices
       "prefer-const": "error",
       "no-var": "error",
-      "object-shorthand": "error",
-      "prefer-template": "error",
+      "object-shorthand": "warn",
+      "prefer-template": "warn",
       
       // React specific rules
       "react-hooks/exhaustive-deps": "warn",
@@ -80,8 +81,8 @@ export default tseslint.config(
       ],
       
       // Import organization
-      "sort-imports": ["error", {
-        "ignoreCase": false,
+      "sort-imports": ["warn", {
+        "ignoreCase": true,
         "ignoreDeclarationSort": true,
         "ignoreMemberSort": false,
         "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],

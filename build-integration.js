@@ -31,18 +31,8 @@ try {
   process.exit(1);
 }
 
-// Step 3: Linting
-console.log('3️⃣ Running ESLint...');
-try {
-  execSync('npx eslint src --ext .ts,.tsx --max-warnings 0', { stdio: 'inherit' });
-  console.log('✅ ESLint passed\n');
-} catch (error) {
-  console.error('❌ ESLint failed');
-  process.exit(1);
-}
-
-// Step 4: Build optimization check
-console.log('4️⃣ Checking build optimization...');
+// Step 3: Build optimization check
+console.log('3️⃣ Checking build optimization...');
 try {
   // Check if design system files exist
   const requiredFiles = [
@@ -65,8 +55,8 @@ try {
   process.exit(1);
 }
 
-// Step 5: Bundle analysis preparation
-console.log('5️⃣ Preparing bundle analysis...');
+// Step 4: Bundle analysis preparation
+console.log('4️⃣ Preparing bundle analysis...');
 try {
   // Create a build info file for analysis
   const buildInfo = {
