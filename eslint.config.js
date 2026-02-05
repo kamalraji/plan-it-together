@@ -46,14 +46,11 @@ export default tseslint.config(
       
       // Design system specific rules for better development experience
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/prefer-const": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
       
       // Component development rules
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/ban-types": "off",
-      "@typescript-eslint/no-unused-locals": "off",
-      "@typescript-eslint/no-unused-parameters": "off",
       
       // Performance and best practices
       "prefer-const": "error",
