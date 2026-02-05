@@ -523,10 +523,10 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'email': return 'bg-info/20 text-blue-800';
-      case 'notification': return 'bg-warning/20 text-yellow-800';
+      case 'email': return 'bg-info/20 text-info';
+      case 'notification': return 'bg-warning/20 text-warning';
       case 'announcement': return 'bg-success/20 text-success';
-      case 'reminder': return 'bg-orange-100 text-orange-800';
+      case 'reminder': return 'bg-warning/20 text-warning';
       default: return 'bg-muted text-foreground';
     }
   };

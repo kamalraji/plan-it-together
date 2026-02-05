@@ -13,9 +13,9 @@ interface SponsorTier {
 
 export function SponsorshipSummary() {
   const tiers: SponsorTier[] = [
-    { tier: 'Platinum', count: 2, target: 3, revenue: 60000, color: 'bg-slate-400' },
-    { tier: 'Gold', count: 4, target: 5, revenue: 40000, color: 'bg-amber-400' },
-    { tier: 'Silver', count: 6, target: 10, revenue: 18000, color: 'bg-slate-300' },
+    { tier: 'Platinum', count: 2, target: 3, revenue: 60000, color: 'bg-muted-foreground' },
+    { tier: 'Gold', count: 4, target: 5, revenue: 40000, color: 'bg-warning' },
+    { tier: 'Silver', count: 6, target: 10, revenue: 18000, color: 'bg-muted' },
     { tier: 'Bronze', count: 8, target: 15, revenue: 8000, color: 'bg-warning' },
   ];
 
@@ -31,8 +31,8 @@ export function SponsorshipSummary() {
             Sponsorship Summary
           </CardTitle>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-            <span className="text-sm font-semibold text-emerald-500">+15%</span>
+            <TrendingUp className="h-4 w-4 text-success" />
+            <span className="text-sm font-semibold text-success">+15%</span>
           </div>
         </div>
       </CardHeader>

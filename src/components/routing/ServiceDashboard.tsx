@@ -360,14 +360,14 @@ const StatusWidget: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
       case 'healthy':
       case 'active':
       case 'online':
-        return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
+        return 'text-success bg-success/20';
       case 'warning':
       case 'degraded':
-        return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'text-warning bg-warning/20';
       case 'error':
       case 'offline':
       case 'failed':
-        return 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400';
+        return 'text-destructive bg-destructive/20';
       default:
         return 'text-muted-foreground bg-muted';
     }

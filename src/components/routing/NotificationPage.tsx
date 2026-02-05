@@ -398,7 +398,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
       case 'event':
         return <CalendarIcon className="h-5 w-5 text-primary" />;
       case 'marketplace':
-        return <ShoppingBagIcon className="h-5 w-5 text-orange-500" />;
+        return <ShoppingBagIcon className="h-5 w-5 text-warning" />;
       case 'system':
         return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:
@@ -454,7 +454,7 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
                 <div className="mt-4">
                   <Link
                     to={notification.actionUrl}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-md hover:bg-indigo-200 transition-colors"
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary bg-primary/20 rounded-md hover:bg-primary/30 transition-colors"
                   >
                     {notification.actionLabel}
                   </Link>

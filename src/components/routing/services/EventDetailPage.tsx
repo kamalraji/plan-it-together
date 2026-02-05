@@ -87,7 +87,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Event not found or access denied</h1>
-          <Link to="/dashboard/eventmanagement/list" className="text-indigo-600 hover:text-indigo-800">
+          <Link to="/dashboard/eventmanagement/list" className="text-primary hover:text-primary/80">
             Back to events
           </Link>
         </div>
@@ -96,9 +96,9 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
   }
   const getModeBadge = (mode: EventMode) => {
     const modeConfig = {
-      [EventMode.ONLINE]: { color: 'bg-info/20 text-blue-800', label: 'Online', icon: GlobeAltIcon },
-      [EventMode.OFFLINE]: { color: 'bg-purple-100 text-purple-800', label: 'Offline', icon: MapPinIcon },
-      [EventMode.HYBRID]: { color: 'bg-primary/20 text-indigo-800', label: 'Hybrid', icon: CalendarIcon },
+      [EventMode.ONLINE]: { color: 'bg-info/20 text-info', label: 'Online', icon: GlobeAltIcon },
+      [EventMode.OFFLINE]: { color: 'bg-primary/20 text-primary', label: 'Offline', icon: MapPinIcon },
+      [EventMode.HYBRID]: { color: 'bg-secondary/20 text-secondary-foreground', label: 'Hybrid', icon: CalendarIcon },
     };
 
     const config = modeConfig[mode];

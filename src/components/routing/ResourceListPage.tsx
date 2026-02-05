@@ -274,7 +274,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
                     key={index}
                     onClick={() => handleBulkAction(action)}
                     className={`inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${action.variant === 'danger'
-                        ? 'border-red-300 text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500'
+                      ? 'border-destructive/40 text-destructive bg-destructive/10 hover:bg-destructive/20 focus:ring-destructive'
                         : 'border-input text-foreground bg-card hover:bg-muted/50 focus-visible:ring-ring'
                       }`}
                   >

@@ -280,8 +280,8 @@ const OrganizationAdminManagement: React.FC<OrganizationAdminManagementProps> = 
                   <div className="text-right">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       admin.role === 'OWNER' 
-                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
-                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                        ? 'bg-primary/20 text-primary' 
+                        : 'bg-info/20 text-info'
                     }`}>
                       {admin.role}
                     </span>

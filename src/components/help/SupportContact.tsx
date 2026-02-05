@@ -127,7 +127,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
   const priorities = [
     { value: 'low', label: 'Low', color: 'text-success' },
     { value: 'medium', label: 'Medium', color: 'text-warning' },
-    { value: 'high', label: 'High', color: 'text-orange-600' },
+    { value: 'high', label: 'High', color: 'text-warning' },
     { value: 'urgent', label: 'Urgent', color: 'text-destructive' }
   ];
 
@@ -186,7 +186,7 @@ export const SupportContact: React.FC<SupportContactProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-info/20 text-blue-800';
+      case 'open': return 'bg-info/20 text-info';
       case 'in_progress': return 'bg-warning/20 text-warning';
       case 'resolved': return 'bg-success/20 text-success';
       case 'closed': return 'bg-muted text-foreground';

@@ -40,12 +40,12 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
 
   const getTypeColor = (type: string) => {
     const colors = {
-      event: 'text-info bg-info/10 border-blue-200',
-      workspace: 'text-success bg-success/10 border-green-200',
-      organization: 'text-primary bg-purple-50 border-purple-200',
-      marketplace: 'text-orange-600 bg-orange-50 border-orange-200',
+      event: 'text-info bg-info/10 border-info/30',
+      workspace: 'text-success bg-success/10 border-success/30',
+      organization: 'text-primary bg-primary/10 border-primary/30',
+      marketplace: 'text-warning bg-warning/10 border-warning/30',
       user: 'text-muted-foreground bg-muted/50 border-border',
-      service: 'text-orange-600 bg-orange-50 border-orange-200',
+      service: 'text-warning bg-warning/10 border-warning/30',
     };
     return colors[type as keyof typeof colors] || 'text-muted-foreground bg-muted/50 border-border';
   };

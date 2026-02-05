@@ -195,7 +195,7 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
                 <span className="text-primary text-sm">📋</span>
               </div>
             </div>
@@ -209,8 +209,8 @@ const EventMarketplaceIntegration: React.FC<EventMarketplaceIntegrationProps> = 
         <div className="bg-card rounded-lg shadow p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <span className="text-orange-600 text-sm">🛍️</span>
+              <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
+                <span className="text-warning text-sm">🛍️</span>
               </div>
             </div>
             <div className="ml-3">

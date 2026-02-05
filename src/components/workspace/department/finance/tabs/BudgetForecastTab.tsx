@@ -38,9 +38,9 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
   };
 
   const getHealthStatus = (percent: number) => {
-    if (percent < 60) return { label: 'Healthy', color: 'text-emerald-600', bgColor: 'bg-emerald-500/10' };
+    if (percent < 60) return { label: 'Healthy', color: 'text-success', bgColor: 'bg-success/10' };
     if (percent < 80) return { label: 'Moderate', color: 'text-warning', bgColor: 'bg-warning/10' };
-    if (percent < 100) return { label: 'High Usage', color: 'text-orange-600', bgColor: 'bg-orange-500/10' };
+    if (percent < 100) return { label: 'High Usage', color: 'text-warning', bgColor: 'bg-warning/10' };
     return { label: 'Over Budget', color: 'text-destructive', bgColor: 'bg-destructive/10' };
   };
 
@@ -51,8 +51,8 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-emerald-500/10">
-          <TrendingUp className="w-6 h-6 text-emerald-600" />
+        <div className="p-2.5 rounded-xl bg-success/10">
+          <TrendingUp className="w-6 h-6 text-success" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Budget Forecast</h1>
@@ -147,8 +147,8 @@ export function BudgetForecastTab({ workspaceId }: BudgetForecastTabProps) {
         <CardContent>
           <div className="space-y-3">
             {utilizationPercent < 50 && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
-                <ArrowUpRight className="h-5 w-5 text-emerald-600 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-success/5 border border-success/20">
+                <ArrowUpRight className="h-5 w-5 text-success mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Budget on track</p>
                   <p className="text-xs text-muted-foreground">
