@@ -80,7 +80,7 @@ export function CertificateDesignStudio({
       const canvasJSON = canvasRef.current.exportJSON();
       onSave({ canvasJSON, name });
       toast.success('Template saved successfully');
-    } catch (error) {
+  } catch {
       toast.error('Failed to save template');
     } finally {
       setIsSaving(false);
@@ -97,7 +97,7 @@ export function CertificateDesignStudio({
       });
       toast.success('Export completed');
       setExportDialogOpen(false);
-    } catch (error) {
+  } catch {
       toast.error('Failed to export');
     } finally {
       setIsExporting(false);

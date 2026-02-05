@@ -75,7 +75,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+  } catch {
       setDownloadError('Failed to download QR code. Please try again.');
     }
   };
@@ -100,7 +100,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         await navigator.clipboard.writeText(qrCodeData.qrCode);
         alert('QR code copied to clipboard!');
       }
-    } catch (_error) {
+} catch {
       // Share QR code failed silently
     }
   };

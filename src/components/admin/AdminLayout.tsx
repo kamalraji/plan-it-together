@@ -56,7 +56,7 @@ export const AdminLayout: React.FC = () => {
         } else {
           setServerVerified(!!isAdmin);
         }
-      } catch (_err) {
+      } catch {
         // Unexpected error during verification - deny access
         setServerVerified(false);
       } finally {

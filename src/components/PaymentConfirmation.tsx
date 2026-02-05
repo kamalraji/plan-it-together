@@ -46,6 +46,7 @@ export function PaymentConfirmation({ bookingId, userRole, onConfirmed }: Paymen
         alert(data.error.message);
       }
     } catch (error) {
+      console.error('Payment confirmation failed:', error);
       alert('Failed to confirm payment. Please try again.');
     } finally {
       setLoading(false);
