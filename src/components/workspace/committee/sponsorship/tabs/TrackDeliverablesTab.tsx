@@ -47,7 +47,7 @@ const statusConfig: Record<string, { icon: React.ElementType; color: string; bgC
 const priorityColors: Record<string, string> = {
   low: 'bg-muted text-foreground',
   medium: 'bg-info/20 text-info',
-  high: 'bg-orange-100 text-orange-700',
+  high: 'bg-warning/20 text-warning',
   critical: 'bg-destructive/20 text-destructive',
 };
 

@@ -92,15 +92,15 @@ export function EventStatusActions({
   const getStatusBadgeStyle = (status: EventStatus) => {
     switch (status) {
       case EventStatus.DRAFT:
-        return 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400';
+        return 'bg-warning/20 text-warning';
       case EventStatus.PUBLISHED:
-        return 'bg-green-500/20 text-green-600 dark:text-green-400';
+        return 'bg-success/20 text-success';
       case EventStatus.ONGOING:
-        return 'bg-blue-500/20 text-blue-600 dark:text-blue-400';
+        return 'bg-info/20 text-info';
       case EventStatus.COMPLETED:
         return 'bg-muted text-muted-foreground';
       case EventStatus.CANCELLED:
-        return 'bg-red-500/20 text-red-600 dark:text-red-400';
+        return 'bg-destructive/20 text-destructive';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -170,7 +170,7 @@ export function EventStatusActions({
                     title: 'Cancel Event',
                     description: 'This will cancel the event. This action cannot be undone easily.',
                   })}
-                  className="text-red-600 dark:text-red-400"
+                  className="text-destructive"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
                   Cancel Event
@@ -197,7 +197,7 @@ export function EventStatusActions({
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400"
+            className="gap-2 bg-warning/10 border-warning/30 text-warning"
             onClick={() => setShowApprovalStatus(true)}
           >
             <Clock className="h-4 w-4" />

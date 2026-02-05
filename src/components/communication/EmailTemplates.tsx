@@ -124,7 +124,7 @@ export function EmailTemplates({
       </div>
 
       {selectedTemplate && (
-        <div className="mt-4 p-4 bg-info/10 border border-blue-200 rounded-md">
+        <div className="mt-4 p-4 bg-info/10 border border-info/30 rounded-md">
           <div className="flex items-start space-x-2">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-info mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -132,7 +132,7 @@ export function EmailTemplates({
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-blue-800">
+              <p className="text-sm font-medium text-info">
                 Template "{selectedTemplate.name}" applied
               </p>
               <p className="text-sm text-info mt-1">

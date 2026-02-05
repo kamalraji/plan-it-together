@@ -366,8 +366,8 @@ export const CustomDashboard: React.FC<CustomDashboardProps> = ({
       )}
 
       {/* Instructions */}
-      <div className="bg-info/10 border border-blue-200 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-blue-800 mb-2">Customization Tips</h4>
+      <div className="bg-info/10 border border-info/30 rounded-lg p-4">
+        <h4 className="text-sm font-medium text-info mb-2">Customization Tips</h4>
         <ul className="text-sm text-info space-y-1">
           <li>• Drag widgets to reorder them</li>
           <li>• Use the dropdown to change widget sizes</li>

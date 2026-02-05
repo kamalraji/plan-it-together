@@ -73,7 +73,7 @@ export function CommitteeConnectionsPanel({ workspaceId, eventId, orgSlug }: Com
     if (lower.includes('technical')) return 'text-info bg-info/10';
     if (lower.includes('it')) return 'text-primary bg-primary/10';
     if (lower.includes('network')) return 'text-success bg-success/10';
-    return 'text-orange-500 bg-orange-500/10';
+    return 'text-warning bg-warning/10';
   };
 
   const handleCommitteeClick = (committeeId: string) => {

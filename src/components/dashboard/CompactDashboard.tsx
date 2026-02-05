@@ -134,25 +134,25 @@ export function CompactDashboard() {
       icon: CalendarDays, 
       label: 'Events', 
       path: `/${organization.slug}/eventmanagement`,
-      color: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
+      color: 'bg-info/10 text-info dark:bg-info/20 dark:text-info'
     },
     { 
       icon: SlidersHorizontal, 
       label: 'Analytics', 
       path: `/${organization.slug}/analytics`,
-      color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
+      color: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning'
     },
     { 
       icon: Briefcase, 
       label: 'Workspaces', 
       path: `/${organization.slug}/workspaces`,
-      color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+      color: 'bg-success/10 text-success dark:bg-success/20 dark:text-success'
     },
     { 
       icon: Users, 
       label: 'Team', 
       path: `/${organization.slug}/team`,
-      color: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400'
+      color: 'bg-accent/10 text-accent-foreground dark:bg-accent/20 dark:text-accent-foreground'
     },
   ];
 
@@ -277,8 +277,8 @@ export function CompactDashboard() {
                 to={getWorkspaceUrl(ws)}
                 className="flex items-center gap-3 p-2.5 sm:p-3 bg-card border border-border rounded-xl hover:bg-muted/50 active:scale-[0.98] transition-all"
               >
-                <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
-                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+                <div className="p-1.5 sm:p-2 rounded-lg bg-success/10 dark:bg-success/20">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-foreground truncate">{ws.name}</p>
@@ -288,7 +288,7 @@ export function CompactDashboard() {
                 </div>
                 <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${
                   ws.status === 'active' 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    ? 'bg-success/20 text-success dark:bg-success/30 dark:text-success' 
                     : 'bg-muted text-muted-foreground'
                 }`}>
                   {ws.status}

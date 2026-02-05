@@ -61,28 +61,28 @@ const getStatusBadge = (status: VendorStatus) => {
   switch (status) {
     case 'PENDING':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+        <Badge variant="secondary" className="gap-1.5 bg-warning/20 text-warning dark:bg-warning/30 dark:text-warning">
           <Clock className="w-3 h-3" />
           Pending
         </Badge>
       );
     case 'VERIFIED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+        <Badge variant="secondary" className="gap-1.5 bg-success/20 text-success dark:bg-success/30 dark:text-success">
           <CheckCircle2 className="w-3 h-3" />
           Verified
         </Badge>
       );
     case 'REJECTED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        <Badge variant="secondary" className="gap-1.5 bg-destructive/20 text-destructive dark:bg-destructive/30 dark:text-destructive">
           <XCircle className="w-3 h-3" />
           Rejected
         </Badge>
       );
     case 'SUSPENDED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200">
+        <Badge variant="secondary" className="gap-1.5 bg-muted text-foreground dark:bg-muted dark:text-muted-foreground">
           <AlertCircle className="w-3 h-3" />
           Suspended
         </Badge>
@@ -283,7 +283,7 @@ export const VendorApprovalPanel: React.FC = () => {
           <TabsTrigger value="PENDING" className="gap-2">
             <Clock className="w-4 h-4" />
             Pending
-            <Badge variant="secondary" className="ml-1 bg-warning/20 text-amber-800">{statusCounts.PENDING || 0}</Badge>
+            <Badge variant="secondary" className="ml-1 bg-warning/20 text-warning">{statusCounts.PENDING || 0}</Badge>
           </TabsTrigger>
           <TabsTrigger value="VERIFIED" className="gap-2">
             <CheckCircle2 className="w-4 h-4" />
@@ -484,9 +484,9 @@ export const VendorApprovalPanel: React.FC = () => {
               </div>
 
               {selectedVendor.rejection_reason && (
-                <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-                  <label className="text-sm font-medium text-red-800 dark:text-red-200">Rejection Reason</label>
-                  <p className="mt-1 text-sm text-red-700 dark:text-red-300">{selectedVendor.rejection_reason}</p>
+                <div className="p-4 bg-destructive/10 dark:bg-destructive/20 rounded-lg border border-destructive/30 dark:border-destructive/40">
+                  <label className="text-sm font-medium text-destructive">Rejection Reason</label>
+                  <p className="mt-1 text-sm text-destructive/90">{selectedVendor.rejection_reason}</p>
                 </div>
               )}
             </div>

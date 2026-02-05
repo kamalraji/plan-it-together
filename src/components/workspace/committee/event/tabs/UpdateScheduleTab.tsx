@@ -33,9 +33,9 @@ interface UpdateScheduleTabProps {
 // ];
 
 const STATUSES = [
-  { value: 'upcoming', label: 'Upcoming', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  { value: 'in-progress', label: 'In Progress', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' },
-  { value: 'completed', label: 'Completed', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' },
+  { value: 'upcoming', label: 'Upcoming', color: 'bg-info/20 text-info dark:bg-info/30 dark:text-info' },
+  { value: 'in-progress', label: 'In Progress', color: 'bg-warning/20 text-warning dark:bg-warning/30 dark:text-warning' },
+  { value: 'completed', label: 'Completed', color: 'bg-success/20 text-success dark:bg-success/30 dark:text-success' },
 ];
 
 export const UpdateScheduleTab: React.FC<UpdateScheduleTabProps> = ({ workspaceId }) => {
@@ -251,8 +251,8 @@ export const UpdateScheduleTab: React.FC<UpdateScheduleTabProps> = ({ workspaceI
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900">
-                <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-info/20 dark:bg-info/30">
+                <Clock className="h-5 w-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{upcoming}</p>
@@ -264,8 +264,8 @@ export const UpdateScheduleTab: React.FC<UpdateScheduleTabProps> = ({ workspaceI
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900">
-                <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <div className="p-2 rounded-lg bg-warning/20 dark:bg-warning/30">
+                <Clock className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{inProgress}</p>
@@ -277,8 +277,8 @@ export const UpdateScheduleTab: React.FC<UpdateScheduleTabProps> = ({ workspaceI
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900">
-                <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-2 rounded-lg bg-success/20 dark:bg-success/30">
+                <Clock className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{completed}</p>

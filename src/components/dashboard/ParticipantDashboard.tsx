@@ -542,7 +542,7 @@ export function ParticipantDashboard() {
                         className={`px-2 py-0.5 rounded-full ${
                           registration.status === 'CONFIRMED'
                             ? 'bg-success/20 text-success'
-                            : 'bg-warning/20 text-yellow-800'
+                            : 'bg-warning/20 text-warning'
                         }`}
                       >
                         {registration.status}

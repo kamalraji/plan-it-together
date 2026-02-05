@@ -53,7 +53,7 @@ export function TechInfrastructureOverview() {
         );
       case 'maintenance':
         return (
-          <Badge variant="outline" className="text-warning border-yellow-600/30 bg-warning/10">
+          <Badge variant="outline" className="text-warning border-warning/30 bg-warning/10">
             <AlertCircle className="h-3 w-3 mr-1" />
             Maintenance
           </Badge>

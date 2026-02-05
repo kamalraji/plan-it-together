@@ -79,7 +79,7 @@ export function EmailVerification() {
                   <div className="mt-4">
                     <Link
                       to="/dashboard"
-                      className="text-sm font-medium text-green-800 underline hover:text-green-600"
+                    className="text-sm font-medium text-success underline hover:text-success/80"
                     >
                       Go to Dashboard
                     </Link>
@@ -93,8 +93,8 @@ export function EmailVerification() {
             <div className="rounded-md bg-destructive/10 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
+                    <svg
+                    className="h-5 w-5 text-destructive"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -107,7 +107,7 @@ export function EmailVerification() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
+                  <h3 className="text-sm font-medium text-destructive">
                     Verification Failed
                   </h3>
                   <div className="mt-2 text-sm text-destructive">
@@ -116,13 +116,13 @@ export function EmailVerification() {
                   <div className="mt-4 space-x-4">
                     <Link
                       to="/login"
-                      className="text-sm font-medium text-red-800 underline hover:text-red-600"
+                      className="text-sm font-medium text-destructive underline hover:text-destructive/80"
                     >
                       Back to Login
                     </Link>
                     <Link
                       to="/resend-verification"
-                      className="text-sm font-medium text-red-800 underline hover:text-red-600"
+                      className="text-sm font-medium text-destructive underline hover:text-destructive/80"
                     >
                       Resend Verification Email
                     </Link>

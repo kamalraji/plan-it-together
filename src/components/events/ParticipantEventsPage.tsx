@@ -75,7 +75,7 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.OTHER]: { icon: LayoutGrid, label: 'Other', color: 'bg-muted-foreground/30/10 text-muted-foreground border-gray-500/20' },
   // College/University
   [EventCategory.SEMINAR]: { icon: BookOpen, label: 'Seminar', color: 'bg-teal-500/10 text-teal-600 border-teal-500/20' },
-  [EventCategory.SYMPOSIUM]: { icon: Landmark, label: 'Symposium', color: 'bg-primary/10 text-primary border-purple-500/20' },
+  [EventCategory.SYMPOSIUM]: { icon: Landmark, label: 'Symposium', color: 'bg-primary/10 text-primary border-primary/20' },
   [EventCategory.CULTURAL_FEST]: { icon: PartyPopper, label: 'Cultural Fest', color: 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20' },
   [EventCategory.SPORTS_EVENT]: { icon: Dumbbell, label: 'Sports Event', color: 'bg-destructive/10 text-destructive border-destructive/20' },
   [EventCategory.ORIENTATION]: { icon: UserCheck, label: 'Orientation', color: 'bg-sky-500/10 text-sky-600 border-sky-500/20' },
@@ -96,8 +96,8 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.TRADE_SHOW]: { icon: Store, label: 'Trade Show', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
   [EventCategory.EXPO]: { icon: Building2, label: 'Expo', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
   [EventCategory.SUMMIT]: { icon: Mountain, label: 'Summit', color: 'bg-info/10 text-info border-info/20' },
-  [EventCategory.PANEL_DISCUSSION]: { icon: PanelTop, label: 'Panel Discussion', color: 'bg-primary/10 text-primary border-purple-500/20' },
-  [EventCategory.DEMO_DAY]: { icon: Rocket, label: 'Demo Day', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
+  [EventCategory.PANEL_DISCUSSION]: { icon: PanelTop, label: 'Panel Discussion', color: 'bg-primary/10 text-primary border-primary/20' },
+  [EventCategory.DEMO_DAY]: { icon: Rocket, label: 'Demo Day', color: 'bg-warning/10 text-warning border-warning/20' },
   // Non-Profit
   [EventCategory.FUNDRAISER]: { icon: Heart, label: 'Fundraiser', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
   [EventCategory.GALA]: { icon: Gift, label: 'Gala', color: 'bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20' },

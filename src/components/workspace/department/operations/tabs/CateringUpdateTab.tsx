@@ -29,12 +29,12 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
   const getDietaryIcon = (type: string) => {
     const lowerType = type.toLowerCase();
     if (lowerType.includes('vegan') || lowerType.includes('vegetarian')) {
-      return <Leaf className="h-4 w-4 text-emerald-500" />;
+      return <Leaf className="h-4 w-4 text-success" />;
     }
     if (lowerType.includes('gluten')) {
       return <Wheat className="h-4 w-4 text-warning" />;
     }
-    return <AlertCircle className="h-4 w-4 text-orange-500" />;
+    return <AlertCircle className="h-4 w-4 text-warning" />;
   };
 
   if (isLoading) {
@@ -87,8 +87,8 @@ export function CateringUpdateTab({ workspace }: CateringUpdateTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-500/20 rounded-full">
-                <Leaf className="h-6 w-6 text-emerald-500" />
+              <div className="p-3 bg-success/20 rounded-full">
+                <Leaf className="h-6 w-6 text-success" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-foreground">{totalDietaryReqs}</div>
