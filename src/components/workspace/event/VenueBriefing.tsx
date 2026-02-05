@@ -36,7 +36,7 @@ export function VenueBriefing(_props: VenueBriefingProps) {
 
   const getStatusStyle = (status: VenueZone['status']) => {
     switch (status) {
-      case 'ready': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30';
+      case 'ready': return 'bg-success/10 text-success border-success/30';
       case 'in-progress': return 'bg-info/10 text-info border-info/30';
       case 'issue': return 'bg-destructive/10 text-destructive border-destructive/30';
     }
@@ -49,11 +49,11 @@ export function VenueBriefing(_props: VenueBriefingProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-emerald-500" />
+            <MapPin className="h-4 w-4 text-success" />
             Venue Zones
           </CardTitle>
           <Badge variant="outline" className="text-xs gap-1">
-            <Check className="h-3 w-3 text-emerald-500" />
+            <Check className="h-3 w-3 text-success" />
             {readyCount}/{venueZones.length} Ready
           </Badge>
         </div>

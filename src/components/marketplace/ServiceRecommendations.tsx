@@ -184,7 +184,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
 
       {/* Event Context Card */}
       {event && (
-        <div className="bg-info/10 border border-blue-200 rounded-lg p-4">
+        <div className="bg-info/10 border border-info/30 rounded-lg p-4">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-info mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -192,7 +192,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-info">
                 Event Context
               </p>
               <div className="mt-1 text-sm text-info space-y-1">
@@ -215,7 +215,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
                   <h4 className="font-medium text-foreground text-sm">
                     {service.title}
                     {service.featured && (
-                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/20 text-yellow-800">
+                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/20 text-warning">
                         Featured
                       </span>
                     )}
@@ -276,7 +276,7 @@ const ServiceRecommendations: React.FC<ServiceRecommendationsProps> = ({
                 </button>
                 <button
                   onClick={() => onRequestQuote(service)}
-                  className="flex-1 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                  className="flex-1 text-xs bg-info text-info-foreground px-2 py-1 rounded hover:bg-info/90 transition-colors"
                 >
                   Request Quote
                 </button>

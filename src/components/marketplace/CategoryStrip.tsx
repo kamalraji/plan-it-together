@@ -11,19 +11,19 @@ interface CategoryData {
 }
 
 const CATEGORY_CONFIG: Record<string, { icon: LucideIcon; bg: string }> = {
-  'VENUE': { icon: MapPin, bg: 'bg-emerald-100 text-emerald-700' },
-  'CATERING': { icon: Utensils, bg: 'bg-rose-100 text-rose-700' },
-  'PHOTOGRAPHY': { icon: Camera, bg: 'bg-warning/20 text-amber-700' },
+  'VENUE': { icon: MapPin, bg: 'bg-success/20 text-success' },
+  'CATERING': { icon: Utensils, bg: 'bg-destructive/20 text-destructive' },
+  'PHOTOGRAPHY': { icon: Camera, bg: 'bg-warning/20 text-warning' },
   'VIDEOGRAPHY': { icon: Video, bg: 'bg-destructive/20 text-destructive' },
-  'ENTERTAINMENT': { icon: Music, bg: 'bg-violet-100 text-violet-700' },
-  'DECORATION': { icon: Sparkles, bg: 'bg-pink-100 text-pink-700' },
-  'AUDIO_VISUAL': { icon: Mic2, bg: 'bg-cyan-100 text-cyan-700' },
+  'ENTERTAINMENT': { icon: Music, bg: 'bg-accent/20 text-accent-foreground' },
+  'DECORATION': { icon: Sparkles, bg: 'bg-accent/20 text-accent-foreground' },
+  'AUDIO_VISUAL': { icon: Mic2, bg: 'bg-info/20 text-info' },
   'TRANSPORTATION': { icon: Truck, bg: 'bg-info/20 text-info' },
   'SECURITY': { icon: Shield, bg: 'bg-muted text-foreground' },
-  'CLEANING': { icon: Paintbrush, bg: 'bg-teal-100 text-teal-700' },
-  'EQUIPMENT_RENTAL': { icon: Box, bg: 'bg-orange-100 text-orange-700' },
+  'CLEANING': { icon: Paintbrush, bg: 'bg-success/20 text-success' },
+  'EQUIPMENT_RENTAL': { icon: Box, bg: 'bg-warning/20 text-warning' },
   'PRINTING': { icon: Printer, bg: 'bg-primary/20 text-primary' },
-  'MARKETING': { icon: Megaphone, bg: 'bg-purple-100 text-purple-700' },
+  'MARKETING': { icon: Megaphone, bg: 'bg-primary/20 text-primary' },
   'OTHER': { icon: MoreHorizontal, bg: 'bg-muted text-foreground' },
 };
 

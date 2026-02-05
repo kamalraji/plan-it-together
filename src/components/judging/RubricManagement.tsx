@@ -148,13 +148,13 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-destructive/10 border border-red-200 rounded-md">
-          <p className="text-red-800">{error}</p>
+        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/30 rounded-md">
+          <p className="text-destructive">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mb-4 p-4 bg-success/10 border border-green-200 rounded-md">
+        <div className="mb-4 p-4 bg-success/10 border border-success/30 rounded-md">
           <p className="text-success">{success}</p>
         </div>
       )}
@@ -171,7 +171,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
                   <button
                     type="button"
                     onClick={() => removeCriterion(index)}
-                    className="text-red-600 hover:text-red-800 font-medium"
+                    className="text-destructive hover:text-destructive/80 font-medium"
                   >
                     Remove
                   </button>
@@ -246,7 +246,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
           <button
             type="button"
             onClick={addCriterion}
-            className="px-4 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus-visible:ring-ring"
+            className="px-4 py-2 text-info border border-info rounded-md hover:bg-info/10 focus:outline-none focus:ring-2 focus-visible:ring-ring"
           >
             Add Criterion
           </button>
@@ -258,7 +258,7 @@ const RubricManagement: React.FC<RubricManagementProps> = ({ eventId, onRubricCr
             <button
               type="submit"
               disabled={loading || getTotalWeight() !== 100}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-info text-info-foreground rounded-md hover:bg-info/90 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : existingRubric ? 'Update Rubric' : 'Create Rubric'}
             </button>

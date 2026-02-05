@@ -50,10 +50,10 @@ const calculateTrustScore = (metrics: TrustMetrics): number => {
 };
 
 const getTrustLevel = (score: number): { label: string; color: string; bgColor: string } => {
-  if (score >= 90) return { label: 'Exceptional', color: 'text-emerald-600', bgColor: 'bg-emerald-500' };
+  if (score >= 90) return { label: 'Exceptional', color: 'text-success', bgColor: 'bg-success' };
   if (score >= 75) return { label: 'Excellent', color: 'text-info', bgColor: 'bg-info' };
   if (score >= 60) return { label: 'Good', color: 'text-warning', bgColor: 'bg-warning' };
-  if (score >= 40) return { label: 'Fair', color: 'text-orange-600', bgColor: 'bg-orange-500' };
+  if (score >= 40) return { label: 'Fair', color: 'text-warning', bgColor: 'bg-warning' };
   return { label: 'New', color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/20' };
 };
 
