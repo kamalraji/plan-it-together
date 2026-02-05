@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Thittam1HubLogo } from "@/components/brand/Thittam1HubLogo";
 import { useSeo } from "@/hooks/useSeo";
 import { SkipLink } from "@/components/accessibility";
 import { 
@@ -37,7 +38,7 @@ const Thittam1HubLanding = () => {
     description:
       "Thittam1Hub is a unified event management and publishing platform that centralizes planning, tracking, and certificate-backed verification for every event.",
     canonicalPath: "/",
-    ogImagePath: "/images/thittam1hub-og.png",
+    ogImagePath: "/og-image.png",
     ogType: "website",
     jsonLdId: "ld-json-thittam1hub-landing",
     jsonLdFactory: (canonicalUrl) => ({
@@ -47,7 +48,7 @@ const Thittam1HubLanding = () => {
           '@type': 'Organization',
           name: 'Thittam1Hub',
           url: canonicalUrl,
-          logo: `${window.location.origin}/favicon.ico`,
+          logo: `${window.location.origin}/favicon.png`,
           sameAs: [],
         },
         {
@@ -55,7 +56,7 @@ const Thittam1HubLanding = () => {
           name: 'Thittam1Hub',
           description:
             'Thittam1Hub is an event marketing workspace that unifies registrations, QR attendance, judging, and certificate-backed verification.',
-          image: `${window.location.origin}/images/thittam1hub-og.png`,
+          image: `${window.location.origin}/og-image.png`,
           brand: {
             '@type': 'Organization',
             name: 'Thittam1Hub',
@@ -78,15 +79,9 @@ const Thittam1HubLanding = () => {
         {/* Top nav */}
         <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-md">
           <div className="container flex items-center justify-between py-4 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-md">
-                TH
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-sm font-semibold tracking-tight">Thittam1Hub Events</span>
-                <span className="text-[11px] text-muted-foreground">Event workspaces for teams</span>
-              </div>
-            </div>
+            <Link to="/" className="flex items-center">
+              <Thittam1HubLogo size="md" />
+            </Link>
 
             <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground" aria-label="Main navigation">
               {navLinks.map((link) => (
