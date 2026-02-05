@@ -147,11 +147,11 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'VERIFIED':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Verified</Badge>;
+        return <Badge className="bg-success/20 text-success hover:bg-success/20">Verified</Badge>;
       case 'PENDING':
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending Verification</Badge>;
+        return <Badge className="bg-warning/20 text-warning hover:bg-warning/20">Pending Verification</Badge>;
       case 'REJECTED':
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Rejected</Badge>;
+        return <Badge className="bg-destructive/20 text-destructive hover:bg-destructive/20">Rejected</Badge>;
       case 'SUSPENDED':
         return <Badge className="bg-muted text-foreground hover:bg-muted">Suspended</Badge>;
       default:
@@ -243,7 +243,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-lg bg-accent/20 flex items-center justify-center">
                 <CalendarCheck className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -317,11 +317,11 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
 
       {/* Status Alert */}
       {vendor.verification_status === 'PENDING' && (
-        <Card className="border-yellow-200 bg-warning/10">
+        <Card className="border-warning/30 bg-warning/10">
           <CardContent className="p-4 flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-warning" />
             <div>
-              <p className="font-medium text-yellow-800">Verification Pending</p>
+              <p className="font-medium text-warning">Verification Pending</p>
               <p className="text-sm text-warning">
                 Your vendor profile is under review. You'll be notified once it's approved.
               </p>
@@ -331,7 +331,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
       )}
 
       {vendor.verification_status === 'VERIFIED' && (
-        <Card className="border-green-200 bg-success/10">
+        <Card className="border-success/30 bg-success/10">
           <CardContent className="p-4 flex items-center gap-3">
             <CheckCircle className="h-5 w-5 text-success" />
             <div>

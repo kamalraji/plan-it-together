@@ -507,7 +507,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="businessLicense"
-                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
               >
                 <span>Upload business license</span>
                 <input
@@ -552,7 +552,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="insuranceCertificate"
-                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
               >
                 <span>Upload insurance certificate</span>
                 <input
@@ -606,7 +606,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             <div className="flex text-sm text-muted-foreground">
               <label
                 htmlFor="portfolio"
-                className="relative cursor-pointer bg-card rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer bg-card rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
               >
                 <span>Upload portfolio files</span>
                 <input
@@ -749,10 +749,10 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
         </div>
 
         {error && (
-          <div className="mb-6 bg-destructive/10 border border-red-200 rounded-md p-4">
+          <div className="mb-6 bg-destructive/10 border border-destructive/30 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -761,7 +761,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             </div>
           </div>
@@ -792,7 +792,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
             <button
               type="button"
               onClick={nextStep}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
+              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
             >
               Next
             </button>
@@ -801,7 +801,7 @@ const VendorRegistration: React.FC<VendorRegistrationProps> = ({
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Profile...' : 'Complete Registration'}
             </button>

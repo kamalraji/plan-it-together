@@ -112,15 +112,15 @@ const VendorBookingManager: React.FC<VendorBookingManagerProps> = ({ vendorId })
 
   const getStatusBadge = (status: BookingStatus) => {
     const styles: Record<BookingStatus, string> = {
-      PENDING: 'bg-warning/20 text-yellow-800',
-      REVIEWING: 'bg-info/20 text-blue-800',
-      QUOTE_SENT: 'bg-purple-100 text-purple-800',
+      PENDING: 'bg-warning/20 text-warning',
+      REVIEWING: 'bg-info/20 text-info',
+      QUOTE_SENT: 'bg-accent/20 text-accent-foreground',
       QUOTE_ACCEPTED: 'bg-success/20 text-success',
       CONFIRMED: 'bg-success/20 text-success',
-      IN_PROGRESS: 'bg-info/20 text-blue-800',
+      IN_PROGRESS: 'bg-info/20 text-info',
       COMPLETED: 'bg-success/20 text-success',
       CANCELLED: 'bg-muted text-muted-foreground',
-      DECLINED: 'bg-destructive/20 text-red-800',
+      DECLINED: 'bg-destructive/20 text-destructive',
     };
     return <Badge className={styles[status]}>{status.replace('_', ' ')}</Badge>;
   };

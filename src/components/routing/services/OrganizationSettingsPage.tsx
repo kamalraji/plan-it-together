@@ -241,7 +241,7 @@ export const OrganizationSettingsPage: React.FC = () => {
           <p className="text-muted-foreground mb-4">The organization you are looking for does not exist.</p>
           <Link
             to="/dashboard/organizations"
-            className="text-blue-600 hover:text-blue-500 font-medium"
+            className="text-primary hover:text-primary/80 font-medium"
           >
              Back to Organizations
           </Link>
@@ -287,7 +287,7 @@ export const OrganizationSettingsPage: React.FC = () => {
           <p className="text-muted-foreground mb-4">You don't have permission to manage settings for this organization.</p>
           <Link
             to={`/dashboard/organizations/${organizationId}`}
-            className="text-blue-600 hover:text-blue-500 font-medium"
+            className="text-primary hover:text-primary/80 font-medium"
           >
              Back to Organization
           </Link>
@@ -502,7 +502,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={saving || updateOrganization.isPending}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
                     >
                       {saving || updateOrganization.isPending ? 'Saving...' : 'Save Changes'}
                     </button>
@@ -839,7 +839,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={saving || updateOrganization.isPending}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                    className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus-visible:ring-ring disabled:opacity-50"
                   >
                     {saving || updateOrganization.isPending ? 'Saving...' : 'Save Branding & SEO'}
                   </button>
@@ -932,7 +932,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                           <p className="text-sm text-muted-foreground">Connect with Mailchimp, SendGrid, or other email services</p>
                         </div>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                      <button className="text-primary hover:text-primary/80 text-sm font-medium">
                         Configure
                       </button>
                     </div>
@@ -945,7 +945,7 @@ export const OrganizationSettingsPage: React.FC = () => {
                           <p className="text-sm text-muted-foreground">Connect with Google Analytics or other tracking services</p>
                         </div>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                      <button className="text-primary hover:text-primary/80 text-sm font-medium">
                         Configure
                       </button>
                     </div>

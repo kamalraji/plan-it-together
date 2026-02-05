@@ -159,17 +159,17 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-red-200 rounded-md p-4">
+      <div className="bg-destructive/10 border border-destructive/30 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
+            <h3 className="text-sm font-medium text-destructive">Error loading analytics</h3>
             <div className="mt-2 text-sm text-destructive">
               <p>{error}</p>
             </div>
             <div className="mt-4">
               <button
                 onClick={fetchAnalyticsData}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                className="bg-destructive/20 px-3 py-2 rounded-md text-sm font-medium text-destructive hover:bg-destructive/30"
               >
                 Try again
               </button>
@@ -383,8 +383,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               (performanceMetrics?.averageResponseTime || 0) <= 12 
                 ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.averageResponseTime || 0) <= 24
-                ? 'bg-warning/20 text-yellow-800'
-                : 'bg-destructive/20 text-red-800'
+                ? 'bg-warning/20 text-warning'
+                : 'bg-destructive/20 text-destructive'
             }`}>
               {(performanceMetrics?.averageResponseTime || 0) <= 12 ? 'Excellent' : 
                (performanceMetrics?.averageResponseTime || 0) <= 24 ? 'Good' : 'Needs Improvement'}
@@ -402,8 +402,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               (performanceMetrics?.completionRate || 0) >= 95 
                 ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.completionRate || 0) >= 85
-                ? 'bg-warning/20 text-yellow-800'
-                : 'bg-destructive/20 text-red-800'
+                ? 'bg-warning/20 text-warning'
+                : 'bg-destructive/20 text-destructive'
             }`}>
               {(performanceMetrics?.completionRate || 0) >= 95 ? 'Excellent' : 
                (performanceMetrics?.completionRate || 0) >= 85 ? 'Good' : 'Needs Improvement'}
@@ -421,8 +421,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               (performanceMetrics?.repeatCustomerRate || 0) >= 30 
                 ? 'bg-success/20 text-success' 
                 : (performanceMetrics?.repeatCustomerRate || 0) >= 15
-                ? 'bg-warning/20 text-yellow-800'
-                : 'bg-destructive/20 text-red-800'
+                ? 'bg-warning/20 text-warning'
+                : 'bg-destructive/20 text-destructive'
             }`}>
               {(performanceMetrics?.repeatCustomerRate || 0) >= 30 ? 'Excellent' : 
                (performanceMetrics?.repeatCustomerRate || 0) >= 15 ? 'Good' : 'Needs Improvement'}
@@ -526,8 +526,8 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mr-3 ${
-                    suggestion.priority === 'HIGH' ? 'bg-destructive/20 text-red-800' :
-                    suggestion.priority === 'MEDIUM' ? 'bg-warning/20 text-yellow-800' :
+                    suggestion.priority === 'HIGH' ? 'bg-destructive/20 text-destructive' :
+                    suggestion.priority === 'MEDIUM' ? 'bg-warning/20 text-warning' :
                     'bg-success/20 text-success'
                   }`}>
                     {suggestion.priority}
@@ -584,7 +584,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       forecast.growthRate > 0 ? 'bg-success/20 text-success' : 
-                      forecast.growthRate < 0 ? 'bg-destructive/20 text-red-800' :
+                      forecast.growthRate < 0 ? 'bg-destructive/20 text-destructive' :
                       'bg-muted text-foreground'
                     }`}>
                       {forecast.growthRate > 0 ? '+' : ''}{forecast.growthRate.toFixed(1)}%
@@ -637,7 +637,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
                   <span className="text-sm text-muted-foreground mr-2">Relevance:</span>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     trend.relevanceScore >= 80 ? 'bg-success/20 text-success' :
-                    trend.relevanceScore >= 60 ? 'bg-warning/20 text-yellow-800' :
+                    trend.relevanceScore >= 60 ? 'bg-warning/20 text-warning' :
                     'bg-muted text-foreground'
                   }`}>
                     {trend.relevanceScore}%
@@ -646,7 +646,7 @@ const VendorAnalyticsDashboard: React.FC<VendorAnalyticsDashboardProps> = ({ ven
               </div>
               <p className="text-sm text-muted-foreground mb-2">{trend.description}</p>
               {trend.actionable && (
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-info/20 text-blue-800">
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-info/20 text-info">
                   Actionable
                 </span>
               )}

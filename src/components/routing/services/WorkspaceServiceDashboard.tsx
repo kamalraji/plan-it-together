@@ -482,9 +482,9 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                   {/* Status indicator bar */}
                   <div className={cn(
                     "absolute top-0 left-0 right-0 h-1 transition-all duration-300",
-                    workspace.status === WorkspaceStatus.ACTIVE && "bg-gradient-to-r from-emerald-500 to-emerald-400",
-                    workspace.status === WorkspaceStatus.PROVISIONING && "bg-gradient-to-r from-amber-500 to-amber-400",
-                    workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-gradient-to-r from-sky-500 to-sky-400",
+                    workspace.status === WorkspaceStatus.ACTIVE && "bg-gradient-to-r from-success to-success/80",
+                    workspace.status === WorkspaceStatus.PROVISIONING && "bg-gradient-to-r from-warning to-warning/80",
+                    workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-gradient-to-r from-info to-info/80",
                     workspace.status === WorkspaceStatus.DISSOLVED && "bg-gradient-to-r from-muted-foreground/50 to-muted-foreground/30"
                   )} />
                   
@@ -503,9 +503,9 @@ export const WorkspaceServiceDashboard: React.FC = () => {
                       </div>
                       <span className={cn(
                         "shrink-0 inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wide",
-                        workspace.status === WorkspaceStatus.ACTIVE && "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-                        workspace.status === WorkspaceStatus.PROVISIONING && "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-                        workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+                        workspace.status === WorkspaceStatus.ACTIVE && "bg-success/15 text-success",
+                        workspace.status === WorkspaceStatus.PROVISIONING && "bg-warning/15 text-warning",
+                        workspace.status === WorkspaceStatus.WINDING_DOWN && "bg-info/15 text-info",
                         workspace.status === WorkspaceStatus.DISSOLVED && "bg-muted text-muted-foreground"
                       )}>
                         {workspace.status}
