@@ -178,7 +178,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         title: 'Active Users',
         value: realTimeData.activeUsers,
         icon: UserGroupIcon,
-        color: 'text-blue-600',
+        color: 'text-info',
         trend: historicalData.map(d => d.activeUsers),
       },
       {
@@ -186,7 +186,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         title: 'New Registrations',
         value: realTimeData.registrations,
         icon: ChartBarIcon,
-        color: 'text-green-600',
+        color: 'text-success',
         trend: historicalData.map(d => d.registrations),
       },
       {
@@ -194,7 +194,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         title: 'Check-ins',
         value: realTimeData.checkIns,
         icon: BoltIcon,
-        color: 'text-purple-600',
+        color: 'text-accent',
         trend: historicalData.map(d => d.checkIns),
       },
       {
@@ -202,7 +202,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         title: 'Page Views',
         value: realTimeData.pageViews,
         icon: EyeIcon,
-        color: 'text-orange-600',
+        color: 'text-warning',
         trend: historicalData.map(d => d.pageViews),
       },
     ];
@@ -215,14 +215,14 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
           title: 'System Load',
           value: `${(realTimeData.systemLoad * 100).toFixed(1)}%`,
           icon: SignalIcon,
-          color: realTimeData.systemLoad > 0.8 ? 'text-red-600' : 'text-green-600',
+          color: realTimeData.systemLoad > 0.8 ? 'text-destructive' : 'text-success',
         },
         {
           id: 'response-time',
           title: 'Response Time',
           value: `${realTimeData.responseTime}ms`,
           icon: ClockIcon,
-          color: realTimeData.responseTime > 1000 ? 'text-red-600' : 'text-green-600',
+          color: realTimeData.responseTime > 1000 ? 'text-destructive' : 'text-success',
         }
       );
     }
@@ -246,9 +246,9 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h2 className="text-lg font-medium text-foreground">Real-time Metrics</h2>
-            <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-600' : 'text-red-600'
+            <div className={`flex items-center space-x-2 ${isConnected ? 'text-success' : 'text-destructive'
               }`}>
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success' : 'bg-destructive'
                 } ${isConnected ? 'animate-pulse' : ''}`} />
               <span className="text-sm font-medium">
                 {isConnected ? 'Connected' : 'Disconnected'}
@@ -281,7 +281,7 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
             <button
               onClick={handlePauseToggle}
               className={`inline-flex items-center px-3 py-2 border border-input rounded-md text-sm font-medium ${isPaused
-                  ? 'text-green-700 bg-green-50 hover:bg-green-100'
+                  ? 'text-success bg-success/10 hover:bg-success/20'
                   : 'text-foreground bg-card hover:bg-muted/50'
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring`}
             >
@@ -301,8 +301,8 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         </div>
 
         {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
       </div>
@@ -318,8 +318,8 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
                   {metric.value}
                 </p>
                 {metric.change && (
-                  <p className={`text-sm ${metric.changeType === 'increase' ? 'text-green-600' :
-                      metric.changeType === 'decrease' ? 'text-red-600' :
+                  <p className={`text-sm ${metric.changeType === 'increase' ? 'text-success' :
+                      metric.changeType === 'decrease' ? 'text-destructive' :
                         'text-muted-foreground'
                     }`}>
                     {metric.change}
