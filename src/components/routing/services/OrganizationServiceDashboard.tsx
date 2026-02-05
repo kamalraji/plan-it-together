@@ -171,8 +171,8 @@ export const OrganizationServiceDashboard: React.FC = () => {
               description: 'Track growth, engagement, and performance metrics',
               icon: BarChart3,
               path: getOrgPath('/analytics'),
-              gradient: 'from-emerald-500/10 to-teal-500/10',
-              iconBg: 'bg-emerald-500/10 text-emerald-600'
+              gradient: 'from-success/10 to-secondary/10',
+              iconBg: 'bg-success/10 text-success'
             },
           ].map((action) => (
             <Link

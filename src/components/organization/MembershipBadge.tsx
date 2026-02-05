@@ -42,8 +42,8 @@ export const MembershipBadge: React.FC<MembershipBadgeProps> = ({ role, status, 
   };
 
   const statusClasses: Record<MembershipStatus, string> = {
-    ACTIVE: 'bg-emerald-100 text-emerald-800',
-    PENDING: 'bg-warning/20 text-amber-800',
+    ACTIVE: 'bg-success/20 text-success',
+    PENDING: 'bg-warning/20 text-warning',
     REJECTED: 'bg-destructive/10 text-destructive',
     REMOVED: 'bg-muted text-muted-foreground',
     UNKNOWN: 'bg-muted text-muted-foreground',

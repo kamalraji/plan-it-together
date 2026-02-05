@@ -68,27 +68,27 @@ interface Booking {
 const STATUS_CONFIG: Record<string, { label: string; variant: string; icon: React.ReactNode }> = {
   PENDING: { 
     label: 'Pending', 
-    variant: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+    variant: 'bg-warning/20 text-warning',
     icon: <Clock className="h-3 w-3" />
   },
   REVIEWING: { 
     label: 'Under Review', 
-    variant: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    variant: 'bg-info/20 text-info',
     icon: <FileText className="h-3 w-3" />
   },
   QUOTE_SENT: { 
     label: 'Quote Received', 
-    variant: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+    variant: 'bg-primary/20 text-primary',
     icon: <DollarSign className="h-3 w-3" />
   },
   ACCEPTED: { 
     label: 'Accepted', 
-    variant: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+    variant: 'bg-success/20 text-success',
     icon: <CheckCircle className="h-3 w-3" />
   },
   DECLINED: { 
     label: 'Declined', 
-    variant: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    variant: 'bg-destructive/20 text-destructive',
     icon: <XCircle className="h-3 w-3" />
   },
   COMPLETED: { 
@@ -287,7 +287,7 @@ const OrganizerBookingsManager: React.FC = () => {
                           )}
                           {booking.quoted_price && (
                             <div className="flex items-center gap-2 text-foreground font-medium">
-                              <DollarSign className="h-4 w-4 text-emerald-600" />
+                              <DollarSign className="h-4 w-4 text-success" />
                               <span>Quote: ₹{booking.quoted_price.toLocaleString()}</span>
                             </div>
                           )}
@@ -312,7 +312,7 @@ const OrganizerBookingsManager: React.FC = () => {
                         {booking.status === 'QUOTE_SENT' && (
                           <Button
                             size="sm"
-                            className="bg-emerald-600 hover:bg-emerald-700"
+                            className="bg-success hover:bg-success/90"
                             onClick={() => {
                               setSelectedBooking(booking);
                               handleAcceptQuote();
@@ -438,7 +438,7 @@ const OrganizerBookingsManager: React.FC = () => {
                   {selectedBooking.quoted_price && (
                     <div>
                       <p className="text-muted-foreground">Vendor's Quote</p>
-                      <p className="font-medium text-emerald-600 text-lg">
+                      <p className="font-medium text-success text-lg">
                         ₹{selectedBooking.quoted_price.toLocaleString()}
                       </p>
                     </div>
@@ -474,12 +474,12 @@ const OrganizerBookingsManager: React.FC = () => {
 
               {/* Quote Received Alert */}
               {selectedBooking.status === 'QUOTE_SENT' && (
-                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg">
                   <div className="flex items-start gap-3">
                     <DollarSign className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-purple-800 dark:text-purple-300">Quote Received</p>
-                      <p className="text-sm text-purple-700 dark:text-purple-400">
+                      <p className="font-medium text-primary">Quote Received</p>
+                      <p className="text-sm text-primary/80">
                         The vendor has sent you a quote of ₹{selectedBooking.quoted_price?.toLocaleString()}. 
                         Accept to confirm the booking.
                       </p>
@@ -493,7 +493,7 @@ const OrganizerBookingsManager: React.FC = () => {
           <DialogFooter className="gap-2">
             {selectedBooking?.status === 'QUOTE_SENT' && (
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="bg-success hover:bg-success/90"
                 onClick={handleAcceptQuote}
                 disabled={acceptQuoteMutation.isPending}
               >
@@ -504,7 +504,7 @@ const OrganizerBookingsManager: React.FC = () => {
             {['PENDING', 'REVIEWING', 'QUOTE_SENT'].includes(selectedBooking?.status || '') && (
               <Button
                 variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-destructive border-destructive/30 hover:bg-destructive/10"
                 onClick={handleCancelBooking}
                 disabled={cancelMutation.isPending}
               >

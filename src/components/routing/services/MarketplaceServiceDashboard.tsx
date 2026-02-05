@@ -106,11 +106,11 @@ export const MarketplaceServiceDashboard: React.FC = () => {
       case 'CONFIRMED':
         return 'bg-success/20 text-success';
       case 'QUOTE_SENT':
-        return 'bg-info/20 text-blue-800';
+        return 'bg-info/20 text-info';
       case 'IN_PROGRESS':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-primary/20 text-primary';
       case 'PENDING':
-        return 'bg-warning/20 text-yellow-800';
+        return 'bg-warning/20 text-warning';
       default:
         return 'bg-muted text-foreground';
     }

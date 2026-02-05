@@ -162,9 +162,9 @@ export const WorkspaceListPage: React.FC = () => {
       case WorkspaceStatus.ACTIVE:
         return 'bg-success/20 text-success';
       case WorkspaceStatus.PROVISIONING:
-        return 'bg-warning/20 text-yellow-800';
+        return 'bg-warning/20 text-warning';
       case WorkspaceStatus.WINDING_DOWN:
-        return 'bg-info/20 text-blue-800';
+        return 'bg-info/20 text-info';
       case WorkspaceStatus.DISSOLVED:
         return 'bg-muted text-foreground';
       default:
@@ -503,7 +503,7 @@ export const WorkspaceListPage: React.FC = () => {
 
         {/* Bulk Actions */}
         {selectedWorkspaces.length > 0 && (
-          <div className="bg-info/10 border border-blue-200 rounded-lg p-4 mt-4">
+          <div className="bg-info/10 border border-info/30 rounded-lg p-4 mt-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-info">
                 {selectedWorkspaces.length} workspace{selectedWorkspaces.length !== 1 ? 's' : ''} selected
@@ -530,7 +530,7 @@ export const WorkspaceListPage: React.FC = () => {
                         setSelectedWorkspaces([]);
                       }
                     }}
-                    className="px-3 py-1 text-sm font-medium text-blue-700 bg-card border border-blue-300 rounded-md hover:bg-blue-50"
+                    className="px-3 py-1 text-sm font-medium text-info bg-card border border-info/40 rounded-md hover:bg-info/10"
                   >
                     {action.label}
                   </button>

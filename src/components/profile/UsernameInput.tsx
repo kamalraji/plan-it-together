@@ -155,7 +155,7 @@ export const UsernameInput: React.FC<UsernameInputProps> = ({
       
       {/* Rate limit warning */}
       {!canChange && currentUsername && (
-        <div className="flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 px-2 py-1.5 rounded-md">
+        <div className="flex items-center gap-1.5 text-xs text-warning bg-warning/10 px-2 py-1.5 rounded-md">
           <Info className="h-3 w-3 shrink-0" />
           <span>
             Username can be changed again in {daysRemaining} day{daysRemaining !== 1 ? 's' : ''}

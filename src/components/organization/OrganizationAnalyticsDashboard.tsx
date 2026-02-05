@@ -54,7 +54,7 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
     { title: 'Total Events', value: events?.length || 0, icon: CalendarIcon, color: 'text-info' },
     { title: 'Total Participants', value: analytics?.totalRegistrations || 0, icon: UsersIcon, color: 'text-success' },
     { title: 'Active Events', value: events?.filter((e: any) => e.status === 'PUBLISHED').length || 0, icon: TrophyIcon, color: 'text-primary' },
-    { title: 'Completed', value: events?.filter((e: any) => e.status === 'COMPLETED').length || 0, icon: CheckCircleIcon, color: 'text-orange-600' },
+    { title: 'Completed', value: events?.filter((e: any) => e.status === 'COMPLETED').length || 0, icon: CheckCircleIcon, color: 'text-warning' },
   ];
 
   return (
@@ -132,13 +132,13 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                 <div className="bg-card rounded-lg border border-border p-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-success/20 text-success flex items-center justify-center text-sm font-semibold">
                         AC
                       </div>
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-muted-foreground">Active Events</p>
-                      <p className="text-2xl font-bold text-emerald-500">{eventMetrics.activeEvents}</p>
+                      <p className="text-2xl font-bold text-success">{eventMetrics.activeEvents}</p>
                     </div>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                 <div className="bg-card rounded-lg border border-border p-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-warning/20 text-amber-700 flex items-center justify-center text-sm font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-warning/20 text-warning flex items-center justify-center text-sm font-semibold">
                         DR
                       </div>
                     </div>
@@ -174,7 +174,7 @@ export const OrganizationAnalyticsDashboard: React.FC<OrganizationAnalyticsDashb
                 <div className="bg-card rounded-lg border border-border p-4">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-sm font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-semibold">
                         UP
                       </div>
                     </div>

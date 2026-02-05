@@ -41,11 +41,11 @@ interface WorkspaceCardProps {
 const getStatusStyles = (status: WorkspaceStatus) => {
   switch (status) {
     case WorkspaceStatus.ACTIVE:
-      return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
+      return 'bg-success/15 text-success border-success/30';
     case WorkspaceStatus.PROVISIONING:
-      return 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30';
+      return 'bg-warning/15 text-warning border-warning/30';
     case WorkspaceStatus.WINDING_DOWN:
-      return 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30';
+      return 'bg-destructive/15 text-destructive border-destructive/30';
     case WorkspaceStatus.ARCHIVED:
       return 'bg-muted text-muted-foreground border-border';
     default:
@@ -103,7 +103,7 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
                 </span>
               )}
               {workspace.isMember && !workspace.isOwner && (
-                <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/15 text-blue-600 dark:text-blue-400 rounded font-medium">
+                <span className="text-[9px] px-1.5 py-0.5 bg-info/15 text-info rounded font-medium">
                   Member
                 </span>
               )}

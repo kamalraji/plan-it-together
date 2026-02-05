@@ -20,7 +20,7 @@ const statusConfig = {
   draft: { icon: Edit3, label: 'Draft', color: 'text-muted-foreground', bgColor: 'bg-muted' },
   review: { icon: Eye, label: 'In Review', color: 'text-warning', bgColor: 'bg-warning/10' },
   in_review: { icon: Eye, label: 'In Review', color: 'text-warning', bgColor: 'bg-warning/10' },
-  approved: { icon: CheckCircle, label: 'Approved', color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
+  approved: { icon: CheckCircle, label: 'Approved', color: 'text-success', bgColor: 'bg-success/10' },
   published: { icon: Send, label: 'Published', color: 'text-info', bgColor: 'bg-info/10' },
 };
 

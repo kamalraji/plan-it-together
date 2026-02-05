@@ -298,7 +298,7 @@ export const PerformanceWarnings: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-4 right-4 bg-warning/10 border border-yellow-200 rounded-md p-4 max-w-sm z-50">
+    <div className="fixed top-4 right-4 bg-warning/10 border border-warning/30 rounded-md p-4 max-w-sm z-50">
       <div className="flex">
         <div className="flex-shrink-0">
           <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -306,7 +306,7 @@ export const PerformanceWarnings: React.FC = () => {
           </svg>
         </div>
         <div className="ml-3">
-          <h3 className="text-sm font-medium text-yellow-800">Performance Warnings</h3>
+          <h3 className="text-sm font-medium text-warning">Performance Warnings</h3>
           <div className="mt-2 text-sm text-warning">
             <ul className="list-disc list-inside space-y-1">
               {warnings.map((warning, index) => (

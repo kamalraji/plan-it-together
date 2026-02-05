@@ -298,8 +298,8 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner': return 'bg-success/20 text-success';
-      case 'intermediate': return 'bg-warning/20 text-yellow-800';
-      case 'advanced': return 'bg-destructive/20 text-red-800';
+      case 'intermediate': return 'bg-warning/20 text-warning';
+      case 'advanced': return 'bg-destructive/20 text-destructive';
       default: return 'bg-muted text-foreground';
     }
   };
@@ -346,8 +346,8 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
             <p className="text-muted-foreground text-sm mb-4">{step.content}</p>
             
             {step.hints && step.hints.length > 0 && (
-              <div className="bg-info/10 border border-blue-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-blue-800 font-medium mb-1">💡 Hints:</p>
+              <div className="bg-info/10 border border-info/30 rounded-lg p-3 mb-4">
+                <p className="text-sm text-info font-medium mb-1">💡 Hints:</p>
                 <ul className="text-sm text-info space-y-1">
                   {step.hints.map((hint, index) => (
                     <li key={index}>• {hint}</li>
@@ -529,7 +529,7 @@ export const InteractiveTutorials: React.FC<InteractiveTutorialsProps> = ({
 
                     <button
                       onClick={() => startTutorial(tutorial)}
-                      className="ml-4 flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                      className="ml-4 flex items-center px-4 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:bg-primary/90"
                     >
                       <Play className="w-4 h-4 mr-2" />
                       {tutorialProgress?.completed ? 'Restart' : tutorialProgress ? 'Continue' : 'Start'}

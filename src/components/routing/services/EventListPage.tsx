@@ -145,9 +145,9 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
 
   const getStatusBadge = (status: EventStatus) => {
     const statusConfig = {
-      [EventStatus.DRAFT]: { color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400', label: 'Draft' },
-      [EventStatus.PUBLISHED]: { color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400', label: 'Published' },
-      [EventStatus.ONGOING]: { color: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400', label: 'Ongoing' },
+      [EventStatus.DRAFT]: { color: 'bg-warning/20 text-warning', label: 'Draft' },
+      [EventStatus.PUBLISHED]: { color: 'bg-success/20 text-success', label: 'Published' },
+      [EventStatus.ONGOING]: { color: 'bg-info/20 text-info', label: 'Ongoing' },
       [EventStatus.COMPLETED]: { color: 'bg-muted text-muted-foreground', label: 'Completed' },
       [EventStatus.CANCELLED]: { color: 'bg-destructive/10 text-destructive', label: 'Cancelled' },
     };

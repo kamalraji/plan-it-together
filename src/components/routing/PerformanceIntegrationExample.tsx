@@ -100,8 +100,8 @@ export const PerformanceIntegrationExample: React.FC = () => {
       render: (value: string) => (
         <span className={`px-2 py-1 text-xs rounded-full ${
           value === 'active' ? 'bg-success/20 text-success' :
-          value === 'inactive' ? 'bg-destructive/20 text-red-800' :
-          'bg-warning/20 text-yellow-800'
+          value === 'inactive' ? 'bg-destructive/20 text-destructive' :
+          'bg-warning/20 text-warning'
         }`}>
           {value}
         </span>
@@ -164,7 +164,7 @@ export const PerformanceIntegrationExample: React.FC = () => {
           </LoadingButton>
           <button
             onClick={handleError}
-            className="w-full px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className="w-full px-3 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90"
           >
             Simulate Error
           </button>
@@ -207,8 +207,8 @@ export const PerformanceIntegrationExample: React.FC = () => {
                   <div className="text-right">
                     <div className={`px-2 py-1 text-xs rounded-full ${
                       item.status === 'active' ? 'bg-success/20 text-success' :
-                      item.status === 'inactive' ? 'bg-destructive/20 text-red-800' :
-                      'bg-warning/20 text-yellow-800'
+                      item.status === 'inactive' ? 'bg-destructive/20 text-destructive' :
+                      'bg-warning/20 text-warning'
                     }`}>
                       {item.status}
                     </div>

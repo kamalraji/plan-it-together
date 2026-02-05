@@ -174,7 +174,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
         );
       case 'PENDING':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/20 text-yellow-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/20 text-warning">
             Pending Verification
           </span>
         );
@@ -186,13 +186,13 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'COLLEGE':
-        return 'bg-info/20 text-blue-800';
+        return 'bg-info/20 text-info';
       case 'COMPANY':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-primary/20 text-primary';
       case 'INDUSTRY':
         return 'bg-success/20 text-success';
       case 'NON_PROFIT':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-warning/20 text-warning';
       default:
         return 'bg-muted text-foreground';
     }
@@ -238,7 +238,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
     <div className="min-h-screen bg-muted/50">
       {/* Banner Section */}
       <div 
-        className="h-64 bg-gradient-to-r from-blue-600 to-purple-600 relative"
+        className="h-64 bg-gradient-to-r from-info to-primary relative"
         style={{
           backgroundImage: organization.branding?.bannerUrl ? `url(${organization.branding.bannerUrl})` : undefined,
           backgroundSize: 'cover',
@@ -303,7 +303,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                         className={`px-6 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
                           isFollowing
                             ? 'bg-muted text-foreground hover:bg-muted focus:ring-ring'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-ring'
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring'
                         }`}
                       >
                         {followMutation.isPending ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
@@ -415,7 +415,7 @@ const OrganizationPage: React.FC<OrganizationPageProps> = ({
                           <div className="ml-6">
                             <a
                               href={`/events/${event.id}`}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus-visible:ring-ring"
+                              className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus-visible:ring-ring"
                             >
                               View Event
                             </a>

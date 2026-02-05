@@ -50,7 +50,7 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
   const getStatusBadge = (status: EventBriefing['status']) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />Completed</Badge>;
+        return <Badge className="bg-success/20 text-success border-success/30"><CheckCircle2 className="h-3 w-3 mr-1" />Completed</Badge>;
       case 'in_progress':
         return <Badge className="bg-info/20 text-info border-info/30"><PlayCircle className="h-3 w-3 mr-1" />In Progress</Badge>;
       case 'delayed':
@@ -119,7 +119,7 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
         <Card className="bg-card/50 border-border/50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-500">{completedCount}</div>
+              <div className="text-3xl font-bold text-success">{completedCount}</div>
               <p className="text-sm text-muted-foreground">Completed</p>
             </div>
           </CardContent>
@@ -156,7 +156,7 @@ export function EventBriefingTab({ workspace }: EventBriefingTabProps) {
 
                     {/* Timeline connector */}
                     <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full ${item.status === 'completed' ? 'bg-emerald-500' : item.status === 'in_progress' ? 'bg-info' : 'bg-muted-foreground'}`} />
+                      <div className={`w-3 h-3 rounded-full ${item.status === 'completed' ? 'bg-success' : item.status === 'in_progress' ? 'bg-info' : 'bg-muted-foreground'}`} />
                       {index < briefings.length - 1 && <div className="w-0.5 flex-1 bg-border mt-1" />}
                     </div>
 
